@@ -8,9 +8,14 @@
   const TABLES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const FACTORS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const OPERATIONS = ["multiply", "divide", "mix"];
+  const TOPICS = ["times", "add", "subtract", "mix"];
+  const DIFFICULTIES = ["2-digit", "3-digit", "thousands"];
+  const MIX_OPERATIONS = ["add", "subtract", "multiply", "divide"];
   const DEFAULT_SETTINGS = {
     tables: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+    topic: "times",
     operation: "multiply",
+    difficulty: "3-digit",
     timerSeconds: 0,
     questionCount: 20,
   };
@@ -29,6 +34,14 @@
     return OPERATIONS.includes(operation) ? operation : "multiply";
   }
 
+  function normalizeTopic(topic) {
+    return TOPICS.includes(topic) ? topic : "times";
+  }
+
+  function normalizeDifficulty(difficulty) {
+    return DIFFICULTIES.includes(difficulty) ? difficulty : "3-digit";
+  }
+
   function normalizeSettings(raw) {
     const source = raw && typeof raw === "object" ? raw : {};
     const tables = uniqueSortedNumbers(source.tables || DEFAULT_SETTINGS.tables);
@@ -41,13 +54,151 @@
 
     return {
       tables: tables.length ? tables : DEFAULT_SETTINGS.tables.slice(),
+      topic: normalizeTopic(source.topic),
       operation: normalizeOperation(source.operation),
+      difficulty: normalizeDifficulty(source.difficulty),
       timerSeconds,
       questionCount,
     };
   }
 
-  function pickOperation(operation, rng) {
+  function randomInt(min, max, rng) {
+    return min + Math.floor(rng() * (max - min + 1));
+  }
+
+  function pickItem(items, rng) {
+    return items[Math.floor(rng() * items.length)];
+  }
+
+  function needsRegroupAdd(left, right) {
+    let a = left;
+    let b = right;
+    while (a > 0 || b > 0) {
+      if (a % 10 + (b % 10) >= 10) {
+        return true;
+      }
+      a = Math.floor(a / 10);
+      b = Math.floor(b / 10);
+    }
+    return false;
+  }
+
+  function needsRegroupSubtract(left, right) {
+    let a = left;
+    let b = right;
+    while (a > 0 || b > 0) {
+      if (a % 10 < b % 10) {
+        return true;
+      }
+      a = Math.floor(a / 10);
+      b = Math.floor(b / 10);
+    }
+    return false;
+  }
+
+  function generateAddPair(difficulty, rng) {
+    const resolved = normalizeDifficulty(difficulty);
+    let pair = { left: 10, right: 10 };
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      if (resolved === "2-digit") {
+        pair = {
+          left: randomInt(10, 99, rng),
+          right: randomInt(10, 99, rng),
+        };
+      } else if (resolved === "3-digit") {
+        pair = {
+          left: randomInt(100, 999, rng),
+          right: rng() < 0.45 ? randomInt(10, 99, rng) : randomInt(100, 999, rng),
+        };
+      } else {
+        const rightKind = rng();
+        let right;
+        if (rightKind < 0.25) {
+          right = randomInt(10, 99, rng);
+        } else if (rightKind < 0.6) {
+          right = randomInt(100, 999, rng);
+        } else {
+          right = randomInt(1000, 9999, rng);
+        }
+        pair = {
+          left: randomInt(1000, 9999, rng),
+          right,
+        };
+      }
+      if (needsRegroupAdd(pair.left, pair.right) || attempt === 7) {
+        return pair;
+      }
+    }
+    return pair;
+  }
+
+  function generateSubtractPair(difficulty, rng) {
+    const resolved = normalizeDifficulty(difficulty);
+    let pair = { left: 10, right: 1 };
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      if (resolved === "2-digit") {
+        const left = randomInt(10, 99, rng);
+        pair = {
+          left,
+          right: randomInt(1, left, rng),
+        };
+      } else if (resolved === "3-digit") {
+        const left = randomInt(100, 999, rng);
+        const useTwoDigit = rng() < 0.4 || left < 200;
+        pair = {
+          left,
+          right: useTwoDigit ? randomInt(10, 99, rng) : randomInt(100, left, rng),
+        };
+      } else {
+        const left = randomInt(1000, 9999, rng);
+        const kind = rng();
+        let right;
+        if (kind < 0.25) {
+          right = randomInt(10, 99, rng);
+        } else if (kind < 0.7) {
+          right = randomInt(100, Math.min(999, left), rng);
+        } else {
+          right = randomInt(100, left, rng);
+        }
+        pair = { left, right };
+      }
+      if (pair.left < pair.right) {
+        pair = { left: pair.right, right: pair.left };
+      }
+      if (needsRegroupSubtract(pair.left, pair.right) || attempt === 7) {
+        return pair;
+      }
+    }
+    return pair;
+  }
+
+  function makeAddQuestion(left, right) {
+    return {
+      left,
+      right,
+      answer: left + right,
+      operation: "add",
+      symbol: "+",
+      prompt: `${left} + ${right}`,
+      fact: `${left} + ${right}`,
+    };
+  }
+
+  function makeSubtractQuestion(left, right) {
+    const minuend = Math.max(left, right);
+    const subtrahend = Math.min(left, right);
+    return {
+      left: minuend,
+      right: subtrahend,
+      answer: minuend - subtrahend,
+      operation: "subtract",
+      symbol: "−",
+      prompt: `${minuend} − ${subtrahend}`,
+      fact: `${minuend} − ${subtrahend}`,
+    };
+  }
+
+  function pickTimesOperation(operation, rng) {
     if (operation !== "mix") {
       return operation;
     }
@@ -59,7 +210,7 @@
   }
 
   function makeQuestion(table, factor, operation, rng) {
-    const resolved = pickOperation(normalizeOperation(operation), rng || Math.random);
+    const resolved = pickTimesOperation(normalizeOperation(operation), rng || Math.random);
     if (resolved === "divide") {
       return {
         left: table * factor,
@@ -105,9 +256,60 @@
     return next;
   }
 
-  function buildRound(settings, rng) {
-    const normalized = normalizeSettings(settings);
+  function makeArithmeticQuestion(operation, difficulty, rng) {
     const random = rng || Math.random;
+    if (operation === "subtract") {
+      const pair = generateSubtractPair(difficulty, random);
+      return makeSubtractQuestion(pair.left, pair.right);
+    }
+    const pair = generateAddPair(difficulty, random);
+    return makeAddQuestion(pair.left, pair.right);
+  }
+
+  function pickMixOperation(rng) {
+    return MIX_OPERATIONS[Math.floor(rng() * MIX_OPERATIONS.length)];
+  }
+
+  function makeTopicQuestion(settings, rng) {
+    const topic = normalizeTopic(settings.topic);
+    if (topic === "add") {
+      return makeArithmeticQuestion("add", settings.difficulty, rng);
+    }
+    if (topic === "subtract") {
+      return makeArithmeticQuestion("subtract", settings.difficulty, rng);
+    }
+    if (topic === "mix") {
+      const mixed = pickMixOperation(rng);
+      if (mixed === "add" || mixed === "subtract") {
+        return makeArithmeticQuestion(mixed, settings.difficulty, rng);
+      }
+      const pairs = allPairs(settings.tables);
+      const pair = pairs.length ? pickItem(pairs, rng) : { table: 2, factor: 2 };
+      return makeQuestion(pair.table, pair.factor, mixed, rng);
+    }
+    const pairs = allPairs(settings.tables);
+    const pair = pairs.length ? pickItem(pairs, rng) : { table: 2, factor: 2 };
+    return makeQuestion(pair.table, pair.factor, settings.operation, rng);
+  }
+
+    function fillDeck(makeNext, count) {
+    const deck = [];
+    let lastKey = "";
+    let skips = 0;
+    while (deck.length < count) {
+      const question = makeNext();
+      if (questionKey(question) === lastKey && skips < 4) {
+        skips += 1;
+        continue;
+      }
+      skips = 0;
+      deck.push(question);
+      lastKey = questionKey(question);
+    }
+    return deck;
+  }
+
+  function buildTimesRound(normalized, rng) {
     const pairs = allPairs(normalized.tables);
     if (!pairs.length) {
       throw new Error("Choose at least one times table.");
@@ -120,10 +322,10 @@
 
     while (deck.length < count) {
       if (!pool.length) {
-        pool = shuffle(pairs, random);
+        pool = shuffle(pairs, rng);
       }
       const next = pool.shift();
-      const question = makeQuestion(next.table, next.factor, normalized.operation, random);
+      const question = makeQuestion(next.table, next.factor, normalized.operation, rng);
       if (questionKey(question) === lastKey && pool.length > 0) {
         pool.push(next);
         continue;
@@ -132,6 +334,63 @@
       lastKey = questionKey(question);
     }
 
+    return {
+      settings: normalized,
+      questions: deck,
+    };
+  }
+
+  function buildArithmeticRound(normalized, rng) {
+    const count = normalized.timerSeconds > 0 ? 80 : normalized.questionCount;
+    const operation = normalized.topic === "subtract" ? "subtract" : "add";
+    return {
+      settings: normalized,
+      questions: fillDeck(
+        () => makeArithmeticQuestion(operation, normalized.difficulty, rng),
+        count,
+      ),
+    };
+  }
+
+  function buildMixRound(normalized, rng) {
+    const pairs = allPairs(normalized.tables);
+    if (!pairs.length) {
+      throw new Error("Choose at least one times table.");
+    }
+    const count = normalized.timerSeconds > 0 ? 80 : normalized.questionCount;
+    return {
+      settings: normalized,
+      questions: fillDeck(() => makeTopicQuestion(normalized, rng), count),
+    };
+  }
+
+  function buildRound(settings, rng) {
+    const normalized = normalizeSettings(settings);
+    const random = rng || Math.random;
+    if (normalized.topic === "add" || normalized.topic === "subtract") {
+      return buildArithmeticRound(normalized, random);
+    }
+    if (normalized.topic === "mix") {
+      return buildMixRound(normalized, random);
+    }
+    return buildTimesRound(normalized, random);
+  }
+
+  function buildReplayRound(questions, settings, rng) {
+    const normalized = normalizeSettings(settings);
+    const random = rng || Math.random;
+    const source = (questions || []).filter((question) => question && question.prompt);
+    if (!source.length) {
+      return buildRound(normalized, random);
+    }
+    const count = normalized.timerSeconds > 0 ? source.length : normalized.questionCount;
+    let pool = [];
+    const deck = fillDeck(() => {
+      if (!pool.length) {
+        pool = shuffle(source, random);
+      }
+      return pool.shift();
+    }, count);
     return {
       settings: normalized,
       questions: deck,
@@ -200,19 +459,67 @@
     return `${minutes}:${seconds}`;
   }
 
+  function subtitleFor(settings) {
+    const normalized = normalizeSettings(settings);
+    if (normalized.topic === "add") {
+      return "Addition practice";
+    }
+    if (normalized.topic === "subtract") {
+      return "Subtraction practice";
+    }
+    if (normalized.topic === "mix") {
+      return "A mix of + − × ÷";
+    }
+    if (normalized.operation === "divide") {
+      return "Division practice";
+    }
+    if (normalized.operation === "mix") {
+      return "Times tables practice";
+    }
+    return "Multiplication practice";
+  }
+
+  function markFor(settings) {
+    const normalized = normalizeSettings(settings);
+    if (normalized.topic === "add") {
+      return "+";
+    }
+    if (normalized.topic === "subtract") {
+      return "−";
+    }
+    if (normalized.topic === "mix") {
+      return "+×";
+    }
+    return "×÷";
+  }
+
+  function usesWorkspace(settings) {
+    const topic = normalizeSettings(settings).topic;
+    return topic === "add" || topic === "subtract" || topic === "mix";
+  }
+
   return {
     TABLES,
     FACTORS,
     OPERATIONS,
+    TOPICS,
+    DIFFICULTIES,
     DEFAULT_SETTINGS,
     normalizeSettings,
     makeQuestion,
+    makeAddQuestion,
+    makeSubtractQuestion,
+    makeArithmeticQuestion,
     buildRound,
+    buildReplayRound,
     nextQuestion,
     gradeAnswer,
     summarize,
     headlineFor,
     formatClock,
     questionKey,
+    subtitleFor,
+    markFor,
+    usesWorkspace,
   };
 });

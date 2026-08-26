@@ -68,5 +68,132 @@ test("normalizeSettings falls back to a playable default", () => {
   const settings = engine.normalizeSettings({ tables: ["nope"], operation: "add", timerSeconds: 12 });
   assert.ok(settings.tables.length > 0);
   assert.equal(settings.operation, "multiply");
+  assert.equal(settings.topic, "times");
+  assert.equal(settings.difficulty, "3-digit");
   assert.equal(settings.timerSeconds, 0);
+});
+
+function cyclingRng() {
+  return rngFrom([0.01, 0.18, 0.33, 0.47, 0.61, 0.74, 0.88, 0.96, 0.09, 0.22, 0.41, 0.55, 0.69, 0.83, 0.12]);
+}
+
+test("add questions are multi-digit, not facts within 20", () => {
+  const round = engine.buildRound(
+    { topic: "add", difficulty: "2-digit", timerSeconds: 0, questionCount: 24 },
+    cyclingRng(),
+  );
+  assert.equal(round.questions.length, 24);
+  for (const question of round.questions) {
+    assert.equal(question.operation, "add");
+    assert.ok(question.left >= 10 && question.left <= 99);
+    assert.ok(question.right >= 10 && question.right <= 99);
+    assert.equal(question.answer, question.left + question.right);
+    assert.ok(question.answer >= 20);
+  }
+});
+
+test("3-digit add uses a number in the hundreds", () => {
+  const round = engine.buildRound(
+    { topic: "add", difficulty: "3-digit", timerSeconds: 0, questionCount: 20 },
+    cyclingRng(),
+  );
+  for (const question of round.questions) {
+    assert.equal(question.operation, "add");
+    assert.ok(Math.max(question.left, question.right) >= 100);
+    assert.ok(Math.max(question.left, question.right) <= 999);
+    assert.equal(question.answer, question.left + question.right);
+  }
+});
+
+test("thousands add includes a number in the thousands", () => {
+  const round = engine.buildRound(
+    { topic: "add", difficulty: "thousands", timerSeconds: 0, questionCount: 16 },
+    cyclingRng(),
+  );
+  for (const question of round.questions) {
+    assert.equal(question.operation, "add");
+    assert.ok(Math.max(question.left, question.right) >= 1000);
+    assert.ok(question.answer === question.left + question.right);
+  }
+});
+
+test("subtract answers stay non-negative", () => {
+  for (const difficulty of engine.DIFFICULTIES) {
+    const round = engine.buildRound(
+      { topic: "subtract", difficulty, timerSeconds: 0, questionCount: 20 },
+      cyclingRng(),
+    );
+    for (const question of round.questions) {
+      assert.equal(question.operation, "subtract");
+      assert.ok(question.left >= question.right);
+      assert.ok(question.answer >= 0);
+      assert.equal(question.answer, question.left - question.right);
+    }
+  }
+});
+
+test("mix includes add, subtract, multiply, and divide", () => {
+  const seen = new Set();
+  let tick = 0;
+  const round = engine.buildRound(
+    {
+      topic: "mix",
+      tables: [3, 7],
+      difficulty: "2-digit",
+      timerSeconds: 0,
+      questionCount: 48,
+    },
+    () => {
+      tick += 1;
+      return (tick % 97) / 97;
+    },
+  );
+  for (const question of round.questions) {
+    seen.add(question.operation);
+    if (question.operation === "multiply") {
+      assert.ok([3, 7].includes(question.left));
+    }
+    if (question.operation === "divide") {
+      assert.ok([3, 7].includes(question.right));
+    }
+    if (question.operation === "subtract") {
+      assert.ok(question.answer >= 0);
+    }
+  }
+  assert.deepEqual([...seen].sort(), ["add", "divide", "multiply", "subtract"]);
+});
+
+test("times tables still ignore add/sub topics when topic is times", () => {
+  const round = engine.buildRound(
+    { tables: [4], operation: "divide", topic: "times", timerSeconds: 0, questionCount: 8 },
+    rngFrom([0.2, 0.8, 0.1, 0.6]),
+  );
+  for (const question of round.questions) {
+    assert.equal(question.operation, "divide");
+    assert.equal(question.right, 4);
+  }
+});
+
+test("replay round repeats the missed questions", () => {
+  const missed = [
+    engine.makeAddQuestion(347, 86),
+    engine.makeSubtractQuestion(1205, 478),
+  ];
+  const round = engine.buildReplayRound(
+    missed,
+    { topic: "add", difficulty: "3-digit", timerSeconds: 0, questionCount: 6 },
+    rngFrom([0.2, 0.9, 0.1]),
+  );
+  assert.equal(round.questions.length, 6);
+  for (const question of round.questions) {
+    assert.ok(["347 + 86", "1205 − 478"].includes(question.prompt));
+  }
+});
+
+test("subtitle follows the chosen topic", () => {
+  assert.equal(engine.subtitleFor({ topic: "add" }), "Addition practice");
+  assert.equal(engine.subtitleFor({ topic: "subtract" }), "Subtraction practice");
+  assert.equal(engine.subtitleFor({ topic: "mix" }), "A mix of + − × ÷");
+  assert.equal(engine.subtitleFor({ topic: "times", operation: "multiply" }), "Multiplication practice");
+  assert.equal(engine.subtitleFor({ topic: "times", operation: "divide" }), "Division practice");
 });
