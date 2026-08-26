@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#243038" />
+    <meta
+      name="description"
+      content="Offline multiplication and division practice. Pick tables, go timed or untimed, and see your score."
+    />
+    <title>Times Tables</title>
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="masthead">
+        <div class="mark" aria-hidden="true">×÷</div>
+        <div>
+          <h1>Times Tables</h1>
+          <p>Multiplication practice</p>
+        </div>
+      </header>
+
+      <section id="screen-setup" class="card" aria-label="Choose practice">
+        <div class="section">
+          <div class="section-head">
+            <h2>Pick your tables</h2>
+            <div class="quiet-row">
+              <button type="button" class="btn btn-ghost" id="select-all">All</button>
+              <button type="button" class="btn btn-ghost" id="select-none">None</button>
+            </div>
+          </div>
+          <div id="table-grid" class="chip-grid"></div>
+        </div>
+
+        <fieldset class="section">
+          <legend>Operation</legend>
+          <div class="choice-row">
+            <label class="choice"><input type="radio" name="operation" value="multiply" checked /> Multiply</label>
+            <label class="choice"><input type="radio" name="operation" value="divide" /> Divide</label>
+            <label class="choice"><input type="radio" name="operation" value="mix" /> Mix</label>
+          </div>
+        </fieldset>
+
+        <fieldset class="section">
+          <legend>Timer</legend>
+          <div class="choice-row">
+            <label class="choice"><input type="radio" name="timer" value="0" checked /> Off</label>
+            <label class="choice"><input type="radio" name="timer" value="30" /> 30s</label>
+            <label class="choice"><input type="radio" name="timer" value="60" /> 60s</label>
+            <label class="choice"><input type="radio" name="timer" value="90" /> 90s</label>
+          </div>
+        </fieldset>
+
+        <fieldset class="section" id="count-fieldset">
+          <legend>Questions</legend>
+          <div class="choice-row">
+            <label class="choice"><input type="radio" name="count" value="10" /> 10</label>
+            <label class="choice"><input type="radio" name="count" value="20" checked /> 20</label>
+            <label class="choice"><input type="radio" name="count" value="30" /> 30</label>
+          </div>
+        </fieldset>
+
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="start-practice">Start</button>
+        </div>
+        <p id="setup-error" class="error" hidden></p>
+      </section>
+
+      <section id="screen-practice" class="card practice-card" aria-label="Practice" hidden>
+        <div class="hud">
+          <div>Score <strong id="score-correct">0</strong> / <strong id="score-asked">0</strong></div>
+          <div>Streak <strong id="streak">0</strong></div>
+          <div id="timer" hidden>00:00</div>
+          <div id="progress">1 / 20</div>
+        </div>
+        <p id="prompt" class="prompt" aria-live="polite">7 × 8 =</p>
+        <div id="answer-display" class="answer is-empty" aria-live="polite"> </div>
+        <p id="feedback" class="feedback">Type the answer</p>
+        <div id="keypad" class="keypad"></div>
+        <div class="actions">
+          <button type="button" class="btn" id="restart-round">Restart</button>
+          <button type="button" class="btn btn-ghost" id="change-tables">Change tables</button>
+        </div>
+      </section>
+
+      <section id="screen-results" class="card" aria-label="Results" hidden>
+        <h2 id="results-headline">Strong work</h2>
+        <p id="results-score" class="results-score">0 / 0</p>
+        <div class="results-meta">
+          <span id="results-accuracy">0% correct</span>
+          <span id="results-time">Time 00:00</span>
+        </div>
+        <h2>Missed facts</h2>
+        <ul id="missed-list" class="missed-list"></ul>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="play-again">Play again</button>
+          <button type="button" class="btn" id="practice-missed">Practice missed</button>
+          <button type="button" class="btn btn-ghost" id="results-change-tables">Change tables</button>
+        </div>
+      </section>
+    </main>
+    <script src="./js/practice.js"></script>
+    <script src="./js/app.js"></script>
+  </body>
+</html>
