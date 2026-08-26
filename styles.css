@@ -66,6 +66,7 @@ p {
   color: #fffdf8;
   font-size: 1.35rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .masthead h1 {

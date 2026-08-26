@@ -165,7 +165,8 @@
     if (timed) {
       els.progress.textContent = "Until the timer ends";
     } else {
-      els.progress.textContent = `${Math.min(state.asked + 1, state.settings.questionCount)} / ${state.settings.questionCount}`;
+      const current = state.locked ? state.asked : state.asked + 1;
+      els.progress.textContent = `${Math.min(current, state.settings.questionCount)} / ${state.settings.questionCount}`;
     }
   }
 
@@ -176,7 +177,7 @@
     setFeedback("Type the answer", "");
     els.prompt.textContent = `${question.prompt} =`;
     els.prompt.dataset.operation = question.operation;
-    document.getElementById("practice-card").dataset.state = "idle";
+    screens.practice.dataset.state = "idle";
     updateHud();
   }
 
@@ -265,11 +266,11 @@
     if (grade.ok) {
       state.streak += 1;
       setFeedback("Correct", "ok");
-      document.getElementById("practice-card").dataset.state = "ok";
+      screens.practice.dataset.state = "ok";
     } else {
       state.streak = 0;
       setFeedback(`Not quite — ${question.prompt} = ${question.answer}`, "bad");
-      document.getElementById("practice-card").dataset.state = "bad";
+      screens.practice.dataset.state = "bad";
     }
     updateHud();
 
