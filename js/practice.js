@@ -99,7 +99,7 @@
   function generateAddPair(difficulty, rng) {
     const resolved = normalizeDifficulty(difficulty);
     let pair = { left: 10, right: 10 };
-    for (let attempt = 0; attempt < 8; attempt += 1) {
+    for (let attempt = 0; attempt < 10; attempt += 1) {
       if (resolved === "2-digit") {
         pair = {
           left: randomInt(10, 99, rng),
@@ -108,24 +108,23 @@
       } else if (resolved === "3-digit") {
         pair = {
           left: randomInt(100, 999, rng),
-          right: rng() < 0.45 ? randomInt(10, 99, rng) : randomInt(100, 999, rng),
+          right: rng() < 0.28 ? randomInt(12, 99, rng) : randomInt(100, 999, rng),
         };
       } else {
-        const rightKind = rng();
+        const kind = rng();
+        let left = randomInt(1000, 9999, rng);
         let right;
-        if (rightKind < 0.25) {
-          right = randomInt(10, 99, rng);
-        } else if (rightKind < 0.6) {
+        if (kind < 0.12) {
+          left = randomInt(1, 9, rng) * 1000;
+          right = randomInt(100, 999, rng);
+        } else if (kind < 0.55) {
           right = randomInt(100, 999, rng);
         } else {
           right = randomInt(1000, 9999, rng);
         }
-        pair = {
-          left: randomInt(1000, 9999, rng),
-          right,
-        };
+        pair = { left, right };
       }
-      if (needsRegroupAdd(pair.left, pair.right) || attempt === 7) {
+      if (needsRegroupAdd(pair.left, pair.right) || attempt === 9) {
         return pair;
       }
     }
@@ -134,38 +133,38 @@
 
   function generateSubtractPair(difficulty, rng) {
     const resolved = normalizeDifficulty(difficulty);
-    let pair = { left: 10, right: 1 };
-    for (let attempt = 0; attempt < 8; attempt += 1) {
+    let pair = { left: 20, right: 10 };
+    for (let attempt = 0; attempt < 10; attempt += 1) {
       if (resolved === "2-digit") {
-        const left = randomInt(10, 99, rng);
+        const left = randomInt(20, 99, rng);
         pair = {
           left,
-          right: randomInt(1, left, rng),
+          right: randomInt(10, left, rng),
         };
       } else if (resolved === "3-digit") {
         const left = randomInt(100, 999, rng);
-        const useTwoDigit = rng() < 0.4 || left < 200;
+        const useTwoDigit = rng() < 0.22 || left < 200;
         pair = {
           left,
-          right: useTwoDigit ? randomInt(10, 99, rng) : randomInt(100, left, rng),
+          right: useTwoDigit ? randomInt(12, 99, rng) : randomInt(100, left, rng),
         };
       } else {
         const left = randomInt(1000, 9999, rng);
         const kind = rng();
         let right;
-        if (kind < 0.25) {
-          right = randomInt(10, 99, rng);
-        } else if (kind < 0.7) {
-          right = randomInt(100, Math.min(999, left), rng);
+        if (kind < 0.1) {
+          right = randomInt(12, 99, rng);
+        } else if (kind < 0.6) {
+          right = randomInt(100, 999, rng);
         } else {
-          right = randomInt(100, left, rng);
+          right = randomInt(1000, left, rng);
         }
         pair = { left, right };
       }
       if (pair.left < pair.right) {
         pair = { left: pair.right, right: pair.left };
       }
-      if (needsRegroupSubtract(pair.left, pair.right) || attempt === 7) {
+      if (needsRegroupSubtract(pair.left, pair.right) || attempt === 9) {
         return pair;
       }
     }

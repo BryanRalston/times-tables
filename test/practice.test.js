@@ -132,6 +132,32 @@ test("subtract answers stay non-negative", () => {
   }
 });
 
+test("2-digit subtract uses two 2-digit numbers", () => {
+  const round = engine.buildRound(
+    { topic: "subtract", difficulty: "2-digit", timerSeconds: 0, questionCount: 20 },
+    cyclingRng(),
+  );
+  for (const question of round.questions) {
+    assert.ok(question.left >= 20 && question.left <= 99);
+    assert.ok(question.right >= 10 && question.right <= question.left);
+  }
+});
+
+test("thousands subtract is mostly bigger than a 2-digit take-away", () => {
+  const round = engine.buildRound(
+    { topic: "subtract", difficulty: "thousands", timerSeconds: 0, questionCount: 24 },
+    cyclingRng(),
+  );
+  let chunky = 0;
+  for (const question of round.questions) {
+    assert.ok(question.left >= 1000);
+    if (question.right >= 100) {
+      chunky += 1;
+    }
+  }
+  assert.ok(chunky >= 16, `expected mostly 3+ digit subtrahends, got ${chunky}`);
+});
+
 test("mix includes add, subtract, multiply, and divide", () => {
   const seen = new Set();
   let tick = 0;
