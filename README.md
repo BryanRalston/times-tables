@@ -25,6 +25,7 @@ https://bryanralston.github.io/times-tables/
 - **Times tables:** 1–12, multiply, divide, or mix
 - **Add / Subtract:** 2-digit, 3-digit, or thousands, with optional scratch paper
 - **Mix (+ − × ÷):** add, subtract, multiply, and divide
+- **Find n:** a letter or box hides a number (`3 + n = 7`, `n × 4 = 20`)
 - **Shapes:** name the picture, count sides and corners, add the distance around (perimeter), and fill a rectangle (area)
 - Untimed rounds of 10, 20, or 30 questions
 - Optional 30 / 60 / 90 second timer
