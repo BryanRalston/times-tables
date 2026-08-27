@@ -220,6 +220,146 @@ test("subtitle follows the chosen topic", () => {
   assert.equal(engine.subtitleFor({ topic: "add" }), "Addition practice");
   assert.equal(engine.subtitleFor({ topic: "subtract" }), "Subtraction practice");
   assert.equal(engine.subtitleFor({ topic: "mix" }), "A mix of + − × ÷");
+  assert.equal(engine.subtitleFor({ topic: "shapes" }), "Shapes practice");
   assert.equal(engine.subtitleFor({ topic: "times", operation: "multiply" }), "Multiplication practice");
   assert.equal(engine.subtitleFor({ topic: "times", operation: "divide" }), "Division practice");
+});
+
+test("normalizeSettings keeps a shapes topic and focus", () => {
+  const settings = engine.normalizeSettings({ topic: "shapes", shapeFocus: "measure" });
+  assert.equal(settings.topic, "shapes");
+  assert.equal(settings.shapeFocus, "measure");
+  assert.equal(engine.normalizeSettings({ topic: "shapes", shapeFocus: "nope" }).shapeFocus, "mix");
+});
+
+test("shapes name questions are multiple choice and show a picture", () => {
+  const round = engine.buildRound(
+    { topic: "shapes", shapeFocus: "names", timerSeconds: 0, questionCount: 12 },
+    cyclingRng(),
+  );
+  const seen = new Set();
+  for (const question of round.questions) {
+    assert.equal(question.kind, "name");
+    assert.equal(question.answerKind, "choice");
+    assert.ok(engine.SHAPE_IDS.includes(question.shape));
+    if (question.shape === "square") {
+      assert.equal(question.figure.boxWidth, question.figure.boxHeight);
+    }
+    if (question.shape === "rectangle") {
+      assert.notEqual(question.figure.boxWidth, question.figure.boxHeight);
+    }
+    assert.equal(question.answer, question.shape === "lshape" ? "L shape" : question.shape);
+    assert.ok(question.figureSvg.includes("<svg"));
+    assert.ok(question.choices.some((choice) => choice.value === question.answer));
+    seen.add(question.shape);
+  }
+  assert.ok(seen.size >= 4);
+});
+
+test("circle has no straight sides and no corners", () => {
+  const sides = engine.makeShapeQuestion({ shapeFocus: "count" }, rngFrom([0.1, 0.9, 0.2]));
+  const corners = engine.makeShapeQuestion({ shapeFocus: "count" }, rngFrom([0.8, 0.9, 0.2]));
+  assert.equal(sides.shape, "circle");
+  assert.equal(sides.kind, "sides");
+  assert.equal(sides.answer, 0);
+  assert.match(sides.prompt, /straight sides/i);
+  assert.ok(sides.figureSvg.includes("circle"));
+  assert.equal(corners.shape, "circle");
+  assert.equal(corners.kind, "corners");
+  assert.equal(corners.answer, 0);
+  assert.ok(corners.figureSvg.includes("circle"));
+});
+
+test("sides and corners match the picture", () => {
+  const expected = {
+    triangle: { sides: 3, corners: 3 },
+    square: { sides: 4, corners: 4 },
+    rectangle: { sides: 4, corners: 4 },
+    pentagon: { sides: 5, corners: 5 },
+    hexagon: { sides: 6, corners: 6 },
+    circle: { sides: 0, corners: 0 },
+  };
+  const round = engine.buildRound(
+    { topic: "shapes", shapeFocus: "count", timerSeconds: 0, questionCount: 36 },
+    cyclingRng(),
+  );
+  for (const question of round.questions) {
+    assert.ok(question.kind === "sides" || question.kind === "corners");
+    assert.equal(question.answerKind, "number");
+    assert.equal(question.answer, expected[question.shape][question.kind]);
+    assert.ok(question.figureSvg.includes("<svg"));
+  }
+});
+
+test("rectangle and square perimeter add the labeled sides", () => {
+  const round = engine.buildRound(
+    { topic: "shapes", shapeFocus: "measure", timerSeconds: 0, questionCount: 40 },
+    cyclingRng(),
+  );
+  let perimeters = 0;
+  let areas = 0;
+  for (const question of round.questions) {
+    assert.ok(question.figureSvg.includes("<svg"));
+    if (question.kind === "perimeter") {
+      perimeters += 1;
+      const sum = question.figure.sideLengths.reduce((total, value) => total + value, 0);
+      assert.equal(question.answer, sum);
+      for (const value of question.figure.sideLengths) {
+        assert.ok(question.figureSvg.includes(`>${value}</text>`));
+      }
+      if (question.shape === "square") {
+        assert.equal(question.answer, 4 * question.figure.side);
+      }
+      if (question.shape === "rectangle") {
+        assert.equal(question.answer, 2 * (question.figure.length + question.figure.width));
+        assert.notEqual(question.figure.length, question.figure.width);
+      }
+    }
+    if (question.kind === "area") {
+      areas += 1;
+      assert.ok(question.shape === "square" || question.shape === "rectangle");
+      assert.equal(question.answer, question.figure.length * question.figure.width);
+      assert.ok(question.figure.showGrid);
+      assert.ok(question.figureSvg.includes("<rect"));
+    }
+  }
+  assert.ok(perimeters >= 8);
+  assert.ok(areas >= 4);
+});
+
+test("gradeAnswer accepts a shape name tap", () => {
+  const question = engine.makeShapeQuestion({ shapeFocus: "names" }, () => 0.1);
+  assert.equal(question.kind, "name");
+  assert.deepEqual(engine.gradeAnswer(question, question.answer), {
+    ok: true,
+    empty: false,
+    given: question.answer,
+  });
+  assert.equal(engine.gradeAnswer(question, "circle").ok, question.answer === "circle");
+  assert.equal(engine.gradeAnswer(question, "").empty, true);
+});
+
+test("mix stays numbers-only and times tables still work", () => {
+  const mix = engine.buildRound(
+    {
+      topic: "mix",
+      tables: [4],
+      difficulty: "2-digit",
+      timerSeconds: 0,
+      questionCount: 24,
+    },
+    cyclingRng(),
+  );
+  for (const question of mix.questions) {
+    assert.ok(["add", "subtract", "multiply", "divide"].includes(question.operation));
+    assert.notEqual(question.topic, "shapes");
+  }
+  const times = engine.buildRound(
+    { topic: "times", tables: [8], operation: "multiply", timerSeconds: 0, questionCount: 6 },
+    rngFrom([0.2, 0.8, 0.1, 0.6]),
+  );
+  for (const question of times.questions) {
+    assert.equal(question.operation, "multiply");
+    assert.equal(question.left, 8);
+  }
 });
