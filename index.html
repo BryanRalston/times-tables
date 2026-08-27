@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#243038" />
     <meta
       name="description"
-      content="Offline math practice for times tables, multi-digit add and subtract, and 3rd-grade shapes. Pick a topic, go timed or untimed, and see your score."
+      content="Offline math practice for times tables, multi-digit add and subtract, missing numbers, and 3rd-grade shapes. Pick a topic, go timed or untimed, and see your score."
     />
     <title>Times Tables</title>
     <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9IiMyNDMwMzgiLz48dGV4dCB4PSIzMiIgeT0iNDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjYiIGZvbnQtZmFtaWx5PSJUcmVidWNoZXQgTVMsIFNlZ29lIFVJLCBzYW5zLXNlcmlmIiBmaWxsPSIjZmZmZGY4Ij7Dl8O3PC90ZXh0Pjwvc3ZnPg==" />
@@ -456,6 +456,26 @@ fieldset.is-disabled {
   margin-bottom: 2px;
 }
 
+.prompt .blank {
+  display: inline-block;
+  min-width: 0.72em;
+  color: var(--sky);
+  border-bottom: 5px solid var(--sky);
+  line-height: 1;
+  padding: 0 0.08em;
+  margin: 0 0.04em;
+}
+
+.prompt .blank.is-box {
+  min-width: 0.95em;
+  min-height: 0.95em;
+  border: 3px solid var(--sky);
+  border-bottom-width: 3px;
+  border-radius: 6px;
+  vertical-align: 0.08em;
+  background: #fff;
+}
+
 .shape-figure {
   display: grid;
   place-items: center;
@@ -547,6 +567,7 @@ fieldset.is-disabled {
             <label class="choice"><input type="radio" name="topic" value="add" /> Add</label>
             <label class="choice"><input type="radio" name="topic" value="subtract" /> Subtract</label>
             <label class="choice"><input type="radio" name="topic" value="mix" /> Mix (+ − × ÷)</label>
+            <label class="choice"><input type="radio" name="topic" value="missing" /> Find n</label>
             <label class="choice"><input type="radio" name="topic" value="shapes" /> Shapes</label>
           </div>
         </fieldset>
@@ -673,7 +694,7 @@ fieldset.is-disabled {
   const TABLES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const FACTORS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const OPERATIONS = ["multiply", "divide", "mix"];
-  const TOPICS = ["times", "add", "subtract", "mix", "shapes"];
+  const TOPICS = ["times", "add", "subtract", "mix", "missing", "shapes"];
   const DIFFICULTIES = ["2-digit", "3-digit", "thousands"];
   const MIX_OPERATIONS = ["add", "subtract", "multiply", "divide"];
   const SHAPE_IDS = ["triangle", "square", "rectangle", "pentagon", "hexagon", "circle"];
@@ -896,6 +917,9 @@ fieldset.is-disabled {
   }
 
   function questionKey(question) {
+    if (question && question.topic === "missing") {
+      return ["missing", question.operation, question.slot, question.left, question.right, question.token].join(":");
+    }
     if (question && (question.topic === "shapes" || question.kind)) {
       const figure = question.figure || {};
       const lengths = (figure.sideLengths || []).join("-");
@@ -993,6 +1017,229 @@ fieldset.is-disabled {
     const pairs = allPairs(settings.tables);
     const pair = pairs.length ? pickItem(pairs, rng) : { table: 2, factor: 2 };
     return makeQuestion(pair.table, pair.factor, settings.operation, rng);
+  }
+
+  function pickMissingToken(rng, forceLetter) {
+    if (forceLetter) {
+      return { token: "n", kind: "letter" };
+    }
+    const roll = rng();
+    if (roll < 0.62) {
+      return { token: "n", kind: "letter" };
+    }
+    if (roll < 0.86) {
+      return { token: "□", kind: "box" };
+    }
+    return { token: pickItem(["a", "b"], rng), kind: "letter" };
+  }
+
+  function pickMissingOperation(rng) {
+    const roll = rng();
+    if (roll < 0.3) {
+      return "add";
+    }
+    if (roll < 0.56) {
+      return "subtract";
+    }
+    if (roll < 0.8) {
+      return "multiply";
+    }
+    return "divide";
+  }
+
+  function generateMissingAddSpec(rng) {
+    const roll = rng();
+    let left;
+    let right;
+    if (roll < 0.58) {
+      const flavor = rng();
+      if (flavor < 0.5) {
+        left = randomInt(1, 12, rng);
+        right = randomInt(1, 12, rng);
+      } else if (flavor < 0.8) {
+        left = randomInt(10, 40, rng);
+        right = randomInt(2, 9, rng);
+      } else {
+        left = randomInt(11, 40, rng);
+        right = randomInt(11, 40, rng);
+      }
+    } else if (roll < 0.88) {
+      const pair = generateAddPair(rng() < 0.5 ? "2-digit" : "3-digit", rng);
+      left = pair.left;
+      right = pair.right;
+    } else if (rng() < 0.55) {
+      left = randomInt(1, 9, rng) * 1000;
+      right = randomInt(100, 850, rng);
+    } else {
+      const pair = generateAddPair("thousands", rng);
+      left = pair.left;
+      right = pair.right;
+    }
+    const hideLeft = rng() < 0.5;
+    return {
+      operation: "add",
+      symbol: "+",
+      left,
+      right,
+      result: left + right,
+      answer: hideLeft ? left : right,
+      slot: hideLeft ? "left" : "right",
+    };
+  }
+
+  function generateMissingSubtractSpec(rng) {
+    const roll = rng();
+    let left;
+    let right;
+    if (roll < 0.58) {
+      left = randomInt(6, 24, rng);
+      right = randomInt(1, left - 1, rng);
+    } else if (roll < 0.88) {
+      const pair = generateSubtractPair(rng() < 0.5 ? "2-digit" : "3-digit", rng);
+      left = pair.left;
+      right = pair.right;
+    } else if (rng() < 0.5) {
+      left = randomInt(2, 9, rng) * 1000;
+      right = randomInt(100, 850, rng);
+      if (right >= left) {
+        left = right + randomInt(200, 800, rng);
+      }
+    } else {
+      const pair = generateSubtractPair("thousands", rng);
+      left = pair.left;
+      right = pair.right;
+    }
+    if (left <= right) {
+      left = right + randomInt(1, 20, rng);
+    }
+    const difference = left - right;
+    const hideMinuend = rng() < 0.45;
+    return {
+      operation: "subtract",
+      symbol: "−",
+      left,
+      right,
+      result: difference,
+      answer: hideMinuend ? left : right,
+      slot: hideMinuend ? "left" : "right",
+    };
+  }
+
+  function generateMissingMultiplySpec(tables, rng) {
+    const selected = uniqueSortedNumbers(tables);
+    const pool = selected.length ? selected : DEFAULT_SETTINGS.tables.slice();
+    const table = pickItem(pool, rng);
+    const factor = pickItem(FACTORS, rng);
+    const hideLeft = rng() < 0.5;
+    return {
+      operation: "multiply",
+      symbol: "×",
+      left: table,
+      right: factor,
+      result: table * factor,
+      answer: hideLeft ? table : factor,
+      slot: hideLeft ? "left" : "right",
+    };
+  }
+
+  function generateMissingDivideSpec(tables, rng) {
+    const selected = uniqueSortedNumbers(tables);
+    const pool = selected.length ? selected : DEFAULT_SETTINGS.tables.slice();
+    const table = pickItem(pool, rng);
+    const factor = pickItem(FACTORS, rng);
+    const product = table * factor;
+    const hideDividend = rng() < 0.5;
+    return {
+      operation: "divide",
+      symbol: "÷",
+      left: product,
+      right: table,
+      result: factor,
+      answer: hideDividend ? product : table,
+      slot: hideDividend ? "left" : "right",
+    };
+  }
+
+  function formatMissingQuestion(spec, tokenInfo, first) {
+    const leftText = spec.slot === "left" ? tokenInfo.token : String(spec.left);
+    const rightText = spec.slot === "right" ? tokenInfo.token : String(spec.right);
+    const prompt = `${leftText} ${spec.symbol} ${rightText} = ${spec.result}`;
+    const blankClass = tokenInfo.kind === "box" ? "blank is-box" : "blank";
+    const blankInner = tokenInfo.kind === "box" ? "" : tokenInfo.token;
+    const leftHtml = spec.slot === "left"
+      ? `<span class="${blankClass}">${blankInner}</span>`
+      : String(spec.left);
+    const rightHtml = spec.slot === "right"
+      ? `<span class="${blankClass}">${blankInner}</span>`
+      : String(spec.right);
+    const token = tokenInfo.token;
+    const tokenName = token === "□" ? "the box" : token;
+    let hint;
+    if (first) {
+      hint = tokenInfo.kind === "box" ? "The box is hiding a number" : `${token} is the missing number`;
+    } else if (tokenInfo.kind === "box") {
+      hint = "Type the number in the box";
+    } else {
+      hint = "Type the number that's hiding";
+    }
+    return {
+      topic: "missing",
+      operation: spec.operation,
+      symbol: spec.symbol,
+      kind: "missing",
+      left: spec.left,
+      right: spec.right,
+      result: spec.result,
+      slot: spec.slot,
+      token,
+      tokenKind: tokenInfo.kind,
+      answer: spec.answer,
+      answerKind: "number",
+      prompt,
+      promptHtml: `${leftHtml} ${spec.symbol} ${rightHtml} = ${spec.result}`,
+      fullPrompt: true,
+      hint,
+      fact: `${spec.left} ${spec.symbol} ${spec.right} = ${spec.result}`,
+      review: `${prompt}  so  ${tokenName} is ${spec.answer}`,
+    };
+  }
+
+  function makeMissingSpec(operation, tables, rng) {
+    if (operation === "subtract") {
+      return generateMissingSubtractSpec(rng);
+    }
+    if (operation === "multiply") {
+      return generateMissingMultiplySpec(tables, rng);
+    }
+    if (operation === "divide") {
+      return generateMissingDivideSpec(tables, rng);
+    }
+    return generateMissingAddSpec(rng);
+  }
+
+  function makeMissingQuestion(settings, rng, options) {
+    const random = rng || Math.random;
+    const first = Boolean(options && options.first);
+    const tables = settings && settings.tables ? settings.tables : DEFAULT_SETTINGS.tables;
+    let spec;
+    if (first) {
+      const left = randomInt(2, 9, random);
+      const right = randomInt(2, 9, random);
+      spec = {
+        operation: "add",
+        symbol: "+",
+        left,
+        right,
+        result: left + right,
+        answer: right,
+        slot: "right",
+      };
+    } else {
+      const requested = options && options.operation;
+      const operation = MIX_OPERATIONS.includes(requested) ? requested : pickMissingOperation(random);
+      spec = makeMissingSpec(operation, tables, random);
+    }
+    return formatMissingQuestion(spec, pickMissingToken(random, first), first);
   }
 
   function pickShapeKind(focus, rng) {
@@ -1498,6 +1745,24 @@ fieldset.is-disabled {
     };
   }
 
+  function buildMissingRound(normalized, rng) {
+    const count = normalized.timerSeconds > 0 ? 80 : normalized.questionCount;
+    let ops = [];
+    let made = 0;
+    return {
+      settings: normalized,
+      questions: fillDeck(() => {
+        const first = made === 0;
+        if (!ops.length) {
+          ops = shuffle(MIX_OPERATIONS.slice(), rng);
+        }
+        const operation = first ? "add" : ops.shift();
+        made += 1;
+        return makeMissingQuestion(normalized, rng, { first, operation });
+      }, count),
+    };
+  }
+
   function buildRound(settings, rng) {
     const normalized = normalizeSettings(settings);
     const random = rng || Math.random;
@@ -1509,6 +1774,9 @@ fieldset.is-disabled {
     }
     if (normalized.topic === "shapes") {
       return buildShapesRound(normalized, random);
+    }
+    if (normalized.topic === "missing") {
+      return buildMissingRound(normalized, random);
     }
     return buildTimesRound(normalized, random);
   }
@@ -1610,6 +1878,9 @@ fieldset.is-disabled {
 
   function subtitleFor(settings) {
     const normalized = normalizeSettings(settings);
+    if (normalized.topic === "missing") {
+      return "What's hiding?";
+    }
     if (normalized.topic === "shapes") {
       return "Shapes practice";
     }
@@ -1633,6 +1904,9 @@ fieldset.is-disabled {
 
   function markFor(settings) {
     const normalized = normalizeSettings(settings);
+    if (normalized.topic === "missing") {
+      return "n";
+    }
     if (normalized.topic === "shapes") {
       return "△□";
     }
@@ -1650,7 +1924,7 @@ fieldset.is-disabled {
 
   function usesWorkspace(settings) {
     const topic = normalizeSettings(settings).topic;
-    return topic === "add" || topic === "subtract" || topic === "mix";
+    return topic === "add" || topic === "subtract" || topic === "mix" || topic === "missing";
   }
 
   return {
@@ -1668,6 +1942,7 @@ fieldset.is-disabled {
     makeSubtractQuestion,
     makeArithmeticQuestion,
     makeShapeQuestion,
+    makeMissingQuestion,
     figureSvg,
     buildRound,
     buildReplayRound,
@@ -2073,7 +2348,11 @@ fieldset.is-disabled {
       return;
     }
     const question = state.round ? currentQuestion() : null;
-    if (question && (question.operation === "add" || question.operation === "subtract")) {
+    if (
+      question
+      && question.topic !== "missing"
+      && (question.operation === "add" || question.operation === "subtract")
+    ) {
       renderPlacePad(question);
     } else {
       renderScratchNotes();
@@ -2086,7 +2365,10 @@ fieldset.is-disabled {
     if (!show) {
       return;
     }
-    if (question.operation === "add" || question.operation === "subtract") {
+    if (
+      question.topic !== "missing"
+      && (question.operation === "add" || question.operation === "subtract")
+    ) {
       renderPlacePad(question);
     } else {
       renderScratchNotes();
@@ -2136,7 +2418,11 @@ fieldset.is-disabled {
     setAnswer("");
     setFeedback(question.hint || "Type the answer", "");
     els.prompt.classList.toggle("is-words", isWords);
-    els.prompt.textContent = isWords ? question.prompt : `${question.prompt} =`;
+    if (question.promptHtml) {
+      els.prompt.innerHTML = question.promptHtml;
+    } else {
+      els.prompt.textContent = isWords ? question.prompt : `${question.prompt} =`;
+    }
     els.prompt.dataset.operation = question.operation;
     screens.practice.dataset.state = "idle";
     renderFigure(question);
@@ -2167,7 +2453,7 @@ fieldset.is-disabled {
     els.resultsScore.textContent = `${summary.correct} / ${summary.asked}`;
     els.resultsAccuracy.textContent = summary.asked ? `${summary.accuracy}% correct` : "No answers";
     els.resultsTime.textContent = `Time ${engine.formatClock(elapsedSeconds)}`;
-    if (state.settings.topic === "shapes") {
+    if (state.settings.topic === "shapes" || state.settings.topic === "missing") {
       els.missedHeading.textContent = "Missed";
     } else if (state.settings.topic === "times") {
       els.missedHeading.textContent = "Missed facts";

@@ -220,6 +220,7 @@ test("subtitle follows the chosen topic", () => {
   assert.equal(engine.subtitleFor({ topic: "add" }), "Addition practice");
   assert.equal(engine.subtitleFor({ topic: "subtract" }), "Subtraction practice");
   assert.equal(engine.subtitleFor({ topic: "mix" }), "A mix of + − × ÷");
+  assert.equal(engine.subtitleFor({ topic: "missing" }), "What's hiding?");
   assert.equal(engine.subtitleFor({ topic: "shapes" }), "Shapes practice");
   assert.equal(engine.subtitleFor({ topic: "times", operation: "multiply" }), "Multiplication practice");
   assert.equal(engine.subtitleFor({ topic: "times", operation: "divide" }), "Division practice");
@@ -339,6 +340,97 @@ test("gradeAnswer accepts a shape name tap", () => {
   assert.equal(engine.gradeAnswer(question, "").empty, true);
 });
 
+test("normalizeSettings keeps a missing-number topic", () => {
+  const settings = engine.normalizeSettings({ topic: "missing" });
+  assert.equal(settings.topic, "missing");
+  assert.equal(engine.subtitleFor(settings), "What's hiding?");
+  assert.equal(engine.markFor(settings), "n");
+  assert.equal(engine.usesWorkspace(settings), true);
+});
+
+test("first missing-number question is a small add with n", () => {
+  const question = engine.makeMissingQuestion({ tables: [3, 4] }, rngFrom([0.2, 0.8]), { first: true });
+  assert.equal(question.topic, "missing");
+  assert.equal(question.operation, "add");
+  assert.equal(question.token, "n");
+  assert.equal(question.slot, "right");
+  assert.match(question.prompt, /^\d+ \+ n = \d+$/);
+  assert.equal(question.answer, question.right);
+  assert.equal(question.result, question.left + question.right);
+  assert.equal(question.hint, "n is the missing number");
+  assert.ok(!/variable|algebra/i.test(`${question.prompt} ${question.hint} ${question.review}`));
+});
+
+test("missing-number round mixes + − × ÷ and hides one number", () => {
+  const seen = new Set();
+  const tokens = new Set();
+  const slots = new Set();
+  let stretch = 0;
+  let tick = 0;
+  const round = engine.buildRound(
+    { topic: "missing", tables: [3, 7], timerSeconds: 0, questionCount: 48 },
+    () => {
+      tick += 1;
+      return (tick % 97) / 97;
+    },
+  );
+  assert.equal(round.questions.length, 48);
+  assert.equal(round.questions[0].token, "n");
+  assert.equal(round.questions[0].operation, "add");
+  assert.match(round.questions[0].prompt, /^\d+ \+ n = \d+$/);
+  for (const question of round.questions) {
+    assert.equal(question.topic, "missing");
+    assert.ok(["add", "subtract", "multiply", "divide"].includes(question.operation));
+    assert.ok(question.prompt.includes("="));
+    assert.ok(question.prompt.includes(question.token));
+    assert.ok(question.answer >= 0);
+    assert.equal(question.fullPrompt, true);
+    if (question.slot === "left") {
+      assert.equal(question.answer, question.left);
+      assert.ok(question.prompt.startsWith(`${question.token} `));
+    } else {
+      assert.equal(question.answer, question.right);
+    }
+    if (question.operation === "add") {
+      assert.equal(question.result, question.left + question.right);
+    }
+    if (question.operation === "subtract") {
+      assert.ok(question.left > question.right);
+      assert.equal(question.result, question.left - question.right);
+    }
+    if (question.operation === "multiply") {
+      assert.equal(question.result, question.left * question.right);
+      assert.ok([3, 7].includes(question.left) || [3, 7].includes(question.right));
+    }
+    if (question.operation === "divide") {
+      assert.equal(question.left, question.right * question.result);
+      assert.ok([3, 7].includes(question.right) || question.slot === "right");
+    }
+    if ((question.operation === "add" || question.operation === "subtract") && question.left >= 20) {
+      stretch += 1;
+    }
+    seen.add(question.operation);
+    tokens.add(question.token);
+    slots.add(question.slot);
+    assert.ok(!/variable|algebra/i.test(`${question.prompt} ${question.hint}`));
+  }
+  assert.deepEqual([...seen].sort(), ["add", "divide", "multiply", "subtract"]);
+  assert.ok(slots.has("left") && slots.has("right"));
+  assert.ok(tokens.has("n"));
+  assert.ok(stretch >= 2, `expected some multi-digit stretch, got ${stretch}`);
+});
+
+test("gradeAnswer scores the hidden number, not the total", () => {
+  const question = engine.makeMissingQuestion({ tables: [4] }, () => 0.2, { first: true });
+  assert.deepEqual(engine.gradeAnswer(question, String(question.answer)), {
+    ok: true,
+    empty: false,
+    given: question.answer,
+  });
+  assert.equal(engine.gradeAnswer(question, String(question.result)).ok, question.result === question.answer);
+  assert.equal(engine.gradeAnswer(question, "").empty, true);
+});
+
 test("mix stays numbers-only and times tables still work", () => {
   const mix = engine.buildRound(
     {
@@ -353,6 +445,7 @@ test("mix stays numbers-only and times tables still work", () => {
   for (const question of mix.questions) {
     assert.ok(["add", "subtract", "multiply", "divide"].includes(question.operation));
     assert.notEqual(question.topic, "shapes");
+    assert.notEqual(question.topic, "missing");
   }
   const times = engine.buildRound(
     { topic: "times", tables: [8], operation: "multiply", timerSeconds: 0, questionCount: 6 },
