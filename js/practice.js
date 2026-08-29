@@ -362,227 +362,105 @@
     return makeQuestion(pair.table, pair.factor, settings.operation, rng);
   }
 
-  function pickMissingToken(rng, forceLetter) {
-    if (forceLetter) {
-      return { token: "n", kind: "letter" };
-    }
-    const roll = rng();
-    if (roll < 0.62) {
-      return { token: "n", kind: "letter" };
-    }
-    if (roll < 0.86) {
-      return { token: "□", kind: "box" };
-    }
-    return { token: pickItem(["a", "b"], rng), kind: "letter" };
-  }
-
-  function pickMissingOperation(rng) {
-    const roll = rng();
-    if (roll < 0.3) {
-      return "add";
-    }
-    if (roll < 0.56) {
-      return "subtract";
-    }
-    if (roll < 0.8) {
-      return "multiply";
-    }
-    return "divide";
-  }
-
   function generateMissingAddSpec(rng) {
-    const roll = rng();
-    let left;
-    let right;
-    if (roll < 0.58) {
-      const flavor = rng();
-      if (flavor < 0.5) {
-        left = randomInt(1, 12, rng);
-        right = randomInt(1, 12, rng);
-      } else if (flavor < 0.8) {
-        left = randomInt(10, 40, rng);
-        right = randomInt(2, 9, rng);
-      } else {
-        left = randomInt(11, 40, rng);
-        right = randomInt(11, 40, rng);
-      }
-    } else if (roll < 0.88) {
-      const pair = generateAddPair(rng() < 0.5 ? "2-digit" : "3-digit", rng);
-      left = pair.left;
-      right = pair.right;
-    } else if (rng() < 0.55) {
-      left = randomInt(1, 9, rng) * 1000;
-      right = randomInt(100, 850, rng);
-    } else {
-      const pair = generateAddPair("thousands", rng);
-      left = pair.left;
-      right = pair.right;
-    }
+    const hidden = randomInt(1, 9, rng);
+    const maxKnown = Math.max(1, 20 - hidden);
+    const known = randomInt(1, Math.min(12, maxKnown), rng);
     const hideLeft = rng() < 0.5;
     return {
       operation: "add",
       symbol: "+",
-      left,
-      right,
-      result: left + right,
-      answer: hideLeft ? left : right,
+      left: hideLeft ? hidden : known,
+      right: hideLeft ? known : hidden,
+      result: known + hidden,
+      answer: hidden,
       slot: hideLeft ? "left" : "right",
     };
   }
 
-  function generateMissingSubtractSpec(rng) {
-    const roll = rng();
-    let left;
-    let right;
-    if (roll < 0.58) {
-      left = randomInt(6, 24, rng);
-      right = randomInt(1, left - 1, rng);
-    } else if (roll < 0.88) {
-      const pair = generateSubtractPair(rng() < 0.5 ? "2-digit" : "3-digit", rng);
-      left = pair.left;
-      right = pair.right;
-    } else if (rng() < 0.5) {
-      left = randomInt(2, 9, rng) * 1000;
-      right = randomInt(100, 850, rng);
-      if (right >= left) {
-        left = right + randomInt(200, 800, rng);
-      }
-    } else {
-      const pair = generateSubtractPair("thousands", rng);
-      left = pair.left;
-      right = pair.right;
-    }
-    if (left <= right) {
-      left = right + randomInt(1, 20, rng);
-    }
-    const difference = left - right;
-    const hideMinuend = rng() < 0.45;
-    return {
-      operation: "subtract",
-      symbol: "−",
-      left,
-      right,
-      result: difference,
-      answer: hideMinuend ? left : right,
-      slot: hideMinuend ? "left" : "right",
-    };
-  }
-
-  function generateMissingMultiplySpec(tables, rng) {
-    const selected = uniqueSortedNumbers(tables);
-    const pool = selected.length ? selected : DEFAULT_SETTINGS.tables.slice();
-    const table = pickItem(pool, rng);
-    const factor = pickItem(FACTORS, rng);
-    const hideLeft = rng() < 0.5;
-    return {
-      operation: "multiply",
-      symbol: "×",
-      left: table,
-      right: factor,
-      result: table * factor,
-      answer: hideLeft ? table : factor,
-      slot: hideLeft ? "left" : "right",
-    };
-  }
-
-  function generateMissingDivideSpec(tables, rng) {
-    const selected = uniqueSortedNumbers(tables);
-    const pool = selected.length ? selected : DEFAULT_SETTINGS.tables.slice();
-    const table = pickItem(pool, rng);
-    const factor = pickItem(FACTORS, rng);
-    const product = table * factor;
-    const hideDividend = rng() < 0.5;
-    return {
-      operation: "divide",
-      symbol: "÷",
-      left: product,
-      right: table,
-      result: factor,
-      answer: hideDividend ? product : table,
-      slot: hideDividend ? "left" : "right",
-    };
-  }
-
-  function formatMissingQuestion(spec, tokenInfo, first) {
-    const leftText = spec.slot === "left" ? tokenInfo.token : String(spec.left);
-    const rightText = spec.slot === "right" ? tokenInfo.token : String(spec.right);
-    const prompt = `${leftText} ${spec.symbol} ${rightText} = ${spec.result}`;
-    const blankClass = tokenInfo.kind === "box" ? "blank is-box" : "blank";
-    const blankInner = tokenInfo.kind === "box" ? "" : tokenInfo.token;
+  function formatMissingQuestion(spec, first) {
+    const token = "n";
+    const leftText = spec.slot === "left" ? token : String(spec.left);
+    const rightText = spec.slot === "right" ? token : String(spec.right);
+    const prompt = `${leftText} + ${rightText} = ${spec.result}`;
     const leftHtml = spec.slot === "left"
-      ? `<span class="${blankClass}">${blankInner}</span>`
+      ? `<span class="blank">${token}</span>`
       : String(spec.left);
     const rightHtml = spec.slot === "right"
-      ? `<span class="${blankClass}">${blankInner}</span>`
+      ? `<span class="blank">${token}</span>`
       : String(spec.right);
-    const token = tokenInfo.token;
-    const tokenName = token === "□" ? "the box" : token;
-    let hint;
-    if (first) {
-      hint = tokenInfo.kind === "box" ? "The box is hiding a number" : `${token} is the missing number`;
-    } else if (tokenInfo.kind === "box") {
-      hint = "Type the number in the box";
-    } else {
-      hint = "Type the number that's hiding";
-    }
+    const known = spec.slot === "left" ? spec.right : spec.left;
     return {
       topic: "missing",
-      operation: spec.operation,
-      symbol: spec.symbol,
+      operation: "add",
+      symbol: "+",
       kind: "missing",
       left: spec.left,
       right: spec.right,
       result: spec.result,
+      known,
       slot: spec.slot,
       token,
-      tokenKind: tokenInfo.kind,
+      tokenKind: "letter",
       answer: spec.answer,
       answerKind: "number",
       prompt,
-      promptHtml: `${leftHtml} ${spec.symbol} ${rightHtml} = ${spec.result}`,
+      promptHtml: `${leftHtml} + ${rightHtml} = ${spec.result}`,
       fullPrompt: true,
-      hint,
-      fact: `${spec.left} ${spec.symbol} ${spec.right} = ${spec.result}`,
-      review: `${prompt}  so  ${tokenName} is ${spec.answer}`,
+      hint: first ? "n is hiding" : "What number is n?",
+      fact: `${spec.left} + ${spec.right} = ${spec.result}`,
+      review: `${prompt}  so  n is ${spec.answer}`,
     };
-  }
-
-  function makeMissingSpec(operation, tables, rng) {
-    if (operation === "subtract") {
-      return generateMissingSubtractSpec(rng);
-    }
-    if (operation === "multiply") {
-      return generateMissingMultiplySpec(tables, rng);
-    }
-    if (operation === "divide") {
-      return generateMissingDivideSpec(tables, rng);
-    }
-    return generateMissingAddSpec(rng);
   }
 
   function makeMissingQuestion(settings, rng, options) {
     const random = rng || Math.random;
     const first = Boolean(options && options.first);
-    const tables = settings && settings.tables ? settings.tables : DEFAULT_SETTINGS.tables;
-    let spec;
-    if (first) {
-      const left = randomInt(2, 9, random);
-      const right = randomInt(2, 9, random);
-      spec = {
-        operation: "add",
-        symbol: "+",
-        left,
-        right,
-        result: left + right,
-        answer: right,
-        slot: "right",
-      };
-    } else {
-      const requested = options && options.operation;
-      const operation = MIX_OPERATIONS.includes(requested) ? requested : pickMissingOperation(random);
-      spec = makeMissingSpec(operation, tables, random);
+    const spec = first
+      ? {
+          operation: "add",
+          symbol: "+",
+          left: 8,
+          right: 4,
+          result: 12,
+          answer: 4,
+          slot: "right",
+        }
+      : generateMissingAddSpec(random);
+    return formatMissingQuestion(spec, first);
+  }
+
+  function whyModel(question) {
+    if (!question || question.topic !== "missing" || question.operation !== "add") {
+      return null;
     }
-    return formatMissingQuestion(spec, pickMissingToken(random, first), first);
+    const known = question.slot === "left" ? question.right : question.left;
+    return {
+      kind: "balance",
+      known,
+      hidden: question.answer,
+      total: question.result,
+      slot: question.slot,
+      token: question.token || "n",
+      fact: `${question.left} + ${question.right} = ${question.result}`,
+    };
+  }
+
+  function whyCaption(model, phase) {
+    if (!model) {
+      return "";
+    }
+    if (phase === "lift") {
+      return `Take ${model.known} from both`;
+    }
+    if (phase === "reveal") {
+      return model.fact;
+    }
+    return "";
+  }
+
+  function usesWhyModel(question) {
+    return Boolean(whyModel(question));
   }
 
   function onestepOperation(form) {
@@ -1307,18 +1185,13 @@
 
   function buildMissingRound(normalized, rng) {
     const count = normalized.timerSeconds > 0 ? 80 : normalized.questionCount;
-    let ops = [];
     let made = 0;
     return {
       settings: normalized,
       questions: fillDeck(() => {
         const first = made === 0;
-        if (!ops.length) {
-          ops = shuffle(MIX_OPERATIONS.slice(), rng);
-        }
-        const operation = first ? "add" : ops.shift();
         made += 1;
-        return makeMissingQuestion(normalized, rng, { first, operation });
+        return makeMissingQuestion(normalized, rng, { first });
       }, count),
     };
   }
@@ -1532,7 +1405,7 @@
 
   function usesWorkspace(settings) {
     const topic = normalizeSettings(settings).topic;
-    return topic === "add" || topic === "subtract" || topic === "mix" || isFindNTopic(topic);
+    return topic === "add" || topic === "subtract" || topic === "mix" || topic === "onestep" || topic === "twostep";
   }
 
   function emptyProgress() {
@@ -1676,6 +1549,9 @@
     makeMissingQuestion,
     makeOnestepQuestion,
     makeTwostepQuestion,
+    whyModel,
+    whyCaption,
+    usesWhyModel,
     figureSvg,
     buildRound,
     buildReplayRound,
