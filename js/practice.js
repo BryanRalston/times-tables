@@ -8,12 +8,13 @@
   const TABLES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const FACTORS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const OPERATIONS = ["multiply", "divide", "mix"];
-  const TOPICS = ["times", "add", "subtract", "mix", "missing", "onestep", "twostep", "shapes"];
+  const TOPICS = ["times", "add", "subtract", "mix", "missing", "subtrahend", "onestep", "twostep", "shapes"];
   const DIFFICULTIES = ["2-digit", "3-digit", "thousands"];
   const MIX_OPERATIONS = ["add", "subtract", "multiply", "divide"];
   const ONESTEP_FORMS = ["n+a", "a+n", "n-a", "a-n", "an", "n/a", "a/n"];
   const TWOSTEP_FORMS = ["an+b", "n/a+b", "an-b", "a-bn"];
-  const FIND_N_TOPICS = ["missing", "onestep", "twostep"];
+  const FIND_N_TOPICS = ["missing", "subtrahend", "onestep", "twostep"];
+  const PLAYABLE_TRAIL_TOPICS = ["missing", "subtrahend"];
   const ALWAYS_SKILLS = ["times", "add", "subtract", "mix", "missing", "shapes"];
   const SKILL_COPY = {
     times: { title: "Times tables", blurb: "Multiply and divide", list: "Times tables" },
@@ -21,6 +22,7 @@
     subtract: { title: "Subtract", blurb: "Take away", list: "Subtract" },
     mix: { title: "Mix", blurb: "+ − × ÷ together", list: "Mix (+ − × ÷)" },
     missing: { title: "Find n", blurb: "What's hiding?", list: "What's hiding?" },
+    subtrahend: { title: "Find n", blurb: "What's hiding?", list: "Missing subtrahend" },
     onestep: { title: "Find n", blurb: "What number is n?", list: "What number is n?" },
     twostep: { title: "Find n", blurb: "Then do this", list: "Then do this" },
     shapes: { title: "Shapes", blurb: "Names, sides, around", list: "Shapes" },
@@ -72,7 +74,7 @@
   const LOOK_IDS = ["ink", "leaf"];
   const START_NODE_ID = "missing-addend";
   const START_CHAPTER_ID = "grade-3";
-  const TOPIC_TO_NODE = { missing: "missing-addend" };
+  const TOPIC_TO_NODE = { missing: "missing-addend", subtrahend: "missing-subtrahend" };
   const TRAIL_CHAPTERS = [
     {
       id: "grade-3",
@@ -81,7 +83,7 @@
       nodes: [
         { id: "number-sense", title: "Number sense", playable: false },
         { id: "missing-addend", title: "Missing addend", playable: true, topic: "missing" },
-        { id: "missing-subtrahend", title: "Missing subtrahend", playable: false },
+        { id: "missing-subtrahend", title: "Missing subtrahend", playable: true, topic: "subtrahend" },
         { id: "times-facts", title: "Times tables facts", playable: false },
       ],
     },
@@ -362,8 +364,8 @@
     if (question && question.topic === "onestep") {
       return ["onestep", question.form, question.left, question.right, question.answer].join(":");
     }
-    if (question && question.topic === "missing") {
-      return ["missing", question.operation, question.slot, question.left, question.right, question.token].join(":");
+    if (question && (question.topic === "missing" || question.topic === "subtrahend")) {
+      return [question.topic, question.operation, question.slot, question.left, question.right, question.token].join(":");
     }
     if (question && (question.topic === "shapes" || question.kind)) {
       const figure = question.figure || {};
@@ -532,20 +534,95 @@
     return formatMissingQuestion(spec, first);
   }
 
+  function generateMissingSubtrahendSpec(rng) {
+    const hidden = randomInt(1, 9, rng);
+    const maxDiff = Math.max(1, 20 - hidden);
+    const difference = randomInt(1, Math.min(12, maxDiff), rng);
+    return {
+      operation: "subtract",
+      symbol: "−",
+      left: hidden + difference,
+      right: hidden,
+      result: difference,
+      answer: hidden,
+      slot: "right",
+    };
+  }
+
+  function formatMissingSubtrahendQuestion(spec, first) {
+    const token = "n";
+    const prompt = `${spec.left} − ${token} = ${spec.result}`;
+    return {
+      topic: "subtrahend",
+      operation: "subtract",
+      symbol: "−",
+      kind: "missing",
+      family: "subtrahend",
+      left: spec.left,
+      right: spec.right,
+      result: spec.result,
+      known: spec.result,
+      slot: "right",
+      token,
+      tokenKind: "letter",
+      answer: spec.answer,
+      answerKind: "number",
+      prompt,
+      promptHtml: `${spec.left} − <span class="blank">${token}</span> = ${spec.result}`,
+      fullPrompt: true,
+      hint: first ? "n is hiding" : "What number is n?",
+      fact: `${spec.left} − ${spec.answer} = ${spec.result}`,
+      review: `${prompt}  so  n is ${spec.answer}`,
+    };
+  }
+
+  function makeMissingSubtrahendQuestion(settings, rng, options) {
+    const random = rng || Math.random;
+    const first = Boolean(options && options.first);
+    const spec = first
+      ? {
+          operation: "subtract",
+          symbol: "−",
+          left: 12,
+          right: 4,
+          result: 8,
+          answer: 4,
+          slot: "right",
+        }
+      : generateMissingSubtrahendSpec(random);
+    return formatMissingSubtrahendQuestion(spec, first);
+  }
+
   function whyModel(question) {
-    if (!question || question.topic !== "missing" || question.operation !== "add") {
+    if (!question) {
       return null;
     }
-    const known = question.slot === "left" ? question.right : question.left;
-    return {
-      kind: "balance",
-      known,
-      hidden: question.answer,
-      total: question.result,
-      slot: question.slot,
-      token: question.token || "n",
-      fact: `${question.left} + ${question.right} = ${question.result}`,
-    };
+    if (question.topic === "missing" && question.operation === "add") {
+      const known = question.slot === "left" ? question.right : question.left;
+      return {
+        kind: "balance",
+        family: "addend",
+        known,
+        hidden: question.answer,
+        total: question.result,
+        slot: question.slot,
+        token: question.token || "n",
+        fact: `${question.left} + ${question.right} = ${question.result}`,
+      };
+    }
+    if (question.topic === "subtrahend" && question.operation === "subtract") {
+      return {
+        kind: "balance",
+        family: "subtrahend",
+        known: question.result,
+        hidden: question.answer,
+        total: question.left,
+        slot: "right",
+        token: question.token || "n",
+        fact: `${question.left} − ${question.answer} = ${question.result}`,
+      };
+    }
+    return null;
   }
 
   function whyLeftover(model) {
@@ -1355,6 +1432,19 @@
     };
   }
 
+  function buildSubtrahendRound(normalized, rng) {
+    const count = normalized.timerSeconds > 0 ? 80 : normalized.questionCount;
+    let made = 0;
+    return {
+      settings: normalized,
+      questions: fillDeck(() => {
+        const first = made === 0;
+        made += 1;
+        return makeMissingSubtrahendQuestion(normalized, rng, { first });
+      }, count),
+    };
+  }
+
   function buildOnestepRound(normalized, rng) {
     const count = normalized.timerSeconds > 0 ? 80 : normalized.questionCount;
     let forms = [];
@@ -1405,6 +1495,9 @@
     }
     if (normalized.topic === "missing") {
       return buildMissingRound(normalized, random);
+    }
+    if (normalized.topic === "subtrahend") {
+      return buildSubtrahendRound(normalized, random);
     }
     if (normalized.topic === "onestep") {
       return buildOnestepRound(normalized, random);
@@ -1512,7 +1605,7 @@
 
   function subtitleFor(settings) {
     const normalized = normalizeSettings(settings);
-    if (normalized.topic === "missing") {
+    if (normalized.topic === "missing" || normalized.topic === "subtrahend") {
       return "What's hiding?";
     }
     if (normalized.topic === "onestep") {
@@ -1747,10 +1840,10 @@
     if (!found) {
       return "locked";
     }
-    if (found.node.playable) {
+    if (found.node.playable && isNodePurchased(progress, nodeId)) {
       return isNodeCompleted(progress, nodeId) ? "replay" : "current";
     }
-    if (isNodePurchased(progress, nodeId)) {
+    if (!found.node.playable && isNodePurchased(progress, nodeId)) {
       return "coming";
     }
     const next = nextPricedUnlock(progress);
@@ -1758,6 +1851,15 @@
       return "priced";
     }
     return "locked";
+  }
+
+  function canStartNode(progress, nodeId) {
+    const status = nodeStatus(progress, nodeId);
+    return status === "current" || status === "replay";
+  }
+
+  function playableTopic(topic) {
+    return PLAYABLE_TRAIL_TOPICS.includes(topic) ? topic : "missing";
   }
 
   function nodeAction(status) {
@@ -1954,6 +2056,7 @@
     ONESTEP_FORMS,
     TWOSTEP_FORMS,
     FIND_N_TOPICS,
+    PLAYABLE_TRAIL_TOPICS,
     ALWAYS_SKILLS,
     SKILL_COPY,
     SHAPE_IDS,
@@ -1980,6 +2083,7 @@
     makeArithmeticQuestion,
     makeShapeQuestion,
     makeMissingQuestion,
+    makeMissingSubtrahendQuestion,
     makeOnestepQuestion,
     makeTwostepQuestion,
     whyModel,
@@ -2018,6 +2122,8 @@
     isNodePurchased,
     isNodeCompleted,
     isNodePlayable,
+    canStartNode,
+    playableTopic,
     nextPricedUnlock,
     chapterStatus,
     nodeStatus,

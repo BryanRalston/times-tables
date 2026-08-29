@@ -833,9 +833,11 @@ test("first visit opens Grade 3 and only missing addend is playable", () => {
   assert.equal(engine.nodeStatus(progress, "missing-subtrahend"), "priced");
   assert.equal(engine.nodeStatus(progress, "times-facts"), "locked");
   assert.equal(engine.isNodePlayable("missing-addend"), true);
-  assert.equal(engine.isNodePlayable("missing-subtrahend"), false);
+  assert.equal(engine.isNodePlayable("missing-subtrahend"), true);
   assert.equal(engine.isNodePlayable("times-facts"), false);
   assert.equal(engine.isNodePlayable("number-sense"), false);
+  assert.equal(engine.canStartNode(progress, "missing-addend"), true);
+  assert.equal(engine.canStartNode(progress, "missing-subtrahend"), false);
   assert.equal(engine.startNode().topic, "missing");
   const next = engine.nextPricedUnlock(progress);
   assert.equal(next.kind, "node");
@@ -890,9 +892,11 @@ test("a short honest missing-addend run can buy the next Grade 3 node", () => {
   const spent = engine.spendUnlock(progress);
   assert.equal(spent.ok, true);
   assert.equal(spent.unlocked.id, "missing-subtrahend");
-  assert.equal(engine.nodeStatus(spent.progress, "missing-subtrahend"), "coming");
-  assert.equal(engine.isNodePlayable("missing-subtrahend"), false);
-  assert.equal(engine.nodeAction("coming"), "Coming");
+  assert.equal(engine.nodeStatus(spent.progress, "missing-subtrahend"), "current");
+  assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "missing-subtrahend")), "Start");
+  assert.equal(engine.canStartNode(spent.progress, "missing-subtrahend"), true);
+  assert.equal(engine.isNodePlayable("times-facts"), false);
+  assert.equal(engine.nodeStatus(spent.progress, "times-facts"), "priced");
   assert.equal(engine.nextPricedUnlock(spent.progress).id, "times-facts");
 });
 
@@ -931,13 +935,146 @@ test("buying later Grade 3 nodes does not open a keypad family", () => {
   const first = engine.spendUnlock(progress);
   const second = engine.spendUnlock(first.progress);
   assert.equal(first.unlocked.id, "missing-subtrahend");
+  assert.equal(engine.canStartNode(first.progress, "missing-subtrahend"), true);
   assert.equal(second.unlocked.id, "times-facts");
   assert.equal(engine.isNodePlayable("times-facts"), false);
+  assert.equal(engine.canStartNode(second.progress, "times-facts"), false);
   assert.equal(engine.nodeStatus(second.progress, "times-facts"), "coming");
+  assert.equal(engine.nodeAction("coming"), "Coming");
   assert.equal(engine.chapterStatus(second.progress, "grade-4"), "priced");
   const chapter = engine.spendUnlock(second.progress);
   assert.equal(chapter.unlocked.kind, "chapter");
   assert.equal(chapter.unlocked.id, "grade-4");
   assert.equal(engine.chapterStatus(chapter.progress, "grade-4"), "open");
   assert.equal(engine.isNodePlayable("missing-factor"), false);
+  assert.equal(engine.isNodePlayable("number-sense"), false);
+});
+
+test("first missing-subtrahend question is 12 − n = 8", () => {
+  const question = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  assert.equal(question.topic, "subtrahend");
+  assert.equal(question.operation, "subtract");
+  assert.equal(question.token, "n");
+  assert.equal(question.slot, "right");
+  assert.equal(question.prompt, "12 − n = 8");
+  assert.equal(question.left, 12);
+  assert.equal(question.right, 4);
+  assert.equal(question.result, 8);
+  assert.equal(question.answer, 4);
+  assert.equal(question.known, 8);
+  assert.equal(question.hint, "n is hiding");
+  assert.ok(!/variable|algebra|inverse|add n/i.test(`${question.prompt} ${question.hint} ${question.review}`));
+});
+
+test("missing-subtrahend why-model puts minuend against known leftover", () => {
+  const question = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  const model = engine.whyModel(question);
+  assert.equal(engine.usesWhyModel(question), true);
+  assert.equal(model.kind, "balance");
+  assert.equal(model.family, "subtrahend");
+  assert.equal(model.total, 12);
+  assert.equal(model.known, 8);
+  assert.equal(model.hidden, 4);
+  assert.equal(engine.whyLeftover(model), 4);
+  assert.equal(engine.whyCaption(model, "idle"), "");
+  assert.equal(engine.whyCaption(model, "lift"), "What's left?");
+  assert.equal(engine.whyCaption(model, "reveal"), "12 − 4 = 8");
+  assert.equal(engine.whyPrompt(question, "idle").prompt, "12 − n = 8");
+  assert.equal(engine.whyPrompt(question, "lift").prompt, "n = 4");
+  assert.doesNotMatch(engine.whyNudge(model), /12|8|add|inverse/i);
+});
+
+test("wrong leftover on missing subtrahend tilts and does not advance", () => {
+  const question = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  const model = engine.whyModel(question);
+  const wrong = engine.gradeAnswer(question, "5");
+  const right = engine.gradeAnswer(question, "4");
+  assert.equal(wrong.ok, false);
+  assert.equal(engine.shouldAdvanceAfterGrade(question, wrong), false);
+  assert.equal(engine.whyTilt(model, 5), "left");
+  assert.equal(engine.whyTilt(model, 3), "right");
+  assert.equal(engine.whyTilt(model, 4), "level");
+  assert.equal(right.ok, true);
+  assert.equal(engine.shouldAdvanceAfterGrade(question, right), true);
+});
+
+test("missing-subtrahend round stays take-away n, small numbers", () => {
+  let tick = 0;
+  const round = engine.buildRound(
+    { topic: "subtrahend", timerSeconds: 0, questionCount: 20 },
+    () => {
+      tick += 1;
+      return (tick % 97) / 97;
+    },
+  );
+  assert.equal(round.questions.length, 20);
+  assert.equal(round.questions[0].prompt, "12 − n = 8");
+  assert.equal(round.questions[0].answer, 4);
+  for (const question of round.questions) {
+    assert.equal(question.topic, "subtrahend");
+    assert.equal(question.operation, "subtract");
+    assert.match(question.prompt, /^\d+ − n = \d+$/);
+    assert.ok(!question.prompt.includes("×"));
+    assert.ok(!question.prompt.includes("÷"));
+    assert.ok(!question.prompt.includes("+"));
+    assert.ok(question.answer >= 1 && question.answer <= 9);
+    assert.ok(question.left <= 20);
+    assert.ok(question.result <= 12);
+    assert.ok(question.left < 1000);
+    assert.equal(question.left - question.answer, question.result);
+    assert.equal(question.fullPrompt, true);
+    const model = engine.whyModel(question);
+    assert.equal(model.family, "subtrahend");
+    assert.equal(model.total - model.known, model.hidden);
+    assert.equal(model.hidden, question.answer);
+    assert.equal(engine.whyPrompt(question, "lift").prompt, `n = ${model.hidden}`);
+    assert.ok(!/variable|algebra|inverse/i.test(`${question.prompt} ${question.hint}`));
+  }
+});
+
+test("missing addend rounds stay addend-only after subtrahend exists", () => {
+  const addend = engine.buildRound(
+    { topic: "missing", timerSeconds: 0, questionCount: 8 },
+    cyclingRng(),
+  );
+  assert.equal(addend.questions[0].prompt, "8 + n = 12");
+  for (const question of addend.questions) {
+    assert.equal(question.topic, "missing");
+    assert.equal(question.operation, "add");
+    assert.equal(engine.whyModel(question).family, "addend");
+    assert.ok(!question.prompt.includes("−"));
+  }
+});
+
+test("playableTopic only allows the two Grade 3 teaching families", () => {
+  assert.equal(engine.playableTopic("subtrahend"), "subtrahend");
+  assert.equal(engine.playableTopic("missing"), "missing");
+  assert.equal(engine.playableTopic("times"), "missing");
+  assert.equal(engine.playableTopic("onestep"), "missing");
+  assert.equal(engine.normalizeSettings({ topic: "subtrahend" }).topic, "subtrahend");
+  assert.equal(engine.subtitleFor({ topic: "subtrahend" }), "What's hiding?");
+  assert.equal(engine.usesWorkspace({ topic: "subtrahend" }), false);
+});
+
+test("a missing-subtrahend round marks that node for replay, not times facts", () => {
+  const after = engine.applyRoundProgress(
+    engine.emptyProgress(),
+    "subtrahend",
+    { asked: 4, accuracy: 100 },
+    3,
+  );
+  assert.ok(after.completedNodes.includes("missing-subtrahend"));
+  assert.ok(!after.completedNodes.includes("times-facts"));
+  assert.ok(!after.completedNodes.includes("number-sense"));
+  const opened = engine.spendUnlock(engine.applyCoinPayout(after, 12));
+  assert.equal(engine.nodeStatus(opened.progress, "missing-subtrahend"), "replay");
+  assert.equal(engine.nodeAction("replay"), "Replay");
+});
+
+test("coins still require why-move plus correct n on subtrahend", () => {
+  const question = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  assert.equal(engine.usesWhyModel(question), true);
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: 1, earnedThisRound: 0 }), engine.COIN_BASE);
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: false, streak: 4, earnedThisRound: 0 }), 0);
+  assert.equal(engine.payoutCoins({ ok: false, usesWhy: true, whyDone: true, streak: 4, earnedThisRound: 0 }), 0);
 });

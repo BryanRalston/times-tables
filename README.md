@@ -27,12 +27,14 @@ https://bryanralston.github.io/times-tables/
 3. Tap **Start** on **Missing addend**.
 4. Drag the known dots (the matching 8s) off both pans. The prompt becomes `n = leftover`. Type that leftover. A wrong leftover tilts the balance; try again.
 5. Coins are the quiet number in the corner. A correct n **after** the drag earns coins. Miss, skip, or tapping OK before the move earns 0.
-6. Spend coins on the trail to open the next family or grade chapter. Those later nodes stay locked as content for now — paying does not start a new quiz. Looks are an optional cheap extra. There is no real-money shop.
+6. Spend 12 coins on **Missing subtrahend**. It becomes **Start**, not Coming-forever.
+7. Tap **Start** on **Missing subtrahend**. First card is `12 − n = 8`. Drag the known leftover off both pans, then type `n = 4`. A wrong leftover tilts; try again.
 
-First visit: Grade 3 is open. Missing addend is the only playable puzzle. Number sense, missing subtrahend, and times tables facts sit on the Grade 3 path but stay locked. Other grades are closed chapters.
+Number sense and times tables facts stay locked. Other grades stay closed chapters. Looks are an optional cheap extra. There is no real-money shop.
 
 ## Practice
 
 - **Missing addend:** `8 + n = 12` style, small numbers. Drag the known cluster off both pans, then type n.
+- **Missing subtrahend:** `12 − n = 8` style after you spend to open it. Same board: take the known amount from both pans, then type n.
 - Timer and question count sit behind **Round length** on the map, not on the puzzle as the product.
 - Progress and coins stay in the browser (`localStorage`)
