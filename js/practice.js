@@ -8,10 +8,12 @@
   const TABLES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const FACTORS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const OPERATIONS = ["multiply", "divide", "mix"];
-  const TOPICS = ["times", "add", "subtract", "mix", "missing", "onestep", "shapes"];
+  const TOPICS = ["times", "add", "subtract", "mix", "missing", "onestep", "twostep", "shapes"];
   const DIFFICULTIES = ["2-digit", "3-digit", "thousands"];
   const MIX_OPERATIONS = ["add", "subtract", "multiply", "divide"];
   const ONESTEP_FORMS = ["n+a", "a+n", "n-a", "a-n", "an", "n/a", "a/n"];
+  const TWOSTEP_FORMS = ["an+b", "n/a+b", "an-b", "a-bn"];
+  const FIND_N_TOPICS = ["missing", "onestep", "twostep"];
   const ALWAYS_SKILLS = ["times", "add", "subtract", "mix", "missing", "shapes"];
   const SKILL_COPY = {
     times: { title: "Times tables", blurb: "Multiply and divide", list: "Times tables" },
@@ -20,6 +22,7 @@
     mix: { title: "Mix", blurb: "+ − × ÷ together", list: "Mix (+ − × ÷)" },
     missing: { title: "Find n", blurb: "What's hiding?", list: "What's hiding?" },
     onestep: { title: "Find n", blurb: "What number is n?", list: "What number is n?" },
+    twostep: { title: "Find n", blurb: "Then do this", list: "Then do this" },
     shapes: { title: "Shapes", blurb: "Names, sides, around", list: "Shapes" },
   };
   const FLUENCY_STREAK = 8;
@@ -246,7 +249,14 @@
     return rng() < 0.5 ? "multiply" : "divide";
   }
 
+  function isFindNTopic(topic) {
+    return FIND_N_TOPICS.includes(topic);
+  }
+
   function questionKey(question) {
+    if (question && question.topic === "twostep") {
+      return ["twostep", question.form, question.a, question.b, question.c, question.answer].join(":");
+    }
     if (question && question.topic === "onestep") {
       return ["onestep", question.form, question.left, question.right, question.answer].join(":");
     }
@@ -689,6 +699,107 @@
       spec = generateOnestepSpec(form, random);
     }
     return formatOnestepQuestion(spec, first);
+  }
+
+  function twostepOperation(form) {
+    if (form === "an+b" || form === "n/a+b") {
+      return "add";
+    }
+    return "subtract";
+  }
+
+  function generateTwostepSpec(form, rng) {
+    if (form === "an+b") {
+      const a = randomInt(2, 9, rng);
+      const n = randomInt(2, 12, rng);
+      const b = randomInt(1, 12, rng);
+      return { form, n, a, b, c: a * n + b };
+    }
+    if (form === "n/a+b") {
+      const a = randomInt(2, 9, rng);
+      const q = randomInt(2, 12, rng);
+      const b = randomInt(1, 12, rng);
+      return { form, n: a * q, a, b, c: q + b };
+    }
+    if (form === "an-b") {
+      const a = randomInt(2, 9, rng);
+      const n = randomInt(3, 12, rng);
+      const product = a * n;
+      const b = randomInt(1, Math.min(12, product - 1), rng);
+      return { form, n, a, b, c: product - b };
+    }
+    const coeff = randomInt(2, 8, rng);
+    const n = randomInt(1, 8, rng);
+    const c = randomInt(1, 16, rng);
+    return { form: "a-bn", n, a: c + coeff * n, b: coeff, c };
+  }
+
+  function formatTwostepQuestion(spec, first) {
+    const form = TWOSTEP_FORMS.includes(spec.form) ? spec.form : "an+b";
+    const n = spec.n;
+    const a = spec.a;
+    const b = spec.b;
+    const c = spec.c;
+    const blank = '<span class="blank">n</span>';
+    let prompt;
+    let promptHtml;
+    if (form === "an+b") {
+      prompt = `${a}n + ${b} = ${c}`;
+      promptHtml = `${a}${blank} + ${b} = ${c}`;
+    } else if (form === "n/a+b") {
+      prompt = `n/${a} + ${b} = ${c}`;
+      promptHtml = `${blank}/${a} + ${b} = ${c}`;
+    } else if (form === "an-b") {
+      prompt = `${a}n − ${b} = ${c}`;
+      promptHtml = `${a}${blank} − ${b} = ${c}`;
+    } else {
+      prompt = `${a} − ${b}n = ${c}`;
+      promptHtml = `${a} − ${b}${blank} = ${c}`;
+    }
+    return {
+      topic: "twostep",
+      operation: twostepOperation(form),
+      symbol: form.includes("+") ? "+" : "−",
+      kind: "twostep",
+      form,
+      a,
+      b,
+      c,
+      left: a,
+      right: c,
+      result: c,
+      token: "n",
+      tokenKind: "letter",
+      answer: n,
+      answerKind: "number",
+      prompt,
+      promptHtml,
+      fullPrompt: true,
+      hint: first ? "Then do this" : "Find n",
+      fact: prompt,
+      review: `${prompt}  so  n is ${n}`,
+    };
+  }
+
+  function makeTwostepQuestion(settings, rng, options) {
+    const random = rng || Math.random;
+    const first = Boolean(options && options.first);
+    const requested = options && options.form;
+    const form = first
+      ? "an+b"
+      : TWOSTEP_FORMS.includes(requested)
+        ? requested
+        : pickItem(TWOSTEP_FORMS, random);
+    let spec;
+    if (first) {
+      const n = randomInt(3, 8, random);
+      const a = randomInt(2, 4, random);
+      const b = randomInt(2, 6, random);
+      spec = { form: "an+b", n, a, b, c: a * n + b };
+    } else {
+      spec = generateTwostepSpec(form, random);
+    }
+    return formatTwostepQuestion(spec, first);
   }
 
   function pickShapeKind(focus, rng) {
@@ -1230,6 +1341,24 @@
     };
   }
 
+  function buildTwostepRound(normalized, rng) {
+    const count = normalized.timerSeconds > 0 ? 80 : normalized.questionCount;
+    let forms = [];
+    let made = 0;
+    return {
+      settings: normalized,
+      questions: fillDeck(() => {
+        const first = made === 0;
+        if (!forms.length) {
+          forms = shuffle(TWOSTEP_FORMS.slice(), rng);
+        }
+        const form = first ? "an+b" : forms.shift();
+        made += 1;
+        return makeTwostepQuestion(normalized, rng, { first, form });
+      }, count),
+    };
+  }
+
   function buildRound(settings, rng) {
     const normalized = normalizeSettings(settings);
     const random = rng || Math.random;
@@ -1247,6 +1376,9 @@
     }
     if (normalized.topic === "onestep") {
       return buildOnestepRound(normalized, random);
+    }
+    if (normalized.topic === "twostep") {
+      return buildTwostepRound(normalized, random);
     }
     return buildTimesRound(normalized, random);
   }
@@ -1354,6 +1486,9 @@
     if (normalized.topic === "onestep") {
       return "What number is n?";
     }
+    if (normalized.topic === "twostep") {
+      return "Then do this";
+    }
     if (normalized.topic === "shapes") {
       return "Shapes practice";
     }
@@ -1377,7 +1512,7 @@
 
   function markFor(settings) {
     const normalized = normalizeSettings(settings);
-    if (normalized.topic === "missing" || normalized.topic === "onestep") {
+    if (isFindNTopic(normalized.topic)) {
       return "n";
     }
     if (normalized.topic === "shapes") {
@@ -1397,7 +1532,7 @@
 
   function usesWorkspace(settings) {
     const topic = normalizeSettings(settings).topic;
-    return topic === "add" || topic === "subtract" || topic === "mix" || topic === "missing" || topic === "onestep";
+    return topic === "add" || topic === "subtract" || topic === "mix" || isFindNTopic(topic);
   }
 
   function emptyProgress() {
@@ -1426,7 +1561,7 @@
       new Set(
         (Array.isArray(source.unlocked) ? source.unlocked : [])
           .map((skill) => normalizeTopic(skill))
-          .filter((skill) => skill === "onestep"),
+          .filter((skill) => skill === "onestep" || skill === "twostep"),
       ),
     );
     const lastStruggled = TOPICS.includes(source.lastStruggled) ? source.lastStruggled : null;
@@ -1449,7 +1584,10 @@
     if (!recordIsFluent(fluency.missing)) {
       return "missing";
     }
-    return "onestep";
+    if (!recordIsFluent(fluency.onestep)) {
+      return "onestep";
+    }
+    return "twostep";
   }
 
   function isSkillFluent(progress, skill) {
@@ -1465,6 +1603,10 @@
     if (id === "onestep") {
       const normalized = normalizeProgress(progress);
       return normalized.unlocked.includes("onestep") || recordIsFluent(normalized.fluency.missing);
+    }
+    if (id === "twostep") {
+      const normalized = normalizeProgress(progress);
+      return normalized.unlocked.includes("twostep") || recordIsFluent(normalized.fluency.onestep);
     }
     return false;
   }
@@ -1488,6 +1630,9 @@
     next.fluency[id] = rec;
     if (id === "missing" && recordIsFluent(rec) && !next.unlocked.includes("onestep")) {
       next.unlocked.push("onestep");
+    }
+    if (id === "onestep" && recordIsFluent(rec) && !next.unlocked.includes("twostep")) {
+      next.unlocked.push("twostep");
     }
     if (asked >= STRUGGLE_MIN_ASKED && accuracy < STRUGGLE_ACCURACY) {
       next.lastStruggled = id;
@@ -1515,6 +1660,8 @@
     TOPICS,
     DIFFICULTIES,
     ONESTEP_FORMS,
+    TWOSTEP_FORMS,
+    FIND_N_TOPICS,
     ALWAYS_SKILLS,
     SKILL_COPY,
     SHAPE_IDS,
@@ -1528,6 +1675,7 @@
     makeShapeQuestion,
     makeMissingQuestion,
     makeOnestepQuestion,
+    makeTwostepQuestion,
     figureSvg,
     buildRound,
     buildReplayRound,

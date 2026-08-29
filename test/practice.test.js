@@ -221,6 +221,8 @@ test("subtitle follows the chosen topic", () => {
   assert.equal(engine.subtitleFor({ topic: "subtract" }), "Subtraction practice");
   assert.equal(engine.subtitleFor({ topic: "mix" }), "A mix of + − × ÷");
   assert.equal(engine.subtitleFor({ topic: "missing" }), "What's hiding?");
+  assert.equal(engine.subtitleFor({ topic: "onestep" }), "What number is n?");
+  assert.equal(engine.subtitleFor({ topic: "twostep" }), "Then do this");
   assert.equal(engine.subtitleFor({ topic: "shapes" }), "Shapes practice");
   assert.equal(engine.subtitleFor({ topic: "times", operation: "multiply" }), "Multiplication practice");
   assert.equal(engine.subtitleFor({ topic: "times", operation: "divide" }), "Division practice");
@@ -518,9 +520,12 @@ test("new progress recommends Find n facts and keeps original topics quiet", () 
   const progress = engine.normalizeProgress(null);
   assert.equal(progress.recommended, "missing");
   assert.equal(engine.isSkillUnlocked(progress, "onestep"), false);
+  assert.equal(engine.isSkillUnlocked(progress, "twostep"), false);
   assert.deepEqual(engine.otherSkills(progress, "missing"), ["times", "add", "subtract", "mix", "shapes"]);
   assert.equal(engine.skillCopy("missing").title, "Find n");
   assert.equal(engine.skillCopy("onestep").title, "Find n");
+  assert.equal(engine.skillCopy("twostep").title, "Find n");
+  assert.equal(engine.skillCopy("twostep").blurb, "Then do this");
 });
 
 test("a strong Find n round unlocks one-step and recommends it", () => {
@@ -532,10 +537,13 @@ test("a strong Find n round unlocks one-step and recommends it", () => {
   );
   assert.equal(engine.isSkillFluent(after, "missing"), true);
   assert.equal(engine.isSkillUnlocked(after, "onestep"), true);
+  assert.equal(engine.isSkillUnlocked(after, "twostep"), false);
   assert.equal(after.recommended, "onestep");
   assert.ok(after.unlocked.includes("onestep"));
+  assert.ok(!after.unlocked.includes("twostep"));
   assert.ok(engine.otherSkills(after, "onestep").includes("missing"));
   assert.ok(engine.otherSkills(after, "onestep").includes("times"));
+  assert.ok(!engine.otherSkills(after, "onestep").includes("twostep"));
 });
 
 test("a weak round keeps that skill as the recommendation", () => {
@@ -572,6 +580,156 @@ test("Find n facts stay the old missing-number style", () => {
   assert.equal(question.topic, "missing");
   assert.match(question.prompt, /^\d+ \+ n = \d+$/);
   assert.notEqual(question.topic, "onestep");
+});
+
+test("normalizeSettings keeps a two-step Find n topic", () => {
+  const settings = engine.normalizeSettings({ topic: "twostep" });
+  assert.equal(settings.topic, "twostep");
+  assert.equal(engine.subtitleFor(settings), "Then do this");
+  assert.equal(engine.markFor(settings), "n");
+  assert.equal(engine.usesWorkspace(settings), true);
+});
+
+test("first two-step question is a small 3n + 4 style problem", () => {
+  const question = engine.makeTwostepQuestion({}, rngFrom([0.2, 0.8]), { first: true });
+  assert.equal(question.topic, "twostep");
+  assert.equal(question.form, "an+b");
+  assert.equal(question.token, "n");
+  assert.match(question.prompt, /^\d+n \+ \d+ = \d+$/);
+  assert.equal(question.a * question.answer + question.b, question.c);
+  assert.equal(question.hint, "Then do this");
+  assert.ok(!/variable|algebra|equation|system|inequal|graph|parenthes/i.test(`${question.prompt} ${question.hint} ${question.review}`));
+});
+
+test("two-step round stays two operations and includes the four kid forms", () => {
+  const seen = new Set();
+  let tick = 0;
+  const round = engine.buildRound(
+    { topic: "twostep", timerSeconds: 0, questionCount: 48 },
+    () => {
+      tick += 1;
+      return (tick % 97) / 97;
+    },
+  );
+  assert.equal(round.questions.length, 48);
+  assert.equal(round.questions[0].form, "an+b");
+  assert.match(round.questions[0].prompt, /^\d+n \+ \d+ = \d+$/);
+  for (const question of round.questions) {
+    assert.equal(question.topic, "twostep");
+    assert.ok(engine.TWOSTEP_FORMS.includes(question.form));
+    assert.ok(question.prompt.includes("n"));
+    assert.ok(question.prompt.includes("="));
+    assert.equal((question.prompt.match(/=/g) || []).length, 1);
+    assert.ok(!question.prompt.includes("("));
+    assert.ok(!question.prompt.includes(")"));
+    assert.equal((question.prompt.match(/n/g) || []).length, 1);
+    assert.ok(question.answer >= 0);
+    assert.equal(Number.isInteger(question.answer), true);
+    assert.equal(Number.isInteger(question.a), true);
+    assert.equal(Number.isInteger(question.b), true);
+    assert.equal(Number.isInteger(question.c), true);
+    assert.ok(question.c >= 0);
+    if (question.form === "an+b") {
+      assert.equal(question.a * question.answer + question.b, question.c);
+      assert.match(question.prompt, /^\d+n \+ \d+ = \d+$/);
+    }
+    if (question.form === "n/a+b") {
+      assert.equal(question.answer / question.a + question.b, question.c);
+      assert.match(question.prompt, /^n\/\d+ \+ \d+ = \d+$/);
+    }
+    if (question.form === "an-b") {
+      assert.equal(question.a * question.answer - question.b, question.c);
+      assert.match(question.prompt, /^\d+n − \d+ = \d+$/);
+    }
+    if (question.form === "a-bn") {
+      assert.equal(question.a - question.b * question.answer, question.c);
+      assert.match(question.prompt, /^\d+ − \d+n = \d+$/);
+    }
+    assert.ok(!/variable|algebra|equation|two-step|system|inequal|graph/i.test(`${question.prompt} ${question.hint}`));
+    seen.add(question.form);
+  }
+  assert.ok(seen.has("an+b"));
+  assert.ok(seen.has("n/a+b"));
+  assert.ok(seen.has("an-b"));
+  assert.ok(seen.has("a-bn"));
+});
+
+test("gradeAnswer scores n on a two-step problem, not the other numbers", () => {
+  const question = engine.makeTwostepQuestion({}, () => 0.2, { first: true });
+  assert.deepEqual(engine.gradeAnswer(question, String(question.answer)), {
+    ok: true,
+    empty: false,
+    given: question.answer,
+  });
+  assert.equal(engine.gradeAnswer(question, String(question.c)).ok, question.c === question.answer);
+  assert.equal(engine.gradeAnswer(question, String(question.b)).ok, question.b === question.answer);
+});
+
+test("a strong one-step round unlocks two-step and recommends Find n again", () => {
+  const afterMissing = engine.applyRoundProgress(
+    engine.emptyProgress(),
+    "missing",
+    { asked: 10, accuracy: 100 },
+    10,
+  );
+  const after = engine.applyRoundProgress(
+    afterMissing,
+    "onestep",
+    { asked: 10, accuracy: 100 },
+    10,
+  );
+  assert.equal(engine.isSkillFluent(after, "onestep"), true);
+  assert.equal(engine.isSkillUnlocked(after, "twostep"), true);
+  assert.equal(after.recommended, "twostep");
+  assert.ok(after.unlocked.includes("twostep"));
+  assert.equal(engine.skillCopy(after.recommended).title, "Find n");
+  assert.equal(engine.skillCopy(after.recommended).blurb, "Then do this");
+  assert.ok(engine.otherSkills(after, "twostep").includes("onestep"));
+  assert.ok(engine.otherSkills(after, "twostep").includes("missing"));
+  assert.ok(engine.otherSkills(after, "twostep").includes("times"));
+  assert.ok(!engine.otherSkills(after, "twostep").includes("twostep"));
+});
+
+test("saved one-step fluency already recommends two-step", () => {
+  const progress = engine.normalizeProgress({
+    unlocked: ["onestep"],
+    fluency: {
+      missing: { strongRounds: 1, bestStreak: 10, lastAccuracy: 100, lastAsked: 10 },
+      onestep: { strongRounds: 1, bestStreak: 10, lastAccuracy: 100, lastAsked: 10 },
+    },
+  });
+  assert.equal(progress.recommended, "twostep");
+  assert.equal(engine.isSkillUnlocked(progress, "twostep"), true);
+  assert.equal(engine.isSkillUnlocked(progress, "onestep"), true);
+});
+
+test("an 8-streak on one-step is enough to unlock two-step", () => {
+  const afterMissing = engine.applyRoundProgress(
+    engine.emptyProgress(),
+    "missing",
+    { asked: 4, accuracy: 100 },
+    8,
+  );
+  const after = engine.applyRoundProgress(
+    afterMissing,
+    "onestep",
+    { asked: 8, accuracy: 100 },
+    8,
+  );
+  assert.equal(engine.isSkillFluent(after, "onestep"), true);
+  assert.equal(after.recommended, "twostep");
+});
+
+test("one-step rounds stay one-step even after two-step exists", () => {
+  const round = engine.buildRound(
+    { topic: "onestep", timerSeconds: 0, questionCount: 12 },
+    cyclingRng(),
+  );
+  for (const question of round.questions) {
+    assert.equal(question.topic, "onestep");
+    assert.ok(engine.ONESTEP_FORMS.includes(question.form));
+    assert.notEqual(question.topic, "twostep");
+  }
 });
 
 test("mix stays numbers-only and times tables still work", () => {

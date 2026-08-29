@@ -26,6 +26,7 @@ Home is one skill and Start. A quiet **something else** reaches the rest.
 
 - **Find n:** a letter or box hides a number (`3 + n = 7`, `n × 4 = 20`)
 - **Find n (stretch):** one-step `n` problems after a strong Find n round (`n + 7 = 19`, `3n = 12`, `20 − n = 8`, `n/3 = 5`)
+- **Find n (then do this):** two-step `n` problems after a strong one-step round (`3n + 4 = 19`, `n/2 + 5 = 11`, `2n − 7 = 9`, `20 − 3n = 5`)
 - **Times tables:** 1–12, multiply, divide, or mix
 - **Add / Subtract:** 2-digit, 3-digit, or thousands, with optional scratch paper
 - **Mix (+ − × ÷):** add, subtract, multiply, and divide
