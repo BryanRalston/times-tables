@@ -661,6 +661,13 @@ fieldset.is-disabled {
   transform: scale(1);
 }
 
+.why-model[data-phase="lift"] .why-n-token,
+.why-model[data-phase="lift"] .why-n-value,
+.why-model[data-phase="reveal"] .why-n-token,
+.why-model[data-phase="reveal"] .why-n-value {
+  transition: none;
+}
+
 .why-model[data-phase="reveal"] .why-n-value {
   color: var(--leaf);
 }
