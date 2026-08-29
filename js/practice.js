@@ -8,9 +8,25 @@
   const TABLES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const FACTORS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const OPERATIONS = ["multiply", "divide", "mix"];
-  const TOPICS = ["times", "add", "subtract", "mix", "missing", "shapes"];
+  const TOPICS = ["times", "add", "subtract", "mix", "missing", "onestep", "shapes"];
   const DIFFICULTIES = ["2-digit", "3-digit", "thousands"];
   const MIX_OPERATIONS = ["add", "subtract", "multiply", "divide"];
+  const ONESTEP_FORMS = ["n+a", "a+n", "n-a", "a-n", "an", "n/a", "a/n"];
+  const ALWAYS_SKILLS = ["times", "add", "subtract", "mix", "missing", "shapes"];
+  const SKILL_COPY = {
+    times: { title: "Times tables", blurb: "Multiply and divide", list: "Times tables" },
+    add: { title: "Add", blurb: "Stack the numbers", list: "Add" },
+    subtract: { title: "Subtract", blurb: "Take away", list: "Subtract" },
+    mix: { title: "Mix", blurb: "+ − × ÷ together", list: "Mix (+ − × ÷)" },
+    missing: { title: "Find n", blurb: "What's hiding?", list: "What's hiding?" },
+    onestep: { title: "Find n", blurb: "What number is n?", list: "What number is n?" },
+    shapes: { title: "Shapes", blurb: "Names, sides, around", list: "Shapes" },
+  };
+  const FLUENCY_STREAK = 8;
+  const FLUENCY_MIN_ASKED = 10;
+  const FLUENCY_ACCURACY = 90;
+  const STRUGGLE_MIN_ASKED = 8;
+  const STRUGGLE_ACCURACY = 70;
   const SHAPE_IDS = ["triangle", "square", "rectangle", "pentagon", "hexagon", "circle"];
   const SHAPE_FOCUSES = ["mix", "names", "count", "measure"];
   const SHAPE_META = {
@@ -231,6 +247,9 @@
   }
 
   function questionKey(question) {
+    if (question && question.topic === "onestep") {
+      return ["onestep", question.form, question.left, question.right, question.answer].join(":");
+    }
     if (question && question.topic === "missing") {
       return ["missing", question.operation, question.slot, question.left, question.right, question.token].join(":");
     }
@@ -554,6 +573,122 @@
       spec = makeMissingSpec(operation, tables, random);
     }
     return formatMissingQuestion(spec, pickMissingToken(random, first), first);
+  }
+
+  function onestepOperation(form) {
+    if (form === "n+a" || form === "a+n") {
+      return "add";
+    }
+    if (form === "n-a" || form === "a-n") {
+      return "subtract";
+    }
+    if (form === "an") {
+      return "multiply";
+    }
+    return "divide";
+  }
+
+  function generateOnestepSpec(form, rng) {
+    if (form === "n+a" || form === "a+n") {
+      const n = randomInt(2, 18, rng);
+      const a = randomInt(2, 16, rng);
+      return { form, n, a, b: n + a };
+    }
+    if (form === "n-a") {
+      const a = randomInt(2, 12, rng);
+      const n = randomInt(a + 2, a + 20, rng);
+      return { form, n, a, b: n - a };
+    }
+    if (form === "a-n") {
+      const n = randomInt(2, 16, rng);
+      const b = randomInt(2, 16, rng);
+      return { form, n, a: n + b, b };
+    }
+    if (form === "an") {
+      const a = randomInt(2, 12, rng);
+      const n = randomInt(2, 12, rng);
+      return { form, n, a, b: a * n };
+    }
+    if (form === "n/a") {
+      const a = randomInt(2, 12, rng);
+      const b = randomInt(2, 12, rng);
+      return { form, n: a * b, a, b };
+    }
+    const n = randomInt(2, 12, rng);
+    const b = randomInt(2, 9, rng);
+    return { form: "a/n", n, a: n * b, b };
+  }
+
+  function formatOnestepQuestion(spec, first) {
+    const form = ONESTEP_FORMS.includes(spec.form) ? spec.form : "n+a";
+    const n = spec.n;
+    const a = spec.a;
+    const b = spec.b;
+    const blank = '<span class="blank">n</span>';
+    let prompt;
+    let promptHtml;
+    if (form === "n+a") {
+      prompt = `n + ${a} = ${b}`;
+      promptHtml = `${blank} + ${a} = ${b}`;
+    } else if (form === "a+n") {
+      prompt = `${a} + n = ${b}`;
+      promptHtml = `${a} + ${blank} = ${b}`;
+    } else if (form === "n-a") {
+      prompt = `n − ${a} = ${b}`;
+      promptHtml = `${blank} − ${a} = ${b}`;
+    } else if (form === "a-n") {
+      prompt = `${a} − n = ${b}`;
+      promptHtml = `${a} − ${blank} = ${b}`;
+    } else if (form === "an") {
+      prompt = `${a}n = ${b}`;
+      promptHtml = `${a}${blank} = ${b}`;
+    } else if (form === "n/a") {
+      prompt = `n/${a} = ${b}`;
+      promptHtml = `${blank}/${a} = ${b}`;
+    } else {
+      prompt = `${a}/n = ${b}`;
+      promptHtml = `${a}/${blank} = ${b}`;
+    }
+    return {
+      topic: "onestep",
+      operation: onestepOperation(form),
+      symbol: form === "an" ? "" : form === "n/a" || form === "a/n" ? "/" : form.includes("+") ? "+" : "−",
+      kind: "onestep",
+      form,
+      left: a,
+      right: b,
+      result: b,
+      token: "n",
+      tokenKind: "letter",
+      answer: n,
+      answerKind: "number",
+      prompt,
+      promptHtml,
+      fullPrompt: true,
+      hint: first ? "Find n" : "What number is n?",
+      fact: prompt,
+      review: `${prompt}  so  n is ${n}`,
+    };
+  }
+
+  function makeOnestepQuestion(settings, rng, options) {
+    const random = rng || Math.random;
+    const first = Boolean(options && options.first);
+    const requested = options && options.form;
+    const form = first
+      ? "n+a"
+      : ONESTEP_FORMS.includes(requested)
+        ? requested
+        : pickItem(ONESTEP_FORMS, random);
+    let spec;
+    if (first) {
+      const n = randomInt(8, 16, random);
+      const a = randomInt(5, 9, random);
+      spec = { form: "n+a", n, a, b: n + a };
+    } else {
+      spec = generateOnestepSpec(form, random);
+    }
+    return formatOnestepQuestion(spec, first);
   }
 
   function pickShapeKind(focus, rng) {
@@ -1077,6 +1212,24 @@
     };
   }
 
+  function buildOnestepRound(normalized, rng) {
+    const count = normalized.timerSeconds > 0 ? 80 : normalized.questionCount;
+    let forms = [];
+    let made = 0;
+    return {
+      settings: normalized,
+      questions: fillDeck(() => {
+        const first = made === 0;
+        if (!forms.length) {
+          forms = shuffle(ONESTEP_FORMS.slice(), rng);
+        }
+        const form = first ? "n+a" : forms.shift();
+        made += 1;
+        return makeOnestepQuestion(normalized, rng, { first, form });
+      }, count),
+    };
+  }
+
   function buildRound(settings, rng) {
     const normalized = normalizeSettings(settings);
     const random = rng || Math.random;
@@ -1091,6 +1244,9 @@
     }
     if (normalized.topic === "missing") {
       return buildMissingRound(normalized, random);
+    }
+    if (normalized.topic === "onestep") {
+      return buildOnestepRound(normalized, random);
     }
     return buildTimesRound(normalized, random);
   }
@@ -1195,6 +1351,9 @@
     if (normalized.topic === "missing") {
       return "What's hiding?";
     }
+    if (normalized.topic === "onestep") {
+      return "What number is n?";
+    }
     if (normalized.topic === "shapes") {
       return "Shapes practice";
     }
@@ -1218,7 +1377,7 @@
 
   function markFor(settings) {
     const normalized = normalizeSettings(settings);
-    if (normalized.topic === "missing") {
+    if (normalized.topic === "missing" || normalized.topic === "onestep") {
       return "n";
     }
     if (normalized.topic === "shapes") {
@@ -1238,7 +1397,115 @@
 
   function usesWorkspace(settings) {
     const topic = normalizeSettings(settings).topic;
-    return topic === "add" || topic === "subtract" || topic === "mix" || topic === "missing";
+    return topic === "add" || topic === "subtract" || topic === "mix" || topic === "missing" || topic === "onestep";
+  }
+
+  function emptyProgress() {
+    return {
+      unlocked: [],
+      fluency: {},
+      lastStruggled: null,
+      recommended: "missing",
+    };
+  }
+
+  function normalizeProgress(raw) {
+    const source = raw && typeof raw === "object" ? raw : {};
+    const fluency = {};
+    const incoming = source.fluency && typeof source.fluency === "object" ? source.fluency : {};
+    TOPICS.forEach((skill) => {
+      const rec = incoming[skill] && typeof incoming[skill] === "object" ? incoming[skill] : {};
+      fluency[skill] = {
+        strongRounds: Math.max(0, Number(rec.strongRounds) || 0),
+        bestStreak: Math.max(0, Number(rec.bestStreak) || 0),
+        lastAccuracy: Math.max(0, Number(rec.lastAccuracy) || 0),
+        lastAsked: Math.max(0, Number(rec.lastAsked) || 0),
+      };
+    });
+    const unlocked = Array.from(
+      new Set(
+        (Array.isArray(source.unlocked) ? source.unlocked : [])
+          .map((skill) => normalizeTopic(skill))
+          .filter((skill) => skill === "onestep"),
+      ),
+    );
+    const lastStruggled = TOPICS.includes(source.lastStruggled) ? source.lastStruggled : null;
+    return {
+      unlocked,
+      fluency,
+      lastStruggled,
+      recommended: recommendedFrom(fluency, lastStruggled),
+    };
+  }
+
+  function recordIsFluent(rec) {
+    return Boolean(rec && (rec.strongRounds >= 1 || rec.bestStreak >= FLUENCY_STREAK));
+  }
+
+  function recommendedFrom(fluency, lastStruggled) {
+    if (lastStruggled && !recordIsFluent(fluency[lastStruggled])) {
+      return lastStruggled;
+    }
+    if (!recordIsFluent(fluency.missing)) {
+      return "missing";
+    }
+    return "onestep";
+  }
+
+  function isSkillFluent(progress, skill) {
+    const rec = normalizeProgress(progress).fluency[normalizeTopic(skill)];
+    return recordIsFluent(rec);
+  }
+
+  function isSkillUnlocked(progress, skill) {
+    const id = normalizeTopic(skill);
+    if (ALWAYS_SKILLS.includes(id)) {
+      return true;
+    }
+    if (id === "onestep") {
+      const normalized = normalizeProgress(progress);
+      return normalized.unlocked.includes("onestep") || recordIsFluent(normalized.fluency.missing);
+    }
+    return false;
+  }
+
+  function pickRecommended(progress) {
+    return normalizeProgress(progress).recommended;
+  }
+
+  function applyRoundProgress(progress, skill, summary, streakPeak) {
+    const next = normalizeProgress(progress);
+    const id = normalizeTopic(skill);
+    const asked = summary && Number.isInteger(summary.asked) ? summary.asked : 0;
+    const accuracy = summary && Number.isInteger(summary.accuracy) ? summary.accuracy : 0;
+    const rec = next.fluency[id] || { strongRounds: 0, bestStreak: 0, lastAccuracy: 0, lastAsked: 0 };
+    rec.bestStreak = Math.max(rec.bestStreak || 0, Number(streakPeak) || 0);
+    rec.lastAccuracy = accuracy;
+    rec.lastAsked = asked;
+    if (asked >= FLUENCY_MIN_ASKED && accuracy >= FLUENCY_ACCURACY) {
+      rec.strongRounds = (rec.strongRounds || 0) + 1;
+    }
+    next.fluency[id] = rec;
+    if (id === "missing" && recordIsFluent(rec) && !next.unlocked.includes("onestep")) {
+      next.unlocked.push("onestep");
+    }
+    if (asked >= STRUGGLE_MIN_ASKED && accuracy < STRUGGLE_ACCURACY) {
+      next.lastStruggled = id;
+    } else if (recordIsFluent(rec) && next.lastStruggled === id) {
+      next.lastStruggled = null;
+    }
+    next.recommended = recommendedFrom(next.fluency, next.lastStruggled);
+    return next;
+  }
+
+  function skillCopy(skill) {
+    const id = normalizeTopic(skill);
+    return SKILL_COPY[id] || SKILL_COPY.missing;
+  }
+
+  function otherSkills(progress, current) {
+    const currentId = normalizeTopic(current);
+    return TOPICS.filter((id) => id !== currentId && isSkillUnlocked(progress, id));
   }
 
   return {
@@ -1247,6 +1514,9 @@
     OPERATIONS,
     TOPICS,
     DIFFICULTIES,
+    ONESTEP_FORMS,
+    ALWAYS_SKILLS,
+    SKILL_COPY,
     SHAPE_IDS,
     SHAPE_FOCUSES,
     DEFAULT_SETTINGS,
@@ -1257,6 +1527,7 @@
     makeArithmeticQuestion,
     makeShapeQuestion,
     makeMissingQuestion,
+    makeOnestepQuestion,
     figureSvg,
     buildRound,
     buildReplayRound,
@@ -1269,5 +1540,13 @@
     subtitleFor,
     markFor,
     usesWorkspace,
+    emptyProgress,
+    normalizeProgress,
+    isSkillFluent,
+    isSkillUnlocked,
+    pickRecommended,
+    applyRoundProgress,
+    skillCopy,
+    otherSkills,
   };
 });

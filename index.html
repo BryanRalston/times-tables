@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#243038" />
     <meta
       name="description"
-      content="Offline math practice for times tables, multi-digit add and subtract, missing numbers, and 3rd-grade shapes. Pick a topic, go timed or untimed, and see your score."
+      content="Offline math practice. One skill at a time: times tables, add, subtract, Find n, and shapes. No accounts."
     />
     <title>Times Tables</title>
     <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9IiMyNDMwMzgiLz48dGV4dCB4PSIzMiIgeT0iNDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjYiIGZvbnQtZmFtaWx5PSJUcmVidWNoZXQgTVMsIFNlZ29lIFVJLCBzYW5zLXNlcmlmIiBmaWxsPSIjZmZmZGY4Ij7Dl8O3PC90ZXh0Pjwvc3ZnPg==" />
@@ -199,6 +199,71 @@ fieldset.is-disabled {
   color: #fffdf8;
   font-weight: 700;
   min-width: 160px;
+}
+
+.recommend {
+  text-align: center;
+  padding: 8px 6px 4px;
+}
+
+.recommend h2 {
+  font-size: clamp(2rem, 7vw, 2.8rem);
+  letter-spacing: -0.04em;
+}
+
+.recommend p {
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.recommend + .actions {
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.else-block {
+  margin-top: 22px;
+  text-align: center;
+}
+
+.else-toggle {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  min-height: 44px;
+  padding: 8px 10px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.else-panel {
+  text-align: left;
+  margin-top: 10px;
+}
+
+.else-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 18px;
+}
+
+.else-skill {
+  background: none;
+  border: 0;
+  border-radius: 12px;
+  min-height: 44px;
+  padding: 10px 12px;
+  cursor: pointer;
+  color: var(--ink);
+  text-align: left;
+}
+
+.else-skill:hover,
+.else-skill:focus-visible {
+  background: #f7f1e6;
 }
 
 .btn-ghost {
@@ -552,25 +617,26 @@ fieldset.is-disabled {
   <body>
     <main class="app">
       <header class="masthead">
-        <div class="mark" id="masthead-mark" aria-hidden="true">×÷</div>
+        <div class="mark" id="masthead-mark" aria-hidden="true">n</div>
         <div>
           <h1>Times Tables</h1>
-          <p id="masthead-subtitle">Multiplication practice</p>
+          <p id="masthead-subtitle">What's hiding?</p>
         </div>
       </header>
 
-      <section id="screen-setup" class="card" aria-label="Choose practice">
-        <fieldset class="section">
-          <legend>What do you want to practice?</legend>
-          <div class="choice-row">
-            <label class="choice"><input type="radio" name="topic" value="times" checked /> Times tables</label>
-            <label class="choice"><input type="radio" name="topic" value="add" /> Add</label>
-            <label class="choice"><input type="radio" name="topic" value="subtract" /> Subtract</label>
-            <label class="choice"><input type="radio" name="topic" value="mix" /> Mix (+ − × ÷)</label>
-            <label class="choice"><input type="radio" name="topic" value="missing" /> Find n</label>
-            <label class="choice"><input type="radio" name="topic" value="shapes" /> Shapes</label>
-          </div>
-        </fieldset>
+      <section id="screen-setup" class="card" aria-label="Start practice">
+        <div class="recommend" id="recommend-card">
+          <h2 id="recommend-title">Find n</h2>
+          <p id="recommend-blurb">What's hiding?</p>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="start-practice">Start</button>
+        </div>
+
+        <div class="else-block">
+          <button type="button" class="else-toggle" id="else-toggle" aria-expanded="false" aria-controls="else-panel">something else</button>
+          <div id="else-panel" class="else-panel" hidden>
+            <div id="else-skills" class="else-skills"></div>
 
         <div class="section" id="tables-section">
           <div class="section-head">
@@ -629,9 +695,7 @@ fieldset.is-disabled {
             <label class="choice"><input type="radio" name="count" value="30" /> 30</label>
           </div>
         </fieldset>
-
-        <div class="actions">
-          <button type="button" class="btn btn-primary" id="start-practice">Start</button>
+          </div>
         </div>
         <p id="setup-error" class="error" hidden></p>
       </section>
@@ -694,9 +758,25 @@ fieldset.is-disabled {
   const TABLES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const FACTORS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const OPERATIONS = ["multiply", "divide", "mix"];
-  const TOPICS = ["times", "add", "subtract", "mix", "missing", "shapes"];
+  const TOPICS = ["times", "add", "subtract", "mix", "missing", "onestep", "shapes"];
   const DIFFICULTIES = ["2-digit", "3-digit", "thousands"];
   const MIX_OPERATIONS = ["add", "subtract", "multiply", "divide"];
+  const ONESTEP_FORMS = ["n+a", "a+n", "n-a", "a-n", "an", "n/a", "a/n"];
+  const ALWAYS_SKILLS = ["times", "add", "subtract", "mix", "missing", "shapes"];
+  const SKILL_COPY = {
+    times: { title: "Times tables", blurb: "Multiply and divide", list: "Times tables" },
+    add: { title: "Add", blurb: "Stack the numbers", list: "Add" },
+    subtract: { title: "Subtract", blurb: "Take away", list: "Subtract" },
+    mix: { title: "Mix", blurb: "+ − × ÷ together", list: "Mix (+ − × ÷)" },
+    missing: { title: "Find n", blurb: "What's hiding?", list: "What's hiding?" },
+    onestep: { title: "Find n", blurb: "What number is n?", list: "What number is n?" },
+    shapes: { title: "Shapes", blurb: "Names, sides, around", list: "Shapes" },
+  };
+  const FLUENCY_STREAK = 8;
+  const FLUENCY_MIN_ASKED = 10;
+  const FLUENCY_ACCURACY = 90;
+  const STRUGGLE_MIN_ASKED = 8;
+  const STRUGGLE_ACCURACY = 70;
   const SHAPE_IDS = ["triangle", "square", "rectangle", "pentagon", "hexagon", "circle"];
   const SHAPE_FOCUSES = ["mix", "names", "count", "measure"];
   const SHAPE_META = {
@@ -917,6 +997,9 @@ fieldset.is-disabled {
   }
 
   function questionKey(question) {
+    if (question && question.topic === "onestep") {
+      return ["onestep", question.form, question.left, question.right, question.answer].join(":");
+    }
     if (question && question.topic === "missing") {
       return ["missing", question.operation, question.slot, question.left, question.right, question.token].join(":");
     }
@@ -1240,6 +1323,122 @@ fieldset.is-disabled {
       spec = makeMissingSpec(operation, tables, random);
     }
     return formatMissingQuestion(spec, pickMissingToken(random, first), first);
+  }
+
+  function onestepOperation(form) {
+    if (form === "n+a" || form === "a+n") {
+      return "add";
+    }
+    if (form === "n-a" || form === "a-n") {
+      return "subtract";
+    }
+    if (form === "an") {
+      return "multiply";
+    }
+    return "divide";
+  }
+
+  function generateOnestepSpec(form, rng) {
+    if (form === "n+a" || form === "a+n") {
+      const n = randomInt(2, 18, rng);
+      const a = randomInt(2, 16, rng);
+      return { form, n, a, b: n + a };
+    }
+    if (form === "n-a") {
+      const a = randomInt(2, 12, rng);
+      const n = randomInt(a + 2, a + 20, rng);
+      return { form, n, a, b: n - a };
+    }
+    if (form === "a-n") {
+      const n = randomInt(2, 16, rng);
+      const b = randomInt(2, 16, rng);
+      return { form, n, a: n + b, b };
+    }
+    if (form === "an") {
+      const a = randomInt(2, 12, rng);
+      const n = randomInt(2, 12, rng);
+      return { form, n, a, b: a * n };
+    }
+    if (form === "n/a") {
+      const a = randomInt(2, 12, rng);
+      const b = randomInt(2, 12, rng);
+      return { form, n: a * b, a, b };
+    }
+    const n = randomInt(2, 12, rng);
+    const b = randomInt(2, 9, rng);
+    return { form: "a/n", n, a: n * b, b };
+  }
+
+  function formatOnestepQuestion(spec, first) {
+    const form = ONESTEP_FORMS.includes(spec.form) ? spec.form : "n+a";
+    const n = spec.n;
+    const a = spec.a;
+    const b = spec.b;
+    const blank = '<span class="blank">n</span>';
+    let prompt;
+    let promptHtml;
+    if (form === "n+a") {
+      prompt = `n + ${a} = ${b}`;
+      promptHtml = `${blank} + ${a} = ${b}`;
+    } else if (form === "a+n") {
+      prompt = `${a} + n = ${b}`;
+      promptHtml = `${a} + ${blank} = ${b}`;
+    } else if (form === "n-a") {
+      prompt = `n − ${a} = ${b}`;
+      promptHtml = `${blank} − ${a} = ${b}`;
+    } else if (form === "a-n") {
+      prompt = `${a} − n = ${b}`;
+      promptHtml = `${a} − ${blank} = ${b}`;
+    } else if (form === "an") {
+      prompt = `${a}n = ${b}`;
+      promptHtml = `${a}${blank} = ${b}`;
+    } else if (form === "n/a") {
+      prompt = `n/${a} = ${b}`;
+      promptHtml = `${blank}/${a} = ${b}`;
+    } else {
+      prompt = `${a}/n = ${b}`;
+      promptHtml = `${a}/${blank} = ${b}`;
+    }
+    return {
+      topic: "onestep",
+      operation: onestepOperation(form),
+      symbol: form === "an" ? "" : form === "n/a" || form === "a/n" ? "/" : form.includes("+") ? "+" : "−",
+      kind: "onestep",
+      form,
+      left: a,
+      right: b,
+      result: b,
+      token: "n",
+      tokenKind: "letter",
+      answer: n,
+      answerKind: "number",
+      prompt,
+      promptHtml,
+      fullPrompt: true,
+      hint: first ? "Find n" : "What number is n?",
+      fact: prompt,
+      review: `${prompt}  so  n is ${n}`,
+    };
+  }
+
+  function makeOnestepQuestion(settings, rng, options) {
+    const random = rng || Math.random;
+    const first = Boolean(options && options.first);
+    const requested = options && options.form;
+    const form = first
+      ? "n+a"
+      : ONESTEP_FORMS.includes(requested)
+        ? requested
+        : pickItem(ONESTEP_FORMS, random);
+    let spec;
+    if (first) {
+      const n = randomInt(8, 16, random);
+      const a = randomInt(5, 9, random);
+      spec = { form: "n+a", n, a, b: n + a };
+    } else {
+      spec = generateOnestepSpec(form, random);
+    }
+    return formatOnestepQuestion(spec, first);
   }
 
   function pickShapeKind(focus, rng) {
@@ -1763,6 +1962,24 @@ fieldset.is-disabled {
     };
   }
 
+  function buildOnestepRound(normalized, rng) {
+    const count = normalized.timerSeconds > 0 ? 80 : normalized.questionCount;
+    let forms = [];
+    let made = 0;
+    return {
+      settings: normalized,
+      questions: fillDeck(() => {
+        const first = made === 0;
+        if (!forms.length) {
+          forms = shuffle(ONESTEP_FORMS.slice(), rng);
+        }
+        const form = first ? "n+a" : forms.shift();
+        made += 1;
+        return makeOnestepQuestion(normalized, rng, { first, form });
+      }, count),
+    };
+  }
+
   function buildRound(settings, rng) {
     const normalized = normalizeSettings(settings);
     const random = rng || Math.random;
@@ -1777,6 +1994,9 @@ fieldset.is-disabled {
     }
     if (normalized.topic === "missing") {
       return buildMissingRound(normalized, random);
+    }
+    if (normalized.topic === "onestep") {
+      return buildOnestepRound(normalized, random);
     }
     return buildTimesRound(normalized, random);
   }
@@ -1881,6 +2101,9 @@ fieldset.is-disabled {
     if (normalized.topic === "missing") {
       return "What's hiding?";
     }
+    if (normalized.topic === "onestep") {
+      return "What number is n?";
+    }
     if (normalized.topic === "shapes") {
       return "Shapes practice";
     }
@@ -1904,7 +2127,7 @@ fieldset.is-disabled {
 
   function markFor(settings) {
     const normalized = normalizeSettings(settings);
-    if (normalized.topic === "missing") {
+    if (normalized.topic === "missing" || normalized.topic === "onestep") {
       return "n";
     }
     if (normalized.topic === "shapes") {
@@ -1924,7 +2147,115 @@ fieldset.is-disabled {
 
   function usesWorkspace(settings) {
     const topic = normalizeSettings(settings).topic;
-    return topic === "add" || topic === "subtract" || topic === "mix" || topic === "missing";
+    return topic === "add" || topic === "subtract" || topic === "mix" || topic === "missing" || topic === "onestep";
+  }
+
+  function emptyProgress() {
+    return {
+      unlocked: [],
+      fluency: {},
+      lastStruggled: null,
+      recommended: "missing",
+    };
+  }
+
+  function normalizeProgress(raw) {
+    const source = raw && typeof raw === "object" ? raw : {};
+    const fluency = {};
+    const incoming = source.fluency && typeof source.fluency === "object" ? source.fluency : {};
+    TOPICS.forEach((skill) => {
+      const rec = incoming[skill] && typeof incoming[skill] === "object" ? incoming[skill] : {};
+      fluency[skill] = {
+        strongRounds: Math.max(0, Number(rec.strongRounds) || 0),
+        bestStreak: Math.max(0, Number(rec.bestStreak) || 0),
+        lastAccuracy: Math.max(0, Number(rec.lastAccuracy) || 0),
+        lastAsked: Math.max(0, Number(rec.lastAsked) || 0),
+      };
+    });
+    const unlocked = Array.from(
+      new Set(
+        (Array.isArray(source.unlocked) ? source.unlocked : [])
+          .map((skill) => normalizeTopic(skill))
+          .filter((skill) => skill === "onestep"),
+      ),
+    );
+    const lastStruggled = TOPICS.includes(source.lastStruggled) ? source.lastStruggled : null;
+    return {
+      unlocked,
+      fluency,
+      lastStruggled,
+      recommended: recommendedFrom(fluency, lastStruggled),
+    };
+  }
+
+  function recordIsFluent(rec) {
+    return Boolean(rec && (rec.strongRounds >= 1 || rec.bestStreak >= FLUENCY_STREAK));
+  }
+
+  function recommendedFrom(fluency, lastStruggled) {
+    if (lastStruggled && !recordIsFluent(fluency[lastStruggled])) {
+      return lastStruggled;
+    }
+    if (!recordIsFluent(fluency.missing)) {
+      return "missing";
+    }
+    return "onestep";
+  }
+
+  function isSkillFluent(progress, skill) {
+    const rec = normalizeProgress(progress).fluency[normalizeTopic(skill)];
+    return recordIsFluent(rec);
+  }
+
+  function isSkillUnlocked(progress, skill) {
+    const id = normalizeTopic(skill);
+    if (ALWAYS_SKILLS.includes(id)) {
+      return true;
+    }
+    if (id === "onestep") {
+      const normalized = normalizeProgress(progress);
+      return normalized.unlocked.includes("onestep") || recordIsFluent(normalized.fluency.missing);
+    }
+    return false;
+  }
+
+  function pickRecommended(progress) {
+    return normalizeProgress(progress).recommended;
+  }
+
+  function applyRoundProgress(progress, skill, summary, streakPeak) {
+    const next = normalizeProgress(progress);
+    const id = normalizeTopic(skill);
+    const asked = summary && Number.isInteger(summary.asked) ? summary.asked : 0;
+    const accuracy = summary && Number.isInteger(summary.accuracy) ? summary.accuracy : 0;
+    const rec = next.fluency[id] || { strongRounds: 0, bestStreak: 0, lastAccuracy: 0, lastAsked: 0 };
+    rec.bestStreak = Math.max(rec.bestStreak || 0, Number(streakPeak) || 0);
+    rec.lastAccuracy = accuracy;
+    rec.lastAsked = asked;
+    if (asked >= FLUENCY_MIN_ASKED && accuracy >= FLUENCY_ACCURACY) {
+      rec.strongRounds = (rec.strongRounds || 0) + 1;
+    }
+    next.fluency[id] = rec;
+    if (id === "missing" && recordIsFluent(rec) && !next.unlocked.includes("onestep")) {
+      next.unlocked.push("onestep");
+    }
+    if (asked >= STRUGGLE_MIN_ASKED && accuracy < STRUGGLE_ACCURACY) {
+      next.lastStruggled = id;
+    } else if (recordIsFluent(rec) && next.lastStruggled === id) {
+      next.lastStruggled = null;
+    }
+    next.recommended = recommendedFrom(next.fluency, next.lastStruggled);
+    return next;
+  }
+
+  function skillCopy(skill) {
+    const id = normalizeTopic(skill);
+    return SKILL_COPY[id] || SKILL_COPY.missing;
+  }
+
+  function otherSkills(progress, current) {
+    const currentId = normalizeTopic(current);
+    return TOPICS.filter((id) => id !== currentId && isSkillUnlocked(progress, id));
   }
 
   return {
@@ -1933,6 +2264,9 @@ fieldset.is-disabled {
     OPERATIONS,
     TOPICS,
     DIFFICULTIES,
+    ONESTEP_FORMS,
+    ALWAYS_SKILLS,
+    SKILL_COPY,
     SHAPE_IDS,
     SHAPE_FOCUSES,
     DEFAULT_SETTINGS,
@@ -1943,6 +2277,7 @@ fieldset.is-disabled {
     makeArithmeticQuestion,
     makeShapeQuestion,
     makeMissingQuestion,
+    makeOnestepQuestion,
     figureSvg,
     buildRound,
     buildReplayRound,
@@ -1955,12 +2290,21 @@ fieldset.is-disabled {
     subtitleFor,
     markFor,
     usesWorkspace,
+    emptyProgress,
+    normalizeProgress,
+    isSkillFluent,
+    isSkillUnlocked,
+    pickRecommended,
+    applyRoundProgress,
+    skillCopy,
+    otherSkills,
   };
 });
 
 (function () {
   const engine = window.TimesTables;
   const STORAGE_KEY = "times-tables-settings";
+  const PROGRESS_KEY = "times-tables-progress";
 
   const screens = {
     setup: document.getElementById("screen-setup"),
@@ -1969,6 +2313,11 @@ fieldset.is-disabled {
   };
 
   const els = {
+    recommendTitle: document.getElementById("recommend-title"),
+    recommendBlurb: document.getElementById("recommend-blurb"),
+    elseToggle: document.getElementById("else-toggle"),
+    elsePanel: document.getElementById("else-panel"),
+    elseSkills: document.getElementById("else-skills"),
     tableGrid: document.getElementById("table-grid"),
     tablesSection: document.getElementById("tables-section"),
     operationSection: document.getElementById("operation-section"),
@@ -2008,17 +2357,22 @@ fieldset.is-disabled {
 
   const state = {
     settings: engine.normalizeSettings(loadSettings()),
+    progress: engine.normalizeProgress(loadProgress()),
+    homeSkill: "missing",
+    elseOpen: false,
     round: null,
     asked: 0,
     results: [],
     buffer: "",
     locked: false,
     streak: 0,
+    streakPeak: 0,
     startedAt: 0,
     remainingMs: 0,
     timerId: null,
     advanceId: null,
   };
+  state.homeSkill = state.progress.recommended;
 
   function loadSettings() {
     try {
@@ -2032,15 +2386,22 @@ fieldset.is-disabled {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
   }
 
+  function loadProgress() {
+    try {
+      return JSON.parse(localStorage.getItem(PROGRESS_KEY) || "null");
+    } catch {
+      return null;
+    }
+  }
+
+  function saveProgress(progress) {
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+  }
+
   function showScreen(name) {
     Object.entries(screens).forEach(([key, node]) => {
       node.hidden = key !== name;
     });
-  }
-
-  function selectedTopic() {
-    const checked = document.querySelector('input[name="topic"]:checked');
-    return checked ? checked.value : "times";
   }
 
   function selectedDifficulty() {
@@ -2082,13 +2443,44 @@ fieldset.is-disabled {
   function readSetup() {
     return engine.normalizeSettings({
       tables: selectedTables(),
-      topic: selectedTopic(),
+      topic: state.homeSkill,
       operation: selectedOperation(),
       difficulty: selectedDifficulty(),
       shapeFocus: selectedShapeFocus(),
       timerSeconds: selectedTimer(),
       questionCount: selectedCount(),
     });
+  }
+
+  function renderRecommend(skill) {
+    const copy = engine.skillCopy(skill);
+    els.recommendTitle.textContent = copy.title;
+    els.recommendBlurb.textContent = copy.blurb;
+    updateChrome({ ...state.settings, topic: skill });
+  }
+
+  function renderElseSkills() {
+    els.elseSkills.replaceChildren();
+    engine.otherSkills(state.progress, state.homeSkill).forEach((skill) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "else-skill";
+      button.textContent = engine.skillCopy(skill).list;
+      button.addEventListener("click", () => {
+        state.homeSkill = skill;
+        els.setupError.hidden = true;
+        renderRecommend(skill);
+        renderElseSkills();
+        updateSetupVisibility(readSetup());
+      });
+      els.elseSkills.append(button);
+    });
+  }
+
+  function setElseOpen(open) {
+    state.elseOpen = Boolean(open);
+    els.elsePanel.hidden = !state.elseOpen;
+    els.elseToggle.setAttribute("aria-expanded", state.elseOpen ? "true" : "false");
   }
 
   function updateChrome(settings) {
@@ -2141,14 +2533,15 @@ fieldset.is-disabled {
 
   function hydrateSetup(settings) {
     renderTables(settings.tables);
-    setChoice("topic", settings.topic);
     setChoice("operation", settings.operation);
     setChoice("difficulty", settings.difficulty);
     setChoice("shape-focus", settings.shapeFocus);
     setChoice("timer", settings.timerSeconds);
     setChoice("count", settings.questionCount);
     updateCountDisabled(settings.timerSeconds);
-    updateSetupVisibility(settings);
+    renderRecommend(state.homeSkill);
+    renderElseSkills();
+    updateSetupVisibility({ ...settings, topic: state.homeSkill });
   }
 
   function updateCountDisabled(timerSeconds) {
@@ -2453,7 +2846,14 @@ fieldset.is-disabled {
     els.resultsScore.textContent = `${summary.correct} / ${summary.asked}`;
     els.resultsAccuracy.textContent = summary.asked ? `${summary.accuracy}% correct` : "No answers";
     els.resultsTime.textContent = `Time ${engine.formatClock(elapsedSeconds)}`;
-    if (state.settings.topic === "shapes" || state.settings.topic === "missing") {
+    state.progress = engine.applyRoundProgress(
+      state.progress,
+      state.settings.topic,
+      summary,
+      state.streakPeak,
+    );
+    saveProgress(state.progress);
+    if (state.settings.topic === "shapes" || state.settings.topic === "missing" || state.settings.topic === "onestep") {
       els.missedHeading.textContent = "Missed";
     } else if (state.settings.topic === "times") {
       els.missedHeading.textContent = "Missed facts";
@@ -2501,6 +2901,7 @@ fieldset.is-disabled {
     state.asked = 0;
     state.results = [];
     state.streak = 0;
+    state.streakPeak = 0;
     state.startedAt = Date.now();
     showScreen("practice");
     showQuestion();
@@ -2532,6 +2933,7 @@ fieldset.is-disabled {
     state.asked += 1;
     if (grade.ok) {
       state.streak += 1;
+      state.streakPeak = Math.max(state.streakPeak, state.streak);
       setFeedback("Correct", "ok");
       screens.practice.dataset.state = "ok";
     } else {
@@ -2610,11 +3012,15 @@ fieldset.is-disabled {
     input.addEventListener("change", () => updateCountDisabled(selectedTimer()));
   });
 
-  document.querySelectorAll('input[name="topic"], input[name="operation"]').forEach((input) => {
+  document.querySelectorAll('input[name="operation"]').forEach((input) => {
     input.addEventListener("change", () => {
       els.setupError.hidden = true;
       updateSetupVisibility(readSetup());
     });
+  });
+
+  els.elseToggle.addEventListener("click", () => {
+    setElseOpen(!state.elseOpen);
   });
 
   document.querySelectorAll('input[name="scratch-mode"]').forEach((input) => {
@@ -2668,12 +3074,16 @@ fieldset.is-disabled {
   els.restart.addEventListener("click", () => beginRound(state.settings));
   els.changeTables.addEventListener("click", () => {
     clearTimers();
+    state.homeSkill = state.settings.topic;
     hydrateSetup(state.settings);
+    setElseOpen(true);
     showScreen("setup");
   });
   els.playAgain.addEventListener("click", () => beginRound(state.settings));
   els.resultsChange.addEventListener("click", () => {
-    hydrateSetup(state.settings);
+    state.homeSkill = state.progress.recommended;
+    hydrateSetup({ ...state.settings, topic: state.homeSkill });
+    setElseOpen(false);
     showScreen("setup");
   });
   els.practiceMissed.addEventListener("click", () => {
@@ -2718,6 +3128,7 @@ fieldset.is-disabled {
 
   renderKeypad();
   hydrateSetup(state.settings);
+  setElseOpen(false);
   showScreen("setup");
 
 })();
