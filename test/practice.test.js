@@ -811,3 +811,133 @@ test("mix stays numbers-only and times tables still work", () => {
     assert.equal(question.left, 8);
   }
 });
+
+test("product name is n / What's hiding, not Times Tables", () => {
+  assert.equal(engine.PRODUCT_NAME, "n");
+  assert.equal(engine.PRODUCT_BLURB, "What's hiding");
+  const titles = engine.trailChapters().map((chapter) => chapter.title).join(" ");
+  assert.doesNotMatch(titles, /SAT|calculus|Khan/i);
+  assert.equal(engine.trailChapters()[0].id, "grade-3");
+  assert.equal(engine.trailChapters()[0].nodes.map((node) => node.id).join(","), "number-sense,missing-addend,missing-subtrahend,times-facts");
+});
+
+test("first visit opens Grade 3 and only missing addend is playable", () => {
+  const progress = engine.normalizeProgress(null);
+  assert.equal(progress.coins, engine.STARTER_COINS);
+  assert.equal(engine.chapterStatus(progress, "grade-3"), "open");
+  assert.equal(engine.chapterStatus(progress, "grade-4"), "closed");
+  assert.equal(engine.chapterStatus(progress, "algebra-2"), "closed");
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "current");
+  assert.equal(engine.nodeAction("current"), "Start");
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "locked");
+  assert.equal(engine.nodeStatus(progress, "missing-subtrahend"), "priced");
+  assert.equal(engine.nodeStatus(progress, "times-facts"), "locked");
+  assert.equal(engine.isNodePlayable("missing-addend"), true);
+  assert.equal(engine.isNodePlayable("missing-subtrahend"), false);
+  assert.equal(engine.isNodePlayable("times-facts"), false);
+  assert.equal(engine.isNodePlayable("number-sense"), false);
+  assert.equal(engine.startNode().topic, "missing");
+  const next = engine.nextPricedUnlock(progress);
+  assert.equal(next.kind, "node");
+  assert.equal(next.id, "missing-subtrahend");
+  assert.equal(next.cost, engine.NODE_UNLOCK_COST);
+  assert.ok(progress.coins < next.cost);
+});
+
+test("correct n after the why-move earns coins; miss and skip-move pay 0", () => {
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: 1, earnedThisRound: 0 }), engine.COIN_BASE);
+  assert.equal(engine.payoutCoins({ ok: false, usesWhy: true, whyDone: true, streak: 4, earnedThisRound: 0 }), 0);
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: false, streak: 4, earnedThisRound: 0 }), 0);
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: false, whyDone: true, streak: 4, earnedThisRound: 0 }), 0);
+});
+
+test("streak bonus is small and a round cap stops grinding one family", () => {
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: 2, earnedThisRound: 0 }), engine.COIN_BASE);
+  assert.equal(
+    engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: engine.COIN_STREAK_AT, earnedThisRound: 0 }),
+    engine.COIN_BASE + engine.COIN_STREAK_BONUS,
+  );
+  assert.equal(
+    engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: 20, earnedThisRound: 0 }),
+    engine.COIN_BASE + engine.COIN_STREAK_BONUS,
+  );
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: 8, earnedThisRound: engine.COIN_ROUND_CAP }), 0);
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: 8, earnedThisRound: engine.COIN_ROUND_CAP - 1 }), 1);
+  let earned = 0;
+  for (let streak = 1; streak <= 20; streak += 1) {
+    earned += engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak, earnedThisRound: earned });
+  }
+  assert.equal(earned, engine.COIN_ROUND_CAP);
+  assert.ok(engine.STARTER_COINS + engine.COIN_ROUND_CAP >= engine.NODE_UNLOCK_COST);
+  assert.ok(engine.STARTER_COINS + engine.COIN_ROUND_CAP < engine.NODE_UNLOCK_COST * 2);
+});
+
+test("a short honest missing-addend run can buy the next Grade 3 node", () => {
+  let progress = engine.emptyProgress();
+  let earned = 0;
+  for (let streak = 1; streak <= 4; streak += 1) {
+    const payout = engine.payoutCoins({
+      ok: true,
+      usesWhy: true,
+      whyDone: true,
+      streak,
+      earnedThisRound: earned,
+    });
+    earned += payout;
+    progress = engine.applyCoinPayout(progress, payout);
+  }
+  assert.ok(progress.coins >= engine.NODE_UNLOCK_COST);
+  const spent = engine.spendUnlock(progress);
+  assert.equal(spent.ok, true);
+  assert.equal(spent.unlocked.id, "missing-subtrahend");
+  assert.equal(engine.nodeStatus(spent.progress, "missing-subtrahend"), "coming");
+  assert.equal(engine.isNodePlayable("missing-subtrahend"), false);
+  assert.equal(engine.nodeAction("coming"), "Coming");
+  assert.equal(engine.nextPricedUnlock(spent.progress).id, "times-facts");
+});
+
+test("cannot unlock the next node without earning the rest", () => {
+  const blocked = engine.spendUnlock(engine.emptyProgress());
+  assert.equal(blocked.ok, false);
+  assert.equal(blocked.reason, "coins");
+  assert.equal(blocked.progress.coins, engine.STARTER_COINS);
+  assert.equal(engine.nodeStatus(blocked.progress, "missing-subtrahend"), "priced");
+});
+
+test("looks are a cheap sink and never skip the why-move", () => {
+  const rich = engine.applyCoinPayout(engine.emptyProgress(), 8);
+  const bought = engine.spendLook(rich, "leaf");
+  assert.equal(bought.ok, true);
+  assert.equal(bought.progress.look, "leaf");
+  assert.equal(bought.progress.coins, rich.coins - engine.LOOK_COST);
+  const again = engine.spendLook(bought.progress, "leaf");
+  assert.equal(again.reason, "owned");
+  assert.equal(again.progress.coins, bought.progress.coins);
+  const broke = engine.spendLook(engine.emptyProgress(), "leaf");
+  assert.equal(broke.ok, false);
+  assert.equal(broke.progress.look, "ink");
+});
+
+test("finishing a missing-addend round marks that node for replay", () => {
+  const after = engine.applyRoundProgress(engine.emptyProgress(), "missing", { asked: 4, accuracy: 100 }, 3);
+  assert.ok(after.completedNodes.includes("missing-addend"));
+  assert.equal(engine.nodeStatus(after, "missing-addend"), "replay");
+  assert.equal(engine.nodeAction("replay"), "Replay");
+  assert.equal(engine.nodeStatus(after, "missing-subtrahend"), "priced");
+});
+
+test("buying later Grade 3 nodes does not open a keypad family", () => {
+  let progress = engine.applyCoinPayout(engine.emptyProgress(), 40);
+  const first = engine.spendUnlock(progress);
+  const second = engine.spendUnlock(first.progress);
+  assert.equal(first.unlocked.id, "missing-subtrahend");
+  assert.equal(second.unlocked.id, "times-facts");
+  assert.equal(engine.isNodePlayable("times-facts"), false);
+  assert.equal(engine.nodeStatus(second.progress, "times-facts"), "coming");
+  assert.equal(engine.chapterStatus(second.progress, "grade-4"), "priced");
+  const chapter = engine.spendUnlock(second.progress);
+  assert.equal(chapter.unlocked.kind, "chapter");
+  assert.equal(chapter.unlocked.id, "grade-4");
+  assert.equal(engine.chapterStatus(chapter.progress, "grade-4"), "open");
+  assert.equal(engine.isNodePlayable("missing-factor"), false);
+});

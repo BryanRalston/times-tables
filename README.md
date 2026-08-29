@@ -1,8 +1,8 @@
-# Times Tables
+# n / What's hiding
 
-A single-file, offline math practice page. Home shows one recommended skill and Start. Nothing is sent to a server.
+A single-file, offline math page. Home is a trail of grade chapters. Nothing is sent to a server. No accounts.
 
-The original [Grok share](https://grok.com/share/bGVnYWN5LWNvcHk_bd3e770d-4d57-432c-a779-97664f7053e1) is sign-in gated, so this follows that conversation’s title and last visible prompt (“add division option”).
+Times tables is a family on the Grade 3 path, not the product title.
 
 ## Open it
 
@@ -20,19 +20,19 @@ This repo is one static file at the root. After Pages is set to **main** / **(ro
 
 https://bryanralston.github.io/times-tables/
 
+## For parents
+
+1. Open the live page. You should see **n / What's hiding** and a list of grade chapters, not a wall of topic chips.
+2. Tap **Grade 3**.
+3. Tap **Start** on **Missing addend**.
+4. Drag the known dots (the matching 8s) off both pans. The prompt becomes `n = leftover`. Type that leftover. A wrong leftover tilts the balance; try again.
+5. Coins are the quiet number in the corner. A correct n **after** the drag earns coins. Miss, skip, or tapping OK before the move earns 0.
+6. Spend coins on the trail to open the next family or grade chapter. Those later nodes stay locked as content for now — paying does not start a new quiz. Looks are an optional cheap extra. There is no real-money shop.
+
+First visit: Grade 3 is open. Missing addend is the only playable puzzle. Number sense, missing subtrahend, and times tables facts sit on the Grade 3 path but stay locked. Other grades are closed chapters.
+
 ## Practice
 
-Home is one skill and Start. A quiet **something else** reaches the rest.
-
-- **Find n:** missing addend only at first (`8 + n = 12`, `3 + n = 7`, `n + 5 = 9`), small numbers. Drag the matching dots off both pans, then type n.
-- **Find n (stretch):** one-step mix after a strong missing-addend round (`n + 7 = 19`, `3n = 12`, `20 − n = 8`, `n/3 = 5`)
-- **Find n (then do this):** two-step `n` problems after a strong one-step round (`3n + 4 = 19`, `n/2 + 5 = 11`, `2n − 7 = 9`, `20 − 3n = 5`)
-- **Times tables:** 1–12, multiply, divide, or mix
-- **Add / Subtract:** 2-digit, 3-digit, or thousands, with optional scratch paper
-- **Mix (+ − × ÷):** add, subtract, multiply, and divide
-- **Shapes:** name the picture, count sides and corners, add the distance around (perimeter), and fill a rectangle (area)
-- Same one-problem loop at every level: keypad, check, next, optional scratch pad
-- Untimed rounds of 10, 20, or 30 questions
-- Optional 30 / 60 / 90 second timer
-- Immediate right/wrong, score, streak, restart
-- Progress stays in the browser (`localStorage`)
+- **Missing addend:** `8 + n = 12` style, small numbers. Drag the known cluster off both pans, then type n.
+- Timer and question count sit behind **Round length** on the map, not on the puzzle as the product.
+- Progress and coins stay in the browser (`localStorage`)
