@@ -648,21 +648,30 @@ fieldset.is-disabled {
   color: var(--ink);
 }
 
-.why-model.is-preview .why-n-token,
+.why-model[data-phase="idle"] .take-away {
+  cursor: pointer;
+}
+
+.why-model[data-phase="lift"] .why-tile:not(.take-away) {
+  background: var(--leaf);
+}
+
 .why-model[data-phase="lift"] .why-n-token,
-.why-model[data-phase="reveal"] .why-n-token {
+.why-model[data-phase="reveal"] .why-n-token,
+.why-model.is-preview .why-n-token {
+  opacity: 0;
+}
+
+.why-model[data-phase="lift"] .why-n-value {
   opacity: 0;
 }
 
 .why-model.is-preview .why-n-value,
-.why-model[data-phase="lift"] .why-n-value,
 .why-model[data-phase="reveal"] .why-n-value {
   opacity: 1;
   transform: scale(1);
 }
 
-.why-model[data-phase="lift"] .why-n-token,
-.why-model[data-phase="lift"] .why-n-value,
 .why-model[data-phase="reveal"] .why-n-token,
 .why-model[data-phase="reveal"] .why-n-value {
   transition: none;
@@ -673,11 +682,42 @@ fieldset.is-disabled {
 }
 
 .why-caption {
+  display: block;
+  width: 100%;
   text-align: center;
-  min-height: 1.35em;
-  margin-top: 8px;
+  min-height: 52px;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border: 2px solid var(--sky);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--sky) 12%, white);
+  font: inherit;
   font-weight: 700;
   color: var(--sky);
+  cursor: pointer;
+}
+
+.why-caption:disabled {
+  cursor: default;
+  border-color: transparent;
+  background: transparent;
+}
+
+.why-caption.is-nudge {
+  animation: why-nudge 0.45s ease;
+}
+
+@keyframes why-nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
 }
 
 .why-caption[data-phase="reveal"] {
@@ -1347,7 +1387,17 @@ fieldset.is-disabled {
     if (phase === "reveal") {
       return model.fact;
     }
+    if (phase === "lift") {
+      return "What's left?";
+    }
     return `Take ${model.known} from both`;
+  }
+
+  function whyNudge(model) {
+    if (!model) {
+      return "";
+    }
+    return `Take ${model.known} from both first`;
   }
 
   function usesWhyModel(question) {
@@ -2442,6 +2492,7 @@ fieldset.is-disabled {
     makeTwostepQuestion,
     whyModel,
     whyCaption,
+    whyNudge,
     usesWhyModel,
     figureSvg,
     buildRound,
@@ -2795,17 +2846,59 @@ fieldset.is-disabled {
     pans.append(left, right);
     scale.append(beam, fulcrum, strings, pans);
 
-    const caption = document.createElement("p");
+    const caption = document.createElement("button");
+    caption.type = "button";
+    caption.id = "why-move";
     caption.className = "why-caption";
     caption.setAttribute("aria-live", "polite");
+    caption.addEventListener("click", () => doWhyMove(question));
 
     els.why.append(scale, caption);
     els.why.hidden = false;
     setWhyCaption(engine.whyCaption(model, "idle"), "idle");
+    els.why.querySelectorAll(".take-away").forEach((tile) => {
+      tile.addEventListener("click", () => doWhyMove(question));
+    });
+  }
+
+  function whyMoveDone() {
+    return els.why.dataset.phase === "lift" || els.why.dataset.phase === "reveal";
+  }
+
+  function doWhyMove(question) {
+    if (state.locked || whyMoveDone()) {
+      return;
+    }
+    const model = engine.whyModel(question);
+    if (!model) {
+      return;
+    }
+    setAnswer("");
+    els.why.classList.remove("is-preview");
+    els.why.dataset.phase = "lift";
+    setWhyCaption(engine.whyCaption(model, "lift"), "lift");
+    const caption = els.why.querySelector(".why-caption");
+    if (caption) {
+      caption.disabled = true;
+      caption.classList.remove("is-nudge");
+    }
+    setFeedback(engine.whyCaption(model, "lift"), "");
+  }
+
+  function nudgeWhyMove(question) {
+    const model = engine.whyModel(question);
+    setFeedback(engine.whyNudge(model), "hint");
+    const caption = els.why.querySelector(".why-caption");
+    if (!caption) {
+      return;
+    }
+    caption.classList.remove("is-nudge");
+    void caption.offsetWidth;
+    caption.classList.add("is-nudge");
   }
 
   function syncWhyPreview(value) {
-    if (els.why.hidden || els.why.dataset.phase !== "idle") {
+    if (els.why.hidden || els.why.dataset.phase !== "lift") {
       return;
     }
     const shown = els.why.querySelector(".why-n-value");
@@ -2816,7 +2909,7 @@ fieldset.is-disabled {
     els.why.classList.toggle("is-preview", Boolean(value));
   }
 
-  function playWhyModel(question) {
+  function revealWhyModel(question) {
     const model = engine.whyModel(question);
     if (!model) {
       return 0;
@@ -2826,14 +2919,13 @@ fieldset.is-disabled {
       value.textContent = String(model.hidden);
     }
     els.why.classList.add("is-preview");
-    els.why.dataset.phase = "lift";
-    setWhyCaption(engine.whyCaption(model, "lift"), "lift");
-    window.clearTimeout(state.whyId);
-    state.whyId = window.setTimeout(() => {
-      els.why.dataset.phase = "reveal";
-      setWhyCaption(engine.whyCaption(model, "reveal"), "reveal");
-    }, 1400);
-    return 3400;
+    els.why.dataset.phase = "reveal";
+    setWhyCaption(engine.whyCaption(model, "reveal"), "reveal");
+    const caption = els.why.querySelector(".why-caption");
+    if (caption) {
+      caption.disabled = true;
+    }
+    return 1600;
   }
 
   function setAnswer(value) {
@@ -3206,6 +3298,10 @@ fieldset.is-disabled {
       return;
     }
     const question = currentQuestion();
+    if (engine.usesWhyModel(question) && !whyMoveDone()) {
+      nudgeWhyMove(question);
+      return;
+    }
     const grade = engine.gradeAnswer(question, state.buffer);
     if (grade.empty) {
       setFeedback(question.answerKind === "choice" ? "Tap a name" : "Enter a number", "hint");
@@ -3228,7 +3324,7 @@ fieldset.is-disabled {
     }
     updateHud();
 
-    const teachMs = playWhyModel(question);
+    const teachMs = revealWhyModel(question);
     const delay = teachMs
       ? teachMs
       : grade.ok
