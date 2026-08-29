@@ -59,6 +59,108 @@
     timerSeconds: 0,
     questionCount: 20,
   };
+  const PRODUCT_NAME = "n";
+  const PRODUCT_BLURB = "What's hiding";
+  const STARTER_COINS = 3;
+  const NODE_UNLOCK_COST = 12;
+  const CHAPTER_UNLOCK_COST = 12;
+  const LOOK_COST = 4;
+  const COIN_BASE = 3;
+  const COIN_STREAK_AT = 3;
+  const COIN_STREAK_BONUS = 1;
+  const COIN_ROUND_CAP = 15;
+  const LOOK_IDS = ["ink", "leaf"];
+  const START_NODE_ID = "missing-addend";
+  const START_CHAPTER_ID = "grade-3";
+  const TOPIC_TO_NODE = { missing: "missing-addend" };
+  const TRAIL_CHAPTERS = [
+    {
+      id: "grade-3",
+      title: "Grade 3",
+      blurb: "What's hiding this year",
+      nodes: [
+        { id: "number-sense", title: "Number sense", playable: false },
+        { id: "missing-addend", title: "Missing addend", playable: true, topic: "missing" },
+        { id: "missing-subtrahend", title: "Missing subtrahend", playable: false },
+        { id: "times-facts", title: "Times tables facts", playable: false },
+      ],
+    },
+    {
+      id: "grade-4",
+      title: "Grade 4",
+      blurb: "Later chapter",
+      nodes: [
+        { id: "missing-factor", title: "Missing factor", playable: false },
+        { id: "multi-digit", title: "Multi-digit + − × ÷", playable: false },
+      ],
+    },
+    {
+      id: "grade-5",
+      title: "Grade 5",
+      blurb: "Later chapter",
+      nodes: [
+        { id: "fractions", title: "Fractions", playable: false },
+        { id: "decimals-percents", title: "Decimals and percents", playable: false },
+      ],
+    },
+    {
+      id: "grade-6",
+      title: "Grade 6",
+      blurb: "Later chapter",
+      nodes: [
+        { id: "negatives", title: "Negatives", playable: false },
+        { id: "one-then-two", title: "One-step then two-step", playable: false },
+        { id: "ratios", title: "Ratios", playable: false },
+      ],
+    },
+    {
+      id: "grade-7",
+      title: "Grade 7",
+      blurb: "Later chapter",
+      nodes: [
+        { id: "linear-graph", title: "Linear + graph", playable: false },
+        { id: "systems-intro", title: "Systems intro", playable: false },
+      ],
+    },
+    {
+      id: "grade-8",
+      title: "Grade 8",
+      blurb: "Later chapter",
+      nodes: [
+        { id: "geometry-measure", title: "Geometry measure", playable: false },
+        { id: "exponents-roots", title: "Exponents and roots", playable: false },
+      ],
+    },
+    {
+      id: "algebra-1",
+      title: "Algebra 1",
+      blurb: "Later chapter",
+      nodes: [
+        { id: "linear", title: "Linear", playable: false },
+        { id: "systems", title: "Systems", playable: false },
+        { id: "quadratics", title: "Quadratics", playable: false },
+      ],
+    },
+    {
+      id: "geometry",
+      title: "Geometry",
+      blurb: "Later chapter",
+      nodes: [
+        { id: "angle-area-perimeter", title: "Angle / area / perimeter", playable: false },
+      ],
+    },
+    {
+      id: "algebra-2",
+      title: "Algebra 2 / later",
+      blurb: "Later chapter",
+      nodes: [
+        { id: "trig-ratios", title: "Trig ratios", playable: false },
+        { id: "functions", title: "Functions", playable: false },
+        { id: "stats", title: "Stats", playable: false },
+      ],
+    },
+  ];
+  const GRADE3_ADVANCE_NODES = ["missing-subtrahend", "times-facts"];
 
   function uniqueSortedNumbers(values) {
     return Array.from(
@@ -1471,6 +1573,13 @@
       fluency: {},
       lastStruggled: null,
       recommended: "missing",
+      coins: STARTER_COINS,
+      grantedStarter: true,
+      unlockedNodes: [],
+      openedChapters: [START_CHAPTER_ID],
+      completedNodes: [],
+      look: "ink",
+      boughtLooks: ["ink"],
     };
   }
 
@@ -1495,12 +1604,261 @@
       ),
     );
     const lastStruggled = TOPICS.includes(source.lastStruggled) ? source.lastStruggled : null;
+    const knownNodeIds = trailNodeIds();
+    const knownChapterIds = TRAIL_CHAPTERS.map((chapter) => chapter.id);
+    const hasWallet = Object.prototype.hasOwnProperty.call(source, "coins") || source.grantedStarter;
+    const coins = Math.max(0, Math.floor(Number(hasWallet ? source.coins : STARTER_COINS) || 0));
+    const unlockedNodes = uniqueIds(source.unlockedNodes, knownNodeIds);
+    const openedChapters = uniqueIds(
+      Array.isArray(source.openedChapters) && source.openedChapters.length
+        ? source.openedChapters
+        : [START_CHAPTER_ID],
+      knownChapterIds,
+    );
+    if (!openedChapters.includes(START_CHAPTER_ID)) {
+      openedChapters.unshift(START_CHAPTER_ID);
+    }
+    const completedNodes = uniqueIds(source.completedNodes, knownNodeIds);
+    const look = LOOK_IDS.includes(source.look) ? source.look : "ink";
+    const boughtLooks = uniqueIds(source.boughtLooks, LOOK_IDS);
+    if (!boughtLooks.includes("ink")) {
+      boughtLooks.unshift("ink");
+    }
+    if (!boughtLooks.includes(look)) {
+      boughtLooks.push(look);
+    }
     return {
       unlocked,
       fluency,
       lastStruggled,
       recommended: recommendedFrom(fluency, lastStruggled),
+      coins,
+      grantedStarter: true,
+      unlockedNodes,
+      openedChapters,
+      completedNodes,
+      look,
+      boughtLooks,
     };
+  }
+
+  function uniqueIds(values, allowed) {
+    const allowedSet = new Set(allowed);
+    return Array.from(
+      new Set((Array.isArray(values) ? values : []).filter((id) => allowedSet.has(id))),
+    );
+  }
+
+  function trailChapters() {
+    return TRAIL_CHAPTERS.map((chapter) => ({
+      id: chapter.id,
+      title: chapter.title,
+      blurb: chapter.blurb,
+      nodes: chapter.nodes.map((node) => ({ ...node })),
+    }));
+  }
+
+  function trailNodeIds() {
+    return TRAIL_CHAPTERS.flatMap((chapter) => chapter.nodes.map((node) => node.id));
+  }
+
+  function findChapter(chapterId) {
+    return TRAIL_CHAPTERS.find((chapter) => chapter.id === chapterId) || null;
+  }
+
+  function findNode(nodeId) {
+    for (const chapter of TRAIL_CHAPTERS) {
+      const node = chapter.nodes.find((item) => item.id === nodeId);
+      if (node) {
+        return { chapter, node };
+      }
+    }
+    return null;
+  }
+
+  function isChapterOpen(progress, chapterId) {
+    return normalizeProgress(progress).openedChapters.includes(chapterId);
+  }
+
+  function isNodePurchased(progress, nodeId) {
+    if (nodeId === START_NODE_ID) {
+      return true;
+    }
+    return normalizeProgress(progress).unlockedNodes.includes(nodeId);
+  }
+
+  function isNodeCompleted(progress, nodeId) {
+    return normalizeProgress(progress).completedNodes.includes(nodeId);
+  }
+
+  function isNodePlayable(nodeId) {
+    const found = findNode(nodeId);
+    return Boolean(found && found.node.playable);
+  }
+
+  function nextPricedUnlock(progress) {
+    const normalized = normalizeProgress(progress);
+    for (const nodeId of GRADE3_ADVANCE_NODES) {
+      if (!normalized.unlockedNodes.includes(nodeId)) {
+        const found = findNode(nodeId);
+        return {
+          kind: "node",
+          id: nodeId,
+          chapterId: found ? found.chapter.id : START_CHAPTER_ID,
+          title: found ? found.node.title : nodeId,
+          cost: NODE_UNLOCK_COST,
+        };
+      }
+    }
+    for (const chapter of TRAIL_CHAPTERS) {
+      if (chapter.id === START_CHAPTER_ID) {
+        continue;
+      }
+      if (!normalized.openedChapters.includes(chapter.id)) {
+        return {
+          kind: "chapter",
+          id: chapter.id,
+          chapterId: chapter.id,
+          title: chapter.title,
+          cost: CHAPTER_UNLOCK_COST,
+        };
+      }
+    }
+    return null;
+  }
+
+  function chapterStatus(progress, chapterId) {
+    const chapter = findChapter(chapterId);
+    if (!chapter) {
+      return "closed";
+    }
+    if (isChapterOpen(progress, chapterId)) {
+      return "open";
+    }
+    const next = nextPricedUnlock(progress);
+    if (next && next.kind === "chapter" && next.id === chapterId) {
+      return "priced";
+    }
+    return "closed";
+  }
+
+  function nodeStatus(progress, nodeId) {
+    const found = findNode(nodeId);
+    if (!found) {
+      return "locked";
+    }
+    if (found.node.playable) {
+      return isNodeCompleted(progress, nodeId) ? "replay" : "current";
+    }
+    if (isNodePurchased(progress, nodeId)) {
+      return "coming";
+    }
+    const next = nextPricedUnlock(progress);
+    if (next && next.kind === "node" && next.id === nodeId) {
+      return "priced";
+    }
+    return "locked";
+  }
+
+  function nodeAction(status) {
+    switch (status) {
+      case "current":
+        return "Start";
+      case "replay":
+        return "Replay";
+      case "coming":
+        return "Coming";
+      case "priced":
+        return "Unlock";
+      case "locked":
+        return "";
+      default: {
+        const unexpected = status;
+        void unexpected;
+        return "";
+      }
+    }
+  }
+
+  function startNode() {
+    const found = findNode(START_NODE_ID);
+    return found ? { ...found.node, chapterId: found.chapter.id } : null;
+  }
+
+  function payoutCoins(input) {
+    const source = input && typeof input === "object" ? input : {};
+    if (!source.ok) {
+      return 0;
+    }
+    if (!source.usesWhy) {
+      return 0;
+    }
+    if (!source.whyDone) {
+      return 0;
+    }
+    const earned = Math.max(0, Math.floor(Number(source.earnedThisRound) || 0));
+    const remaining = Math.max(0, COIN_ROUND_CAP - earned);
+    if (!remaining) {
+      return 0;
+    }
+    const streak = Math.max(0, Math.floor(Number(source.streak) || 0));
+    const bonus = streak >= COIN_STREAK_AT ? COIN_STREAK_BONUS : 0;
+    return Math.min(COIN_BASE + bonus, remaining);
+  }
+
+  function applyCoinPayout(progress, payout) {
+    const next = normalizeProgress(progress);
+    const amount = Math.max(0, Math.floor(Number(payout) || 0));
+    next.coins += amount;
+    return next;
+  }
+
+  function spendUnlock(progress) {
+    const next = nextPricedUnlock(progress);
+    const normalized = normalizeProgress(progress);
+    if (!next) {
+      return { ok: false, reason: "none", progress: normalized, unlocked: null };
+    }
+    if (normalized.coins < next.cost) {
+      return { ok: false, reason: "coins", progress: normalized, unlocked: next };
+    }
+    normalized.coins -= next.cost;
+    if (next.kind === "node") {
+      if (!normalized.unlockedNodes.includes(next.id)) {
+        normalized.unlockedNodes.push(next.id);
+      }
+    } else if (!normalized.openedChapters.includes(next.id)) {
+      normalized.openedChapters.push(next.id);
+    }
+    return { ok: true, reason: "ok", progress: normalized, unlocked: next };
+  }
+
+  function spendLook(progress, look) {
+    const normalized = normalizeProgress(progress);
+    if (!LOOK_IDS.includes(look)) {
+      return { ok: false, reason: "look", progress: normalized };
+    }
+    if (normalized.boughtLooks.includes(look)) {
+      normalized.look = look;
+      return { ok: true, reason: "owned", progress: normalized };
+    }
+    if (normalized.coins < LOOK_COST) {
+      return { ok: false, reason: "coins", progress: normalized };
+    }
+    normalized.coins -= LOOK_COST;
+    normalized.boughtLooks.push(look);
+    normalized.look = look;
+    return { ok: true, reason: "ok", progress: normalized };
+  }
+
+  function markNodeCompleted(progress, nodeId) {
+    const next = normalizeProgress(progress);
+    const found = findNode(nodeId);
+    if (!found || next.completedNodes.includes(nodeId)) {
+      return next;
+    }
+    next.completedNodes.push(nodeId);
+    return next;
   }
 
   function recordIsFluent(rec) {
@@ -1570,6 +1928,10 @@
       next.lastStruggled = null;
     }
     next.recommended = recommendedFrom(next.fluency, next.lastStruggled);
+    const nodeId = TOPIC_TO_NODE[id];
+    if (nodeId && asked > 0 && !next.completedNodes.includes(nodeId)) {
+      next.completedNodes.push(nodeId);
+    }
     return next;
   }
 
@@ -1597,6 +1959,20 @@
     SHAPE_IDS,
     SHAPE_FOCUSES,
     DEFAULT_SETTINGS,
+    PRODUCT_NAME,
+    PRODUCT_BLURB,
+    STARTER_COINS,
+    NODE_UNLOCK_COST,
+    CHAPTER_UNLOCK_COST,
+    LOOK_COST,
+    COIN_BASE,
+    COIN_STREAK_AT,
+    COIN_STREAK_BONUS,
+    COIN_ROUND_CAP,
+    LOOK_IDS,
+    START_NODE_ID,
+    START_CHAPTER_ID,
+    TRAIL_CHAPTERS,
     normalizeSettings,
     makeQuestion,
     makeAddQuestion,
@@ -1634,5 +2010,23 @@
     applyRoundProgress,
     skillCopy,
     otherSkills,
+    trailChapters,
+    trailNodeIds,
+    findChapter,
+    findNode,
+    isChapterOpen,
+    isNodePurchased,
+    isNodeCompleted,
+    isNodePlayable,
+    nextPricedUnlock,
+    chapterStatus,
+    nodeStatus,
+    nodeAction,
+    startNode,
+    payoutCoins,
+    applyCoinPayout,
+    spendUnlock,
+    spendLook,
+    markNodeCompleted,
   };
 });
