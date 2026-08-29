@@ -450,13 +450,10 @@
     if (!model) {
       return "";
     }
-    if (phase === "lift") {
-      return `Take ${model.known} from both`;
-    }
     if (phase === "reveal") {
       return model.fact;
     }
-    return "";
+    return `Take ${model.known} from both`;
   }
 
   function usesWhyModel(question) {

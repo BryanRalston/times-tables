@@ -375,7 +375,7 @@ test("missing-number why-model is take-from-both for 8 + n = 12", () => {
   assert.equal(model.hidden, 4);
   assert.equal(model.total, 12);
   assert.equal(model.slot, "right");
-  assert.equal(engine.whyCaption(model, "idle"), "");
+  assert.equal(engine.whyCaption(model, "idle"), "Take 8 from both");
   assert.equal(engine.whyCaption(model, "lift"), "Take 8 from both");
   assert.equal(engine.whyCaption(model, "reveal"), "8 + 4 = 12");
 });

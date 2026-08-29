@@ -1337,13 +1337,10 @@ fieldset.is-disabled {
     if (!model) {
       return "";
     }
-    if (phase === "lift") {
-      return `Take ${model.known} from both`;
-    }
     if (phase === "reveal") {
       return model.fact;
     }
-    return "";
+    return `Take ${model.known} from both`;
   }
 
   function usesWhyModel(question) {
@@ -2797,6 +2794,7 @@ fieldset.is-disabled {
 
     els.why.append(scale, caption);
     els.why.hidden = false;
+    setWhyCaption(engine.whyCaption(model, "idle"), "idle");
   }
 
   function syncWhyPreview(value) {
@@ -2820,15 +2818,15 @@ fieldset.is-disabled {
     if (value) {
       value.textContent = String(model.hidden);
     }
-    els.why.classList.remove("is-preview");
+    els.why.classList.add("is-preview");
     els.why.dataset.phase = "lift";
     setWhyCaption(engine.whyCaption(model, "lift"), "lift");
     window.clearTimeout(state.whyId);
     state.whyId = window.setTimeout(() => {
       els.why.dataset.phase = "reveal";
       setWhyCaption(engine.whyCaption(model, "reveal"), "reveal");
-    }, 1250);
-    return 2900;
+    }, 1400);
+    return 3400;
   }
 
   function setAnswer(value) {
