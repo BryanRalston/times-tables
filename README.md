@@ -1,6 +1,6 @@
 # Times Tables
 
-A single-file, offline math practice page. Pick a topic, go timed or untimed, and get a score. Nothing is sent to a server.
+A single-file, offline math practice page. Home shows one recommended skill and Start. Nothing is sent to a server.
 
 The original [Grok share](https://grok.com/share/bGVnYWN5LWNvcHk_bd3e770d-4d57-432c-a779-97664f7053e1) is sign-in gated, so this follows that conversation’s title and last visible prompt (“add division option”).
 
@@ -22,11 +22,16 @@ https://bryanralston.github.io/times-tables/
 
 ## Practice
 
+Home is one skill and Start. A quiet **something else** reaches the rest.
+
+- **Find n:** a letter or box hides a number (`3 + n = 7`, `n × 4 = 20`)
+- **Find n (stretch):** one-step `n` problems after a strong Find n round (`n + 7 = 19`, `3n = 12`, `20 − n = 8`, `n/3 = 5`)
 - **Times tables:** 1–12, multiply, divide, or mix
 - **Add / Subtract:** 2-digit, 3-digit, or thousands, with optional scratch paper
 - **Mix (+ − × ÷):** add, subtract, multiply, and divide
-- **Find n:** a letter or box hides a number (`3 + n = 7`, `n × 4 = 20`)
 - **Shapes:** name the picture, count sides and corners, add the distance around (perimeter), and fill a rectangle (area)
+- Same one-problem loop at every level: keypad, check, next, optional scratch pad
 - Untimed rounds of 10, 20, or 30 questions
 - Optional 30 / 60 / 90 second timer
 - Immediate right/wrong, score, streak, restart
+- Progress stays in the browser (`localStorage`)
