@@ -453,7 +453,17 @@
     if (phase === "reveal") {
       return model.fact;
     }
+    if (phase === "lift") {
+      return "What's left?";
+    }
     return `Take ${model.known} from both`;
+  }
+
+  function whyNudge(model) {
+    if (!model) {
+      return "";
+    }
+    return `Take ${model.known} from both first`;
   }
 
   function usesWhyModel(question) {
@@ -1548,6 +1558,7 @@
     makeTwostepQuestion,
     whyModel,
     whyCaption,
+    whyNudge,
     usesWhyModel,
     figureSvg,
     buildRound,

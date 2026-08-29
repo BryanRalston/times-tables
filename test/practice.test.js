@@ -376,8 +376,18 @@ test("missing-number why-model is take-from-both for 8 + n = 12", () => {
   assert.equal(model.total, 12);
   assert.equal(model.slot, "right");
   assert.equal(engine.whyCaption(model, "idle"), "Take 8 from both");
-  assert.equal(engine.whyCaption(model, "lift"), "Take 8 from both");
+  assert.equal(engine.whyCaption(model, "lift"), "What's left?");
   assert.equal(engine.whyCaption(model, "reveal"), "8 + 4 = 12");
+  assert.equal(engine.whyNudge(model), "Take 8 from both first");
+});
+
+test("why-nudge names the inverse move, not the leftover", () => {
+  const question = engine.makeMissingQuestion({}, rngFrom([0.2, 0.8]));
+  const model = engine.whyModel(question);
+  assert.equal(engine.usesWhyModel(question), true);
+  assert.equal(engine.whyNudge(model), `Take ${model.known} from both first`);
+  assert.notEqual(engine.whyNudge(model), String(model.hidden));
+  assert.equal(engine.whyCaption(model, "lift"), "What's left?");
 });
 
 test("missing-number round is missing addend only, small numbers", () => {
