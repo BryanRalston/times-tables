@@ -602,12 +602,10 @@ fieldset.is-disabled {
 }
 
 .why-group {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(4, 12px);
   gap: 5px;
-  max-width: 92px;
+  justify-content: center;
 }
 
 .why-tile {
@@ -616,7 +614,7 @@ fieldset.is-disabled {
   border-radius: 50%;
   background: var(--sky);
   display: inline-block;
-  transition: transform 0.55s ease, opacity 0.55s ease;
+  transition: transform 0.6s ease, opacity 0.6s ease;
 }
 
 .why-model[data-phase="lift"] .take-away,
@@ -650,22 +648,20 @@ fieldset.is-disabled {
   color: var(--ink);
 }
 
-.why-model.is-preview .why-n-token {
-  opacity: 0.22;
-}
-
-.why-model.is-preview .why-n-value {
-  opacity: 1;
-  transform: scale(1);
-}
-
+.why-model.is-preview .why-n-token,
+.why-model[data-phase="lift"] .why-n-token,
 .why-model[data-phase="reveal"] .why-n-token {
   opacity: 0;
 }
 
+.why-model.is-preview .why-n-value,
+.why-model[data-phase="lift"] .why-n-value,
 .why-model[data-phase="reveal"] .why-n-value {
   opacity: 1;
   transform: scale(1);
+}
+
+.why-model[data-phase="reveal"] .why-n-value {
   color: var(--leaf);
 }
 
@@ -2831,8 +2827,8 @@ fieldset.is-disabled {
     state.whyId = window.setTimeout(() => {
       els.why.dataset.phase = "reveal";
       setWhyCaption(engine.whyCaption(model, "reveal"), "reveal");
-    }, 620);
-    return 2300;
+    }, 1250);
+    return 2900;
   }
 
   function setAnswer(value) {
@@ -3217,12 +3213,12 @@ fieldset.is-disabled {
     if (grade.ok) {
       state.streak += 1;
       state.streakPeak = Math.max(state.streakPeak, state.streak);
-      setFeedback(engine.usesWhyModel(question) ? "Yes" : "Correct", "ok");
+      setFeedback(engine.usesWhyModel(question) ? "" : "Correct", "ok");
       screens.practice.dataset.state = "ok";
     } else {
       state.streak = 0;
       const explain = question.review || `${question.prompt} = ${question.answer}`;
-      setFeedback(engine.usesWhyModel(question) ? "Not quite" : `Not quite — ${explain}`, "bad");
+      setFeedback(engine.usesWhyModel(question) ? "" : `Not quite — ${explain}`, "bad");
       screens.practice.dataset.state = "bad";
     }
     updateHud();
