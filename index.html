@@ -615,6 +615,7 @@ fieldset.is-disabled {
   border-radius: 12px;
   touch-action: none;
   user-select: none;
+  transition: transform 0.55s ease, opacity 0.55s ease, max-width 0.55s ease, padding 0.55s ease;
 }
 
 .why-model[data-phase="idle"] .why-take {
@@ -636,17 +637,27 @@ fieldset.is-disabled {
 }
 
 .why-model[data-phase="lift"] .take-away,
-.why-model[data-phase="reveal"] .take-away {
-  transform: translateY(-22px);
+.why-model[data-phase="reveal"] .take-away,
+.why-model[data-phase="lift"] .why-take,
+.why-model[data-phase="reveal"] .why-take {
+  transform: translateY(-26px);
   opacity: 0;
+  pointer-events: none;
+}
+
+.why-model[data-phase="lift"] .why-take,
+.why-model[data-phase="reveal"] .why-take {
+  max-width: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .why-model.is-tilt-left .why-scale {
-  transform: rotate(-8deg);
+  transform: rotate(-14deg);
 }
 
 .why-model.is-tilt-right .why-scale {
-  transform: rotate(8deg);
+  transform: rotate(14deg);
 }
 
 .why-n {
