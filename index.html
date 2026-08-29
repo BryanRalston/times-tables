@@ -541,6 +541,142 @@ fieldset.is-disabled {
   background: #fff;
 }
 
+.why-model {
+  margin: 4px 0 10px;
+}
+
+.why-scale {
+  position: relative;
+  padding: 4px 2px 0;
+}
+
+.why-beam {
+  height: 6px;
+  width: 74%;
+  margin: 0 auto;
+  background: var(--ink);
+  border-radius: 99px;
+}
+
+.why-strings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 74%;
+  margin: 0 auto;
+}
+
+.why-strings span {
+  width: 2px;
+  height: 12px;
+  margin: 0 auto;
+  background: var(--ink);
+}
+
+.why-fulcrum {
+  width: 0;
+  height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-top: 14px solid var(--ink);
+  margin: 0 auto;
+}
+
+.why-pans {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.why-pan {
+  min-height: 78px;
+  border: 2px solid var(--ink);
+  border-radius: 16px 16px 22px 22px;
+  background: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 8px 12px;
+}
+
+.why-group {
+  display: grid;
+  grid-template-columns: repeat(4, 12px);
+  gap: 5px;
+  justify-content: center;
+}
+
+.why-tile {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--sky);
+  display: inline-block;
+  transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+.why-model[data-phase="lift"] .take-away,
+.why-model[data-phase="reveal"] .take-away {
+  transform: translateY(-22px);
+  opacity: 0;
+}
+
+.why-n {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--sky);
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: var(--sky);
+  background: #fff;
+  position: relative;
+}
+
+.why-n-token,
+.why-n-value {
+  grid-area: 1 / 1;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.why-n-value {
+  opacity: 0;
+  transform: scale(0.7);
+  color: var(--ink);
+}
+
+.why-model.is-preview .why-n-token,
+.why-model[data-phase="lift"] .why-n-token,
+.why-model[data-phase="reveal"] .why-n-token {
+  opacity: 0;
+}
+
+.why-model.is-preview .why-n-value,
+.why-model[data-phase="lift"] .why-n-value,
+.why-model[data-phase="reveal"] .why-n-value {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.why-model[data-phase="reveal"] .why-n-value {
+  color: var(--leaf);
+}
+
+.why-caption {
+  text-align: center;
+  min-height: 1.35em;
+  margin-top: 8px;
+  font-weight: 700;
+  color: var(--sky);
+}
+
+.why-caption[data-phase="reveal"] {
+  color: var(--leaf);
+}
+
 .shape-figure {
   display: grid;
   place-items: center;
@@ -708,6 +844,7 @@ fieldset.is-disabled {
           <div id="progress">1 / 20</div>
         </div>
         <p id="prompt" class="prompt" aria-live="polite">7 × 8 =</p>
+        <div id="why-model" class="why-model" hidden></div>
         <div id="shape-figure" class="shape-figure" hidden></div>
         <div id="workspace" class="workspace" hidden>
           <div class="workspace-bar">
@@ -1112,227 +1249,102 @@ fieldset.is-disabled {
     return makeQuestion(pair.table, pair.factor, settings.operation, rng);
   }
 
-  function pickMissingToken(rng, forceLetter) {
-    if (forceLetter) {
-      return { token: "n", kind: "letter" };
-    }
-    const roll = rng();
-    if (roll < 0.62) {
-      return { token: "n", kind: "letter" };
-    }
-    if (roll < 0.86) {
-      return { token: "□", kind: "box" };
-    }
-    return { token: pickItem(["a", "b"], rng), kind: "letter" };
-  }
-
-  function pickMissingOperation(rng) {
-    const roll = rng();
-    if (roll < 0.3) {
-      return "add";
-    }
-    if (roll < 0.56) {
-      return "subtract";
-    }
-    if (roll < 0.8) {
-      return "multiply";
-    }
-    return "divide";
-  }
-
   function generateMissingAddSpec(rng) {
-    const roll = rng();
-    let left;
-    let right;
-    if (roll < 0.58) {
-      const flavor = rng();
-      if (flavor < 0.5) {
-        left = randomInt(1, 12, rng);
-        right = randomInt(1, 12, rng);
-      } else if (flavor < 0.8) {
-        left = randomInt(10, 40, rng);
-        right = randomInt(2, 9, rng);
-      } else {
-        left = randomInt(11, 40, rng);
-        right = randomInt(11, 40, rng);
-      }
-    } else if (roll < 0.88) {
-      const pair = generateAddPair(rng() < 0.5 ? "2-digit" : "3-digit", rng);
-      left = pair.left;
-      right = pair.right;
-    } else if (rng() < 0.55) {
-      left = randomInt(1, 9, rng) * 1000;
-      right = randomInt(100, 850, rng);
-    } else {
-      const pair = generateAddPair("thousands", rng);
-      left = pair.left;
-      right = pair.right;
-    }
+    const hidden = randomInt(1, 9, rng);
+    const maxKnown = Math.max(1, 20 - hidden);
+    const known = randomInt(1, Math.min(12, maxKnown), rng);
     const hideLeft = rng() < 0.5;
     return {
       operation: "add",
       symbol: "+",
-      left,
-      right,
-      result: left + right,
-      answer: hideLeft ? left : right,
+      left: hideLeft ? hidden : known,
+      right: hideLeft ? known : hidden,
+      result: known + hidden,
+      answer: hidden,
       slot: hideLeft ? "left" : "right",
     };
   }
 
-  function generateMissingSubtractSpec(rng) {
-    const roll = rng();
-    let left;
-    let right;
-    if (roll < 0.58) {
-      left = randomInt(6, 24, rng);
-      right = randomInt(1, left - 1, rng);
-    } else if (roll < 0.88) {
-      const pair = generateSubtractPair(rng() < 0.5 ? "2-digit" : "3-digit", rng);
-      left = pair.left;
-      right = pair.right;
-    } else if (rng() < 0.5) {
-      left = randomInt(2, 9, rng) * 1000;
-      right = randomInt(100, 850, rng);
-      if (right >= left) {
-        left = right + randomInt(200, 800, rng);
-      }
-    } else {
-      const pair = generateSubtractPair("thousands", rng);
-      left = pair.left;
-      right = pair.right;
-    }
-    if (left <= right) {
-      left = right + randomInt(1, 20, rng);
-    }
-    const difference = left - right;
-    const hideMinuend = rng() < 0.45;
-    return {
-      operation: "subtract",
-      symbol: "−",
-      left,
-      right,
-      result: difference,
-      answer: hideMinuend ? left : right,
-      slot: hideMinuend ? "left" : "right",
-    };
-  }
-
-  function generateMissingMultiplySpec(tables, rng) {
-    const selected = uniqueSortedNumbers(tables);
-    const pool = selected.length ? selected : DEFAULT_SETTINGS.tables.slice();
-    const table = pickItem(pool, rng);
-    const factor = pickItem(FACTORS, rng);
-    const hideLeft = rng() < 0.5;
-    return {
-      operation: "multiply",
-      symbol: "×",
-      left: table,
-      right: factor,
-      result: table * factor,
-      answer: hideLeft ? table : factor,
-      slot: hideLeft ? "left" : "right",
-    };
-  }
-
-  function generateMissingDivideSpec(tables, rng) {
-    const selected = uniqueSortedNumbers(tables);
-    const pool = selected.length ? selected : DEFAULT_SETTINGS.tables.slice();
-    const table = pickItem(pool, rng);
-    const factor = pickItem(FACTORS, rng);
-    const product = table * factor;
-    const hideDividend = rng() < 0.5;
-    return {
-      operation: "divide",
-      symbol: "÷",
-      left: product,
-      right: table,
-      result: factor,
-      answer: hideDividend ? product : table,
-      slot: hideDividend ? "left" : "right",
-    };
-  }
-
-  function formatMissingQuestion(spec, tokenInfo, first) {
-    const leftText = spec.slot === "left" ? tokenInfo.token : String(spec.left);
-    const rightText = spec.slot === "right" ? tokenInfo.token : String(spec.right);
-    const prompt = `${leftText} ${spec.symbol} ${rightText} = ${spec.result}`;
-    const blankClass = tokenInfo.kind === "box" ? "blank is-box" : "blank";
-    const blankInner = tokenInfo.kind === "box" ? "" : tokenInfo.token;
+  function formatMissingQuestion(spec, first) {
+    const token = "n";
+    const leftText = spec.slot === "left" ? token : String(spec.left);
+    const rightText = spec.slot === "right" ? token : String(spec.right);
+    const prompt = `${leftText} + ${rightText} = ${spec.result}`;
     const leftHtml = spec.slot === "left"
-      ? `<span class="${blankClass}">${blankInner}</span>`
+      ? `<span class="blank">${token}</span>`
       : String(spec.left);
     const rightHtml = spec.slot === "right"
-      ? `<span class="${blankClass}">${blankInner}</span>`
+      ? `<span class="blank">${token}</span>`
       : String(spec.right);
-    const token = tokenInfo.token;
-    const tokenName = token === "□" ? "the box" : token;
-    let hint;
-    if (first) {
-      hint = tokenInfo.kind === "box" ? "The box is hiding a number" : `${token} is the missing number`;
-    } else if (tokenInfo.kind === "box") {
-      hint = "Type the number in the box";
-    } else {
-      hint = "Type the number that's hiding";
-    }
+    const known = spec.slot === "left" ? spec.right : spec.left;
     return {
       topic: "missing",
-      operation: spec.operation,
-      symbol: spec.symbol,
+      operation: "add",
+      symbol: "+",
       kind: "missing",
       left: spec.left,
       right: spec.right,
       result: spec.result,
+      known,
       slot: spec.slot,
       token,
-      tokenKind: tokenInfo.kind,
+      tokenKind: "letter",
       answer: spec.answer,
       answerKind: "number",
       prompt,
-      promptHtml: `${leftHtml} ${spec.symbol} ${rightHtml} = ${spec.result}`,
+      promptHtml: `${leftHtml} + ${rightHtml} = ${spec.result}`,
       fullPrompt: true,
-      hint,
-      fact: `${spec.left} ${spec.symbol} ${spec.right} = ${spec.result}`,
-      review: `${prompt}  so  ${tokenName} is ${spec.answer}`,
+      hint: first ? "n is hiding" : "What number is n?",
+      fact: `${spec.left} + ${spec.right} = ${spec.result}`,
+      review: `${prompt}  so  n is ${spec.answer}`,
     };
-  }
-
-  function makeMissingSpec(operation, tables, rng) {
-    if (operation === "subtract") {
-      return generateMissingSubtractSpec(rng);
-    }
-    if (operation === "multiply") {
-      return generateMissingMultiplySpec(tables, rng);
-    }
-    if (operation === "divide") {
-      return generateMissingDivideSpec(tables, rng);
-    }
-    return generateMissingAddSpec(rng);
   }
 
   function makeMissingQuestion(settings, rng, options) {
     const random = rng || Math.random;
     const first = Boolean(options && options.first);
-    const tables = settings && settings.tables ? settings.tables : DEFAULT_SETTINGS.tables;
-    let spec;
-    if (first) {
-      const left = randomInt(2, 9, random);
-      const right = randomInt(2, 9, random);
-      spec = {
-        operation: "add",
-        symbol: "+",
-        left,
-        right,
-        result: left + right,
-        answer: right,
-        slot: "right",
-      };
-    } else {
-      const requested = options && options.operation;
-      const operation = MIX_OPERATIONS.includes(requested) ? requested : pickMissingOperation(random);
-      spec = makeMissingSpec(operation, tables, random);
+    const spec = first
+      ? {
+          operation: "add",
+          symbol: "+",
+          left: 8,
+          right: 4,
+          result: 12,
+          answer: 4,
+          slot: "right",
+        }
+      : generateMissingAddSpec(random);
+    return formatMissingQuestion(spec, first);
+  }
+
+  function whyModel(question) {
+    if (!question || question.topic !== "missing" || question.operation !== "add") {
+      return null;
     }
-    return formatMissingQuestion(spec, pickMissingToken(random, first), first);
+    const known = question.slot === "left" ? question.right : question.left;
+    return {
+      kind: "balance",
+      known,
+      hidden: question.answer,
+      total: question.result,
+      slot: question.slot,
+      token: question.token || "n",
+      fact: `${question.left} + ${question.right} = ${question.result}`,
+    };
+  }
+
+  function whyCaption(model, phase) {
+    if (!model) {
+      return "";
+    }
+    if (phase === "reveal") {
+      return model.fact;
+    }
+    return `Take ${model.known} from both`;
+  }
+
+  function usesWhyModel(question) {
+    return Boolean(whyModel(question));
   }
 
   function onestepOperation(form) {
@@ -2057,18 +2069,13 @@ fieldset.is-disabled {
 
   function buildMissingRound(normalized, rng) {
     const count = normalized.timerSeconds > 0 ? 80 : normalized.questionCount;
-    let ops = [];
     let made = 0;
     return {
       settings: normalized,
       questions: fillDeck(() => {
         const first = made === 0;
-        if (!ops.length) {
-          ops = shuffle(MIX_OPERATIONS.slice(), rng);
-        }
-        const operation = first ? "add" : ops.shift();
         made += 1;
-        return makeMissingQuestion(normalized, rng, { first, operation });
+        return makeMissingQuestion(normalized, rng, { first });
       }, count),
     };
   }
@@ -2282,7 +2289,7 @@ fieldset.is-disabled {
 
   function usesWorkspace(settings) {
     const topic = normalizeSettings(settings).topic;
-    return topic === "add" || topic === "subtract" || topic === "mix" || isFindNTopic(topic);
+    return topic === "add" || topic === "subtract" || topic === "mix" || topic === "onestep" || topic === "twostep";
   }
 
   function emptyProgress() {
@@ -2426,6 +2433,9 @@ fieldset.is-disabled {
     makeMissingQuestion,
     makeOnestepQuestion,
     makeTwostepQuestion,
+    whyModel,
+    whyCaption,
+    usesWhyModel,
     figureSvg,
     buildRound,
     buildReplayRound,
@@ -2476,6 +2486,7 @@ fieldset.is-disabled {
     mark: document.getElementById("masthead-mark"),
     subtitle: document.getElementById("masthead-subtitle"),
     prompt: document.getElementById("prompt"),
+    why: document.getElementById("why-model"),
     figure: document.getElementById("shape-figure"),
     workspace: document.getElementById("workspace"),
     scratchType: document.getElementById("scratch-type"),
@@ -2519,6 +2530,7 @@ fieldset.is-disabled {
     remainingMs: 0,
     timerId: null,
     advanceId: null,
+    whyId: null,
   };
   state.homeSkill = state.progress.recommended;
 
@@ -2704,10 +2716,124 @@ fieldset.is-disabled {
     return engine.nextQuestion(state.round, state.asked);
   }
 
+  function setWhyCaption(text, phase) {
+    const caption = els.why.querySelector(".why-caption");
+    if (!caption) {
+      return;
+    }
+    caption.textContent = text;
+    caption.dataset.phase = phase || "";
+  }
+
+  function appendWhyTiles(parent, count, takeCount) {
+    const group = document.createElement("span");
+    group.className = "why-group";
+    for (let index = 0; index < count; index += 1) {
+      const tile = document.createElement("span");
+      tile.className = index < takeCount ? "why-tile take-away" : "why-tile";
+      group.append(tile);
+    }
+    parent.append(group);
+  }
+
+  function renderWhyModel(question) {
+    window.clearTimeout(state.whyId);
+    state.whyId = null;
+    const model = engine.whyModel(question);
+    els.why.replaceChildren();
+    els.why.classList.remove("is-preview");
+    els.why.dataset.phase = "idle";
+    if (!model) {
+      els.why.hidden = true;
+      return;
+    }
+
+    const scale = document.createElement("div");
+    scale.className = "why-scale";
+    scale.setAttribute("aria-hidden", "true");
+
+    const beam = document.createElement("div");
+    beam.className = "why-beam";
+    const strings = document.createElement("div");
+    strings.className = "why-strings";
+    strings.append(document.createElement("span"), document.createElement("span"));
+    const fulcrum = document.createElement("div");
+    fulcrum.className = "why-fulcrum";
+
+    const pans = document.createElement("div");
+    pans.className = "why-pans";
+    const left = document.createElement("div");
+    left.className = "why-pan";
+    const right = document.createElement("div");
+    right.className = "why-pan";
+
+    const mystery = document.createElement("span");
+    mystery.className = "why-n";
+    const token = document.createElement("span");
+    token.className = "why-n-token";
+    token.textContent = model.token;
+    const value = document.createElement("span");
+    value.className = "why-n-value";
+    mystery.append(token, value);
+
+    if (model.slot === "left") {
+      left.append(mystery);
+      appendWhyTiles(left, model.known, model.known);
+    } else {
+      appendWhyTiles(left, model.known, model.known);
+      left.append(mystery);
+    }
+    appendWhyTiles(right, model.total, model.known);
+
+    pans.append(left, right);
+    scale.append(beam, fulcrum, strings, pans);
+
+    const caption = document.createElement("p");
+    caption.className = "why-caption";
+    caption.setAttribute("aria-live", "polite");
+
+    els.why.append(scale, caption);
+    els.why.hidden = false;
+    setWhyCaption(engine.whyCaption(model, "idle"), "idle");
+  }
+
+  function syncWhyPreview(value) {
+    if (els.why.hidden || els.why.dataset.phase !== "idle") {
+      return;
+    }
+    const shown = els.why.querySelector(".why-n-value");
+    if (!shown) {
+      return;
+    }
+    shown.textContent = value || "";
+    els.why.classList.toggle("is-preview", Boolean(value));
+  }
+
+  function playWhyModel(question) {
+    const model = engine.whyModel(question);
+    if (!model) {
+      return 0;
+    }
+    const value = els.why.querySelector(".why-n-value");
+    if (value) {
+      value.textContent = String(model.hidden);
+    }
+    els.why.classList.add("is-preview");
+    els.why.dataset.phase = "lift";
+    setWhyCaption(engine.whyCaption(model, "lift"), "lift");
+    window.clearTimeout(state.whyId);
+    state.whyId = window.setTimeout(() => {
+      els.why.dataset.phase = "reveal";
+      setWhyCaption(engine.whyCaption(model, "reveal"), "reveal");
+    }, 1400);
+    return 3400;
+  }
+
   function setAnswer(value) {
     state.buffer = value;
     els.answer.textContent = value || " ";
     els.answer.classList.toggle("is-empty", !value);
+    syncWhyPreview(value);
   }
 
   function setFeedback(message, kind) {
@@ -2967,6 +3093,7 @@ fieldset.is-disabled {
     els.prompt.dataset.operation = question.operation;
     screens.practice.dataset.state = "idle";
     renderFigure(question);
+    renderWhyModel(question);
     els.answer.hidden = isChoice;
     els.keypad.hidden = isChoice;
     els.choices.hidden = !isChoice;
@@ -2982,8 +3109,10 @@ fieldset.is-disabled {
   function clearTimers() {
     window.clearInterval(state.timerId);
     window.clearTimeout(state.advanceId);
+    window.clearTimeout(state.whyId);
     state.timerId = null;
     state.advanceId = null;
+    state.whyId = null;
   }
 
   function finishRound() {
@@ -3082,17 +3211,24 @@ fieldset.is-disabled {
     if (grade.ok) {
       state.streak += 1;
       state.streakPeak = Math.max(state.streakPeak, state.streak);
-      setFeedback("Correct", "ok");
+      setFeedback(engine.usesWhyModel(question) ? "" : "Correct", "ok");
       screens.practice.dataset.state = "ok";
     } else {
       state.streak = 0;
       const explain = question.review || `${question.prompt} = ${question.answer}`;
-      setFeedback(`Not quite — ${explain}`, "bad");
+      setFeedback(engine.usesWhyModel(question) ? "" : `Not quite — ${explain}`, "bad");
       screens.practice.dataset.state = "bad";
     }
     updateHud();
 
-    const delay = grade.ok ? 700 : question.review ? 1600 : 1300;
+    const teachMs = playWhyModel(question);
+    const delay = teachMs
+      ? teachMs
+      : grade.ok
+        ? 700
+        : question.review
+          ? 1600
+          : 1300;
     state.advanceId = window.setTimeout(() => {
       if (shouldEndAfterAnswer()) {
         finishRound();
