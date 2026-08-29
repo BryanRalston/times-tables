@@ -375,19 +375,60 @@ test("missing-number why-model is take-from-both for 8 + n = 12", () => {
   assert.equal(model.hidden, 4);
   assert.equal(model.total, 12);
   assert.equal(model.slot, "right");
-  assert.equal(engine.whyCaption(model, "idle"), "Take 8 from both");
+  assert.equal(engine.whyLeftover(model), 4);
+  assert.equal(engine.whyCaption(model, "idle"), "");
   assert.equal(engine.whyCaption(model, "lift"), "What's left?");
   assert.equal(engine.whyCaption(model, "reveal"), "8 + 4 = 12");
-  assert.equal(engine.whyNudge(model), "Take 8 from both first");
+  assert.ok(!/Take \d+ from both/.test(engine.whyCaption(model, "idle")));
+  assert.ok(!/Take \d+ from both/.test(engine.whyNudge(model)));
 });
 
-test("why-nudge names the inverse move, not the leftover", () => {
+test("after isolation the written prompt is n = leftover", () => {
+  const question = engine.makeMissingQuestion({}, () => 0, { first: true });
+  assert.equal(engine.whyPrompt(question, "idle").prompt, "8 + n = 12");
+  assert.equal(engine.whyPrompt(question, "lift").prompt, "n = 4");
+  assert.equal(engine.whyPrompt(question, "reveal").prompt, "n = 4");
+  assert.match(engine.whyPrompt(question, "lift").promptHtml, /n.* = 4/);
+});
+
+test("why-nudge does not name the known amount", () => {
   const question = engine.makeMissingQuestion({}, rngFrom([0.2, 0.8]));
   const model = engine.whyModel(question);
   assert.equal(engine.usesWhyModel(question), true);
-  assert.equal(engine.whyNudge(model), `Take ${model.known} from both first`);
+  assert.doesNotMatch(engine.whyNudge(model), new RegExp(String(model.known)));
+  assert.doesNotMatch(engine.whyCaption(model, "idle"), /Take \d+ from both/);
   assert.notEqual(engine.whyNudge(model), String(model.hidden));
   assert.equal(engine.whyCaption(model, "lift"), "What's left?");
+});
+
+test("isolated prompt follows leftover when n is on either side", () => {
+  const question = engine.makeMissingQuestion({}, rngFrom([0.1, 0.2]));
+  const model = engine.whyModel(question);
+  const leftover = model.total - model.known;
+  assert.equal(engine.whyLeftover(model), leftover);
+  assert.equal(engine.whyPrompt(question, "lift").prompt, `n = ${leftover}`);
+  assert.notEqual(engine.whyPrompt(question, "idle").prompt, engine.whyPrompt(question, "lift").prompt);
+});
+
+test("ordinary wrong answers still advance", () => {
+  const question = engine.makeQuestion(6, 7, "multiply");
+  const wrong = engine.gradeAnswer(question, "41");
+  assert.equal(wrong.ok, false);
+  assert.equal(engine.shouldAdvanceAfterGrade(question, wrong), true);
+});
+
+test("wrong leftover guess tilts and does not advance", () => {
+  const question = engine.makeMissingQuestion({}, () => 0, { first: true });
+  const model = engine.whyModel(question);
+  const wrong = engine.gradeAnswer(question, "5");
+  const right = engine.gradeAnswer(question, "4");
+  assert.equal(wrong.ok, false);
+  assert.equal(engine.shouldAdvanceAfterGrade(question, wrong), false);
+  assert.equal(engine.whyTilt(model, 5), "left");
+  assert.equal(engine.whyTilt(model, 3), "right");
+  assert.equal(engine.whyTilt(model, 4), "level");
+  assert.equal(right.ok, true);
+  assert.equal(engine.shouldAdvanceAfterGrade(question, right), true);
 });
 
 test("missing-number round is missing addend only, small numbers", () => {

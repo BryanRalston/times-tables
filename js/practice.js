@@ -446,6 +446,13 @@
     };
   }
 
+  function whyLeftover(model) {
+    if (!model) {
+      return null;
+    }
+    return model.total - model.known;
+  }
+
   function whyCaption(model, phase) {
     if (!model) {
       return "";
@@ -456,14 +463,57 @@
     if (phase === "lift") {
       return "What's left?";
     }
-    return `Take ${model.known} from both`;
+    return "";
   }
 
   function whyNudge(model) {
     if (!model) {
       return "";
     }
-    return `Take ${model.known} from both first`;
+    return "Take the same from both first";
+  }
+
+  function whyPrompt(question, phase) {
+    const model = whyModel(question);
+    if (!model) {
+      return {
+        prompt: question && question.prompt ? question.prompt : "",
+        promptHtml: question && question.promptHtml ? question.promptHtml : "",
+      };
+    }
+    if (phase === "lift" || phase === "reveal") {
+      const leftover = whyLeftover(model);
+      const token = model.token;
+      return {
+        prompt: `${token} = ${leftover}`,
+        promptHtml: `<span class="blank">${token}</span> = ${leftover}`,
+      };
+    }
+    return {
+      prompt: question.prompt,
+      promptHtml: question.promptHtml || question.prompt,
+    };
+  }
+
+  function whyTilt(model, given) {
+    if (!model || !Number.isInteger(given)) {
+      return "level";
+    }
+    const leftover = whyLeftover(model);
+    if (given === leftover) {
+      return "level";
+    }
+    return given > leftover ? "left" : "right";
+  }
+
+  function shouldAdvanceAfterGrade(question, grade) {
+    if (!grade || grade.empty) {
+      return false;
+    }
+    if (usesWhyModel(question) && !grade.ok) {
+      return false;
+    }
+    return true;
   }
 
   function usesWhyModel(question) {
@@ -1557,8 +1607,12 @@
     makeOnestepQuestion,
     makeTwostepQuestion,
     whyModel,
+    whyLeftover,
     whyCaption,
     whyNudge,
+    whyPrompt,
+    whyTilt,
+    shouldAdvanceAfterGrade,
     usesWhyModel,
     figureSvg,
     buildRound,
