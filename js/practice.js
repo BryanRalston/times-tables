@@ -8,21 +8,23 @@
   const TABLES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const FACTORS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const OPERATIONS = ["multiply", "divide", "mix"];
-  const TOPICS = ["times", "add", "subtract", "mix", "missing", "subtrahend", "onestep", "twostep", "shapes"];
+  const TOPICS = ["times", "add", "subtract", "mix", "sense", "missing", "subtrahend", "factor", "onestep", "twostep", "shapes"];
   const DIFFICULTIES = ["2-digit", "3-digit", "thousands"];
   const MIX_OPERATIONS = ["add", "subtract", "multiply", "divide"];
   const ONESTEP_FORMS = ["n+a", "a+n", "n-a", "a-n", "an", "n/a", "a/n"];
   const TWOSTEP_FORMS = ["an+b", "n/a+b", "an-b", "a-bn"];
-  const FIND_N_TOPICS = ["missing", "subtrahend", "onestep", "twostep"];
-  const PLAYABLE_TRAIL_TOPICS = ["missing", "subtrahend"];
+  const FIND_N_TOPICS = ["sense", "missing", "subtrahend", "factor", "onestep", "twostep"];
+  const PLAYABLE_TRAIL_TOPICS = ["sense", "missing", "subtrahend", "factor"];
   const ALWAYS_SKILLS = ["times", "add", "subtract", "mix", "missing", "shapes"];
   const SKILL_COPY = {
     times: { title: "Times tables", blurb: "Multiply and divide", list: "Times tables" },
     add: { title: "Add", blurb: "Stack the numbers", list: "Add" },
     subtract: { title: "Subtract", blurb: "Take away", list: "Subtract" },
     mix: { title: "Mix", blurb: "+ − × ÷ together", list: "Mix (+ − × ÷)" },
+    sense: { title: "Find n", blurb: "What's hiding?", list: "Number sense" },
     missing: { title: "Find n", blurb: "What's hiding?", list: "What's hiding?" },
     subtrahend: { title: "Find n", blurb: "What's hiding?", list: "Missing subtrahend" },
+    factor: { title: "Find n", blurb: "What's hiding?", list: "Times tables facts" },
     onestep: { title: "Find n", blurb: "What number is n?", list: "What number is n?" },
     twostep: { title: "Find n", blurb: "Then do this", list: "Then do this" },
     shapes: { title: "Shapes", blurb: "Names, sides, around", list: "Shapes" },
@@ -72,19 +74,24 @@
   const COIN_STREAK_BONUS = 1;
   const COIN_ROUND_CAP = 15;
   const LOOK_IDS = ["ink", "leaf"];
-  const START_NODE_ID = "missing-addend";
+  const START_NODE_ID = "number-sense";
   const START_CHAPTER_ID = "grade-3";
-  const TOPIC_TO_NODE = { missing: "missing-addend", subtrahend: "missing-subtrahend" };
+  const TOPIC_TO_NODE = {
+    sense: "number-sense",
+    missing: "missing-addend",
+    subtrahend: "missing-subtrahend",
+    factor: "times-facts",
+  };
   const TRAIL_CHAPTERS = [
     {
       id: "grade-3",
       title: "Grade 3",
       blurb: "What's hiding this year",
       nodes: [
-        { id: "number-sense", title: "Number sense", playable: false },
+        { id: "number-sense", title: "Number sense", playable: true, topic: "sense" },
         { id: "missing-addend", title: "Missing addend", playable: true, topic: "missing" },
         { id: "missing-subtrahend", title: "Missing subtrahend", playable: true, topic: "subtrahend" },
-        { id: "times-facts", title: "Times tables facts", playable: false },
+        { id: "times-facts", title: "Times tables facts", playable: true, topic: "factor" },
       ],
     },
     {
@@ -162,7 +169,7 @@
       ],
     },
   ];
-  const GRADE3_ADVANCE_NODES = ["missing-subtrahend", "times-facts"];
+  const GRADE3_ADVANCE_NODES = ["missing-addend", "missing-subtrahend", "times-facts"];
 
   function uniqueSortedNumbers(values) {
     return Array.from(
@@ -364,7 +371,7 @@
     if (question && question.topic === "onestep") {
       return ["onestep", question.form, question.left, question.right, question.answer].join(":");
     }
-    if (question && (question.topic === "missing" || question.topic === "subtrahend")) {
+    if (question && (question.topic === "missing" || question.topic === "subtrahend" || question.topic === "sense" || question.topic === "factor")) {
       return [question.topic, question.operation, question.slot, question.left, question.right, question.token].join(":");
     }
     if (question && (question.topic === "shapes" || question.kind)) {
@@ -593,9 +600,124 @@
     return formatMissingSubtrahendQuestion(spec, first);
   }
 
+  function generateSenseSpec(rng, options) {
+    const towardTwenty = Boolean(options && options.towardTwenty);
+    if (!towardTwenty) {
+      const hidden = randomInt(1, 9, rng);
+      return {
+        known: 10 - hidden,
+        hidden,
+        total: 10,
+      };
+    }
+    const hidden = randomInt(1, 9, rng);
+    return {
+      known: 10,
+      hidden,
+      total: 10 + hidden,
+    };
+  }
+
+  function formatSenseQuestion(spec, first) {
+    const token = "n";
+    const prompt = `${spec.known} + ${token} = ${spec.total}`;
+    return {
+      topic: "sense",
+      operation: "add",
+      symbol: "+",
+      kind: "missing",
+      family: "sense",
+      left: spec.known,
+      right: spec.hidden,
+      result: spec.total,
+      known: spec.known,
+      slot: "right",
+      token,
+      tokenKind: "letter",
+      answer: spec.hidden,
+      answerKind: "number",
+      prompt,
+      promptHtml: `${spec.known} + <span class="blank">${token}</span> = ${spec.total}`,
+      fullPrompt: true,
+      hint: first ? "n is hiding" : "What number is n?",
+      fact: `${spec.known} + ${spec.hidden} = ${spec.total}`,
+      review: `${prompt}  so  n is ${spec.hidden}`,
+    };
+  }
+
+  function makeSenseQuestion(settings, rng, options) {
+    const random = rng || Math.random;
+    const first = Boolean(options && options.first);
+    const spec = first
+      ? { known: 6, hidden: 4, total: 10 }
+      : generateSenseSpec(random, options);
+    return formatSenseQuestion(spec, first);
+  }
+
+  function generateFactorSpec(rng) {
+    const groups = randomInt(2, 5, rng);
+    const maxHidden = groups === 2 ? 10 : groups === 3 ? 8 : groups === 4 ? 6 : 5;
+    const hidden = randomInt(2, maxHidden, rng);
+    return {
+      groups,
+      hidden,
+      total: groups * hidden,
+      known: (groups - 1) * hidden,
+    };
+  }
+
+  function formatFactorQuestion(spec, first) {
+    const token = "n";
+    const prompt = `${spec.groups} × ${token} = ${spec.total}`;
+    return {
+      topic: "factor",
+      operation: "multiply",
+      symbol: "×",
+      kind: "missing",
+      family: "factor",
+      groups: spec.groups,
+      left: spec.groups,
+      right: spec.hidden,
+      result: spec.total,
+      known: spec.known,
+      slot: "right",
+      token,
+      tokenKind: "letter",
+      answer: spec.hidden,
+      answerKind: "number",
+      prompt,
+      promptHtml: `${spec.groups} × <span class="blank">${token}</span> = ${spec.total}`,
+      fullPrompt: true,
+      hint: first ? "n is hiding" : "What number is n?",
+      fact: `${spec.groups} × ${spec.hidden} = ${spec.total}`,
+      review: `${prompt}  so  n is ${spec.hidden}`,
+    };
+  }
+
+  function makeFactorQuestion(settings, rng, options) {
+    const random = rng || Math.random;
+    const first = Boolean(options && options.first);
+    const spec = first
+      ? { groups: 2, hidden: 4, total: 8, known: 4 }
+      : generateFactorSpec(random);
+    return formatFactorQuestion(spec, first);
+  }
+
   function whyModel(question) {
     if (!question) {
       return null;
+    }
+    if (question.topic === "sense" && question.operation === "add") {
+      return {
+        kind: "frame",
+        family: "sense",
+        known: question.known,
+        hidden: question.answer,
+        total: question.result,
+        slot: "right",
+        token: question.token || "n",
+        fact: `${question.left} + ${question.right} = ${question.result}`,
+      };
     }
     if (question.topic === "missing" && question.operation === "add") {
       const known = question.slot === "left" ? question.right : question.left;
@@ -620,6 +742,19 @@
         slot: "right",
         token: question.token || "n",
         fact: `${question.left} − ${question.answer} = ${question.result}`,
+      };
+    }
+    if (question.topic === "factor" && question.operation === "multiply") {
+      return {
+        kind: "groups",
+        family: "factor",
+        groups: question.groups,
+        known: question.known,
+        hidden: question.answer,
+        total: question.result,
+        slot: "right",
+        token: question.token || "n",
+        fact: `${question.groups} × ${question.answer} = ${question.result}`,
       };
     }
     return null;
@@ -649,7 +784,18 @@
     if (!model) {
       return "";
     }
-    return "Take the same from both first";
+    if (model.family === "sense") {
+      return "Take the ones you can see first";
+    }
+    if (model.family === "factor") {
+      return "Leave one group";
+    }
+    if (model.family === "addend" || model.family === "subtrahend") {
+      return "Take the same from both first";
+    }
+    const unexpected = model.family;
+    void unexpected;
+    return "Take the ones you can see first";
   }
 
   function whyPrompt(question, phase) {
@@ -1445,6 +1591,33 @@
     };
   }
 
+  function buildSenseRound(normalized, rng) {
+    const count = normalized.timerSeconds > 0 ? 80 : normalized.questionCount;
+    let made = 0;
+    return {
+      settings: normalized,
+      questions: fillDeck(() => {
+        const first = made === 0;
+        const towardTwenty = !first && made >= Math.min(8, Math.max(4, count - 4));
+        made += 1;
+        return makeSenseQuestion(normalized, rng, { first, towardTwenty });
+      }, count),
+    };
+  }
+
+  function buildFactorRound(normalized, rng) {
+    const count = normalized.timerSeconds > 0 ? 80 : normalized.questionCount;
+    let made = 0;
+    return {
+      settings: normalized,
+      questions: fillDeck(() => {
+        const first = made === 0;
+        made += 1;
+        return makeFactorQuestion(normalized, rng, { first });
+      }, count),
+    };
+  }
+
   function buildOnestepRound(normalized, rng) {
     const count = normalized.timerSeconds > 0 ? 80 : normalized.questionCount;
     let forms = [];
@@ -1498,6 +1671,12 @@
     }
     if (normalized.topic === "subtrahend") {
       return buildSubtrahendRound(normalized, random);
+    }
+    if (normalized.topic === "sense") {
+      return buildSenseRound(normalized, random);
+    }
+    if (normalized.topic === "factor") {
+      return buildFactorRound(normalized, random);
     }
     if (normalized.topic === "onestep") {
       return buildOnestepRound(normalized, random);
@@ -1605,7 +1784,12 @@
 
   function subtitleFor(settings) {
     const normalized = normalizeSettings(settings);
-    if (normalized.topic === "missing" || normalized.topic === "subtrahend") {
+    if (
+      normalized.topic === "missing"
+      || normalized.topic === "subtrahend"
+      || normalized.topic === "sense"
+      || normalized.topic === "factor"
+    ) {
       return "What's hiding?";
     }
     if (normalized.topic === "onestep") {
@@ -1712,6 +1896,18 @@
       openedChapters.unshift(START_CHAPTER_ID);
     }
     const completedNodes = uniqueIds(source.completedNodes, knownNodeIds);
+    const laterGrade3 = ["missing-subtrahend", "times-facts"];
+    const playedAddend = Number(fluency.missing && fluency.missing.lastAsked) > 0;
+    if (
+      !unlockedNodes.includes("missing-addend")
+      && (
+        laterGrade3.some((id) => unlockedNodes.includes(id) || completedNodes.includes(id))
+        || completedNodes.includes("missing-addend")
+        || playedAddend
+      )
+    ) {
+      unlockedNodes.unshift("missing-addend");
+    }
     const look = LOOK_IDS.includes(source.look) ? source.look : "ink";
     const boughtLooks = uniqueIds(source.boughtLooks, LOOK_IDS);
     if (!boughtLooks.includes("ink")) {
@@ -1803,20 +1999,6 @@
         };
       }
     }
-    for (const chapter of TRAIL_CHAPTERS) {
-      if (chapter.id === START_CHAPTER_ID) {
-        continue;
-      }
-      if (!normalized.openedChapters.includes(chapter.id)) {
-        return {
-          kind: "chapter",
-          id: chapter.id,
-          chapterId: chapter.id,
-          title: chapter.title,
-          cost: CHAPTER_UNLOCK_COST,
-        };
-      }
-    }
     return null;
   }
 
@@ -1859,7 +2041,7 @@
   }
 
   function playableTopic(topic) {
-    return PLAYABLE_TRAIL_TOPICS.includes(topic) ? topic : "missing";
+    return PLAYABLE_TRAIL_TOPICS.includes(topic) ? topic : "sense";
   }
 
   function nodeAction(status) {
@@ -2084,6 +2266,8 @@
     makeShapeQuestion,
     makeMissingQuestion,
     makeMissingSubtrahendQuestion,
+    makeSenseQuestion,
+    makeFactorQuestion,
     makeOnestepQuestion,
     makeTwostepQuestion,
     whyModel,
