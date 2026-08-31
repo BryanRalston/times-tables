@@ -738,6 +738,7 @@ body[data-look="leaf"] {
   box-shadow: none;
 }
 
+.practice-card.is-board .hud,
 .practice-card.is-isolated .keypad,
 .practice-card.is-isolated .actions,
 .practice-card.is-isolated .hud {
@@ -1198,11 +1199,11 @@ body[data-look="leaf"] {
         <p id="feedback" class="feedback"></p>
         <div id="choice-answers" class="choice-answers" hidden></div>
         <div id="keypad" class="keypad"></div>
-        <div class="hud">
+        <div class="hud" id="practice-hud">
           <div>Score <strong id="score-correct">0</strong> / <strong id="score-asked">0</strong></div>
           <div>Streak <strong id="streak">0</strong></div>
           <div id="timer" hidden>00:00</div>
-          <div id="progress">1 / 20</div>
+          <div id="progress"></div>
         </div>
         <div class="actions">
           <button type="button" class="btn btn-quiet" id="restart-round">Restart</button>
@@ -1302,6 +1303,7 @@ body[data-look="leaf"] {
   const COIN_STREAK_AT = 3;
   const COIN_STREAK_BONUS = 1;
   const COIN_ROUND_CAP = 15;
+  const WHY_RUN_LENGTH = 4;
   const ISOLATED_HOLD_MS = 2800;
   const LOOK_IDS = ["ink", "leaf"];
   const START_NODE_ID = "number-sense";
@@ -1419,6 +1421,18 @@ body[data-look="leaf"] {
     return TOPICS.includes(topic) ? topic : "times";
   }
 
+  function isWhyRunTopic(topic) {
+    return PLAYABLE_TRAIL_TOPICS.includes(normalizeTopic(topic));
+  }
+
+  function whyRunLength(topic) {
+    return isWhyRunTopic(topic) ? WHY_RUN_LENGTH : 0;
+  }
+
+  function whyRunReturnsToPath(topic) {
+    return isWhyRunTopic(topic);
+  }
+
   function normalizeDifficulty(difficulty) {
     return DIFFICULTIES.includes(difficulty) ? difficulty : "3-digit";
   }
@@ -1433,13 +1447,17 @@ body[data-look="leaf"] {
     const timerSeconds = [0, 30, 60, 90].includes(Number(source.timerSeconds))
       ? Number(source.timerSeconds)
       : 0;
+    const topic = normalizeTopic(source.topic);
     const rawCount = Number(source.questionCount);
-    const questionCount =
-      Number.isInteger(rawCount) && rawCount > 0 ? Math.min(rawCount, 144) : 20;
+    const questionCount = whyRunLength(topic)
+      ? WHY_RUN_LENGTH
+      : Number.isInteger(rawCount) && rawCount > 0
+        ? Math.min(rawCount, 144)
+        : 20;
 
     return {
       tables: tables.length ? tables : DEFAULT_SETTINGS.tables.slice(),
-      topic: normalizeTopic(source.topic),
+      topic,
       operation: normalizeOperation(source.operation),
       difficulty: normalizeDifficulty(source.difficulty),
       shapeFocus: normalizeShapeFocus(source.shapeFocus),
@@ -2860,7 +2878,7 @@ body[data-look="leaf"] {
       settings: normalized,
       questions: fillDeck(() => {
         const first = made === 0;
-        const towardTwenty = !first && made >= Math.min(8, Math.max(4, count - 4));
+        const towardTwenty = !first && made >= count - 1;
         made += 1;
         return makeSenseQuestion(normalized, rng, { first, towardTwenty });
       }, count),
@@ -3575,6 +3593,7 @@ body[data-look="leaf"] {
     COIN_STREAK_AT,
     COIN_STREAK_BONUS,
     COIN_ROUND_CAP,
+    WHY_RUN_LENGTH,
     ISOLATED_HOLD_MS,
     LOOK_IDS,
     START_NODE_ID,
@@ -3603,6 +3622,8 @@ body[data-look="leaf"] {
     isolatedHoldMs,
     leftoverHoldPlan,
     leftoverTypingAllowed,
+    whyRunLength,
+    whyRunReturnsToPath,
     figureSvg,
     buildRound,
     buildReplayRound,
@@ -3687,6 +3708,7 @@ body[data-look="leaf"] {
     streak: document.getElementById("streak"),
     timer: document.getElementById("timer"),
     progress: document.getElementById("progress"),
+    hud: document.getElementById("practice-hud"),
     keypad: document.getElementById("keypad"),
     restart: document.getElementById("restart-round"),
     changeTables: document.getElementById("change-tables"),
@@ -4407,6 +4429,11 @@ body[data-look="leaf"] {
   }
 
   function updateHud() {
+    const isBoard = screens.practice.classList.contains("is-board");
+    els.hud.hidden = isBoard;
+    if (isBoard) {
+      return;
+    }
     const summary = engine.summarize(state.results);
     els.scoreCorrect.textContent = String(summary.correct);
     els.scoreAsked.textContent = String(summary.asked);
@@ -4692,10 +4719,6 @@ body[data-look="leaf"] {
     clearTimers();
     const summary = engine.summarize(state.results);
     const elapsedSeconds = Math.max(1, Math.round((Date.now() - state.startedAt) / 1000));
-    els.resultsHeadline.textContent = engine.headlineFor(summary);
-    els.resultsScore.textContent = `${summary.correct} / ${summary.asked}`;
-    els.resultsAccuracy.textContent = summary.asked ? `${summary.accuracy}% correct` : "No answers";
-    els.resultsTime.textContent = `Time ${engine.formatClock(elapsedSeconds)}`;
     state.progress = engine.applyRoundProgress(
       state.progress,
       state.settings.topic,
@@ -4703,6 +4726,14 @@ body[data-look="leaf"] {
       state.streakPeak,
     );
     saveProgress(state.progress);
+    if (engine.whyRunReturnsToPath(state.settings.topic)) {
+      showTrail("grade", engine.START_CHAPTER_ID);
+      return;
+    }
+    els.resultsHeadline.textContent = engine.headlineFor(summary);
+    els.resultsScore.textContent = `${summary.correct} / ${summary.asked}`;
+    els.resultsAccuracy.textContent = summary.asked ? `${summary.accuracy}% correct` : "No answers";
+    els.resultsTime.textContent = `Time ${engine.formatClock(elapsedSeconds)}`;
     if (state.settings.topic === "shapes" || engine.FIND_N_TOPICS.includes(state.settings.topic)) {
       els.missedHeading.textContent = "Missed";
     } else if (state.settings.topic === "times") {

@@ -29,7 +29,7 @@ Brand-new visit, taps in order:
 3. Drag the dots you can see off the frame. The prompt becomes `n = leftover`. Type that leftover. A wrong leftover tilts; the board stays.
 4. A correct leftover holds a beat: you still see `n = 4` on the level frame, leftover cells vs the n-box, before the next card. No popup. Score does not jump the beat.
 5. Coins are the quiet number in the corner. A correct n **after** the drag earns coins. Miss, skip, or tapping OK before the move earns 0.
-6. Back to the path. Spend 12 coins on **Missing addend**. It becomes **Start**. Number sense becomes **Replay**. Later nodes stay hollow until the one in front is bought.
+6. After a few why-moves — not a 20-question quiz — you land back on the path. Spend 12 coins on **Missing addend**. It becomes **Start**. Number sense becomes **Replay**. Later nodes stay hollow until the one in front is bought.
 7. Tap **Start** on **Missing addend**. First card is `8 + n = 12`. Drag the known dots off both pans, then type `n = leftover`. A miss then the right leftover replaces, so 5 then 4 is 4. Same isolated-n beat.
 8. Spend 12 coins on **Missing subtrahend**. It becomes **Start**. Earlier purchased nodes stay **Replay**.
 9. Tap **Start** on **Missing subtrahend**. First card is `12 − n = 8`. Drag the known leftover off both pans, then type `n = 4`.
@@ -40,7 +40,7 @@ Other grades stay closed chapters. There is no cosmetics shop and no real-money 
 
 ## Practice
 
-- **Number sense:** hide and count on a ten-frame, first within 10, then a short stretch toward 20. Drag the dots you can see, then type n.
+- **Number sense:** hide and count on a ten-frame, first within 10, then a short stretch toward 20. A short run of living puzzles, then back to the Grade 3 path. Drag the dots you can see, then type n.
 - **Missing addend:** `8 + n = 12` style, small numbers. Drag the known cluster off both pans, then type n.
 - **Missing subtrahend:** `12 − n = 8` style after you spend to open it. Same board: take the known amount from both pans, then type n.
 - **Times tables facts:** missing factor on that same board family. Isolate one group, then type n. Not a 7 × 8 keypad quiz.
