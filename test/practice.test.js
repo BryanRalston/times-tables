@@ -1923,3 +1923,60 @@ test("before the why-move the known group is takeable on the model, not a lectur
   assert.doesNotMatch(html, /Take the same from both first/);
   assert.doesNotMatch(source, /Take the same from both first/);
 });
+
+test("tapping leftover cells or the n box bounces toward the takeable group", () => {
+  const cards = [
+    engine.makeSenseQuestion({}, () => 0, { first: true }),
+    engine.makeMissingQuestion({}, () => 0, { first: true }),
+    engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true }),
+    engine.makeFactorQuestion({}, () => 0, { first: true }),
+  ];
+  const lecture = /Take the ones you can see first|Leave one group|Take the same from both first|put the missing/;
+  for (const question of cards) {
+    const model = engine.whyModel(question);
+    assert.equal(engine.whyNudge(model), "");
+    assert.equal(engine.whyCaption(model, "idle"), "");
+    assert.doesNotMatch(engine.whyNudge(model), lecture);
+    assert.doesNotMatch(engine.whyCaption(model, "idle"), lecture);
+    assert.equal(engine.leftoverTypingAllowed(question, false), false);
+    assert.equal(engine.whyPrompt(question, "lift").prompt, question.prompt);
+  }
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../js/practice.js"), "utf8");
+  const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+  const frame = html.slice(html.indexOf("function renderWhyFrame"), html.indexOf("function renderWhyGroups"));
+  const groups = html.slice(html.indexOf("function renderWhyGroups"), html.indexOf("function renderWhyBalance"));
+  const tiles = html.slice(html.indexOf("function appendWhyTiles"), html.indexOf("function setWhyTakeOffset"));
+  const finish = html.slice(html.indexOf("function finishWhyBoard"), html.indexOf("function clusterColumns"));
+  const rest = html.slice(html.indexOf("function bindWhyRest"), html.indexOf("function renderWhyModel"));
+  const take = html.slice(html.indexOf("function bindWhyTake"), html.indexOf("function bindWhyRest"));
+  const move = html.slice(html.indexOf("function doWhyMove"), html.indexOf("function nudgeWhyMove"));
+  const nudge = html.slice(html.indexOf("function nudgeWhyMove"), html.indexOf("function clearWhyTilt"));
+  const makeN = html.slice(html.indexOf("function makeWhyN"), html.indexOf("function makeWhyCaption"));
+
+  assert.match(frame, /classList\.add\("is-hide", "why-rest"\)/);
+  assert.match(makeN, /className = "why-n why-rest"/);
+  assert.match(groups, /why-n-stack why-rest/);
+  assert.match(groups, /why-clusters why-rest/);
+  assert.match(tiles, /why-group why-rest/);
+  assert.match(finish, /bindWhyTake\(question\)/);
+  assert.match(finish, /bindWhyRest\(question, board\)/);
+  assert.match(rest, /closest\("\.why-take"\)/);
+  assert.match(rest, /closest\("\.why-rest"\)/);
+  assert.match(rest, /nudgeWhyMove\(question\)/);
+  assert.doesNotMatch(rest, /doWhyMove/);
+  assert.match(take, /doWhyMove\(question\)/);
+  assert.doesNotMatch(take, /nudgeWhyMove/);
+  assert.match(move, /dataset\.phase = "lift"/);
+  assert.match(move, /classList\.add\("is-lifted"\)/);
+  assert.match(nudge, /classList\.add\("is-nudge"\)/);
+  assert.match(nudge, /whyNudge/);
+  assert.match(css, /@keyframes why-nudge/);
+  assert.match(css, /\.why-take\.is-nudge/);
+  assert.match(css, /animation:\s*why-takeable/);
+  assert.match(css, /@keyframes why-takeable-glow/);
+  assert.doesNotMatch(html, /Take the ones you can see first/);
+  assert.doesNotMatch(source, /Take the ones you can see first/);
+  assert.doesNotMatch(html, /put the missing ones here/i);
+});
