@@ -2156,6 +2156,10 @@
     return normalized.completedNodes.length === 0 && normalized.unlockedNodes.length === 0;
   }
 
+  function quietFirstLeftoverHops(progress) {
+    return opensOnFirstLeftover(progress);
+  }
+
   function payoutCoins(input) {
     const source = input && typeof input === "object" ? input : {};
     if (!source.ok) {
@@ -2457,6 +2461,7 @@
     isLoudPathNode,
     startNode,
     opensOnFirstLeftover,
+    quietFirstLeftoverHops,
     payoutCoins,
     applyCoinPayout,
     spendUnlock,
