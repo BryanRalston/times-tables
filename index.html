@@ -370,40 +370,6 @@ fieldset.is-disabled {
   margin-bottom: 8px;
 }
 
-.more-block {
-  margin-top: 36px;
-  text-align: left;
-  opacity: 0.72;
-}
-
-.more-toggle {
-  background: none;
-  border: 0;
-  color: var(--muted);
-  cursor: pointer;
-  min-height: 44px;
-  padding: 8px 4px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.more-panel {
-  margin-top: 8px;
-  padding: 8px 0 0;
-}
-
-.look-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.look-btn.is-on {
-  background: var(--ink);
-  color: #fffdf8;
-}
-
 body[data-look="leaf"] {
   --ink: #1f3d2c;
   --stamp: #2f7d4f;
@@ -738,9 +704,26 @@ body[data-look="leaf"] {
   min-height: 1.1em;
 }
 
-.practice-card.is-board .actions .btn {
-  min-height: 40px;
-  padding: 8px 12px;
+.practice-card.is-board .actions {
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.practice-card.is-board .actions .btn-quiet {
+  min-height: 0;
+  padding: 4px 0;
+  background: none;
+  border: 0;
+  color: color-mix(in srgb, var(--muted) 72%, transparent);
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.practice-card.is-board .actions .btn-ghost {
+  min-height: 36px;
+  padding: 6px 12px;
   background: transparent;
   color: var(--muted);
 }
@@ -1188,34 +1171,6 @@ body[data-look="leaf"] {
           </div>
           <p id="grade-note" class="node-note" hidden></p>
         </div>
-
-        <div class="more-block">
-          <button type="button" class="more-toggle" id="more-toggle" aria-expanded="false" aria-controls="more-panel">Round length</button>
-          <div id="more-panel" class="more-panel" hidden>
-            <fieldset class="section">
-              <legend>Timer</legend>
-              <div class="choice-row">
-                <label class="choice"><input type="radio" name="timer" value="0" checked /> Off</label>
-                <label class="choice"><input type="radio" name="timer" value="30" /> 30s</label>
-                <label class="choice"><input type="radio" name="timer" value="60" /> 60s</label>
-                <label class="choice"><input type="radio" name="timer" value="90" /> 90s</label>
-              </div>
-            </fieldset>
-            <fieldset class="section" id="count-fieldset">
-              <legend>Questions</legend>
-              <div class="choice-row">
-                <label class="choice"><input type="radio" name="count" value="10" /> 10</label>
-                <label class="choice"><input type="radio" name="count" value="20" checked /> 20</label>
-                <label class="choice"><input type="radio" name="count" value="30" /> 30</label>
-              </div>
-            </fieldset>
-            <fieldset class="section">
-              <legend>Looks</legend>
-              <p class="chapter-meta">A cheap extra. Cannot skip the move.</p>
-              <div class="look-row" id="look-row"></div>
-            </fieldset>
-          </div>
-        </div>
         <p id="setup-error" class="error" hidden></p>
       </section>
 
@@ -1246,7 +1201,7 @@ body[data-look="leaf"] {
           <div id="progress">1 / 20</div>
         </div>
         <div class="actions">
-          <button type="button" class="btn" id="restart-round">Restart</button>
+          <button type="button" class="btn btn-quiet" id="restart-round">Restart</button>
           <button type="button" class="btn btn-ghost" id="change-tables">Chapters</button>
         </div>
       </section>
@@ -3668,9 +3623,6 @@ body[data-look="leaf"] {
     gradeKicker: document.getElementById("grade-kicker"),
     gradeNote: document.getElementById("grade-note"),
     backChapters: document.getElementById("back-chapters"),
-    moreToggle: document.getElementById("more-toggle"),
-    morePanel: document.getElementById("more-panel"),
-    lookRow: document.getElementById("look-row"),
     coinHud: document.getElementById("coin-hud"),
     coinCount: document.getElementById("coin-count"),
     setupError: document.getElementById("setup-error"),
@@ -3710,7 +3662,6 @@ body[data-look="leaf"] {
     progress: engine.normalizeProgress(loadProgress()),
     trailView: "grade",
     openChapter: engine.START_CHAPTER_ID,
-    moreOpen: false,
     earnedThisRound: 0,
     round: null,
     asked: 0,
@@ -3761,21 +3712,11 @@ body[data-look="leaf"] {
     return checked ? checked.value : "type";
   }
 
-  function selectedTimer() {
-    const checked = document.querySelector('input[name="timer"]:checked');
-    return checked ? Number(checked.value) : 0;
-  }
-
-  function selectedCount() {
-    const checked = document.querySelector('input[name="count"]:checked');
-    return checked ? Number(checked.value) : 20;
-  }
-
   function readSetup(topic) {
     return engine.normalizeSettings({
       topic: engine.playableTopic(topic),
-      timerSeconds: selectedTimer(),
-      questionCount: selectedCount(),
+      timerSeconds: 0,
+      questionCount: engine.DEFAULT_SETTINGS.questionCount,
     });
   }
 
@@ -3820,7 +3761,6 @@ body[data-look="leaf"] {
 
   function renderTrail() {
     updateChrome();
-    renderLooks();
     if (state.trailView === "grade") {
       renderGradePath(state.openChapter);
       return;
@@ -3955,57 +3895,8 @@ body[data-look="leaf"] {
     beginRound(readSetup(node.topic));
   }
 
-  function renderLooks() {
-    els.lookRow.replaceChildren();
-    engine.LOOK_IDS.forEach((look) => {
-      const owned = state.progress.boughtLooks.includes(look);
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = `btn look-btn${state.progress.look === look ? " is-on" : ""}`;
-      button.textContent = look === "ink" ? "Ink" : owned ? "Leaf" : `Leaf · ${engine.LOOK_COST}`;
-      button.addEventListener("click", () => {
-        const result = engine.spendLook(state.progress, look);
-        if (!result.ok) {
-          els.setupError.hidden = false;
-          els.setupError.textContent = "Earn a few more coins for that look.";
-          return;
-        }
-        els.setupError.hidden = true;
-        state.progress = result.progress;
-        saveProgress(state.progress);
-        renderTrail();
-      });
-      els.lookRow.append(button);
-    });
-  }
-
-  function setMoreOpen(open) {
-    state.moreOpen = Boolean(open);
-    els.morePanel.hidden = !state.moreOpen;
-    els.moreToggle.setAttribute("aria-expanded", state.moreOpen ? "true" : "false");
-  }
-
-  function setChoice(name, value) {
-    const input = document.querySelector(`input[name="${name}"][value="${value}"]`);
-    if (input) {
-      input.checked = true;
-    }
-  }
-
-  function hydrateTrail(settings) {
-    setChoice("timer", settings.timerSeconds);
-    setChoice("count", settings.questionCount);
-    updateCountDisabled(settings.timerSeconds);
-    setMoreOpen(false);
+  function hydrateTrail() {
     renderTrail();
-  }
-
-  function updateCountDisabled(timerSeconds) {
-    const disabled = Number(timerSeconds) > 0;
-    document.querySelectorAll('input[name="count"]').forEach((input) => {
-      input.disabled = disabled;
-    });
-    document.getElementById("count-fieldset").classList.toggle("is-disabled", disabled);
   }
 
   function currentQuestion() {
@@ -4913,14 +4804,6 @@ body[data-look="leaf"] {
     });
   }
 
-  document.querySelectorAll('input[name="timer"]').forEach((input) => {
-    input.addEventListener("change", () => updateCountDisabled(selectedTimer()));
-  });
-
-  els.moreToggle.addEventListener("click", () => {
-    setMoreOpen(!state.moreOpen);
-  });
-
   els.backChapters.addEventListener("click", () => {
     showTrail("chapters");
   });
@@ -4966,12 +4849,12 @@ body[data-look="leaf"] {
   els.restart.addEventListener("click", () => beginRound(state.settings));
   els.changeTables.addEventListener("click", () => {
     clearTimers();
-    hydrateTrail(state.settings);
+    hydrateTrail();
     showTrail("grade", engine.START_CHAPTER_ID);
   });
   els.playAgain.addEventListener("click", () => beginRound(state.settings));
   els.resultsChange.addEventListener("click", () => {
-    hydrateTrail(state.settings);
+    hydrateTrail();
     showTrail("grade", engine.START_CHAPTER_ID);
   });
   els.practiceMissed.addEventListener("click", () => {
@@ -5004,7 +4887,7 @@ body[data-look="leaf"] {
   });
 
   renderKeypad();
-  hydrateTrail(state.settings);
+  hydrateTrail();
   showTrail("grade", engine.START_CHAPTER_ID);
 
 })();

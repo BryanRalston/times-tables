@@ -24,7 +24,7 @@ https://bryanralston.github.io/times-tables/
 
 Brand-new visit, taps in order:
 
-1. Open the live page. You land on the **Grade 3** path with **Number sense** and **Start** in front. Later grades stay behind **Chapters**. You do not first tap through a wall of closed grades.
+1. Open the live page. You land on the **Grade 3** path with **Number sense** and **Start** in front. Missing addend shows **12**. Later nodes stay hollow. Later grades stay behind **Chapters**. There is no **Round length**, **Timer**, or **Questions** picker on this path. You do not first tap through a settings door or a wall of closed grades.
 2. Tap **Start** on **Number sense**. First card is `6 + n = 10` on a ten-frame. The frame is the product, not Score / Streak / 20.
 3. Drag the dots you can see off the frame. The prompt becomes `n = leftover`. Type that leftover. A wrong leftover tilts; the board stays.
 4. A correct leftover holds a beat: you still see `n = 4` on the level frame, leftover cells vs the n-box, before the next card. No popup. Score does not jump the beat.
@@ -36,7 +36,7 @@ Brand-new visit, taps in order:
 10. Spend 12 coins on **Times tables facts**. It becomes **Start**, not Coming-forever.
 11. Tap **Start** on **Times tables facts**. First card is `2 × n = 8`. Drag the extra group off both pans so one group is left, then type `n = leftover`.
 
-Other grades stay closed chapters. Looks are an optional cheap extra. There is no real-money shop.
+Other grades stay closed chapters. There is no cosmetics shop and no real-money shop.
 
 ## Practice
 
@@ -44,5 +44,5 @@ Other grades stay closed chapters. Looks are an optional cheap extra. There is n
 - **Missing addend:** `8 + n = 12` style, small numbers. Drag the known cluster off both pans, then type n.
 - **Missing subtrahend:** `12 − n = 8` style after you spend to open it. Same board: take the known amount from both pans, then type n.
 - **Times tables facts:** missing factor on that same board family. Isolate one group, then type n. Not a 7 × 8 keypad quiz.
-- Timer and question count sit behind **Round length** on the map, not on the puzzle as the product.
+- First visit is the Grade 3 trail and **Start**, not a quiz settings page.
 - Progress and coins stay in the browser (`localStorage`)

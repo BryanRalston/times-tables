@@ -1,6 +1,14 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const engine = require("../js/practice.js");
+
+function pageMarkup() {
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const scriptAt = html.indexOf("<script>");
+  return scriptAt >= 0 ? html.slice(0, scriptAt) : html;
+}
 
 function rngFrom(values) {
   let index = 0;
@@ -1392,4 +1400,49 @@ test("old saves that already opened later Grade 3 nodes keep missing addend", ()
   assert.equal(engine.nodeStatus(progress, "missing-addend"), "replay");
   assert.equal(engine.nodeStatus(progress, "missing-subtrahend"), "current");
   assert.equal(engine.nodeStatus(progress, "times-facts"), "priced");
+});
+
+test("Grade 3 path markup is trail + Start, not a quiz settings page", () => {
+  const markup = pageMarkup();
+  const trailStart = markup.indexOf('id="screen-trail"');
+  const practiceStart = markup.indexOf('id="screen-practice"');
+  assert.ok(trailStart >= 0 && practiceStart > trailStart);
+  const trail = markup.slice(trailStart, practiceStart);
+  assert.match(trail, /Number sense/);
+  assert.match(trail, /Start/);
+  assert.match(trail, /Missing addend/);
+  assert.match(trail, /id="back-chapters"/);
+  assert.match(trail, /Grade 3/);
+  assert.doesNotMatch(trail, /Round length/i);
+  assert.doesNotMatch(trail, /<legend>Timer<\/legend>/);
+  assert.doesNotMatch(trail, /<legend>Questions<\/legend>/);
+  assert.doesNotMatch(trail, /name="timer"/);
+  assert.doesNotMatch(trail, /name="count"/);
+  assert.doesNotMatch(trail, />Settings</);
+  assert.doesNotMatch(trail, /Looks/);
+  assert.doesNotMatch(markup, /Round length/i);
+  assert.doesNotMatch(markup, /name="timer"/);
+  assert.doesNotMatch(markup, /name="count"/);
+});
+
+test("puzzle chrome keeps Restart quieter than the board and OK", () => {
+  const markup = pageMarkup();
+  const practice = markup.slice(markup.indexOf('id="screen-practice"'), markup.indexOf('id="screen-results"'));
+  assert.match(practice, /id="restart-round"/);
+  assert.match(practice, /btn-quiet/);
+  assert.match(practice, /id="change-tables"/);
+  assert.match(practice, /class="hud"/);
+  assert.match(practice, /id="why-model"/);
+  assert.match(practice, /id="keypad"/);
+});
+
+test("isolated-n beat still hides the keypad and holds the leftover board", () => {
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  assert.match(html, /function holdIsolatedN/);
+  assert.match(html, /classList\.add\("is-isolated"\)/);
+  assert.match(html, /els\.keypad\.hidden = true/);
+  assert.ok(engine.ISOLATED_HOLD_MS >= 1600);
+  const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  assert.equal(engine.isolatedHoldMs(sense), engine.ISOLATED_HOLD_MS);
+  assert.equal(engine.whyPrompt(sense, "reveal").prompt, "n = 4");
 });
