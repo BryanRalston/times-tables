@@ -4086,7 +4086,7 @@ body[data-look="leaf"] {
 
   function makeWhyN(model) {
     const mystery = document.createElement("span");
-    mystery.className = "why-n";
+    mystery.className = "why-n why-rest";
     const token = document.createElement("span");
     token.className = "why-n-token";
     token.textContent = model.token;
@@ -4118,6 +4118,7 @@ body[data-look="leaf"] {
     els.why.hidden = false;
     setWhyCaption(engine.whyCaption(model, "idle"), "idle");
     bindWhyTake(question);
+    bindWhyRest(question, board);
   }
 
   function clusterColumns(count) {
@@ -4165,7 +4166,7 @@ body[data-look="leaf"] {
           take.append(tile);
           cell.append(take);
         } else if (index < model.known + model.hidden) {
-          cell.classList.add("is-hide");
+          cell.classList.add("is-hide", "why-rest");
           if (index === model.known) {
             cell.append(makeWhyN(model));
           }
@@ -4201,7 +4202,7 @@ body[data-look="leaf"] {
       leftTake.append(makeWhyN(model));
     }
     const leftRest = document.createElement("span");
-    leftRest.className = "why-n-stack";
+    leftRest.className = "why-n-stack why-rest";
     leftRest.append(makeWhyN(model));
     if (extras) {
       left.append(leftTake);
@@ -4213,7 +4214,7 @@ body[data-look="leaf"] {
       rightTake.append(makeDotCluster(model.hidden));
     }
     const rightRest = document.createElement("span");
-    rightRest.className = "why-clusters";
+    rightRest.className = "why-clusters why-rest";
     rightRest.append(makeDotCluster(model.hidden));
     if (extras) {
       right.append(rightTake);
@@ -4274,7 +4275,7 @@ body[data-look="leaf"] {
     const leftover = count - takeCount;
     if (leftover > 0) {
       const restGroup = document.createElement("span");
-      restGroup.className = "why-group";
+      restGroup.className = "why-group why-rest";
       for (let index = 0; index < leftover; index += 1) {
         const tile = document.createElement("span");
         tile.className = "why-tile";
@@ -4354,6 +4355,23 @@ body[data-look="leaf"] {
           doWhyMove(question);
         }
       });
+    });
+  }
+
+  function bindWhyRest(question, board) {
+    board.addEventListener("pointerdown", (event) => {
+      if (state.locked || whyMoveDone() || event.button) {
+        return;
+      }
+      if (event.target.closest(".why-take")) {
+        return;
+      }
+      const rest = event.target.closest(".why-rest");
+      if (!rest) {
+        return;
+      }
+      event.preventDefault();
+      nudgeWhyMove(question);
     });
   }
 
