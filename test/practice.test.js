@@ -1980,3 +1980,38 @@ test("tapping leftover cells or the n box bounces toward the takeable group", ()
   assert.doesNotMatch(source, /Take the ones you can see first/);
   assert.doesNotMatch(html, /put the missing ones here/i);
 });
+
+test("is-nudge clears after the nudge so the idle takeable bob returns", () => {
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../js/practice.js"), "utf8");
+  const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+  const idleTake = css.slice(css.indexOf('.why-model[data-phase="idle"] .why-take'));
+  const idleNudge = css.slice(
+    css.indexOf('.why-model[data-phase="idle"] .why-take.is-nudge'),
+    css.indexOf("@keyframes why-takeable"),
+  );
+  const rest = html.slice(html.indexOf("function bindWhyRest"), html.indexOf("function renderWhyModel"));
+  const take = html.slice(html.indexOf("function bindWhyTake"), html.indexOf("function bindWhyRest"));
+  const move = html.slice(html.indexOf("function doWhyMove"), html.indexOf("function nudgeWhyMove"));
+  const nudge = html.slice(html.indexOf("function nudgeWhyMove"), html.indexOf("function clearWhyTilt"));
+  const addAt = nudge.indexOf('classList.add("is-nudge")');
+  const timeoutAt = nudge.indexOf("setTimeout");
+  const clearAfter = nudge.slice(timeoutAt);
+
+  assert.match(idleTake, /animation:\s*why-takeable/);
+  assert.match(idleNudge, /animation:\s*why-nudge 0\.45s/);
+  assert.match(nudge, /classList\.add\("is-nudge"\)/);
+  assert.match(nudge, /clearTimeout\(state\.whyId\)/);
+  assert.match(nudge, /setTimeout/);
+  assert.match(nudge, /,\s*450\)/);
+  assert.ok(addAt >= 0 && timeoutAt > addAt);
+  assert.match(clearAfter, /classList\.remove\("is-nudge"\)/);
+  assert.match(rest, /nudgeWhyMove\(question\)/);
+  assert.doesNotMatch(rest, /doWhyMove/);
+  assert.match(take, /doWhyMove\(question\)/);
+  assert.doesNotMatch(take, /nudgeWhyMove/);
+  assert.match(move, /dataset\.phase = "lift"/);
+  assert.match(move, /classList\.add\("is-lifted"\)/);
+  assert.doesNotMatch(html, /Take the ones you can see first/);
+  assert.doesNotMatch(source, /Take the ones you can see first/);
+});

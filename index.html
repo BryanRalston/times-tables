@@ -4439,6 +4439,13 @@ body[data-look="leaf"] {
       void group.offsetWidth;
       group.classList.add("is-nudge");
     });
+    window.clearTimeout(state.whyId);
+    state.whyId = window.setTimeout(() => {
+      els.why.querySelectorAll(".why-take").forEach((group) => {
+        group.classList.remove("is-nudge");
+      });
+      state.whyId = null;
+    }, 450);
   }
 
   function clearWhyTilt() {
