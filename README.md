@@ -29,9 +29,9 @@ Brand-new visit, taps in order:
 3. Drag the dots you can see off the frame. The prompt becomes `n = leftover`. Type that leftover. A wrong leftover tilts; the board stays.
 4. A correct leftover holds a beat: you still see `n = 4` on the level frame, leftover cells vs the n-box, before the next card. No popup. Score does not jump the beat.
 5. Coins are the quiet number in the corner. A correct n **after** the drag earns coins. Miss, skip, or tapping OK before the move earns 0.
-6. Back to the path. Spend 12 coins on **Missing addend**. It becomes **Start**.
-7. Tap **Start** on **Missing addend**. First card is `8 + n = 12`. Drag the known dots off both pans, then type `n = leftover`. Same isolated-n beat.
-8. Spend 12 coins on **Missing subtrahend**. It becomes **Start**.
+6. Back to the path. Spend 12 coins on **Missing addend**. It becomes **Start**. Number sense becomes **Replay**. Later nodes stay hollow until the one in front is bought.
+7. Tap **Start** on **Missing addend**. First card is `8 + n = 12`. Drag the known dots off both pans, then type `n = leftover`. A miss then the right leftover replaces, so 5 then 4 is 4. Same isolated-n beat.
+8. Spend 12 coins on **Missing subtrahend**. It becomes **Start**. Earlier purchased nodes stay **Replay**.
 9. Tap **Start** on **Missing subtrahend**. First card is `12 − n = 8`. Drag the known leftover off both pans, then type `n = 4`.
 10. Spend 12 coins on **Times tables facts**. It becomes **Start**, not Coming-forever.
 11. Tap **Start** on **Times tables facts**. First card is `2 × n = 8`. Drag the extra group off both pans so one group is left, then type `n = leftover`.

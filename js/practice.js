@@ -1901,18 +1901,17 @@
       openedChapters.unshift(START_CHAPTER_ID);
     }
     const completedNodes = uniqueIds(source.completedNodes, knownNodeIds);
-    const laterGrade3 = ["missing-subtrahend", "times-facts"];
-    const playedAddend = Number(fluency.missing && fluency.missing.lastAsked) > 0;
-    if (
-      !unlockedNodes.includes("missing-addend")
-      && (
-        laterGrade3.some((id) => unlockedNodes.includes(id) || completedNodes.includes(id))
-        || completedNodes.includes("missing-addend")
-        || playedAddend
-      )
-    ) {
-      unlockedNodes.unshift("missing-addend");
-    }
+    GRADE3_ADVANCE_NODES.forEach((id, index) => {
+      if (unlockedNodes.includes(id)) {
+        return;
+      }
+      const laterPurchased = GRADE3_ADVANCE_NODES.slice(index + 1).some((later) => (
+        unlockedNodes.includes(later)
+      ));
+      if (laterPurchased) {
+        unlockedNodes.push(id);
+      }
+    });
     const look = LOOK_IDS.includes(source.look) ? source.look : "ink";
     const boughtLooks = uniqueIds(source.boughtLooks, LOOK_IDS);
     if (!boughtLooks.includes("ink")) {
@@ -2022,13 +2021,28 @@
     return "closed";
   }
 
+  function frontierPlayableNodeId(progress) {
+    const normalized = normalizeProgress(progress);
+    let frontier = START_NODE_ID;
+    GRADE3_ADVANCE_NODES.forEach((id) => {
+      if (normalized.unlockedNodes.includes(id) && isNodePlayable(id)) {
+        frontier = id;
+      }
+    });
+    return frontier;
+  }
+
   function nodeStatus(progress, nodeId) {
     const found = findNode(nodeId);
     if (!found) {
       return "locked";
     }
     if (found.node.playable && isNodePurchased(progress, nodeId)) {
-      return isNodeCompleted(progress, nodeId) ? "replay" : "current";
+      const frontier = frontierPlayableNodeId(progress);
+      if (nodeId === frontier && !isNodeCompleted(progress, nodeId)) {
+        return "current";
+      }
+      return "replay";
     }
     if (!found.node.playable && isNodePurchased(progress, nodeId)) {
       return "coming";
@@ -2218,10 +2232,45 @@
     }
     next.recommended = recommendedFrom(next.fluency, next.lastStruggled);
     const nodeId = TOPIC_TO_NODE[id];
-    if (nodeId && asked > 0 && !next.completedNodes.includes(nodeId)) {
+    if (
+      nodeId
+      && asked > 0
+      && !next.completedNodes.includes(nodeId)
+      && isNodePurchased(next, nodeId)
+    ) {
       next.completedNodes.push(nodeId);
     }
     return next;
+  }
+
+  function leftoverDigitCap(question) {
+    if (!usesWhyModel(question)) {
+      return 5;
+    }
+    const leftover = whyLeftover(whyModel(question));
+    if (!Number.isInteger(leftover)) {
+      return 1;
+    }
+    return Math.min(2, Math.max(1, String(Math.abs(leftover)).length));
+  }
+
+  function appendAnswerDigit(buffer, digit, question) {
+    const next = String(digit);
+    if (!/^\d$/.test(next)) {
+      return String(buffer || "");
+    }
+    const current = String(buffer || "");
+    if (usesWhyModel(question)) {
+      const cap = leftoverDigitCap(question);
+      if (current.length >= cap) {
+        return next;
+      }
+      return current + next;
+    }
+    if (current.length >= 5) {
+      return current;
+    }
+    return current + next;
   }
 
   function skillCopy(skill) {
@@ -2303,6 +2352,8 @@
     isSkillUnlocked,
     pickRecommended,
     applyRoundProgress,
+    appendAnswerDigit,
+    leftoverDigitCap,
     skillCopy,
     otherSkills,
     trailChapters,
