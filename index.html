@@ -4836,6 +4836,9 @@ body[data-look="leaf"] {
   }
 
   function finishRound() {
+    if (state.holdingIsolated) {
+      return;
+    }
     clearTimers();
     const summary = engine.summarize(state.results);
     const elapsedSeconds = Math.max(1, Math.round((Date.now() - state.startedAt) / 1000));
@@ -4920,6 +4923,9 @@ body[data-look="leaf"] {
   }
 
   function shouldEndAfterAnswer() {
+    if (state.holdingIsolated) {
+      return false;
+    }
     if (state.settings.timerSeconds > 0) {
       return state.remainingMs <= 0;
     }
@@ -4951,7 +4957,9 @@ body[data-look="leaf"] {
 
     state.locked = true;
     state.results.push({ question, ok: grade.ok, given: grade.given });
-    state.asked += 1;
+    if (plan.kind !== "isolated") {
+      state.asked += 1;
+    }
     if (grade.ok) {
       state.streak += 1;
       state.streakPeak = Math.max(state.streakPeak, state.streak);
@@ -4989,6 +4997,9 @@ body[data-look="leaf"] {
           ? 1600
           : 1300;
     state.advanceId = window.setTimeout(() => {
+      if (plan.kind === "isolated") {
+        state.asked += 1;
+      }
       state.holdingIsolated = false;
       if (shouldEndAfterAnswer()) {
         finishRound();

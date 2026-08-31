@@ -1804,6 +1804,73 @@ test("isolated-n beat still hides the keypad and holds the leftover board", () =
   assert.equal(engine.whyPrompt(sense, "reveal").prompt, "n = 4");
 });
 
+test("every Number sense leftover holds isolated-n before the next card or path hop", () => {
+  let tick = 0;
+  const round = engine.buildRound(
+    { topic: "sense", timerSeconds: 0, questionCount: 20 },
+    () => {
+      tick += 1;
+      return (tick % 97) / 97;
+    },
+  );
+  assert.equal(round.questions.length, engine.WHY_RUN_LENGTH);
+  for (const question of round.questions) {
+    const model = engine.whyModel(question);
+    assert.equal(model.kind, "frame");
+    assert.equal(model.family, "sense");
+    const leftover = engine.whyLeftover(model);
+    const plan = engine.leftoverHoldPlan(question, engine.gradeAnswer(question, String(leftover)));
+    assert.equal(plan.kind, "isolated");
+    assert.ok(plan.holdMs >= 2000);
+    assert.equal(plan.holdMs, engine.ISOLATED_HOLD_MS);
+    assert.equal(plan.hideKeypad, true);
+    assert.equal(plan.keepModel, true);
+    assert.equal(plan.prompt, `${question.token} = ${leftover}`);
+    assert.equal(engine.whyPrompt(question, "reveal").prompt, plan.prompt);
+  }
+
+  const addend = engine.makeMissingQuestion({}, () => 0, { first: true });
+  const sub = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  const factor = engine.makeFactorQuestion({}, () => 0, { first: true });
+  for (const question of [addend, sub, factor]) {
+    const leftover = engine.whyLeftover(engine.whyModel(question));
+    const plan = engine.leftoverHoldPlan(question, engine.gradeAnswer(question, String(leftover)));
+    assert.equal(plan.kind, "isolated");
+    assert.ok(plan.holdMs >= 2000);
+    assert.equal(plan.hideKeypad, true);
+    assert.equal(plan.keepModel, true);
+  }
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const submit = html.slice(html.indexOf("function submitAnswer"), html.indexOf("function pressKey"));
+  const show = html.slice(html.indexOf("function showQuestion"), html.indexOf("function clearTimers"));
+  const finish = html.slice(html.indexOf("function finishRound"), html.indexOf("function startTimer"));
+  const shouldEnd = html.slice(
+    html.indexOf("function shouldEndAfterAnswer"),
+    html.indexOf("function submitAnswer"),
+  );
+  const hold = html.slice(html.indexOf("function holdIsolatedN"), html.indexOf("function setAnswer"));
+  const timeout = submit.slice(submit.indexOf("state.advanceId = window.setTimeout"));
+  assert.match(show, /if \(state\.holdingIsolated\) \{\s*return;/);
+  assert.match(finish, /if \(state\.holdingIsolated\) \{\s*return;/);
+  assert.match(shouldEnd, /if \(state\.holdingIsolated\) \{\s*return false;/);
+  assert.match(submit, /if \(plan\.kind !== "isolated"\) \{\s*state\.asked \+= 1;/);
+  assert.match(timeout, /if \(plan\.kind === "isolated"\) \{\s*state\.asked \+= 1;/);
+  assert.match(timeout, /state\.holdingIsolated = false/);
+  assert.match(timeout, /finishRound/);
+  assert.match(timeout, /showQuestion/);
+  assert.ok(timeout.indexOf("asked += 1") < timeout.indexOf("holdingIsolated = false"));
+  assert.ok(timeout.indexOf("holdingIsolated = false") < timeout.indexOf("finishRound"));
+  assert.ok(timeout.indexOf("holdingIsolated = false") < timeout.indexOf("showQuestion"));
+  assert.match(hold, /els\.keypad\.hidden = true/);
+  assert.match(hold, /els\.why\.hidden = false/);
+  assert.match(hold, /dataset\.isolatedHold = "true"/);
+  assert.doesNotMatch(hold, /showQuestion\(/);
+  assert.doesNotMatch(hold, /finishRound\(/);
+  assert.doesNotMatch(submit.slice(0, submit.indexOf("state.advanceId")), /showQuestion\(/);
+  assert.doesNotMatch(submit.slice(0, submit.indexOf("state.advanceId")), /finishRound\(/);
+});
+
 test("leftover keypad waits for the why-move, then isolated-n still holds", () => {
   const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
   const show = html.slice(html.indexOf("function showQuestion"), html.indexOf("function clearTimers"));
