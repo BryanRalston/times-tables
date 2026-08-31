@@ -85,6 +85,10 @@ p {
   font-size: 1.1rem;
 }
 
+.coin-hud.is-ready strong {
+  color: #b8860b;
+}
+
 .coin-dot {
   width: 12px;
   height: 12px;
@@ -367,8 +371,9 @@ fieldset.is-disabled {
 }
 
 .more-block {
-  margin-top: 22px;
+  margin-top: 36px;
   text-align: left;
+  opacity: 0.72;
 }
 
 .more-toggle {
@@ -422,15 +427,18 @@ body[data-look="leaf"] {
 
 .hud {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
-  color: var(--muted);
-  font-size: 0.95rem;
+  margin: 10px 0 0;
+  color: color-mix(in srgb, var(--muted) 78%, transparent);
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
 }
 
 .hud strong {
-  color: var(--ink);
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .practice-card[data-state="ok"] {
@@ -689,6 +697,91 @@ body[data-look="leaf"] {
   margin: 4px 0 10px;
 }
 
+.practice-card.is-board {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 6px 2px 14px;
+}
+
+.practice-card.is-board .prompt {
+  font-size: clamp(1.7rem, 6vw, 2.5rem);
+  margin: 2px 0 14px;
+}
+
+.practice-card.is-board .answer,
+.practice-card.is-isolated .answer {
+  display: none;
+}
+
+.practice-card.is-board .keypad {
+  width: min(280px, 100%);
+  margin: 14px auto 2px;
+  gap: 5px;
+}
+
+.practice-card.is-board .key {
+  min-height: 40px;
+  font-size: 1rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--card) 55%, transparent);
+  border-color: color-mix(in srgb, var(--line) 80%, transparent);
+}
+
+.practice-card.is-board .key.is-enter {
+  background: var(--sky);
+  color: #fffdf8;
+  border-color: var(--sky);
+}
+
+.practice-card.is-board .feedback {
+  min-height: 1.1em;
+}
+
+.practice-card.is-board .actions .btn {
+  min-height: 40px;
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--muted);
+}
+
+.practice-card.is-isolated {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.practice-card.is-isolated .keypad,
+.practice-card.is-isolated .actions,
+.practice-card.is-isolated .hud {
+  display: none;
+}
+
+.practice-card.is-isolated .why-n {
+  width: 56px;
+  height: 56px;
+  font-size: 1.6rem;
+  color: var(--leaf);
+  border-color: var(--leaf);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--leaf) 22%, transparent);
+}
+
+.practice-card.is-isolated .why-cell .why-n {
+  width: 36px;
+  height: 36px;
+  font-size: 1.15rem;
+}
+
+.practice-card.is-isolated .why-frame,
+.practice-card.is-isolated .why-pan {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--leaf) 18%, transparent);
+}
+
+.practice-card.is-board .why-frame,
+.practice-card.is-board .why-pan {
+  box-shadow: var(--shadow);
+}
+
 .why-scale {
   position: relative;
   padding: 4px 2px 0;
@@ -735,7 +828,7 @@ body[data-look="leaf"] {
 }
 
 .why-pan {
-  min-height: 78px;
+  min-height: 112px;
   border: 2px solid var(--ink);
   border-radius: 16px 16px 22px 22px;
   background: #fff;
@@ -744,13 +837,13 @@ body[data-look="leaf"] {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 10px 8px 12px;
+  padding: 14px 10px 16px;
 }
 
 .why-group {
   display: grid;
-  grid-template-columns: repeat(4, 12px);
-  gap: 5px;
+  grid-template-columns: repeat(4, 16px);
+  gap: 6px;
   justify-content: center;
 }
 
@@ -772,8 +865,8 @@ body[data-look="leaf"] {
 }
 
 .why-tile {
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: var(--sky);
   display: inline-block;
@@ -805,13 +898,14 @@ body[data-look="leaf"] {
 }
 
 .why-n {
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
   border: 3px solid var(--sky);
-  border-radius: 8px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   font-weight: 700;
+  font-size: 1.25rem;
   color: var(--sky);
   background: #fff;
   position: relative;
@@ -894,20 +988,20 @@ body[data-look="leaf"] {
 
 .why-frame {
   display: grid;
-  grid-template-columns: repeat(5, 28px);
-  grid-template-rows: repeat(2, 28px);
-  gap: 6px;
-  padding: 10px;
+  grid-template-columns: repeat(5, 40px);
+  grid-template-rows: repeat(2, 40px);
+  gap: 8px;
+  padding: 14px;
   border: 2px solid var(--ink);
-  border-radius: 16px;
+  border-radius: 18px;
   background: #fff;
 }
 
 .why-cell {
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   border: 2px solid var(--line);
-  border-radius: 7px;
+  border-radius: 9px;
   display: grid;
   place-items: center;
   background: #fff;
@@ -932,10 +1026,10 @@ body[data-look="leaf"] {
 }
 
 .why-cell .why-n {
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
   border-width: 2px;
-  font-size: 0.72rem;
+  font-size: 1rem;
 }
 
 .why-n-stack,
@@ -1023,6 +1117,20 @@ body[data-look="leaf"] {
   .key {
     min-height: 54px;
   }
+
+  .practice-card.is-board .key {
+    min-height: 44px;
+  }
+
+  .why-frame {
+    grid-template-columns: repeat(5, 34px);
+    grid-template-rows: repeat(2, 34px);
+  }
+
+  .why-cell {
+    width: 34px;
+    height: 34px;
+  }
 }
 
     </style>
@@ -1041,8 +1149,8 @@ body[data-look="leaf"] {
         </div>
       </header>
 
-      <section id="screen-trail" class="trail" aria-label="Grade chapters">
-        <div id="trail-chapters">
+      <section id="screen-trail" class="trail" aria-label="Grade path">
+        <div id="trail-chapters" hidden>
           <div class="trail-head">
             <h2>Chapters</h2>
             <p>Open a grade. Only this year's path is inside.</p>
@@ -1050,12 +1158,34 @@ body[data-look="leaf"] {
           <div id="chapter-list" class="chapter-list"></div>
         </div>
 
-        <div id="trail-grade" hidden>
+        <div id="trail-grade">
           <div class="grade-toolbar">
             <button type="button" class="btn btn-ghost" id="back-chapters">Chapters</button>
             <p class="grade-kicker" id="grade-kicker">Grade 3</p>
           </div>
-          <div id="grade-path" class="grade-path"></div>
+          <div id="grade-path" class="grade-path">
+            <div class="node is-current">
+              <div class="node-row">
+                <span class="node-title">Number sense</span>
+                <button type="button" class="btn btn-primary">Start</button>
+              </div>
+            </div>
+            <div class="node is-priced">
+              <div class="node-row">
+                <span class="node-title">Missing addend</span>
+              </div>
+            </div>
+            <div class="node is-locked">
+              <div class="node-row">
+                <span class="node-title">Missing subtrahend</span>
+              </div>
+            </div>
+            <div class="node is-locked">
+              <div class="node-row">
+                <span class="node-title">Times tables facts</span>
+              </div>
+            </div>
+          </div>
           <p id="grade-note" class="node-note" hidden></p>
         </div>
 
@@ -1090,13 +1220,7 @@ body[data-look="leaf"] {
       </section>
 
       <section id="screen-practice" class="card practice-card" aria-label="Practice" hidden>
-        <div class="hud">
-          <div>Score <strong id="score-correct">0</strong> / <strong id="score-asked">0</strong></div>
-          <div>Streak <strong id="streak">0</strong></div>
-          <div id="timer" hidden>00:00</div>
-          <div id="progress">1 / 20</div>
-        </div>
-        <p id="prompt" class="prompt" aria-live="polite">7 × 8 =</p>
+        <p id="prompt" class="prompt" aria-live="polite"></p>
         <div id="why-model" class="why-model" hidden></div>
         <div id="shape-figure" class="shape-figure" hidden></div>
         <div id="workspace" class="workspace" hidden>
@@ -1112,9 +1236,15 @@ body[data-look="leaf"] {
           <canvas id="scratch-draw" class="scratch-draw" hidden aria-label="Draw scratch paper"></canvas>
         </div>
         <div id="answer-display" class="answer is-empty" aria-live="polite"> </div>
-        <p id="feedback" class="feedback">Type the answer</p>
+        <p id="feedback" class="feedback"></p>
         <div id="choice-answers" class="choice-answers" hidden></div>
         <div id="keypad" class="keypad"></div>
+        <div class="hud">
+          <div>Score <strong id="score-correct">0</strong> / <strong id="score-asked">0</strong></div>
+          <div>Streak <strong id="streak">0</strong></div>
+          <div id="timer" hidden>00:00</div>
+          <div id="progress">1 / 20</div>
+        </div>
         <div class="actions">
           <button type="button" class="btn" id="restart-round">Restart</button>
           <button type="button" class="btn btn-ghost" id="change-tables">Chapters</button>
@@ -1213,6 +1343,7 @@ body[data-look="leaf"] {
   const COIN_STREAK_AT = 3;
   const COIN_STREAK_BONUS = 1;
   const COIN_ROUND_CAP = 15;
+  const ISOLATED_HOLD_MS = 2800;
   const LOOK_IDS = ["ink", "leaf"];
   const START_NODE_ID = "number-sense";
   const START_CHAPTER_ID = "grade-3";
@@ -1983,6 +2114,10 @@ body[data-look="leaf"] {
 
   function usesWhyModel(question) {
     return Boolean(whyModel(question));
+  }
+
+  function isolatedHoldMs(question) {
+    return usesWhyModel(question) ? ISOLATED_HOLD_MS : 0;
   }
 
   function onestepOperation(form) {
@@ -3394,6 +3529,7 @@ body[data-look="leaf"] {
     COIN_STREAK_AT,
     COIN_STREAK_BONUS,
     COIN_ROUND_CAP,
+    ISOLATED_HOLD_MS,
     LOOK_IDS,
     START_NODE_ID,
     START_CHAPTER_ID,
@@ -3418,6 +3554,7 @@ body[data-look="leaf"] {
     whyTilt,
     shouldAdvanceAfterGrade,
     usesWhyModel,
+    isolatedHoldMs,
     figureSvg,
     buildRound,
     buildReplayRound,
@@ -3520,7 +3657,7 @@ body[data-look="leaf"] {
   const state = {
     settings: engine.normalizeSettings(loadSettings()),
     progress: engine.normalizeProgress(loadProgress()),
-    trailView: "chapters",
+    trailView: "grade",
     openChapter: engine.START_CHAPTER_ID,
     moreOpen: false,
     earnedThisRound: 0,
@@ -3604,6 +3741,8 @@ body[data-look="leaf"] {
     const coins = state.progress.coins;
     els.coinCount.textContent = String(coins);
     els.coinHud.setAttribute("aria-label", `${coins} coins`);
+    const next = engine.nextPricedUnlock(state.progress);
+    els.coinHud.classList.toggle("is-ready", Boolean(next && coins >= next.cost));
   }
 
   function applyLook() {
@@ -3894,7 +4033,7 @@ body[data-look="leaf"] {
     const cols = clusterColumns(count);
     const cluster = document.createElement("span");
     cluster.className = "why-cluster why-group";
-    cluster.style.gridTemplateColumns = `repeat(${cols}, 12px)`;
+    cluster.style.gridTemplateColumns = `repeat(${cols}, 16px)`;
     for (let index = 0; index < count; index += 1) {
       const tile = document.createElement("span");
       tile.className = "why-tile";
@@ -4207,11 +4346,13 @@ body[data-look="leaf"] {
     els.why.classList.toggle("is-preview", Boolean(value));
   }
 
-  function revealWhyModel(question) {
-    const model = engine.whyModel(question);
-    if (!model) {
+  function holdIsolatedN(question) {
+    const holdMs = engine.isolatedHoldMs(question);
+    if (!holdMs) {
+      screens.practice.classList.remove("is-isolated");
       return 0;
     }
+    const model = engine.whyModel(question);
     els.why.querySelectorAll(".why-n-value").forEach((node) => {
       node.textContent = String(model.hidden);
     });
@@ -4219,8 +4360,13 @@ body[data-look="leaf"] {
     els.why.classList.remove("is-tilt-left", "is-tilt-right");
     els.why.dataset.phase = "reveal";
     setWhyPrompt(question, "reveal");
-    setWhyCaption(engine.whyCaption(model, "reveal"), "reveal");
-    return 1600;
+    setWhyCaption("", "reveal");
+    setFeedback("", "");
+    screens.practice.dataset.state = "idle";
+    screens.practice.classList.add("is-isolated");
+    els.keypad.hidden = true;
+    els.answer.hidden = true;
+    return holdMs;
   }
 
   function setAnswer(value) {
@@ -4479,7 +4625,10 @@ body[data-look="leaf"] {
     const question = currentQuestion();
     const isWords = question.topic === "shapes";
     const isChoice = question.answerKind === "choice";
+    const isBoard = engine.usesWhyModel(question);
     state.locked = false;
+    screens.practice.classList.remove("is-isolated");
+    screens.practice.classList.toggle("is-board", isBoard);
     setAnswer("");
     setFeedback(question.hint || "Type the answer", "");
     els.prompt.classList.toggle("is-words", isWords);
@@ -4492,7 +4641,7 @@ body[data-look="leaf"] {
     screens.practice.dataset.state = "idle";
     renderFigure(question);
     renderWhyModel(question);
-    els.answer.hidden = isChoice;
+    els.answer.hidden = isChoice || isBoard;
     els.keypad.hidden = isChoice;
     els.choices.hidden = !isChoice;
     if (isChoice) {
@@ -4582,6 +4731,10 @@ body[data-look="leaf"] {
     state.streak = 0;
     state.streakPeak = 0;
     state.startedAt = Date.now();
+    screens.practice.classList.toggle(
+      "is-board",
+      engine.PLAYABLE_TRAIL_TOPICS.includes(state.settings.topic),
+    );
     showScreen("practice");
     showQuestion();
     if (state.settings.timerSeconds > 0) {
@@ -4645,11 +4798,13 @@ body[data-look="leaf"] {
       setFeedback(engine.usesWhyModel(question) ? "" : `Not quite — ${explain}`, "bad");
       screens.practice.dataset.state = "bad";
     }
-    updateHud();
+    const holdMs = holdIsolatedN(question);
+    if (!holdMs) {
+      updateHud();
+    }
 
-    const teachMs = revealWhyModel(question);
-    const delay = teachMs
-      ? teachMs
+    const delay = holdMs
+      ? holdMs
       : grade.ok
         ? 700
         : question.review
@@ -4799,7 +4954,7 @@ body[data-look="leaf"] {
 
   renderKeypad();
   hydrateTrail(state.settings);
-  showTrail("chapters");
+  showTrail("grade", engine.START_CHAPTER_ID);
 
 })();
 

@@ -73,6 +73,7 @@
   const COIN_STREAK_AT = 3;
   const COIN_STREAK_BONUS = 1;
   const COIN_ROUND_CAP = 15;
+  const ISOLATED_HOLD_MS = 2800;
   const LOOK_IDS = ["ink", "leaf"];
   const START_NODE_ID = "number-sense";
   const START_CHAPTER_ID = "grade-3";
@@ -843,6 +844,10 @@
 
   function usesWhyModel(question) {
     return Boolean(whyModel(question));
+  }
+
+  function isolatedHoldMs(question) {
+    return usesWhyModel(question) ? ISOLATED_HOLD_MS : 0;
   }
 
   function onestepOperation(form) {
@@ -2254,6 +2259,7 @@
     COIN_STREAK_AT,
     COIN_STREAK_BONUS,
     COIN_ROUND_CAP,
+    ISOLATED_HOLD_MS,
     LOOK_IDS,
     START_NODE_ID,
     START_CHAPTER_ID,
@@ -2278,6 +2284,7 @@
     whyTilt,
     shouldAdvanceAfterGrade,
     usesWhyModel,
+    isolatedHoldMs,
     figureSvg,
     buildRound,
     buildReplayRound,
