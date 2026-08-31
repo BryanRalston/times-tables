@@ -1916,6 +1916,8 @@ test("before the why-move the known group is takeable on the model, not a lectur
   assert.match(move, /setWhyPrompt\(question, "lift"\)/);
   assert.match(hold, /setWhyPrompt\(question, "reveal"\)/);
   assert.match(show, /leftoverTypingAllowed/);
+  assert.match(show, /setFeedback\(isBoard \? ""/);
+  assert.match(css, /box-shadow: 0 0 10px 3px/);
   assert.doesNotMatch(html, /Take the ones you can see first/);
   assert.doesNotMatch(source, /Take the ones you can see first/);
   assert.doesNotMatch(html, /Take the same from both first/);
