@@ -2075,6 +2075,34 @@ body[data-look="leaf"] {
     return usesWhyModel(question) ? ISOLATED_HOLD_MS : 0;
   }
 
+  function leftoverHoldPlan(question, grade) {
+    if (!shouldAdvanceAfterGrade(question, grade)) {
+      return {
+        kind: "stay",
+        holdMs: 0,
+        hideKeypad: false,
+        keepModel: false,
+        prompt: "",
+      };
+    }
+    if (usesWhyModel(question) && grade.ok) {
+      return {
+        kind: "isolated",
+        holdMs: isolatedHoldMs(question),
+        hideKeypad: true,
+        keepModel: true,
+        prompt: whyPrompt(question, "reveal").prompt,
+      };
+    }
+    return {
+      kind: "advance",
+      holdMs: 0,
+      hideKeypad: false,
+      keepModel: false,
+      prompt: "",
+    };
+  }
+
   function onestepOperation(form) {
     if (form === "n+a" || form === "a+n") {
       return "add";
@@ -3559,6 +3587,7 @@ body[data-look="leaf"] {
     shouldAdvanceAfterGrade,
     usesWhyModel,
     isolatedHoldMs,
+    leftoverHoldPlan,
     figureSvg,
     buildRound,
     buildReplayRound,
@@ -3675,6 +3704,7 @@ body[data-look="leaf"] {
     timerId: null,
     advanceId: null,
     whyId: null,
+    holdingIsolated: false,
   };
 
   function loadSettings() {
@@ -4288,15 +4318,45 @@ body[data-look="leaf"] {
     els.why.classList.toggle("is-preview", Boolean(value));
   }
 
-  function holdIsolatedN(question) {
-    const holdMs = engine.isolatedHoldMs(question);
+  function clearIsolatedHold() {
+    state.holdingIsolated = false;
+    screens.practice.classList.remove("is-isolated");
+    delete screens.practice.dataset.isolatedHold;
+  }
+
+  function applyHoldPlan(question, plan) {
+    switch (plan.kind) {
+      case "stay":
+        clearIsolatedHold();
+        return 0;
+      case "advance":
+        clearIsolatedHold();
+        return 0;
+      case "isolated":
+        return holdIsolatedN(question, plan);
+      default: {
+        const unexpected = plan.kind;
+        void unexpected;
+        clearIsolatedHold();
+        return 0;
+      }
+    }
+  }
+
+  function holdIsolatedN(question, plan) {
+    const holdMs = plan && plan.holdMs ? plan.holdMs : engine.isolatedHoldMs(question);
     if (!holdMs) {
-      screens.practice.classList.remove("is-isolated");
+      clearIsolatedHold();
       return 0;
     }
     const model = engine.whyModel(question);
+    if (!model) {
+      clearIsolatedHold();
+      return 0;
+    }
+    els.why.hidden = false;
     els.why.querySelectorAll(".why-n-value").forEach((node) => {
-      node.textContent = String(model.hidden);
+      node.textContent = String(engine.whyLeftover(model));
     });
     els.why.classList.add("is-preview");
     els.why.classList.remove("is-tilt-left", "is-tilt-right");
@@ -4306,6 +4366,8 @@ body[data-look="leaf"] {
     setFeedback("", "");
     screens.practice.dataset.state = "idle";
     screens.practice.classList.add("is-isolated");
+    screens.practice.dataset.isolatedHold = "true";
+    state.holdingIsolated = true;
     els.keypad.hidden = true;
     els.answer.hidden = true;
     return holdMs;
@@ -4564,12 +4626,15 @@ body[data-look="leaf"] {
   }
 
   function showQuestion() {
+    if (state.holdingIsolated) {
+      return;
+    }
     const question = currentQuestion();
     const isWords = question.topic === "shapes";
     const isChoice = question.answerKind === "choice";
     const isBoard = engine.usesWhyModel(question);
     state.locked = false;
-    screens.practice.classList.remove("is-isolated");
+    clearIsolatedHold();
     screens.practice.classList.toggle("is-board", isBoard);
     setAnswer("");
     setFeedback(question.hint || "Type the answer", "");
@@ -4602,6 +4667,7 @@ body[data-look="leaf"] {
     state.timerId = null;
     state.advanceId = null;
     state.whyId = null;
+    clearIsolatedHold();
   }
 
   function finishRound() {
@@ -4706,7 +4772,8 @@ body[data-look="leaf"] {
       return;
     }
 
-    if (!engine.shouldAdvanceAfterGrade(question, grade)) {
+    const plan = engine.leftoverHoldPlan(question, grade);
+    if (plan.kind === "stay") {
       tiltWhyScale(question, grade.given);
       setFeedback("", "bad");
       screens.practice.dataset.state = "bad";
@@ -4740,7 +4807,7 @@ body[data-look="leaf"] {
       setFeedback(engine.usesWhyModel(question) ? "" : `Not quite — ${explain}`, "bad");
       screens.practice.dataset.state = "bad";
     }
-    const holdMs = holdIsolatedN(question);
+    const holdMs = applyHoldPlan(question, plan);
     if (!holdMs) {
       updateHud();
     }
@@ -4753,6 +4820,7 @@ body[data-look="leaf"] {
           ? 1600
           : 1300;
     state.advanceId = window.setTimeout(() => {
+      state.holdingIsolated = false;
       if (shouldEndAfterAnswer()) {
         finishRound();
         return;
