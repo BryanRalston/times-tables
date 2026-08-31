@@ -802,18 +802,18 @@
     if (!model) {
       return "";
     }
-    if (model.family === "sense") {
-      return "Take the ones you can see first";
+    switch (model.family) {
+      case "sense":
+      case "factor":
+      case "addend":
+      case "subtrahend":
+        return "";
+      default: {
+        const unexpected = model.family;
+        void unexpected;
+        return "";
+      }
     }
-    if (model.family === "factor") {
-      return "Leave one group";
-    }
-    if (model.family === "addend" || model.family === "subtrahend") {
-      return "Take the same from both first";
-    }
-    const unexpected = model.family;
-    void unexpected;
-    return "Take the ones you can see first";
   }
 
   function whyPrompt(question, phase) {

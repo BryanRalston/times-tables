@@ -462,6 +462,7 @@ test("why-nudge does not name the known amount", () => {
   const question = engine.makeMissingQuestion({}, rngFrom([0.2, 0.8]));
   const model = engine.whyModel(question);
   assert.equal(engine.usesWhyModel(question), true);
+  assert.equal(engine.whyNudge(model), "");
   assert.doesNotMatch(engine.whyNudge(model), new RegExp(String(model.known)));
   assert.doesNotMatch(engine.whyCaption(model, "idle"), /Take \d+ from both/);
   assert.notEqual(engine.whyNudge(model), String(model.hidden));
@@ -1324,6 +1325,7 @@ test("number-sense why-model is a ten-frame hide, then n = leftover", () => {
   assert.equal(engine.whyPrompt(question, "idle").prompt, "6 + n = 10");
   assert.equal(engine.whyPrompt(question, "lift").prompt, "6 + n = 10");
   assert.equal(engine.whyPrompt(question, "reveal").prompt, "n = 4");
+  assert.equal(engine.whyNudge(model), "");
   assert.doesNotMatch(engine.whyNudge(model), /6|4|10/);
 });
 
@@ -1864,4 +1866,60 @@ test("after why-move the heading stays unsolved until leftover OK", () => {
   assert.doesNotMatch(jsWhy, /phase === "lift" \|\| phase === "reveal"/);
   assert.match(move, /setWhyPrompt\(question, "lift"\)/);
   assert.match(hold, /setWhyPrompt\(question, "reveal"\)/);
+});
+
+test("before the why-move the known group is takeable on the model, not a lecture", () => {
+  const cards = [
+    engine.makeSenseQuestion({}, () => 0, { first: true }),
+    engine.makeMissingQuestion({}, () => 0, { first: true }),
+    engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true }),
+    engine.makeFactorQuestion({}, () => 0, { first: true }),
+  ];
+  const lecture = /Take the ones you can see first|Leave one group|Take the same from both first/;
+  for (const question of cards) {
+    const model = engine.whyModel(question);
+    assert.equal(engine.usesWhyModel(question), true);
+    assert.equal(engine.whyCaption(model, "idle"), "");
+    assert.equal(engine.whyNudge(model), "");
+    assert.doesNotMatch(engine.whyCaption(model, "idle"), lecture);
+    assert.doesNotMatch(engine.whyNudge(model), lecture);
+    assert.equal(engine.whyCaption(model, "lift"), "What's left?");
+    assert.equal(engine.whyPrompt(question, "lift").prompt, question.prompt);
+    assert.doesNotMatch(engine.whyPrompt(question, "lift").prompt, /^n = /);
+    const leftover = engine.whyLeftover(model);
+    const plan = engine.leftoverHoldPlan(question, engine.gradeAnswer(question, String(leftover)));
+    assert.equal(plan.kind, "isolated");
+    assert.equal(plan.hideKeypad, true);
+    assert.equal(engine.leftoverTypingAllowed(question, false), false);
+    assert.equal(engine.leftoverTypingAllowed(question, true), true);
+  }
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../js/practice.js"), "utf8");
+  const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+  const idleTake = css.slice(css.indexOf('.why-model[data-phase="idle"] .why-take'));
+  const liftBlock = css.slice(
+    css.indexOf('.why-model[data-phase="lift"] .take-away'),
+    css.indexOf(".why-model.is-tilt-left"),
+  );
+  const move = html.slice(html.indexOf("function doWhyMove"), html.indexOf("function nudgeWhyMove"));
+  const hold = html.slice(html.indexOf("function holdIsolatedN"), html.indexOf("function setAnswer"));
+  const show = html.slice(html.indexOf("function showQuestion"), html.indexOf("function clearTimers"));
+  assert.match(idleTake, /animation:\s*why-takeable/);
+  assert.match(css, /@keyframes why-takeable/);
+  assert.match(css, /@keyframes why-takeable-glow/);
+  assert.match(css, /\[data-phase="idle"\] \.why-take \.why-tile/);
+  assert.doesNotMatch(liftBlock, /why-takeable/);
+  assert.match(move, /dataset\.phase = "lift"/);
+  assert.match(move, /classList\.add\("is-lifted"\)/);
+  assert.match(move, /leftoverTypingAllowed/);
+  assert.match(move, /setWhyPrompt\(question, "lift"\)/);
+  assert.match(hold, /setWhyPrompt\(question, "reveal"\)/);
+  assert.match(show, /leftoverTypingAllowed/);
+  assert.match(show, /setFeedback\(isBoard \? ""/);
+  assert.match(css, /box-shadow: 0 0 10px 3px/);
+  assert.doesNotMatch(html, /Take the ones you can see first/);
+  assert.doesNotMatch(source, /Take the ones you can see first/);
+  assert.doesNotMatch(html, /Take the same from both first/);
+  assert.doesNotMatch(source, /Take the same from both first/);
 });
