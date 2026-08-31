@@ -73,7 +73,7 @@
   const COIN_STREAK_AT = 3;
   const COIN_STREAK_BONUS = 1;
   const COIN_ROUND_CAP = 15;
-  const ISOLATED_HOLD_MS = 2000;
+  const ISOLATED_HOLD_MS = 2800;
   const LOOK_IDS = ["ink", "leaf"];
   const START_NODE_ID = "number-sense";
   const START_CHAPTER_ID = "grade-3";
