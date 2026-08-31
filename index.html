@@ -738,6 +738,7 @@ body[data-look="leaf"] {
   box-shadow: none;
 }
 
+.practice-card.is-board .hud,
 .practice-card.is-isolated .keypad,
 .practice-card.is-isolated .actions,
 .practice-card.is-isolated .hud {
@@ -1198,11 +1199,11 @@ body[data-look="leaf"] {
         <p id="feedback" class="feedback"></p>
         <div id="choice-answers" class="choice-answers" hidden></div>
         <div id="keypad" class="keypad"></div>
-        <div class="hud">
+        <div class="hud" id="quiz-hud" hidden>
           <div>Score <strong id="score-correct">0</strong> / <strong id="score-asked">0</strong></div>
           <div>Streak <strong id="streak">0</strong></div>
           <div id="timer" hidden>00:00</div>
-          <div id="progress">1 / 20</div>
+          <div id="progress"></div>
         </div>
         <div class="actions">
           <button type="button" class="btn btn-quiet" id="restart-round">Restart</button>
@@ -1302,6 +1303,7 @@ body[data-look="leaf"] {
   const COIN_STREAK_AT = 3;
   const COIN_STREAK_BONUS = 1;
   const COIN_ROUND_CAP = 15;
+  const WHY_RUN_LENGTH = 4;
   const ISOLATED_HOLD_MS = 2800;
   const LOOK_IDS = ["ink", "leaf"];
   const START_NODE_ID = "number-sense";
@@ -3320,6 +3322,22 @@ body[data-look="leaf"] {
     return PLAYABLE_TRAIL_TOPICS.includes(topic) ? topic : "sense";
   }
 
+  function whyRunSettings(topic) {
+    return normalizeSettings({
+      topic: playableTopic(topic),
+      timerSeconds: 0,
+      questionCount: WHY_RUN_LENGTH,
+    });
+  }
+
+  function returnsToPath(topic) {
+    return PLAYABLE_TRAIL_TOPICS.includes(normalizeTopic(topic));
+  }
+
+  function showsQuizHud(question) {
+    return Boolean(question) && !usesWhyModel(question);
+  }
+
   function nodeAction(status) {
     switch (status) {
       case "current":
@@ -3575,6 +3593,7 @@ body[data-look="leaf"] {
     COIN_STREAK_AT,
     COIN_STREAK_BONUS,
     COIN_ROUND_CAP,
+    WHY_RUN_LENGTH,
     ISOLATED_HOLD_MS,
     LOOK_IDS,
     START_NODE_ID,
@@ -3635,6 +3654,9 @@ body[data-look="leaf"] {
     isNodePlayable,
     canStartNode,
     playableTopic,
+    whyRunSettings,
+    returnsToPath,
+    showsQuizHud,
     nextPricedUnlock,
     chapterStatus,
     nodeStatus,
@@ -3682,6 +3704,7 @@ body[data-look="leaf"] {
     answer: document.getElementById("answer-display"),
     feedback: document.getElementById("feedback"),
     choices: document.getElementById("choice-answers"),
+    quizHud: document.getElementById("quiz-hud"),
     scoreCorrect: document.getElementById("score-correct"),
     scoreAsked: document.getElementById("score-asked"),
     streak: document.getElementById("streak"),
@@ -3758,11 +3781,7 @@ body[data-look="leaf"] {
   }
 
   function readSetup(topic) {
-    return engine.normalizeSettings({
-      topic: engine.playableTopic(topic),
-      timerSeconds: 0,
-      questionCount: engine.DEFAULT_SETTINGS.questionCount,
-    });
+    return engine.whyRunSettings(topic);
   }
 
   function updateChrome() {
@@ -4407,6 +4426,13 @@ body[data-look="leaf"] {
   }
 
   function updateHud() {
+    const question = state.round ? currentQuestion() : null;
+    const hideQuiz = !engine.showsQuizHud(question);
+    els.quizHud.hidden = hideQuiz;
+    if (hideQuiz) {
+      els.progress.textContent = "";
+      return;
+    }
     const summary = engine.summarize(state.results);
     els.scoreCorrect.textContent = String(summary.correct);
     els.scoreAsked.textContent = String(summary.asked);
@@ -4691,11 +4717,6 @@ body[data-look="leaf"] {
   function finishRound() {
     clearTimers();
     const summary = engine.summarize(state.results);
-    const elapsedSeconds = Math.max(1, Math.round((Date.now() - state.startedAt) / 1000));
-    els.resultsHeadline.textContent = engine.headlineFor(summary);
-    els.resultsScore.textContent = `${summary.correct} / ${summary.asked}`;
-    els.resultsAccuracy.textContent = summary.asked ? `${summary.accuracy}% correct` : "No answers";
-    els.resultsTime.textContent = `Time ${engine.formatClock(elapsedSeconds)}`;
     state.progress = engine.applyRoundProgress(
       state.progress,
       state.settings.topic,
@@ -4703,6 +4724,15 @@ body[data-look="leaf"] {
       state.streakPeak,
     );
     saveProgress(state.progress);
+    if (engine.returnsToPath(state.settings.topic)) {
+      showTrail("grade", engine.START_CHAPTER_ID);
+      return;
+    }
+    const elapsedSeconds = Math.max(1, Math.round((Date.now() - state.startedAt) / 1000));
+    els.resultsHeadline.textContent = engine.headlineFor(summary);
+    els.resultsScore.textContent = `${summary.correct} / ${summary.asked}`;
+    els.resultsAccuracy.textContent = summary.asked ? `${summary.accuracy}% correct` : "No answers";
+    els.resultsTime.textContent = `Time ${engine.formatClock(elapsedSeconds)}`;
     if (state.settings.topic === "shapes" || engine.FIND_N_TOPICS.includes(state.settings.topic)) {
       els.missedHeading.textContent = "Missed";
     } else if (state.settings.topic === "times") {
@@ -4742,10 +4772,13 @@ body[data-look="leaf"] {
 
   function beginRound(settings, replayQuestions) {
     clearTimers();
-    state.settings = engine.normalizeSettings({
-      ...settings,
-      topic: engine.playableTopic(settings && settings.topic),
-    });
+    const topic = engine.playableTopic(settings && settings.topic);
+    state.settings = engine.returnsToPath(topic)
+      ? engine.whyRunSettings(topic)
+      : engine.normalizeSettings({
+        ...settings,
+        topic,
+      });
     saveSettings(state.settings);
     state.earnedThisRound = 0;
     updateChrome();

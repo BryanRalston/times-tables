@@ -73,6 +73,7 @@
   const COIN_STREAK_AT = 3;
   const COIN_STREAK_BONUS = 1;
   const COIN_ROUND_CAP = 15;
+  const WHY_RUN_LENGTH = 4;
   const ISOLATED_HOLD_MS = 2800;
   const LOOK_IDS = ["ink", "leaf"];
   const START_NODE_ID = "number-sense";
@@ -2091,6 +2092,22 @@
     return PLAYABLE_TRAIL_TOPICS.includes(topic) ? topic : "sense";
   }
 
+  function whyRunSettings(topic) {
+    return normalizeSettings({
+      topic: playableTopic(topic),
+      timerSeconds: 0,
+      questionCount: WHY_RUN_LENGTH,
+    });
+  }
+
+  function returnsToPath(topic) {
+    return PLAYABLE_TRAIL_TOPICS.includes(normalizeTopic(topic));
+  }
+
+  function showsQuizHud(question) {
+    return Boolean(question) && !usesWhyModel(question);
+  }
+
   function nodeAction(status) {
     switch (status) {
       case "current":
@@ -2346,6 +2363,7 @@
     COIN_STREAK_AT,
     COIN_STREAK_BONUS,
     COIN_ROUND_CAP,
+    WHY_RUN_LENGTH,
     ISOLATED_HOLD_MS,
     LOOK_IDS,
     START_NODE_ID,
@@ -2406,6 +2424,9 @@
     isNodePlayable,
     canStartNode,
     playableTopic,
+    whyRunSettings,
+    returnsToPath,
+    showsQuizHud,
     nextPricedUnlock,
     chapterStatus,
     nodeStatus,

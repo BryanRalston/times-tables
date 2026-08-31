@@ -1047,7 +1047,7 @@ test("streak bonus is small and a round cap stops grinding one family", () => {
 test("a short honest number-sense run can buy missing addend", () => {
   let progress = engine.emptyProgress();
   let earned = 0;
-  for (let streak = 1; streak <= 4; streak += 1) {
+  for (let streak = 1; streak <= engine.WHY_RUN_LENGTH; streak += 1) {
     const payout = engine.payoutCoins({
       ok: true,
       usesWhy: true,
@@ -1495,9 +1495,64 @@ test("puzzle chrome keeps Restart quieter than the board and OK", () => {
   assert.match(practice, /id="restart-round"/);
   assert.match(practice, /btn-quiet/);
   assert.match(practice, /id="change-tables"/);
-  assert.match(practice, /class="hud"/);
   assert.match(practice, /id="why-model"/);
   assert.match(practice, /id="keypad"/);
+});
+
+test("why-model cards hide Score, Streak, and 1/20", () => {
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const markup = pageMarkup();
+  const practice = markup.slice(markup.indexOf('id="screen-practice"'), markup.indexOf('id="screen-results"'));
+  const hud = html.slice(html.indexOf("function updateHud"), html.indexOf("const PLACE_LABELS"));
+  const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  const times = engine.makeQuestion(3, 4, "multiply");
+  assert.equal(engine.showsQuizHud(sense), false);
+  assert.equal(engine.showsQuizHud(times), true);
+  assert.match(practice, /id="quiz-hud"/);
+  assert.match(practice, /id="quiz-hud" hidden/);
+  assert.doesNotMatch(practice, /1 \/ 20/);
+  assert.doesNotMatch(practice, /1\/20/);
+  assert.match(html, /\.practice-card\.is-board \.hud/);
+  assert.match(hud, /showsQuizHud/);
+  assert.match(hud, /els\.quizHud\.hidden = hideQuiz/);
+  assert.match(hud, /els\.progress\.textContent = ""/);
+});
+
+test("short why-model run returns to the Grade 3 path", () => {
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const finish = html.slice(html.indexOf("function finishRound"), html.indexOf("function startTimer"));
+  const begin = html.slice(html.indexOf("function beginRound"), html.indexOf("function shouldEndAfterAnswer"));
+  const setup = html.slice(html.indexOf("function readSetup"), html.indexOf("function updateChrome"));
+  assert.equal(engine.WHY_RUN_LENGTH, 4);
+  assert.ok(engine.WHY_RUN_LENGTH < 20);
+  assert.equal(engine.whyRunSettings("sense").questionCount, engine.WHY_RUN_LENGTH);
+  assert.equal(engine.whyRunSettings("sense").timerSeconds, 0);
+  assert.equal(engine.whyRunSettings("missing").questionCount, engine.WHY_RUN_LENGTH);
+  assert.equal(engine.returnsToPath("sense"), true);
+  assert.equal(engine.returnsToPath("missing"), true);
+  assert.equal(engine.returnsToPath("subtrahend"), true);
+  assert.equal(engine.returnsToPath("factor"), true);
+  assert.equal(engine.returnsToPath("times"), false);
+  assert.match(setup, /whyRunSettings/);
+  assert.match(begin, /whyRunSettings/);
+  assert.match(finish, /returnsToPath/);
+  assert.match(finish, /showTrail\("grade"/);
+  assert.doesNotMatch(finish.slice(0, finish.indexOf("returnsToPath") + 80), /showScreen\("results"\)/);
+  const after = engine.applyRoundProgress(
+    engine.emptyProgress(),
+    "sense",
+    { asked: engine.WHY_RUN_LENGTH, accuracy: 100 },
+    engine.WHY_RUN_LENGTH,
+  );
+  assert.equal(engine.nodeStatus(after, "number-sense"), "replay");
+  assert.equal(engine.nodeStatus(after, "missing-addend"), "priced");
+  assert.equal(engine.nextPricedUnlock(after).cost, engine.NODE_UNLOCK_COST);
+  assert.equal(engine.canStartNode(after, "missing-addend"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(after, id)) === "Start",
+  );
+  assert.deepEqual(starts, []);
+  assert.equal(engine.chapterStatus(after, "grade-4"), "closed");
 });
 
 test("isolated-n beat still hides the keypad and holds the leftover board", () => {

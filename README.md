@@ -25,11 +25,11 @@ https://bryanralston.github.io/times-tables/
 Brand-new visit, taps in order:
 
 1. Open the live page. You land on the **Grade 3** path with **Number sense** and **Start** in front. Missing addend shows **12**. Later nodes stay hollow. Later grades stay behind **Chapters**. There is no **Round length**, **Timer**, or **Questions** picker on this path. You do not first tap through a settings door or a wall of closed grades.
-2. Tap **Start** on **Number sense**. First card is `6 + n = 10` on a ten-frame. The frame is the product, not Score / Streak / 20.
+2. Tap **Start** on **Number sense**. First card is `6 + n = 10` on a ten-frame. The frame is the product. There is no Score / Streak / 1/20 on the board.
 3. Drag the dots you can see off the frame. The prompt becomes `n = leftover`. Type that leftover. A wrong leftover tilts; the board stays.
-4. A correct leftover holds a beat: you still see `n = 4` on the level frame, leftover cells vs the n-box, before the next card. No popup. Score does not jump the beat.
+4. A correct leftover holds a beat: you still see `n = 4` on the level frame, leftover cells vs the n-box, before the next card. No popup.
 5. Coins are the quiet number in the corner. A correct n **after** the drag earns coins. Miss, skip, or tapping OK before the move earns 0.
-6. Back to the path. Spend 12 coins on **Missing addend**. It becomes **Start**. Number sense becomes **Replay**. Later nodes stay hollow until the one in front is bought.
+6. A short honest run, then back to the Grade 3 path. Fluent leftover play earns enough to spend 12 on **Missing addend**. It becomes **Start**. Number sense becomes **Replay**. Later nodes stay hollow until the one in front is bought.
 7. Tap **Start** on **Missing addend**. First card is `8 + n = 12`. Drag the known dots off both pans, then type `n = leftover`. A miss then the right leftover replaces, so 5 then 4 is 4. Same isolated-n beat.
 8. Spend 12 coins on **Missing subtrahend**. It becomes **Start**. Earlier purchased nodes stay **Replay**.
 9. Tap **Start** on **Missing subtrahend**. First card is `12 − n = 8`. Drag the known leftover off both pans, then type `n = 4`.
