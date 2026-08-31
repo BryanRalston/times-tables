@@ -952,6 +952,15 @@ test("first visit opens Grade 3 and only number sense is Start", () => {
   assert.equal(next.id, "missing-addend");
   assert.equal(next.cost, engine.NODE_UNLOCK_COST);
   assert.ok(progress.coins < next.cost);
+  const loud = engine.loudPathAction(progress);
+  assert.equal(loud.kind, "start");
+  assert.equal(loud.id, "number-sense");
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), true);
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, ["number-sense"]);
 });
 
 test("5 coins and empty unlocks still leave only number sense as Start", () => {
@@ -981,6 +990,8 @@ test("5 coins and empty unlocks still leave only number sense as Start", () => {
   assert.deepEqual(starts, ["number-sense"]);
   assert.equal(engine.nextPricedUnlock(progress).id, "missing-addend");
   assert.equal(engine.nextPricedUnlock(progress).cost, engine.NODE_UNLOCK_COST);
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), true);
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), false);
 });
 
 test("playing number sense does not grant later Grade 3 nodes", () => {
@@ -1487,6 +1498,8 @@ test("Grade 3 path markup is trail + Start, not a quiz settings page", () => {
   assert.doesNotMatch(markup, /Round length/i);
   assert.doesNotMatch(markup, /name="timer"/);
   assert.doesNotMatch(markup, /name="count"/);
+  const starts = (trail.match(/>Start</g) || []).length;
+  assert.equal(starts, 1);
 });
 
 test("puzzle chrome keeps Restart quieter than the board and OK", () => {
@@ -1561,11 +1574,77 @@ test("a short why-model run returns to the Grade 3 path", () => {
   assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
   assert.equal(engine.nextPricedUnlock(progress).id, "missing-addend");
   assert.equal(engine.nextPricedUnlock(progress).cost, 12);
+  const loud = engine.loudPathAction(progress);
+  assert.equal(loud.kind, "priced");
+  assert.equal(loud.id, "missing-addend");
+  assert.equal(loud.cost, 12);
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), true);
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), false);
   const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
     (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
   );
   assert.deepEqual(starts, []);
+  assert.equal(engine.canStartNode(progress, "missing-addend"), false);
   assert.equal(engine.chapterStatus(progress, "grade-4"), "closed");
+});
+
+test("after a fluent short run the priced 12 is loud and Replay is quiet", () => {
+  let progress = engine.emptyProgress();
+  let earned = 0;
+  for (let streak = 1; streak <= engine.WHY_RUN_LENGTH; streak += 1) {
+    const payout = engine.payoutCoins({
+      ok: true,
+      usesWhy: true,
+      whyDone: true,
+      streak,
+      earnedThisRound: earned,
+    });
+    earned += payout;
+    progress = engine.applyCoinPayout(progress, payout);
+  }
+  progress = engine.applyRoundProgress(progress, "sense", {
+    asked: engine.WHY_RUN_LENGTH,
+    accuracy: 100,
+  }, engine.WHY_RUN_LENGTH);
+  assert.ok(progress.coins >= 12);
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(progress, "number-sense")), "Replay");
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), false);
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.deepEqual(engine.loudPathAction(progress), {
+    kind: "priced",
+    id: "missing-addend",
+    cost: 12,
+  });
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), true);
+  assert.equal(engine.canStartNode(progress, "missing-addend"), false);
+  const blocked = engine.normalizeProgress(progress);
+  assert.ok(!blocked.unlockedNodes.includes("missing-addend"));
+  const spent = engine.spendUnlock(progress);
+  assert.equal(spent.ok, true);
+  assert.equal(spent.unlocked.id, "missing-addend");
+  assert.equal(engine.nodeStatus(spent.progress, "missing-addend"), "current");
+  assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "missing-addend")), "Start");
+  assert.equal(engine.isLoudPathNode(spent.progress, "missing-addend"), true);
+  assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "number-sense")), "Replay");
+  assert.equal(engine.isLoudPathNode(spent.progress, "number-sense"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(spent.progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, ["missing-addend"]);
+  assert.equal(engine.chapterStatus(spent.progress, "grade-4"), "closed");
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+  const render = html.slice(html.indexOf("function renderGradePath"), html.indexOf("function tryUnlock"));
+  assert.match(css, /\.node\.is-priced\.is-loud/);
+  assert.match(css, /\.node\.is-replay \.btn-quiet/);
+  assert.match(css, /\.node\.is-replay \.node-title/);
+  assert.doesNotMatch(css, /\.node\.is-current,\s*\.node\.is-replay \{/);
+  assert.match(render, /isLoudPathNode/);
+  assert.match(render, /status === "replay" \? "btn btn-quiet" : "btn btn-primary"/);
+  assert.match(render, /loud \? "btn btn-primary" : "btn"/);
+  assert.match(render, /classList\.add\("is-loud"\)/);
 });
 
 test("isolated-n beat still hides the keypad and holds the leftover board", () => {

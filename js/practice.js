@@ -2128,6 +2128,24 @@
     }
   }
 
+  function loudPathAction(progress) {
+    const normalized = normalizeProgress(progress);
+    const currentId = trailNodeIds().find((id) => nodeStatus(normalized, id) === "current");
+    if (currentId) {
+      return { kind: "start", id: currentId };
+    }
+    const next = nextPricedUnlock(normalized);
+    if (next && next.kind === "node" && normalized.coins >= next.cost) {
+      return { kind: "priced", id: next.id, cost: next.cost };
+    }
+    return null;
+  }
+
+  function isLoudPathNode(progress, nodeId) {
+    const loud = loudPathAction(progress);
+    return Boolean(loud && loud.id === nodeId);
+  }
+
   function startNode() {
     const found = findNode(START_NODE_ID);
     return found ? { ...found.node, chapterId: found.chapter.id } : null;
@@ -2430,6 +2448,8 @@
     chapterStatus,
     nodeStatus,
     nodeAction,
+    loudPathAction,
+    isLoudPathNode,
     startNode,
     payoutCoins,
     applyCoinPayout,
