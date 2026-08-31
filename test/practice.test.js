@@ -435,6 +435,22 @@ test("ordinary wrong answers still advance", () => {
   assert.equal(engine.shouldAdvanceAfterGrade(question, wrong), true);
 });
 
+test("why leftover keypad replaces so 5 then 4 is 4", () => {
+  const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  const addend = engine.makeMissingQuestion({}, () => 0, { first: true });
+  const sub = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  const factor = engine.makeFactorQuestion({}, () => 0, { first: true });
+  const times = engine.makeQuestion(7, 8, "multiply");
+  assert.equal(engine.whyLeftover(engine.whyModel(sense)), 4);
+  assert.equal(engine.appendAnswerDigit("", "5", sense), "5");
+  assert.equal(engine.appendAnswerDigit("5", "4", sense), "4");
+  assert.equal(engine.appendAnswerDigit("5", "4", addend), "4");
+  assert.equal(engine.appendAnswerDigit("5", "4", sub), "4");
+  assert.equal(engine.appendAnswerDigit("5", "4", factor), "4");
+  assert.equal(engine.appendAnswerDigit("5", "4", times), "54");
+  assert.equal(engine.appendAnswerDigit("54", "3", times), "543");
+});
+
 test("wrong leftover guess tilts and does not advance", () => {
   const question = engine.makeMissingQuestion({}, () => 0, { first: true });
   const model = engine.whyModel(question);
@@ -866,6 +882,68 @@ test("first visit opens Grade 3 and only number sense is Start", () => {
   assert.ok(progress.coins < next.cost);
 });
 
+test("5 coins and empty unlocks still leave only number sense as Start", () => {
+  const progress = engine.normalizeProgress({
+    coins: 5,
+    unlockedNodes: [],
+    completedNodes: [],
+    fluency: {
+      sense: { lastAsked: 4, lastAccuracy: 100 },
+      missing: { lastAsked: 4, lastAccuracy: 100 },
+    },
+  });
+  assert.equal(progress.coins, 5);
+  assert.deepEqual(progress.unlockedNodes, []);
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "current");
+  assert.equal(engine.nodeAction(engine.nodeStatus(progress, "number-sense")), "Start");
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.equal(engine.nodeStatus(progress, "missing-subtrahend"), "locked");
+  assert.equal(engine.nodeStatus(progress, "times-facts"), "locked");
+  assert.equal(engine.canStartNode(progress, "number-sense"), true);
+  assert.equal(engine.canStartNode(progress, "missing-addend"), false);
+  assert.equal(engine.canStartNode(progress, "missing-subtrahend"), false);
+  assert.equal(engine.canStartNode(progress, "times-facts"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, ["number-sense"]);
+  assert.equal(engine.nextPricedUnlock(progress).id, "missing-addend");
+  assert.equal(engine.nextPricedUnlock(progress).cost, engine.NODE_UNLOCK_COST);
+});
+
+test("playing number sense does not grant later Grade 3 nodes", () => {
+  const after = engine.applyRoundProgress(
+    engine.normalizeProgress({ coins: 5, unlockedNodes: [] }),
+    "sense",
+    { asked: 4, accuracy: 100 },
+    3,
+  );
+  assert.ok(after.completedNodes.includes("number-sense"));
+  assert.ok(!after.unlockedNodes.includes("missing-addend"));
+  assert.ok(!after.unlockedNodes.includes("missing-subtrahend"));
+  assert.ok(!after.unlockedNodes.includes("times-facts"));
+  assert.equal(engine.nodeStatus(after, "number-sense"), "replay");
+  assert.equal(engine.nodeStatus(after, "missing-addend"), "priced");
+  assert.equal(engine.canStartNode(after, "missing-addend"), false);
+  assert.equal(engine.canStartNode(after, "missing-subtrahend"), false);
+  assert.equal(engine.canStartNode(after, "times-facts"), false);
+});
+
+test("leftover save with every Grade 3 node unlocked still shows one Start", () => {
+  const leftover = engine.normalizeProgress({
+    coins: 5,
+    unlockedNodes: ["missing-addend", "missing-subtrahend", "times-facts"],
+  });
+  assert.equal(engine.nodeStatus(leftover, "number-sense"), "replay");
+  assert.equal(engine.nodeStatus(leftover, "missing-addend"), "replay");
+  assert.equal(engine.nodeStatus(leftover, "missing-subtrahend"), "replay");
+  assert.equal(engine.nodeStatus(leftover, "times-facts"), "current");
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(leftover, id)) === "Start",
+  );
+  assert.deepEqual(starts, ["times-facts"]);
+});
+
 test("correct n after the why-move earns coins; miss and skip-move pay 0", () => {
   assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: 1, earnedThisRound: 0 }), engine.COIN_BASE);
   assert.equal(engine.payoutCoins({ ok: false, usesWhy: true, whyDone: true, streak: 4, earnedThisRound: 0 }), 0);
@@ -912,7 +990,8 @@ test("a short honest number-sense run can buy missing addend", () => {
   const spent = engine.spendUnlock(progress);
   assert.equal(spent.ok, true);
   assert.equal(spent.unlocked.id, "missing-addend");
-  assert.equal(engine.nodeStatus(spent.progress, "number-sense"), "current");
+  assert.equal(engine.nodeStatus(spent.progress, "number-sense"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "number-sense")), "Replay");
   assert.equal(engine.nodeStatus(spent.progress, "missing-addend"), "current");
   assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "missing-addend")), "Start");
   assert.equal(engine.canStartNode(spent.progress, "missing-addend"), true);
@@ -943,7 +1022,8 @@ test("looks are a cheap sink and never skip the why-move", () => {
 });
 
 test("finishing a missing-addend round marks that node for replay", () => {
-  const after = engine.applyRoundProgress(engine.emptyProgress(), "missing", { asked: 4, accuracy: 100 }, 3);
+  const opened = engine.spendUnlock(engine.applyCoinPayout(engine.emptyProgress(), 12));
+  const after = engine.applyRoundProgress(opened.progress, "missing", { asked: 4, accuracy: 100 }, 3);
   assert.ok(after.completedNodes.includes("missing-addend"));
   assert.equal(engine.nodeStatus(after, "missing-addend"), "replay");
   assert.equal(engine.nodeAction("replay"), "Replay");
@@ -957,13 +1037,18 @@ test("buying later Grade 3 nodes teaches times facts and never opens Grade 4", (
   const third = engine.spendUnlock(second.progress);
   assert.equal(first.unlocked.id, "missing-addend");
   assert.equal(engine.canStartNode(first.progress, "missing-addend"), true);
+  assert.equal(engine.nodeStatus(first.progress, "number-sense"), "replay");
   assert.equal(second.unlocked.id, "missing-subtrahend");
   assert.equal(engine.canStartNode(second.progress, "missing-subtrahend"), true);
+  assert.equal(engine.nodeStatus(second.progress, "missing-addend"), "replay");
   assert.equal(third.unlocked.id, "times-facts");
   assert.equal(engine.isNodePlayable("times-facts"), true);
   assert.equal(engine.canStartNode(third.progress, "times-facts"), true);
   assert.equal(engine.nodeStatus(third.progress, "times-facts"), "current");
   assert.equal(engine.nodeAction(engine.nodeStatus(third.progress, "times-facts")), "Start");
+  assert.equal(engine.nodeStatus(third.progress, "number-sense"), "replay");
+  assert.equal(engine.nodeStatus(third.progress, "missing-addend"), "replay");
+  assert.equal(engine.nodeStatus(third.progress, "missing-subtrahend"), "replay");
   assert.equal(engine.nextPricedUnlock(third.progress), null);
   assert.equal(engine.chapterStatus(third.progress, "grade-4"), "closed");
   const blocked = engine.spendUnlock(third.progress);
@@ -1088,8 +1173,10 @@ test("playableTopic only allows the four Grade 3 teaching families", () => {
 });
 
 test("a missing-subtrahend round marks that node for replay, not times facts", () => {
+  const first = engine.spendUnlock(engine.applyCoinPayout(engine.emptyProgress(), 24));
+  const opened = engine.spendUnlock(first.progress);
   const after = engine.applyRoundProgress(
-    engine.emptyProgress(),
+    opened.progress,
     "subtrahend",
     { asked: 4, accuracy: 100 },
     3,
@@ -1097,9 +1184,9 @@ test("a missing-subtrahend round marks that node for replay, not times facts", (
   assert.ok(after.completedNodes.includes("missing-subtrahend"));
   assert.ok(!after.completedNodes.includes("times-facts"));
   assert.ok(!after.completedNodes.includes("number-sense"));
-  const opened = engine.spendUnlock(engine.applyCoinPayout(after, 12));
-  assert.equal(engine.nodeStatus(opened.progress, "missing-subtrahend"), "replay");
+  assert.equal(engine.nodeStatus(after, "missing-subtrahend"), "replay");
   assert.equal(engine.nodeAction("replay"), "Replay");
+  assert.equal(engine.nodeStatus(after, "times-facts"), "priced");
 });
 
 test("coins still require why-move plus correct n on subtrahend", () => {
@@ -1299,8 +1386,10 @@ test("old saves that already opened later Grade 3 nodes keep missing addend", ()
     completedNodes: ["missing-addend"],
   });
   assert.ok(progress.unlockedNodes.includes("missing-addend"));
-  assert.equal(engine.nodeStatus(progress, "number-sense"), "current");
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "replay");
   assert.equal(engine.canStartNode(progress, "missing-addend"), true);
   assert.equal(engine.canStartNode(progress, "missing-subtrahend"), true);
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "replay");
+  assert.equal(engine.nodeStatus(progress, "missing-subtrahend"), "current");
   assert.equal(engine.nodeStatus(progress, "times-facts"), "priced");
 });
