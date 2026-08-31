@@ -824,7 +824,7 @@
         promptHtml: question && question.promptHtml ? question.promptHtml : "",
       };
     }
-    if (phase === "lift" || phase === "reveal") {
+    if (phase === "reveal") {
       const leftover = whyLeftover(model);
       const token = model.token;
       return {

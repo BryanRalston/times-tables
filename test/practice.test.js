@@ -394,9 +394,10 @@ test("missing-number why-model is take-from-both for 8 + n = 12", () => {
 test("after isolation the written prompt is n = leftover", () => {
   const question = engine.makeMissingQuestion({}, () => 0, { first: true });
   assert.equal(engine.whyPrompt(question, "idle").prompt, "8 + n = 12");
-  assert.equal(engine.whyPrompt(question, "lift").prompt, "n = 4");
+  assert.equal(engine.whyPrompt(question, "lift").prompt, "8 + n = 12");
+  assert.doesNotMatch(engine.whyPrompt(question, "lift").prompt, /^n = 4$/);
   assert.equal(engine.whyPrompt(question, "reveal").prompt, "n = 4");
-  assert.match(engine.whyPrompt(question, "lift").promptHtml, /n.* = 4/);
+  assert.match(engine.whyPrompt(question, "reveal").promptHtml, /n.* = 4/);
 });
 
 test("isolated n hold is a beat on the leftover board, not an instant skip", () => {
@@ -472,8 +473,10 @@ test("isolated prompt follows leftover when n is on either side", () => {
   const model = engine.whyModel(question);
   const leftover = model.total - model.known;
   assert.equal(engine.whyLeftover(model), leftover);
-  assert.equal(engine.whyPrompt(question, "lift").prompt, `n = ${leftover}`);
-  assert.notEqual(engine.whyPrompt(question, "idle").prompt, engine.whyPrompt(question, "lift").prompt);
+  assert.equal(engine.whyPrompt(question, "idle").prompt, question.prompt);
+  assert.equal(engine.whyPrompt(question, "lift").prompt, question.prompt);
+  assert.equal(engine.whyPrompt(question, "reveal").prompt, `n = ${leftover}`);
+  assert.notEqual(engine.whyPrompt(question, "lift").prompt, engine.whyPrompt(question, "reveal").prompt);
 });
 
 test("ordinary wrong answers still advance", () => {
@@ -1181,7 +1184,8 @@ test("missing-subtrahend why-model puts minuend against known leftover", () => {
   assert.equal(engine.whyCaption(model, "lift"), "What's left?");
   assert.equal(engine.whyCaption(model, "reveal"), "12 − 4 = 8");
   assert.equal(engine.whyPrompt(question, "idle").prompt, "12 − n = 8");
-  assert.equal(engine.whyPrompt(question, "lift").prompt, "n = 4");
+  assert.equal(engine.whyPrompt(question, "lift").prompt, "12 − n = 8");
+  assert.equal(engine.whyPrompt(question, "reveal").prompt, "n = 4");
   assert.doesNotMatch(engine.whyNudge(model), /12|8|add|inverse/i);
 });
 
@@ -1228,7 +1232,8 @@ test("missing-subtrahend round stays take-away n, small numbers", () => {
     assert.equal(model.family, "subtrahend");
     assert.equal(model.total - model.known, model.hidden);
     assert.equal(model.hidden, question.answer);
-    assert.equal(engine.whyPrompt(question, "lift").prompt, `n = ${model.hidden}`);
+    assert.equal(engine.whyPrompt(question, "lift").prompt, question.prompt);
+    assert.equal(engine.whyPrompt(question, "reveal").prompt, `n = ${model.hidden}`);
     assert.ok(!/variable|algebra|inverse/i.test(`${question.prompt} ${question.hint}`));
   }
 });
@@ -1317,7 +1322,8 @@ test("number-sense why-model is a ten-frame hide, then n = leftover", () => {
   assert.equal(engine.whyCaption(model, "lift"), "What's left?");
   assert.equal(engine.whyCaption(model, "reveal"), "6 + 4 = 10");
   assert.equal(engine.whyPrompt(question, "idle").prompt, "6 + n = 10");
-  assert.equal(engine.whyPrompt(question, "lift").prompt, "n = 4");
+  assert.equal(engine.whyPrompt(question, "lift").prompt, "6 + n = 10");
+  assert.equal(engine.whyPrompt(question, "reveal").prompt, "n = 4");
   assert.doesNotMatch(engine.whyNudge(model), /6|4|10/);
 });
 
@@ -1360,7 +1366,8 @@ test("number-sense round stays hide/count within 20", () => {
     const model = engine.whyModel(question);
     assert.equal(model.kind, "frame");
     assert.equal(model.total - model.known, model.hidden);
-    assert.equal(engine.whyPrompt(question, "lift").prompt, `n = ${model.hidden}`);
+    assert.equal(engine.whyPrompt(question, "lift").prompt, question.prompt);
+    assert.equal(engine.whyPrompt(question, "reveal").prompt, `n = ${model.hidden}`);
     if (question.result > 10) {
       sawTwenty = true;
       assert.equal(question.known, 10);
@@ -1398,7 +1405,8 @@ test("times-facts why-model isolates one group, then n = leftover", () => {
   assert.equal(engine.whyCaption(model, "lift"), "What's left?");
   assert.equal(engine.whyCaption(model, "reveal"), "2 × 4 = 8");
   assert.equal(engine.whyPrompt(question, "idle").prompt, "2 × n = 8");
-  assert.equal(engine.whyPrompt(question, "lift").prompt, "n = 4");
+  assert.equal(engine.whyPrompt(question, "lift").prompt, "2 × n = 8");
+  assert.equal(engine.whyPrompt(question, "reveal").prompt, "n = 4");
   assert.doesNotMatch(engine.whyNudge(model), /2|4|8|×/);
 });
 
@@ -1440,7 +1448,8 @@ test("times-facts round is missing factor, not a product keypad quiz", () => {
     const model = engine.whyModel(question);
     assert.equal(model.kind, "groups");
     assert.equal(model.total - model.known, model.hidden);
-    assert.equal(engine.whyPrompt(question, "lift").prompt, `n = ${model.hidden}`);
+    assert.equal(engine.whyPrompt(question, "lift").prompt, question.prompt);
+    assert.equal(engine.whyPrompt(question, "reveal").prompt, `n = ${model.hidden}`);
     assert.ok(!/variable|algebra|SAT|calculus/i.test(`${question.prompt} ${question.hint}`));
   }
 });
@@ -1819,4 +1828,40 @@ test("leftover keypad waits for the why-move, then isolated-n still holds", () =
   assert.equal(plan.keepModel, true);
   assert.equal(plan.prompt, "n = 4");
   assert.ok(plan.holdMs >= 2000);
+});
+
+test("after why-move the heading stays unsolved until leftover OK", () => {
+  const cards = [
+    engine.makeSenseQuestion({}, () => 0, { first: true }),
+    engine.makeMissingQuestion({}, () => 0, { first: true }),
+    engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true }),
+    engine.makeFactorQuestion({}, () => 0, { first: true }),
+  ];
+  for (const question of cards) {
+    const leftover = engine.whyLeftover(engine.whyModel(question));
+    const isolated = `${question.token} = ${leftover}`;
+    assert.equal(engine.whyPrompt(question, "idle").prompt, question.prompt);
+    assert.equal(engine.whyPrompt(question, "lift").prompt, question.prompt);
+    assert.equal(engine.whyPrompt(question, "lift").promptHtml, question.promptHtml);
+    assert.notEqual(engine.whyPrompt(question, "lift").prompt, isolated);
+    assert.doesNotMatch(engine.whyPrompt(question, "lift").prompt, /^n = /);
+    const plan = engine.leftoverHoldPlan(question, engine.gradeAnswer(question, String(leftover)));
+    assert.equal(plan.kind, "isolated");
+    assert.equal(plan.prompt, isolated);
+    assert.equal(plan.hideKeypad, true);
+    assert.ok(plan.holdMs >= 2000);
+    assert.equal(engine.whyPrompt(question, "reveal").prompt, isolated);
+  }
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../js/practice.js"), "utf8");
+  const htmlWhy = html.slice(html.indexOf("function whyPrompt"), html.indexOf("function whyTilt"));
+  const jsWhy = source.slice(source.indexOf("function whyPrompt"), source.indexOf("function whyTilt"));
+  const move = html.slice(html.indexOf("function doWhyMove"), html.indexOf("function nudgeWhyMove"));
+  const hold = html.slice(html.indexOf("function holdIsolatedN"), html.indexOf("function setAnswer"));
+  assert.match(htmlWhy, /phase === "reveal"/);
+  assert.doesNotMatch(htmlWhy, /phase === "lift" \|\| phase === "reveal"/);
+  assert.match(jsWhy, /phase === "reveal"/);
+  assert.doesNotMatch(jsWhy, /phase === "lift" \|\| phase === "reveal"/);
+  assert.match(move, /setWhyPrompt\(question, "lift"\)/);
+  assert.match(hold, /setWhyPrompt\(question, "reveal"\)/);
 });

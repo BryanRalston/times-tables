@@ -26,7 +26,7 @@ Brand-new visit, taps in order:
 
 1. Open the live page. You land on the **Grade 3** path with **Number sense** and **Start** in front. Missing addend shows **12**. Later nodes stay hollow. Later grades stay behind **Chapters**. There is no **Round length**, **Timer**, or **Questions** picker on this path. You do not first tap through a settings door or a wall of closed grades.
 2. Tap **Start** on **Number sense**. First card is `6 + n = 10` on a ten-frame. The frame is the product, not Score / Streak / 20.
-3. Drag the dots you can see off the frame. The prompt becomes `n = leftover`. Type that leftover. A wrong leftover tilts; the board stays.
+3. Drag the dots you can see off the frame. The heading stays `6 + n = 10`. Type the leftover in the n-box. A wrong leftover tilts; the board stays.
 4. A correct leftover holds a beat: you still see `n = 4` on the level frame, leftover cells vs the n-box, before the next card. No popup. Score does not jump the beat.
 5. Coins are the quiet number in the corner. A correct n **after** the drag earns coins. Miss, skip, or tapping OK before the move earns 0.
 6. After a few why-moves — not a 20-question quiz — you land back on the path. The loud next action is **12** on **Missing addend**. Number sense is quiet **Replay**. Spend 12 coins on **Missing addend**. It becomes **Start** — that's the loud tap. **Missing subtrahend** still shows **12**, quieter until they earn 12 again. Times tables facts stay hollow until the one in front is bought.
