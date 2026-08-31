@@ -971,6 +971,8 @@ test("empty progress first paint is the Number sense leftover board not the trai
     html.indexOf('els.changeTables.addEventListener'),
     html.indexOf('els.playAgain.addEventListener'),
   );
+  assert.match(chapters, /recordRoundProgress/);
+  assert.ok(chapters.indexOf("recordRoundProgress") < chapters.indexOf("showTrail"));
   assert.match(chapters, /showTrail\("grade", engine\.START_CHAPTER_ID\)/);
 });
 
@@ -1018,6 +1020,77 @@ test("return visits with a finished leftover open the Grade 3 path", () => {
   const boot = html.slice(html.lastIndexOf("renderKeypad()"), html.lastIndexOf("})();"));
   assert.match(boot, /opensOnFirstLeftover\(state\.progress\)/);
   assert.match(boot, /showTrail\("grade", engine\.START_CHAPTER_ID\)/);
+});
+
+test("playing the leftover board finishes Number sense the same as Start-then-4-cards", () => {
+  const fresh = engine.emptyProgress();
+  assert.equal(engine.opensOnFirstLeftover(fresh), true);
+  assert.equal(engine.nodeStatus(fresh, "number-sense"), "current");
+  assert.equal(engine.nodeAction(engine.nodeStatus(fresh, "number-sense")), "Start");
+  assert.equal(engine.canStartNode(fresh, "missing-addend"), false);
+
+  let progress = fresh;
+  let earned = 0;
+  for (let streak = 1; streak <= engine.WHY_RUN_LENGTH; streak += 1) {
+    const payout = engine.payoutCoins({
+      ok: true,
+      usesWhy: true,
+      whyDone: true,
+      streak,
+      earnedThisRound: earned,
+    });
+    earned += payout;
+    progress = engine.applyCoinPayout(progress, payout);
+  }
+  progress = engine.applyRoundProgress(progress, "sense", {
+    asked: engine.WHY_RUN_LENGTH,
+    accuracy: 100,
+  }, engine.WHY_RUN_LENGTH);
+  assert.ok(progress.coins >= 12);
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(progress, "number-sense")), "Replay");
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), false);
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.deepEqual(engine.loudPathAction(progress), {
+    kind: "priced",
+    id: "missing-addend",
+    cost: 12,
+  });
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), true);
+  assert.equal(engine.canStartNode(progress, "missing-addend"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, []);
+  assert.equal(engine.chapterStatus(progress, "grade-4"), "closed");
+  const blocked = engine.spendUnlock(engine.emptyProgress());
+  assert.equal(blocked.ok, false);
+  const spent = engine.spendUnlock(progress);
+  assert.equal(spent.ok, true);
+  assert.equal(spent.unlocked.id, "missing-addend");
+  assert.equal(engine.canStartNode(spent.progress, "missing-addend"), true);
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const record = html.slice(
+    html.indexOf("function recordRoundProgress"),
+    html.indexOf("function finishRound"),
+  );
+  assert.match(record, /applyRoundProgress/);
+  assert.match(record, /summary\.asked/);
+  const finish = html.slice(html.indexOf("function finishRound"), html.indexOf("function startTimer"));
+  assert.match(finish, /recordRoundProgress/);
+  assert.doesNotMatch(finish.slice(0, finish.indexOf("whyRunReturnsToPath")), /showScreen\("results"\)/);
+  const submit = html.slice(html.indexOf("function submitAnswer"), html.indexOf("function pressKey"));
+  assert.match(submit, /recordRoundProgress/);
+  assert.match(submit, /whyRunLength\(state\.settings\.topic\)/);
+  assert.ok(submit.indexOf("recordRoundProgress") < submit.indexOf("leftoverHoldPlan") || submit.indexOf("recordRoundProgress") < submit.indexOf("applyHoldPlan"));
+  const chapters = html.slice(
+    html.indexOf('els.changeTables.addEventListener'),
+    html.indexOf('els.playAgain.addEventListener'),
+  );
+  assert.match(chapters, /recordRoundProgress\(\)/);
+  assert.ok(chapters.indexOf("recordRoundProgress") < chapters.indexOf("clearTimers"));
+  assert.ok(chapters.indexOf("recordRoundProgress") < chapters.indexOf("showTrail"));
 });
 
 test("first visit opens Grade 3 and only number sense is Start", () => {
@@ -1658,7 +1731,9 @@ test("a short why-model run returns to the Grade 3 path", () => {
   const finish = html.slice(html.indexOf("function finishRound"), html.indexOf("function startTimer"));
   assert.match(finish, /whyRunReturnsToPath/);
   assert.match(finish, /showTrail\("grade"/);
-  assert.match(finish, /applyRoundProgress/);
+  assert.match(finish, /recordRoundProgress/);
+  assert.match(html, /function recordRoundProgress/);
+  assert.match(html, /applyRoundProgress/);
   assert.doesNotMatch(finish.slice(0, finish.indexOf("whyRunReturnsToPath")), /showScreen\("results"\)/);
 
   let progress = engine.emptyProgress();
