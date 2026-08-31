@@ -2282,12 +2282,22 @@
     return Math.min(2, Math.max(1, String(Math.abs(leftover)).length));
   }
 
-  function appendAnswerDigit(buffer, digit, question) {
+  function leftoverTypingAllowed(question, whyDone) {
+    if (!usesWhyModel(question)) {
+      return true;
+    }
+    return whyDone === true;
+  }
+
+  function appendAnswerDigit(buffer, digit, question, whyDone) {
     const next = String(digit);
     if (!/^\d$/.test(next)) {
       return String(buffer || "");
     }
     const current = String(buffer || "");
+    if (!leftoverTypingAllowed(question, whyDone)) {
+      return current;
+    }
     if (usesWhyModel(question)) {
       const cap = leftoverDigitCap(question);
       if (current.length >= cap) {
@@ -2363,6 +2373,7 @@
     usesWhyModel,
     isolatedHoldMs,
     leftoverHoldPlan,
+    leftoverTypingAllowed,
     figureSvg,
     buildRound,
     buildReplayRound,
