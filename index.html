@@ -1207,7 +1207,7 @@ body[data-look="leaf"] {
         </div>
       </header>
 
-      <section id="screen-trail" class="trail" aria-label="Grade path">
+      <section id="screen-trail" class="trail" aria-label="Grade path" hidden>
         <div id="trail-chapters" hidden>
           <div class="trail-head">
             <h2>Chapters</h2>
@@ -3451,6 +3451,11 @@ body[data-look="leaf"] {
     return found ? { ...found.node, chapterId: found.chapter.id } : null;
   }
 
+  function opensOnFirstLeftover(progress) {
+    const normalized = normalizeProgress(progress);
+    return normalized.completedNodes.length === 0 && normalized.unlockedNodes.length === 0;
+  }
+
   function payoutCoins(input) {
     const source = input && typeof input === "object" ? input : {};
     if (!source.ok) {
@@ -3751,6 +3756,7 @@ body[data-look="leaf"] {
     loudPathAction,
     isLoudPathNode,
     startNode,
+    opensOnFirstLeftover,
     payoutCoins,
     applyCoinPayout,
     spendUnlock,
@@ -5140,8 +5146,12 @@ body[data-look="leaf"] {
   });
 
   renderKeypad();
-  hydrateTrail();
-  showTrail("grade", engine.START_CHAPTER_ID);
+  if (engine.opensOnFirstLeftover(state.progress)) {
+    beginRound(readSetup(engine.startNode().topic));
+  } else {
+    hydrateTrail();
+    showTrail("grade", engine.START_CHAPTER_ID);
+  }
 
 })();
 
