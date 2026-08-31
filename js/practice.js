@@ -2130,13 +2130,14 @@
 
   function loudPathAction(progress) {
     const normalized = normalizeProgress(progress);
+    const next = nextPricedUnlock(normalized);
+    const boughtAhead = GRADE3_ADVANCE_NODES.some((id) => normalized.unlockedNodes.includes(id));
+    if (next && next.kind === "node" && (normalized.coins >= next.cost || boughtAhead)) {
+      return { kind: "priced", id: next.id, cost: next.cost };
+    }
     const currentId = trailNodeIds().find((id) => nodeStatus(normalized, id) === "current");
     if (currentId) {
       return { kind: "start", id: currentId };
-    }
-    const next = nextPricedUnlock(normalized);
-    if (next && next.kind === "node" && normalized.coins >= next.cost) {
-      return { kind: "priced", id: next.id, cost: next.cost };
     }
     return null;
   }

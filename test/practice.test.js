@@ -1080,6 +1080,17 @@ test("a short honest number-sense run can buy missing addend", () => {
   assert.equal(engine.canStartNode(spent.progress, "missing-addend"), true);
   assert.equal(engine.nodeStatus(spent.progress, "missing-subtrahend"), "priced");
   assert.equal(engine.nextPricedUnlock(spent.progress).id, "missing-subtrahend");
+  assert.deepEqual(engine.loudPathAction(spent.progress), {
+    kind: "priced",
+    id: "missing-subtrahend",
+    cost: 12,
+  });
+  assert.equal(engine.isLoudPathNode(spent.progress, "missing-subtrahend"), true);
+  assert.equal(engine.isLoudPathNode(spent.progress, "missing-addend"), false);
+  assert.equal(engine.canStartNode(spent.progress, "missing-addend"), true);
+  assert.equal(engine.canStartNode(spent.progress, "missing-subtrahend"), false);
+  assert.equal(engine.canStartNode(spent.progress, "times-facts"), false);
+  assert.equal(engine.chapterStatus(spent.progress, "grade-4"), "closed");
 });
 
 test("cannot unlock the next node without earning the rest", () => {
@@ -1625,9 +1636,16 @@ test("after a fluent short run the priced 12 is loud and Replay is quiet", () =>
   assert.equal(spent.unlocked.id, "missing-addend");
   assert.equal(engine.nodeStatus(spent.progress, "missing-addend"), "current");
   assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "missing-addend")), "Start");
-  assert.equal(engine.isLoudPathNode(spent.progress, "missing-addend"), true);
+  assert.equal(engine.isLoudPathNode(spent.progress, "missing-addend"), false);
   assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "number-sense")), "Replay");
   assert.equal(engine.isLoudPathNode(spent.progress, "number-sense"), false);
+  assert.equal(engine.nodeStatus(spent.progress, "missing-subtrahend"), "priced");
+  assert.deepEqual(engine.loudPathAction(spent.progress), {
+    kind: "priced",
+    id: "missing-subtrahend",
+    cost: 12,
+  });
+  assert.equal(engine.isLoudPathNode(spent.progress, "missing-subtrahend"), true);
   const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
     (id) => engine.nodeAction(engine.nodeStatus(spent.progress, id)) === "Start",
   );
@@ -1645,6 +1663,64 @@ test("after a fluent short run the priced 12 is loud and Replay is quiet", () =>
   assert.match(render, /status === "replay" \? "btn btn-quiet" : "btn btn-primary"/);
   assert.match(render, /loud \? "btn btn-primary" : "btn"/);
   assert.match(render, /classList\.add\("is-loud"\)/);
+});
+
+test("after spendUnlock of addend the priced subtrahend 12 is the loud next", () => {
+  let progress = engine.emptyProgress();
+  let earned = 0;
+  for (let streak = 1; streak <= engine.WHY_RUN_LENGTH; streak += 1) {
+    const payout = engine.payoutCoins({
+      ok: true,
+      usesWhy: true,
+      whyDone: true,
+      streak,
+      earnedThisRound: earned,
+    });
+    earned += payout;
+    progress = engine.applyCoinPayout(progress, payout);
+  }
+  progress = engine.applyRoundProgress(progress, "sense", {
+    asked: engine.WHY_RUN_LENGTH,
+    accuracy: 100,
+  }, engine.WHY_RUN_LENGTH);
+  assert.equal(progress.coins, 17);
+  assert.ok(!progress.unlockedNodes.includes("missing-addend"));
+  const spent = engine.spendUnlock(progress);
+  assert.equal(spent.ok, true);
+  assert.equal(spent.unlocked.id, "missing-addend");
+  assert.equal(spent.progress.coins, 5);
+  assert.equal(engine.nodeStatus(spent.progress, "missing-addend"), "current");
+  assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "missing-addend")), "Start");
+  assert.equal(engine.canStartNode(spent.progress, "missing-addend"), true);
+  assert.equal(engine.nodeStatus(spent.progress, "number-sense"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "number-sense")), "Replay");
+  assert.equal(engine.isLoudPathNode(spent.progress, "number-sense"), false);
+  assert.equal(engine.nodeStatus(spent.progress, "missing-subtrahend"), "priced");
+  assert.deepEqual(engine.loudPathAction(spent.progress), {
+    kind: "priced",
+    id: "missing-subtrahend",
+    cost: 12,
+  });
+  assert.equal(engine.isLoudPathNode(spent.progress, "missing-subtrahend"), true);
+  assert.equal(engine.isLoudPathNode(spent.progress, "missing-addend"), false);
+  assert.equal(engine.canStartNode(spent.progress, "missing-subtrahend"), false);
+  assert.equal(engine.canStartNode(spent.progress, "times-facts"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(spent.progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, ["missing-addend"]);
+  assert.equal(engine.nodeStatus(spent.progress, "times-facts"), "locked");
+  assert.equal(engine.chapterStatus(spent.progress, "grade-4"), "closed");
+  const again = engine.spendUnlock(spent.progress);
+  assert.equal(again.ok, false);
+  assert.equal(again.reason, "coins");
+  assert.equal(engine.nodeStatus(again.progress, "missing-subtrahend"), "priced");
+  assert.equal(engine.isLoudPathNode(again.progress, "missing-subtrahend"), true);
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../js/practice.js"), "utf8");
+  assert.match(html, /normalized\.coins >= next\.cost \|\| boughtAhead/);
+  assert.match(source, /normalized\.coins >= next\.cost \|\| boughtAhead/);
 });
 
 test("isolated-n beat still hides the keypad and holds the leftover board", () => {
