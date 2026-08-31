@@ -2151,6 +2151,11 @@
     return found ? { ...found.node, chapterId: found.chapter.id } : null;
   }
 
+  function opensOnFirstLeftover(progress) {
+    const normalized = normalizeProgress(progress);
+    return normalized.completedNodes.length === 0 && normalized.unlockedNodes.length === 0;
+  }
+
   function payoutCoins(input) {
     const source = input && typeof input === "object" ? input : {};
     if (!source.ok) {
@@ -2451,6 +2456,7 @@
     loudPathAction,
     isLoudPathNode,
     startNode,
+    opensOnFirstLeftover,
     payoutCoins,
     applyCoinPayout,
     spendUnlock,

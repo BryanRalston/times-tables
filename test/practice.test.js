@@ -931,6 +931,95 @@ test("product name is n / What's hiding, not Times Tables", () => {
   assert.equal(engine.trailChapters()[0].nodes.map((node) => node.id).join(","), "number-sense,missing-addend,missing-subtrahend,times-facts");
 });
 
+test("empty progress first paint is the Number sense leftover board not the trail", () => {
+  const progress = engine.normalizeProgress(null);
+  assert.equal(progress.coins, engine.STARTER_COINS);
+  assert.equal(progress.coins, 3);
+  assert.deepEqual(progress.completedNodes, []);
+  assert.deepEqual(progress.unlockedNodes, []);
+  assert.equal(engine.opensOnFirstLeftover(progress), true);
+  assert.equal(engine.opensOnFirstLeftover(engine.emptyProgress()), true);
+  assert.equal(engine.opensOnFirstLeftover(undefined), true);
+  assert.equal(engine.startNode().topic, "sense");
+  const first = engine.makeSenseQuestion({}, () => 0, { first: true });
+  assert.equal(first.prompt, "6 + n = 10");
+  assert.equal(first.known, 6);
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.equal(engine.nextPricedUnlock(progress).id, "missing-addend");
+  assert.equal(engine.nextPricedUnlock(progress).cost, 12);
+  assert.equal(engine.chapterStatus(progress, "grade-4"), "closed");
+  assert.doesNotMatch(pageMarkup(), /Round length/i);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, ["number-sense"]);
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../js/practice.js"), "utf8");
+  const trailOpen = html.indexOf('id="screen-trail"');
+  const trailTag = html.slice(html.lastIndexOf("<section", trailOpen), html.indexOf(">", trailOpen) + 1);
+  assert.match(trailTag, /\bhidden\b/);
+  const boot = html.slice(html.lastIndexOf("renderKeypad()"), html.lastIndexOf("})();"));
+  assert.match(source, /function opensOnFirstLeftover/);
+  assert.match(html, /function opensOnFirstLeftover/);
+  assert.match(boot, /opensOnFirstLeftover\(state\.progress\)/);
+  assert.match(boot, /beginRound\(readSetup\(engine\.startNode\(\)\.topic\)\)/);
+  assert.match(boot, /showTrail\("grade"/);
+  assert.ok(boot.indexOf("opensOnFirstLeftover") < boot.indexOf("beginRound"));
+  assert.ok(boot.indexOf("beginRound") < boot.indexOf("showTrail"));
+  const chapters = html.slice(
+    html.indexOf('els.changeTables.addEventListener'),
+    html.indexOf('els.playAgain.addEventListener'),
+  );
+  assert.match(chapters, /showTrail\("grade", engine\.START_CHAPTER_ID\)/);
+});
+
+test("return visits with a finished leftover open the Grade 3 path", () => {
+  let progress = engine.emptyProgress();
+  assert.equal(engine.opensOnFirstLeftover(progress), true);
+  let earned = 0;
+  for (let streak = 1; streak <= engine.WHY_RUN_LENGTH; streak += 1) {
+    const payout = engine.payoutCoins({
+      ok: true,
+      usesWhy: true,
+      whyDone: true,
+      streak,
+      earnedThisRound: earned,
+    });
+    earned += payout;
+    progress = engine.applyCoinPayout(progress, payout);
+  }
+  progress = engine.applyRoundProgress(progress, "sense", {
+    asked: engine.WHY_RUN_LENGTH,
+    accuracy: 100,
+  }, engine.WHY_RUN_LENGTH);
+  assert.ok(progress.coins >= 12);
+  assert.equal(engine.opensOnFirstLeftover(progress), false);
+  assert.ok(progress.completedNodes.includes("number-sense"));
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(progress, "number-sense")), "Replay");
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), false);
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.deepEqual(engine.loudPathAction(progress), {
+    kind: "priced",
+    id: "missing-addend",
+    cost: 12,
+  });
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), true);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, []);
+  assert.equal(engine.chapterStatus(progress, "grade-4"), "closed");
+
+  const spent = engine.spendUnlock(progress);
+  assert.equal(engine.opensOnFirstLeftover(spent.progress), false);
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const boot = html.slice(html.lastIndexOf("renderKeypad()"), html.lastIndexOf("})();"));
+  assert.match(boot, /opensOnFirstLeftover\(state\.progress\)/);
+  assert.match(boot, /showTrail\("grade", engine\.START_CHAPTER_ID\)/);
+});
+
 test("first visit opens Grade 3 and only number sense is Start", () => {
   const progress = engine.normalizeProgress(null);
   assert.equal(progress.coins, engine.STARTER_COINS);
