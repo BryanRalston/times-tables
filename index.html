@@ -861,10 +861,54 @@ body[data-look="leaf"] {
 .why-model[data-phase="idle"] .why-take {
   cursor: grab;
   outline: 2px dashed color-mix(in srgb, var(--sky) 45%, transparent);
+  transition: none;
+  animation: why-takeable 1.45s ease-in-out infinite;
 }
 
 .why-model[data-phase="idle"] .why-take:active {
   cursor: grabbing;
+}
+
+.why-model[data-phase="idle"] .why-take .why-tile,
+.why-model[data-phase="idle"] .why-take .why-n {
+  animation: why-takeable-glow 1.45s ease-in-out infinite;
+}
+
+.why-model[data-phase="idle"] .why-take.is-nudge {
+  animation: why-nudge 0.45s ease;
+}
+
+@keyframes why-takeable {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes why-takeable-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--sky) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 12px 3px color-mix(in srgb, var(--sky) 55%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .why-model[data-phase="idle"] .why-take,
+  .why-model[data-phase="idle"] .why-take .why-tile,
+  .why-model[data-phase="idle"] .why-take .why-n {
+    animation: none;
+  }
+
+  .why-model[data-phase="idle"] .why-take .why-tile,
+  .why-model[data-phase="idle"] .why-take .why-n {
+    box-shadow: 0 0 10px 2px color-mix(in srgb, var(--sky) 48%, transparent);
+  }
 }
 
 .why-tile {
@@ -2047,18 +2091,18 @@ body[data-look="leaf"] {
     if (!model) {
       return "";
     }
-    if (model.family === "sense") {
-      return "Take the ones you can see first";
+    switch (model.family) {
+      case "sense":
+      case "factor":
+      case "addend":
+      case "subtrahend":
+        return "";
+      default: {
+        const unexpected = model.family;
+        void unexpected;
+        return "";
+      }
     }
-    if (model.family === "factor") {
-      return "Leave one group";
-    }
-    if (model.family === "addend" || model.family === "subtrahend") {
-      return "Take the same from both first";
-    }
-    const unexpected = model.family;
-    void unexpected;
-    return "Take the ones you can see first";
   }
 
   function whyPrompt(question, phase) {
