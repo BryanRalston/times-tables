@@ -483,20 +483,44 @@ test("ordinary wrong answers still advance", () => {
   assert.equal(engine.shouldAdvanceAfterGrade(question, wrong), true);
 });
 
-test("why leftover keypad replaces so 5 then 4 is 4", () => {
+test("before why-move leftover digits do not become the answer", () => {
   const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
   const addend = engine.makeMissingQuestion({}, () => 0, { first: true });
   const sub = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
   const factor = engine.makeFactorQuestion({}, () => 0, { first: true });
   const times = engine.makeQuestion(7, 8, "multiply");
+  assert.equal(engine.leftoverTypingAllowed(sense, false), false);
+  assert.equal(engine.leftoverTypingAllowed(addend, false), false);
+  assert.equal(engine.leftoverTypingAllowed(sub, false), false);
+  assert.equal(engine.leftoverTypingAllowed(factor, false), false);
+  assert.equal(engine.leftoverTypingAllowed(times, false), true);
+  assert.equal(engine.appendAnswerDigit("", "4", sense, false), "");
+  assert.equal(engine.appendAnswerDigit("", "5", sense, false), "");
+  assert.equal(engine.appendAnswerDigit("4", "2", sense, false), "4");
+  assert.equal(engine.appendAnswerDigit("", "4", addend, false), "");
+  assert.equal(engine.appendAnswerDigit("", "4", sub, false), "");
+  assert.equal(engine.appendAnswerDigit("", "4", factor, false), "");
+  assert.equal(engine.appendAnswerDigit("", "5", times, false), "5");
+});
+
+test("after why-move leftover keypad replaces so 5 then 4 is 4", () => {
+  const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  const addend = engine.makeMissingQuestion({}, () => 0, { first: true });
+  const sub = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  const factor = engine.makeFactorQuestion({}, () => 0, { first: true });
+  const times = engine.makeQuestion(7, 8, "multiply");
+  assert.equal(engine.leftoverTypingAllowed(sense, true), true);
+  assert.equal(engine.leftoverTypingAllowed(addend, true), true);
+  assert.equal(engine.leftoverTypingAllowed(sub, true), true);
+  assert.equal(engine.leftoverTypingAllowed(factor, true), true);
   assert.equal(engine.whyLeftover(engine.whyModel(sense)), 4);
-  assert.equal(engine.appendAnswerDigit("", "5", sense), "5");
-  assert.equal(engine.appendAnswerDigit("5", "4", sense), "4");
-  assert.equal(engine.appendAnswerDigit("5", "4", addend), "4");
-  assert.equal(engine.appendAnswerDigit("5", "4", sub), "4");
-  assert.equal(engine.appendAnswerDigit("5", "4", factor), "4");
-  assert.equal(engine.appendAnswerDigit("5", "4", times), "54");
-  assert.equal(engine.appendAnswerDigit("54", "3", times), "543");
+  assert.equal(engine.appendAnswerDigit("", "5", sense, true), "5");
+  assert.equal(engine.appendAnswerDigit("5", "4", sense, true), "4");
+  assert.equal(engine.appendAnswerDigit("5", "4", addend, true), "4");
+  assert.equal(engine.appendAnswerDigit("5", "4", sub, true), "4");
+  assert.equal(engine.appendAnswerDigit("5", "4", factor, true), "4");
+  assert.equal(engine.appendAnswerDigit("5", "4", times, true), "54");
+  assert.equal(engine.appendAnswerDigit("54", "3", times, true), "543");
 });
 
 test("wrong leftover guess tilts and does not advance", () => {
@@ -1490,4 +1514,32 @@ test("isolated-n beat still hides the keypad and holds the leftover board", () =
   assert.equal(plan.hideKeypad, true);
   assert.equal(plan.keepModel, true);
   assert.equal(engine.whyPrompt(sense, "reveal").prompt, "n = 4");
+});
+
+test("leftover keypad waits for the why-move, then isolated-n still holds", () => {
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const show = html.slice(html.indexOf("function showQuestion"), html.indexOf("function clearTimers"));
+  const move = html.slice(html.indexOf("function doWhyMove"), html.indexOf("function nudgeWhyMove"));
+  const press = html.slice(html.indexOf("function pressKey"), html.indexOf("function renderKeypad"));
+  const hold = html.slice(html.indexOf("function holdIsolatedN"), html.indexOf("function setAnswer"));
+  assert.match(show, /leftoverTypingAllowed/);
+  assert.match(show, /els\.keypad\.hidden/);
+  assert.match(move, /leftoverTypingAllowed/);
+  assert.match(move, /classList\.add\("is-lifted"\)/);
+  assert.match(press, /leftoverTypingAllowed/);
+  assert.match(press, /appendAnswerDigit\(state\.buffer, key, question, whyDone\)/);
+  assert.match(press, /nudgeWhyMove/);
+  assert.match(html, /is-board:not\(\.is-lifted\) \.keypad/);
+  assert.match(hold, /els\.keypad\.hidden = true/);
+  const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  assert.equal(engine.leftoverTypingAllowed(sense, false), false);
+  assert.equal(engine.appendAnswerDigit("", "4", sense, false), "");
+  assert.equal(engine.appendAnswerDigit("", "5", sense, true), "5");
+  assert.equal(engine.appendAnswerDigit("5", "4", sense, true), "4");
+  const plan = engine.leftoverHoldPlan(sense, engine.gradeAnswer(sense, "4"));
+  assert.equal(plan.kind, "isolated");
+  assert.equal(plan.hideKeypad, true);
+  assert.equal(plan.keepModel, true);
+  assert.equal(plan.prompt, "n = 4");
+  assert.ok(plan.holdMs >= 2000);
 });

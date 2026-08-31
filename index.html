@@ -686,6 +686,10 @@ body[data-look="leaf"] {
   gap: 5px;
 }
 
+.practice-card.is-board:not(.is-lifted) .keypad {
+  display: none;
+}
+
 .practice-card.is-board .key {
   min-height: 40px;
   font-size: 1rem;
@@ -3507,12 +3511,22 @@ body[data-look="leaf"] {
     return Math.min(2, Math.max(1, String(Math.abs(leftover)).length));
   }
 
-  function appendAnswerDigit(buffer, digit, question) {
+  function leftoverTypingAllowed(question, whyDone) {
+    if (!usesWhyModel(question)) {
+      return true;
+    }
+    return whyDone === true;
+  }
+
+  function appendAnswerDigit(buffer, digit, question, whyDone) {
     const next = String(digit);
     if (!/^\d$/.test(next)) {
       return String(buffer || "");
     }
     const current = String(buffer || "");
+    if (!leftoverTypingAllowed(question, whyDone)) {
+      return current;
+    }
     if (usesWhyModel(question)) {
       const cap = leftoverDigitCap(question);
       if (current.length >= cap) {
@@ -3588,6 +3602,7 @@ body[data-look="leaf"] {
     usesWhyModel,
     isolatedHoldMs,
     leftoverHoldPlan,
+    leftoverTypingAllowed,
     figureSvg,
     buildRound,
     buildReplayRound,
@@ -4276,6 +4291,8 @@ body[data-look="leaf"] {
     setWhyCaption("", "lift");
     setWhyPrompt(question, "lift");
     setFeedback(engine.whyCaption(model, "lift"), "");
+    screens.practice.classList.add("is-lifted");
+    els.keypad.hidden = !engine.leftoverTypingAllowed(question, whyMoveDone());
   }
 
   function nudgeWhyMove(question) {
@@ -4636,6 +4653,7 @@ body[data-look="leaf"] {
     state.locked = false;
     clearIsolatedHold();
     screens.practice.classList.toggle("is-board", isBoard);
+    screens.practice.classList.toggle("is-lifted", false);
     setAnswer("");
     setFeedback(question.hint || "Type the answer", "");
     els.prompt.classList.toggle("is-words", isWords);
@@ -4649,7 +4667,7 @@ body[data-look="leaf"] {
     renderFigure(question);
     renderWhyModel(question);
     els.answer.hidden = isChoice || isBoard;
-    els.keypad.hidden = isChoice;
+    els.keypad.hidden = isChoice || !engine.leftoverTypingAllowed(question, whyMoveDone());
     els.choices.hidden = !isChoice;
     if (isChoice) {
       renderChoices(question);
@@ -4846,7 +4864,12 @@ body[data-look="leaf"] {
       return;
     }
     if (/^\d$/.test(key)) {
-      setAnswer(engine.appendAnswerDigit(state.buffer, key, question));
+      const whyDone = whyMoveDone();
+      if (question && !engine.leftoverTypingAllowed(question, whyDone)) {
+        nudgeWhyMove(question);
+        return;
+      }
+      setAnswer(engine.appendAnswerDigit(state.buffer, key, question, whyDone));
     }
   }
 
