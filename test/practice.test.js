@@ -1093,6 +1093,111 @@ test("playing the leftover board finishes Number sense the same as Start-then-4-
   assert.ok(chapters.indexOf("recordRoundProgress") < chapters.indexOf("showTrail"));
 });
 
+test("first leftover paint has no loud Chapters hop", () => {
+  const fresh = engine.emptyProgress();
+  assert.equal(fresh.coins, 3);
+  assert.equal(engine.opensOnFirstLeftover(fresh), true);
+  assert.equal(engine.quietFirstLeftoverHops(fresh), true);
+  assert.equal(engine.quietFirstLeftoverHops(null), true);
+  assert.equal(engine.quietFirstLeftoverHops(undefined), true);
+  assert.equal(engine.chapterStatus(fresh, "grade-4"), "closed");
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(fresh, id)) === "Start",
+  );
+  assert.deepEqual(starts, ["number-sense"]);
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../js/practice.js"), "utf8");
+  const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+  const hopCss = css.slice(css.indexOf(".practice-card.is-board.is-first-leftover .actions"));
+  assert.match(source, /function quietFirstLeftoverHops/);
+  assert.match(html, /function quietFirstLeftoverHops/);
+  assert.match(html, /function paintFirstLeftoverHops/);
+  assert.match(css, /\.practice-card\.is-board\.is-first-leftover \.actions/);
+  assert.match(hopCss, /display:\s*none/);
+  const paint = html.slice(
+    html.indexOf("function paintFirstLeftoverHops"),
+    html.indexOf("function updateChrome"),
+  );
+  assert.match(paint, /quietFirstLeftoverHops\(state\.progress\)/);
+  assert.match(paint, /is-first-leftover/);
+  assert.match(paint, /els\.restart\.hidden = quiet/);
+  assert.match(paint, /els\.changeTables\.hidden = quiet/);
+  const show = html.slice(html.indexOf("function showQuestion"), html.indexOf("function clearTimers"));
+  const chrome = html.slice(html.indexOf("function updateChrome"), html.indexOf("function renderCoinHud"));
+  assert.match(show, /paintFirstLeftoverHops/);
+  assert.match(chrome, /paintFirstLeftoverHops/);
+  const hops = html.slice(
+    html.indexOf("els.restart.addEventListener"),
+    html.indexOf("els.playAgain.addEventListener"),
+  );
+  assert.match(hops, /quietFirstLeftoverHops\(state\.progress\)/);
+  assert.ok(hops.indexOf("quietFirstLeftoverHops") < hops.indexOf("beginRound"));
+  assert.ok(hops.indexOf("quietFirstLeftoverHops") < hops.indexOf("showTrail"));
+  assert.doesNotMatch(pageMarkup().slice(0, pageMarkup().indexOf('id="screen-practice"')), /Round length/i);
+});
+
+test("after a 4-card leftover run the path has quiet Replay, loud 12, and Chapters", () => {
+  let progress = engine.emptyProgress();
+  assert.equal(engine.quietFirstLeftoverHops(progress), true);
+  let earned = 0;
+  for (let streak = 1; streak <= engine.WHY_RUN_LENGTH; streak += 1) {
+    const payout = engine.payoutCoins({
+      ok: true,
+      usesWhy: true,
+      whyDone: true,
+      streak,
+      earnedThisRound: earned,
+    });
+    earned += payout;
+    progress = engine.applyCoinPayout(progress, payout);
+  }
+  progress = engine.applyRoundProgress(progress, "sense", {
+    asked: engine.WHY_RUN_LENGTH,
+    accuracy: 100,
+  }, engine.WHY_RUN_LENGTH);
+  assert.ok(progress.coins >= 12);
+  assert.equal(engine.opensOnFirstLeftover(progress), false);
+  assert.equal(engine.quietFirstLeftoverHops(progress), false);
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(progress, "number-sense")), "Replay");
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), false);
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.deepEqual(engine.loudPathAction(progress), {
+    kind: "priced",
+    id: "missing-addend",
+    cost: 12,
+  });
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), true);
+  assert.equal(engine.canStartNode(progress, "missing-addend"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, []);
+  assert.equal(engine.chapterStatus(progress, "grade-4"), "closed");
+  const blocked = engine.spendUnlock(engine.emptyProgress());
+  assert.equal(blocked.ok, false);
+  assert.ok(!progress.unlockedNodes.includes("missing-addend"));
+
+  const markup = pageMarkup();
+  const trail = markup.slice(markup.indexOf('id="screen-trail"'), markup.indexOf('id="screen-practice"'));
+  assert.match(trail, /id="back-chapters"/);
+  assert.match(trail, />Chapters</);
+  const practice = markup.slice(markup.indexOf('id="screen-practice"'), markup.indexOf('id="screen-results"'));
+  assert.match(practice, /id="change-tables"/);
+  assert.match(practice, />Chapters</);
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const paint = html.slice(
+    html.indexOf("function paintFirstLeftoverHops"),
+    html.indexOf("function updateChrome"),
+  );
+  assert.match(paint, /els\.changeTables\.hidden = quiet/);
+  const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+  assert.match(css, /\.node\.is-replay \.btn-quiet/);
+  const render = html.slice(html.indexOf("function renderGradePath"), html.indexOf("function startPlayableNode"));
+  assert.match(render, /status === "replay" \? "btn btn-quiet" : "btn btn-primary"/);
+});
+
 test("first visit opens Grade 3 and only number sense is Start", () => {
   const progress = engine.normalizeProgress(null);
   assert.equal(progress.coins, engine.STARTER_COINS);

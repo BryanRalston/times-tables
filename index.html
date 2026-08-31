@@ -747,6 +747,10 @@ body[data-look="leaf"] {
   color: var(--muted);
 }
 
+.practice-card.is-board.is-first-leftover .actions {
+  display: none;
+}
+
 .practice-card.is-isolated {
   background: transparent;
   border: 0;
@@ -3456,6 +3460,10 @@ body[data-look="leaf"] {
     return normalized.completedNodes.length === 0 && normalized.unlockedNodes.length === 0;
   }
 
+  function quietFirstLeftoverHops(progress) {
+    return opensOnFirstLeftover(progress);
+  }
+
   function payoutCoins(input) {
     const source = input && typeof input === "object" ? input : {};
     if (!source.ok) {
@@ -3757,6 +3765,7 @@ body[data-look="leaf"] {
     isLoudPathNode,
     startNode,
     opensOnFirstLeftover,
+    quietFirstLeftoverHops,
     payoutCoins,
     applyCoinPayout,
     spendUnlock,
@@ -3883,11 +3892,19 @@ body[data-look="leaf"] {
     });
   }
 
+  function paintFirstLeftoverHops() {
+    const quiet = engine.quietFirstLeftoverHops(state.progress);
+    screens.practice.classList.toggle("is-first-leftover", quiet);
+    els.restart.hidden = quiet;
+    els.changeTables.hidden = quiet;
+  }
+
   function updateChrome() {
     els.mark.textContent = engine.PRODUCT_NAME;
     els.subtitle.textContent = engine.PRODUCT_BLURB;
     els.changeTables.textContent = "Chapters";
     els.resultsChange.textContent = "Chapters";
+    paintFirstLeftoverHops();
     renderCoinHud();
     applyLook();
   }
@@ -4829,6 +4846,7 @@ body[data-look="leaf"] {
     }
     renderWorkspace(question);
     updateHud();
+    paintFirstLeftoverHops();
   }
 
   function clearTimers() {
@@ -5119,8 +5137,16 @@ body[data-look="leaf"] {
     }
   });
 
-  els.restart.addEventListener("click", () => beginRound(state.settings));
+  els.restart.addEventListener("click", () => {
+    if (engine.quietFirstLeftoverHops(state.progress)) {
+      return;
+    }
+    beginRound(state.settings);
+  });
   els.changeTables.addEventListener("click", () => {
+    if (engine.quietFirstLeftoverHops(state.progress)) {
+      return;
+    }
     recordRoundProgress();
     clearTimers();
     hydrateTrail();

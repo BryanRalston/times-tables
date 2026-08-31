@@ -24,7 +24,7 @@ https://bryanralston.github.io/times-tables/
 
 Brand-new visit, taps in order:
 
-1. Open the live page. You land on `6 + n = 10` on a ten-frame. The 6 is takeable. Coins are 3. There is no **Start** on a trail first. **Chapters** still opens the Grade 3 path; Missing addend shows **12**. Later grades stay behind **Chapters**. There is no **Round length**, **Timer**, or **Questions** picker. You do not first tap through a settings door or a wall of closed grades.
+1. Open the live page. You land on `6 + n = 10` on a ten-frame. The 6 is takeable. Coins are 3. There is no **Start** on a trail first, and no **Chapters** hop off that first leftover. After the short run you land on the Grade 3 path; Missing addend shows **12**. Later grades stay behind **Chapters**. There is no **Round length**, **Timer**, or **Questions** picker. You do not first tap through a settings door or a wall of closed grades.
 2. Drag the dots you can see off the frame. Tapping leftover cells or the n box bounces toward those dots — it does not sit mute and does not cover the model with a lecture. The heading stays `6 + n = 10`. Type the leftover in the n-box. A wrong leftover tilts; the board stays.
 3. A correct leftover holds a beat: you still see `n = 4` on the level frame, leftover cells vs the n-box, before the next card. No popup. Score does not jump the beat.
 4. Coins are the quiet number in the corner. A correct n **after** the drag earns coins. Miss, skip, or tapping OK before the move earns 0.
