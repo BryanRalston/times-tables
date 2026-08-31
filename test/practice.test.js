@@ -391,6 +391,24 @@ test("after isolation the written prompt is n = leftover", () => {
   assert.match(engine.whyPrompt(question, "lift").promptHtml, /n.* = 4/);
 });
 
+test("isolated n hold is a beat on the leftover board, not an instant skip", () => {
+  const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  const addend = engine.makeMissingQuestion({}, () => 0, { first: true });
+  const sub = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  const factor = engine.makeFactorQuestion({}, () => 0, { first: true });
+  const times = engine.makeQuestion(7, 8, "multiply");
+  assert.ok(engine.isolatedHoldMs(sense) >= 1600);
+  assert.equal(engine.isolatedHoldMs(sense), engine.ISOLATED_HOLD_MS);
+  assert.equal(engine.isolatedHoldMs(addend), engine.ISOLATED_HOLD_MS);
+  assert.equal(engine.isolatedHoldMs(sub), engine.ISOLATED_HOLD_MS);
+  assert.equal(engine.isolatedHoldMs(factor), engine.ISOLATED_HOLD_MS);
+  assert.equal(engine.isolatedHoldMs(times), 0);
+  assert.equal(engine.whyPrompt(sense, "reveal").prompt, "n = 4");
+  assert.equal(engine.whyLeftover(engine.whyModel(sense)), 4);
+  assert.equal(engine.shouldAdvanceAfterGrade(sense, engine.gradeAnswer(sense, "4")), true);
+  assert.equal(engine.shouldAdvanceAfterGrade(sense, engine.gradeAnswer(sense, "5")), false);
+});
+
 test("why-nudge does not name the known amount", () => {
   const question = engine.makeMissingQuestion({}, rngFrom([0.2, 0.8]));
   const model = engine.whyModel(question);
