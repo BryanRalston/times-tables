@@ -4841,13 +4841,11 @@ body[data-look="leaf"] {
     clearIsolatedHold();
   }
 
-  function finishRound() {
-    if (state.holdingIsolated) {
-      return;
-    }
-    clearTimers();
+  function recordRoundProgress() {
     const summary = engine.summarize(state.results);
-    const elapsedSeconds = Math.max(1, Math.round((Date.now() - state.startedAt) / 1000));
+    if (!summary.asked) {
+      return summary;
+    }
     state.progress = engine.applyRoundProgress(
       state.progress,
       state.settings.topic,
@@ -4855,6 +4853,16 @@ body[data-look="leaf"] {
       state.streakPeak,
     );
     saveProgress(state.progress);
+    return summary;
+  }
+
+  function finishRound() {
+    if (state.holdingIsolated) {
+      return;
+    }
+    clearTimers();
+    const summary = recordRoundProgress();
+    const elapsedSeconds = Math.max(1, Math.round((Date.now() - state.startedAt) / 1000));
     if (engine.whyRunReturnsToPath(state.settings.topic)) {
       showTrail("grade", engine.START_CHAPTER_ID);
       return;
@@ -4990,6 +4998,12 @@ body[data-look="leaf"] {
       setFeedback(engine.usesWhyModel(question) ? "" : `Not quite — ${explain}`, "bad");
       screens.practice.dataset.state = "bad";
     }
+    if (
+      engine.whyRunReturnsToPath(state.settings.topic)
+      && state.results.length >= engine.whyRunLength(state.settings.topic)
+    ) {
+      recordRoundProgress();
+    }
     const holdMs = applyHoldPlan(question, plan);
     if (!holdMs) {
       updateHud();
@@ -5107,6 +5121,7 @@ body[data-look="leaf"] {
 
   els.restart.addEventListener("click", () => beginRound(state.settings));
   els.changeTables.addEventListener("click", () => {
+    recordRoundProgress();
     clearTimers();
     hydrateTrail();
     showTrail("grade", engine.START_CHAPTER_ID);
