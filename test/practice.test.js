@@ -417,6 +417,46 @@ test("isolated n hold is a beat on the leftover board, not an instant skip", () 
   assert.equal(engine.shouldAdvanceAfterGrade(sense, engine.gradeAnswer(sense, "5")), false);
 });
 
+test("after a correct leftover the isolated-n beat holds before advancing", () => {
+  const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  const addend = engine.makeMissingQuestion({}, () => 0, { first: true });
+  const sub = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  const factor = engine.makeFactorQuestion({}, () => 0, { first: true });
+  const times = engine.makeQuestion(7, 8, "multiply");
+  const correct = engine.leftoverHoldPlan(sense, engine.gradeAnswer(sense, "4"));
+  assert.equal(correct.kind, "isolated");
+  assert.ok(correct.holdMs >= 2000);
+  assert.equal(correct.holdMs, engine.ISOLATED_HOLD_MS);
+  assert.equal(correct.hideKeypad, true);
+  assert.equal(correct.keepModel, true);
+  assert.equal(correct.prompt, "n = 4");
+  assert.equal(engine.leftoverHoldPlan(addend, engine.gradeAnswer(addend, "4")).kind, "isolated");
+  assert.equal(engine.leftoverHoldPlan(sub, engine.gradeAnswer(sub, "4")).kind, "isolated");
+  assert.equal(engine.leftoverHoldPlan(factor, engine.gradeAnswer(factor, "4")).kind, "isolated");
+  const miss = engine.leftoverHoldPlan(sense, engine.gradeAnswer(sense, "5"));
+  assert.equal(miss.kind, "stay");
+  assert.equal(miss.holdMs, 0);
+  assert.equal(miss.hideKeypad, false);
+  const ordinary = engine.leftoverHoldPlan(times, engine.gradeAnswer(times, "56"));
+  assert.equal(ordinary.kind, "advance");
+  assert.equal(ordinary.holdMs, 0);
+  assert.equal(ordinary.hideKeypad, false);
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const submit = html.slice(html.indexOf("function submitAnswer"), html.indexOf("function pressKey"));
+  const show = html.slice(html.indexOf("function showQuestion"), html.indexOf("function clearTimers"));
+  const hold = html.slice(html.indexOf("function holdIsolatedN"), html.indexOf("function setAnswer"));
+  assert.match(submit, /leftoverHoldPlan/);
+  assert.match(submit, /applyHoldPlan/);
+  assert.match(submit, /state\.advanceId = window\.setTimeout/);
+  assert.match(submit, /state\.holdingIsolated = false/);
+  assert.match(show, /if \(state\.holdingIsolated\)/);
+  assert.match(hold, /els\.keypad\.hidden = true/);
+  assert.match(hold, /els\.why\.hidden = false/);
+  assert.match(hold, /dataset\.isolatedHold = "true"/);
+  assert.doesNotMatch(hold, /renderWhyModel/);
+  assert.doesNotMatch(hold, /showQuestion\(/);
+});
+
 test("why-nudge does not name the known amount", () => {
   const question = engine.makeMissingQuestion({}, rngFrom([0.2, 0.8]));
   const model = engine.whyModel(question);
@@ -1441,8 +1481,13 @@ test("isolated-n beat still hides the keypad and holds the leftover board", () =
   assert.match(html, /function holdIsolatedN/);
   assert.match(html, /classList\.add\("is-isolated"\)/);
   assert.match(html, /els\.keypad\.hidden = true/);
+  assert.match(html, /state\.holdingIsolated = true/);
   assert.ok(engine.ISOLATED_HOLD_MS >= 1600);
   const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  const plan = engine.leftoverHoldPlan(sense, engine.gradeAnswer(sense, "4"));
   assert.equal(engine.isolatedHoldMs(sense), engine.ISOLATED_HOLD_MS);
+  assert.equal(plan.kind, "isolated");
+  assert.equal(plan.hideKeypad, true);
+  assert.equal(plan.keepModel, true);
   assert.equal(engine.whyPrompt(sense, "reveal").prompt, "n = 4");
 });

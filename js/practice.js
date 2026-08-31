@@ -850,6 +850,34 @@
     return usesWhyModel(question) ? ISOLATED_HOLD_MS : 0;
   }
 
+  function leftoverHoldPlan(question, grade) {
+    if (!shouldAdvanceAfterGrade(question, grade)) {
+      return {
+        kind: "stay",
+        holdMs: 0,
+        hideKeypad: false,
+        keepModel: false,
+        prompt: "",
+      };
+    }
+    if (usesWhyModel(question) && grade.ok) {
+      return {
+        kind: "isolated",
+        holdMs: isolatedHoldMs(question),
+        hideKeypad: true,
+        keepModel: true,
+        prompt: whyPrompt(question, "reveal").prompt,
+      };
+    }
+    return {
+      kind: "advance",
+      holdMs: 0,
+      hideKeypad: false,
+      keepModel: false,
+      prompt: "",
+    };
+  }
+
   function onestepOperation(form) {
     if (form === "n+a" || form === "a+n") {
       return "add";
@@ -2334,6 +2362,7 @@
     shouldAdvanceAfterGrade,
     usesWhyModel,
     isolatedHoldMs,
+    leftoverHoldPlan,
     figureSvg,
     buildRound,
     buildReplayRound,
