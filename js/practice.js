@@ -73,6 +73,7 @@
   const COIN_STREAK_AT = 3;
   const COIN_STREAK_BONUS = 1;
   const COIN_ROUND_CAP = 15;
+  const WHY_RUN_LENGTH = 4;
   const ISOLATED_HOLD_MS = 2800;
   const LOOK_IDS = ["ink", "leaf"];
   const START_NODE_ID = "number-sense";
@@ -190,6 +191,18 @@
     return TOPICS.includes(topic) ? topic : "times";
   }
 
+  function isWhyRunTopic(topic) {
+    return PLAYABLE_TRAIL_TOPICS.includes(normalizeTopic(topic));
+  }
+
+  function whyRunLength(topic) {
+    return isWhyRunTopic(topic) ? WHY_RUN_LENGTH : 0;
+  }
+
+  function whyRunReturnsToPath(topic) {
+    return isWhyRunTopic(topic);
+  }
+
   function normalizeDifficulty(difficulty) {
     return DIFFICULTIES.includes(difficulty) ? difficulty : "3-digit";
   }
@@ -204,13 +217,17 @@
     const timerSeconds = [0, 30, 60, 90].includes(Number(source.timerSeconds))
       ? Number(source.timerSeconds)
       : 0;
+    const topic = normalizeTopic(source.topic);
     const rawCount = Number(source.questionCount);
-    const questionCount =
-      Number.isInteger(rawCount) && rawCount > 0 ? Math.min(rawCount, 144) : 20;
+    const questionCount = whyRunLength(topic)
+      ? WHY_RUN_LENGTH
+      : Number.isInteger(rawCount) && rawCount > 0
+        ? Math.min(rawCount, 144)
+        : 20;
 
     return {
       tables: tables.length ? tables : DEFAULT_SETTINGS.tables.slice(),
-      topic: normalizeTopic(source.topic),
+      topic,
       operation: normalizeOperation(source.operation),
       difficulty: normalizeDifficulty(source.difficulty),
       shapeFocus: normalizeShapeFocus(source.shapeFocus),
@@ -1631,7 +1648,7 @@
       settings: normalized,
       questions: fillDeck(() => {
         const first = made === 0;
-        const towardTwenty = !first && made >= Math.min(8, Math.max(4, count - 4));
+        const towardTwenty = !first && made >= count - 1;
         made += 1;
         return makeSenseQuestion(normalized, rng, { first, towardTwenty });
       }, count),
@@ -2346,6 +2363,7 @@
     COIN_STREAK_AT,
     COIN_STREAK_BONUS,
     COIN_ROUND_CAP,
+    WHY_RUN_LENGTH,
     ISOLATED_HOLD_MS,
     LOOK_IDS,
     START_NODE_ID,
@@ -2374,6 +2392,8 @@
     isolatedHoldMs,
     leftoverHoldPlan,
     leftoverTypingAllowed,
+    whyRunLength,
+    whyRunReturnsToPath,
     figureSvg,
     buildRound,
     buildReplayRound,

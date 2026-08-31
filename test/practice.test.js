@@ -548,7 +548,7 @@ test("missing-number round is missing addend only, small numbers", () => {
       return (tick % 97) / 97;
     },
   );
-  assert.equal(round.questions.length, 20);
+  assert.equal(round.questions.length, engine.WHY_RUN_LENGTH);
   assert.equal(round.questions[0].prompt, "8 + n = 12");
   assert.equal(round.questions[0].answer, 4);
   for (const question of round.questions) {
@@ -1187,7 +1187,7 @@ test("missing-subtrahend round stays take-away n, small numbers", () => {
       return (tick % 97) / 97;
     },
   );
-  assert.equal(round.questions.length, 20);
+  assert.equal(round.questions.length, engine.WHY_RUN_LENGTH);
   assert.equal(round.questions[0].prompt, "12 − n = 8");
   assert.equal(round.questions[0].answer, 4);
   for (const question of round.questions) {
@@ -1323,7 +1323,7 @@ test("number-sense round stays hide/count within 20", () => {
       return (tick % 97) / 97;
     },
   );
-  assert.equal(round.questions.length, 20);
+  assert.equal(round.questions.length, engine.WHY_RUN_LENGTH);
   assert.equal(round.questions[0].prompt, "6 + n = 10");
   let sawTwenty = false;
   for (const question of round.questions) {
@@ -1404,7 +1404,7 @@ test("times-facts round is missing factor, not a product keypad quiz", () => {
       return (tick % 97) / 97;
     },
   );
-  assert.equal(round.questions.length, 20);
+  assert.equal(round.questions.length, engine.WHY_RUN_LENGTH);
   assert.equal(round.questions[0].prompt, "2 × n = 8");
   for (const question of round.questions) {
     assert.equal(question.topic, "factor");
@@ -1498,6 +1498,74 @@ test("puzzle chrome keeps Restart quieter than the board and OK", () => {
   assert.match(practice, /class="hud"/);
   assert.match(practice, /id="why-model"/);
   assert.match(practice, /id="keypad"/);
+});
+
+test("why-model cards do not show Score, Streak, or 1/20", () => {
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+  const boardHud = css.slice(css.indexOf(".practice-card.is-board .hud"));
+  assert.match(css, /\.practice-card\.is-board \.hud/);
+  assert.match(boardHud, /display:\s*none/);
+  const practice = html.slice(html.indexOf('id="screen-practice"'), html.indexOf('id="screen-results"'));
+  const show = html.slice(html.indexOf("function showQuestion"), html.indexOf("function clearTimers"));
+  const hud = html.slice(html.indexOf("function updateHud"), html.indexOf("const PLACE_LABELS"));
+  assert.doesNotMatch(practice, /1\s*\/\s*20/);
+  assert.match(practice, /id="practice-hud"/);
+  assert.match(show, /updateHud/);
+  assert.match(hud, /els\.hud\.hidden = isBoard/);
+  assert.match(hud, /if \(isBoard\) \{\s*return;/);
+  const header = html.slice(html.indexOf("<header"), html.indexOf("</header>"));
+  assert.doesNotMatch(header, /Score|Streak|1\s*\/\s*20/);
+});
+
+test("a short why-model run returns to the Grade 3 path", () => {
+  assert.equal(engine.WHY_RUN_LENGTH, 4);
+  assert.ok(engine.WHY_RUN_LENGTH < 20);
+  assert.equal(engine.whyRunLength("sense"), engine.WHY_RUN_LENGTH);
+  assert.equal(engine.whyRunLength("missing"), engine.WHY_RUN_LENGTH);
+  assert.equal(engine.whyRunLength("subtrahend"), engine.WHY_RUN_LENGTH);
+  assert.equal(engine.whyRunLength("factor"), engine.WHY_RUN_LENGTH);
+  assert.equal(engine.whyRunLength("times"), 0);
+  assert.equal(engine.whyRunReturnsToPath("sense"), true);
+  assert.equal(engine.whyRunReturnsToPath("missing"), true);
+  assert.equal(engine.whyRunReturnsToPath("times"), false);
+  assert.equal(engine.normalizeSettings({ topic: "sense", questionCount: 20 }).questionCount, engine.WHY_RUN_LENGTH);
+  assert.equal(engine.normalizeSettings({ topic: "times", questionCount: 20 }).questionCount, 20);
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const finish = html.slice(html.indexOf("function finishRound"), html.indexOf("function startTimer"));
+  assert.match(finish, /whyRunReturnsToPath/);
+  assert.match(finish, /showTrail\("grade"/);
+  assert.match(finish, /applyRoundProgress/);
+  assert.doesNotMatch(finish.slice(0, finish.indexOf("whyRunReturnsToPath")), /showScreen\("results"\)/);
+
+  let progress = engine.emptyProgress();
+  let earned = 0;
+  for (let streak = 1; streak <= engine.WHY_RUN_LENGTH; streak += 1) {
+    const payout = engine.payoutCoins({
+      ok: true,
+      usesWhy: true,
+      whyDone: true,
+      streak,
+      earnedThisRound: earned,
+    });
+    earned += payout;
+    progress = engine.applyCoinPayout(progress, payout);
+  }
+  progress = engine.applyRoundProgress(progress, "sense", {
+    asked: engine.WHY_RUN_LENGTH,
+    accuracy: 100,
+  }, engine.WHY_RUN_LENGTH);
+  assert.ok(progress.coins >= engine.NODE_UNLOCK_COST);
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(progress, "number-sense")), "Replay");
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.equal(engine.nextPricedUnlock(progress).id, "missing-addend");
+  assert.equal(engine.nextPricedUnlock(progress).cost, 12);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, []);
+  assert.equal(engine.chapterStatus(progress, "grade-4"), "closed");
 });
 
 test("isolated-n beat still hides the keypad and holds the leftover board", () => {
