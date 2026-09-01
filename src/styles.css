@@ -39,31 +39,25 @@
   #app {
     min-height: 100%;
   }
-  body {
+  html {
     background-color: #f4b3d0;
-    background-image: url("/times-tables/theme/jelly-wide.jpg");
-    background-size: cover;
-    background-attachment: fixed;
-    background-position: center;
+    background-image: url("/times-tables/theme/jelly-tile.jpg");
+    background-size: 240px;
+  }
+  body {
+    background-color: transparent;
+    background-image: url("/times-tables/theme/jelly-wide.jpg"), url("/times-tables/theme/jelly-tile.jpg");
+    background-size: cover, 240px;
+    background-attachment: fixed, fixed;
+    background-position: center, center;
     color: var(--color-ink);
     font-family: var(--font-sans);
     line-height: 1.5;
   }
   @media (max-width: 720px) {
     body {
-      background-image: url("/times-tables/theme/jelly-tall.jpg");
+      background-image: url("/times-tables/theme/jelly-tall.jpg"), url("/times-tables/theme/jelly-tile.jpg");
     }
-  }
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background-image: url("/times-tables/theme/jelly-tile.jpg");
-    background-size: 220px;
-    opacity: 0.28;
-    mix-blend-mode: overlay;
-    pointer-events: none;
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {

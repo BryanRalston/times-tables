@@ -42,7 +42,7 @@ export function GrownupPage() {
           <h1 className="font-display text-2xl">{ui.classIsOn}</h1>
         </div>
       </div>
-      <p className="mt-3 text-sm text-muted">{ui.grownupBlurb}</p>
+      <p className="frost mt-3 rounded-[16px] border border-line p-3 text-sm text-muted">{ui.grownupBlurb}</p>
 
       <label className="frost mt-6 block rounded-[16px] border border-line p-3 text-sm font-medium">
         {ui.language}
@@ -59,7 +59,7 @@ export function GrownupPage() {
         </select>
       </label>
 
-      <label className="mt-4 block text-sm font-medium">
+      <label className="frost mt-4 block rounded-[16px] border border-line p-3 text-sm font-medium">
         {ui.whoPlaying}
         <select
           value={learnerId}
@@ -73,7 +73,7 @@ export function GrownupPage() {
           ))}
         </select>
       </label>
-      <label className="mt-4 block text-sm font-medium">
+      <label className="frost mt-4 block rounded-[16px] border border-line p-3 text-sm font-medium">
         {ui.nameOnPath}
         <input
           value={name}
@@ -86,9 +86,9 @@ export function GrownupPage() {
       <Button variant="secondary" className="mt-3" onClick={() => addLearner(`${ui.kid1} ${roster.length + 1}`)}>
         {ui.anotherKid}
       </Button>
-      <p className="mt-2 text-xs text-muted">{ui.kidsBlurb}</p>
+      <p className="frost mt-2 rounded-[16px] border border-line p-3 text-xs text-muted">{ui.kidsBlurb}</p>
 
-      <label className="mt-4 block text-sm font-medium">
+      <label className="frost mt-4 block rounded-[16px] border border-line p-3 text-sm font-medium">
         {ui.classIsOn}
         <select
           value={classUnitId}
@@ -110,7 +110,7 @@ export function GrownupPage() {
         </p>
       ) : null}
 
-      <label className="mt-4 flex items-center gap-3 text-sm">
+      <label className="frost mt-4 flex items-center gap-3 rounded-[16px] border border-line p-3 text-sm">
         <input type="checkbox" checked={skipWeekend} onChange={(e) => setSkipWeekend(e.target.checked)} />
         {ui.weekendExtraUses}
       </label>

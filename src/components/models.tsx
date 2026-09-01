@@ -121,7 +121,8 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
   const data = question.data as TenFrameData;
   const [gone, setGone] = useState<boolean[]>(() => Array(data.shown).fill(false));
   const cells = Math.min(20, Math.max(data.total, data.shown));
-  const rows = cells > 10 ? 2 : 1;
+  const perRow = 5;
+  const rows = Math.ceil(Math.max(cells, 10) / perRow);
 
   function take(i: number) {
     if (i >= data.shown) return;
@@ -140,8 +141,8 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
       <div className="flex flex-col items-center gap-2">
         {Array.from({ length: rows }, (_, r) => (
           <div key={r} className="flex flex-nowrap justify-center gap-1 rounded-[16px] border border-line bg-bg-warm p-2">
-            {Array.from({ length: r === 0 ? Math.min(10, cells) : cells - 10 }, (_, c) => {
-              const i = r * 10 + c;
+            {Array.from({ length: Math.min(perRow, Math.max(0, cells - r * perRow)) }, (_, c) => {
+              const i = r * perRow + c;
               const filled = i < data.shown;
               return (
                 <Dot
@@ -155,9 +156,9 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
           </div>
         ))}
       </div>
-      <p className="mt-3 text-center text-sm text-muted">
-        {status === "correct" ? `n = ${question.answer}` : "Take the dots you can see. n is what's hiding."}
-      </p>
+      {status === "correct" ? (
+        <p className="mt-3 text-center text-sm text-muted">n = {question.answer}</p>
+      ) : null}
     </Frame>
   );
 }

@@ -75,7 +75,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <p className="mb-3 text-center text-sm text-muted">
+      <p className="frost mb-3 rounded-[16px] border border-line p-3 text-center text-sm text-muted">
         {ui.yearMap}{" "}
         <button type="button" className="font-medium text-teal" onClick={() => navigate({ id: "lessons" })}>
           {ui.lessons}

@@ -37,6 +37,16 @@ export function MagentaImg({
       ctx.drawImage(img, 0, 0);
       const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const d = frame.data;
+      let transparent = 0;
+      const sample = Math.min(400, d.length / 4);
+      for (let i = 0; i < sample * 4; i += 4) {
+        if ((d[i + 3] ?? 255) < 16) transparent += 1;
+      }
+      if (src.endsWith(".png") && transparent > sample * 0.2) {
+        keyed.set(src, src);
+        setUrl(src);
+        return;
+      }
       for (let i = 0; i < d.length; i += 4) {
         if (isMagenta(d[i]!, d[i + 1]!, d[i + 2]!)) d[i + 3] = 0;
       }

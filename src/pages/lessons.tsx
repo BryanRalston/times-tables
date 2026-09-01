@@ -18,7 +18,7 @@ export function LessonsPage() {
       <AppHeader />
       <AppTabs active="lessons" />
       <h2 className="font-display text-2xl">{ui.lessons}</h2>
-      <p className="mb-4 text-sm text-muted">{ui.lessonsIntro}</p>
+      <p className="frost mb-4 rounded-[16px] border border-line p-3 text-sm text-muted">{ui.lessonsIntro}</p>
 
       {QUARTERS.map((q) => {
         const units = UNITS.filter((u) => u.quarter === q.id);
