@@ -17,7 +17,7 @@ import { rngFromSeed } from "@/lib/rng";
 import { canAffordAnything, coinsForResult } from "@/lib/coins";
 import { playCorrect, playStar, playWrong, unlockAudio } from "@/lib/sound";
 import { schoolStreak } from "@/lib/streak";
-import type { ItemSource, Locale, Question } from "@/lib/types";
+import type { GraphData, ItemSource, Locale, Question } from "@/lib/types";
 import { answersMatch } from "@/lib/utils";
 
 type Kind = "welcome" | "daily" | "activity";
@@ -139,6 +139,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const [hop, setHop] = useState(false);
   const [star, setStar] = useState(false);
   const [pose, setPose] = useState<Pose>("think");
+  const [interacted, setInteracted] = useState(false);
   const holdRef = useRef(0);
   const recorded = useRef(false);
 
@@ -187,6 +188,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     setHop(false);
     setStar(false);
     setPose("think");
+    setInteracted(false);
   }
 
   function finish(nextCorrect: number, nextMisses: string[]) {
@@ -235,6 +237,10 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   function check(override?: string) {
     if (!q || status !== "idle") return;
+    if (q.needsInteract && !interacted) {
+      setShake((n) => n + 1);
+      return;
+    }
     const given = override ?? value;
     if (!given.length) return;
     if (answersMatch(given, q.answer, q.alts)) {
@@ -370,7 +376,11 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         <p className="mb-1 text-center text-[11px] font-medium uppercase tracking-wide text-faint">{q.sol.join(" · ")}</p>
       ) : null}
       {q.kind === "fluency" || q.kind === "word" || q.kind === "jumps" || (q.kind === "tenframe" && "equation" in (q.data as object) && (q.data as { equation?: string }).equation === q.prompt) || (q.kind === "money" && (q.data as { mode?: string }).mode === "make") ? null : (
-        <h2 className="mb-3 text-center font-display text-xl leading-tight sm:text-2xl">{q.prompt}</h2>
+        <h2 className="mb-3 text-center font-display text-xl leading-tight sm:text-2xl">
+          {q.kind === "graph" && (q.data as GraphData).collect && interacted && (q.data as GraphData).readPrompt
+            ? (q.data as GraphData).readPrompt
+            : q.prompt}
+        </h2>
       )}
 
       <Board
@@ -378,14 +388,20 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         question={q}
         value={value}
         setValue={setValue}
-        interacted={false}
-        onInteract={() => undefined}
+        interacted={interacted}
+        onInteract={() => setInteracted(true)}
         status={status}
         shake={shake}
       />
 
       <div className="mt-4">
-        <AnswerPanel question={q} value={value} setValue={setValue} onCheck={check} disabled={status !== "idle"} />
+        <AnswerPanel
+          question={q}
+          value={value}
+          setValue={setValue}
+          onCheck={check}
+          disabled={status !== "idle" || Boolean(q.needsInteract && !interacted)}
+        />
       </div>
 
       {q.kind === "word" || q.prompt.length > 70 ? <div className="mt-3"><ScratchPad /></div> : null}

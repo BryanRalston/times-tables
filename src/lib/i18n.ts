@@ -60,6 +60,8 @@ export type Ui = {
   tapAgainReset: string;
   resetBlurb: string;
   grownupBlurb: string;
+  grownupPoints: string[];
+  undo: string;
   kidsBlurb: string;
   startHere: string;
   whatsHiding: string;
@@ -152,7 +154,14 @@ export const UI: Record<Locale, Ui> = {
     tapAgainReset: "Tap again to reset",
     resetBlurb: "Reset clears stars, streak, and the leftover visit. It does not leave the device either.",
     grownupBlurb:
-      "Class is on only changes the suggested daily walk. Every lesson stays playable — she can pick Q4 in August. Daily walks stay 8–12 new plus review; a unit cannot be finished in a weekend.",
+      "LCPS 2026–27 Grade 3 year, 2023 Virginia SOLs. Nothing leaves this device — no accounts. Set Class is on to unit N for the daily walk; Lessons never lock. Coins and the shelf are optional juice. Advanced (Grade 4) is a parallel year, not the Grade 3 SOL.",
+    grownupPoints: [
+      "LCPS 2026–27 Grade 3 year. 2023 Virginia SOLs.",
+      "Nothing leaves this device. No accounts.",
+      "Set Class is on to unit N for the daily walk. Lessons never lock.",
+      "Coins and the squishee shelf are optional juice.",
+      "Advanced (Grade 4) is a parallel year, not the Grade 3 SOL.",
+    ],
     kidsBlurb: "Each kid has their own stars, streak, and squishee shelf. Questions shuffle per kid.",
     startHere: "Start here",
     whatsHiding: "What's hiding",
@@ -182,6 +191,7 @@ export const UI: Record<Locale, Ui> = {
     plus1min: "+1 min",
     minus1min: "−1 min",
     orderEmpty: "tap the numbers in order",
+    undo: "Undo",
     clear: "Clear",
     fridayCheck: "Friday check",
     weekendExtra: "Weekend extra",
@@ -244,7 +254,14 @@ export const UI: Record<Locale, Ui> = {
     tapAgainReset: "Toca otra vez para reiniciar",
     resetBlurb: "Reiniciar borra estrellas, racha y la primera visita. Nada sale del aparato.",
     grownupBlurb:
-      "La clase está en solo cambia el paseo diario sugerido. Toda lección se puede jugar — puede elegir Q4 en agosto. Los paseos siguen siendo 8–12 nuevos más repaso; una unidad no se termina en un fin de semana.",
+      "Año LCPS 2026–27 de 3.º, SOLs de Virginia 2023. Nada sale de este aparato — sin cuentas. Pon La clase está en la unidad N para el paseo diario; Lecciones nunca se bloquea. Las monedas y el estante son jugo opcional. Avanzado (4.º) es un año paralelo, no el SOL de 3.º.",
+    grownupPoints: [
+      "Año LCPS 2026–27 de 3.º. SOLs de Virginia 2023.",
+      "Nada sale de este aparato. Sin cuentas.",
+      "Pon La clase está en la unidad N para el paseo diario. Lecciones nunca se bloquea.",
+      "Las monedas y el estante de squishees son jugo opcional.",
+      "Avanzado (4.º) es un año paralelo, no el SOL de 3.º.",
+    ],
     kidsBlurb: "Cada niña o niño tiene sus estrellas, racha y estante. Las preguntas se mezclan por persona.",
     startHere: "Empieza aquí",
     whatsHiding: "Qué se esconde",
@@ -274,6 +291,7 @@ export const UI: Record<Locale, Ui> = {
     plus1min: "+1 min",
     minus1min: "−1 min",
     orderEmpty: "toca los números en orden",
+    undo: "Deshacer",
     clear: "Borrar",
     fridayCheck: "Chequeo de viernes",
     weekendExtra: "Extra de fin de semana",
@@ -336,7 +354,14 @@ export const UI: Record<Locale, Ui> = {
     tapAgainReset: "Toque de novo para reiniciar",
     resetBlurb: "Reiniciar apaga estrelas, sequência e a primeira visita. Nada sai do aparelho.",
     grownupBlurb:
-      "A turma está em só muda o passeio diário sugerido. Toda lição continua jogável — ela pode escolher Q4 em agosto. Os passeios seguem 8–12 novos mais revisão; uma unidade não termina num fim de semana.",
+      "Ano LCPS 2026–27 do 3.º, SOLs da Virgínia 2023. Nada sai deste aparelho — sem contas. Defina A turma está em na unidade N para o passeio diário; Lições nunca trava. Moedas e a estante são suco opcional. Avançado (4.º) é um ano paralelo, não o SOL do 3.º.",
+    grownupPoints: [
+      "Ano LCPS 2026–27 do 3.º. SOLs da Virgínia 2023.",
+      "Nada sai deste aparelho. Sem contas.",
+      "Defina A turma está em na unidade N para o passeio diário. Lições nunca trava.",
+      "Moedas e a estante de squishees são suco opcional.",
+      "Avançado (4.º) é um ano paralelo, não o SOL do 3.º.",
+    ],
     kidsBlurb: "Cada criança tem suas estrelas, sequência e estante. As perguntas misturam por pessoa.",
     startHere: "Comece aqui",
     whatsHiding: "O que está escondido",
@@ -366,6 +391,7 @@ export const UI: Record<Locale, Ui> = {
     plus1min: "+1 min",
     minus1min: "−1 min",
     orderEmpty: "toque os números em ordem",
+    undo: "Desfazer",
     clear: "Limpar",
     fridayCheck: "Checagem de sexta",
     weekendExtra: "Extra de fim de semana",

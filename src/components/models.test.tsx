@@ -91,5 +91,26 @@ describe("boards", () => {
     const html = renderToStaticMarkup(<Board {...stub(q)} />);
     expect(html).toContain(q.prompt);
     expect(html).not.toMatch(/read the pointer/i);
+    expect(html).toMatch(/<img|<svg/);
+  });
+
+  it("unit pick always shows an object, not a blank card", () => {
+    for (let i = 0; i < 24; i++) {
+      const q = makeQuestion(activityById("u8-unit")!.activity, rngFromSeed(`unit:${i}`));
+      const html = renderToStaticMarkup(<Board {...stub(q)} />);
+      expect(html).toMatch(/<img|<svg/);
+      expect(html.replace(/&#x27;/g, "'")).toContain(q.prompt);
+    }
+  });
+
+  it("order board uses i18n, not hardcoded English, and can undo", () => {
+    const q = makeQuestion(activityById("u2-order")!.activity, rngFromSeed(3));
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).not.toContain("Tap in order");
+    expect(html).toMatch(/tap the numbers in order/i);
+    const withPick = renderToStaticMarkup(
+      <Board {...stub(q)} value={(q.choices ?? [])[0] ?? "1"} />,
+    );
+    expect(withPick).toMatch(/Undo|Deshacer|Desfazer/);
   });
 });

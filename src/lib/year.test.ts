@@ -212,6 +212,24 @@ describe("principal holes", () => {
     const next = placeOnGraph(d.tray!, counts, first.id, first.label);
     expect(next.tray.length).toBe(d.tray!.length - 1);
     expect(next.counts[first.label]).toBe(1);
+    expect(q.needsInteract).toBe(true);
+    expect(d.readPrompt?.length).toBeGreaterThan(0);
+  });
+
+  it("collect graphs require sorting before the read", () => {
+    for (const id of ["u1-tally", "u6-picto", "u7-bar"]) {
+      for (let i = 0; i < 12; i++) {
+        const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`col:${id}:${i}`));
+        const d = q.data as GraphData;
+        expect(q.needsInteract, id).toBe(true);
+        expect(d.collect).toBe(true);
+        expect(d.tray?.length).toBeGreaterThan(0);
+        expect(d.readPrompt?.length).toBeGreaterThan(0);
+        if (d.ask === "greatest" || d.ask === "least") {
+          expect(q.choices ?? []).toContain(q.answer);
+        }
+      }
+    }
   });
 
   it("count money does not spoil the total", () => {
@@ -243,6 +261,11 @@ describe("locale", () => {
     expect(UI["pt-BR"].check).toBe("Conferir");
     expect(UI.es.yourAnswer).toBe("Tu respuesta");
     expect(UI["pt-BR"].yourAnswer).toBe("Sua resposta");
+    expect(UI.en.undo).toBe("Undo");
+    expect(UI.es.undo).toBe("Deshacer");
+    expect(UI.en.grownupPoints.length).toBeGreaterThanOrEqual(5);
+    expect(UI.en.grownupBlurb).toMatch(/Grade 4/);
+    expect(UI.en.grownupBlurb).toMatch(/Nothing leaves/i);
   });
 
   it("spanish word story is actually Spanish", () => {

@@ -1,0 +1,24 @@
+{
+  "name": "Grade 3 Path",
+  "short_name": "Grade 3 Path",
+  "description": "LCPS 2026–27 Grade 3 math. Nothing leaves this device.",
+  "start_url": "/times-tables/",
+  "scope": "/times-tables/",
+  "display": "standalone",
+  "background_color": "#f4b3d0",
+  "theme_color": "#f4b3d0",
+  "icons": [
+    {
+      "src": "/times-tables/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/times-tables/squishees/frog.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

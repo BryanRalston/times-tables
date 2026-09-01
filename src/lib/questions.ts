@@ -761,21 +761,49 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     for (const p of trayPack) counts[p.label] = (counts[p.label] ?? 0) + 1;
     const focus = focusCat.label;
     const tray = trayPack.map((p, i) => ({ id: `t-${i}`, label: p.label, symbol: p.id }));
+    const ask = rng.pick(["value", "greatest", "least"] as const);
+    let readPrompt = t().graphHowMany(focus);
+    let answer = String(counts[focus] ?? 0);
+    let graphAlts: string[] | undefined;
+    let input: Question["input"] = "keypad";
+    let choices: string[] | undefined;
+    if (ask === "greatest") {
+      const m = Math.max(...Object.values(counts));
+      const winners = labels.filter((l) => (counts[l] ?? 0) === m);
+      readPrompt = t().graphMost;
+      answer = winners[0]!;
+      graphAlts = winners.slice(1);
+      input = "choice";
+      choices = labels;
+    } else if (ask === "least") {
+      const m = Math.min(...Object.values(counts));
+      const winners = labels.filter((l) => (counts[l] ?? 0) === m);
+      readPrompt = t().graphLeast;
+      answer = winners[0]!;
+      graphAlts = winners.slice(1);
+      input = "choice";
+      choices = labels;
+    }
     return keypadQ(rng, {
       kind: "graph",
       prompt: t().sortHowMany(focus),
       hint: t().sortHint,
-      answer: String(counts[focus] ?? 0),
+      answer,
+      alts: graphAlts,
+      input,
+      choices,
+      needsInteract: true,
       data: {
         title: t().graphTitle,
         kind,
         key: 1,
         symbol: pack[0]!.id,
         rows: pack.map((p) => ({ label: p.label, value: 0, symbol: p.id })),
-        ask: "value",
+        ask,
         focus,
         collect: true,
         tray,
+        readPrompt,
       } satisfies GraphData,
     });
   }

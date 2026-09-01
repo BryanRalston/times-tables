@@ -382,6 +382,7 @@ function CompareNums({ question, status, shake }: BoardProps) {
 
 function OrderNums({ question, value, setValue, status, shake }: BoardProps) {
   const data = question.data as OrderData;
+  const ui = UI[parseLocale(useProgress((st) => st.locale))];
   const picked = value ? value.split(" ").filter(Boolean) : [];
   const labels = question.choices ?? data.numbers.map(String);
   return (
@@ -406,7 +407,16 @@ function OrderNums({ question, value, setValue, status, shake }: BoardProps) {
           );
         })}
       </div>
-      <p className="mt-3 text-center font-display text-lg tabular-nums">{picked.join("  →  ") || "Tap in order"}</p>
+      <p className="mt-3 text-center font-display text-lg tabular-nums">{picked.join("  →  ") || ui.orderEmpty}</p>
+      {picked.length ? (
+        <button
+          type="button"
+          className="mx-auto mt-2 block text-sm text-muted"
+          onClick={() => setValue(picked.slice(0, -1).join(" "))}
+        >
+          {ui.undo}
+        </button>
+      ) : null}
     </Frame>
   );
 }
@@ -913,11 +923,12 @@ function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
     if (!picked) return;
     const item = tray.find((t) => t.id === picked);
     if (!item) return;
-    setTray((t) => t.filter((x) => x.id !== picked));
+    const nextTray = tray.filter((x) => x.id !== picked);
+    setTray(nextTray);
     setCounts((c) => ({ ...c, [label]: (c[label] ?? 0) + 1 }));
     setPicked(null);
     playTap();
-    onInteract();
+    if (nextTray.length === 0) onInteract();
   }
 
   return (
@@ -1150,12 +1161,30 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
   const ui = UI[parseLocale(useProgress((st) => st.locale))];
   if (data.mode === "unit") {
     const p = question.prompt.toLowerCase();
-    const showPencil = /pencil|l[aá]piz|l[aá]pis/.test(p);
+    const src = /pencil|l[aá]piz|l[aá]pis/.test(p)
+      ? asset("measure/pencil.png")
+      : /grape|uva/.test(p)
+        ? asset("squishees/grape.png")
+        : /watermelon|melon|sand[ií]a/.test(p)
+          ? asset("squishees/melon.png")
+          : /apple|manzana|ma[cç]/.test(p) || /pound|gram|kilo|mass|weight|peso/.test(p)
+            ? asset("measure/scale.png")
+            : /water|milk|spoon|bottle|cup|liter|gallon|leche|leite|agua|água/.test(p)
+              ? asset("measure/beaker.png")
+              : /classroom|height|clip|inch|yard|meter|centimeter|aula|altura/.test(p)
+                ? asset("measure/ruler.png")
+                : null;
     return (
       <Frame shake={shake} status={status}>
-        {showPencil ? (
-          <img src={asset("measure/pencil.png")} alt="" className="mx-auto h-28 object-contain" />
-        ) : null}
+        {src ? (
+          <img src={src} alt="" className="mx-auto h-28 object-contain" />
+        ) : (
+          <svg viewBox="0 0 120 72" className="mx-auto h-20 w-40" aria-hidden>
+            <rect x="8" y="18" width="104" height="44" rx="8" fill="#fffaf1" stroke="#1f1a14" strokeWidth="2" />
+            <rect x="20" y="28" width="36" height="24" rx="4" fill="#d7ecec" stroke="#0d7377" />
+            <rect x="64" y="28" width="36" height="24" rx="4" fill="#f4d7c8" stroke="#c45c26" />
+          </svg>
+        )}
         <p className="mt-2 text-center font-display text-xl leading-tight">{question.prompt}</p>
       </Frame>
     );

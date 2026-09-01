@@ -330,7 +330,17 @@ describe("answer audit", () => {
           expect(counts[row.label] ?? 0, `${id} missing ${row.label}`).toBeGreaterThanOrEqual(1);
         }
         expect(counts[d.focus!] ?? 0).toBeGreaterThanOrEqual(2);
-        expect(Number(q.answer)).toBe(counts[d.focus!]);
+        expect(q.needsInteract).toBe(true);
+        expect(d.readPrompt?.length).toBeGreaterThan(0);
+        if (d.ask === "value") expect(Number(q.answer)).toBe(counts[d.focus!]);
+        if (d.ask === "greatest") {
+          const m = Math.max(...Object.values(counts));
+          expect(counts[q.answer]).toBe(m);
+        }
+        if (d.ask === "least") {
+          const m = Math.min(...Object.values(counts));
+          expect(counts[q.answer]).toBe(m);
+        }
       }
     }
   });

@@ -45,7 +45,14 @@ export function GrownupPage() {
           <h1 className="font-display text-2xl">{ui.classIsOn}</h1>
         </div>
       </div>
-      <p className="frost mt-3 rounded-[16px] border border-line p-3 text-sm text-muted">{ui.grownupBlurb}</p>
+      <div className="frost mt-3 rounded-[16px] border border-line p-3 text-sm text-muted">
+        <p>{ui.grownupBlurb}</p>
+        <ul className="mt-2 list-disc space-y-1 pl-4">
+          {ui.grownupPoints.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      </div>
 
       <label className="frost mt-6 block rounded-[16px] border border-line p-3 text-sm font-medium">
         {ui.language}

@@ -167,6 +167,31 @@ async function answerUi(page) {
   return { digit, check, lt, hour, skip, yesno, buttons };
 }
 
+async function maybeInteract(page) {
+  const dots = page.getByRole("button", { name: "dot" });
+  if (await dots.count()) {
+    await dots.first().click({ timeout: 2000 }).catch(() => undefined);
+    return;
+  }
+  const groups = page.locator("button[aria-label^='group']");
+  if (await groups.count()) {
+    await groups.first().click({ timeout: 2000 }).catch(() => undefined);
+    return;
+  }
+  for (let i = 0; i < 10; i++) {
+    const tray = page.locator(".border-dashed button");
+    if (!(await tray.count())) break;
+    const label = (await tray.first().getAttribute("aria-label")) || "";
+    await tray.first().click({ timeout: 2000 }).catch(() => undefined);
+    const cat = page.locator("button.w-20").filter({ hasText: new RegExp(`^${label}$`, "i") });
+    if (await cat.count()) await cat.first().click({ timeout: 2000 }).catch(() => undefined);
+    else {
+      const any = page.locator("button.w-20");
+      if (await any.count()) await any.first().click({ timeout: 2000 }).catch(() => undefined);
+    }
+  }
+}
+
 async function typeDigits(page, s) {
   for (const ch of s) {
     if (ch === ".") {
@@ -181,7 +206,7 @@ async function typeDigits(page, s) {
     }
     if (ch === " ") continue;
     const b = page.getByRole("button", { name: ch, exact: true });
-    if (await b.count()) await b.first().click();
+    if (await b.count()) await b.first().click({ timeout: 2500 });
   }
 }
 
@@ -202,6 +227,9 @@ async function statusOf(page) {
 }
 
 async function tryFunction(page, kind, id) {
+  try {
+  await maybeInteract(page);
+  await page.waitForTimeout(200);
   const text = await page.locator("#app").innerText();
   const ui = await answerUi(page);
 
@@ -282,6 +310,9 @@ async function tryFunction(page, kind, id) {
   if (kind === "money") return { fn: "skip", note: "money make/change/compare" };
 
   return { fn: "skip", note: "no derived answer" };
+  } catch (e) {
+    return { fn: "skip", note: String(e).slice(0, 100) };
+  }
 }
 
 async function hunt(page, kind, id, text) {

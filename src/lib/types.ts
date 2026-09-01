@@ -171,6 +171,7 @@ export interface GraphData {
   focusB?: string;
   collect?: boolean;
   tray?: { id: string; label: string; symbol?: string }[];
+  readPrompt?: string;
 }
 
 export interface PatternData {
