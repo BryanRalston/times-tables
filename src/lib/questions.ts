@@ -663,7 +663,7 @@ function moneyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     return keypadQ(rng, {
       kind: "money",
       prompt: t().changeMoney(moneyFmt(cost), moneyFmt(pay)),
-      hint: "n is leftover.",
+      hint: t().changeHint,
       answer: String(n),
       alts: [moneyFmt(n)],
       needsInteract: true,

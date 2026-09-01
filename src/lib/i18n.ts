@@ -765,6 +765,7 @@ export type QCopy = {
   makeMoney: (fmt: string) => string;
   makeHint: string;
   changeMoney: (cost: string, pay: string) => string;
+  changeHint: string;
   howManyCents: string;
   compareMoney: string;
   unitSquares: string;
@@ -881,6 +882,7 @@ export function qCopy(locale: Locale): QCopy {
       makeMoney: (fmt) => `Arma ${fmt}. Toca billetes y monedas.`,
       makeHint: "Arma la cantidad. Comprueba cuando el total coincida.",
       changeMoney: (cost, pay) => `Un artículo cuesta ${cost}. Pagas ${pay}. ¿Cuánto de cambio?`,
+      changeHint: "n es lo que sobra.",
       howManyCents: "¿Cuántos centavos?",
       compareMoney: "Compara los dos conjuntos.",
       unitSquares: "¿Cuántos cuadrados unitarios?",
@@ -995,6 +997,7 @@ export function qCopy(locale: Locale): QCopy {
       makeMoney: (fmt) => `Monte ${fmt}. Toque notas e moedas.`,
       makeHint: "Monte o valor. Conferir quando o total bater.",
       changeMoney: (cost, pay) => `Um item custa ${cost}. Você paga ${pay}. Quanto de troco?`,
+      changeHint: "n é o que sobra.",
       howManyCents: "Quantos centavos?",
       compareMoney: "Compare os dois conjuntos.",
       unitSquares: "Quantos quadrados unitários?",
@@ -1108,6 +1111,7 @@ export function qCopy(locale: Locale): QCopy {
     makeMoney: (fmt) => `Make ${fmt}. Tap bills and coins.`,
     makeHint: "Build the amount. Check when the total matches.",
     changeMoney: (cost, pay) => `An item costs ${cost}. You pay ${pay}. How much change?`,
+    changeHint: "n is leftover.",
     howManyCents: "How many cents?",
     compareMoney: "Compare the two sets.",
     unitSquares: "How many unit squares?",

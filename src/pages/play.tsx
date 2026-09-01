@@ -150,6 +150,27 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const locale = parseLocale(useProgress((s) => s.locale));
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const qa = new URLSearchParams(window.location.search).get("qa") === "1";
+    if (!qa) {
+      delete window.__G3_Q;
+      return;
+    }
+    window.__G3_Q = q
+      ? {
+          answer: q.answer,
+          needsInteract: Boolean(q.needsInteract),
+          kind: q.kind,
+          input: q.input,
+          choices: q.choices ?? null,
+          prompt: q.prompt,
+          interacted,
+          checkDisabled: Boolean(q.needsInteract && !interacted),
+        }
+      : null;
+  }, [q, interacted]);
+
+  useEffect(() => {
     unlockAudio();
   }, []);
 
