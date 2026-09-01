@@ -1049,6 +1049,43 @@ function ComputeBoard({ question, status, shake }: BoardProps) {
   );
 }
 
+/** Overlay viewBoxes match keyed public/measure PNGs. */
+const RULER_FACE = { w: 1258, h: 200, x0: 168, x1: 1210, y0: 26, yMaj: 84, yMin: 54, yNum: 128 };
+const SCALE_FACE = { w: 400, h: 644, cx: 205, cy: 290, r: 148, start: 225, sweep: 270 };
+const BEAKER_FACE = { w: 413, h: 979, x: 132, fw: 188, yTop: 228, yBot: 862, tickX: 324 };
+
+function ToolFace({
+  src,
+  viewBox,
+  className,
+  imgClass,
+  under,
+  over,
+  label,
+}: {
+  src: string;
+  viewBox: string;
+  className?: string;
+  imgClass?: string;
+  under?: ReactNode;
+  over: ReactNode;
+  label: string;
+}) {
+  return (
+    <div className={cn("relative mx-auto", className)}>
+      {under ? (
+        <svg viewBox={viewBox} className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden>
+          {under}
+        </svg>
+      ) : null}
+      <img src={src} alt="" className={cn("relative block", imgClass)} />
+      <svg viewBox={viewBox} className="pointer-events-none absolute inset-0 h-full w-full" role="img" aria-label={label}>
+        {over}
+      </svg>
+    </div>
+  );
+}
+
 function MeasureBoard({ question, status, shake }: BoardProps) {
   const data = question.data as MeasureData;
   const ui = UI[parseLocale(useProgress((st) => st.locale))];
@@ -1068,78 +1105,143 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
   const halves = data.attribute === "length";
   const steps = halves ? max * 2 : max;
   const at = halves ? data.value * 2 : data.value;
+  const label = `${ui.readPointer} ${data.unit}`;
   const caption = (
     <p className="mt-1 text-center text-sm font-medium text-ink">
       {ui.readPointer} · {data.unit}
     </p>
   );
   if (data.attribute === "length") {
-    const x = (i: number) => 22 + (i / steps) * 236;
+    const { w, h, x0, x1, y0, yMaj, yMin, yNum } = RULER_FACE;
+    const x = (i: number) => x0 + (i / steps) * (x1 - x0);
     const px = x(at);
     const src = data.unit === "cm" ? asset("measure/ruler-cm.png") : asset("measure/ruler.png");
     return (
       <Frame shake={shake} status={status}>
-        <img src={src} alt="" className="mx-auto h-20 w-full object-contain sm:h-24" />
-        <svg viewBox="0 0 280 52" className="w-full" role="img" aria-label={`${ui.readPointer} ${data.unit}`}>
-          {Array.from({ length: steps + 1 }, (_, i) => {
-            const major = i % 2 === 0;
-            return (
-              <g key={i}>
-                <line x1={x(i)} y1="8" x2={x(i)} y2={major ? 28 : 18} stroke="#1f1a14" strokeWidth={major ? 2.5 : 1.4} />
-                {major ? (
-                  <text x={x(i)} y="48" textAnchor="middle" fontSize="12" fontWeight="700" fill="#1f1a14">
-                    {i / 2}
-                  </text>
-                ) : null}
-              </g>
-            );
-          })}
-          <polygon points={`${px},8 ${px - 8},0 ${px + 8},0`} fill="#c45c26" stroke="#1f1a14" strokeWidth="1.1" />
-        </svg>
+        <ToolFace
+          src={src}
+          viewBox={`0 0 ${w} ${h}`}
+          className="w-full max-w-xl"
+          imgClass="h-auto w-full"
+          label={label}
+          over={
+            <>
+              {Array.from({ length: steps + 1 }, (_, i) => {
+                const major = halves ? i % 2 === 0 : true;
+                return (
+                  <g key={i}>
+                    <line
+                      x1={x(i)}
+                      y1={y0}
+                      x2={x(i)}
+                      y2={major ? yMaj : yMin}
+                      stroke="#1f1a14"
+                      strokeWidth={major ? 3 : 1.6}
+                    />
+                    {major ? (
+                      <text x={x(i)} y={yNum} textAnchor="middle" fontSize="40" fontWeight="700" fill="#1f1a14">
+                        {halves ? i / 2 : i}
+                      </text>
+                    ) : null}
+                  </g>
+                );
+              })}
+              <polygon
+                points={`${px},${y0} ${px - 12},${y0 - 20} ${px + 12},${y0 - 20}`}
+                fill="#c45c26"
+                stroke="#1f1a14"
+                strokeWidth="1.2"
+              />
+            </>
+          }
+        />
         {caption}
       </Frame>
     );
   }
   if (data.attribute === "mass") {
-    const y = (i: number) => 148 - (i / max) * 116;
-    const py = y(data.value);
+    const { w, h, cx, cy, r, start, sweep } = SCALE_FACE;
+    const deg = start + (data.value / max) * sweep;
+    const polar = (radius: number, d: number) => {
+      const a = (d * Math.PI) / 180;
+      return [cx + Math.cos(a) * radius, cy + Math.sin(a) * radius] as const;
+    };
     return (
       <Frame shake={shake} status={status}>
-        <div className="flex items-center justify-center gap-1">
-          <svg viewBox="0 0 72 180" className="h-52" role="img" aria-label={`${ui.readPointer} ${data.unit}`}>
-            {Array.from({ length: max + 1 }, (_, i) => (
-              <g key={i}>
-                <line x1="58" y1={y(i)} x2="48" y2={y(i)} stroke="#1f1a14" strokeWidth="2" />
-                <text x="44" y={y(i) + 5} textAnchor="end" fontSize="13" fontWeight="700" fill="#1f1a14">
-                  {i}
-                </text>
-              </g>
-            ))}
-            <polygon points={`60,${py} 72,${py - 8} 72,${py + 8}`} fill="#c45c26" stroke="#1f1a14" strokeWidth="1" />
-          </svg>
-          <img src={asset("measure/scale.png")} alt="" className="h-52 object-contain" />
+        <div className="flex justify-center">
+          <ToolFace
+            src={asset("measure/scale.png")}
+            viewBox={`0 0 ${w} ${h}`}
+            className="inline-block"
+            imgClass="h-64 w-auto sm:h-72"
+            label={label}
+            over={
+              <>
+                {Array.from({ length: max + 1 }, (_, i) => {
+                  const d = start + (i / max) * sweep;
+                  const [x1, y1] = polar(r * 0.84, d);
+                  const [x2, y2] = polar(r * 0.98, d);
+                  const [tx, ty] = polar(r * 0.68, d);
+                  return (
+                    <g key={i}>
+                      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#1f1a14" strokeWidth="3" />
+                      <text x={tx} y={ty} textAnchor="middle" dominantBaseline="middle" fontSize="28" fontWeight="700" fill="#1f1a14">
+                        {i}
+                      </text>
+                    </g>
+                  );
+                })}
+                <g transform={`rotate(${deg} ${cx} ${cy})`}>
+                  <line x1={cx} y1={cy} x2={cx + r * 0.78} y2={cy} stroke="#1f1a14" strokeWidth="5" strokeLinecap="round" />
+                  <polygon
+                    points={`${cx + r * 0.88},${cy} ${cx + r * 0.7},${cy - 11} ${cx + r * 0.7},${cy + 11}`}
+                    fill="#c45c26"
+                    stroke="#1f1a14"
+                    strokeWidth="1.1"
+                  />
+                  <circle cx={cx} cy={cy} r="9" fill="#1f1a14" />
+                </g>
+              </>
+            }
+          />
         </div>
         {caption}
       </Frame>
     );
   }
-  const y = (i: number) => 148 - (i / max) * 116;
-  const py = y(data.value);
+  const { w, h, x: fx, fw, yTop, yBot, tickX } = BEAKER_FACE;
+  const y = (i: number) => yBot - (i / max) * (yBot - yTop);
+  const fillY = y(data.value);
+  const py = fillY;
   return (
     <Frame shake={shake} status={status}>
-      <div className="flex items-center justify-center gap-1">
-        <svg viewBox="0 0 72 180" className="h-52" role="img" aria-label={`${ui.readPointer} ${data.unit}`}>
-          {Array.from({ length: max + 1 }, (_, i) => (
-            <g key={i}>
-              <line x1="58" y1={y(i)} x2="48" y2={y(i)} stroke="#1f1a14" strokeWidth="2" />
-              <text x="44" y={y(i) + 5} textAnchor="end" fontSize="13" fontWeight="700" fill="#1f1a14">
-                {i}
-              </text>
-            </g>
-          ))}
-          <polygon points={`60,${py} 72,${py - 8} 72,${py + 8}`} fill="#c45c26" stroke="#1f1a14" strokeWidth="1" />
-        </svg>
-        <img src={asset("measure/beaker.png")} alt="" className="h-52 object-contain" />
+      <div className="flex justify-center">
+        <ToolFace
+          src={asset("measure/beaker.png")}
+          viewBox={`0 0 ${w} ${h}`}
+          className="inline-block"
+          imgClass="h-64 w-auto sm:h-72"
+          label={label}
+          under={<rect x={fx} y={fillY} width={fw} height={yBot - fillY} rx="36" fill="#0d7377" opacity="0.55" />}
+          over={
+            <>
+              {Array.from({ length: max + 1 }, (_, i) => (
+                <g key={i}>
+                  <line x1={tickX} y1={y(i)} x2={tickX + 22} y2={y(i)} stroke="#1f1a14" strokeWidth="3" />
+                  <text x={tickX + 30} y={y(i) + 8} fontSize="42" fontWeight="700" fill="#1f1a14">
+                    {i}
+                  </text>
+                </g>
+              ))}
+              <polygon
+                points={`${tickX},${py} ${tickX - 20},${py - 12} ${tickX - 20},${py + 12}`}
+                fill="#c45c26"
+                stroke="#1f1a14"
+                strokeWidth="1.1"
+              />
+            </>
+          }
+        />
       </div>
       {caption}
     </Frame>

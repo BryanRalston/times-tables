@@ -50,10 +50,19 @@ describe("boards", () => {
       const d = q.data as MeasureData;
       const html = renderToStaticMarkup(<Board {...stub(q)} />);
       expect(html).toContain("polygon");
+      expect(html).toContain("inset-0");
       expect(html).toContain(">0<");
       expect(html).toContain(String(Math.floor(d.value)));
       expect(html).toContain(d.unit);
       expect(html).toContain("measure/");
+      if (d.attribute === "mass") {
+        expect(html).toContain("measure/scale");
+        expect(html).toMatch(/rotate\(/);
+      }
+      if (d.attribute === "volume") {
+        expect(html).toContain("measure/beaker");
+        expect(html).toContain("<rect");
+      }
     }
   });
 
