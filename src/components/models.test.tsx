@@ -5,7 +5,7 @@ import { makeQuestion } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
 import type { ChoiceData, ClockData, DecimalData, MeasureData, MoneyData, Question } from "@/lib/types";
 import { moneyFmt } from "@/lib/utils";
-import { Board, type BoardProps } from "./models";
+import { BEAKER_FACE, Board, beakerMeniscusY, type BoardProps } from "./models";
 
 function stub(q: Question): BoardProps {
   return {
@@ -146,5 +146,27 @@ describe("boards", () => {
       expect(html, id).toContain("polygon");
       expect(html, id).toContain("measure/");
     }
+  });
+
+  it("beaker fill meniscus maps to value/max on the inner wall", () => {
+    const q = makeQuestion(activityById("u8-volume")!.activity, rngFromSeed("beaker:fill"));
+    const d = q.data as MeasureData;
+    expect(d.attribute).toBe("volume");
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    const yAttr = html.match(/data-fill-y="([^"]+)"/);
+    const vAttr = html.match(/data-value="([^"]+)"/);
+    const mAttr = html.match(/data-max="([^"]+)"/);
+    expect(yAttr, "fill y").toBeTruthy();
+    expect(Number(vAttr?.[1])).toBe(d.value);
+    expect(Number(mAttr?.[1])).toBe(d.max);
+    const expected = beakerMeniscusY(d.value, d.max);
+    expect(Number(yAttr![1])).toBe(expected);
+    expect(expected).toBeLessThan(BEAKER_FACE.yBot);
+    expect(expected).toBeGreaterThanOrEqual(BEAKER_FACE.yTop);
+    const ratio = d.value / d.max;
+    const t = (BEAKER_FACE.yBot - expected) / (BEAKER_FACE.yBot - BEAKER_FACE.yTop);
+    expect(t).toBeCloseTo(ratio, 5);
+    expect(html).toMatch(/clip-?path/i);
+    expect(html).toContain("measure/beaker");
   });
 });

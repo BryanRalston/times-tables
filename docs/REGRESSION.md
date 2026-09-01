@@ -16,5 +16,6 @@ These already shipped (or shipped-and-broke). A test or script must fail if they
 | 10 | Length-read used yards/meters/etc. Must be `in` or `cm` only. | `answers-audit.test.ts` length read. |
 | 11 | MagentaVideo hid the PNG before the canvas painted; iPhone/coarse still tried chroma-key and showed an empty glyph. PNG stays until paint; skip on iOS/coarse. | `src/components/poke-toy.test.tsx` PNG in the tree; `src/components/magenta-video.test.ts` skip. |
 | 12 | Donut (and squishees) had two faces or leftover magenta. | `scripts/check-assets.py` (`npm run check:assets`, run from `npm test`). Two-eye-pair detector + magenta + missing files. |
+| 13 | Beaker interior was keyed out (glass ring). Teal fill sat *behind* the punch-out and did not read as liquid. | `scripts/check-assets.py` beaker bbox/tube center must be opaque. `models.test.tsx` beaker `data-fill-y` equals `beakerMeniscusY(value, max)`. |
 
 `npm test` = vitest + asset check. `npm run test:play` = answering Playwright (local preview).

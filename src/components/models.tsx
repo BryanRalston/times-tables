@@ -1104,7 +1104,13 @@ function ComputeBoard({ question, status, shake }: BoardProps) {
 /** Overlay viewBoxes match keyed public/measure PNGs. */
 const RULER_FACE = { w: 1229, h: 222, x0: 148, x1: 1188, y0: 36, yMaj: 92, yMin: 62, yNum: 142 };
 const SCALE_FACE = { w: 392, h: 717, cx: 170, cy: 331, r: 136, start: 225, sweep: 270 };
-const BEAKER_FACE = { w: 413, h: 979, x: 132, fw: 188, yTop: 228, yBot: 862, tickX: 250 };
+/** Inner cavity of public/measure/beaker.png (309×919). y grows down; meniscus at yBot when value is 0. */
+export const BEAKER_FACE = { w: 309, h: 919, x: 86, fw: 142, yTop: 78, yBot: 788, tickX: 220 };
+
+export function beakerMeniscusY(value: number, max: number, face = BEAKER_FACE): number {
+  const m = Math.max(1, max);
+  return face.yBot - (value / m) * (face.yBot - face.yTop);
+}
 
 function ToolFace({
   src,
@@ -1303,9 +1309,9 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
     );
   }
   const { w, h, x: fx, fw, yTop, yBot, tickX } = BEAKER_FACE;
-  const y = (i: number) => yBot - (i / max) * (yBot - yTop);
+  const y = (i: number) => beakerMeniscusY(i, max);
   const fillY = y(data.value);
-  const py = fillY;
+  const clipId = `beaker-inner-${question.id}`;
   return (
     <Frame shake={shake} status={status}>
       <div className="flex justify-center">
@@ -1315,19 +1321,38 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
           className="inline-block"
           imgClass="h-64 w-auto sm:h-72"
           label={label}
-          under={<rect x={fx} y={fillY} width={fw} height={yBot - fillY} rx="36" fill="#0d7377" opacity="0.55" />}
           over={
             <>
+              <defs>
+                <clipPath id={clipId}>
+                  <rect x={fx} y={yTop} width={fw} height={yBot - yTop} rx="12" />
+                </clipPath>
+              </defs>
+              <g clipPath={`url(#${clipId})`}>
+                <rect
+                  data-beaker-fill=""
+                  data-fill-y={fillY}
+                  data-value={data.value}
+                  data-max={max}
+                  x={fx}
+                  y={fillY}
+                  width={fw}
+                  height={Math.max(0, yBot - fillY)}
+                  fill="#0d7377"
+                  opacity="0.72"
+                />
+                <ellipse cx={fx + fw / 2} cy={fillY} rx={fw / 2} ry="9" fill="#14939a" opacity="0.88" />
+              </g>
               {Array.from({ length: max + 1 }, (_, i) => (
                 <g key={i}>
-                  <line x1={tickX} y1={y(i)} x2={tickX + 22} y2={y(i)} stroke="#1f1a14" strokeWidth="3" />
-                  <text x={tickX + 28} y={y(i) + 7} fontSize="36" fontWeight="700" fill="#1f1a14">
+                  <line x1={tickX - 16} y1={y(i)} x2={tickX + 4} y2={y(i)} stroke="#1f1a14" strokeWidth="3" />
+                  <text x={tickX + 10} y={y(i) + 6} fontSize="28" fontWeight="700" fill="#1f1a14">
                     {i}
                   </text>
                 </g>
               ))}
               <polygon
-                points={`${tickX},${py} ${tickX - 20},${py - 12} ${tickX - 20},${py + 12}`}
+                points={`${tickX - 18},${fillY} ${tickX - 38},${fillY - 11} ${tickX - 38},${fillY + 11}`}
                 fill="#c45c26"
                 stroke="#1f1a14"
                 strokeWidth="1.1"

@@ -207,6 +207,34 @@ def main() -> int:
             if two_faces(blobs, w, h):
                 fails.append(f"{name}: two face clusters ({len(blobs)} dark blobs)")
 
+    beaker = PUBLIC / "measure" / "beaker.png"
+    if not beaker.exists():
+        fails.append("missing measure/beaker.png")
+    else:
+        im = Image.open(beaker).convert("RGBA")
+        px = im.load()
+        bw, bh = im.size
+        minx, miny, maxx, maxy = bw, bh, 0, 0
+        for y in range(bh):
+            for x in range(bw):
+                if px[x, y][3] > 16:
+                    if x < minx:
+                        minx = x
+                    if y < miny:
+                        miny = y
+                    if x > maxx:
+                        maxx = x
+                    if y > maxy:
+                        maxy = y
+        cx, cy = (minx + maxx) // 2, (miny + maxy) // 2
+        # Tube mid-height, not the hex base.
+        ty = miny + int((maxy - miny) * 0.4)
+        if px[cx, cy][3] < 16 or px[cx, ty][3] < 16:
+            fails.append("beaker.png: cylinder center is transparent (interior keyed out)")
+        mag = magenta_count(px, bw, bh)
+        if mag > 8:
+            fails.append(f"beaker.png: leftover magenta {mag}px")
+
     for name in MONEY_FILES:
         path = MONEY / name
         if not path.exists():
