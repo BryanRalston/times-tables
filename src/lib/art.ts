@@ -16,4 +16,6 @@ export const ART = {
   remCelebrate: asset("art/rem-celebrate.png"),
   nodeOpen: asset("art/node-open.png"),
   nodeLocked: asset("art/node-locked.png"),
+  charsWide: asset("theme/chars-wide.jpg"),
+  charsTall: asset("theme/chars-tall.jpg"),
 } as const;
