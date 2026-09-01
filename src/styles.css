@@ -25,6 +25,7 @@
 
   --font-display: "Fraunces", Georgia, "Times New Roman", serif;
   --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --radius-full: 9999px;
 
   --shadow-soft: 0 10px 30px -18px rgb(31 26 20 / 0.35);
 }
@@ -39,25 +40,27 @@
   #app {
     min-height: 100%;
   }
-  html {
+  html,
+  body,
+  #app {
     background-color: #f4b3d0;
-    background-image: url("/times-tables/theme/jelly-tile.jpg");
-    background-size: 240px;
   }
   body {
-    background-color: transparent;
-    background-image: url("/times-tables/theme/jelly-wide.jpg"), url("/times-tables/theme/jelly-tile.jpg");
-    background-size: cover, 240px;
-    background-attachment: fixed, fixed;
-    background-position: center, center;
+    background-image: url("/times-tables/theme/chars-wide.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     color: var(--color-ink);
     font-family: var(--font-sans);
     line-height: 1.5;
   }
   @media (max-width: 720px) {
     body {
-      background-image: url("/times-tables/theme/jelly-tall.jpg"), url("/times-tables/theme/jelly-tile.jpg");
+      background-image: url("/times-tables/theme/chars-tall.jpg");
     }
+  }
+  .rounded-full {
+    border-radius: 9999px;
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {
@@ -123,9 +126,14 @@
 }
 
 .frost {
-  background-color: rgb(255 250 241 / 0.9);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background-color: rgb(255 250 241 / 0.94);
+}
+@media (hover: hover) and (pointer: fine) {
+  .frost {
+    background-color: rgb(255 250 241 / 0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
 }
 
 @keyframes hop {
@@ -228,6 +236,11 @@
 }
 .squash {
   animation: squash 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rare-glow {
+  border-radius: 9999px;
+  box-shadow: 0 0 0 3px rgb(196 92 38 / 0.45), 0 0 18px rgb(196 92 38 / 0.55);
 }
 
 details > summary {

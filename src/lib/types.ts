@@ -260,6 +260,7 @@ export interface LearnerSlice {
   sessions: Record<string, DaySession>;
   squishees: string[];
   attempts: Record<string, number>;
+  perfectWalks: number;
 }
 
 export interface SaveState extends LearnerSlice {

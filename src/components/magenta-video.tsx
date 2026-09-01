@@ -7,6 +7,18 @@ function isMagenta(r: number, g: number, b: number): boolean {
 
 const keyed = new Map<string, string>();
 
+function isIos(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return (
+    /iP(hone|od|ad)/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  );
+}
+
+function isCoarse(): boolean {
+  return typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
+}
+
 export function MagentaImg({
   src,
   alt = "",
@@ -16,7 +28,7 @@ export function MagentaImg({
   alt?: string;
   className?: string;
 }) {
-  const [url, setUrl] = useState<string | null>(() => keyed.get(src) ?? null);
+  const [url, setUrl] = useState(() => keyed.get(src) ?? src);
 
   useEffect(() => {
     const hit = keyed.get(src);
@@ -24,44 +36,52 @@ export function MagentaImg({
       setUrl(hit);
       return;
     }
+    setUrl(src);
+    if (isIos() || isCoarse()) {
+      keyed.set(src, src);
+      return;
+    }
     const img = new Image();
     img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = img.naturalWidth || img.width;
-      canvas.height = img.naturalHeight || img.height;
-      const ctx = canvas.getContext("2d");
-      if (!ctx || !canvas.width) {
-        setUrl(src);
-        return;
-      }
-      ctx.drawImage(img, 0, 0);
-      const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const d = frame.data;
-      let transparent = 0;
-      const sample = Math.min(400, d.length / 4);
-      for (let i = 0; i < sample * 4; i += 4) {
-        if ((d[i + 3] ?? 255) < 16) transparent += 1;
-      }
-      if (src.endsWith(".png") && transparent > sample * 0.2) {
+      try {
+        const nw = img.naturalWidth || img.width;
+        const nh = img.naturalHeight || img.height;
+        const max = 512;
+        const scale = Math.min(1, max / Math.max(nw, nh, 1));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(nw * scale));
+        canvas.height = Math.max(1, Math.round(nh * scale));
+        const ctx = canvas.getContext("2d");
+        if (!ctx || !canvas.width) return;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const d = frame.data;
+        let transparent = 0;
+        const sample = Math.min(400, d.length / 4);
+        for (let i = 0; i < sample * 4; i += 4) {
+          if ((d[i + 3] ?? 255) < 16) transparent += 1;
+        }
+        if (src.endsWith(".png") && transparent > sample * 0.2) {
+          keyed.set(src, src);
+          setUrl(src);
+          return;
+        }
+        for (let i = 0; i < d.length; i += 4) {
+          if (isMagenta(d[i]!, d[i + 1]!, d[i + 2]!)) d[i + 3] = 0;
+        }
+        ctx.putImageData(frame, 0, 0);
+        const next = canvas.toDataURL("image/png");
+        keyed.set(src, next);
+        setUrl(next);
+      } catch {
         keyed.set(src, src);
         setUrl(src);
-        return;
       }
-      for (let i = 0; i < d.length; i += 4) {
-        if (isMagenta(d[i]!, d[i + 1]!, d[i + 2]!)) d[i + 3] = 0;
-      }
-      ctx.putImageData(frame, 0, 0);
-      const next = canvas.toDataURL("image/png");
-      keyed.set(src, next);
-      setUrl(next);
     };
     img.onerror = () => setUrl(src);
     img.src = src;
   }, [src]);
 
-  if (!url) {
-    return <span className={cn("inline-block", className)} aria-hidden />;
-  }
   return <img src={url} alt={alt} draggable={false} className={cn("object-contain", className)} />;
 }
 
@@ -79,8 +99,10 @@ export function MagentaVideo({
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
+  const skip = isIos() || isCoarse();
 
   useEffect(() => {
+    if (skip) return;
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
@@ -92,22 +114,31 @@ export function MagentaVideo({
 
     const draw = () => {
       if (stopped) return;
-      if (video.readyState >= 2 && video.videoWidth) {
-        if (canvas.width !== video.videoWidth) {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
+      try {
+        if (video.readyState >= 2 && video.videoWidth) {
+          const max = 480;
+          const scale = Math.min(1, max / Math.max(video.videoWidth, video.videoHeight, 1));
+          const w = Math.max(1, Math.round(video.videoWidth * scale));
+          const h = Math.max(1, Math.round(video.videoHeight * scale));
+          if (canvas.width !== w) {
+            canvas.width = w;
+            canvas.height = h;
+          }
+          ctx.drawImage(video, 0, 0, w, h);
+          const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const d = frame.data;
+          for (let i = 0; i < d.length; i += 4) {
+            if (isMagenta(d[i]!, d[i + 1]!, d[i + 2]!)) d[i + 3] = 0;
+          }
+          ctx.putImageData(frame, 0, 0);
+          if (!painted) {
+            painted = true;
+            setReady(true);
+          }
         }
-        ctx.drawImage(video, 0, 0);
-        const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const d = frame.data;
-        for (let i = 0; i < d.length; i += 4) {
-          if (isMagenta(d[i]!, d[i + 1]!, d[i + 2]!)) d[i + 3] = 0;
-        }
-        ctx.putImageData(frame, 0, 0);
-        if (!painted) {
-          painted = true;
-          setReady(true);
-        }
+      } catch {
+        stopped = true;
+        return;
       }
       raf = requestAnimationFrame(draw);
     };
@@ -122,7 +153,9 @@ export function MagentaVideo({
       video.removeEventListener("ended", ended);
       video.pause();
     };
-  }, [src, onEnded, loop]);
+  }, [src, onEnded, loop, skip]);
+
+  if (skip) return null;
 
   return (
     <div className={cn("relative", className)}>

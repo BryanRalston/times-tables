@@ -213,7 +213,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       });
     }
     if (kind === "welcome") markWelcome();
-    const toy = earnSquishee();
+    const toy = earnSquishee({ pct, kind });
     setPrize(toy);
     playStar();
     setPose("star");
@@ -294,7 +294,11 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
           {prize ? (
             <div className="mt-4">
               <MagentaImg src={squisheeSrc(prize)} alt="" className="mx-auto h-28 w-28 squash" />
-              <p className="text-sm text-teal">{ui.youEarned(squisheeById(prize)?.name ?? prize)}</p>
+              <p className="text-sm text-teal">
+                {squisheeById(prize)?.rarity === "rare"
+                  ? ui.youFoundRare(squisheeById(prize)?.name ?? prize)
+                  : ui.youEarned(squisheeById(prize)?.name ?? prize)}
+              </p>
             </div>
           ) : null}
           <Button className="mt-6 w-full" size="lg" onClick={() => navigate({ id: "home" }, { replace: true })}>

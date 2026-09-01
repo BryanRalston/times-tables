@@ -1,11 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { todayIso } from "./calendar";
 import { UNIT_SPANS, UNITS, unitById } from "./curriculum";
-import { nextSquishee } from "./squishees";
 import { parseLocale } from "./i18n";
+import { pickPrize, type EarnKind } from "./squishees";
+import { schoolStreak } from "./streak";
 import type { DaySession, LearnerSlice, Locale, SaveState } from "./types";
 
-const SAVE_VERSION = 4;
+const SAVE_VERSION = 5;
 const STORAGE_KEY = "g3-path-v2";
 const DEFAULT_ID = "kid-1";
 
@@ -20,6 +22,7 @@ export function emptyLearner(name = ""): LearnerSlice {
     sessions: {},
     squishees: [],
     attempts: {},
+    perfectWalks: 0,
   };
 }
 
@@ -34,6 +37,7 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
     sessions: s.sessions,
     squishees: s.squishees ?? [],
     attempts: s.attempts ?? {},
+    perfectWalks: s.perfectWalks ?? 0,
   };
 }
 
@@ -64,10 +68,12 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
     sessions: raw.sessions ?? {},
     squishees: raw.squishees ?? [],
     attempts: raw.attempts ?? {},
+    perfectWalks: raw.perfectWalks ?? 0,
   });
   const learners = { ...(raw.learners ?? {}) };
   if (!learners[learnerId]) learners[learnerId] = fromFlat;
-  const cur = sliceOf(learners[learnerId] ?? fromFlat);
+  for (const id of Object.keys(learners)) learners[id] = sliceOf(learners[id]!);
+  const cur = learners[learnerId] ?? fromFlat;
   return {
     version: SAVE_VERSION,
     learnerId,
@@ -97,7 +103,7 @@ interface ProgressApi extends SaveState {
   recordSession: (session: DaySession) => void;
   noteFact: (key: string, ok: boolean) => void;
   beginPlay: (activityId: string) => number;
-  earnSquishee: () => string | null;
+  earnSquishee: (opts: { pct: number; kind: EarnKind }) => string | null;
   switchLearner: (id: string) => void;
   addLearner: (name: string) => string;
   resetAll: () => void;
@@ -137,6 +143,7 @@ export const useProgress = create<ProgressApi>()(
         const stars = Math.max(prev.stars, pct >= 1 ? 3 : pct >= 0.7 ? 2 : pct >= 0.4 ? 1 : 0);
         commit(get, set, {
           stars: get().stars + earned,
+          perfectWalks: get().perfectWalks + (total > 0 && correct === total ? 1 : 0),
           activities: {
             ...get().activities,
             [activityId]: {
@@ -176,12 +183,22 @@ export const useProgress = create<ProgressApi>()(
         commit(get, set, { attempts });
         return n;
       },
-      earnSquishee: () => {
-        const id = get().learnerId;
-        const earned = get().squishees;
-        const next = nextSquishee(earned, id, earned.length);
+      earnSquishee: ({ pct, kind }) => {
+        const st = get();
+        const next = pickPrize(
+          {
+            earned: st.squishees,
+            stars: st.stars,
+            perfectWalks: st.perfectWalks,
+            streak: schoolStreak(st.sessions, todayIso()),
+            activities: st.activities,
+            kind,
+            pct,
+          },
+          st.learnerId,
+        );
         if (!next) return null;
-        commit(get, set, { squishees: [...earned, next] });
+        commit(get, set, { squishees: [...st.squishees, next] });
         return next;
       },
       switchLearner: (id) => {
@@ -233,6 +250,7 @@ export const useProgress = create<ProgressApi>()(
         sessions: s.sessions,
         squishees: s.squishees,
         attempts: s.attempts,
+        perfectWalks: s.perfectWalks,
         learners: s.learners,
       }),
       merge: (persisted, current) => {
@@ -244,9 +262,25 @@ export const useProgress = create<ProgressApi>()(
 );
 
 export function hydrateProgress() {
-  void Promise.resolve(useProgress.persist.rehydrate()).finally(() => {
-    useProgress.getState().setHydrated(true);
-  });
+  const done = () => {
+    try {
+      useProgress.getState().setHydrated(true);
+    } catch {
+      /* ignore */
+    }
+  };
+  done();
+  let t = 0;
+  if (typeof window !== "undefined") t = window.setTimeout(done, 400);
+  try {
+    void Promise.resolve(useProgress.persist.rehydrate()).finally(() => {
+      if (t) window.clearTimeout(t);
+      done();
+    });
+  } catch {
+    if (t) window.clearTimeout(t);
+    done();
+  }
 }
 
 export function unitStars(unitId: string): number {
