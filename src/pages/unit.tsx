@@ -11,8 +11,9 @@ import { sessionsForUnit, useProgress } from "@/lib/progress";
 export function UnitPage({ unitId }: { unitId: string }) {
   const unit = unitById(unitId);
   const classUnitId = useProgress((s) => s.classUnitId);
+  const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
   const activities = useProgress((s) => s.activities);
-  const suggested = suggestedUnitId(todayIso(), classUnitId || undefined);
+  const suggested = suggestedUnitId(todayIso(), classUnitId || undefined, pathGrade);
 
   if (!unit) {
     return (

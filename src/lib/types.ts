@@ -1,5 +1,11 @@
 export type Locale = "en" | "es" | "pt-BR";
 
+export type PathGrade = 3 | 4;
+
+export function parsePathGrade(v: unknown): PathGrade {
+  return v === 4 || v === "4" ? 4 : 3;
+}
+
 export type QuarterId = 1 | 2 | 3 | 4;
 
 export type Kind =
@@ -22,7 +28,10 @@ export type Kind =
   | "fluency"
   | "measure"
   | "compute"
-  | "jumps";
+  | "jumps"
+  | "decimal"
+  | "fracop"
+  | "lines";
 
 export type InputMode =
   | "keypad"
@@ -188,7 +197,7 @@ export interface MeasureData {
   unit: string;
   value: number;
   max: number;
-  mode: "read" | "estimate" | "unit";
+  mode: "read" | "estimate" | "unit" | "convert";
 }
 
 export interface ComputeData {
@@ -202,6 +211,28 @@ export interface JumpsData {
   size: number;
   jumps: number;
   hide: "product" | "jumps" | "size";
+}
+
+export interface DecimalData {
+  whole: number;
+  tenths: number;
+  hundredths: number;
+  thousandths?: number;
+  mode: "read" | "add" | "sub";
+  b?: { whole: number; tenths: number; hundredths: number };
+}
+
+export interface FracOpData {
+  a: number;
+  b: number;
+  den: number;
+  op: "+" | "−";
+}
+
+export interface LinesData {
+  figure: "point" | "line" | "ray" | "segment" | "angle" | "parallel" | "perpendicular";
+  degrees?: number;
+  pair?: "parallel" | "perpendicular" | "neither";
 }
 
 export interface Question {
@@ -237,7 +268,10 @@ export interface Question {
     | FluencyData
     | MeasureData
     | ComputeData
-    | JumpsData;
+    | JumpsData
+    | DecimalData
+    | FracOpData
+    | LinesData;
 }
 
 export interface ActivitySave {
@@ -277,6 +311,7 @@ export interface SaveState extends LearnerSlice {
   version: number;
   learnerId: string;
   classUnitId: string;
+  pathGrade: PathGrade;
   skipWeekend: boolean;
   locale: Locale;
   learners: Record<string, LearnerSlice>;

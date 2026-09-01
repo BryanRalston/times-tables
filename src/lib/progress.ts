@@ -1,11 +1,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { applyBuy, type BuyReason } from "./coins";
-import { UNIT_SPANS, UNITS, unitById } from "./curriculum";
+import { GRADE4_SPANS, UNIT_SPANS, UNITS, unitById, unitsFor } from "./curriculum";
 import { parseLocale } from "./i18n";
-import type { DaySession, LearnerSlice, Locale, SaveState } from "./types";
+import type { DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
+import { parsePathGrade } from "./types";
 
-const SAVE_VERSION = 6;
+const SAVE_VERSION = 7;
 const STORAGE_KEY = "g3-path-v2";
 const DEFAULT_ID = "kid-1";
 
@@ -47,6 +48,7 @@ function empty(): SaveState {
     version: SAVE_VERSION,
     learnerId: DEFAULT_ID,
     classUnitId: "",
+    pathGrade: 3,
     skipWeekend: true,
     locale: "en",
     learners: { [DEFAULT_ID]: kid },
@@ -75,10 +77,14 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
   if (!learners[learnerId]) learners[learnerId] = fromFlat;
   for (const id of Object.keys(learners)) learners[id] = sliceOf(learners[id]!);
   const cur = learners[learnerId] ?? fromFlat;
+  const pathGrade = parsePathGrade(raw.pathGrade);
+  let classUnitId = raw.classUnitId ?? "";
+  if (classUnitId && !unitsFor(pathGrade).some((u) => u.id === classUnitId)) classUnitId = "";
   return {
     version: SAVE_VERSION,
     learnerId,
-    classUnitId: raw.classUnitId ?? "",
+    classUnitId,
+    pathGrade,
     skipWeekend: raw.skipWeekend !== false,
     locale: parseLocale(raw.locale),
     learners,
@@ -92,6 +98,7 @@ interface ProgressApi extends SaveState {
   setName: (name: string) => void;
   markWelcome: () => void;
   setClassUnit: (id: string) => void;
+  setPathGrade: (grade: PathGrade) => void;
   setSkipWeekend: (v: boolean) => void;
   setLocale: (locale: Locale) => void;
   recordRound: (opts: {
@@ -131,6 +138,11 @@ export const useProgress = create<ProgressApi>()(
       setName: (name) => commit(get, set, { name: name.trim().slice(0, 24) }),
       markWelcome: () => commit(get, set, { seenWelcome: true }),
       setClassUnit: (id) => set({ classUnitId: id }),
+      setPathGrade: (grade) => {
+        const pathGrade = parsePathGrade(grade);
+        const classUnitId = unitsFor(pathGrade).some((u) => u.id === get().classUnitId) ? get().classUnitId : "";
+        set({ pathGrade, classUnitId });
+      },
       setSkipWeekend: (v) => set({ skipWeekend: v }),
       setLocale: (locale) => set({ locale: parseLocale(locale) }),
       recordRound: ({ activityId, correct, total, earned, misses }) => {
@@ -219,6 +231,7 @@ export const useProgress = create<ProgressApi>()(
           hydrated: true,
           learnerId: id,
           classUnitId: get().classUnitId,
+          pathGrade: get().pathGrade,
           skipWeekend: get().skipWeekend,
           locale: get().locale,
           learners: { ...get().learners, [id]: kid },
@@ -236,6 +249,7 @@ export const useProgress = create<ProgressApi>()(
         stars: s.stars,
         seenWelcome: s.seenWelcome,
         classUnitId: s.classUnitId,
+        pathGrade: s.pathGrade,
         skipWeekend: s.skipWeekend,
         locale: s.locale,
         activities: s.activities,
@@ -300,7 +314,7 @@ export function sessionsForUnit(unitId: string): number {
 }
 
 export function unitExhausted(unitId: string): boolean {
-  const span = UNIT_SPANS.find((s) => s.id === unitId);
+  const span = UNIT_SPANS.find((s) => s.id === unitId) ?? GRADE4_SPANS.find((s) => s.id === unitId);
   if (!span) return false;
   const need = Math.max(6, Math.floor((span.end - span.start + 1) * 0.5));
   return sessionsForUnit(unitId) >= need;

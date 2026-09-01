@@ -1,5 +1,9 @@
 import { SCHOOL_DAYS, lastSchoolDayOnOrBefore, schoolDayIndex, todayIso } from "./calendar";
-import type { ActivityDef, QuarterId, UnitDef } from "./types";
+import type { ActivityDef, PathGrade, QuarterId, UnitDef } from "./types";
+import { parsePathGrade } from "./types";
+
+export { parsePathGrade };
+export type { PathGrade };
 
 export const QUARTERS: {
   id: QuarterId;
@@ -24,6 +28,23 @@ function A(
 ): ActivityDef {
   return { id, title, blurb, sol, kind, rounds, params };
 }
+
+export const GRADE4_SOLS = [
+  "4.NS.1",
+  "4.NS.2",
+  "4.NS.3",
+  "4.NS.4",
+  "4.CE.1",
+  "4.CE.2",
+  "4.CE.3",
+  "4.CE.4",
+  "4.MG.1",
+  "4.MG.2",
+  "4.MG.3",
+  "4.MG.4",
+  "4.PS.1",
+  "4.PFA.1",
+] as const;
 
 export const GRADE3_SOLS = [
   "3.NS.1",
@@ -288,39 +309,286 @@ export const UNIT_SPANS: { id: string; start: number; end: number }[] = [
   { id: "u13", start: 170, end: 179 },
 ];
 
+export const GRADE4_UNITS: UnitDef[] = [
+  {
+    id: "g4-u1",
+    number: 1,
+    quarter: 1,
+    title: "Place Value Through Hundred Millions",
+    short: "Nine-digit place",
+    sol: ["4.NS.1"],
+    blurb: "Read, write, and name the place and value of digits through hundred millions.",
+    activities: [
+      A("g4-u1-place", "Place and value", "Nine-digit numbers. Name the place and the value.", ["4.NS.1"], "placevalue", { nine: true }),
+      A("g4-u1-word", "Word form", "Nine-digit numbers: words ↔ digits.", ["4.NS.1"], "placevalue", { mode: "word", nine: true }),
+    ],
+  },
+  {
+    id: "g4-u2",
+    number: 2,
+    quarter: 1,
+    title: "Compare and Order Whole Numbers",
+    short: "Compare 7 digits",
+    sol: ["4.NS.2"],
+    blurb: "Compare and order whole numbers up to seven digits.",
+    activities: [
+      A("g4-u2-compare", "Compare", "Greater than, less than, equal — up to 7 digits.", ["4.NS.2"], "compare", { digits: 7 }),
+      A("g4-u2-order", "Put in order", "Least to greatest, seven-digit numbers.", ["4.NS.2"], "order", { digits: 7 }),
+    ],
+  },
+  {
+    id: "g4-u3",
+    number: 3,
+    quarter: 1,
+    title: "Add and Subtract Whole Numbers",
+    short: "Add and subtract",
+    sol: ["4.CE.1"],
+    blurb: "Estimate and compute sums and differences. Multi-step. No 1,000 cap.",
+    activities: [
+      A("g4-u3-add", "Add and subtract", "Whole numbers past 1,000.", ["4.CE.1"], "compute", { mode: "exact", cap: 0 }),
+      A("g4-u3-estimate", "About how many", "Round to estimate a sum or difference.", ["4.CE.1"], "compute", { mode: "estimate", cap: 0 }),
+      A("g4-u3-two", "Two-step stories", "Then do this — with a model.", ["4.CE.1"], "word", { mode: "two" }),
+    ],
+  },
+  {
+    id: "g4-u4",
+    number: 4,
+    quarter: 2,
+    title: "Facts Through 12 and Related Division",
+    short: "Facts to 12",
+    sol: ["4.CE.2"],
+    blurb: "Fluency through 12 × 12. Two-digit times one-digit. Related division.",
+    activities: [
+      A("g4-u4-facts", "Mixed facts", "× and ÷ through 12 × 12.", ["4.CE.2"], "fluency", { factors: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] }),
+      A("g4-u4-groups", "Equal groups", "Groups of 11 and 12 too.", ["4.CE.2"], "groups", { factors: [6, 7, 8, 9, 10, 11, 12] }),
+      A("g4-u4-twoby", "Two-digit × one", "Break apart tens and ones.", ["4.CE.2"], "fluency", { twoByOne: true }),
+      A("g4-u4-family", "Related facts", "One model, four facts, through 12.", ["4.CE.2"], "choice", { mode: "family", factors: [6, 7, 8, 9, 10, 11, 12] }),
+    ],
+  },
+  {
+    id: "g4-u5",
+    number: 5,
+    quarter: 2,
+    title: "Fractions",
+    short: "Fractions",
+    sol: ["4.NS.3"],
+    blurb: "Name, place, equivalent, and compare fractions with denominators through 12.",
+    activities: [
+      A("g4-u5-name", "Name the fraction", "Shaded pieces. Denominators to 12.", ["4.NS.3"], "fraction", { mode: "name", dens: [2, 3, 4, 5, 6, 8, 10, 12] }),
+      A("g4-u5-line", "On a number line", "Name the point. Denominators to 12.", ["4.NS.3"], "fraction", { mode: "line", dens: [2, 3, 4, 5, 6, 8, 10, 12] }),
+      A("g4-u5-equiv", "Same amount", "Different pieces, same bar.", ["4.NS.3"], "fraction", { mode: "equiv", dens: [2, 3, 4, 5, 6] }),
+      A("g4-u5-compare", "Which is more?", "Two bars, same whole.", ["4.NS.3"], "fraction", { mode: "compare", dens: [2, 3, 4, 5, 6, 8, 10, 12] }),
+    ],
+  },
+  {
+    id: "g4-u6",
+    number: 6,
+    quarter: 2,
+    title: "Add and Subtract Like Fractions",
+    short: "Like fractions",
+    sol: ["4.CE.3"],
+    blurb: "Add and subtract fractions with like denominators. Pieces you can see.",
+    activities: [
+      A("g4-u6-add", "Add like fractions", "Same-size pieces. How many in all?", ["4.CE.3"], "fracop", { op: "+" }),
+      A("g4-u6-sub", "Subtract like fractions", "Take pieces away. How many left?", ["4.CE.3"], "fracop", { op: "−" }),
+    ],
+  },
+  {
+    id: "g4-u7",
+    number: 7,
+    quarter: 3,
+    title: "Decimals Through Thousandths",
+    short: "Decimals",
+    sol: ["4.NS.4"],
+    blurb: "Read decimals through thousandths on a tenths/hundredths grid.",
+    activities: [
+      A("g4-u7-tenths", "Tenths", "A ten-cell bar. Read the decimal.", ["4.NS.4"], "decimal", { places: 1 }),
+      A("g4-u7-hundredths", "Hundredths", "A 10-by-10 grid. Read the decimal.", ["4.NS.4"], "decimal", { places: 2 }),
+      A("g4-u7-thousandths", "Thousandths", "Place chart through thousandths.", ["4.NS.4"], "decimal", { places: 3 }),
+    ],
+  },
+  {
+    id: "g4-u8",
+    number: 8,
+    quarter: 3,
+    title: "Add and Subtract Decimals",
+    short: "Decimal operations",
+    sol: ["4.CE.4"],
+    blurb: "Add and subtract tenths and hundredths on a grid.",
+    activities: [
+      A("g4-u8-add", "Add decimals", "Join two shaded grids.", ["4.CE.4"], "decimal", { mode: "add" }),
+      A("g4-u8-sub", "Subtract decimals", "Take shading away.", ["4.CE.4"], "decimal", { mode: "sub" }),
+    ],
+  },
+  {
+    id: "g4-u9",
+    number: 9,
+    quarter: 3,
+    title: "Elapsed Time",
+    short: "Elapsed time",
+    sol: ["4.MG.2"],
+    blurb: "Elapsed time in hours and minutes, within 12 hours. Two clocks.",
+    activities: [
+      A("g4-u9-elapsed", "Hours and minutes", "How much time from start to end?", ["4.MG.2"], "clock", { mode: "elapsed", minutes: true }),
+    ],
+  },
+  {
+    id: "g4-u10",
+    number: 10,
+    quarter: 3,
+    title: "Equivalent Customary Measures",
+    short: "Equivalent measures",
+    sol: ["4.MG.1"],
+    blurb: "Feet and inches, yards, pounds, gallons and quarts.",
+    activities: [
+      A("g4-u10-convert", "How many smaller units?", "2 feet = n inches. See the pieces.", ["4.MG.1"], "measure", { mode: "convert" }),
+      A("g4-u10-unit", "Pick the unit", "Best unit for the job.", ["4.MG.1"], "measure", { mode: "unit" }),
+    ],
+  },
+  {
+    id: "g4-u11",
+    number: 11,
+    quarter: 3,
+    title: "Area and Perimeter",
+    short: "Area and perimeter",
+    sol: ["4.MG.3"],
+    blurb: "Cover and go around. Missing side is n.",
+    activities: [
+      A("g4-u11-area", "Cover the grid", "How many unit squares?", ["4.MG.3"], "area"),
+      A("g4-u11-peri", "Around the shape", "Perimeter of a polygon.", ["4.MG.3"], "perimeter"),
+      A("g4-u11-missing", "Missing side", "Perimeter you know. One side is n.", ["4.MG.3"], "perimeter", { hide: true }),
+    ],
+  },
+  {
+    id: "g4-u12",
+    number: 12,
+    quarter: 4,
+    title: "Points, Lines, Rays, and Angles",
+    short: "Lines and angles",
+    sol: ["4.MG.4"],
+    blurb: "Identify points, lines, rays, segments, angles, parallel and perpendicular.",
+    activities: [
+      A("g4-u12-lines", "Name the figure", "Point, line, ray, or segment.", ["4.MG.4"], "lines", { mode: "figure" }),
+      A("g4-u12-angles", "Name the angle", "Acute, right, or obtuse.", ["4.MG.4"], "lines", { mode: "angle" }),
+      A("g4-u12-parallel", "Parallel or perpendicular", "How do the lines meet?", ["4.MG.4"], "lines", { mode: "pair" }),
+    ],
+  },
+  {
+    id: "g4-u13",
+    number: 13,
+    quarter: 4,
+    title: "The Data Cycle",
+    short: "Data cycle",
+    sol: ["4.PS.1"],
+    blurb: "Collect, organize, and read pictographs and bar graphs.",
+    activities: [
+      A("g4-u13-tally", "Tally and graph", "Sort the pictures. Watch the graph grow.", ["4.PS.1"], "graph", { kind: "picto", collect: true }),
+      A("g4-u13-bar", "Read a bar graph", "The bars grow. Then answer.", ["4.PS.1"], "graph", { kind: "bar", collect: true }),
+    ],
+  },
+  {
+    id: "g4-u14",
+    number: 14,
+    quarter: 4,
+    title: "Patterns",
+    short: "Patterns",
+    sol: ["4.PFA.1"],
+    blurb: "Growing and shrinking patterns, including multiplication.",
+    activities: [
+      A("g4-u14-pattern", "Add and subtract patterns", "Identify, describe, and extend +/− patterns.", ["4.PFA.1"], "pattern", { steps: [2, 3, 4, 5, 6, 8, 10] }),
+      A("g4-u14-mult", "Multiply patterns", "Each term is multiplied. What is hiding?", ["4.PFA.1"], "pattern", { multiply: true }),
+    ],
+  },
+  {
+    id: "g4-u15",
+    number: 15,
+    quarter: 4,
+    title: "Mixed Review",
+    short: "Year mix",
+    sol: ["4.CE.1", "4.CE.2", "4.NS.4", "4.CE.3", "4.MG.4"],
+    blurb: "A mix from the Grade 4 year. Still a walk, not a test.",
+    activities: [
+      A("g4-u15-compute", "Add and subtract mix", "Whole numbers from the year.", ["4.CE.1"], "compute", { mode: "exact", cap: 0 }),
+      A("g4-u15-facts", "Facts mix", "Through 12 × 12.", ["4.CE.2"], "fluency", { factors: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] }),
+      A("g4-u15-dec", "Decimals mix", "Read a tenths or hundredths grid.", ["4.NS.4"], "decimal", { places: 2 }),
+      A("g4-u15-frac", "Like fractions mix", "Add or subtract same-size pieces.", ["4.CE.3"], "fracop"),
+      A("g4-u15-lines", "Figures mix", "Name the line or angle.", ["4.MG.4"], "lines"),
+    ],
+  },
+];
+
+export const GRADE4_SPANS: { id: string; start: number; end: number }[] = [
+  { id: "g4-u1", start: 0, end: 14 },
+  { id: "g4-u2", start: 15, end: 29 },
+  { id: "g4-u3", start: 30, end: 48 },
+  { id: "g4-u4", start: 49, end: 61 },
+  { id: "g4-u5", start: 62, end: 74 },
+  { id: "g4-u6", start: 75, end: 85 },
+  { id: "g4-u7", start: 86, end: 96 },
+  { id: "g4-u8", start: 97, end: 107 },
+  { id: "g4-u9", start: 108, end: 117 },
+  { id: "g4-u10", start: 118, end: 127 },
+  { id: "g4-u11", start: 128, end: 136 },
+  { id: "g4-u12", start: 137, end: 147 },
+  { id: "g4-u13", start: 148, end: 158 },
+  { id: "g4-u14", start: 159, end: 169 },
+  { id: "g4-u15", start: 170, end: 179 },
+];
+
+export function unitsFor(grade: PathGrade | unknown = 3): UnitDef[] {
+  return parsePathGrade(grade) === 4 ? GRADE4_UNITS : UNITS;
+}
+
+export function spansFor(grade: PathGrade | unknown = 3): { id: string; start: number; end: number }[] {
+  return parsePathGrade(grade) === 4 ? GRADE4_SPANS : UNIT_SPANS;
+}
+
+function spanOf(unitId: string): { id: string; start: number; end: number } | undefined {
+  return UNIT_SPANS.find((s) => s.id === unitId) ?? GRADE4_SPANS.find((s) => s.id === unitId);
+}
+
 export function unitById(id: string): UnitDef | undefined {
-  return UNITS.find((u) => u.id === id);
+  return UNITS.find((u) => u.id === id) ?? GRADE4_UNITS.find((u) => u.id === id);
 }
 
 export function activityById(id: string): { unit: UnitDef; activity: ActivityDef } | undefined {
   if (id === WELCOME_ACTIVITY.id) {
     return { unit: UNITS[0]!, activity: WELCOME_ACTIVITY };
   }
-  for (const unit of UNITS) {
+  for (const unit of [...UNITS, ...GRADE4_UNITS]) {
     const activity = unit.activities.find((a) => a.id === id);
     if (activity) return { unit, activity };
   }
   return undefined;
 }
 
-export function suggestedUnitId(iso?: string, classUnitId?: string): string {
-  if (classUnitId && unitById(classUnitId)) return classUnitId;
+export function suggestedUnitId(iso?: string, classUnitId?: string, grade: PathGrade | unknown = 3): string {
+  const g = parsePathGrade(grade);
+  const list = unitsFor(g);
+  const first = list[0]?.id ?? "u1";
+  const last = list[list.length - 1]?.id ?? first;
+  if (classUnitId && list.some((u) => u.id === classUnitId)) return classUnitId;
   const raw = iso ?? todayIso();
-  if (!SCHOOL_DAYS.length) return "u1";
-  if (raw < SCHOOL_DAYS[0]!) return "u1";
+  if (!SCHOOL_DAYS.length) return first;
+  if (raw < SCHOOL_DAYS[0]!) return first;
   const day = schoolDayIndex(raw) >= 0 ? raw : lastSchoolDayOnOrBefore(raw) ?? raw;
   const idx = schoolDayIndex(day);
-  if (idx < 0) return "u13";
-  const span = UNIT_SPANS.find((s) => idx >= s.start && idx <= s.end);
-  return span?.id ?? "u1";
+  if (idx < 0) return last;
+  const span = spansFor(g).find((s) => idx >= s.start && idx <= s.end);
+  return span?.id ?? first;
 }
 
 export function unitSpanDays(unitId: string): number {
-  const s = UNIT_SPANS.find((x) => x.id === unitId);
+  const s = spanOf(unitId);
   return s ? s.end - s.start + 1 : 0;
 }
 
 export function fluencyFactorsForUnit(unitId: string): number[] {
+  if (unitId.startsWith("g4-")) {
+    const n = unitById(unitId)?.number ?? 1;
+    if (n >= 4) return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    return [0, 1, 2, 5, 10];
+  }
   const n = unitById(unitId)?.number ?? 1;
   if (n >= 12) return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   if (n >= 9) return [0, 1, 2, 3, 4, 5, 8, 9, 10];
@@ -328,14 +596,15 @@ export function fluencyFactorsForUnit(unitId: string): number[] {
   return [1, 2, 5];
 }
 
-export function coversSol(code: string): boolean {
-  return UNITS.some((u) => u.activities.some((a) => a.sol.some((s) => s === code || s.startsWith(`${code}.`))));
+export function coversSol(code: string, grade: PathGrade | unknown = 3): boolean {
+  return unitsFor(grade).some((u) => u.activities.some((a) => a.sol.some((s) => s === code || s.startsWith(`${code}.`))));
 }
 
 export function earlierUnits(unitId: string): UnitDef[] {
   const u = unitById(unitId);
   if (!u) return [];
-  return UNITS.filter((x) => x.number < u.number);
+  const list = unitId.startsWith("g4-") ? GRADE4_UNITS : UNITS;
+  return list.filter((x) => x.number < u.number);
 }
 
 export function quarterForUnit(unitId: string): QuarterId {
@@ -343,7 +612,7 @@ export function quarterForUnit(unitId: string): QuarterId {
 }
 
 export function unitWindowLabel(unitId: string): string {
-  const s = UNIT_SPANS.find((x) => x.id === unitId);
+  const s = spanOf(unitId);
   if (!s) return "";
   const a = SCHOOL_DAYS[s.start];
   const b = SCHOOL_DAYS[s.end];
@@ -357,7 +626,7 @@ export function unitWindowLabel(unitId: string): string {
 }
 
 export function remainingSchoolDaysInUnit(unitId: string, iso: string): number {
-  const s = UNIT_SPANS.find((x) => x.id === unitId);
+  const s = spanOf(unitId);
   if (!s) return 0;
   const idx = schoolDayIndex(iso);
   if (idx < 0) return s.end - s.start + 1;

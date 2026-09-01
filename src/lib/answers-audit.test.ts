@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { UNITS, activityById } from "./curriculum";
+import { GRADE4_UNITS, UNITS, activityById } from "./curriculum";
 import { makeQuestion, wordForm } from "./questions";
 import { rngFromSeed } from "./rng";
 import type {
@@ -30,7 +30,7 @@ const COIN: Record<string, number> = {
 
 describe("answer audit", () => {
   it("every activity's choices include the scored answer", () => {
-    for (const unit of UNITS) {
+    for (const unit of [...UNITS, ...GRADE4_UNITS]) {
       for (const activity of unit.activities) {
         for (let i = 0; i < 25; i++) {
           const q = makeQuestion(activity, rngFromSeed(`${activity.id}:${i}`));
@@ -38,7 +38,7 @@ describe("answer audit", () => {
             expect(q.choices?.includes(q.answer), `${activity.id} missing ${q.answer}`).toBe(true);
             expect((q.choices ?? []).length).toBeGreaterThanOrEqual(2);
           }
-          expect(q.answer.length).toBeGreaterThan(0);
+          expect(q.answer.length, activity.id).toBeGreaterThan(0);
         }
       }
     }

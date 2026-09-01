@@ -1,4 +1,4 @@
-import { GRAPH_CATS, NAMES, PLACE, qCopy, SHAPE, THINGS, parseLocale, wordForm as formWords, type Locale } from "./i18n";
+import { G4Q, GRAPH_CATS, NAMES, PLACE, qCopy, SHAPE, THINGS, parseLocale, wordForm as formWords, type Locale } from "./i18n";
 import type { Rng } from "./rng";
 import { rngRandom } from "./rng";
 import type {
@@ -7,10 +7,13 @@ import type {
   ClockData,
   Coin,
   ComputeData,
+  DecimalData,
   FractionData,
+  FracOpData,
   GraphData,
   GroupsData,
   ItemSource,
+  LinesData,
   MeasureData,
   MoneyData,
   PerimeterData,
@@ -96,7 +99,7 @@ function groupsQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const hide = (params.hide as GroupsData["hide"] | undefined) ?? rng.pick(["groups", "size", "product"]);
   const sizePool = hide === "groups" ? pool.filter((n) => n >= 1) : pool.filter((n) => n > 0 || hide === "product");
   const size = rng.pick(sizePool.length ? sizePool : [2, 3, 4, 5]);
-  const groups = rng.int(2, 6);
+  const groups = rng.int(2, size >= 11 ? 4 : 6);
   const product = size * groups;
   let prompt = "";
   let answer = "";
@@ -127,7 +130,7 @@ function groupsQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 
 function arrayQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const pool = (params.factors as number[] | undefined) ?? [2, 3, 4, 5, 6];
-  const cols = rng.pick(pool.filter((n) => n >= 2 && n <= 8));
+  const cols = rng.pick(pool.filter((n) => n >= 2 && n <= 12));
   const rows = rng.int(2, 6);
   const hide = rng.pick(["rows", "cols", "product"] as const);
   const product = rows * cols;
@@ -166,7 +169,7 @@ function placeValueQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     });
   }
   if (params.mode === "word") {
-    const n = rng.int(102500, 987654);
+    const n = params.nine ? rng.int(1_250_000, 98_765_432) : rng.int(102500, 987654);
     const words = wordForm(n, loc);
     const distractors = [wordForm(n + 1000, loc), wordForm(Math.max(n - 10000, 102500), loc), wordForm(n + 100000 > 999999 ? n - 100000 : n + 100000, loc)];
     const wordChoices = ensureChoices(rng, words, distractors);
@@ -183,13 +186,14 @@ function placeValueQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       answer: toWords ? words : shown,
       input: "choice",
       choices: toWords ? wordChoices : numChoices,
-      data: { number: n, digit: Number(String(n)[0]), place: "hundred thousands", mode: "word", words } satisfies PlaceValueData,
+      data: { number: n, digit: Number(String(n)[0]), place: params.nine ? "millions" : "hundred thousands", mode: "word", words } satisfies PlaceValueData,
     });
   }
   const six = Boolean(params.six);
-  const digits = six ? rng.int(5, 6) : rng.int(3, 4);
-  const min = digits === 3 ? 105 : digits === 4 ? 1025 : digits === 5 ? 10250 : 102500;
-  const max = digits === 3 ? 980 : digits === 4 ? 9876 : digits === 5 ? 98000 : 987654;
+  const nine = Boolean(params.nine);
+  const digits = nine ? rng.int(7, 9) : six ? rng.int(5, 6) : rng.int(3, 4);
+  const min = digits === 3 ? 105 : digits === 4 ? 1025 : digits === 5 ? 10250 : digits === 6 ? 102500 : digits === 7 ? 1_025_000 : digits === 8 ? 10_250_000 : 102_500_000;
+  const max = digits === 3 ? 980 : digits === 4 ? 9876 : digits === 5 ? 98000 : digits === 6 ? 987654 : digits === 7 ? 9_876_543 : digits === 8 ? 98_765_432 : 987_654_321;
   const n = rng.int(min, max);
   const s = String(n);
   const counts: Record<string, number> = {};
@@ -237,9 +241,12 @@ function buildQ(rng: Rng): Question {
   });
 }
 
-function compareQ(rng: Rng): Question {
-  const a = rng.int(120, 9800);
-  let b = rng.int(120, 9800);
+function compareQ(rng: Rng, params: Record<string, unknown> = {}): Question {
+  const digits = Number(params.digits ?? 0);
+  const lo = digits >= 7 ? 1_000_000 : 120;
+  const hi = digits >= 7 ? 9_999_999 : 9800;
+  const a = rng.int(lo, hi);
+  let b = rng.int(lo, hi);
   if (rng.next() < 0.15) b = a;
   const ans = a < b ? "<" : a > b ? ">" : "=";
   return keypadQ(rng, {
@@ -267,9 +274,12 @@ function orderQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       choices: nums.map((n) => `${n}/${den}`),
     });
   }
+  const digits = Number(params.digits ?? 0);
+  const lo = digits >= 7 ? 1_000_000 : 100;
+  const hi = digits >= 7 ? 9_999_999 : 9000;
   const numbers: number[] = [];
   while (numbers.length < 3) {
-    const n = rng.int(100, 9000);
+    const n = rng.int(lo, hi);
     if (!numbers.includes(n)) numbers.push(n);
   }
   const dir = rng.pick(["asc", "desc"] as const);
@@ -287,7 +297,7 @@ function orderQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 function familyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const pool = ((params.factors as number[] | undefined) ?? [2, 3, 4, 5, 6]).filter((n) => n >= 2);
   const a = rng.pick(pool);
-  const b = rng.int(2, 6);
+  const b = rng.int(2, pool.some((n) => n >= 11) ? 12 : 6);
   const p = a * b;
   const facts = [`${a} × ${b} = ${p}`, `${b} × ${a} = ${p}`, `${p} ÷ ${a} = ${b}`, `${p} ÷ ${b} = ${a}`];
   const ask = rng.pick(facts);
@@ -430,11 +440,12 @@ function shapeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 }
 
 function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
-  const den = rng.pick([...DENS]);
+  const dens = ((params.dens as number[] | undefined) ?? [...DENS]).filter((n) => n >= 2);
+  const den = rng.pick(dens.length ? dens : [...DENS]);
   const mode = String(params.mode ?? "name") as FractionData["mode"];
   if (mode === "line" || params.compare) {
     if (params.compare) {
-      const den1 = rng.pick([...DENS]);
+      const den1 = rng.pick(dens);
       const num1 = rng.int(1, den1);
       const num2 = rng.int(0, den1);
       const ans = num1 < num2 ? "<" : num1 > num2 ? ">" : "=";
@@ -490,8 +501,8 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     });
   }
   if (mode === "compare") {
-    const den1 = rng.pick([...DENS]);
-    let den2 = rng.pick(DENS.filter((d) => d !== den1));
+    const den1 = rng.pick(dens);
+    let den2 = rng.pick(dens.filter((d) => d !== den1).length ? dens.filter((d) => d !== den1) : dens);
     const num1 = rng.int(1, den1 - 1);
     const num2 = rng.int(1, den2 - 1);
     const v1 = num1 / den1;
@@ -553,6 +564,38 @@ function clockQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const minutePool = params.nearest === "minute" ? rng.int(0, 59) : rng.pick([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]);
   const minutes = minutePool;
   if (String(params.mode ?? "read") === "elapsed") {
+    if (params.minutes) {
+      const startH = hours;
+      const startM = rng.pick([0, 10, 15, 20, 30, 45]);
+      const elapsedH = rng.int(0, 2);
+      const elapsedM = rng.pick([15, 20, 30, 45]);
+      const total = elapsedH * 60 + elapsedM;
+      const copy = G4Q[loc];
+      const start = `${startH}:${pad2(startM)}`;
+      let endM = startM + elapsedM;
+      let endH = startH + elapsedH;
+      if (endM >= 60) {
+        endM -= 60;
+        endH += 1;
+      }
+      endH = ((endH - 1) % 12) + 1;
+      const end = `${endH}:${pad2(endM)}`;
+      return keypadQ(rng, {
+        kind: "clock",
+        prompt: copy.elapsedMin(start, end),
+        answer: String(total),
+        alts: [`${elapsedH}:${pad2(elapsedM)}`, `${total} minutes`, `${total} min`],
+        input: "keypad",
+        data: {
+          hours: startH,
+          minutes: startM,
+          mode: "elapsed",
+          elapsedHours: elapsedH,
+          elapsedMinutes: elapsedM,
+          find: "elapsed",
+        } satisfies ClockData,
+      });
+    }
     const hoursLater = rng.pick([1, 2, 3]);
     const endH = ((hours - 1 + hoursLater) % 12) + 1;
     const endClock = `${endH}:${pad2(minutes)}`;
@@ -797,6 +840,20 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 }
 
 function patternQ(rng: Rng, params: Record<string, unknown> = {}): Question {
+  if (params.multiply) {
+    const k = rng.pick([2, 3, 4, 5]);
+    const start = rng.int(1, 4);
+    const seq: (number | null)[] = Array.from({ length: 5 }, (_, i) => start * k ** i);
+    const hide = rng.int(1, 3);
+    const answer = String(seq[hide]);
+    seq[hide] = null;
+    return keypadQ(rng, {
+      kind: "pattern",
+      prompt: t().patternUp,
+      answer,
+      data: { seq, step: k, dir: "up", rule: `×${k}` },
+    });
+  }
   const step = rng.pick(((params.steps as number[]) ?? [2, 5, 10]).filter((n) => n > 0));
   const down = params.dir === "down" || (params.dir !== "up" && rng.next() < 0.45);
   const start = down ? rng.int(step * 5, step * 5 + 20) : rng.int(0, 8);
@@ -826,6 +883,25 @@ function patternQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 
 function measureQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const mode = String(params.mode ?? "read") as MeasureData["mode"];
+  if (mode === "convert") {
+    const facts = [
+      { n: rng.int(2, 5), from: "ft", to: "in", rate: 12, attr: "length" as const },
+      { n: rng.int(2, 6), from: "yd", to: "ft", rate: 3, attr: "length" as const },
+      { n: rng.int(2, 4), from: "lb", to: "oz", rate: 16, attr: "mass" as const },
+      { n: rng.int(2, 4), from: "gal", to: "qt", rate: 4, attr: "volume" as const },
+      { n: rng.int(2, 5), from: "qt", to: "pt", rate: 2, attr: "volume" as const },
+      { n: rng.int(2, 6), from: "pt", to: "cup", rate: 2, attr: "volume" as const },
+    ];
+    const f = rng.pick(facts);
+    const value = f.n * f.rate;
+    return keypadQ(rng, {
+      kind: "measure",
+      prompt: G4Q[loc].convert(f.n, f.from, f.to),
+      answer: String(value),
+      alts: [`${value} ${f.to}`],
+      data: { attribute: f.attr, system: "us", unit: f.to, value: f.n, max: value, mode: "convert" },
+    });
+  }
   if (mode === "unit") {
     const items = t().measureUnits;
     const item = rng.pick(items);
@@ -881,12 +957,13 @@ function measureQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 function computeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const mode = String(params.mode ?? "exact") as ComputeData["mode"];
   const op: "+" | "−" = rng.next() < 0.55 ? "+" : "−";
-  let a = rng.int(120, 860);
-  let b = rng.int(40, 900);
+  const uncapped = params.cap === 0;
+  let a = uncapped ? rng.int(1200, 48000) : rng.int(120, 860);
+  let b = uncapped ? rng.int(400, 22000) : rng.int(40, 900);
   if (op === "−" && b > a) [a, b] = [b, a];
-  if (op === "+" && a + b > 1000) b = 1000 - a;
+  if (!uncapped && op === "+" && a + b > 1000) b = 1000 - a;
   if (mode === "estimate") {
-    const round = (n: number) => Math.round(n / 100) * 100;
+    const round = (n: number) => (uncapped ? Math.round(n / 1000) * 1000 : Math.round(n / 100) * 100);
     const ans = op === "+" ? round(a) + round(b) : round(a) - round(b);
     return keypadQ(rng, {
       kind: "compute",
@@ -931,6 +1008,19 @@ function jumpsQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 function fluencyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const pool = ((params.factors as number[] | undefined) ?? [0, 1, 2, 5, 10]).slice();
   const ops = (params.ops as Array<"+" | "−" | "×" | "÷"> | undefined) ?? ["×", "÷"];
+  if (params.twoByOne) {
+    const tens = rng.int(1, 4) * 10;
+    const ones = rng.int(1, 9);
+    const a = tens + ones;
+    const b = rng.int(2, 9);
+    return keypadQ(rng, {
+      kind: "fluency",
+      prompt: `${a} × ${b}`,
+      answer: String(a * b),
+      factKey: `${b}×${a}`,
+      data: { a, b, op: "×" },
+    });
+  }
   if (ops.includes("+") && !ops.includes("×")) {
     const a = rng.int(8, 90);
     const b = rng.int(6, 40);
@@ -952,7 +1042,8 @@ function fluencyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     });
   }
   const a = rng.pick(pool);
-  const b = a === 0 || a === 1 ? rng.int(0, 10) : rng.int(0, 10);
+  const cap = Math.min(12, Math.max(10, ...pool.filter((n) => n >= 0)));
+  const b = a === 0 || a === 1 ? rng.int(0, cap) : rng.int(0, cap);
   const op: "×" | "÷" = a === 0 || b === 0 ? "×" : rng.pick(ops.filter((o) => o === "×" || o === "÷") as Array<"×" | "÷">);
   if (op === "÷") {
     const product = a * (b === 0 ? rng.int(1, 10) : b || rng.int(1, 10));
@@ -1041,6 +1132,109 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   });
 }
 
+function decValue(whole: number, tenths: number, hundredths = 0, thousandths = 0): number {
+  return whole + tenths / 10 + hundredths / 100 + thousandths / 1000;
+}
+
+function decimalQ(rng: Rng, params: Record<string, unknown> = {}): Question {
+  const copy = G4Q[loc];
+  const mode = String(params.mode ?? "read") as DecimalData["mode"];
+  const places = Number(params.places ?? (mode === "read" ? 1 : 2));
+  if (mode === "add" || mode === "sub") {
+    const aT = rng.int(1, 5);
+    const aH = rng.int(0, 9);
+    const bT = rng.int(1, mode === "sub" ? aT : 4);
+    const bH = rng.int(0, mode === "sub" ? aH : 9);
+    const a = { whole: 0, tenths: aT, hundredths: aH };
+    const b = { whole: 0, tenths: bT, hundredths: bH };
+    const av = decValue(0, aT, aH);
+    const bv = decValue(0, bT, bH);
+    const sum = mode === "add" ? av + bv : av - bv;
+    const ans = sum.toFixed(2);
+    return keypadQ(rng, {
+      kind: "decimal",
+      prompt: mode === "add" ? copy.decAdd : copy.decSub,
+      answer: ans,
+      alts: [String(sum), sum.toFixed(1), ans.replace(/^0/, "")],
+      data: { whole: a.whole, tenths: a.tenths, hundredths: a.hundredths, mode, b } satisfies DecimalData,
+    });
+  }
+  const whole = places >= 3 ? rng.int(0, 4) : 0;
+  const tenths = rng.int(places === 1 ? 1 : 0, 9);
+  const hundredths = places >= 2 ? rng.int(places === 2 && tenths === 0 ? 1 : 0, 9) : 0;
+  const thousandths = places >= 3 ? rng.int(1, 9) : undefined;
+  const n = decValue(whole, tenths, hundredths, thousandths ?? 0);
+  const answer = places >= 3 ? n.toFixed(3) : places >= 2 ? n.toFixed(2) : n.toFixed(1);
+  const prompt = places >= 3 ? copy.thousandths : places >= 2 ? copy.hundredths : copy.tenths;
+  return keypadQ(rng, {
+    kind: "decimal",
+    prompt,
+    answer,
+    alts: [String(n), answer.replace(/^0/, ""), `${Math.round(n * 10 ** places)}/${10 ** places}`],
+    data: { whole, tenths, hundredths, thousandths, mode: "read" } satisfies DecimalData,
+  });
+}
+
+function fracOpQ(rng: Rng, params: Record<string, unknown> = {}): Question {
+  const copy = G4Q[loc];
+  const den = rng.pick([2, 3, 4, 5, 6, 8, 10, 12]);
+  const wantSub = params.op === "−" || (params.op !== "+" && rng.next() < 0.5);
+  let a = rng.int(1, den);
+  let b = rng.int(1, den);
+  if (wantSub && b > a) [a, b] = [b, a];
+  if (!wantSub && a + b > den * 2) b = Math.max(1, den - a);
+  const op: "+" | "−" = wantSub ? "−" : "+";
+  const num = wantSub ? a - b : a + b;
+  return keypadQ(rng, {
+    kind: "fracop",
+    prompt: wantSub ? copy.fracSub : copy.fracAdd,
+    answer: `${num}/${den}`,
+    alts: num > den && den > 0 ? [`${Math.floor(num / den)} ${num % den}/${den}`, String(num)] : [String(num)],
+    input: "fraction",
+    data: { a, b, den, op } satisfies FracOpData,
+  });
+}
+
+function linesQ(rng: Rng, params: Record<string, unknown> = {}): Question {
+  const copy = G4Q[loc];
+  const mode = String(params.mode ?? rng.pick(["figure", "angle", "pair"]));
+  if (mode === "angle") {
+    const degrees = rng.pick([30, 45, 60, 90, 120, 135, 150]);
+    const kind = degrees < 90 ? "acute" : degrees === 90 ? "right" : "obtuse";
+    const answer = copy[kind];
+    return keypadQ(rng, {
+      kind: "lines",
+      prompt: copy.angleType,
+      answer,
+      input: "choice",
+      choices: rng.shuffle([copy.acute, copy.right, copy.obtuse]),
+      data: { figure: "angle", degrees } satisfies LinesData,
+    });
+  }
+  if (mode === "pair") {
+    const pair = rng.pick(["parallel", "perpendicular", "neither"] as const);
+    const answer = copy[pair];
+    return keypadQ(rng, {
+      kind: "lines",
+      prompt: copy.pairLines,
+      answer,
+      input: "choice",
+      choices: rng.shuffle([copy.parallel, copy.perpendicular, copy.neither]),
+      data: { figure: pair === "neither" ? "line" : pair, pair } satisfies LinesData,
+    });
+  }
+  const figure = rng.pick(["point", "line", "ray", "segment"] as const);
+  const answer = copy[figure];
+  return keypadQ(rng, {
+    kind: "lines",
+    prompt: copy.nameFigure,
+    answer,
+    input: "choice",
+    choices: rng.shuffle([copy.point, copy.line, copy.ray, copy.segment]),
+    data: { figure } satisfies LinesData,
+  });
+}
+
 export function makeQuestion(activity: ActivityDef, rng: Rng, locale: Locale | string = "en"): Question {
   const prev = loc;
   loc = parseLocale(locale);
@@ -1064,7 +1258,7 @@ export function makeQuestion(activity: ActivityDef, rng: Rng, locale: Locale | s
       q = buildQ(rng);
       break;
     case "compare":
-      q = compareQ(rng);
+      q = compareQ(rng, p);
       break;
     case "order":
       q = orderQ(rng, p);
@@ -1107,6 +1301,15 @@ export function makeQuestion(activity: ActivityDef, rng: Rng, locale: Locale | s
       break;
     case "jumps":
       q = jumpsQ(rng, p);
+      break;
+    case "decimal":
+      q = decimalQ(rng, p);
+      break;
+    case "fracop":
+      q = fracOpQ(rng, p);
+      break;
+    case "lines":
+      q = linesQ(rng, p);
       break;
     default:
       q = tenframeQ(rng, p);

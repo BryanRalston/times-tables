@@ -76,7 +76,8 @@ describe("migrate", () => {
     });
     expect(next.squishees).toEqual(["frog", "cat"]);
     expect(next.coins).toBe(0);
-    expect(next.version).toBe(6);
+    expect(next.version).toBe(7);
+    expect(next.pathGrade).toBe(3);
     expect(next.learners["kid-1"]?.squishees).toEqual(["frog", "cat"]);
     expect(next.learners["kid-1"]?.coins).toBe(0);
   });

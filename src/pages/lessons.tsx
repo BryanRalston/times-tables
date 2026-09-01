@@ -1,7 +1,7 @@
 import { AppHeader, AppTabs, useUi } from "@/components/chrome";
 import { ART } from "@/lib/art";
 import { todayIso } from "@/lib/calendar";
-import { QUARTERS, UNITS, suggestedUnitId } from "@/lib/curriculum";
+import { QUARTERS, suggestedUnitId, unitsFor } from "@/lib/curriculum";
 import { parseLocale } from "@/lib/i18n";
 import { activityText, unitText } from "@/lib/labels";
 import { navigate } from "@/lib/nav";
@@ -10,8 +10,9 @@ import { cn } from "@/lib/utils";
 
 export function LessonsPage() {
   const classUnitId = useProgress((s) => s.classUnitId);
+  const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
   const activities = useProgress((s) => s.activities);
-  const suggested = suggestedUnitId(todayIso(), classUnitId || undefined);
+  const suggested = suggestedUnitId(todayIso(), classUnitId || undefined, pathGrade);
   const locale = parseLocale(useProgress((s) => s.locale));
   const ui = useUi();
   const qName = [ui.q1, ui.q2, ui.q3, ui.q4];
@@ -24,7 +25,7 @@ export function LessonsPage() {
       <p className="frost mb-4 rounded-[16px] border border-line p-3 text-sm text-muted">{ui.lessonsIntro}</p>
 
       {QUARTERS.map((q) => {
-        const units = UNITS.filter((u) => u.quarter === q.id);
+        const units = unitsFor(pathGrade).filter((u) => u.quarter === q.id);
         return (
           <section key={q.id} className="mb-6">
             <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted">

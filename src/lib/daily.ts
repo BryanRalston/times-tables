@@ -81,12 +81,13 @@ export function makeDailyWalk(opts: {
   learnerId?: string;
   attempt?: number;
   locale?: Locale | string;
+  grade?: 3 | 4;
 }): DailyWalk {
   const locale = parseLocale(opts.locale);
   const skipWeekend = opts.skipWeekend !== false;
   const weekend = isWeekend(opts.date);
   const schoolDate = weekend && skipWeekend ? lastSchoolDayOnOrBefore(opts.date) ?? opts.date : opts.date;
-  const unitId = suggestedUnitId(schoolDate, opts.classUnitId);
+  const unitId = suggestedUnitId(schoolDate, opts.classUnitId, opts.grade);
   const unit = unitById(unitId) ?? UNITS[0]!;
   const friday = isFriday(schoolDate) && isSchoolDay(schoolDate);
   const weekendPlay = weekend && skipWeekend;

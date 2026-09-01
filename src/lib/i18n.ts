@@ -22,7 +22,10 @@ export type Ui = {
   grownups: string;
   tabsAria: string;
   grade3: string;
+  grade4: string;
   path: string;
+  pathGrade3: string;
+  pathGrade4: string;
   namedPath: (name: string) => string;
   check: string;
   yourAnswer: string;
@@ -111,7 +114,10 @@ export const UI: Record<Locale, Ui> = {
     grownups: "Grown-ups",
     tabsAria: "Home, lessons, and shelf",
     grade3: "Grade 3",
+    grade4: "Grade 4",
     path: "Grade 3 Path",
+    pathGrade3: "Grade 3 Path",
+    pathGrade4: "Advanced (Grade 4)",
     namedPath: (name) => `${name}'s path`,
     check: "Check",
     yourAnswer: "Your answer",
@@ -200,7 +206,10 @@ export const UI: Record<Locale, Ui> = {
     grownups: "Adultos",
     tabsAria: "Inicio, lecciones y estante",
     grade3: "3.º grado",
+    grade4: "4.º grado",
     path: "Camino de 3.º",
+    pathGrade3: "Camino de 3.º",
+    pathGrade4: "Avanzado (4.º)",
     namedPath: (name) => `Camino de ${name}`,
     check: "Comprobar",
     yourAnswer: "Tu respuesta",
@@ -289,7 +298,10 @@ export const UI: Record<Locale, Ui> = {
     grownups: "Adultos",
     tabsAria: "Início, lições e estante",
     grade3: "3.º ano",
+    grade4: "4.º ano",
     path: "Caminho do 3.º",
+    pathGrade3: "Caminho do 3.º",
+    pathGrade4: "Avançado (4.º)",
     namedPath: (name) => `Caminho de ${name}`,
     check: "Conferir",
     yourAnswer: "Sua resposta",
@@ -391,9 +403,9 @@ export const SHAPE: Record<Locale, Record<string, string>> = {
 };
 
 export const PLACE: Record<Locale, string[]> = {
-  en: ["ones", "tens", "hundreds", "thousands", "ten thousands", "hundred thousands"],
-  es: ["unidades", "decenas", "centenas", "unidades de millar", "decenas de millar", "centenas de millar"],
-  "pt-BR": ["unidades", "dezenas", "centenas", "unidades de milhar", "dezenas de milhar", "centenas de milhar"],
+  en: ["ones", "tens", "hundreds", "thousands", "ten thousands", "hundred thousands", "millions", "ten millions", "hundred millions"],
+  es: ["unidades", "decenas", "centenas", "unidades de millar", "decenas de millar", "centenas de millar", "millones", "decenas de millón", "centenas de millón"],
+  "pt-BR": ["unidades", "dezenas", "centenas", "unidades de milhar", "dezenas de milhar", "centenas de milhar", "milhões", "dezenas de milhão", "centenas de milhão"],
 };
 
 export const GRAPH_CATS: Record<Locale, { id: string; label: string }[]> = {
@@ -508,10 +520,13 @@ function ptBelow1000(n: number): string {
 
 export function wordForm(n: number, locale: Locale = "en"): string {
   if (n === 0) return locale === "es" ? "cero" : locale === "pt-BR" ? "zero" : "zero";
-  const thousands = Math.floor(n / 1000);
+  const millions = Math.floor(n / 1_000_000);
+  const thousands = Math.floor((n % 1_000_000) / 1000);
   const rest = n % 1000;
   if (locale === "es") {
     const parts: string[] = [];
+    if (millions === 1) parts.push("un millón");
+    else if (millions) parts.push(`${esBelow1000(millions, true)} millones`);
     if (thousands === 1) parts.push("mil");
     else if (thousands) parts.push(`${esBelow1000(thousands, true)} mil`);
     if (rest) parts.push(esBelow1000(rest));
@@ -519,16 +534,125 @@ export function wordForm(n: number, locale: Locale = "en"): string {
   }
   if (locale === "pt-BR") {
     const parts: string[] = [];
+    if (millions === 1) parts.push("um milhão");
+    else if (millions) parts.push(`${ptBelow1000(millions)} milhões`);
     if (thousands === 1) parts.push("mil");
     else if (thousands) parts.push(`${ptBelow1000(thousands)} mil`);
     if (rest) parts.push(ptBelow1000(rest));
     return parts.join(" ");
   }
   const parts: string[] = [];
+  if (millions === 1) parts.push("one million");
+  else if (millions) parts.push(`${enBelow1000(millions)} million`);
   if (thousands) parts.push(`${enBelow1000(thousands)} thousand`);
   if (rest) parts.push(enBelow1000(rest));
   return parts.join(" ");
 }
+
+export const G4Q: Record<
+  Locale,
+  {
+    tenths: string;
+    hundredths: string;
+    thousandths: string;
+    decAdd: string;
+    decSub: string;
+    fracAdd: string;
+    fracSub: string;
+    elapsedMin: (start: string, end: string) => string;
+    convert: (n: number, from: string, to: string) => string;
+    nameFigure: string;
+    angleType: string;
+    pairLines: string;
+    point: string;
+    line: string;
+    ray: string;
+    segment: string;
+    angle: string;
+    parallel: string;
+    perpendicular: string;
+    neither: string;
+    acute: string;
+    right: string;
+    obtuse: string;
+  }
+> = {
+  en: {
+    tenths: "How many tenths are shaded?",
+    hundredths: "How many hundredths are shaded?",
+    thousandths: "Read the decimal.",
+    decAdd: "Add the shaded amounts.",
+    decSub: "Take the second amount from the first.",
+    fracAdd: "Add the shaded pieces.",
+    fracSub: "Take the second bar from the first.",
+    elapsedMin: (start, end) => `How many minutes from ${start} to ${end}?`,
+    convert: (n, from, to) => `${n} ${from} = n ${to}. What is n?`,
+    nameFigure: "What is this figure?",
+    angleType: "What kind of angle?",
+    pairLines: "How do these lines meet?",
+    point: "point",
+    line: "line",
+    ray: "ray",
+    segment: "line segment",
+    angle: "angle",
+    parallel: "parallel",
+    perpendicular: "perpendicular",
+    neither: "neither",
+    acute: "acute",
+    right: "right",
+    obtuse: "obtuse",
+  },
+  es: {
+    tenths: "¿Cuántos décimos están sombreados?",
+    hundredths: "¿Cuántos centésimos están sombreados?",
+    thousandths: "Lee el decimal.",
+    decAdd: "Suma las cantidades sombreadas.",
+    decSub: "Quita la segunda cantidad de la primera.",
+    fracAdd: "Suma las piezas sombreadas.",
+    fracSub: "Quita la segunda barra de la primera.",
+    elapsedMin: (start, end) => `¿Cuántos minutos de ${start} a ${end}?`,
+    convert: (n, from, to) => `${n} ${from} = n ${to}. ¿Cuánto es n?`,
+    nameFigure: "¿Qué figura es?",
+    angleType: "¿Qué tipo de ángulo?",
+    pairLines: "¿Cómo se encuentran estas rectas?",
+    point: "punto",
+    line: "recta",
+    ray: "semirrecta",
+    segment: "segmento",
+    angle: "ángulo",
+    parallel: "paralelas",
+    perpendicular: "perpendiculares",
+    neither: "ninguna",
+    acute: "agudo",
+    right: "recto",
+    obtuse: "obtuso",
+  },
+  "pt-BR": {
+    tenths: "Quantos décimos estão sombreados?",
+    hundredths: "Quantos centésimos estão sombreados?",
+    thousandths: "Leia o decimal.",
+    decAdd: "Some as quantidades sombreadas.",
+    decSub: "Tire a segunda quantidade da primeira.",
+    fracAdd: "Some os pedaços sombreados.",
+    fracSub: "Tire a segunda barra da primeira.",
+    elapsedMin: (start, end) => `Quantos minutos de ${start} a ${end}?`,
+    convert: (n, from, to) => `${n} ${from} = n ${to}. Quanto é n?`,
+    nameFigure: "Que figura é esta?",
+    angleType: "Que tipo de ângulo?",
+    pairLines: "Como essas retas se encontram?",
+    point: "ponto",
+    line: "reta",
+    ray: "semirreta",
+    segment: "segmento",
+    angle: "ângulo",
+    parallel: "paralelas",
+    perpendicular: "perpendiculares",
+    neither: "nenhuma",
+    acute: "agudo",
+    right: "reto",
+    obtuse: "obtuso",
+  },
+};
 
 export type QCopy = {
   leftoverHint: string;

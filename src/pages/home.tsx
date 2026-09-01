@@ -13,6 +13,7 @@ import { useProgress } from "@/lib/progress";
 
 export function HomePage() {
   const classUnitId = useProgress((s) => s.classUnitId);
+  const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
   const skipWeekend = useProgress((s) => s.skipWeekend);
   const shaky = useProgress((s) => s.shaky);
   const sessions = useProgress((s) => s.sessions);
@@ -22,7 +23,7 @@ export function HomePage() {
   const locale = parseLocale(useProgress((s) => s.locale));
   const ui = useUi();
   const date = todayIso();
-  const suggested = suggestedUnitId(date, classUnitId || undefined);
+  const suggested = suggestedUnitId(date, classUnitId || undefined, pathGrade);
   const unit = unitById(suggested);
   const nextAttempt = (attempts[`daily:${suggested}`] ?? 0) + 1;
   const walk = useMemo(
@@ -35,8 +36,9 @@ export function HomePage() {
         learnerId,
         attempt: nextAttempt,
         locale,
+        grade: pathGrade,
       }),
-    [date, classUnitId, skipWeekend, shaky, learnerId, nextAttempt, locale],
+    [date, classUnitId, skipWeekend, shaky, learnerId, nextAttempt, locale, pathGrade],
   );
   const done = Boolean(sessions[walk.date]?.completed);
   const remain = remainingSchoolDaysInUnit(suggested, walk.schoolDate);

@@ -1,6 +1,6 @@
 import { useUi } from "@/components/chrome";
 import { ART } from "@/lib/art";
-import { QUARTERS, UNITS, unitWindowLabel } from "@/lib/curriculum";
+import { QUARTERS, unitWindowLabel, unitsFor } from "@/lib/curriculum";
 import { parseLocale } from "@/lib/i18n";
 import { unitText } from "@/lib/labels";
 import { unitStatus } from "@/lib/path";
@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 
 export function YearPath({ suggestedId, onOpen }: { suggestedId: string; onOpen: (id: string) => void }) {
   const sessions = useProgress((s) => s.sessions);
+  const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
   const locale = parseLocale(useProgress((s) => s.locale));
   const ui = useUi();
   const qName = [ui.q1, ui.q2, ui.q3, ui.q4];
@@ -17,7 +18,7 @@ export function YearPath({ suggestedId, onOpen }: { suggestedId: string; onOpen:
   return (
     <ol className="relative mx-auto max-w-lg overflow-x-hidden pb-8">
       <div className="absolute bottom-10 left-1/2 top-6 w-1.5 -translate-x-1/2 rounded-full bg-line" aria-hidden />
-      {UNITS.map((u, i) => {
+      {unitsFor(pathGrade).map((u, i) => {
         const st = unitStatus(u, suggestedId);
         const done = Object.values(sessions).some((s) => s.unitId === u.id && s.completed);
         const q = QUARTERS.find((x) => x.id === u.quarter);

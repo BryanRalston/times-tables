@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { activityById } from "@/lib/curriculum";
 import { makeQuestion } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
-import type { MeasureData, MoneyData, Question } from "@/lib/types";
+import type { DecimalData, MeasureData, MoneyData, Question } from "@/lib/types";
 import { moneyFmt } from "@/lib/utils";
 import { Board, type BoardProps } from "./models";
 
@@ -64,6 +64,26 @@ describe("boards", () => {
         expect(html).toContain("<rect");
       }
     }
+  });
+
+  it("grade 4 fraction pieces, decimal tenths, and line choices render", () => {
+    const add = makeQuestion(activityById("g4-u6-add")!.activity, rngFromSeed(3));
+    const d = add.data as { a: number; b: number; den: number };
+    const addHtml = renderToStaticMarkup(<Board {...stub(add)} />);
+    expect(addHtml).toContain(`${d.a}/${d.den}`);
+    expect(addHtml).toContain(`${d.b}/${d.den}`);
+
+    const tenths = makeQuestion(activityById("g4-u7-tenths")!.activity, rngFromSeed(3));
+    const td = tenths.data as DecimalData;
+    const tHtml = renderToStaticMarkup(<Board {...stub(tenths)} />);
+    expect(tHtml).toContain("flex-1");
+    expect(String(tenths.answer)).toBe(`0.${td.tenths}`);
+
+    const line = makeQuestion(activityById("g4-u12-lines")!.activity, rngFromSeed(3));
+    const lHtml = renderToStaticMarkup(<Board {...stub(line)} />);
+    expect(lHtml).toContain("<svg");
+    expect(line.choices ?? []).toContain(line.answer);
+    expect(td).toBeTruthy();
   });
 
   it("unit pick shows the prompt, not an empty pointer card", () => {

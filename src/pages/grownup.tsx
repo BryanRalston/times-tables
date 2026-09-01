@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Mascot } from "@/components/mascot";
 import { Button } from "@/components/ui/button";
 import { YEAR_LABEL } from "@/lib/calendar";
-import { UNITS } from "@/lib/curriculum";
+import { unitsFor } from "@/lib/curriculum";
+import { parsePathGrade } from "@/lib/types";
 import { LOCALES, LOCALE_NATIVE, parseLocale, UI } from "@/lib/i18n";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
@@ -11,10 +12,12 @@ export function GrownupPage() {
   const name = useProgress((s) => s.name);
   const learnerId = useProgress((s) => s.learnerId);
   const classUnitId = useProgress((s) => s.classUnitId);
+  const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
   const skipWeekend = useProgress((s) => s.skipWeekend);
   const locale = parseLocale(useProgress((s) => s.locale));
   const setName = useProgress((s) => s.setName);
   const setClassUnit = useProgress((s) => s.setClassUnit);
+  const setPathGrade = useProgress((s) => s.setPathGrade);
   const setSkipWeekend = useProgress((s) => s.setSkipWeekend);
   const setLocale = useProgress((s) => s.setLocale);
   const switchLearner = useProgress((s) => s.switchLearner);
@@ -89,6 +92,18 @@ export function GrownupPage() {
       <p className="frost mt-2 rounded-[16px] border border-line p-3 text-xs text-muted">{ui.kidsBlurb}</p>
 
       <label className="frost mt-4 block rounded-[16px] border border-line p-3 text-sm font-medium">
+        {ui.path}
+        <select
+          value={pathGrade}
+          onChange={(e) => setPathGrade(parsePathGrade(e.target.value))}
+          className="mt-1 h-12 w-full rounded-[14px] border border-line bg-surface px-3"
+        >
+          <option value={3}>{ui.pathGrade3}</option>
+          <option value={4}>{ui.pathGrade4}</option>
+        </select>
+      </label>
+
+      <label className="frost mt-4 block rounded-[16px] border border-line p-3 text-sm font-medium">
         {ui.classIsOn}
         <select
           value={classUnitId}
@@ -96,7 +111,7 @@ export function GrownupPage() {
           className="mt-1 h-12 w-full rounded-[14px] border border-line bg-surface px-3"
         >
           <option value="">{ui.followCalendar}</option>
-          {UNITS.map((u) => (
+          {unitsFor(pathGrade).map((u) => (
             <option key={u.id} value={u.id}>
               {ui.unitN(u.number)}: {u.short}
             </option>
@@ -105,8 +120,8 @@ export function GrownupPage() {
       </label>
       {classUnitId ? (
         <p className="mt-2 text-sm text-muted">
-          {UNITS.find((u) => u.id === classUnitId)?.title}
-          <span className="mt-1 block text-xs text-faint">{UNITS.find((u) => u.id === classUnitId)?.sol.join(" · ")}</span>
+          {unitsFor(pathGrade).find((u) => u.id === classUnitId)?.title}
+          <span className="mt-1 block text-xs text-faint">{unitsFor(pathGrade).find((u) => u.id === classUnitId)?.sol.join(" · ")}</span>
         </p>
       ) : null}
 

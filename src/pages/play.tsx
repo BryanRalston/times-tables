@@ -48,6 +48,7 @@ function buildPack(
   learnerId: string,
   attempt: number,
   locale: Locale,
+  grade: 3 | 4,
 ): Pack {
   const date = todayIso();
   const ui = UI[locale];
@@ -87,6 +88,7 @@ function buildPack(
     learnerId,
     attempt,
     locale,
+    grade,
   });
   return {
     title: walkLabel(walk, locale),
@@ -119,11 +121,11 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   const [pack] = useState(() => {
     const st = useProgress.getState();
-    const unitGuess = suggestedUnitId(todayIso(), st.classUnitId || undefined);
+    const unitGuess = suggestedUnitId(todayIso(), st.classUnitId || undefined, st.pathGrade);
     const key = playKey(kind, activityId, unitGuess);
     const attempt = st.beginPlay(key);
     const locale = parseLocale(st.locale);
-    return buildPack(kind, activityId, st.classUnitId, st.skipWeekend, st.shaky, st.learnerId, attempt, locale);
+    return buildPack(kind, activityId, st.classUnitId, st.skipWeekend, st.shaky, st.learnerId, attempt, locale, st.pathGrade ?? 3);
   });
   const [coinsEarned, setCoinsEarned] = useState(0);
   const [finishPhase, setFinishPhase] = useState<"play" | "summary" | null>(null);

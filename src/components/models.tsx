@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { ChoiceList } from "@/components/keypad";
 import { MagentaImg } from "@/components/magenta-video";
-import { parseLocale, PLACE, UI } from "@/lib/i18n";
+import { G4Q, parseLocale, PLACE, UI } from "@/lib/i18n";
 import { useProgress } from "@/lib/progress";
 import { asset } from "@/lib/art";
 import { playTap } from "@/lib/sound";
@@ -15,11 +15,14 @@ import type {
   Coin,
   CompareData,
   ComputeData,
+  DecimalData,
   FractionData,
+  FracOpData,
   FluencyData,
   GraphData,
   GroupsData,
   JumpsData,
+  LinesData,
   MeasureData,
   MoneyData,
   OrderData,
@@ -28,6 +31,7 @@ import type {
   Question,
   TenFrameData,
 } from "@/lib/types";
+
 import { cn, moneyFmt, pad2 } from "@/lib/utils";
 
 export interface BoardProps {
@@ -81,6 +85,12 @@ export function Board(props: BoardProps) {
       return <ComputeBoard {...props} />;
     case "jumps":
       return <NumberLine {...props} />;
+    case "decimal":
+      return <DecimalBoard {...props} />;
+    case "fracop":
+      return <FracOpBoard {...props} />;
+    case "lines":
+      return <LinesBoard {...props} />;
     case "word":
       return <BigPrompt prompt={question.prompt} status={props.status} />;
     default:
@@ -241,15 +251,16 @@ function PlaceValue({ question, status, shake }: BoardProps) {
   const s = String(data.number);
   const locale = parseLocale(useProgress((st) => st.locale));
   if (data.mode === "word") {
-    const padded = s.padStart(6, "0");
-    const labels = [...PLACE[locale]].reverse();
+    const cols = s.length > 6 ? 9 : 6;
+    const padded = s.padStart(cols, "0");
+    const labels = [...PLACE[locale]].slice(0, cols).reverse();
     const askingWords = question.prompt.includes("in words") || question.prompt.includes("en palabras") || question.prompt.includes("por extenso");
     return (
       <Frame shake={shake} status={status}>
         <p className="mb-3 text-center font-display text-xl tabular-nums sm:text-2xl">
           {askingWords ? data.number.toLocaleString("en-US") : (data.words ?? "")}
         </p>
-        <div className="grid grid-cols-6 gap-1 text-center text-[9px] leading-tight text-muted">
+        <div className={cn("grid gap-1 text-center text-[9px] leading-tight text-muted", cols >= 9 ? "grid-cols-9" : "grid-cols-6")}>
           {padded.split("").map((ch, i) => (
             <div key={i} className="rounded-[10px] border border-line bg-bg-warm p-1">
               <p className="font-display text-lg text-ink tabular-nums">{askingWords ? Number(ch) : "·"}</p>
@@ -287,7 +298,7 @@ function PlaceValue({ question, status, shake }: BoardProps) {
       </Frame>
     );
   }
-  const enPlaces = ["ones", "tens", "hundreds", "thousands", "ten thousands", "hundred thousands"];
+  const enPlaces = PLACE.en;
   const locLabels = PLACE[locale];
   const cols = s.split("").map((ch, i) => {
     const fromRight = s.length - 1 - i;
@@ -305,7 +316,7 @@ function PlaceValue({ question, status, shake }: BoardProps) {
       <div
         className={cn(
           "grid gap-1 text-center text-[9px] leading-tight text-muted",
-          s.length >= 6 ? "grid-cols-6" : s.length === 5 ? "grid-cols-5" : "grid-cols-4",
+          s.length >= 9 ? "grid-cols-9" : s.length >= 6 ? "grid-cols-6" : s.length === 5 ? "grid-cols-5" : "grid-cols-4",
         )}
       >
         {cols.map((col, i) => (
@@ -599,29 +610,59 @@ function FractionBar({ question, onInteract, status, shake }: BoardProps) {
   );
 }
 
+function ClockFace({ hours, minutes, size = "size-48" }: { hours: number; minutes: number; size?: string }) {
+  const minAngle = minutes * 6;
+  const hourAngle = (hours % 12) * 30 + minutes * 0.5;
+  return (
+    <svg viewBox="0 0 100 100" className={size}>
+      <circle cx="50" cy="50" r="46" fill="#fffaf1" stroke="#1f1a14" strokeWidth="2" />
+      {Array.from({ length: 12 }, (_, i) => {
+        const a = ((i + 1) / 12) * Math.PI * 2 - Math.PI / 2;
+        const x = 50 + Math.cos(a) * 36;
+        const y = 50 + Math.sin(a) * 36;
+        return (
+          <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#1f1a14">
+            {i + 1}
+          </text>
+        );
+      })}
+      <line x1="50" y1="50" x2={50 + Math.sin((hourAngle * Math.PI) / 180) * 22} y2={50 - Math.cos((hourAngle * Math.PI) / 180) * 22} stroke="#1f1a14" strokeWidth="3" strokeLinecap="round" />
+      <line x1="50" y1="50" x2={50 + Math.sin((minAngle * Math.PI) / 180) * 32} y2={50 - Math.cos((minAngle * Math.PI) / 180) * 32} stroke="#0d7377" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="50" cy="50" r="2.5" fill="#c45c26" />
+    </svg>
+  );
+}
+
 function AnalogClock({ question, status, shake }: BoardProps) {
   const data = question.data as ClockData;
-  const minAngle = data.minutes * 6;
-  const hourAngle = (data.hours % 12) * 30 + data.minutes * 0.5;
+  const extraM = data.elapsedMinutes ?? 0;
+  if (data.mode === "elapsed" && extraM > 0) {
+    let endM = data.minutes + extraM;
+    let endH = data.hours + (data.elapsedHours ?? 0);
+    if (endM >= 60) {
+      endM -= 60;
+      endH += 1;
+    }
+    endH = ((endH - 1) % 12) + 1;
+    return (
+      <Frame shake={shake} status={status}>
+        <div className="flex justify-center gap-4">
+          <div className="text-center">
+            <ClockFace hours={data.hours} minutes={data.minutes} size="size-36 sm:size-44" />
+            <p className="mt-1 text-xs text-muted">{data.hours}:{pad2(data.minutes)}</p>
+          </div>
+          <div className="text-center">
+            <ClockFace hours={endH} minutes={endM} size="size-36 sm:size-44" />
+            <p className="mt-1 text-xs text-muted">{endH}:{pad2(endM)}</p>
+          </div>
+        </div>
+      </Frame>
+    );
+  }
   return (
     <Frame shake={shake} status={status}>
       <div className="flex justify-center">
-        <svg viewBox="0 0 100 100" className="size-48">
-          <circle cx="50" cy="50" r="46" fill="#fffaf1" stroke="#1f1a14" strokeWidth="2" />
-          {Array.from({ length: 12 }, (_, i) => {
-            const a = ((i + 1) / 12) * Math.PI * 2 - Math.PI / 2;
-            const x = 50 + Math.cos(a) * 36;
-            const y = 50 + Math.sin(a) * 36;
-            return (
-              <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#1f1a14">
-                {i + 1}
-              </text>
-            );
-          })}
-          <line x1="50" y1="50" x2={50 + Math.sin((hourAngle * Math.PI) / 180) * 22} y2={50 - Math.cos((hourAngle * Math.PI) / 180) * 22} stroke="#1f1a14" strokeWidth="3" strokeLinecap="round" />
-          <line x1="50" y1="50" x2={50 + Math.sin((minAngle * Math.PI) / 180) * 32} y2={50 - Math.cos((minAngle * Math.PI) / 180) * 32} stroke="#0d7377" strokeWidth="2" strokeLinecap="round" />
-          <circle cx="50" cy="50" r="2.5" fill="#c45c26" />
-        </svg>
+        <ClockFace hours={data.hours} minutes={data.minutes} />
       </div>
       <p className="mt-2 text-center text-sm text-muted">
         {data.find === "time" ? "Read the hands." : `Start ${data.hours}:${pad2(data.minutes)}`}
@@ -1015,6 +1056,24 @@ function NumberLine({ question, status, shake }: BoardProps) {
 
 function ComputeBoard({ question, status, shake }: BoardProps) {
   const data = question.data as ComputeData;
+  if (data.a > 2000 || data.b > 2000) {
+    return (
+      <Frame shake={shake} status={status}>
+        <p className="mb-3 text-center font-display text-2xl tabular-nums">
+          {data.a.toLocaleString("en-US")} {data.op} {data.b.toLocaleString("en-US")}
+          {data.mode === "estimate" ? <span className="block text-sm font-sans text-muted">Nearest thousand</span> : null}
+        </p>
+        <div className="mx-auto max-w-xs rounded-[16px] border border-line bg-bg-warm p-3 font-display text-2xl tabular-nums">
+          <p className="text-right">{data.a.toLocaleString("en-US")}</p>
+          <p className="text-right">
+            {data.op} {data.b.toLocaleString("en-US")}
+          </p>
+          <div className="mt-1 border-t-2 border-ink" />
+          <p className="text-right text-muted">n</p>
+        </div>
+      </Frame>
+    );
+  }
   const left = hundredsParts(data.a);
   const right = hundredsParts(data.b);
   return (
@@ -1098,6 +1157,29 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
           <img src={asset("measure/pencil.png")} alt="" className="mx-auto h-28 object-contain" />
         ) : null}
         <p className="mt-2 text-center font-display text-xl leading-tight">{question.prompt}</p>
+      </Frame>
+    );
+  }
+  if (data.mode === "convert") {
+    const n = Math.max(1, Math.min(8, data.value));
+    const rate = Math.round(data.max / n) || data.max;
+    return (
+      <Frame shake={shake} status={status}>
+        <p className="mb-2 text-center font-display text-xl">{question.prompt}</p>
+        <div className="flex flex-wrap justify-center gap-2">
+          {Array.from({ length: n }, (_, i) => (
+            <div key={i} className="rounded-[12px] border border-line bg-bg-warm px-2 py-2 text-center">
+              <div className="flex gap-0.5">
+                {Array.from({ length: Math.min(rate, 16) }, (_, k) => (
+                  <span key={k} className="h-8 w-1.5 rounded-sm bg-teal" />
+                ))}
+              </div>
+              <p className="mt-1 text-[11px] text-muted">
+                {rate} {data.unit}
+              </p>
+            </div>
+          ))}
+        </div>
       </Frame>
     );
   }
@@ -1250,9 +1332,48 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
 
 function FluencyBoard({ question, status, shake }: BoardProps) {
   const data = question.data as FluencyData;
-  const times = data.op === "×" && data.a > 0 && data.b > 0 && data.a <= 6 && data.b <= 10;
+  if (data.op === "×" && data.a >= 10 && data.a <= 49 && data.b >= 2 && data.b <= 9) {
+    const tens = Math.floor(data.a / 10) * 10;
+    const ones = data.a % 10;
+    return (
+      <Frame shake={shake} status={status}>
+        <p className="mb-3 text-center font-display text-2xl">{question.prompt}</p>
+        <div className="flex justify-center gap-4 text-center text-xs text-muted">
+          <div>
+            <p className="mb-1 font-display text-lg text-ink">
+              {tens} × {data.b}
+            </p>
+            <div className="flex flex-wrap justify-center gap-1">
+              {Array.from({ length: data.b }, (_, g) => (
+                <div key={g} className="flex gap-0.5 rounded-[8px] border border-line bg-bg-warm p-1">
+                  {Array.from({ length: tens / 10 }, (_, i) => (
+                    <span key={i} className="h-8 w-2 rounded-sm bg-teal" />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="mb-1 font-display text-lg text-ink">
+              {ones} × {data.b}
+            </p>
+            <div className="flex flex-wrap justify-center gap-1">
+              {Array.from({ length: data.b }, (_, g) => (
+                <div key={g} className="flex gap-0.5 rounded-[8px] border border-line bg-bg-warm p-1">
+                  {Array.from({ length: ones }, (_, i) => (
+                    <span key={i} className="size-3 rounded-full bg-star" />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Frame>
+    );
+  }
+  const times = data.op === "×" && data.a > 0 && data.b > 0 && data.a <= 12 && data.b <= 12;
   const div =
-    data.op === "÷" && data.b > 0 && data.a % data.b === 0 && data.a / data.b <= 6 && data.b <= 10 && data.a / data.b >= 1;
+    data.op === "÷" && data.b > 0 && data.a % data.b === 0 && data.a / data.b <= 12 && data.b <= 12 && data.a / data.b >= 1;
   const addSmall = (data.op === "+" || data.op === "−") && data.a <= 20 && data.b <= 20;
   if (times || div) {
     const groups = times ? data.a : data.a / data.b;
@@ -1264,7 +1385,7 @@ function FluencyBoard({ question, status, shake }: BoardProps) {
           {Array.from({ length: groups }, (_, g) => (
             <div key={g} className="flex flex-wrap gap-1 rounded-[12px] border border-line bg-bg-warm p-1.5">
               {Array.from({ length: size }, (_, i) => (
-                <span key={i} className="size-3 rounded-full bg-teal sm:size-4" />
+                <span key={i} className={cn("rounded-full bg-teal", groups * size > 40 ? "size-2" : "size-3 sm:size-4")} />
               ))}
             </div>
           ))}
@@ -1290,6 +1411,163 @@ function FluencyBoard({ question, status, shake }: BoardProps) {
     );
   }
   return <BigPrompt prompt={question.prompt} status={status} />;
+}
+
+function DecimalBoard({ question, status, shake }: BoardProps) {
+  const data = question.data as DecimalData;
+  const cells = (tenths: number, hundredths: number) => tenths * 10 + hundredths;
+  const shadeA = cells(data.tenths, data.hundredths);
+  const shadeB = data.b ? cells(data.b.tenths, data.b.hundredths) : 0;
+  const thousandths = data.thousandths;
+  const grid = (shaded: number, label: string) => (
+    <div className="text-center">
+      <div className="mx-auto grid w-40 grid-cols-10 gap-px rounded-[8px] border border-line bg-line p-px">
+        {Array.from({ length: 100 }, (_, i) => (
+          <span key={i} className={cn("aspect-square", i < shaded ? "bg-teal" : "bg-surface")} />
+        ))}
+      </div>
+      <p className="mt-1 text-xs text-muted">{label}</p>
+    </div>
+  );
+  if (thousandths != null) {
+    const locale = parseLocale(useProgress((st) => st.locale));
+    const labels = PLACE[locale].slice(0, 4).reverse();
+    const digits = [data.whole, data.tenths, data.hundredths, thousandths];
+    return (
+      <Frame shake={shake} status={status}>
+        <p className="mb-2 text-center font-display text-xl">{question.prompt}</p>
+        <div className="grid grid-cols-4 gap-1 text-center text-[10px] text-muted">
+          {digits.map((d, i) => (
+            <div key={i} className="rounded-[10px] border border-line bg-bg-warm p-2">
+              <p className="font-display text-2xl text-ink tabular-nums">{d}</p>
+              {labels[i]}
+            </div>
+          ))}
+        </div>
+        {grid(shadeA, `${data.tenths}.${data.hundredths}`)}
+      </Frame>
+    );
+  }
+  if (data.mode === "add" || data.mode === "sub") {
+    return (
+      <Frame shake={shake} status={status}>
+        <p className="mb-2 text-center font-display text-xl">{question.prompt}</p>
+        <div className="flex flex-wrap justify-center gap-4">
+          {grid(shadeA, "first")}
+          {grid(shadeB, "second")}
+        </div>
+      </Frame>
+    );
+  }
+  const tenthsOnly = data.hundredths === 0 && shadeA % 10 === 0;
+  if (tenthsOnly || shadeA <= 10 && data.hundredths === 0) {
+    return (
+      <Frame shake={shake} status={status}>
+        <p className="mb-2 text-center font-display text-xl">{question.prompt}</p>
+        <div className="mx-auto flex h-12 w-full max-w-sm overflow-hidden rounded-[12px] border border-line">
+          {Array.from({ length: 10 }, (_, i) => (
+            <span key={i} className={cn("h-full flex-1 border-r border-line last:border-r-0", i < data.tenths ? "bg-teal" : "bg-surface")} />
+          ))}
+        </div>
+        <p className="mt-1 text-center text-xs text-muted">{data.tenths} / 10</p>
+      </Frame>
+    );
+  }
+  return (
+    <Frame shake={shake} status={status}>
+      <p className="mb-2 text-center font-display text-xl">{question.prompt}</p>
+      {grid(shadeA, `${shadeA} / 100`)}
+    </Frame>
+  );
+}
+
+function FracOpBoard({ question, status, shake }: BoardProps) {
+  const data = question.data as FracOpData;
+  const den = Math.max(1, data.den);
+  const bar = (shaded: number, key: string) => (
+    <div key={key} className="mb-2 flex h-12 overflow-hidden rounded-[12px] border border-line">
+      {Array.from({ length: den }, (_, i) => (
+        <span key={i} className={cn("h-full flex-1 border-r border-line last:border-r-0", i < shaded ? "bg-teal" : "bg-surface")} />
+      ))}
+    </div>
+  );
+  return (
+    <Frame shake={shake} status={status}>
+      <p className="mb-2 text-center font-display text-xl">
+        {data.a}/{den} {data.op} {data.b}/{den}
+      </p>
+      {bar(data.a, "a")}
+      {bar(data.b, "b")}
+    </Frame>
+  );
+}
+
+function LinesBoard({ question, status, shake }: BoardProps) {
+  const data = question.data as LinesData;
+  const locale = parseLocale(useProgress((st) => st.locale));
+  const copy = G4Q[locale];
+  return (
+    <Frame shake={shake} status={status}>
+      <svg viewBox="0 0 160 100" className="mx-auto h-40 w-full max-w-sm">
+        {!data.pair && data.figure === "point" ? <circle cx="80" cy="50" r="5" fill="#0d7377" /> : null}
+        {!data.pair && data.figure === "line" ? (
+          <line x1="10" y1="50" x2="150" y2="50" stroke="#1f1a14" strokeWidth="3" />
+        ) : null}
+        {data.figure === "ray" ? (
+          <>
+            <circle cx="30" cy="50" r="4" fill="#1f1a14" />
+            <line x1="30" y1="50" x2="150" y2="50" stroke="#1f1a14" strokeWidth="3" />
+            <polygon points="150,50 138,44 138,56" fill="#1f1a14" />
+          </>
+        ) : null}
+        {data.figure === "segment" ? (
+          <>
+            <line x1="30" y1="50" x2="130" y2="50" stroke="#1f1a14" strokeWidth="3" />
+            <circle cx="30" cy="50" r="4" fill="#1f1a14" />
+            <circle cx="130" cy="50" r="4" fill="#1f1a14" />
+          </>
+        ) : null}
+        {data.figure === "angle" ? (
+          <g transform="translate(50,70)">
+            <line x1="0" y1="0" x2="90" y2="0" stroke="#1f1a14" strokeWidth="3" />
+            <line
+              x1="0"
+              y1="0"
+              x2={80 * Math.cos((-(data.degrees ?? 90) * Math.PI) / 180)}
+              y2={80 * Math.sin((-(data.degrees ?? 90) * Math.PI) / 180)}
+              stroke="#0d7377"
+              strokeWidth="3"
+            />
+            <path
+              d={`M 22 0 A 22 22 0 0 ${ (data.degrees ?? 90) > 180 ? 1 : 0 } ${22 * Math.cos((-(data.degrees ?? 90) * Math.PI) / 180)} ${22 * Math.sin((-(data.degrees ?? 90) * Math.PI) / 180)}`}
+              fill="none"
+              stroke="#c45c26"
+              strokeWidth="2"
+            />
+          </g>
+        ) : null}
+        {data.pair === "parallel" ? (
+          <>
+            <line x1="20" y1="35" x2="140" y2="35" stroke="#1f1a14" strokeWidth="3" />
+            <line x1="20" y1="65" x2="140" y2="65" stroke="#0d7377" strokeWidth="3" />
+          </>
+        ) : null}
+        {data.pair === "perpendicular" ? (
+          <>
+            <line x1="20" y1="50" x2="140" y2="50" stroke="#1f1a14" strokeWidth="3" />
+            <line x1="80" y1="15" x2="80" y2="85" stroke="#0d7377" strokeWidth="3" />
+          </>
+        ) : null}
+        {data.pair === "neither" ? (
+          <>
+            <line x1="20" y1="30" x2="140" y2="50" stroke="#1f1a14" strokeWidth="3" />
+            <line x1="30" y1="80" x2="140" y2="25" stroke="#0d7377" strokeWidth="3" />
+          </>
+        ) : null}
+      </svg>
+      <p className="text-center text-xs text-muted">{copy.nameFigure}</p>
+    </Frame>
+  );
 }
 
 function BigPrompt({ prompt, status }: { prompt: string; status: BoardProps["status"] }) {
