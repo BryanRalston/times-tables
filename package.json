@@ -9,6 +9,7 @@
     "preview": "vite preview --port 4173 --host",
     "test": "vitest run && node scripts/check-assets.mjs",
     "check:assets": "node scripts/check-assets.mjs",
+    "check:pages": "node scripts/check-pages.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

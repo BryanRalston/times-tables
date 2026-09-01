@@ -29,18 +29,7 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
-      - name: Guard built index for Pages
-        run: |
-          touch dist/.nojekyll
-          grep -E 'assets/[^"]+\.js' dist/index.html
-          if grep -q 'src/main.tsx' dist/index.html; then
-            echo "dist/index.html still points at /src/main.tsx" >&2
-            exit 1
-          fi
-          if grep -q '%BASE_URL%' dist/index.html; then
-            echo "dist/index.html still has unsubstituted %BASE_URL%" >&2
-            exit 1
-          fi
+      - run: npm run check:pages
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
