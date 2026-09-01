@@ -4,6 +4,33 @@ import { cn, pad2 } from "@/lib/utils";
 
 const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0", "back"] as const;
 
+export function AnswerReadout({
+  value,
+  empty = "?",
+  label = "Your answer",
+}: {
+  value: string;
+  empty?: string;
+  label?: string;
+}) {
+  const shown = value.length > 0;
+  return (
+    <div className="rounded-[20px] border-2 border-ink bg-surface px-4 py-3 text-center shadow-soft">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted">{label}</p>
+      <p
+        className={cn(
+          "font-display min-h-14 text-5xl leading-tight tabular-nums",
+          shown ? "text-ink" : "text-faint",
+        )}
+        aria-live="polite"
+        aria-label={shown ? `${label} ${value}` : `${label} empty`}
+      >
+        {shown ? value : empty}
+      </p>
+    </div>
+  );
+}
+
 export function Keypad({
   value,
   onChange,
@@ -29,23 +56,26 @@ export function Keypad({
   }
 
   return (
-    <div className={cn("grid w-full grid-cols-3 gap-2", className)}>
-      {KEYS.map((k) => (
-        <Button
-          key={k}
-          variant="secondary"
-          size="key"
-          className="min-w-0 w-full"
-          aria-label={k === "back" ? "Backspace" : k}
-          onClick={() => press(k)}
-          disabled={disabled}
-        >
-          {k === "back" ? <Delete className="size-5" /> : k}
+    <div className={cn("space-y-3", className)}>
+      <AnswerReadout value={value} />
+      <div className="grid w-full grid-cols-3 gap-2">
+        {KEYS.map((k) => (
+          <Button
+            key={k}
+            variant="secondary"
+            size="key"
+            className="min-w-0 w-full"
+            aria-label={k === "back" ? "Backspace" : k}
+            onClick={() => press(k)}
+            disabled={disabled}
+          >
+            {k === "back" ? <Delete className="size-5" /> : k}
+          </Button>
+        ))}
+        <Button className="col-span-3" size="lg" onClick={onCheck} disabled={disabled || value.length === 0}>
+          Check
         </Button>
-      ))}
-      <Button className="col-span-3" size="lg" onClick={onCheck} disabled={disabled || value.length === 0}>
-        Check
-      </Button>
+      </div>
     </div>
   );
 }

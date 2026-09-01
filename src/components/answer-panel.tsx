@@ -1,4 +1,4 @@
-import { ChoiceList, ClockKeys, CompareKeys, FractionKeys, Keypad } from "@/components/keypad";
+import { AnswerReadout, ChoiceList, ClockKeys, CompareKeys, FractionKeys, Keypad } from "@/components/keypad";
 import { Button } from "@/components/ui/button";
 import type { Question } from "@/lib/types";
 
@@ -37,13 +37,16 @@ export function AnswerPanel({
   }
   if (question.input === "order") {
     return (
-      <div className="flex gap-2">
-        <Button variant="secondary" className="flex-1" onClick={() => setValue("")} disabled={disabled || !value}>
-          Clear
-        </Button>
-        <Button className="flex-1" onClick={() => onCheck()} disabled={disabled || !value}>
-          Check
-        </Button>
+      <div className="space-y-3">
+        <AnswerReadout value={value} empty="tap the numbers in order" />
+        <div className="flex gap-2">
+          <Button variant="secondary" className="flex-1" onClick={() => setValue("")} disabled={disabled || !value}>
+            Clear
+          </Button>
+          <Button className="flex-1" onClick={() => onCheck()} disabled={disabled || !value}>
+            Check
+          </Button>
+        </div>
       </div>
     );
   }
