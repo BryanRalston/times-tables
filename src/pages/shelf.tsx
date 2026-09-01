@@ -6,6 +6,16 @@ import { COMMON_SQUISHEES, RARE_SQUISHEES, squisheeSrc } from "@/lib/squishees";
 import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
 
+export function LockedRareMark() {
+  return (
+    <span className="grid h-20 w-20 place-items-center" aria-hidden>
+      <span className="grid h-16 w-16 place-items-center rounded-[42%] bg-faint/35 text-2xl font-display leading-none text-muted">
+        ?
+      </span>
+    </span>
+  );
+}
+
 export function ShelfPage() {
   const earned = useProgress((s) => s.squishees);
   const [poke, setPoke] = useState<string | null>(null);
@@ -72,17 +82,13 @@ export function ShelfPage() {
               )}
               aria-label={got ? `Poke ${s.name}` : ui.rareHint(s.id)}
             >
-              <SquashOnPoke
-                active={poke === s.id}
-                className={got ? "rare-glow" : undefined}
-                onRest={() => setPoke(null)}
-              >
-                <MagentaImg
-                  src={squisheeSrc(s.id)}
-                  alt=""
-                  className={cn("h-20 w-20", !got && "grayscale brightness-0 opacity-40")}
-                />
-              </SquashOnPoke>
+              {got ? (
+                <SquashOnPoke active={poke === s.id} className="rare-glow" onRest={() => setPoke(null)}>
+                  <MagentaImg src={squisheeSrc(s.id)} alt="" className="h-20 w-20" />
+                </SquashOnPoke>
+              ) : (
+                <LockedRareMark />
+              )}
               <span className="mt-1 text-center text-xs font-medium">{got ? s.name : "???"}</span>
               {!got ? <span className="mt-1 text-center text-[10px] leading-tight text-muted">{ui.rareHint(s.id)}</span> : null}
             </button>
