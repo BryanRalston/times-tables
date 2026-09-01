@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { AnswerPanel } from "@/components/answer-panel";
 import { useUi } from "@/components/chrome";
-import { MagentaImg, MagentaVideo } from "@/components/magenta-video";
+import { MagentaImg } from "@/components/magenta-video";
 import { Mascot, StarPop, type Pose } from "@/components/mascot";
 import { Board } from "@/components/models";
 import { ScratchPad } from "@/components/scratch";
 import { Button } from "@/components/ui/button";
-import { asset } from "@/lib/art";
 import { todayIso } from "@/lib/calendar";
 import { activityById, suggestedUnitId } from "@/lib/curriculum";
 import { makeDailyWalk, walkLabel } from "@/lib/daily";
@@ -282,9 +281,12 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     return (
       <div className="mx-auto grid min-h-dvh max-w-lg place-items-center px-4 py-8">
         <div className="w-full text-center">
-          <div className="relative mx-auto h-52 w-52">
-            <Mascot pose="celebrate" hop size="lg" className="mx-auto" />
-            {!reduce ? <MagentaVideo src={asset("squishees/frog-poke.mp4")} className="absolute inset-0" /> : null}
+          <div className="mx-auto grid h-52 w-52 place-items-center">
+            {prize ? (
+              <MagentaImg src={squisheeSrc(prize)} alt="" className="h-44 w-44 squash sm:h-52 sm:w-52" />
+            ) : (
+              <Mascot pose="celebrate" hop size="lg" className="mx-auto" />
+            )}
           </div>
           <h1 className="mt-2 font-display text-3xl">{ui.niceWalk}</h1>
           <p className="text-muted">
@@ -292,14 +294,11 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
           </p>
           {kind === "daily" ? <p className="mt-1 text-sm text-star">{ui.streak(streak)}</p> : null}
           {prize ? (
-            <div className="mt-4">
-              <MagentaImg src={squisheeSrc(prize)} alt="" className="mx-auto h-28 w-28 squash" />
-              <p className="text-sm text-teal">
-                {squisheeById(prize)?.rarity === "rare"
-                  ? ui.youFoundRare(squisheeById(prize)?.name ?? prize)
-                  : ui.youEarned(squisheeById(prize)?.name ?? prize)}
-              </p>
-            </div>
+            <p className="mt-4 text-sm text-teal">
+              {squisheeById(prize)?.rarity === "rare"
+                ? ui.youFoundRare(squisheeById(prize)?.name ?? prize)
+                : ui.youEarned(squisheeById(prize)?.name ?? prize)}
+            </p>
           ) : null}
           <Button className="mt-6 w-full" size="lg" onClick={() => navigate({ id: "home" }, { replace: true })}>
             {ui.home}
