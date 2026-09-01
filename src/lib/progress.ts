@@ -1,40 +1,78 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { UNIT_SPANS, UNITS, unitById } from "./curriculum";
-import type { DaySession, SaveState } from "./types";
+import { nextSquishee } from "./squishees";
+import type { DaySession, LearnerSlice, SaveState } from "./types";
 
-const SAVE_VERSION = 2;
+const SAVE_VERSION = 3;
 const STORAGE_KEY = "g3-path-v2";
+const DEFAULT_ID = "kid-1";
 
-function empty(): SaveState {
+export function emptyLearner(name = ""): LearnerSlice {
   return {
-    version: SAVE_VERSION,
-    name: "",
+    name,
     stars: 0,
     seenWelcome: false,
-    classUnitId: "",
-    skipWeekend: true,
     activities: {},
     badges: [],
     shaky: {},
     sessions: {},
+    squishees: [],
+    attempts: {},
+  };
+}
+
+function sliceOf(s: LearnerSlice): LearnerSlice {
+  return {
+    name: s.name,
+    stars: s.stars,
+    seenWelcome: s.seenWelcome,
+    activities: s.activities,
+    badges: s.badges,
+    shaky: s.shaky,
+    sessions: s.sessions,
+    squishees: s.squishees ?? [],
+    attempts: s.attempts ?? {},
+  };
+}
+
+function empty(): SaveState {
+  const kid = emptyLearner();
+  return {
+    version: SAVE_VERSION,
+    learnerId: DEFAULT_ID,
+    classUnitId: "",
+    skipWeekend: true,
+    learners: { [DEFAULT_ID]: kid },
+    ...kid,
   };
 }
 
 function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
   const base = empty();
   if (!raw || typeof raw !== "object") return base;
-  return {
-    ...base,
-    ...raw,
-    version: SAVE_VERSION,
+  const learnerId = raw.learnerId || DEFAULT_ID;
+  const fromFlat = sliceOf({
+    name: raw.name ?? "",
+    stars: typeof raw.stars === "number" ? raw.stars : 0,
+    seenWelcome: Boolean(raw.seenWelcome),
     activities: raw.activities ?? {},
     badges: raw.badges ?? [],
     shaky: raw.shaky ?? {},
     sessions: raw.sessions ?? {},
-    stars: typeof raw.stars === "number" ? raw.stars : 0,
-    skipWeekend: raw.skipWeekend !== false,
+    squishees: raw.squishees ?? [],
+    attempts: raw.attempts ?? {},
+  });
+  const learners = { ...(raw.learners ?? {}) };
+  if (!learners[learnerId]) learners[learnerId] = fromFlat;
+  const cur = sliceOf(learners[learnerId] ?? fromFlat);
+  return {
+    version: SAVE_VERSION,
+    learnerId,
     classUnitId: raw.classUnitId ?? "",
+    skipWeekend: raw.skipWeekend !== false,
+    learners,
+    ...cur,
   };
 }
 
@@ -54,7 +92,22 @@ interface ProgressApi extends SaveState {
   }) => void;
   recordSession: (session: DaySession) => void;
   noteFact: (key: string, ok: boolean) => void;
+  beginPlay: (activityId: string) => number;
+  earnSquishee: () => string | null;
+  switchLearner: (id: string) => void;
+  addLearner: (name: string) => string;
   resetAll: () => void;
+}
+
+function commit(get: () => ProgressApi, set: (p: Partial<ProgressApi>) => void, patch: Partial<LearnerSlice>) {
+  const id = get().learnerId || DEFAULT_ID;
+  const cur = sliceOf(get().learners[id] ?? get());
+  const next = { ...cur, ...patch };
+  set({
+    learnerId: id,
+    ...next,
+    learners: { ...get().learners, [id]: next },
+  });
 }
 
 export const useProgress = create<ProgressApi>()(
@@ -63,8 +116,8 @@ export const useProgress = create<ProgressApi>()(
       ...empty(),
       hydrated: false,
       setHydrated: (v) => set({ hydrated: v }),
-      setName: (name) => set({ name: name.trim().slice(0, 24) }),
-      markWelcome: () => set({ seenWelcome: true }),
+      setName: (name) => commit(get, set, { name: name.trim().slice(0, 24) }),
+      markWelcome: () => commit(get, set, { seenWelcome: true }),
       setClassUnit: (id) => set({ classUnitId: id }),
       setSkipWeekend: (v) => set({ skipWeekend: v }),
       recordRound: ({ activityId, correct, total, earned, misses }) => {
@@ -77,7 +130,7 @@ export const useProgress = create<ProgressApi>()(
         };
         const pct = total === 0 ? 0 : correct / total;
         const stars = Math.max(prev.stars, pct >= 1 ? 3 : pct >= 0.7 ? 2 : pct >= 0.4 ? 1 : 0);
-        set({
+        commit(get, set, {
           stars: get().stars + earned,
           activities: {
             ...get().activities,
@@ -92,7 +145,7 @@ export const useProgress = create<ProgressApi>()(
         });
       },
       recordSession: (session) => {
-        set({
+        commit(get, set, {
           sessions: {
             ...get().sessions,
             [session.date]: session,
@@ -109,15 +162,59 @@ export const useProgress = create<ProgressApi>()(
         } else {
           shaky[key] = (shaky[key] ?? 0) + 1;
         }
-        set({ shaky });
+        commit(get, set, { shaky });
       },
-      resetAll: () => set({ ...empty(), hydrated: true }),
+      beginPlay: (activityId) => {
+        const attempts = { ...get().attempts };
+        const n = (attempts[activityId] ?? 0) + 1;
+        attempts[activityId] = n;
+        commit(get, set, { attempts });
+        return n;
+      },
+      earnSquishee: () => {
+        const id = get().learnerId;
+        const earned = get().squishees;
+        const next = nextSquishee(earned, id, earned.length);
+        if (!next) return null;
+        commit(get, set, { squishees: [...earned, next] });
+        return next;
+      },
+      switchLearner: (id) => {
+        const kid = get().learners[id];
+        if (!kid) return;
+        set({ learnerId: id, ...sliceOf(kid) });
+      },
+      addLearner: (name) => {
+        const id = `kid-${Date.now().toString(36)}`;
+        const kid = emptyLearner(name.trim().slice(0, 24) || "New kid");
+        set({
+          learnerId: id,
+          ...kid,
+          learners: { ...get().learners, [id]: kid },
+        });
+        return id;
+      },
+      resetAll: () => {
+        const id = get().learnerId || DEFAULT_ID;
+        const name = get().name;
+        const kid = emptyLearner(name);
+        set({
+          ...empty(),
+          hydrated: true,
+          learnerId: id,
+          classUnitId: get().classUnitId,
+          skipWeekend: get().skipWeekend,
+          learners: { ...get().learners, [id]: kid },
+          ...kid,
+        });
+      },
     }),
     {
       name: STORAGE_KEY,
       skipHydration: true,
       partialize: (s) => ({
         version: s.version,
+        learnerId: s.learnerId,
         name: s.name,
         stars: s.stars,
         seenWelcome: s.seenWelcome,
@@ -127,6 +224,9 @@ export const useProgress = create<ProgressApi>()(
         badges: s.badges,
         shaky: s.shaky,
         sessions: s.sessions,
+        squishees: s.squishees,
+        attempts: s.attempts,
+        learners: s.learners,
       }),
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<SaveState>;
@@ -168,4 +268,12 @@ export function unitExhausted(unitId: string): boolean {
 
 export function allActivityCount(): number {
   return UNITS.reduce((n, u) => n + u.activities.length, 0);
+}
+
+export function learnerRoster(): { id: string; name: string }[] {
+  const s = useProgress.getState();
+  return Object.entries(s.learners).map(([id, k]) => ({
+    id,
+    name: k.name.trim() || (id === DEFAULT_ID ? "Kid 1" : "Kid"),
+  }));
 }

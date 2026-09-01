@@ -62,11 +62,23 @@ export function sessionCounts(opts: { friday: boolean; weekend: boolean }): {
   return { fresh: 8, review: 4, fluency: 2, fridayExtra: 0 };
 }
 
+export function walkSeed(opts: {
+  learnerId: string;
+  date: string;
+  unitId: string;
+  attempt: number;
+  extra?: boolean;
+}): string {
+  return `walk:${opts.learnerId}:${opts.date}:${opts.unitId}:${opts.attempt}:${opts.extra ? "xtra" : "day"}`;
+}
+
 export function makeDailyWalk(opts: {
   date: string;
   classUnitId?: string;
   skipWeekend?: boolean;
   shaky?: Record<string, number>;
+  learnerId?: string;
+  attempt?: number;
 }): DailyWalk {
   const skipWeekend = opts.skipWeekend !== false;
   const weekend = isWeekend(opts.date);
@@ -75,7 +87,13 @@ export function makeDailyWalk(opts: {
   const unit = unitById(unitId) ?? UNITS[0]!;
   const friday = isFriday(schoolDate) && isSchoolDay(schoolDate);
   const weekendPlay = weekend && skipWeekend;
-  const seed = `walk:${opts.date}:${unit.id}:${weekendPlay ? "xtra" : "day"}`;
+  const seed = walkSeed({
+    learnerId: opts.learnerId || "kid-1",
+    date: opts.date,
+    unitId: unit.id,
+    attempt: opts.attempt ?? 1,
+    extra: weekendPlay,
+  });
   const rng = rngFromSeed(seed);
   const counts = sessionCounts({ friday, weekend: weekendPlay });
   if (!friday && !weekendPlay) {

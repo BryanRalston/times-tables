@@ -1,4 +1,5 @@
-import { BookOpen, Flame, Home, Settings2, Star } from "lucide-react";
+import { BookOpen, Flame, Home, Settings2, Sparkles, Star } from "lucide-react";
+import type { ReactNode } from "react";
 import { Mascot } from "@/components/mascot";
 import { todayIso, YEAR_LABEL } from "@/lib/calendar";
 import { navigate } from "@/lib/nav";
@@ -41,33 +42,26 @@ export function AppHeader() {
   );
 }
 
-export function AppTabs({ active }: { active: "home" | "lessons" }) {
+export function AppTabs({ active }: { active: "home" | "lessons" | "shelf" }) {
+  const tab = (id: "home" | "lessons" | "shelf", label: string, icon: ReactNode) => (
+    <button
+      type="button"
+      className={cn(
+        "inline-flex h-11 items-center justify-center gap-1.5 rounded-[12px] text-sm font-medium",
+        active === id ? "bg-surface text-ink shadow-soft" : "text-muted",
+      )}
+      aria-current={active === id ? "page" : undefined}
+      onClick={() => navigate({ id })}
+    >
+      {icon}
+      {label}
+    </button>
+  );
   return (
-    <nav className="mb-5 grid grid-cols-2 gap-1 rounded-[16px] bg-surface-2 p-1" aria-label="Home and lessons">
-      <button
-        type="button"
-        className={cn(
-          "inline-flex h-11 items-center justify-center gap-2 rounded-[12px] text-sm font-medium",
-          active === "home" ? "bg-surface text-ink shadow-soft" : "text-muted",
-        )}
-        aria-current={active === "home" ? "page" : undefined}
-        onClick={() => navigate({ id: "home" })}
-      >
-        <Home className="size-4" />
-        Home
-      </button>
-      <button
-        type="button"
-        className={cn(
-          "inline-flex h-11 items-center justify-center gap-2 rounded-[12px] text-sm font-medium",
-          active === "lessons" ? "bg-surface text-ink shadow-soft" : "text-muted",
-        )}
-        aria-current={active === "lessons" ? "page" : undefined}
-        onClick={() => navigate({ id: "lessons" })}
-      >
-        <BookOpen className="size-4" />
-        Lessons
-      </button>
+    <nav className="mb-5 grid grid-cols-3 gap-1 rounded-[16px] bg-surface-2 p-1" aria-label="Home, lessons, and shelf">
+      {tab("home", "Home", <Home className="size-4" />)}
+      {tab("lessons", "Lessons", <BookOpen className="size-4" />)}
+      {tab("shelf", "Shelf", <Sparkles className="size-4" />)}
     </nav>
   );
 }

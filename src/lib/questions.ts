@@ -17,6 +17,7 @@ import type {
   Question,
   TenFrameData,
 } from "./types";
+import { SQUISHEE_IDS } from "./squishees";
 import { moneyFmt, pad2 } from "./utils";
 
 let qn = 0;
@@ -69,7 +70,7 @@ function wordForm(n: number): string {
 
 const NAMES = ["Maya", "Leo", "Priya", "Sam", "Ava", "Noah", "Elena", "Kai", "Rosa", "Ben"];
 const THINGS = ["apples", "stickers", "marbles", "crayons", "shells", "cards", "blocks", "beads"];
-const SYMBOLS = ["★", "●", "▲", "■", "♥"];
+
 
 function keypadQ(rng: Rng, partial: Omit<Question, "id" | "input"> & { input?: Question["input"] }): Question {
   return { id: qid(rng), input: partial.input ?? "keypad", ...partial };
@@ -673,7 +674,7 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       title: "Class pets",
       kind,
       key,
-      symbol: rng.pick(SYMBOLS),
+      symbol: rng.pick(SQUISHEE_IDS),
       rows,
       ask,
       focus,

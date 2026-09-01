@@ -7,6 +7,7 @@ import { GrownupPage } from "@/pages/grownup";
 import { HomePage } from "@/pages/home";
 import { LessonsPage } from "@/pages/lessons";
 import { PlayPage } from "@/pages/play";
+import { ShelfPage } from "@/pages/shelf";
 import { UnitPage } from "@/pages/unit";
 
 function Splash() {
@@ -32,6 +33,7 @@ export function App() {
   if (route.id === "play") return <PlayPage kind={route.kind} activityId={route.activityId} />;
   if (route.id === "unit") return <UnitPage unitId={route.unitId} />;
   if (route.id === "lessons") return <LessonsPage />;
+  if (route.id === "shelf") return <ShelfPage />;
   if (route.id === "grownup") return <GrownupPage />;
   return <HomePage />;
 }

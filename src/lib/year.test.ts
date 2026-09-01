@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { SCHOOL_DAYS, isSchoolDay, prevSchoolDay, weekdayName } from "./calendar";
-import { GRADE3_SOLS, UNITS, WELCOME_ACTIVITY, coversSol, fluencyFactorsForUnit, suggestedUnitId, unitById } from "./curriculum";
+import { GRADE3_SOLS, UNITS, WELCOME_ACTIVITY, activityById, coversSol, fluencyFactorsForUnit, suggestedUnitId, unitById } from "./curriculum";
 import { makeDailyWalk } from "./daily";
 import { parseHash } from "./nav";
 import { isUnitOpen, unitStatus } from "./path";
-import { makeQuestion, makeWelcomeRound, welcomeFirst } from "./questions";
+import { makeActivityRound, makeQuestion, makeWelcomeRound, welcomeFirst } from "./questions";
 import { rngFromSeed } from "./rng";
 import { schoolStreak } from "./streak";
 import { answersMatch } from "./utils";
@@ -165,6 +165,27 @@ describe("nav", () => {
     expect(parseHash("#/unit/u2")).toEqual({ id: "unit", unitId: "u2" });
     expect(parseHash("#/grownup")).toEqual({ id: "grownup" });
     expect(parseHash("#/lessons")).toEqual({ id: "lessons" });
+    expect(parseHash("#/shelf")).toEqual({ id: "shelf" });
+  });
+});
+
+describe("shuffle", () => {
+  it("two attempts of the same activity yield different prompts", () => {
+    const found = activityById("u2-place");
+    expect(found).toBeTruthy();
+    const r1 = makeActivityRound(found!.activity, rngFromSeed("kid-a:u2-place:1"));
+    const r2 = makeActivityRound(found!.activity, rngFromSeed("kid-a:u2-place:2"));
+    expect(r1.map((q) => q.prompt).join("|")).not.toBe(r2.map((q) => q.prompt).join("|"));
+    for (const q of [...r1, ...r2]) {
+      expect(answersMatch(q.answer, q.answer, q.alts)).toBe(true);
+      expect(q.answer.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("two learners get different daily walks on the same date", () => {
+    const a = makeDailyWalk({ date: "2026-09-15", learnerId: "maya", attempt: 1 });
+    const b = makeDailyWalk({ date: "2026-09-15", learnerId: "leo", attempt: 1 });
+    expect(a.items.map((q) => q.prompt).join("|")).not.toBe(b.items.map((q) => q.prompt).join("|"));
   });
 });
 

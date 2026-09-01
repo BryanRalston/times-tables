@@ -7,12 +7,14 @@ import { ScratchPad } from "@/components/scratch";
 import { Button } from "@/components/ui/button";
 import { ART } from "@/lib/art";
 import { todayIso } from "@/lib/calendar";
-import { activityById } from "@/lib/curriculum";
+import { activityById, suggestedUnitId } from "@/lib/curriculum";
 import { makeDailyWalk, walkLabel } from "@/lib/daily";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { makeActivityRound, makeWelcomeRound } from "@/lib/questions";
+import { rngFromSeed } from "@/lib/rng";
 import { playCorrect, playStar, playWrong, unlockAudio } from "@/lib/sound";
+import { squisheeById, squisheeSrc } from "@/lib/squishees";
 import { schoolStreak } from "@/lib/streak";
 import type { ItemSource, Question } from "@/lib/types";
 import { answersMatch } from "@/lib/utils";
@@ -30,12 +32,26 @@ interface Pack {
   activityId: string;
 }
 
-function buildPack(kind: Kind, activityId: string | undefined, classUnitId: string, skipWeekend: boolean, shaky: Record<string, number>): Pack {
+function playKey(kind: Kind, activityId: string | undefined, unitId: string): string {
+  if (kind === "welcome") return "welcome";
+  if (kind === "activity") return activityId ?? "practice";
+  return `daily:${unitId}`;
+}
+
+function buildPack(
+  kind: Kind,
+  activityId: string | undefined,
+  classUnitId: string,
+  skipWeekend: boolean,
+  shaky: Record<string, number>,
+  learnerId: string,
+  attempt: number,
+): Pack {
   const date = todayIso();
   if (kind === "welcome") {
     return {
       title: "What's hiding",
-      items: makeWelcomeRound(),
+      items: makeWelcomeRound(rngFromSeed(`welcome:${learnerId}:${attempt}`)),
       unitId: "u1",
       date,
       schoolDay: 0,
@@ -46,7 +62,9 @@ function buildPack(kind: Kind, activityId: string | undefined, classUnitId: stri
   }
   if (kind === "activity") {
     const found = activityById(activityId ?? "");
-    const items = found ? makeActivityRound(found.activity) : [];
+    const items = found
+      ? makeActivityRound(found.activity, rngFromSeed(`activity:${learnerId}:${found.activity.id}:${attempt}`))
+      : [];
     return {
       title: found?.activity.title ?? "Practice",
       items,
@@ -58,7 +76,14 @@ function buildPack(kind: Kind, activityId: string | undefined, classUnitId: stri
       activityId: activityId ?? "practice",
     };
   }
-  const walk = makeDailyWalk({ date, classUnitId: classUnitId || undefined, skipWeekend, shaky });
+  const walk = makeDailyWalk({
+    date,
+    classUnitId: classUnitId || undefined,
+    skipWeekend,
+    shaky,
+    learnerId,
+    attempt,
+  });
   return {
     title: walkLabel(walk),
     items: walk.items,
@@ -80,20 +105,24 @@ function sourceLabel(src?: ItemSource): string | null {
 }
 
 export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string }) {
-  const classUnitId = useProgress((s) => s.classUnitId);
-  const skipWeekend = useProgress((s) => s.skipWeekend);
-  const shaky = useProgress((s) => s.shaky);
   const sessions = useProgress((s) => s.sessions);
   const markWelcome = useProgress((s) => s.markWelcome);
   const recordRound = useProgress((s) => s.recordRound);
   const recordSession = useProgress((s) => s.recordSession);
   const noteFact = useProgress((s) => s.noteFact);
+  const earnSquishee = useProgress((s) => s.earnSquishee);
 
-  const [pack] = useState(() => buildPack(kind, activityId, classUnitId, skipWeekend, shaky));
+  const [pack] = useState(() => {
+    const st = useProgress.getState();
+    const unitGuess = suggestedUnitId(todayIso(), st.classUnitId || undefined);
+    const key = playKey(kind, activityId, unitGuess);
+    const attempt = st.beginPlay(key);
+    return buildPack(kind, activityId, st.classUnitId, st.skipWeekend, st.shaky, st.learnerId, attempt);
+  });
+  const [prize, setPrize] = useState<string | null>(null);
   const [i, setI] = useState(0);
   const [value, setValue] = useState("");
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
-  const [interacted, setInteracted] = useState(false);
   const [shake, setShake] = useState(0);
   const [correct, setCorrect] = useState(0);
   const [misses, setMisses] = useState<string[]>([]);
@@ -144,7 +173,6 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   function resetCard() {
     setValue("");
     setStatus("idle");
-    setInteracted(false);
     setHop(false);
     setStar(false);
     setPose("think");
@@ -176,6 +204,8 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       });
     }
     if (kind === "welcome") markWelcome();
+    const toy = earnSquishee();
+    setPrize(toy);
     playStar();
     setPose("star");
     setDone(true);
@@ -192,7 +222,6 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   function check(override?: string) {
     if (!q || status !== "idle") return;
-    if (q.needsInteract && !interacted) return;
     const given = override ?? value;
     if (!given.length) return;
     if (answersMatch(given, q.answer, q.alts)) {
@@ -253,6 +282,12 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
             {correct} of {pack.items.length} · {pack.title}
           </p>
           {kind === "daily" ? <p className="mt-1 text-sm text-star">School-day streak {streak}</p> : null}
+          {prize ? (
+            <div className="mt-4">
+              <img src={squisheeSrc(prize)} alt="" className="mx-auto h-28 w-28 object-contain squash" />
+              <p className="text-sm text-teal">You earned {squisheeById(prize)?.name}!</p>
+            </div>
+          ) : null}
           <Button className="mt-6 w-full" size="lg" onClick={() => navigate({ id: "home" }, { replace: true })}>
             Home
           </Button>
@@ -263,7 +298,6 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   if (!q) return null;
 
-  const gated = Boolean(q.needsInteract && !interacted);
   const pill = sourceLabel(q.source);
   const speech =
     pose === "oops"
@@ -310,15 +344,14 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         question={q}
         value={value}
         setValue={setValue}
-        interacted={interacted}
-        onInteract={() => setInteracted(true)}
+        interacted={false}
+        onInteract={() => undefined}
         status={status}
         shake={shake}
       />
 
       <div className="mt-4">
-        {gated ? <p className="mb-2 text-center text-sm text-muted">Take what you can see first.</p> : null}
-        <AnswerPanel question={q} value={value} setValue={setValue} onCheck={check} disabled={status !== "idle" || gated} />
+        <AnswerPanel question={q} value={value} setValue={setValue} onCheck={check} disabled={status !== "idle"} />
       </div>
 
       {q.kind === "word" || q.prompt.length > 70 ? <div className="mt-3"><ScratchPad /></div> : null}

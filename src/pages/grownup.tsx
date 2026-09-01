@@ -8,12 +8,20 @@ import { useProgress } from "@/lib/progress";
 
 export function GrownupPage() {
   const name = useProgress((s) => s.name);
+  const learnerId = useProgress((s) => s.learnerId);
   const classUnitId = useProgress((s) => s.classUnitId);
   const skipWeekend = useProgress((s) => s.skipWeekend);
   const setName = useProgress((s) => s.setName);
   const setClassUnit = useProgress((s) => s.setClassUnit);
   const setSkipWeekend = useProgress((s) => s.setSkipWeekend);
+  const switchLearner = useProgress((s) => s.switchLearner);
+  const addLearner = useProgress((s) => s.addLearner);
   const resetAll = useProgress((s) => s.resetAll);
+  const learners = useProgress((s) => s.learners);
+  const roster = Object.entries(learners).map(([id, k]) => ({
+    id,
+    name: k.name.trim() || (id === "kid-1" ? "Kid 1" : "Kid"),
+  }));
   const [armed, setArmed] = useState(false);
 
   return (
@@ -33,6 +41,20 @@ export function GrownupPage() {
       </p>
 
       <label className="mt-6 block text-sm font-medium">
+        Who is playing
+        <select
+          value={learnerId}
+          onChange={(e) => switchLearner(e.target.value)}
+          className="mt-1 h-12 w-full rounded-[14px] border border-line bg-surface px-3"
+        >
+          {roster.map((k) => (
+            <option key={k.id} value={k.id}>
+              {k.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="mt-4 block text-sm font-medium">
         Name on the path
         <input
           value={name}
@@ -42,6 +64,14 @@ export function GrownupPage() {
           placeholder="Optional"
         />
       </label>
+      <Button
+        variant="secondary"
+        className="mt-3"
+        onClick={() => addLearner(`Kid ${roster.length + 1}`)}
+      >
+        Another kid
+      </Button>
+      <p className="mt-2 text-xs text-muted">Each kid has their own stars, streak, and squishee shelf. Questions shuffle per kid.</p>
 
       <label className="mt-4 block text-sm font-medium">
         Class is on

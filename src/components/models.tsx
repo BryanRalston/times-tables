@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { ChoiceList } from "@/components/keypad";
 import { playTap } from "@/lib/sound";
+import { squisheeSrc } from "@/lib/squishees";
 import type {
   AreaData,
   ArrayData,
@@ -694,6 +695,7 @@ function PerimeterBoard({ question, onInteract, status, shake }: BoardProps) {
 function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
   const data = question.data as GraphData;
   const max = Math.max(...data.rows.map((r) => r.value), 1);
+  const count = (v: number) => Math.max(1, Math.round(v / Math.max(1, data.key)));
   return (
     <Frame shake={shake} status={status}>
       <p className="mb-2 text-center text-sm font-medium">{data.title}</p>
@@ -701,20 +703,39 @@ function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
         <div className="space-y-2">
           {data.rows.map((r) => (
             <div key={r.label} className="flex items-center gap-2">
-              <span className="w-20 text-sm">{r.label}</span>
-              <button type="button" className="tracking-widest text-lg" onClick={() => onInteract()} aria-label={`${r.label} pictures`}>
-                {data.symbol.repeat(Math.max(1, r.value / data.key))}
+              <span className="w-20 shrink-0 text-sm">{r.label}</span>
+              <button
+                type="button"
+                className="flex flex-wrap items-center gap-0.5"
+                onClick={() => onInteract()}
+                aria-label={`${r.label} pictures`}
+              >
+                {Array.from({ length: count(r.value) }, (_, i) => (
+                  <img key={i} src={squisheeSrc(data.symbol)} alt="" className="size-7 object-contain" />
+                ))}
               </button>
             </div>
           ))}
-          <p className="text-xs text-muted">Key: {data.symbol} = {data.key}</p>
+          <p className="flex items-center gap-1 text-xs text-muted">
+            Key: <img src={squisheeSrc(data.symbol)} alt="" className="inline size-5 object-contain" /> = {data.key}
+          </p>
         </div>
       ) : (
-        <div className="flex h-36 items-end justify-around gap-2">
+        <div className="flex h-40 items-stretch justify-around gap-2">
           {data.rows.map((r) => (
-            <button type="button" key={r.label} className="flex flex-1 flex-col items-center gap-1" onClick={() => onInteract()}>
-              <div className="w-full rounded-t-md bg-teal" style={{ height: `${(r.value / max) * 100}%` }} />
-              <span className="text-[11px]">{r.label}</span>
+            <button
+              type="button"
+              key={r.label}
+              className="flex h-full min-w-0 flex-1 flex-col"
+              onClick={() => onInteract()}
+            >
+              <div className="flex min-h-0 flex-1 items-end">
+                <div
+                  className="w-full min-h-2 rounded-t-md bg-teal"
+                  style={{ height: `${Math.max(8, (r.value / max) * 100)}%` }}
+                />
+              </div>
+              <span className="mt-1 shrink-0 text-[11px]">{r.label}</span>
             </button>
           ))}
         </div>

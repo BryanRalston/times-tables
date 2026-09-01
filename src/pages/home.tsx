@@ -15,12 +15,23 @@ export function HomePage() {
   const shaky = useProgress((s) => s.shaky);
   const sessions = useProgress((s) => s.sessions);
   const seenWelcome = useProgress((s) => s.seenWelcome);
+  const learnerId = useProgress((s) => s.learnerId);
+  const attempts = useProgress((s) => s.attempts);
   const date = todayIso();
   const suggested = suggestedUnitId(date, classUnitId || undefined);
   const unit = unitById(suggested);
+  const nextAttempt = (attempts[`daily:${suggested}`] ?? 0) + 1;
   const walk = useMemo(
-    () => makeDailyWalk({ date, classUnitId: classUnitId || undefined, skipWeekend, shaky }),
-    [date, classUnitId, skipWeekend, shaky],
+    () =>
+      makeDailyWalk({
+        date,
+        classUnitId: classUnitId || undefined,
+        skipWeekend,
+        shaky,
+        learnerId,
+        attempt: nextAttempt,
+      }),
+    [date, classUnitId, skipWeekend, shaky, learnerId, nextAttempt],
   );
   const done = Boolean(sessions[walk.date]?.completed);
   const remain = remainingSchoolDaysInUnit(suggested, walk.schoolDate);

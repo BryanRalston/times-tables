@@ -246,15 +246,22 @@ export interface DaySession {
   completed: boolean;
 }
 
-export interface SaveState {
-  version: number;
+export interface LearnerSlice {
   name: string;
   stars: number;
   seenWelcome: boolean;
-  classUnitId: string;
-  skipWeekend: boolean;
   activities: Record<string, ActivitySave>;
   badges: string[];
   shaky: Record<string, number>;
   sessions: Record<string, DaySession>;
+  squishees: string[];
+  attempts: Record<string, number>;
+}
+
+export interface SaveState extends LearnerSlice {
+  version: number;
+  learnerId: string;
+  classUnitId: string;
+  skipWeekend: boolean;
+  learners: Record<string, LearnerSlice>;
 }
