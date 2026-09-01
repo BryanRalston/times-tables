@@ -1,3 +1,5 @@
+export type Locale = "en" | "es" | "pt-BR";
+
 export type QuarterId = 1 | 2 | 3 | 4;
 
 export type Kind =
@@ -152,10 +154,12 @@ export interface GraphData {
   kind: "picto" | "bar";
   key: number;
   symbol: string;
-  rows: { label: string; value: number }[];
+  rows: { label: string; value: number; symbol?: string }[];
   ask: "greatest" | "least" | "value" | "more" | "total";
   focus?: string;
   focusB?: string;
+  collect?: boolean;
+  tray?: { id: string; label: string; symbol?: string }[];
 }
 
 export interface PatternData {
@@ -263,5 +267,6 @@ export interface SaveState extends LearnerSlice {
   learnerId: string;
   classUnitId: string;
   skipWeekend: boolean;
+  locale: Locale;
   learners: Record<string, LearnerSlice>;
 }

@@ -1,5 +1,8 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { ChoiceList } from "@/components/keypad";
+import { MagentaImg } from "@/components/magenta-video";
+import { parseLocale, PLACE, UI } from "@/lib/i18n";
+import { useProgress } from "@/lib/progress";
 import { playTap } from "@/lib/sound";
 import { squisheeSrc } from "@/lib/squishees";
 import type {
@@ -86,7 +89,7 @@ function Frame({ children, shake, status }: { children: ReactNode; shake: number
     <div
       key={shake}
       className={cn(
-        "rounded-[24px] border bg-surface p-4 shadow-soft sm:p-5",
+        "frost rounded-[24px] border p-4 shadow-soft sm:p-5",
         status === "correct" && "border-good bg-good-soft",
         status === "wrong" && "border-bad shake",
         status === "idle" && "border-line",
@@ -230,6 +233,27 @@ function PlaceValue({ question, status, shake }: BoardProps) {
   const data = question.data as PlaceValueData;
   const parts = tensOnes(data.number);
   const s = String(data.number);
+  const locale = parseLocale(useProgress((st) => st.locale));
+  if (data.mode === "word") {
+    const padded = s.padStart(6, "0");
+    const labels = [...PLACE[locale]].reverse();
+    const askingWords = question.prompt.includes("in words") || question.prompt.includes("en palabras") || question.prompt.includes("por extenso");
+    return (
+      <Frame shake={shake} status={status}>
+        <p className="mb-3 text-center font-display text-xl tabular-nums sm:text-2xl">
+          {askingWords ? data.number.toLocaleString("en-US") : (data.words ?? "")}
+        </p>
+        <div className="grid grid-cols-6 gap-1 text-center text-[9px] leading-tight text-muted">
+          {padded.split("").map((ch, i) => (
+            <div key={i} className="rounded-[10px] border border-line bg-bg-warm p-1">
+              <p className="font-display text-lg text-ink tabular-nums">{askingWords ? Number(ch) : "·"}</p>
+              {labels[i]}
+            </div>
+          ))}
+        </div>
+      </Frame>
+    );
+  }
   if (data.mode === "expanded") {
     const tens = Math.floor(data.number / 10) * 10;
     const ones = data.digit;
@@ -574,9 +598,10 @@ const COIN_META: { id: Coin; label: string; cents: number; size: string; fill: s
   { id: "penny", label: "1¢", cents: 1, size: "size-11", fill: "bg-star-soft border-star" },
 ];
 
-function MoneyBoard({ question, onInteract, status, shake }: BoardProps) {
+function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProps) {
   const data = question.data as MoneyData;
   const [gone, setGone] = useState<Record<string, boolean>>({});
+  const [built, setBuilt] = useState<Coin[]>([]);
   const coins = useMemo(() => {
     const list: { key: string; id: Coin }[] = [];
     for (const meta of COIN_META) {
@@ -592,7 +617,57 @@ function MoneyBoard({ question, onInteract, status, shake }: BoardProps) {
     onInteract();
   }
 
-  const total = coins.reduce((n, c) => n + (COIN_META.find((m) => m.id === c.id)?.cents ?? 0), 0);
+  const builtTotal = built.reduce((n, id) => n + (COIN_META.find((m) => m.id === id)?.cents ?? 0), 0);
+
+  const ui = UI[parseLocale(useProgress((st) => st.locale))];
+  if (data.mode === "make") {
+    return (
+      <Frame shake={shake} status={status}>
+        <p className="mb-2 text-center font-display text-xl">{ui.makeAmount(moneyFmt(data.target ?? 0))}</p>
+        <p className="mb-2 text-center text-xs text-muted">{ui.bankTap}</p>
+        <div className="flex flex-wrap justify-center gap-2">
+          {COIN_META.map((meta) => (
+            <button
+              type="button"
+              key={meta.id}
+              onClick={() => {
+                const next = [...built, meta.id];
+                setBuilt(next);
+                const t = next.reduce((n, id) => n + (COIN_META.find((m) => m.id === id)?.cents ?? 0), 0);
+                setValue(String(t));
+                playTap();
+                onInteract();
+              }}
+              className={cn("grid place-items-center rounded-full border text-xs font-medium", meta.size, meta.fill)}
+            >
+              {meta.label}
+            </button>
+          ))}
+        </div>
+        <p className="mb-1 mt-3 text-center text-xs text-muted">{ui.yourSet}</p>
+        <div className="flex min-h-12 flex-wrap justify-center gap-1">
+          {built.map((id, i) => {
+            const meta = COIN_META.find((m) => m.id === id)!;
+            return (
+              <button
+                type="button"
+                key={`${id}-${i}`}
+                onClick={() => {
+                  const next = built.filter((_, j) => j !== i);
+                  setBuilt(next);
+                  setValue(String(next.reduce((n, c) => n + (COIN_META.find((m) => m.id === c)?.cents ?? 0), 0)));
+                }}
+                className={cn("grid place-items-center rounded-full border text-[10px] font-medium", meta.size, meta.fill)}
+              >
+                {meta.label}
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-2 text-center font-display text-lg tabular-nums">{moneyFmt(builtTotal)}</p>
+      </Frame>
+    );
+  }
 
   return (
     <Frame shake={shake} status={status}>
@@ -617,7 +692,7 @@ function MoneyBoard({ question, onInteract, status, shake }: BoardProps) {
         })}
       </div>
       <p className="mt-3 text-center text-sm text-muted">
-        {data.mode === "change" ? "Take the dimes you can see." : `${moneyFmt(total)} if you count them all.`}
+        {data.mode === "change" ? ui.takeCoins : ui.countCoins}
       </p>
     </Frame>
   );
@@ -694,45 +769,91 @@ function PerimeterBoard({ question, onInteract, status, shake }: BoardProps) {
 
 function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
   const data = question.data as GraphData;
-  const max = Math.max(...data.rows.map((r) => r.value), 1);
-  const count = (v: number) => Math.max(1, Math.round(v / Math.max(1, data.key)));
+  const ui = UI[parseLocale(useProgress((st) => st.locale))];
+  const [tray, setTray] = useState(() => data.tray ?? []);
+  const [counts, setCounts] = useState<Record<string, number>>(() =>
+    Object.fromEntries(data.rows.map((r) => [r.label, data.collect ? 0 : r.value])),
+  );
+  const [picked, setPicked] = useState<string | null>(null);
+  const rows = data.rows.map((r) => ({ ...r, value: counts[r.label] ?? 0 }));
+  const max = Math.max(...rows.map((r) => r.value), 1);
+  const count = (v: number) => Math.max(0, Math.round(v / Math.max(1, data.key)));
+  const sym = (r: { symbol?: string }) => r.symbol ?? data.symbol;
+
+  function place(label: string) {
+    if (!data.collect) {
+      onInteract();
+      return;
+    }
+    if (!picked) return;
+    const item = tray.find((t) => t.id === picked);
+    if (!item) return;
+    setTray((t) => t.filter((x) => x.id !== picked));
+    setCounts((c) => ({ ...c, [label]: (c[label] ?? 0) + 1 }));
+    setPicked(null);
+    playTap();
+    onInteract();
+  }
+
   return (
     <Frame shake={shake} status={status}>
       <p className="mb-2 text-center text-sm font-medium">{data.title}</p>
+      {data.collect && tray.length ? (
+        <div className="mb-3 rounded-[12px] border border-dashed border-line bg-bg-warm p-2">
+          <p className="mb-1 text-xs text-muted">{ui.tapPicture}</p>
+          <div className="flex flex-wrap gap-1">
+            {tray.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setPicked(t.id)}
+                className={cn(
+                  "rounded-[10px] border bg-surface p-1",
+                  picked === t.id ? "border-teal" : "border-line",
+                )}
+                aria-label={t.label}
+              >
+                <MagentaImg src={squisheeSrc(t.symbol ?? data.symbol)} alt="" className="size-8" />
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
       {data.kind === "picto" ? (
         <div className="space-y-2">
-          {data.rows.map((r) => (
+          {rows.map((r) => (
             <div key={r.label} className="flex items-center gap-2">
-              <span className="w-20 shrink-0 text-sm">{r.label}</span>
               <button
                 type="button"
-                className="flex flex-wrap items-center gap-0.5"
-                onClick={() => onInteract()}
-                aria-label={`${r.label} pictures`}
+                className="w-20 shrink-0 rounded-[8px] border border-line px-1 py-0.5 text-left text-sm"
+                onClick={() => place(r.label)}
               >
-                {Array.from({ length: count(r.value) }, (_, i) => (
-                  <img key={i} src={squisheeSrc(data.symbol)} alt="" className="size-7 object-contain" />
-                ))}
+                {r.label}
               </button>
+              <div className="flex flex-wrap items-center gap-0.5">
+                {Array.from({ length: count(r.value) }, (_, i) => (
+                  <MagentaImg key={i} src={squisheeSrc(sym(r))} alt="" className="size-7" />
+                ))}
+              </div>
             </div>
           ))}
           <p className="flex items-center gap-1 text-xs text-muted">
-            Key: <img src={squisheeSrc(data.symbol)} alt="" className="inline size-5 object-contain" /> = {data.key}
+            Key: <MagentaImg src={squisheeSrc(data.symbol)} alt="" className="inline size-5" /> = {data.key}
           </p>
         </div>
       ) : (
         <div className="flex h-40 items-stretch justify-around gap-2">
-          {data.rows.map((r) => (
+          {rows.map((r) => (
             <button
               type="button"
               key={r.label}
               className="flex h-full min-w-0 flex-1 flex-col"
-              onClick={() => onInteract()}
+              onClick={() => place(r.label)}
             >
               <div className="flex min-h-0 flex-1 items-end">
                 <div
-                  className="w-full min-h-2 rounded-t-md bg-teal"
-                  style={{ height: `${Math.max(8, (r.value / max) * 100)}%` }}
+                  className="w-full rounded-t-md bg-teal"
+                  style={{ height: r.value ? `${Math.max(8, (r.value / max) * 100)}%` : "0%" }}
                 />
               </div>
               <span className="mt-1 shrink-0 text-[11px]">{r.label}</span>
@@ -811,55 +932,95 @@ function ComputeBoard({ question, status, shake }: BoardProps) {
 
 function MeasureBoard({ question, status, shake }: BoardProps) {
   const data = question.data as MeasureData;
+  const ui = UI[parseLocale(useProgress((st) => st.locale))];
   if (data.mode === "unit") {
     return (
       <Frame shake={shake} status={status}>
-        <p className="text-center text-sm text-muted">Pick the unit that fits.</p>
+        <p className="text-center text-sm text-muted">{ui.readPointer}</p>
       </Frame>
     );
   }
-  const pct = Math.min(100, (data.value / data.max) * 100);
+  const max = Math.max(1, data.max);
+  const halves = data.attribute === "length" && (data.unit === "in" || data.unit === "cm");
+  const steps = halves ? max * 2 : max;
+  const at = halves ? data.value * 2 : data.value;
+  const x = (i: number) => 28 + (i / steps) * 204;
+  const caption = (
+    <p className="mt-1 text-center text-sm font-medium text-ink">
+      {ui.readPointer} · {data.unit}
+    </p>
+  );
   if (data.attribute === "length") {
-    const ticks = data.max * (data.unit === "in" ? 2 : 1);
+    const px = x(at);
     return (
       <Frame shake={shake} status={status}>
-        <div className="relative mx-auto h-20 w-full max-w-sm">
-          <div className="absolute left-0 top-1 h-4 rounded-sm bg-teal" style={{ width: `${pct}%` }} />
-          <div className="absolute bottom-5 left-0 right-0 flex h-6 items-end border-t border-ink">
-            {Array.from({ length: ticks + 1 }, (_, i) => (
-              <span key={i} className="flex-1 border-l border-ink" />
-            ))}
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 flex justify-between text-[10px] text-muted">
-            {Array.from({ length: data.max + 1 }, (_, i) => (
-              <span key={i}>{i}</span>
-            ))}
-          </div>
-        </div>
-        <p className="mt-2 text-center text-xs text-muted">{data.unit}</p>
+        <svg viewBox="0 0 260 100" className="h-36 w-full" role="img" aria-label={`${ui.readPointer} ${data.unit}`}>
+          <rect x="20" y="44" width="220" height="40" rx="5" fill="#f4e4b8" stroke="#1f1a14" strokeWidth="2.5" />
+          <rect x="28" y="22" width={Math.max(6, (at / steps) * 204)} height="16" rx="3" fill="#0d7377" />
+          {Array.from({ length: steps + 1 }, (_, i) => {
+            const major = !halves || i % 2 === 0;
+            return (
+              <g key={i}>
+                <line x1={x(i)} y1="44" x2={x(i)} y2={major ? 72 : 58} stroke="#1f1a14" strokeWidth={major ? 2.5 : 1.5} />
+                {major ? (
+                  <text x={x(i)} y="92" textAnchor="middle" fontSize="13" fontWeight="700" fill="#1f1a14">
+                    {halves ? i / 2 : i}
+                  </text>
+                ) : null}
+              </g>
+            );
+          })}
+          <polygon points={`${px},44 ${px - 9},18 ${px + 9},18`} fill="#c45c26" stroke="#1f1a14" strokeWidth="1.2" />
+        </svg>
+        {caption}
       </Frame>
     );
   }
   if (data.attribute === "mass") {
+    const y = 148 - (data.value / max) * 116;
     return (
       <Frame shake={shake} status={status}>
-        <div className="flex items-end justify-center gap-1">
-          {Array.from({ length: data.value }, (_, i) => (
-            <span key={i} className="w-6 rounded-t bg-q2" style={{ height: `${16 + i * 4}px` }} />
-          ))}
-        </div>
-        <p className="mt-2 text-center text-xs text-muted">Scale · {data.unit}</p>
+        <svg viewBox="0 0 140 180" className="mx-auto h-52" role="img" aria-label={`${ui.readPointer} ${data.unit}`}>
+          <rect x="52" y="20" width="56" height="136" rx="8" fill="#fffaf1" stroke="#1f1a14" strokeWidth="2.5" />
+          {Array.from({ length: max + 1 }, (_, i) => {
+            const yy = 148 - (i / max) * 116;
+            return (
+              <g key={i}>
+                <line x1="52" y1={yy} x2="42" y2={yy} stroke="#1f1a14" strokeWidth="2" />
+                <text x="38" y={yy + 5} textAnchor="end" fontSize="13" fontWeight="700" fill="#1f1a14">
+                  {i}
+                </text>
+              </g>
+            );
+          })}
+          <rect x="60" y={y} width="40" height={148 - y} fill="#0d7377" />
+          <polygon points={`112,${y} 128,${y - 8} 128,${y + 8}`} fill="#c45c26" stroke="#1f1a14" strokeWidth="1" />
+        </svg>
+        {caption}
       </Frame>
     );
   }
+  const fillH = (data.value / max) * 116;
+  const meniscus = 148 - fillH;
   return (
     <Frame shake={shake} status={status}>
-      <div className="mx-auto flex h-36 w-16 flex-col justify-end overflow-hidden rounded-b-[20px] border-2 border-ink">
-        <div className="w-full bg-teal" style={{ height: `${pct}%` }} />
-      </div>
-      <p className="mt-2 text-center text-xs text-muted">
-        0 to {data.max} {data.unit}
-      </p>
+      <svg viewBox="0 0 140 180" className="mx-auto h-52" role="img" aria-label={`${ui.readPointer} ${data.unit}`}>
+        <path d="M48,20 L112,20 L104,156 L56,156 Z" fill="#fffaf1" stroke="#1f1a14" strokeWidth="2.5" />
+        {Array.from({ length: max + 1 }, (_, i) => {
+          const yy = 148 - (i / max) * 116;
+          return (
+            <g key={i}>
+              <line x1="48" y1={yy} x2="38" y2={yy} stroke="#1f1a14" strokeWidth="2" />
+              <text x="34" y={yy + 5} textAnchor="end" fontSize="13" fontWeight="700" fill="#1f1a14">
+                {i}
+              </text>
+            </g>
+          );
+        })}
+        <path d={`M54,${meniscus} L106,${meniscus} L100,156 L60,156 Z`} fill="#0d7377" opacity="0.88" />
+        <polygon points={`112,${meniscus} 128,${meniscus - 8} 128,${meniscus + 8}`} fill="#c45c26" stroke="#1f1a14" strokeWidth="1" />
+      </svg>
+      {caption}
     </Frame>
   );
 }

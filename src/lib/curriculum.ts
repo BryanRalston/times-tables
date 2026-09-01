@@ -53,8 +53,8 @@ export const UNITS: UnitDef[] = [
       A("u1-leftover", "What's hiding", "Ten-frames. Take the dots you can see, then name n.", ["3.NS.1"], "tenframe", { maxTotal: 10 }),
       A("u1-friends", "Number friends", "Add and subtract on a frame, within 20.", ["3.CE.1"], "tenframe", { minTotal: 10, maxTotal: 20 }),
       A("u1-coins", "Count the coins", "Pennies, nickels, dimes, quarters — up to a dollar.", ["3.NS.4.a"], "money", { mode: "count", max: 100 }),
-      A("u1-ask", "A data question", "Which question can we answer with a pictograph?", ["3.PS.1.a"], "choice", { mode: "dataQ" }),
-      A("u1-graph", "Pictograph key of 1", "Collect pictures. Each picture is 1.", ["3.PS.1.a", "3.PS.1.b"], "graph", { kind: "picto", key: 1 }),
+      A("u1-tally", "Tally and graph", "Sort the pictures. Watch the pictograph grow. Then read it.", ["3.PS.1.a", "3.PS.1.b"], "graph", { kind: "picto", collect: true }),
+      A("u1-graph", "Pictograph key of 1", "Read a pictograph. Each picture is 1.", ["3.PS.1.b"], "graph", { kind: "picto", key: 1 }),
     ],
   },
   {
@@ -67,7 +67,7 @@ export const UNITS: UnitDef[] = [
     blurb: "Read, write, build, compare, and order numbers through thousands — place up to six digits.",
     activities: [
       A("u2-place", "Place and value", "Name the place and value of a digit, through hundred thousands.", ["3.NS.1.a", "3.NS.1.b"], "placevalue", { six: true }),
-      A("u2-word", "Word form", "Read a number in words. Match the digits.", ["3.NS.1.a"], "placevalue", { mode: "word" }),
+      A("u2-word", "Word form", "Six-digit numbers: words ↔ digits, with a place chart.", ["3.NS.1.a"], "placevalue", { mode: "word" }),
       A("u2-build", "Compose and decompose", "Build a number to 9,999 in more than one way.", ["3.NS.1.c"], "build"),
       A("u2-expanded", "Tens you can see", "60 + n = 64. Leftover ones on a tens-and-ones board.", ["3.NS.1.c", "3.CE.1"], "placevalue", { mode: "expanded" }),
       A("u2-compare", "Compare", "Greater than, less than, equal to — up to 9,999.", ["3.NS.2.a"], "compare"),
@@ -137,7 +137,7 @@ export const UNITS: UnitDef[] = [
       A("u6-array", "Easy arrays", "Rows of 2, 5, or 10.", ["3.CE.2.d"], "array", { factors: [2, 5, 10] }),
       A("u6-factor", "Missing factor", "5 × n = 30. Isolate one group.", ["3.CE.2.d"], "groups", { hide: "groups", factors: [2, 5, 10] }),
       A("u6-skip", "Skip count", "The pattern is hiding a number.", ["3.CE.2.d"], "pattern", { steps: [2, 5, 10], dir: "up" }),
-      A("u6-picto", "Pictograph with a key", "Each picture can stand for more than 1.", ["3.PS.1.c", "3.PS.1.e"], "graph", { kind: "picto", key: 2 }),
+      A("u6-picto", "Tally with a key", "Sort pictures. Each picture can stand for 1. Then read.", ["3.PS.1.c", "3.PS.1.e"], "graph", { kind: "picto", collect: true, key: 2 }),
     ],
   },
   {
@@ -155,7 +155,7 @@ export const UNITS: UnitDef[] = [
       A("u7-estimate", "About how many", "Add or subtract to 1,000. Estimate first on hundreds.", ["3.CE.1"], "compute", { mode: "estimate" }),
       A("u7-exact", "Add and subtract to 1,000", "Hundreds, tens, and ones you can see.", ["3.CE.1"], "compute", { mode: "exact" }),
       A("u7-pattern", "Growing and shrinking", "Identify, describe, and extend +/− patterns.", ["3.PFA.1"], "pattern", { steps: [2, 3, 4, 5, 10] }),
-      A("u7-bar", "Read a bar graph", "Interpret data to solve a story.", ["3.PS.1"], "graph", { kind: "bar", key: 1 }),
+      A("u7-bar", "Tally a bar graph", "Sort the pictures. The bars grow. Then answer.", ["3.PS.1"], "graph", { kind: "bar", collect: true }),
     ],
   },
   {
@@ -222,6 +222,7 @@ export const UNITS: UnitDef[] = [
       A("u11-elapsed", "One hour later", "Elapsed time in one-hour increments.", ["3.MG.3.c"], "clock", { mode: "elapsed", hours: true }),
       A("u11-count", "Count to $5", "Bills and coins up to five dollars.", ["3.NS.4.a"], "money", { mode: "count", max: 500 }),
       A("u11-compare", "Compare money", "Which set is more?", ["3.NS.4.b"], "money", { mode: "compare", max: 500 }),
+      A("u11-make", "Make this amount", "Tap bills and coins until you match the total, up to $5.", ["3.NS.4.b"], "money", { mode: "make", max: 500 }),
       A("u11-change", "Make change", "Pay with bills. n is leftover.", ["3.NS.4.c"], "money", { mode: "change", max: 500 }),
     ],
   },

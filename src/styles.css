@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #f3eee4;
-  --color-bg-warm: #e8dfcf;
-  --color-surface: #fffaf1;
-  --color-surface-2: #efe6d6;
+  --color-bg: #f4b3d0;
+  --color-bg-warm: #ffe6f2;
+  --color-surface: rgb(255 250 241 / 0.9);
+  --color-surface-2: rgb(255 232 244 / 0.82);
   --color-ink: #1f1a14;
   --color-muted: #6b6358;
   --color-faint: #9a9186;
@@ -40,10 +40,30 @@
     min-height: 100%;
   }
   body {
-    background: var(--color-bg);
+    background-color: #f4b3d0;
+    background-image: url("/times-tables/theme/jelly-wide.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
     color: var(--color-ink);
     font-family: var(--font-sans);
     line-height: 1.5;
+  }
+  @media (max-width: 720px) {
+    body {
+      background-image: url("/times-tables/theme/jelly-tall.jpg");
+    }
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: url("/times-tables/theme/jelly-tile.jpg");
+    background-size: 220px;
+    opacity: 0.28;
+    mix-blend-mode: overlay;
+    pointer-events: none;
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {
@@ -105,8 +125,13 @@
 }
 
 .paper-grid {
-  background-image: radial-gradient(rgb(31 26 20 / 0.045) 0.8px, transparent 0.8px);
-  background-size: 18px 18px;
+  background-image: none;
+}
+
+.frost {
+  background-color: rgb(255 250 241 / 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 @keyframes hop {

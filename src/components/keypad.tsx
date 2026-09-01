@@ -1,29 +1,37 @@
 import { Delete } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { parseLocale, UI } from "@/lib/i18n";
+import { useProgress } from "@/lib/progress";
 import { cn, pad2 } from "@/lib/utils";
+
+function useChrome() {
+  return UI[parseLocale(useProgress((s) => s.locale))];
+}
 
 const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0", "back"] as const;
 
 export function AnswerReadout({
   value,
   empty = "?",
-  label = "Your answer",
+  label,
 }: {
   value: string;
   empty?: string;
   label?: string;
 }) {
+  const ui = useChrome();
   const shown = value.length > 0;
+  const shownLabel = label ?? ui.yourAnswer;
   return (
-    <div className="rounded-[20px] border-2 border-ink bg-surface px-4 py-3 text-center shadow-soft">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted">{label}</p>
+    <div className="frost rounded-[20px] border-2 border-ink px-4 py-3 text-center shadow-soft">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted">{shownLabel}</p>
       <p
         className={cn(
           "font-display min-h-14 text-5xl leading-tight tabular-nums",
           shown ? "text-ink" : "text-faint",
         )}
         aria-live="polite"
-        aria-label={shown ? `${label} ${value}` : `${label} empty`}
+        aria-label={shown ? `${shownLabel} ${value}` : `${shownLabel} empty`}
       >
         {shown ? value : empty}
       </p>
@@ -44,6 +52,7 @@ export function Keypad({
   disabled?: boolean;
   className?: string;
 }) {
+  const ui = useChrome();
   function press(k: (typeof KEYS)[number]) {
     if (disabled) return;
     if (k === "back") {
@@ -73,7 +82,7 @@ export function Keypad({
           </Button>
         ))}
         <Button className="col-span-3" size="lg" onClick={onCheck} disabled={disabled || value.length === 0}>
-          Check
+          {ui.check}
         </Button>
       </div>
     </div>
@@ -114,6 +123,7 @@ export function FractionKeys({
   disabled?: boolean;
   mixed?: boolean;
 }) {
+  const ui = useChrome();
   const parts = value.split(" ");
   const mixedWhole = mixed ? (parts.length > 1 ? parts[0] : parts[0]?.includes("/") ? "" : (parts[0] ?? "")) : "";
   const frac = mixed ? (parts.length > 1 ? parts[1] : parts[0]?.includes("/") ? parts[0] : "") : value;
@@ -162,7 +172,7 @@ export function FractionKeys({
         </Button>
       </div>
       <Button className="w-full" size="lg" onClick={onCheck} disabled={disabled || value.length === 0}>
-        Check
+        {ui.check}
       </Button>
     </div>
   );
@@ -179,6 +189,7 @@ export function ClockKeys({
   onCheck: () => void;
   disabled?: boolean;
 }) {
+  const ui = useChrome();
   const [hRaw, mRaw] = (value || "12:00").split(":");
   let hours = Number(hRaw || 12);
   let minutes = Number(mRaw || 0);
@@ -198,26 +209,26 @@ export function ClockKeys({
       </p>
       <div className="grid grid-cols-2 gap-2">
         <Button variant="secondary" disabled={disabled} onClick={() => set(hours + 1, minutes)}>
-          Hour +
+          {ui.hourPlus}
         </Button>
         <Button variant="secondary" disabled={disabled} onClick={() => set(hours - 1, minutes)}>
-          Hour −
+          {ui.hourMinus}
         </Button>
         <Button variant="secondary" disabled={disabled} onClick={() => set(hours, minutes + 5)}>
-          +5 min
+          {ui.plus5min}
         </Button>
         <Button variant="secondary" disabled={disabled} onClick={() => set(hours, minutes - 5)}>
-          −5 min
+          {ui.minus5min}
         </Button>
         <Button variant="secondary" disabled={disabled} onClick={() => set(hours, minutes + 1)}>
-          +1 min
+          {ui.plus1min}
         </Button>
         <Button variant="secondary" disabled={disabled} onClick={() => set(hours, minutes - 1)}>
-          −1 min
+          {ui.minus1min}
         </Button>
       </div>
       <Button className="w-full" size="lg" onClick={onCheck} disabled={disabled}>
-        Check
+        {ui.check}
       </Button>
     </div>
   );

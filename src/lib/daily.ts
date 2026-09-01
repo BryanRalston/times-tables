@@ -8,6 +8,7 @@ import {
   unitSpanDays,
   UNITS,
 } from "./curriculum";
+import { parseLocale, UI, type Locale } from "./i18n";
 import { makeFluencyItem, makeQuestion, withSource } from "./questions";
 import { rngFromSeed, type Rng } from "./rng";
 import type { ActivityDef, ItemSource, Question, UnitDef } from "./types";
@@ -32,7 +33,7 @@ function pickActivity(unit: UnitDef, rng: Rng): ActivityDef {
   return rng.pick(unit.activities);
 }
 
-function reviewQuestion(unit: UnitDef, earlier: UnitDef[], shaky: string[], rng: Rng): Question {
+function reviewQuestion(unit: UnitDef, earlier: UnitDef[], shaky: string[], rng: Rng, locale: Locale): Question {
   if (shaky.length && rng.next() < 0.35) {
     const fact = rng.pick(shaky);
     const [a, b] = fact.split("×").map(Number);
@@ -43,7 +44,7 @@ function reviewQuestion(unit: UnitDef, earlier: UnitDef[], shaky: string[], rng:
   }
   const pool = earlier.length ? earlier : [unit];
   const u = rng.pick(pool);
-  const q = makeQuestion(pickActivity(u, rng), rng);
+  const q = makeQuestion(pickActivity(u, rng), rng, locale);
   return withSource(q, "review");
 }
 
@@ -79,7 +80,9 @@ export function makeDailyWalk(opts: {
   shaky?: Record<string, number>;
   learnerId?: string;
   attempt?: number;
+  locale?: Locale | string;
 }): DailyWalk {
+  const locale = parseLocale(opts.locale);
   const skipWeekend = opts.skipWeekend !== false;
   const weekend = isWeekend(opts.date);
   const schoolDate = weekend && skipWeekend ? lastSchoolDayOnOrBefore(opts.date) ?? opts.date : opts.date;
@@ -109,10 +112,10 @@ export function makeDailyWalk(opts: {
   const items: Question[] = [];
 
   for (let i = 0; i < counts.fresh; i++) {
-    items.push(withSource(makeQuestion(pickActivity(unit, rng), rng), "fresh"));
+    items.push(withSource(makeQuestion(pickActivity(unit, rng), rng, locale), "fresh"));
   }
   for (let i = 0; i < counts.review; i++) {
-    items.push(reviewQuestion(unit, earlier, shakyKeys, rng));
+    items.push(reviewQuestion(unit, earlier, shakyKeys, rng, locale));
   }
   for (let i = 0; i < counts.fluency; i++) {
     items.push(withSource(makeFluencyItem(rng, factors), "fluency"));
@@ -120,7 +123,7 @@ export function makeDailyWalk(opts: {
   for (let i = 0; i < counts.fridayExtra; i++) {
     const src: ItemSource = "friday";
     if (rng.next() < 0.5) items.push(withSource(makeFluencyItem(rng, factors), src));
-    else items.push(reviewQuestion(unit, earlier.length ? earlier : [unit], shakyKeys, rng));
+    else items.push(reviewQuestion(unit, earlier.length ? earlier : [unit], shakyKeys, rng, locale));
   }
 
   const shuffledTail = rng.shuffle(items.slice(counts.fresh));
@@ -145,11 +148,19 @@ export function makeDailyWalk(opts: {
   };
 }
 
-export function walkLabel(walk: DailyWalk): string {
+const WEEKDAY_I18N: Record<Locale, Record<string, string>> = {
+  en: {},
+  es: { Sunday: "domingo", Monday: "lunes", Tuesday: "martes", Wednesday: "miércoles", Thursday: "jueves", Friday: "viernes", Saturday: "sábado" },
+  "pt-BR": { Sunday: "domingo", Monday: "segunda", Tuesday: "terça", Wednesday: "quarta", Thursday: "quinta", Friday: "sexta", Saturday: "sábado" },
+};
+
+export function walkLabel(walk: DailyWalk, locale: Locale | string = "en"): string {
+  const loc = parseLocale(locale);
+  const ui = UI[loc];
   if (walk.isWeekend && !walk.isSchoolDay) {
-    return `Weekend extra · ${walk.unit.short}`;
+    return `${ui.weekendExtra} · ${walk.unit.short}`;
   }
-  const day = walk.weekday;
-  const tag = walk.isFriday ? "Friday check" : `${day}'s walk`;
+  const day = WEEKDAY_I18N[loc][walk.weekday] ?? walk.weekday;
+  const tag = walk.isFriday ? ui.fridayCheck : ui.walkOf(day);
   return `${tag} · ${walk.unit.short}`;
 }

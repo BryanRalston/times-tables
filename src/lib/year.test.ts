@@ -4,7 +4,10 @@ import { GRADE3_SOLS, UNITS, WELCOME_ACTIVITY, activityById, coversSol, fluencyF
 import { makeDailyWalk } from "./daily";
 import { parseHash } from "./nav";
 import { isUnitOpen, unitStatus } from "./path";
-import { makeActivityRound, makeQuestion, makeWelcomeRound, welcomeFirst } from "./questions";
+import { UI } from "./i18n";
+import { makeActivityRound, makeQuestion, makeWelcomeRound, placeOnGraph, welcomeFirst, wordForm } from "./questions";
+import type { GraphData, MeasureData, MoneyData, PlaceValueData } from "./types";
+import { moneyFmt } from "./utils";
 import { rngFromSeed } from "./rng";
 import { schoolStreak } from "./streak";
 import { answersMatch } from "./utils";
@@ -166,6 +169,88 @@ describe("nav", () => {
     expect(parseHash("#/grownup")).toEqual({ id: "grownup" });
     expect(parseHash("#/lessons")).toEqual({ id: "lessons" });
     expect(parseHash("#/shelf")).toEqual({ id: "shelf" });
+  });
+});
+
+describe("principal holes", () => {
+  it("word form uses six-digit numbers ≥ 100,000", () => {
+    expect(wordForm(165724)).toBe("one hundred sixty-five thousand seven hundred twenty-four");
+    const found = activityById("u2-word")!;
+    for (let i = 0; i < 8; i++) {
+      const q = makeQuestion(found.activity, rngFromSeed(20 + i));
+      const n = (q.data as PlaceValueData).number;
+      expect(n).toBeGreaterThanOrEqual(100000);
+    }
+  });
+
+  it("money make-mode exists", () => {
+    const found = activityById("u11-make")!;
+    const q = makeQuestion(found.activity, rngFromSeed(3));
+    expect((q.data as MoneyData).mode).toBe("make");
+    expect(Number(q.answer)).toBeGreaterThan(0);
+    expect((q.data as MoneyData).target).toBe(Number(q.answer));
+  });
+
+  it("measure items have a numeric reading", () => {
+    for (const id of ["u8-length", "u8-mass", "u8-volume"]) {
+      const q = makeQuestion(activityById(id)!.activity, rngFromSeed(5));
+      const d = q.data as MeasureData;
+      expect(d.value).toBeGreaterThan(0);
+      expect(d.unit.length).toBeGreaterThan(0);
+      expect(Number(q.answer)).toBeGreaterThan(0);
+    }
+  });
+
+  it("data cycle mutates a graph", () => {
+    const q = makeQuestion(activityById("u1-tally")!.activity, rngFromSeed(2));
+    const d = q.data as GraphData;
+    expect(d.collect).toBe(true);
+    expect(d.tray?.length).toBeGreaterThan(0);
+    expect(d.rows.every((r) => r.value === 0)).toBe(true);
+    const first = d.tray![0]!;
+    const counts = Object.fromEntries(d.rows.map((r) => [r.label, 0]));
+    const next = placeOnGraph(d.tray!, counts, first.id, first.label);
+    expect(next.tray.length).toBe(d.tray!.length - 1);
+    expect(next.counts[first.label]).toBe(1);
+  });
+
+  it("count money does not spoil the total", () => {
+    const found = activityById("u1-coins")!;
+    for (let i = 0; i < 6; i++) {
+      const q = makeQuestion(found.activity, rngFromSeed(11 + i));
+      const d = q.data as MoneyData;
+      expect(d.mode).toBe("count");
+      const cents = Object.entries(d.coins).reduce((n, [id, c]) => {
+        const v = id === "penny" ? 1 : id === "nickel" ? 5 : id === "dime" ? 10 : id === "quarter" ? 25 : id === "dollar" ? 100 : 500;
+        return n + v * (c ?? 0);
+      }, 0);
+      expect(q.prompt).toBe("How many cents?");
+      expect(q.prompt).not.toContain(String(cents));
+      expect(q.prompt).not.toContain(moneyFmt(cents));
+    }
+  });
+});
+
+describe("locale", () => {
+  it("chrome strings cover English, Spanish, and Portuguese", () => {
+    expect(UI.en.home).toBe("Home");
+    expect(UI.es.home).toBe("Inicio");
+    expect(UI["pt-BR"].home).toBe("Início");
+    expect(UI.es.lessons).toBe("Lecciones");
+    expect(UI["pt-BR"].lessons).toBe("Lições");
+    expect(UI.es.shelf).toBe("Estante");
+    expect(UI.es.check).toBe("Comprobar");
+    expect(UI["pt-BR"].check).toBe("Conferir");
+    expect(UI.es.yourAnswer).toBe("Tu respuesta");
+    expect(UI["pt-BR"].yourAnswer).toBe("Sua resposta");
+  });
+
+  it("spanish word story is actually Spanish", () => {
+    const q = makeQuestion(activityById("u7-add")!.activity, rngFromSeed(4), "es");
+    expect(q.prompt).toMatch(/tiene|cuántos|bolsas|paquetes|ve /i);
+    expect(q.prompt).not.toMatch(/\bhas \d+ (apples|stickers|marbles)\b/i);
+    expect(q.prompt).not.toMatch(/Take the dots/);
+    expect(q.hint ?? "").not.toMatch(/Take the dots/);
   });
 });
 

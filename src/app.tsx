@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Mascot } from "@/components/mascot";
+import { parseLocale } from "@/lib/i18n";
 import { useRoute } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { unlockAudio } from "@/lib/sound";
@@ -12,7 +13,7 @@ import { UnitPage } from "@/pages/unit";
 
 function Splash() {
   return (
-    <div className="paper-grid grid min-h-dvh place-items-center">
+    <div className="grid min-h-dvh place-items-center">
       <Mascot pose="wave" size="lg" />
     </div>
   );
@@ -20,6 +21,7 @@ function Splash() {
 
 export function App() {
   const hydrated = useProgress((s) => s.hydrated);
+  const locale = parseLocale(useProgress((s) => s.locale));
   const route = useRoute();
 
   useEffect(() => {
@@ -28,9 +30,13 @@ export function App() {
     return () => window.removeEventListener("pointerdown", on);
   }, []);
 
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
+
   if (!hydrated) return <Splash />;
 
-  if (route.id === "play") return <PlayPage kind={route.kind} activityId={route.activityId} />;
+  if (route.id === "play") return <PlayPage key={`${route.kind}:${route.activityId ?? ""}`} kind={route.kind} activityId={route.activityId} />;
   if (route.id === "unit") return <UnitPage unitId={route.unitId} />;
   if (route.id === "lessons") return <LessonsPage />;
   if (route.id === "shelf") return <ShelfPage />;

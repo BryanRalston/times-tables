@@ -5,6 +5,56 @@ function isMagenta(r: number, g: number, b: number): boolean {
   return r > 140 && b > 110 && g < 130 && b > g + 40 && r > g + 40;
 }
 
+const keyed = new Map<string, string>();
+
+export function MagentaImg({
+  src,
+  alt = "",
+  className,
+}: {
+  src: string;
+  alt?: string;
+  className?: string;
+}) {
+  const [url, setUrl] = useState<string | null>(() => keyed.get(src) ?? null);
+
+  useEffect(() => {
+    const hit = keyed.get(src);
+    if (hit) {
+      setUrl(hit);
+      return;
+    }
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth || img.width;
+      canvas.height = img.naturalHeight || img.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx || !canvas.width) {
+        setUrl(src);
+        return;
+      }
+      ctx.drawImage(img, 0, 0);
+      const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const d = frame.data;
+      for (let i = 0; i < d.length; i += 4) {
+        if (isMagenta(d[i]!, d[i + 1]!, d[i + 2]!)) d[i + 3] = 0;
+      }
+      ctx.putImageData(frame, 0, 0);
+      const next = canvas.toDataURL("image/png");
+      keyed.set(src, next);
+      setUrl(next);
+    };
+    img.onerror = () => setUrl(src);
+    img.src = src;
+  }, [src]);
+
+  if (!url) {
+    return <span className={cn("inline-block", className)} aria-hidden />;
+  }
+  return <img src={url} alt={alt} draggable={false} className={cn("object-contain", className)} />;
+}
+
 export function MagentaVideo({
   src,
   className,

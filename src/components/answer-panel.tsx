@@ -1,5 +1,7 @@
 import { AnswerReadout, ChoiceList, ClockKeys, CompareKeys, FractionKeys, Keypad } from "@/components/keypad";
 import { Button } from "@/components/ui/button";
+import { parseLocale, UI } from "@/lib/i18n";
+import { useProgress } from "@/lib/progress";
 import type { Question } from "@/lib/types";
 
 export function AnswerPanel({
@@ -15,6 +17,7 @@ export function AnswerPanel({
   onCheck: (override?: string) => void;
   disabled?: boolean;
 }) {
+  const ui = UI[parseLocale(useProgress((s) => s.locale))];
   if (question.input === "choice") {
     return <ChoiceList choices={question.choices ?? []} onPick={(s) => onCheck(s)} disabled={disabled} />;
   }
@@ -38,13 +41,13 @@ export function AnswerPanel({
   if (question.input === "order") {
     return (
       <div className="space-y-3">
-        <AnswerReadout value={value} empty="tap the numbers in order" />
+        <AnswerReadout value={value} empty={ui.orderEmpty} />
         <div className="flex gap-2">
           <Button variant="secondary" className="flex-1" onClick={() => setValue("")} disabled={disabled || !value}>
-            Clear
+            {ui.clear}
           </Button>
           <Button className="flex-1" onClick={() => onCheck()} disabled={disabled || !value}>
-            Check
+            {ui.check}
           </Button>
         </div>
       </div>

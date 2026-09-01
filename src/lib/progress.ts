@@ -2,9 +2,10 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { UNIT_SPANS, UNITS, unitById } from "./curriculum";
 import { nextSquishee } from "./squishees";
-import type { DaySession, LearnerSlice, SaveState } from "./types";
+import { parseLocale } from "./i18n";
+import type { DaySession, LearnerSlice, Locale, SaveState } from "./types";
 
-const SAVE_VERSION = 3;
+const SAVE_VERSION = 4;
 const STORAGE_KEY = "g3-path-v2";
 const DEFAULT_ID = "kid-1";
 
@@ -43,6 +44,7 @@ function empty(): SaveState {
     learnerId: DEFAULT_ID,
     classUnitId: "",
     skipWeekend: true,
+    locale: "en",
     learners: { [DEFAULT_ID]: kid },
     ...kid,
   };
@@ -71,6 +73,7 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
     learnerId,
     classUnitId: raw.classUnitId ?? "",
     skipWeekend: raw.skipWeekend !== false,
+    locale: parseLocale(raw.locale),
     learners,
     ...cur,
   };
@@ -83,6 +86,7 @@ interface ProgressApi extends SaveState {
   markWelcome: () => void;
   setClassUnit: (id: string) => void;
   setSkipWeekend: (v: boolean) => void;
+  setLocale: (locale: Locale) => void;
   recordRound: (opts: {
     activityId: string;
     correct: number;
@@ -120,6 +124,7 @@ export const useProgress = create<ProgressApi>()(
       markWelcome: () => commit(get, set, { seenWelcome: true }),
       setClassUnit: (id) => set({ classUnitId: id }),
       setSkipWeekend: (v) => set({ skipWeekend: v }),
+      setLocale: (locale) => set({ locale: parseLocale(locale) }),
       recordRound: ({ activityId, correct, total, earned, misses }) => {
         const prev = get().activities[activityId] ?? {
           plays: 0,
@@ -204,6 +209,7 @@ export const useProgress = create<ProgressApi>()(
           learnerId: id,
           classUnitId: get().classUnitId,
           skipWeekend: get().skipWeekend,
+          locale: get().locale,
           learners: { ...get().learners, [id]: kid },
           ...kid,
         });
@@ -220,6 +226,7 @@ export const useProgress = create<ProgressApi>()(
         seenWelcome: s.seenWelcome,
         classUnitId: s.classUnitId,
         skipWeekend: s.skipWeekend,
+        locale: s.locale,
         activities: s.activities,
         badges: s.badges,
         shaky: s.shaky,

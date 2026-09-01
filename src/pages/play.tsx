@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { AnswerPanel } from "@/components/answer-panel";
-import { MagentaVideo } from "@/components/magenta-video";
+import { useUi } from "@/components/chrome";
+import { MagentaImg, MagentaVideo } from "@/components/magenta-video";
 import { Mascot, StarPop, type Pose } from "@/components/mascot";
 import { Board } from "@/components/models";
 import { ScratchPad } from "@/components/scratch";
 import { Button } from "@/components/ui/button";
-import { ART } from "@/lib/art";
+import { asset } from "@/lib/art";
 import { todayIso } from "@/lib/calendar";
 import { activityById, suggestedUnitId } from "@/lib/curriculum";
 import { makeDailyWalk, walkLabel } from "@/lib/daily";
+import { parseLocale, UI } from "@/lib/i18n";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { makeActivityRound, makeWelcomeRound } from "@/lib/questions";
@@ -16,7 +18,7 @@ import { rngFromSeed } from "@/lib/rng";
 import { playCorrect, playStar, playWrong, unlockAudio } from "@/lib/sound";
 import { squisheeById, squisheeSrc } from "@/lib/squishees";
 import { schoolStreak } from "@/lib/streak";
-import type { ItemSource, Question } from "@/lib/types";
+import type { ItemSource, Locale, Question } from "@/lib/types";
 import { answersMatch } from "@/lib/utils";
 
 type Kind = "welcome" | "daily" | "activity";
@@ -46,12 +48,14 @@ function buildPack(
   shaky: Record<string, number>,
   learnerId: string,
   attempt: number,
+  locale: Locale,
 ): Pack {
   const date = todayIso();
+  const ui = UI[locale];
   if (kind === "welcome") {
     return {
-      title: "What's hiding",
-      items: makeWelcomeRound(rngFromSeed(`welcome:${learnerId}:${attempt}`)),
+      title: ui.whatsHiding,
+      items: makeWelcomeRound(rngFromSeed(`welcome:${learnerId}:${attempt}`), locale),
       unitId: "u1",
       date,
       schoolDay: 0,
@@ -63,10 +67,10 @@ function buildPack(
   if (kind === "activity") {
     const found = activityById(activityId ?? "");
     const items = found
-      ? makeActivityRound(found.activity, rngFromSeed(`activity:${learnerId}:${found.activity.id}:${attempt}`))
+      ? makeActivityRound(found.activity, rngFromSeed(`activity:${learnerId}:${found.activity.id}:${attempt}`), undefined, locale)
       : [];
     return {
-      title: found?.activity.title ?? "Practice",
+      title: found?.activity.title ?? ui.play,
       items,
       unitId: found?.unit.id ?? "u1",
       date,
@@ -83,9 +87,10 @@ function buildPack(
     shaky,
     learnerId,
     attempt,
+    locale,
   });
   return {
-    title: walkLabel(walk),
+    title: walkLabel(walk, locale),
     items: walk.items,
     unitId: walk.unit.id,
     date: walk.date,
@@ -96,11 +101,12 @@ function buildPack(
   };
 }
 
-function sourceLabel(src?: ItemSource): string | null {
-  if (src === "review") return "Review";
-  if (src === "fluency") return "Fluency";
-  if (src === "friday") return "Friday";
-  if (src === "fresh") return "New";
+function sourceLabel(src: ItemSource | undefined, locale: Locale): string | null {
+  const ui = UI[locale];
+  if (src === "review") return locale === "es" ? "Repaso" : locale === "pt-BR" ? "Revisão" : "Review";
+  if (src === "fluency") return locale === "es" ? "Fluidez" : locale === "pt-BR" ? "Fluência" : "Fluency";
+  if (src === "friday") return ui.fridayCheck;
+  if (src === "fresh") return locale === "es" ? "Nuevo" : locale === "pt-BR" ? "Novo" : "New";
   return null;
 }
 
@@ -117,7 +123,8 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     const unitGuess = suggestedUnitId(todayIso(), st.classUnitId || undefined);
     const key = playKey(kind, activityId, unitGuess);
     const attempt = st.beginPlay(key);
-    return buildPack(kind, activityId, st.classUnitId, st.skipWeekend, st.shaky, st.learnerId, attempt);
+    const locale = parseLocale(st.locale);
+    return buildPack(kind, activityId, st.classUnitId, st.skipWeekend, st.shaky, st.learnerId, attempt, locale);
   });
   const [prize, setPrize] = useState<string | null>(null);
   const [i, setI] = useState(0);
@@ -136,6 +143,8 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const q = pack.items[i];
   const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const who = q?.source === "review" ? "rem" : "nix";
+  const ui = useUi();
+  const locale = parseLocale(useProgress((s) => s.locale));
 
   useEffect(() => {
     unlockAudio();
@@ -263,7 +272,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   if (!pack.items.length) {
     return (
       <div className="grid min-h-dvh place-items-center p-6">
-        <Button onClick={() => navigate({ id: "home" })}>Path</Button>
+        <Button onClick={() => navigate({ id: "home" })}>{ui.path}</Button>
       </div>
     );
   }
@@ -271,25 +280,25 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   if (done) {
     const streak = schoolStreak(sessions, pack.date);
     return (
-      <div className="paper-grid mx-auto grid min-h-dvh max-w-lg place-items-center px-4 py-8">
+      <div className="mx-auto grid min-h-dvh max-w-lg place-items-center px-4 py-8">
         <div className="w-full text-center">
           <div className="relative mx-auto h-52 w-52">
             <Mascot pose="celebrate" hop size="lg" className="mx-auto" />
-            {!reduce ? <MagentaVideo src={ART.nixCelebrateVid} className="absolute inset-0" /> : null}
+            {!reduce ? <MagentaVideo src={asset("squishees/frog-poke.mp4")} className="absolute inset-0" /> : null}
           </div>
-          <h1 className="mt-2 font-display text-3xl">Nice walk</h1>
+          <h1 className="mt-2 font-display text-3xl">{ui.niceWalk}</h1>
           <p className="text-muted">
-            {correct} of {pack.items.length} · {pack.title}
+            {ui.of(correct, pack.items.length)} · {pack.title}
           </p>
-          {kind === "daily" ? <p className="mt-1 text-sm text-star">School-day streak {streak}</p> : null}
+          {kind === "daily" ? <p className="mt-1 text-sm text-star">{ui.streak(streak)}</p> : null}
           {prize ? (
             <div className="mt-4">
-              <img src={squisheeSrc(prize)} alt="" className="mx-auto h-28 w-28 object-contain squash" />
-              <p className="text-sm text-teal">You earned {squisheeById(prize)?.name}!</p>
+              <MagentaImg src={squisheeSrc(prize)} alt="" className="mx-auto h-28 w-28 squash" />
+              <p className="text-sm text-teal">{ui.youEarned(squisheeById(prize)?.name ?? prize)}</p>
             </div>
           ) : null}
           <Button className="mt-6 w-full" size="lg" onClick={() => navigate({ id: "home" }, { replace: true })}>
-            Home
+            {ui.home}
           </Button>
         </div>
       </div>
@@ -298,21 +307,19 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   if (!q) return null;
 
-  const pill = sourceLabel(q.source);
+  const pill = sourceLabel(q.source, locale);
   const speech =
     pose === "oops"
-      ? "Try again."
+      ? ui.tryAgain
       : status === "correct"
-        ? `n is ${q.answer}.`
-        : who === "rem"
-          ? "Review with Rem."
-          : (q.hint ?? "Take what you can see.");
+        ? ui.nIs(q.answer)
+        : (q.hint ?? ui.takeWhatYouSee);
 
   return (
-    <div className="paper-grid mx-auto min-h-dvh max-w-lg overflow-x-hidden px-4 pb-8 pt-3">
+    <div className="mx-auto min-h-dvh max-w-lg overflow-x-hidden px-4 pb-8 pt-3">
       <header className="mb-2 flex items-center gap-2">
         <button type="button" className="text-sm text-muted" onClick={() => navigate({ id: "home" })}>
-          ← Home
+          ← {ui.home}
         </button>
         <div className="mx-2 h-2 flex-1 overflow-hidden rounded-full bg-surface-2">
           <div className="h-full bg-teal transition-[width] duration-300" style={{ width: `${(i / pack.items.length) * 100}%` }} />
@@ -337,7 +344,9 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       {q.sol?.length ? (
         <p className="mb-1 text-center text-[11px] font-medium uppercase tracking-wide text-faint">{q.sol.join(" · ")}</p>
       ) : null}
-      <h2 className="mb-3 text-center font-display text-xl leading-tight sm:text-2xl">{q.prompt}</h2>
+      {q.kind === "fluency" || q.kind === "word" || (q.kind === "tenframe" && "equation" in (q.data as object) && (q.data as { equation?: string }).equation === q.prompt) || (q.kind === "money" && (q.data as { mode?: string }).mode === "make") ? null : (
+        <h2 className="mb-3 text-center font-display text-xl leading-tight sm:text-2xl">{q.prompt}</h2>
+      )}
 
       <Board
         key={q.id}
@@ -357,7 +366,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       {q.kind === "word" || q.prompt.length > 70 ? <div className="mt-3"><ScratchPad /></div> : null}
 
       <button type="button" className="mt-4 w-full text-center text-xs text-faint" onClick={skip}>
-        Skip
+        {ui.skip}
       </button>
     </div>
   );

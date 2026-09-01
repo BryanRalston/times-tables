@@ -1,3 +1,4 @@
+import { GRAPH_CATS, NAMES, PLACE, qCopy, SHAPE, THINGS, parseLocale, wordForm as formWords, type Locale } from "./i18n";
 import type { Rng } from "./rng";
 import { rngRandom } from "./rng";
 import type {
@@ -17,8 +18,12 @@ import type {
   Question,
   TenFrameData,
 } from "./types";
-import { SQUISHEE_IDS } from "./squishees";
 import { moneyFmt, pad2 } from "./utils";
+
+let loc: Locale = "en";
+function t() {
+  return qCopy(loc);
+}
 
 let qn = 0;
 function qid(rng: Rng): string {
@@ -43,33 +48,9 @@ const COIN_VALUE: Record<Coin, number> = {
   dollar: 100,
   five: 500,
 };
-const ONES = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
-const TEENS = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
-const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
-
-function wordBelow100(n: number): string {
-  if (n < 10) return ONES[n] ?? String(n);
-  if (n < 20) return TEENS[n - 10] ?? String(n);
-  const t = Math.floor(n / 10);
-  const o = n % 10;
-  return o ? `${TENS[t]}-${ONES[o]}` : (TENS[t] ?? String(n));
+export function wordForm(n: number, locale: Locale = "en"): string {
+  return formWords(n, locale);
 }
-
-function wordForm(n: number): string {
-  if (n === 0) return "zero";
-  const thousands = Math.floor(n / 1000);
-  const rest = n % 1000;
-  const hundreds = Math.floor(rest / 100);
-  const below = rest % 100;
-  const parts: string[] = [];
-  if (thousands) parts.push(`${wordBelow100(thousands)} thousand`);
-  if (hundreds) parts.push(`${ONES[hundreds]} hundred`);
-  if (below) parts.push(wordBelow100(below));
-  return parts.join(" ");
-}
-
-const NAMES = ["Maya", "Leo", "Priya", "Sam", "Ava", "Noah", "Elena", "Kai", "Rosa", "Ben"];
-const THINGS = ["apples", "stickers", "marbles", "crayons", "shells", "cards", "blocks", "beads"];
 
 
 function keypadQ(rng: Rng, partial: Omit<Question, "id" | "input"> & { input?: Question["input"] }): Question {
@@ -80,7 +61,7 @@ export function welcomeFirst(rng: Rng): Question {
   return keypadQ(rng, {
     kind: "tenframe",
     prompt: "6 + n = 10",
-    hint: "Take the dots you can see. n is what's hiding.",
+    hint: t().leftoverHint,
     answer: "4",
     needsInteract: true,
     data: { total: 10, shown: 6, equation: "6 + n = 10" } satisfies TenFrameData,
@@ -98,7 +79,7 @@ function tenframeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   return keypadQ(rng, {
     kind: "tenframe",
     prompt: equation,
-    hint: "Take the dots you can see. n is what's hiding.",
+    hint: t().leftoverHint,
     answer: String(n),
     needsInteract: true,
     data: { total, shown, equation } satisfies TenFrameData,
@@ -117,7 +98,7 @@ function groupsQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   let equation = "";
   if (hide === "product") {
     equation = `${groups} × ${size} = n`;
-    prompt = `${groups} groups of ${size}. How many in all?`;
+    prompt = t().groupsOf(groups, size);
     answer = String(product);
   } else if (hide === "groups") {
     equation = `${size} × n = ${product}`;
@@ -125,13 +106,13 @@ function groupsQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     answer = String(groups);
   } else {
     equation = `n × ${groups} = ${product}`;
-    prompt = `${groups} groups. ${product} in all. How many in each group?`;
+    prompt = t().groupsEach(groups, product);
     answer = String(size);
   }
   return keypadQ(rng, {
     kind: "groups",
     prompt,
-    hint: "Count one group, then count the groups.",
+    hint: t().groupsHint,
     answer,
     needsInteract: hide !== "product",
     factKey: `${Math.min(size, groups)}×${Math.max(size, groups)}`,
@@ -145,17 +126,17 @@ function arrayQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const rows = rng.int(2, 6);
   const hide = rng.pick(["rows", "cols", "product"] as const);
   const product = rows * cols;
-  let prompt = `${rows} rows of ${cols}. How many in all?`;
+  let prompt = t().rowsOf(rows, cols);
   let answer = String(product);
   if (hide === "rows") {
-    prompt = `An array of ${product}. ${cols} in each row. How many rows?`;
+    prompt = t().arrayRows(product, cols);
     answer = String(rows);
   } else if (hide === "cols") {
-    prompt = `An array of ${product}. ${rows} rows. How many in each row?`;
+    prompt = t().arrayCols(product, rows);
     answer = String(cols);
   }
   if (params.area) {
-    prompt = hide === "product" ? `A ${rows} by ${cols} rectangle. Area?` : prompt.replace("array", "rectangle");
+    prompt = hide === "product" ? t().rectArea(rows, cols) : prompt;
   }
   return keypadQ(rng, {
     kind: "array",
@@ -174,23 +155,25 @@ function placeValueQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     return keypadQ(rng, {
       kind: "placevalue",
       prompt: `${tens} + n = ${total}`,
-      hint: "Tens you can see. n is the leftover ones.",
+      hint: t().tensHint,
       answer: String(ones),
       data: { number: total, digit: ones, place: "ones", mode: "expanded" } satisfies PlaceValueData,
     });
   }
   if (params.mode === "word") {
-    const n = rng.int(105, 9876);
-    const words = wordForm(n);
-    const distractors = [wordForm(n + 10), wordForm(Math.max(n - 100, 12)), wordForm(n + 1000 > 9999 ? n - 1000 : n + 1000)];
+    const n = rng.int(102500, 987654);
+    const words = wordForm(n, loc);
+    const distractors = [wordForm(n + 1000, loc), wordForm(Math.max(n - 10000, 102500), loc), wordForm(n + 100000 > 999999 ? n - 100000 : n + 100000, loc)];
     const choices = rng.shuffle([words, ...distractors]).filter((v, i, a) => a.indexOf(v) === i).slice(0, 4);
+    const toWords = rng.next() < 0.5;
+    const shown = n.toLocaleString("en-US");
     return keypadQ(rng, {
       kind: "placevalue",
-      prompt: `Which is ${n.toLocaleString("en-US")} in words?`,
-      answer: words,
+      prompt: toWords ? t().whichInWords(shown) : t().whichNumber(words),
+      answer: toWords ? words : shown,
       input: "choice",
-      choices,
-      data: { number: n, digit: n % 10, place: "ones", mode: "word", words } satisfies PlaceValueData,
+      choices: toWords ? choices : rng.shuffle([n, n + 1000, Math.max(n - 10000, 102500), n + 100].map((x) => x.toLocaleString("en-US"))).slice(0, 4),
+      data: { number: n, digit: Number(String(n)[0]), place: "hundred thousands", mode: "word", words } satisfies PlaceValueData,
     });
   }
   const six = Boolean(params.six);
@@ -201,26 +184,28 @@ function placeValueQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const s = String(n);
   const idx = rng.int(0, s.length - 1);
   const digit = Number(s[idx]);
-  const place = PLACES[s.length - 1 - idx]!;
+  const placeEn = PLACES[s.length - 1 - idx]!;
+  const place = PLACE[loc][s.length - 1 - idx]!;
   const value = digit * 10 ** (s.length - 1 - idx);
   const mode = rng.pick(["place", "value"] as const);
-  const pool = PLACES.slice(0, Math.max(4, s.length));
+  const pool = PLACE[loc].slice(0, Math.max(4, s.length));
+  const shown = n.toLocaleString("en-US");
   if (mode === "place") {
     return keypadQ(rng, {
       kind: "placevalue",
-      prompt: `In ${n.toLocaleString("en-US")}, what place is the ${digit} in?`,
+      prompt: t().whatPlace(shown, digit),
       answer: place,
-      alts: [place.replace(/s$/, "")],
+      alts: [placeEn, place.replace(/s$/, "")],
       input: "choice",
       choices: rng.shuffle([...pool]),
-      data: { number: n, digit, place, mode },
+      data: { number: n, digit, place: placeEn, mode },
     });
   }
   return keypadQ(rng, {
     kind: "placevalue",
-    prompt: `In ${n.toLocaleString("en-US")}, what is the value of the ${digit} in the ${place}?`,
+    prompt: t().whatValue(shown, digit, place),
     answer: String(value),
-    data: { number: n, digit, place, mode: "value" },
+    data: { number: n, digit, place: placeEn, mode: "value" },
   });
 }
 
@@ -232,7 +217,7 @@ function buildQ(rng: Rng): Question {
   const target = thousands * 1000 + hundreds * 100 + tens * 10 + ones;
   return keypadQ(rng, {
     kind: "build",
-    prompt: `Build ${target}. How many hundreds?`,
+    prompt: t().buildHundreds(target),
     hint: "Thousands, hundreds, tens, ones.",
     answer: String(hundreds),
     data: { target },
@@ -261,7 +246,7 @@ function orderQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const sorted = [...nums].sort((x, y) => (dir === "asc" ? x - y : y - x));
     return keypadQ(rng, {
       kind: "order",
-      prompt: dir === "asc" ? "Least to greatest." : "Greatest to least.",
+      prompt: dir === "asc" ? t().leastToGreatest : t().greatestToLeast,
       answer: sorted.map((n) => `${n}/${den}`).join(" "),
       input: "order",
       data: { numbers: nums, dir },
@@ -273,7 +258,7 @@ function orderQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const sorted = [...numbers].sort((a, b) => (dir === "asc" ? a - b : b - a));
   return keypadQ(rng, {
     kind: "order",
-    prompt: dir === "asc" ? "Least to greatest." : "Greatest to least.",
+    prompt: dir === "asc" ? t().leastToGreatest : t().greatestToLeast,
     answer: sorted.join(" "),
     input: "order",
     data: { numbers, dir },
@@ -297,7 +282,7 @@ function familyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const choices = rng.shuffle([ask, rng.pick(wrong), rng.pick(wrong.filter((w) => w !== ask))]);
   return keypadQ(rng, {
     kind: "choice",
-    prompt: `Which fact belongs with ${a} groups of ${b}?`,
+    prompt: t().familyFact(a, b),
     answer: ask,
     input: "choice",
     choices,
@@ -314,7 +299,7 @@ function shapeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const ask = rng.pick(["sides", "vertices"] as const);
     return keypadQ(rng, {
       kind: "choice",
-      prompt: ask === "sides" ? "How many sides?" : "How many vertices?",
+      prompt: ask === "sides" ? t().howManySides : t().howManyVertices,
       answer: String(sides),
       data: { visual: "shape", shape: name, sides, isPolygon: true, rotation: rng.int(0, 20) },
     });
@@ -323,48 +308,63 @@ function shapeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const ok = rng.next() < 0.6;
     return keypadQ(rng, {
       kind: "choice",
-      prompt: "Is this a polygon?",
-      answer: ok ? "yes" : "no",
+      prompt: t().isPolygon,
+      answer: ok ? t().yes : t().no,
       input: "choice",
-      choices: ["yes", "no"],
+      choices: [t().yes, t().no],
       data: { visual: "shape", shape: ok ? name : rng.pick(["circle", "open"]), sides: ok ? sides : 0, isPolygon: ok },
     });
   }
   if (mode === "attr") {
     return keypadQ(rng, {
       kind: "choice",
-      prompt: `A ${name} has how many vertices?`,
+      prompt: t().verticesOf(SHAPE[loc][name] ?? name),
       answer: String(sides),
       data: { visual: "shape", shape: name, sides, isPolygon: true },
     });
   }
   if (mode === "combine") {
+    const joins = [
+      { parts: ["triangle", "triangle"], result: "quadrilateral", prompt: t().combineTT },
+      { parts: ["triangle", "quadrilateral"], result: "pentagon", prompt: t().combineTQ },
+      { parts: ["quadrilateral", "quadrilateral"], result: "hexagon", prompt: t().combineQQ },
+    ] as const;
+    const j = rng.pick(joins);
+    const shapeNames = ["triangle", "quadrilateral", "pentagon", "hexagon", "octagon"] as const;
     return keypadQ(rng, {
       kind: "choice",
-      prompt: "Two triangles joined on a side make which polygon?",
-      answer: "quadrilateral",
-      alts: ["square", "rectangle", "quad"],
+      prompt: j.prompt,
+      answer: SHAPE[loc][j.result] ?? j.result,
+      alts: j.result === "quadrilateral" ? ["square", "rectangle", "quad", "cuadrilátero", "quadrilátero"] : [j.result],
       input: "choice",
-      choices: rng.shuffle(["triangle", "quadrilateral", "pentagon", "hexagon"]).slice(0, 4),
-      data: { visual: "combine", parts: ["triangle", "triangle"], result: "quadrilateral", isPolygon: true, sides: 4, shape: "quadrilateral" },
+      choices: rng.shuffle(shapeNames.map((n) => SHAPE[loc][n] ?? n)).filter((n, i, a) => a.indexOf(n) === i).slice(0, 4),
+      data: { visual: "combine", parts: [...j.parts], result: j.result, isPolygon: true, sides: j.result === "quadrilateral" ? 4 : j.result === "pentagon" ? 5 : 6, shape: j.result },
     });
   }
   if (mode === "subdivide") {
+    const splits = [
+      { shape: "quadrilateral", sides: 4, answer: "2", prompt: t().subdivideQ },
+      { shape: "pentagon", sides: 5, answer: "3", prompt: t().subdivideP },
+      { shape: "hexagon", sides: 6, answer: "4", prompt: t().subdivideH },
+    ] as const;
+    const s = rng.pick(splits);
     return keypadQ(rng, {
       kind: "choice",
-      prompt: "This quadrilateral is split. How many triangles?",
-      answer: "2",
+      prompt: s.prompt,
+      answer: s.answer,
       input: "choice",
-      choices: ["2", "3", "4", "1"],
-      data: { visual: "subdivide", shape: "quadrilateral", sides: 4, isPolygon: true },
+      choices: rng.shuffle(["2", "3", "4", "1", "5"]).slice(0, 4),
+      data: { visual: "subdivide", shape: s.shape, sides: s.sides, isPolygon: true },
     });
   }
   if (mode === "dataQ") {
-    const ok = "How many pets does our class have?";
-    const choices = rng.shuffle([ok, "What color is the sky?", "How tall will I be next year?", "Who is the fastest runner forever?"]);
+    const okPool = t().dataOk;
+    const noPool = t().dataNo;
+    const ok = rng.pick(okPool);
+    const choices = rng.shuffle([ok, ...rng.shuffle(noPool).slice(0, 3)]);
     return keypadQ(rng, {
       kind: "choice",
-      prompt: "Which question can we answer by collecting class data?",
+      prompt: t().dataPrompt,
       answer: ok,
       input: "choice",
       choices,
@@ -373,11 +373,11 @@ function shapeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   }
   return keypadQ(rng, {
     kind: "choice",
-    prompt: "What is this polygon called?",
-    answer: name,
-    alts: sides === 4 ? ["rectangle", "square", "quad"] : [],
+    prompt: t().polygonName,
+    answer: SHAPE[loc][name] ?? name,
+    alts: sides === 4 ? ["rectangle", "square", "quad", name] : [name],
     input: "choice",
-    choices: rng.shuffle(["triangle", "quadrilateral", "pentagon", "hexagon", "octagon"]).slice(0, 4).concat(name).filter((v, i, a) => a.indexOf(v) === i).slice(0, 4),
+    choices: rng.shuffle(["triangle", "quadrilateral", "pentagon", "hexagon", "octagon"].map((n) => SHAPE[loc][n] ?? n)).slice(0, 4).concat(SHAPE[loc][name] ?? name).filter((v, i, a) => a.indexOf(v) === i).slice(0, 4),
     data: { visual: "shape", shape: name, sides, isPolygon: true, rotation: rng.int(-15, 15) },
   });
 }
@@ -393,7 +393,7 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       const ans = num1 < num2 ? "<" : num1 > num2 ? ">" : "=";
       return keypadQ(rng, {
         kind: "fraction",
-        prompt: `${num1}/${den1} ○ ${num2}/${den1} on the number line`,
+        prompt: `${num1}/${den1} ○ ${num2}/${den1} ${t().fractionLine}`,
         answer: ans,
         input: "compare",
         data: { num: num1, den: den1, num2, den2: den1, mode: "line", shaded: num1 },
@@ -402,7 +402,7 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const num = rng.int(1, den);
     return keypadQ(rng, {
       kind: "fraction",
-      prompt: "What fraction is marked on the number line?",
+      prompt: t().fractionOnLine,
       answer: `${num}/${den}`,
       input: "fraction",
       data: { num, den, mode: "line", shaded: num },
@@ -411,7 +411,7 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   if (mode === "unit") {
     return keypadQ(rng, {
       kind: "fraction",
-      prompt: `One piece of ${den}. Name the unit fraction.`,
+      prompt: t().unitFraction(den),
       answer: `1/${den}`,
       input: "fraction",
       data: { num: 1, den, mode: "unit", shaded: 1 },
@@ -436,7 +436,7 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const num = rng.int(1, den - 1);
     return keypadQ(rng, {
       kind: "fraction",
-      prompt: "Name the mixed number.",
+      prompt: t().mixedName,
       answer: `${whole} ${num}/${den}`,
       input: "fraction",
       data: { num, den, mode: "mixed", shaded: whole * den + num },
@@ -464,7 +464,7 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const bench = v < 0.25 ? "0" : v < 0.75 ? "1/2" : "1";
     return keypadQ(rng, {
       kind: "fraction",
-      prompt: `Is ${num}/${den} closer to 0, 1/2, or 1?`,
+      prompt: t().closerTo(`${num}/${den}`),
       answer: bench,
       input: "choice",
       choices: ["0", "1/2", "1"],
@@ -485,7 +485,7 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const num = rng.int(1, den);
   return keypadQ(rng, {
     kind: "fraction",
-    prompt: "What fraction is shaded?",
+    prompt: t().shaded,
     answer: `${num}/${den}`,
     input: "fraction",
     data: { num, den, mode: "name", shaded: num },
@@ -502,7 +502,7 @@ function clockQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const endClock = `${endH}:${pad2(minutes)}`;
     return keypadQ(rng, {
       kind: "clock",
-      prompt: `Start ${hours}:${pad2(minutes)}. End ${endClock}. How many hours passed?`,
+      prompt: t().elapsedHours(`${hours}:${pad2(minutes)}`, endClock),
       answer: String(hoursLater),
       alts: [`${hoursLater} hour`, `${hoursLater} hours`],
       input: "keypad",
@@ -511,7 +511,7 @@ function clockQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   }
   return keypadQ(rng, {
     kind: "clock",
-    prompt: "What time is it?",
+    prompt: t().whatTime,
     answer: `${hours}:${pad2(minutes)}`,
     input: "clock",
     data: { hours, minutes, mode: "read", find: "time" } satisfies ClockData,
@@ -543,15 +543,14 @@ function moneyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const mode = String(params.mode ?? "count");
   const max = Number(params.max ?? 100);
   if (mode === "make") {
-    const target = 100;
-    const dimes = rng.int(2, 8);
-    const leftover = target - dimes * 10;
+    const target = rng.int(15, Math.min(max, 500));
     return keypadQ(rng, {
       kind: "money",
-      prompt: `${dimes} dimes. How many more cents to make a dollar?`,
-      answer: String(leftover),
-      alts: [moneyFmt(leftover)],
-      data: { coins: { dime: dimes }, target, mode: "make" } satisfies MoneyData,
+      prompt: t().makeMoney(moneyFmt(target)),
+      hint: t().makeHint,
+      answer: String(target),
+      alts: [moneyFmt(target)],
+      data: { coins: {}, target, mode: "make" } satisfies MoneyData,
     });
   }
   if (mode === "change") {
@@ -560,7 +559,7 @@ function moneyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const n = pay - cost;
     return keypadQ(rng, {
       kind: "money",
-      prompt: `An item costs ${moneyFmt(cost)}. You pay ${moneyFmt(pay)}. How much change?`,
+      prompt: t().changeMoney(moneyFmt(cost), moneyFmt(pay)),
       hint: "n is leftover.",
       answer: String(n),
       alts: [moneyFmt(n)],
@@ -583,7 +582,7 @@ function moneyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const purse = randomPurse(rng, max);
   return keypadQ(rng, {
     kind: "money",
-    prompt: "How many cents?",
+    prompt: t().howManyCents,
     answer: String(purse.cents),
     alts: [moneyFmt(purse.cents)],
     data: { coins: purse.coins, mode: "count" } satisfies MoneyData,
@@ -601,7 +600,7 @@ function areaQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const shown = total - hideCount;
   return keypadQ(rng, {
     kind: "area",
-    prompt: hide ? `${shown} squares showing. n hide. Area?` : "How many unit squares?",
+    prompt: hide ? t().squaresHide(shown) : t().unitSquares,
     answer: hide ? String(hideCount) : String(total),
     alts: hide ? [String(total)] : undefined,
     needsInteract: hide,
@@ -619,7 +618,7 @@ function perimeterQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const shown = peri - sides[hideIndex]!;
     return keypadQ(rng, {
       kind: "perimeter",
-      prompt: `A ${name}. Sides add to ${peri}. You see ${shown}. n is the missing side.`,
+      prompt: t().periMissing(SHAPE[loc][name] ?? name, peri, shown),
       answer: String(sides[hideIndex]),
       needsInteract: true,
       data: { sides, unit: "units", name, hideIndex } satisfies PerimeterData,
@@ -627,17 +626,56 @@ function perimeterQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   }
   return keypadQ(rng, {
     kind: "perimeter",
-    prompt: `Perimeter of this ${name}?`,
+    prompt: t().periName(SHAPE[loc][name] ?? name),
     answer: String(peri),
     data: { sides, unit: "units", name } satisfies PerimeterData,
   });
 }
 
+export function placeOnGraph(
+  tray: { id: string; label: string; symbol?: string }[],
+  counts: Record<string, number>,
+  tokenId: string,
+  category: string,
+): { tray: { id: string; label: string; symbol?: string }[]; counts: Record<string, number> } {
+  const item = tray.find((x) => x.id === tokenId);
+  if (!item) return { tray, counts };
+  return {
+    tray: tray.filter((x) => x.id !== tokenId),
+    counts: { ...counts, [category]: (counts[category] ?? 0) + 1 },
+  };
+}
+
 function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
-  const labels = rng.shuffle(["cats", "dogs", "birds", "fish", "hamsters"]).slice(0, 4);
+  const pack = rng.shuffle(GRAPH_CATS[loc]).slice(0, 4);
+  const labels = pack.map((p) => p.label);
   const key = Number(params.key ?? rng.pick([1, 2]));
   const kind = (params.kind as "picto" | "bar") ?? "picto";
-  const rows = labels.map((label) => ({ label, value: rng.int(1, 8) * key }));
+  if (params.collect) {
+    const trayPack = Array.from({ length: rng.int(7, 10) }, () => rng.pick(pack));
+    const counts: Record<string, number> = Object.fromEntries(labels.map((l) => [l, 0]));
+    for (const p of trayPack) counts[p.label] = (counts[p.label] ?? 0) + 1;
+    const focus = rng.pick(labels);
+    const tray = trayPack.map((p, i) => ({ id: `t-${i}`, label: p.label, symbol: p.id }));
+    return keypadQ(rng, {
+      kind: "graph",
+      prompt: t().sortHowMany(focus),
+      hint: t().sortHint,
+      answer: String(counts[focus] ?? 0),
+      data: {
+        title: t().graphTitle,
+        kind,
+        key: 1,
+        symbol: pack[0]!.id,
+        rows: pack.map((p) => ({ label: p.label, value: 0, symbol: p.id })),
+        ask: "value",
+        focus,
+        collect: true,
+        tray,
+      } satisfies GraphData,
+    });
+  }
+  const rows = pack.map((p) => ({ label: p.label, value: rng.int(1, 8) * key, symbol: p.id }));
   const ask = rng.pick(["greatest", "least", "value", "more", "total"] as const);
   const focus = rng.pick(rows).label;
   const focusB = rng.pick(rows.filter((r) => r.label !== focus)).label;
@@ -647,34 +685,34 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   if (ask === "greatest") {
     const m = Math.max(...rows.map((r) => r.value));
     const winners = rows.filter((r) => r.value === m);
-    prompt = "Which has the most?";
+    prompt = t().graphMost;
     answer = winners[0]!.label;
   } else if (ask === "least") {
     const m = Math.min(...rows.map((r) => r.value));
-    prompt = "Which has the least?";
+    prompt = t().graphLeast;
     answer = rows.find((r) => r.value === m)!.label;
   } else if (ask === "value") {
-    prompt = `How many ${focus}?`;
+    prompt = t().graphHowMany(focus);
     answer = String(byLabel[focus]);
   } else if (ask === "more") {
-    prompt = `How many more ${focus} than ${focusB}?`;
+    prompt = t().graphMore(focus, focusB);
     answer = String(Math.abs(byLabel[focus]! - byLabel[focusB]!));
   } else {
-    prompt = "How many in all?";
+    prompt = t().graphAll;
     answer = String(rows.reduce((n, r) => n + r.value, 0));
   }
   return keypadQ(rng, {
     kind: "graph",
     prompt,
-    hint: key > 1 ? `Each picture stands for ${key}.` : undefined,
+    hint: key > 1 ? t().graphKey(key) : undefined,
     answer,
     input: ask === "greatest" || ask === "least" ? "choice" : "keypad",
     choices: ask === "greatest" || ask === "least" ? labels : undefined,
     data: {
-      title: "Class pets",
+      title: t().graphTitle,
       kind,
       key,
-      symbol: rng.pick(SQUISHEE_IDS),
+      symbol: pack[0]!.id,
       rows,
       ask,
       focus,
@@ -694,7 +732,7 @@ function patternQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const choices = rng.shuffle([rule, down ? `+${step}` : `−${step}`, `+${step + 1}`, `×${step}`]).slice(0, 4);
     return keypadQ(rng, {
       kind: "pattern",
-      prompt: "What is the rule?",
+      prompt: t().patternRule,
       answer: rule,
       input: "choice",
       choices,
@@ -706,7 +744,7 @@ function patternQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   seq[hide] = null;
   return keypadQ(rng, {
     kind: "pattern",
-    prompt: down ? "The pattern is shrinking. What number is hiding?" : "The pattern is growing. What number is hiding?",
+    prompt: down ? t().patternDown : t().patternUp,
     answer,
     data: { seq, step: delta, dir: down ? "down" : "up" },
   });
@@ -715,13 +753,7 @@ function patternQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 function measureQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const mode = String(params.mode ?? "read") as MeasureData["mode"];
   if (mode === "unit") {
-    const items: { prompt: string; answer: string; choices: string[] }[] = [
-      { prompt: "Best unit for the length of a pencil?", answer: "inch", choices: ["inch", "yard", "mile", "gallon"] },
-      { prompt: "Best unit for the length of a classroom?", answer: "meter", choices: ["centimeter", "meter", "mile", "gram"] },
-      { prompt: "Best unit for a watermelon?", answer: "pound", choices: ["ounce", "pound", "inch", "cup"] },
-      { prompt: "Best unit for a spoon of water?", answer: "milliliter", choices: ["liter", "milliliter", "yard", "kilogram"] },
-      { prompt: "Do you need an estimate or an exact measure to fill a prescription?", answer: "exact", choices: ["estimate", "exact"] },
-    ];
+    const items = t().measureUnits;
     const item = rng.pick(items);
     return keypadQ(rng, {
       kind: "measure",
@@ -741,7 +773,7 @@ function measureQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const value = halves ? rng.int(2, 14) / 2 : rng.int(2, max);
     return keypadQ(rng, {
       kind: "measure",
-      prompt: `How long? (${unit})`,
+      prompt: t().howLong(unit),
       answer: String(value),
       alts: [`${value} ${unit}`],
       data: { attribute: "length", system: metric ? "metric" : "us", unit, value, max, mode: "read" },
@@ -753,7 +785,7 @@ function measureQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const value = rng.int(2, 8);
     return keypadQ(rng, {
       kind: "measure",
-      prompt: `How heavy? (${unit})`,
+      prompt: t().howHeavy(unit),
       answer: String(value),
       alts: [`${value} ${unit}`],
       data: { attribute: "mass", system: metric ? "metric" : "us", unit, value, max: 10, mode: "read" },
@@ -764,7 +796,7 @@ function measureQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const value = rng.int(1, 6);
   return keypadQ(rng, {
     kind: "measure",
-    prompt: `How much liquid? (${unit})`,
+    prompt: t().howMuchLiquid(unit),
     answer: String(value),
     alts: [`${value} ${unit}`],
     data: { attribute: "volume", system: metric ? "metric" : "us", unit, value, max: 8, mode: "read" },
@@ -783,7 +815,7 @@ function computeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const ans = op === "+" ? round(a) + round(b) : round(a) - round(b);
     return keypadQ(rng, {
       kind: "compute",
-      prompt: `About how much is ${a} ${op} ${b}? (nearest hundred)`,
+      prompt: t().aboutHowMuch(a, op, b),
       answer: String(ans),
       data: { a, b, op, mode: "estimate" },
     });
@@ -844,15 +876,15 @@ function fluencyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 }
 
 function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
-  const name = rng.pick(NAMES);
-  const thing = rng.pick(THINGS);
+  const name = rng.pick(NAMES[loc]);
+  const thing = rng.pick(THINGS[loc]);
   const mode = String(params.mode ?? "add");
   if (mode === "groups") {
     const groups = rng.int(2, 6);
     const size = rng.pick([2, 3, 4, 5]);
     return keypadQ(rng, {
       kind: "groups",
-      prompt: `${name} has ${groups} bags of ${size} ${thing}. How many ${thing}?`,
+      prompt: t().wordBags(name, groups, size, thing),
       answer: String(groups * size),
       factKey: `${Math.min(groups, size)}×${Math.max(groups, size)}`,
       data: { groups, size, hide: "product", equation: `${groups} × ${size} = n` },
@@ -863,8 +895,8 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const shown = rng.int(3, total - 2);
     return keypadQ(rng, {
       kind: "tenframe",
-      prompt: `${name} had ${total} ${thing}. ${shown} are in the dish. How many are hiding?`,
-      hint: "Take the ones you can see. n is hiding.",
+      prompt: t().wordTake(name, total, shown, thing),
+      hint: t().wordTakeHint,
       answer: String(total - shown),
       needsInteract: true,
       data: { total, shown, equation: `${total} − n = ${shown}` },
@@ -875,7 +907,7 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const b = rng.int(4, a);
     return keypadQ(rng, {
       kind: "compare",
-      prompt: `${name} has ${a} ${thing}. A friend has ${b}. How many more does ${name} have?`,
+      prompt: t().wordCompare(name, a, thing, b),
       answer: String(a - b),
       input: "keypad",
       data: { a, b, visual: "bars" },
@@ -891,9 +923,9 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     return keypadQ(rng, {
       kind: "groups",
       prompt: add
-        ? `${name} has ${groups} packs of ${size} ${thing}, then finds ${extra} more. How many now?`
-        : `${name} has ${groups} packs of ${size} ${thing} and gives away ${extra}. How many left?`,
-      hint: "Groups first. Then add or take. Scratch pad is there.",
+        ? t().wordTwoAdd(name, groups, size, thing, extra)
+        : t().wordTwoTake(name, groups, size, thing, extra),
+      hint: t().wordTwoHint,
       answer: String(answer),
       data: { groups, size, hide: "product", equation: `${groups} × ${size}` },
     });
@@ -902,17 +934,20 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const n = rng.int(2, 6);
   return keypadQ(rng, {
     kind: "tenframe",
-    prompt: `${name} sees ${shown} ${thing}. Some are hiding. There are ${shown + n} in all. How many hide?`,
-    hint: "Take the dots you can see. n is what's hiding.",
+    prompt: t().wordSee(name, shown, thing, shown + n),
+    hint: t().leftoverHint,
     answer: String(n),
     needsInteract: true,
     data: { total: shown + n, shown, equation: `${shown} + n = ${shown + n}` },
   });
 }
 
-export function makeQuestion(activity: ActivityDef, rng: Rng): Question {
+export function makeQuestion(activity: ActivityDef, rng: Rng, locale: Locale | string = "en"): Question {
+  const prev = loc;
+  loc = parseLocale(locale);
   const p = activity.params ?? {};
   let q: Question;
+  try {
   switch (activity.kind) {
     case "tenframe":
       q = tenframeQ(rng, p);
@@ -975,28 +1010,46 @@ export function makeQuestion(activity: ActivityDef, rng: Rng): Question {
       q = tenframeQ(rng, p);
   }
   return { ...q, sol: activity.sol };
+  } finally {
+    loc = prev;
+  }
 }
 
-export function makeWelcomeRound(rng: Rng = rngRandom()): Question[] {
-  const first = welcomeFirst(rng);
-  const rest = [tenframeQ(rng, { maxTotal: 10 }), tenframeQ(rng, { minTotal: 8, maxTotal: 10 }), tenframeQ(rng, { minTotal: 10, maxTotal: 14 })];
-  return [first, ...rest];
+export function makeWelcomeRound(rng: Rng = rngRandom(), locale: Locale | string = "en"): Question[] {
+  const prev = loc;
+  loc = parseLocale(locale);
+  try {
+    const first = welcomeFirst(rng);
+    const rest = [tenframeQ(rng, { maxTotal: 10 }), tenframeQ(rng, { minTotal: 8, maxTotal: 10 }), tenframeQ(rng, { minTotal: 10, maxTotal: 14 })];
+    return [first, ...rest];
+  } finally {
+    loc = prev;
+  }
 }
 
-export function makeActivityRound(activity: ActivityDef, rng: Rng = rngRandom(), count?: number): Question[] {
+export function makeActivityRound(activity: ActivityDef, rng: Rng = rngRandom(), count?: number, locale: Locale | string = "en"): Question[] {
   const n = count ?? activity.rounds;
   const seen = new Set<string>();
   const out: Question[] = [];
   let guard = 0;
   while (out.length < n && guard < n * 8) {
     guard += 1;
-    const q = makeQuestion(activity, rng);
+    const q = makeQuestion(activity, rng, locale);
     const key = `${q.prompt}|${q.answer}`;
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(q);
   }
-  while (out.length < n) out.push(makeQuestion(activity, rng));
+  let extra = 0;
+  while (out.length < n && extra < n * 12) {
+    extra += 1;
+    const q = makeQuestion(activity, rng, locale);
+    const key = `${q.prompt}|${q.answer}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(q);
+  }
+  while (out.length < n) out.push(makeQuestion(activity, rng, locale));
   return out;
 }
 
