@@ -69,6 +69,7 @@ export function UnitPage({ unitId }: { unitId: string }) {
               <span className="min-w-0 flex-1">
                 <span className="block font-display text-lg leading-tight">{a.title}</span>
                 <span className="block text-xs text-muted">{a.blurb}</span>
+                <span className="block text-[11px] text-faint">{a.sol.join(" · ")}</span>
               </span>
               <span className="text-star">{save?.stars ? "★".repeat(save.stars) : "Play"}</span>
             </button>

@@ -300,6 +300,9 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         <p className="mb-2 text-center text-[11px] font-medium uppercase tracking-wide text-muted">{pill}</p>
       ) : null}
 
+      {q.sol?.length ? (
+        <p className="mb-1 text-center text-[11px] font-medium uppercase tracking-wide text-faint">{q.sol.join(" · ")}</p>
+      ) : null}
       <h2 className="mb-3 text-center font-display text-xl leading-tight sm:text-2xl">{q.prompt}</h2>
 
       <Board

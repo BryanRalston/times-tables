@@ -58,6 +58,12 @@ export function GrownupPage() {
           ))}
         </select>
       </label>
+      {classUnitId ? (
+        <p className="mt-2 text-sm text-muted">
+          {UNITS.find((u) => u.id === classUnitId)?.title}
+          <span className="mt-1 block text-xs text-faint">{UNITS.find((u) => u.id === classUnitId)?.sol.join(" · ")}</span>
+        </p>
+      ) : null}
 
       <label className="mt-4 flex items-center gap-3 text-sm">
         <input type="checkbox" checked={skipWeekend} onChange={(e) => setSkipWeekend(e.target.checked)} />

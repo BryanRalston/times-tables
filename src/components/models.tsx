@@ -9,10 +9,12 @@ import type {
   ClockData,
   Coin,
   CompareData,
+  ComputeData,
   FractionData,
   FluencyData,
   GraphData,
   GroupsData,
+  MeasureData,
   MoneyData,
   OrderData,
   PerimeterData,
@@ -67,6 +69,10 @@ export function Board(props: BoardProps) {
       return <PatternBoard {...props} />;
     case "fluency":
       return <FluencyBoard {...props} />;
+    case "measure":
+      return <MeasureBoard {...props} />;
+    case "compute":
+      return <ComputeBoard {...props} />;
     case "word":
       return <BigPrompt prompt={question.prompt} status={props.status} />;
     default:
@@ -390,6 +396,42 @@ const POLY: Record<string, string> = {
 
 function ChoiceVisual({ question, status, shake }: BoardProps) {
   const data = question.data as ChoiceData;
+  if (data.visual === "none") {
+    return (
+      <Frame shake={shake} status={status}>
+        <p className="text-center text-sm text-muted">{question.prompt}</p>
+      </Frame>
+    );
+  }
+  if (data.visual === "combine") {
+    return (
+      <Frame shake={shake} status={status}>
+        <div className="flex items-center justify-center gap-3">
+          <svg viewBox="0 0 100 100" className="size-20">
+            <polygon points={POLY.triangle} fill="#d7ecec" stroke="#0d7377" strokeWidth="3" />
+          </svg>
+          <span className="text-xl text-muted">+</span>
+          <svg viewBox="0 0 100 100" className="size-20">
+            <polygon points={POLY.triangle} fill="#d7ecec" stroke="#0d7377" strokeWidth="3" />
+          </svg>
+          <span className="text-xl text-muted">→</span>
+          <svg viewBox="0 0 100 100" className="size-20">
+            <polygon points={POLY.quadrilateral} fill="#dceadf" stroke="#2f6f4e" strokeWidth="3" />
+          </svg>
+        </div>
+      </Frame>
+    );
+  }
+  if (data.visual === "subdivide") {
+    return (
+      <Frame shake={shake} status={status}>
+        <svg viewBox="0 0 100 100" className="mx-auto size-40">
+          <polygon points={POLY.quadrilateral} fill="#d7ecec" stroke="#0d7377" strokeWidth="3" />
+          <line x1="18" y1="20" x2="82" y2="82" stroke="#c45c26" strokeWidth="2" />
+        </svg>
+      </Frame>
+    );
+  }
   const pts = POLY[data.shape ?? "triangle"] ?? POLY.triangle!;
   return (
     <Frame shake={shake} status={status}>
@@ -430,6 +472,31 @@ function FractionBar({ question, onInteract, status, shake }: BoardProps) {
     });
     playTap();
     onInteract();
+  }
+
+  if (data.mode === "line") {
+    const marks = den;
+    const x = (k: number, d: number) => 8 + (k / d) * 84;
+    return (
+      <Frame shake={shake} status={status}>
+        <svg viewBox="0 0 100 36" className="h-16 w-full">
+          <line x1="8" y1="20" x2="92" y2="20" stroke="#1f1a14" strokeWidth="1.5" />
+          {Array.from({ length: marks + 1 }, (_, i) => (
+            <g key={i}>
+              <line x1={x(i, marks)} y1="14" x2={x(i, marks)} y2="26" stroke="#1f1a14" strokeWidth="1.2" />
+              <text x={x(i, marks)} y="34" textAnchor="middle" fontSize="5" fill="#6b6358">
+                {i === 0 ? "0" : i === marks ? "1" : ""}
+              </text>
+            </g>
+          ))}
+          <circle cx={x(data.num, den)} cy="20" r="3" fill="#0d7377" />
+          {data.num2 != null && data.den2 ? <circle cx={x(data.num2, data.den2)} cy="20" r="3" fill="#c45c26" /> : null}
+        </svg>
+        <p className="text-center text-xs text-muted">
+          {data.num2 != null ? `${data.num}/${data.den} and ${data.num2}/${data.den2}` : `${data.num} jump${data.num === 1 ? "" : "s"} of 1/${den}`}
+        </p>
+      </Frame>
+    );
   }
 
   const bars = data.mode === "mixed" ? Math.ceil(shaded / den) : data.mode === "compare" ? 2 : 1;
@@ -498,6 +565,7 @@ function AnalogClock({ question, status, shake }: BoardProps) {
 }
 
 const COIN_META: { id: Coin; label: string; cents: number; size: string; fill: string }[] = [
+  { id: "five", label: "$5", cents: 500, size: "h-12 w-20 rounded-[8px]", fill: "bg-good-soft border-good" },
   { id: "dollar", label: "$1", cents: 100, size: "size-16", fill: "bg-good-soft border-good" },
   { id: "quarter", label: "25¢", cents: 25, size: "size-14", fill: "bg-surface-2 border-faint" },
   { id: "dime", label: "10¢", cents: 10, size: "size-10", fill: "bg-surface-2 border-faint" },
@@ -672,6 +740,105 @@ function PatternBoard({ question, status, shake }: BoardProps) {
           </span>
         ))}
       </div>
+    </Frame>
+  );
+}
+
+function hundredsParts(n: number) {
+  return {
+    h: Math.floor(n / 100),
+    t: Math.floor((n % 100) / 10),
+    o: n % 10,
+  };
+}
+
+function ComputeBoard({ question, status, shake }: BoardProps) {
+  const data = question.data as ComputeData;
+  const left = hundredsParts(data.a);
+  const right = hundredsParts(data.b);
+  return (
+    <Frame shake={shake} status={status}>
+      <p className="mb-3 text-center font-display text-2xl tabular-nums">
+        {data.a} {data.op} {data.b}
+        {data.mode === "estimate" ? <span className="block text-sm font-sans text-muted">Nearest hundred</span> : null}
+      </p>
+      <div className="flex justify-center gap-6 text-center text-[11px] text-muted">
+        {[left, right].map((p, i) => (
+          <div key={i}>
+            <div className="flex flex-wrap justify-center gap-0.5">
+              {Array.from({ length: p.h }, (_, k) => (
+                <span key={k} className="size-5 rounded-[3px] bg-q2" />
+              ))}
+            </div>
+            <div className="mt-1 flex justify-center gap-0.5">
+              {Array.from({ length: p.t }, (_, k) => (
+                <span key={k} className="h-8 w-1.5 rounded-sm bg-teal" />
+              ))}
+            </div>
+            <div className="mt-1 flex justify-center gap-0.5">
+              {Array.from({ length: p.o }, (_, k) => (
+                <span key={k} className="size-2 rounded-[2px] bg-star" />
+              ))}
+            </div>
+            {i === 0 ? data.a : data.b}
+          </div>
+        ))}
+      </div>
+    </Frame>
+  );
+}
+
+function MeasureBoard({ question, status, shake }: BoardProps) {
+  const data = question.data as MeasureData;
+  if (data.mode === "unit") {
+    return (
+      <Frame shake={shake} status={status}>
+        <p className="text-center text-sm text-muted">Pick the unit that fits.</p>
+      </Frame>
+    );
+  }
+  const pct = Math.min(100, (data.value / data.max) * 100);
+  if (data.attribute === "length") {
+    const ticks = data.max * (data.unit === "in" ? 2 : 1);
+    return (
+      <Frame shake={shake} status={status}>
+        <div className="relative mx-auto h-20 w-full max-w-sm">
+          <div className="absolute left-0 top-1 h-4 rounded-sm bg-teal" style={{ width: `${pct}%` }} />
+          <div className="absolute bottom-5 left-0 right-0 flex h-6 items-end border-t border-ink">
+            {Array.from({ length: ticks + 1 }, (_, i) => (
+              <span key={i} className="flex-1 border-l border-ink" />
+            ))}
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 flex justify-between text-[10px] text-muted">
+            {Array.from({ length: data.max + 1 }, (_, i) => (
+              <span key={i}>{i}</span>
+            ))}
+          </div>
+        </div>
+        <p className="mt-2 text-center text-xs text-muted">{data.unit}</p>
+      </Frame>
+    );
+  }
+  if (data.attribute === "mass") {
+    return (
+      <Frame shake={shake} status={status}>
+        <div className="flex items-end justify-center gap-1">
+          {Array.from({ length: data.value }, (_, i) => (
+            <span key={i} className="w-6 rounded-t bg-q2" style={{ height: `${16 + i * 4}px` }} />
+          ))}
+        </div>
+        <p className="mt-2 text-center text-xs text-muted">Scale · {data.unit}</p>
+      </Frame>
+    );
+  }
+  return (
+    <Frame shake={shake} status={status}>
+      <div className="mx-auto flex h-36 w-16 flex-col justify-end overflow-hidden rounded-b-[20px] border-2 border-ink">
+        <div className="w-full bg-teal" style={{ height: `${pct}%` }} />
+      </div>
+      <p className="mt-2 text-center text-xs text-muted">
+        0 to {data.max} {data.unit}
+      </p>
     </Frame>
   );
 }

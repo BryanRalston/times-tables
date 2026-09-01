@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { SCHOOL_DAYS, isSchoolDay, prevSchoolDay, weekdayName } from "./calendar";
-import { UNITS, WELCOME_ACTIVITY, suggestedUnitId, unitById } from "./curriculum";
+import { GRADE3_SOLS, UNITS, WELCOME_ACTIVITY, coversSol, fluencyFactorsForUnit, suggestedUnitId, unitById } from "./curriculum";
 import { makeDailyWalk } from "./daily";
 import { parseHash } from "./nav";
 import { isUnitOpen, unitStatus } from "./path";
@@ -41,6 +41,42 @@ describe("curriculum", () => {
 
   it("class unit wins", () => {
     expect(suggestedUnitId("2026-08-17", "u9")).toBe("u9");
+  });
+
+  it("matches the LCPS yearly overview units", () => {
+    expect(UNITS[0]?.title).toMatch(/Data Cycle/i);
+    expect(UNITS[1]?.title).toMatch(/Place Value/i);
+    expect(UNITS[2]?.title).toMatch(/Making Meaning with Models/i);
+    expect(UNITS[3]?.title).toMatch(/Geometry/i);
+    expect(UNITS[4]?.title).toMatch(/Fraction Understanding Part 1/i);
+    expect(UNITS[5]?.title).toMatch(/Foundational Facts/i);
+    expect(UNITS[6]?.title).toMatch(/Analyzing My World/i);
+    expect(UNITS[7]?.title).toMatch(/Measurement, Perimeter, and Area/i);
+    expect(UNITS[8]?.title).toMatch(/Building on Foundational Facts/i);
+    expect(UNITS[9]?.title).toMatch(/Fractions Part 2/i);
+    expect(UNITS[10]?.title).toMatch(/Time and Money/i);
+    expect(UNITS[11]?.title).toMatch(/Develop Fluency/i);
+    expect(UNITS[12]?.title).toMatch(/Digging Deeper/i);
+  });
+
+  it("covers every Grade 3 SOL in the overview", () => {
+    for (const code of GRADE3_SOLS) {
+      expect(coversSol(code), code).toBe(true);
+    }
+  });
+
+  it("tags measurement 3.MG.1 on Unit 8 and time 3.MG.3 on Unit 11", () => {
+    expect(UNITS[7]?.sol).toEqual(expect.arrayContaining(["3.MG.1", "3.MG.2"]));
+    expect(UNITS[10]?.sol).toEqual(expect.arrayContaining(["3.MG.3", "3.NS.4"]));
+    expect(UNITS[10]?.sol.join()).not.toMatch(/3\.MG\.1/);
+    expect(UNITS[6]?.sol).toEqual(expect.arrayContaining(["3.PFA.1"]));
+  });
+
+  it("includes 6s and 7s in Unit 12 fluency", () => {
+    const factors = fluencyFactorsForUnit("u12");
+    expect(factors).toEqual(expect.arrayContaining([6, 7]));
+    const six = UNITS[11]?.activities.find((a) => a.id === "u12-six");
+    expect(six?.params?.factors).toEqual(expect.arrayContaining([6, 7]));
   });
 });
 

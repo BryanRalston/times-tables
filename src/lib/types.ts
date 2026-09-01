@@ -17,7 +17,9 @@ export type Kind =
   | "graph"
   | "pattern"
   | "word"
-  | "fluency";
+  | "fluency"
+  | "measure"
+  | "compute";
 
 export type InputMode =
   | "keypad"
@@ -74,7 +76,8 @@ export interface PlaceValueData {
   number: number;
   digit: number;
   place: string;
-  mode: "place" | "value" | "expanded";
+  mode: "place" | "value" | "expanded" | "word";
+  words?: string;
 }
 
 export interface BuildData {
@@ -93,11 +96,13 @@ export interface OrderData {
 }
 
 export interface ChoiceData {
-  visual?: "shape" | "none";
+  visual?: "shape" | "none" | "combine" | "subdivide";
   shape?: string;
   rotation?: number;
   isPolygon?: boolean;
   sides?: number;
+  parts?: string[];
+  result?: string;
 }
 
 export interface FractionData {
@@ -105,7 +110,7 @@ export interface FractionData {
   den: number;
   num2?: number;
   den2?: number;
-  mode: "name" | "unit" | "mixed" | "compare" | "benchmark" | "equiv" | "leftover";
+  mode: "name" | "unit" | "mixed" | "compare" | "benchmark" | "equiv" | "leftover" | "line";
   shaded?: number;
 }
 
@@ -127,7 +132,7 @@ export interface MoneyData {
   otherCents?: number;
 }
 
-export type Coin = "penny" | "nickel" | "dime" | "quarter" | "dollar";
+export type Coin = "penny" | "nickel" | "dime" | "quarter" | "dollar" | "five";
 
 export interface AreaData {
   cells: boolean[][];
@@ -156,6 +161,8 @@ export interface GraphData {
 export interface PatternData {
   seq: (number | null)[];
   step: number;
+  dir?: "up" | "down";
+  rule?: string;
 }
 
 export interface WordData {
@@ -167,6 +174,22 @@ export interface FluencyData {
   a: number;
   b: number;
   op: "×" | "÷" | "+" | "−";
+}
+
+export interface MeasureData {
+  attribute: "length" | "mass" | "volume";
+  system: "us" | "metric";
+  unit: string;
+  value: number;
+  max: number;
+  mode: "read" | "estimate" | "unit";
+}
+
+export interface ComputeData {
+  a: number;
+  b: number;
+  op: "+" | "−";
+  mode: "exact" | "estimate";
 }
 
 export interface Question {
@@ -181,6 +204,7 @@ export interface Question {
   needsInteract?: boolean;
   factKey?: string;
   source?: ItemSource;
+  sol?: string[];
   data:
     | TenFrameData
     | GroupsData
@@ -198,7 +222,9 @@ export interface Question {
     | GraphData
     | PatternData
     | WordData
-    | FluencyData;
+    | FluencyData
+    | MeasureData
+    | ComputeData;
 }
 
 export interface ActivitySave {

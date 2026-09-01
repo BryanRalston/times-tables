@@ -1,7 +1,7 @@
 import { AppHeader, AppTabs } from "@/components/chrome";
 import { ART } from "@/lib/art";
 import { todayIso } from "@/lib/calendar";
-import { QUARTERS, UNITS, suggestedUnitId, unitWindowLabel } from "@/lib/curriculum";
+import { QUARTERS, UNITS, suggestedUnitId } from "@/lib/curriculum";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
@@ -42,7 +42,7 @@ export function LessonsPage() {
                           ) : null}
                         </span>
                         <span className="block text-xs text-muted">
-                          Unit {u.number} · {unitWindowLabel(u.id)}
+                          Unit {u.number} · {u.sol.join(" · ")}
                         </span>
                       </span>
                     </summary>
@@ -71,6 +71,7 @@ export function LessonsPage() {
                             <span className="min-w-0 flex-1">
                               <span className="block font-medium leading-tight">{a.title}</span>
                               <span className="block text-xs text-muted">{a.blurb}</span>
+                              <span className="block text-[11px] text-faint">{a.sol.join(" · ")}</span>
                             </span>
                             <span className="text-star">{save?.stars ? "★".repeat(save.stars) : "Play"}</span>
                           </button>

@@ -209,6 +209,12 @@ export function ClockKeys({
         <Button variant="secondary" disabled={disabled} onClick={() => set(hours, minutes - 5)}>
           −5 min
         </Button>
+        <Button variant="secondary" disabled={disabled} onClick={() => set(hours, minutes + 1)}>
+          +1 min
+        </Button>
+        <Button variant="secondary" disabled={disabled} onClick={() => set(hours, minutes - 1)}>
+          −1 min
+        </Button>
       </div>
       <Button className="w-full" size="lg" onClick={onCheck} disabled={disabled}>
         Check

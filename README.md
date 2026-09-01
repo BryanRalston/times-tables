@@ -1,6 +1,6 @@
 # Grade 3 Path
 
-A school-year of LCPS 2026–27 math trails. Home is today's walk plus a year map. **Lessons** is the menu: every unit, every activity, nothing locked. Leftover `6 + n = 10` is the loud first lesson, not a trap.
+A school-year of LCPS 2026–27 math trails, mapped to the Grade 3 Mathematics Yearly Overview. Home is today's walk plus a year map. **Lessons** is the menu: every unit, every activity, nothing locked. Leftover `6 + n = 10` is the loud first lesson, not a trap.
 
 Times tables are a family on that path (equal groups, then 2s 5s 10s, then 3s 4s 8s 9s), not the product title. Nothing is sent to a server. No accounts.
 
