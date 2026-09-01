@@ -101,6 +101,9 @@ export type Ui = {
   orderEmpty: string;
   clear: string;
   fridayCheck: string;
+  review: string;
+  fresh: string;
+  fluencyLabel: string;
   weekendExtra: string;
   walkOf: (day: string) => string;
   of: (a: number, b: number) => string;
@@ -210,6 +213,9 @@ export const UI: Record<Locale, Ui> = {
     undo: "Undo",
     clear: "Clear",
     fridayCheck: "Friday check",
+    review: "Review",
+    fresh: "New",
+    fluencyLabel: "Fluency",
     weekendExtra: "Weekend extra",
     walkOf: (day) => `${day}'s walk`,
     of: (a, b) => `${a} of ${b}`,
@@ -318,6 +324,9 @@ export const UI: Record<Locale, Ui> = {
     undo: "Deshacer",
     clear: "Borrar",
     fridayCheck: "Chequeo de viernes",
+    review: "Repaso",
+    fresh: "Nuevo",
+    fluencyLabel: "Fluidez",
     weekendExtra: "Extra de fin de semana",
     walkOf: (day) => `Paseo del ${day}`,
     of: (a, b) => `${a} de ${b}`,
@@ -426,6 +435,9 @@ export const UI: Record<Locale, Ui> = {
     undo: "Desfazer",
     clear: "Limpar",
     fridayCheck: "Checagem de sexta",
+    review: "Revisão",
+    fresh: "Novo",
+    fluencyLabel: "Fluência",
     weekendExtra: "Extra de fim de semana",
     walkOf: (day) => `Passeio de ${day}`,
     of: (a, b) => `${a} de ${b}`,

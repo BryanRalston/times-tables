@@ -104,10 +104,10 @@ function buildPack(
 
 function sourceLabel(src: ItemSource | undefined, locale: Locale): string | null {
   const ui = UI[locale];
-  if (src === "review") return locale === "es" ? "Repaso" : locale === "pt-BR" ? "Revisão" : "Review";
-  if (src === "fluency") return locale === "es" ? "Fluidez" : locale === "pt-BR" ? "Fluência" : "Fluency";
+  if (src === "review") return ui.review;
+  if (src === "fluency") return ui.fluencyLabel;
   if (src === "friday") return ui.fridayCheck;
-  if (src === "fresh") return locale === "es" ? "Nuevo" : locale === "pt-BR" ? "Novo" : "New";
+  if (src === "fresh") return ui.fresh;
   return null;
 }
 

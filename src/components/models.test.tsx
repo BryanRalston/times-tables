@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { activityById } from "@/lib/curriculum";
 import { makeQuestion } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
-import type { DecimalData, MeasureData, MoneyData, Question } from "@/lib/types";
+import type { ChoiceData, ClockData, DecimalData, MeasureData, MoneyData, Question } from "@/lib/types";
 import { moneyFmt } from "@/lib/utils";
 import { Board, type BoardProps } from "./models";
 
@@ -112,5 +112,39 @@ describe("boards", () => {
       <Board {...stub(q)} value={(q.choices ?? [])[0] ?? "1"} />,
     );
     expect(withPick).toMatch(/Undo|Deshacer|Desfazer/);
+  });
+
+  it("count money img count matches the coin bag", () => {
+    const q = makeQuestion(activityById("u1-coins")!.activity, rngFromSeed("coins:board"));
+    const d = q.data as MoneyData;
+    const n = Object.values(d.coins).reduce((s, c) => s + (c ?? 0), 0);
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect((html.match(/<img/g) ?? []).length).toBe(n);
+  });
+
+  it("combine drawing is two parts plus ? not the named result polygon", () => {
+    const q = makeQuestion(activityById("u4-combine")!.activity, rngFromSeed("join:board"));
+    const d = q.data as ChoiceData;
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain("?");
+    expect((html.match(/<polygon/g) ?? []).length).toBe(2);
+    expect(html).not.toContain(d.result);
+  });
+
+  it("read-clock board draws hour and minute hands", () => {
+    const q = makeQuestion(activityById("u11-clock")!.activity, rngFromSeed(3));
+    expect((q.data as ClockData).mode).toBe("read");
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect((html.match(/<line/g) ?? []).length).toBeGreaterThanOrEqual(2);
+    expect(html).toContain("stroke-linecap");
+  });
+
+  it("measure read mode has a pointer on the tool", () => {
+    for (const id of ["u8-length", "u8-mass", "u8-volume"]) {
+      const q = makeQuestion(activityById(id)!.activity, rngFromSeed("ptr:5"));
+      const html = renderToStaticMarkup(<Board {...stub(q)} />);
+      expect(html, id).toContain("polygon");
+      expect(html, id).toContain("measure/");
+    }
   });
 });
