@@ -47,6 +47,13 @@ export type Ui = {
   yourSet: string;
   makeAmount: (fmt: string) => string;
   readPointer: string;
+  countThemAll: string;
+  tapAGroup: string;
+  readTheHands: string;
+  startClock: (t: string) => string;
+  graphKeyWord: string;
+  nearestHundred: string;
+  nearestThousand: string;
   tapPicture: string;
   now: string;
   unitPage: string;
@@ -142,6 +149,13 @@ export const UI: Record<Locale, Ui> = {
     yourSet: "Your set — tap to take back",
     makeAmount: (fmt) => `Make ${fmt}`,
     readPointer: "Read the pointer",
+    countThemAll: "Count them all.",
+    tapAGroup: "Tap a group to isolate it, then name n.",
+    readTheHands: "Read the hands.",
+    startClock: (t) => `Start ${t}`,
+    graphKeyWord: "Key",
+    nearestHundred: "Nearest hundred",
+    nearestThousand: "Nearest thousand",
     tapPicture: "Tap a picture, then its category.",
     now: "Now",
     unitPage: "Unit page",
@@ -243,6 +257,13 @@ export const UI: Record<Locale, Ui> = {
     yourSet: "Tu conjunto — toca para devolver",
     makeAmount: (fmt) => `Arma ${fmt}`,
     readPointer: "Lee el puntero",
+    countThemAll: "Cuéntalos todos.",
+    tapAGroup: "Toca un grupo para aislarlo, luego nombra n.",
+    readTheHands: "Lee las manecillas.",
+    startClock: (t) => `Empieza ${t}`,
+    graphKeyWord: "Clave",
+    nearestHundred: "Centena más cercana",
+    nearestThousand: "Millar más cercano",
     tapPicture: "Toca una foto, luego su categoría.",
     now: "Ahora",
     unitPage: "Página de la unidad",
@@ -344,6 +365,13 @@ export const UI: Record<Locale, Ui> = {
     yourSet: "Seu conjunto — toque para devolver",
     makeAmount: (fmt) => `Monte ${fmt}`,
     readPointer: "Leia o ponteiro",
+    countThemAll: "Conte todos.",
+    tapAGroup: "Toque um grupo para isolá-lo, depois nomeie n.",
+    readTheHands: "Leia os ponteiros.",
+    startClock: (t) => `Começa ${t}`,
+    graphKeyWord: "Legenda",
+    nearestHundred: "Centena mais próxima",
+    nearestThousand: "Milhar mais próximo",
     tapPicture: "Toque numa figura, depois na categoria.",
     now: "Agora",
     unitPage: "Página da unidade",
@@ -686,6 +714,8 @@ export const G4Q: Record<
 
 export type QCopy = {
   leftoverHint: string;
+  leftoverPieces: (shown: number, den: number) => string;
+  leftoverPiecesHint: string;
   tensHint: string;
   groupsHint: string;
   groupsOf: (g: number, s: number) => string;
@@ -702,6 +732,7 @@ export type QCopy = {
   whatPlace: (n: string, digit: number) => string;
   whatValue: (n: string, digit: number, place: string) => string;
   buildHundreds: (target: number) => string;
+  buildPlacesHint: string;
   leastToGreatest: string;
   greatestToLeast: string;
   familyFact: (a: number, b: number) => string;
@@ -727,6 +758,7 @@ export type QCopy = {
   unitFraction: (den: number) => string;
   mixedName: string;
   closerTo: (frac: string) => string;
+  equivN: (num: number, den: number, den2: number) => string;
   shaded: string;
   whatTime: string;
   elapsedHours: (start: string, end: string) => string;
@@ -786,6 +818,8 @@ export function qCopy(locale: Locale): QCopy {
   if (locale === "es") {
     return {
       leftoverHint: "Toma los puntos que ves. n es lo que se esconde.",
+      leftoverPieces: (shown, den) => `${shown}/${den} + n = 1. ¿Cuánto es n?`,
+      leftoverPiecesHint: "Toma las piezas que ves.",
       tensHint: "Decenas que ves. n son las unidades que faltan.",
       groupsHint: "Cuenta un grupo, luego cuenta los grupos.",
       groupsOf: (g, s) => `${g} grupos de ${s}. ¿Cuántos en total?`,
@@ -802,6 +836,7 @@ export function qCopy(locale: Locale): QCopy {
       whatPlace: (n, digit) => `En ${n}, ¿en qué lugar está el ${digit}?`,
       whatValue: (n, digit, place) => `En ${n}, ¿cuál es el valor del ${digit} en ${place}?`,
       buildHundreds: (target) => `Arma ${target}. ¿Cuántas centenas?`,
+      buildPlacesHint: "Miles, centenas, decenas, unidades.",
       leastToGreatest: "De menor a mayor.",
       greatestToLeast: "De mayor a menor.",
       familyFact: (a, b) => `¿Qué hecho va con ${a} grupos de ${b}?`,
@@ -839,6 +874,7 @@ export function qCopy(locale: Locale): QCopy {
       unitFraction: (den) => `Una pieza de ${den}. Nombra la fracción unitaria.`,
       mixedName: "Nombra el número mixto.",
       closerTo: (frac) => `¿${frac} está más cerca de 0, 1/2 o 1?`,
+      equivN: (num, den, den2) => `${num}/${den} = n/${den2}. ¿Cuánto es n?`,
       shaded: "¿Qué fracción está sombreada?",
       whatTime: "¿Qué hora es?",
       elapsedHours: (start, end) => `Empieza ${start}. Termina ${end}. ¿Cuántas horas pasaron?`,
@@ -896,6 +932,8 @@ export function qCopy(locale: Locale): QCopy {
   if (locale === "pt-BR") {
     return {
       leftoverHint: "Pegue os pontos que você vê. n é o que está escondido.",
+      leftoverPieces: (shown, den) => `${shown}/${den} + n = 1. Quanto é n?`,
+      leftoverPiecesHint: "Pegue as peças que você vê.",
       tensHint: "Dezenas que você vê. n são as unidades que faltam.",
       groupsHint: "Conte um grupo, depois conte os grupos.",
       groupsOf: (g, s) => `${g} grupos de ${s}. Quantos no total?`,
@@ -912,6 +950,7 @@ export function qCopy(locale: Locale): QCopy {
       whatPlace: (n, digit) => `Em ${n}, que ordem está o ${digit}?`,
       whatValue: (n, digit, place) => `Em ${n}, qual é o valor do ${digit} em ${place}?`,
       buildHundreds: (target) => `Monte ${target}. Quantas centenas?`,
+      buildPlacesHint: "Milhares, centenas, dezenas, unidades.",
       leastToGreatest: "Do menor para o maior.",
       greatestToLeast: "Do maior para o menor.",
       familyFact: (a, b) => `Qual fato combina com ${a} grupos de ${b}?`,
@@ -949,6 +988,7 @@ export function qCopy(locale: Locale): QCopy {
       unitFraction: (den) => `Um pedaço de ${den}. Nomeie a fração unitária.`,
       mixedName: "Nomeie o número misto.",
       closerTo: (frac) => `${frac} está mais perto de 0, 1/2 ou 1?`,
+      equivN: (num, den, den2) => `${num}/${den} = n/${den2}. Quanto é n?`,
       shaded: "Que fração está pintada?",
       whatTime: "Que horas são?",
       elapsedHours: (start, end) => `Começa ${start}. Termina ${end}. Quantas horas passaram?`,
@@ -1005,6 +1045,8 @@ export function qCopy(locale: Locale): QCopy {
   }
   return {
     leftoverHint: "Take the dots you can see. n is what's hiding.",
+    leftoverPieces: (shown, den) => `${shown}/${den} + n = 1. What is n?`,
+    leftoverPiecesHint: "Take the pieces you can see.",
     tensHint: "Tens you can see. n is the leftover ones.",
     groupsHint: "Count one group, then count the groups.",
     groupsOf: (g, s) => `${g} groups of ${s}. How many in all?`,
@@ -1021,6 +1063,7 @@ export function qCopy(locale: Locale): QCopy {
     whatPlace: (n, digit) => `In ${n}, what place is the ${digit} in?`,
     whatValue: (n, digit, place) => `In ${n}, what is the value of the ${digit} in the ${place}?`,
     buildHundreds: (target) => `Build ${target}. How many hundreds?`,
+    buildPlacesHint: "Thousands, hundreds, tens, ones.",
     leastToGreatest: "Least to greatest.",
     greatestToLeast: "Greatest to least.",
     familyFact: (a, b) => `Which fact belongs with ${a} groups of ${b}?`,
@@ -1058,6 +1101,7 @@ export function qCopy(locale: Locale): QCopy {
     unitFraction: (den) => `One piece of ${den}. Name the unit fraction.`,
     mixedName: "Name the mixed number.",
     closerTo: (frac) => `Is ${frac} closer to 0, 1/2, or 1?`,
+    equivN: (num, den, den2) => `${num}/${den} = n/${den2}. What is n?`,
     shaded: "What fraction is shaded?",
     whatTime: "What time is it?",
     elapsedHours: (start, end) => `Start ${start}. End ${end}. How many hours passed?`,

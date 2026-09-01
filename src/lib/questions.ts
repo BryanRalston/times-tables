@@ -71,6 +71,7 @@ export function welcomeFirst(rng: Rng): Question {
     prompt: "6 + n = 10",
     hint: t().leftoverHint,
     answer: "4",
+    needsInteract: false,
     data: { total: 10, shown: 6, equation: "6 + n = 10" } satisfies TenFrameData,
   });
 }
@@ -88,6 +89,7 @@ function tenframeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     prompt: equation,
     hint: t().leftoverHint,
     answer: String(n),
+    needsInteract: false,
     data: { total, shown, equation } satisfies TenFrameData,
   });
 }
@@ -233,7 +235,7 @@ function buildQ(rng: Rng): Question {
   return keypadQ(rng, {
     kind: "build",
     prompt: t().buildHundreds(target),
-    hint: "Thousands, hundreds, tens, ones.",
+    hint: t().buildPlacesHint,
     answer: String(hundreds),
     data: { target },
   });
@@ -349,6 +351,8 @@ function shapeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       kind: "choice",
       prompt: ask === "sides" ? t().howManySides : t().howManyVertices,
       answer: String(sides),
+      input: "choice",
+      choices: ensureChoices(rng, String(sides), ["3", "4", "5", "6", "8"]),
       data: { visual: "shape", shape: name, sides, isPolygon: true, rotation: rng.int(0, 20) },
     });
   }
@@ -368,6 +372,8 @@ function shapeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       kind: "choice",
       prompt: t().verticesOf(SHAPE[loc][name] ?? name),
       answer: String(sides),
+      input: "choice",
+      choices: ensureChoices(rng, String(sides), ["3", "4", "5", "6", "8"]),
       data: { visual: "shape", shape: name, sides, isPolygon: true },
     });
   }
@@ -478,8 +484,8 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const n = den - shown;
     return keypadQ(rng, {
       kind: "fraction",
-      prompt: `${shown}/${den} + n = 1. What is n?`,
-      hint: "Take the pieces you can see.",
+      prompt: t().leftoverPieces(shown, den),
+      hint: t().leftoverPiecesHint,
       answer: `${n}/${den}`,
       alts: [String(n)],
       input: "fraction",
@@ -542,7 +548,7 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const num = rng.int(1, baseDen - 1);
     return keypadQ(rng, {
       kind: "fraction",
-      prompt: `${num}/${baseDen} = n/${baseDen * k}. What is n?`,
+      prompt: t().equivN(num, baseDen, baseDen * k),
       answer: String(num * k),
       data: { num, den: baseDen, num2: num * k, den2: baseDen * k, mode: "equiv", shaded: num },
     });
@@ -833,9 +839,9 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     prompt = t().graphHowMany(focus);
     answer = String(byLabel[focus]);
   } else if (ask === "more") {
-    const a = rng.pick(rows);
-    const b = rng.pick(rows.filter((r) => r.label !== a.label));
-    const [big, small] = a.value >= b.value ? [a, b] : [b, a];
+    const ranked = [...rows].sort((x, y) => y.value - x.value);
+    const big = ranked[0]!;
+    const small = ranked.find((r) => r.value < big.value)!;
     focus = big.label;
     focusB = small.label;
     prompt = t().graphMore(focus, focusB);

@@ -134,6 +134,7 @@ function Dot({ filled, gone, onClick }: { filled: boolean; gone?: boolean; onCli
 
 function TenFrame({ question, onInteract, status, shake }: BoardProps) {
   const data = question.data as TenFrameData;
+  const ui = UI[parseLocale(useProgress((st) => st.locale))];
   const [gone, setGone] = useState<boolean[]>(() => Array(data.shown).fill(false));
   const cells = Math.min(20, Math.max(data.total, data.shown));
   const perRow = 5;
@@ -172,7 +173,7 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
         ))}
       </div>
       {status === "correct" ? (
-        <p className="mt-3 text-center text-sm text-muted">n = {question.answer}</p>
+        <p className="mt-3 text-center text-sm text-muted">{ui.nIs(question.answer)}</p>
       ) : null}
     </Frame>
   );
@@ -180,6 +181,7 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
 
 function Groups({ question, onInteract, status, shake }: BoardProps) {
   const data = question.data as GroupsData;
+  const ui = UI[parseLocale(useProgress((st) => st.locale))];
   const [taken, setTaken] = useState(false);
   const groups = Math.max(1, data.groups);
   const size = Math.max(0, data.size);
@@ -215,7 +217,7 @@ function Groups({ question, onInteract, status, shake }: BoardProps) {
         ))}
       </div>
       <p className="mt-3 text-center text-sm text-muted">
-        {data.hide === "product" ? "Count them all." : "Tap a group to isolate it, then name n."}
+        {data.hide === "product" ? ui.countThemAll : ui.tapAGroup}
       </p>
     </Frame>
   );
@@ -623,6 +625,7 @@ function FractionBar({ question, onInteract, status, shake }: BoardProps) {
 
 function AnalogClock({ question, status, shake }: BoardProps) {
   const data = question.data as ClockData;
+  const ui = UI[parseLocale(useProgress((st) => st.locale))];
   const extraM = data.elapsedMinutes ?? 0;
   if (data.mode === "elapsed") {
     let endM = data.minutes + extraM;
@@ -653,7 +656,7 @@ function AnalogClock({ question, status, shake }: BoardProps) {
         <ClockFace hours={data.hours} minutes={data.minutes} />
       </div>
       <p className="mt-2 text-center text-sm text-muted">
-        {data.find === "time" ? "Read the hands." : `Start ${data.hours}:${pad2(data.minutes)}`}
+        {data.find === "time" ? ui.readTheHands : ui.startClock(`${data.hours}:${pad2(data.minutes)}`)}
       </p>
     </Frame>
   );
@@ -952,7 +955,7 @@ function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
             </div>
           ))}
           <p className="flex items-center gap-1 text-xs text-muted">
-            Key: <MagentaImg src={squisheeSrc(data.symbol)} alt="" className="inline size-5" /> = {data.key}
+            {ui.graphKeyWord}: <MagentaImg src={squisheeSrc(data.symbol)} alt="" className="inline size-5" /> = {data.key}
           </p>
         </div>
       ) : (
@@ -1045,12 +1048,13 @@ function NumberLine({ question, status, shake }: BoardProps) {
 
 function ComputeBoard({ question, status, shake }: BoardProps) {
   const data = question.data as ComputeData;
+  const ui = UI[parseLocale(useProgress((st) => st.locale))];
   if (data.a > 2000 || data.b > 2000) {
     return (
       <Frame shake={shake} status={status}>
         <p className="mb-3 text-center font-display text-2xl tabular-nums">
           {data.a.toLocaleString("en-US")} {data.op} {data.b.toLocaleString("en-US")}
-          {data.mode === "estimate" ? <span className="block text-sm font-sans text-muted">Nearest thousand</span> : null}
+          {data.mode === "estimate" ? <span className="block text-sm font-sans text-muted">{ui.nearestThousand}</span> : null}
         </p>
         <div className="mx-auto max-w-xs rounded-[16px] border border-line bg-bg-warm p-3 font-display text-2xl tabular-nums">
           <p className="text-right">{data.a.toLocaleString("en-US")}</p>
@@ -1069,7 +1073,7 @@ function ComputeBoard({ question, status, shake }: BoardProps) {
     <Frame shake={shake} status={status}>
       <p className="mb-3 text-center font-display text-2xl tabular-nums">
         {data.a} {data.op} {data.b}
-        {data.mode === "estimate" ? <span className="block text-sm font-sans text-muted">Nearest hundred</span> : null}
+        {data.mode === "estimate" ? <span className="block text-sm font-sans text-muted">{ui.nearestHundred}</span> : null}
       </p>
       <div className="flex justify-center gap-6 text-center text-[11px] text-muted">
         {[left, right].map((p, i) => (

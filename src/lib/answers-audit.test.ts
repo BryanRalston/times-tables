@@ -1,23 +1,36 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { GRADE4_UNITS, UNITS, activityById } from "./curriculum";
-import { makeQuestion, wordForm } from "./questions";
+import { makeQuestion, welcomeFirst, wordForm } from "./questions";
 import { rngFromSeed } from "./rng";
 import type {
   AreaData,
   ArrayData,
+  BuildData,
   ClockData,
+  CompareData,
   ComputeData,
+  DecimalData,
+  FluencyData,
   FractionData,
+  FracOpData,
   GraphData,
   GroupsData,
   JumpsData,
   MeasureData,
   MoneyData,
+  OrderData,
+  PatternData,
   PerimeterData,
   PlaceValueData,
+  Question,
   TenFrameData,
 } from "./types";
 import { answersMatch, moneyFmt } from "./utils";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
 
 const COIN: Record<string, number> = {
   penny: 1,
@@ -363,4 +376,222 @@ describe("answer audit", () => {
       }
     }
   });
+
+  it("leftover / what's hiding / find-n ten-frames do not gate Check", () => {
+    expect(welcomeFirst(rngFromSeed(1)).needsInteract).toBeFalsy();
+    for (const id of ["u1-leftover", "u1-friends"]) {
+      for (let i = 0; i < 20; i++) {
+        const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`ni:${id}:${i}`));
+        expect(q.kind).toBe("tenframe");
+        expect(q.needsInteract, id).toBeFalsy();
+        const d = q.data as TenFrameData;
+        expect(Number(q.answer)).toBe(d.total - d.shown);
+      }
+    }
+  });
+
+  it("every Grade 3 kind has a real math invariant", () => {
+    for (const unit of UNITS) {
+      for (const activity of unit.activities) {
+        for (let i = 0; i < 12; i++) {
+          const q = makeQuestion(activity, rngFromSeed(`inv:${activity.id}:${i}`));
+          expect(q.answer.length, activity.id).toBeGreaterThan(0);
+          if (q.input === "choice") {
+            expect(q.choices ?? [], activity.id).toContain(q.answer);
+          }
+          assertKind(activity.id, q);
+        }
+      }
+    }
+    for (const unit of GRADE4_UNITS) {
+      for (const activity of unit.activities) {
+        const q = makeQuestion(activity, rngFromSeed(`g4inv:${activity.id}`));
+        if (q.input === "choice") expect(q.choices ?? []).toContain(q.answer);
+        assertKind(activity.id, q);
+      }
+    }
+  });
+
+  it("board copy is not hardcoded English in models or generators", () => {
+    const models = readFileSync(join(HERE, "../components/models.tsx"), "utf8");
+    expect(models).not.toContain("Count them all.");
+    expect(models).not.toContain("Tap a group to isolate it, then name n.");
+    expect(models).not.toContain("Read the hands.");
+    expect(models).not.toContain("Nearest hundred");
+    expect(models).not.toContain("Nearest thousand");
+    expect(models).not.toMatch(/Key:\s*</);
+    const gens = readFileSync(join(HERE, "questions.ts"), "utf8");
+    expect(gens).not.toContain("Thousands, hundreds, tens, ones.");
+    expect(gens).not.toContain("Take the pieces you can see.");
+    expect(gens).not.toMatch(/What is n\?`/);
+  });
 });
+
+function assertKind(activityId: string, q: Question) {
+  switch (q.kind) {
+    case "tenframe": {
+      const d = q.data as TenFrameData;
+      expect(Number(q.answer), activityId).toBe(d.total - d.shown);
+      if (activityId === "u1-leftover" || activityId === "u1-friends") {
+        expect(q.needsInteract, activityId).toBeFalsy();
+      }
+      break;
+    }
+    case "groups": {
+      const d = q.data as GroupsData;
+      const p = d.groups * d.size;
+      if (d.hide === "product") {
+        if (activityId.endsWith("-two")) {
+          expect(Number.isFinite(Number(q.answer)), activityId).toBe(true);
+        } else {
+          expect(Number(q.answer), activityId).toBe(p);
+        }
+      }
+      if (d.hide === "groups") expect(Number(q.answer), activityId).toBe(d.groups);
+      if (d.hide === "size") expect(Number(q.answer), activityId).toBe(d.size);
+      break;
+    }
+    case "array": {
+      const d = q.data as ArrayData;
+      const p = d.rows * d.cols;
+      if (d.hide === "product") expect(Number(q.answer), activityId).toBe(p);
+      if (d.hide === "rows") expect(Number(q.answer), activityId).toBe(d.rows);
+      if (d.hide === "cols") expect(Number(q.answer), activityId).toBe(d.cols);
+      break;
+    }
+    case "jumps": {
+      const d = q.data as JumpsData;
+      const p = d.jumps * d.size;
+      if (d.hide === "product") expect(Number(q.answer), activityId).toBe(p);
+      if (d.hide === "jumps") expect(Number(q.answer), activityId).toBe(d.jumps);
+      if (d.hide === "size") expect(Number(q.answer), activityId).toBe(d.size);
+      break;
+    }
+    case "placevalue": {
+      const d = q.data as PlaceValueData;
+      expect(d.number).toBeGreaterThan(0);
+      if (d.mode === "expanded") expect(Number(q.answer)).toBe(d.digit);
+      if (d.mode === "value") expect(Number(q.answer)).toBeGreaterThan(0);
+      break;
+    }
+    case "build": {
+      const d = q.data as BuildData;
+      expect(Number(q.answer), activityId).toBe(Math.floor(d.target / 100) % 10);
+      break;
+    }
+    case "compare": {
+      const d = q.data as CompareData;
+      if (q.input === "compare") {
+        const exp = d.a < d.b ? "<" : d.a > d.b ? ">" : "=";
+        expect(q.answer, activityId).toBe(exp);
+      } else {
+        expect(Number(q.answer), activityId).toBe(d.a - d.b);
+      }
+      break;
+    }
+    case "order": {
+      const d = q.data as OrderData;
+      const parts = q.answer.split(" ");
+      expect(parts.length, activityId).toBe(d.numbers.length);
+      break;
+    }
+    case "choice": {
+      expect(q.choices ?? [], activityId).toContain(q.answer);
+      break;
+    }
+    case "fraction": {
+      const d = q.data as FractionData;
+      if (d.mode === "name") expect(q.answer).toBe(`${d.num}/${d.den}`);
+      if (d.mode === "unit") expect(q.answer).toBe(`1/${d.den}`);
+      if (d.mode === "leftover") expect(q.answer).toBe(`${d.den - d.num}/${d.den}`);
+      break;
+    }
+    case "clock": {
+      const d = q.data as ClockData;
+      if (d.mode === "read" && d.find === "time") {
+        expect(q.answer).toMatch(/^\d{1,2}:\d{2}$/);
+      }
+      break;
+    }
+    case "money": {
+      const d = q.data as MoneyData;
+      if (d.mode === "count") {
+        const cents = Object.entries(d.coins).reduce((n, [id, c]) => n + (COIN[id] ?? 0) * (c ?? 0), 0);
+        expect(Number(q.answer), activityId).toBe(cents);
+        expect(q.prompt).not.toContain(String(cents));
+        expect(q.prompt).not.toContain(moneyFmt(cents));
+        expect(q.prompt).not.toMatch(/\$\d+\.\d{2}/);
+      }
+      if (d.mode === "change") expect(Number(q.answer)).toBe((d.pay ?? 0) - (d.cost ?? 0));
+      break;
+    }
+    case "area": {
+      const d = q.data as AreaData;
+      expect(Number(q.answer), activityId).toBe(d.cells.flat().filter(Boolean).length);
+      break;
+    }
+    case "perimeter": {
+      const d = q.data as PerimeterData;
+      if (d.hideIndex == null) expect(Number(q.answer)).toBe(d.sides.reduce((a, b) => a + b, 0));
+      else expect(Number(q.answer)).toBe(d.sides[d.hideIndex]);
+      break;
+    }
+    case "graph": {
+      const d = q.data as GraphData;
+      if (d.collect) expect(q.needsInteract).toBe(true);
+      if (d.ask === "more") {
+        const byLabel = Object.fromEntries(d.rows.map((r) => [r.label, r.value]));
+        expect(byLabel[d.focus!]!).toBeGreaterThan(byLabel[d.focusB!]!);
+        expect(Number(q.answer)).toBe(byLabel[d.focus!]! - byLabel[d.focusB!]!);
+        expect(q.prompt.toLowerCase().indexOf(d.focus!.toLowerCase())).toBeLessThan(
+          q.prompt.toLowerCase().indexOf(d.focusB!.toLowerCase()),
+        );
+      }
+      break;
+    }
+    case "pattern": {
+      const d = q.data as PatternData;
+      expect(d.seq.some((n) => n == null)).toBe(true);
+      expect(q.answer.length).toBeGreaterThan(0);
+      break;
+    }
+    case "fluency": {
+      const d = q.data as FluencyData;
+      const v = d.op === "×" ? d.a * d.b : d.op === "÷" ? d.a / d.b : d.op === "+" ? d.a + d.b : d.a - d.b;
+      expect(Number(q.answer), activityId).toBe(v);
+      break;
+    }
+    case "measure": {
+      const d = q.data as MeasureData;
+      if (d.mode === "read" && d.attribute === "length") expect(["in", "cm"]).toContain(d.unit);
+      if (d.mode === "read") expect(String(q.answer)).toBe(String(d.value));
+      break;
+    }
+    case "compute": {
+      const d = q.data as ComputeData;
+      if (d.mode === "exact") expect(Number(q.answer)).toBe(d.op === "+" ? d.a + d.b : d.a - d.b);
+      break;
+    }
+    case "decimal": {
+      const d = q.data as DecimalData;
+      expect(d.tenths).toBeGreaterThanOrEqual(0);
+      expect(q.answer.length).toBeGreaterThan(0);
+      break;
+    }
+    case "fracop": {
+      const d = q.data as FracOpData;
+      const num = d.op === "+" ? d.a + d.b : d.a - d.b;
+      expect(q.answer).toBe(`${num}/${d.den}`);
+      break;
+    }
+    case "lines": {
+      expect(q.choices ?? []).toContain(q.answer);
+      break;
+    }
+    case "word":
+      expect(q.prompt.length).toBeGreaterThan(8);
+      break;
+    default:
+      throw new Error(`unhandled kind ${(q as Question).kind} on ${activityId}`);
+  }
+}
