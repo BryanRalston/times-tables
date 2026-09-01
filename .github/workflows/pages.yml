@@ -27,6 +27,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Pillow for asset check
+        run: python3 -m pip install --user -r scripts/requirements-assets.txt
       - run: npm test
       - run: npm run build
       - run: npm run check:pages

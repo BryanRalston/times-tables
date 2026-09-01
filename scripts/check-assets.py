@@ -9,7 +9,11 @@ import sys
 from collections import deque
 from pathlib import Path
 
-from PIL import Image
+try:
+    from PIL import Image
+except ImportError:
+    sys.stderr.write("check-assets needs Pillow (pip install pillow)\n")
+    raise
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
