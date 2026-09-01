@@ -202,7 +202,7 @@ async function interactIfNeeded(page) {
     const dots = page.getByRole("button", { name: "dot" });
     if (await dots.count()) {
       await dots.first().click({ timeout: 1500 }).catch(() => undefined);
-      await page.waitForTimeout(80);
+      await page.waitForFunction(() => !window.__G3_Q?.checkDisabled, null, { timeout: 2000 }).catch(() => undefined);
       continue;
     }
     const groups = page.locator("button[aria-label^='group']");
@@ -343,11 +343,30 @@ async function checkActivity(page, id, kind, viewport) {
         return row;
       }
       const check = page.getByRole("button", { name: /^Check$/i });
-      const checkCount = await check.count();
-      const enabledBefore = checkCount > 0 && !(await check.first().isDisabled());
-      if (enabledBefore) {
+      if (await check.count()) {
         row.ui = "fail";
-        row.note = "leftover Check enabled before why-move";
+        row.note = "leftover Check present before why-move";
+        await shotFail(page, `${viewport}-${id}`);
+        return row;
+      }
+      const dots = page.getByRole("button", { name: "dot" });
+      if (!(await dots.count())) {
+        row.ui = "fail";
+        row.note = "leftover missing known group";
+        await shotFail(page, `${viewport}-${id}`);
+        return row;
+      }
+      await dots.first().click({ timeout: 1500 });
+      if (await check.count()) {
+        row.ui = "fail";
+        row.note = "leftover Check present before why-move wait";
+        await shotFail(page, `${viewport}-${id}`);
+        return row;
+      }
+      await page.waitForFunction(() => window.__G3_Q && !window.__G3_Q.checkDisabled, null, { timeout: 2000 });
+      if (!(await check.count())) {
+        row.ui = "fail";
+        row.note = "leftover Check missing after why-move";
         await shotFail(page, `${viewport}-${id}`);
         return row;
       }

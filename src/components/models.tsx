@@ -1,8 +1,8 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ClockFace } from "@/components/clock-face";
 import { ChoiceList } from "@/components/keypad";
 import { G4Q, parseLocale, PLACE, UI } from "@/lib/i18n";
-import { splitCounted } from "@/lib/leftover";
+import { leftoverWhyMoveMs, splitCounted } from "@/lib/leftover";
 import { useProgress } from "@/lib/progress";
 import { asset } from "@/lib/art";
 import { playTap } from "@/lib/sound";
@@ -153,47 +153,66 @@ function Dot({
 function TenFrame({ question, onInteract, status, shake }: BoardProps) {
   const data = question.data as TenFrameData;
   const [taken, setTaken] = useState(false);
+  const taking = useRef(false);
+  const whyRef = useRef(0);
   const cells = Math.min(20, Math.max(data.total, data.shown));
   const perRow = 5;
   const rows = Math.ceil(Math.max(cells, 10) / perRow);
   const knownGone = taken || status === "correct";
+  const lastLeftoverRow = Math.floor(Math.max(0, data.total - 1) / perRow);
+
+  useEffect(() => () => window.clearTimeout(whyRef.current), []);
 
   function takeGroup() {
-    if (knownGone) return;
+    if (taking.current || knownGone) return;
+    taking.current = true;
     setTaken(true);
     playTap();
-    onInteract();
+    whyRef.current = window.setTimeout(onInteract, leftoverWhyMoveMs());
   }
 
   return (
     <Frame shake={shake} status={status}>
       <p className="mb-3 text-center font-display text-2xl sm:text-3xl">{data.equation}</p>
       <div className="flex flex-col items-center gap-2">
-        {Array.from({ length: rows }, (_, r) => (
-          <div key={r} className="flex flex-nowrap justify-center gap-1 rounded-[16px] border border-line bg-bg-warm p-2">
-            {Array.from({ length: Math.min(perRow, Math.max(0, cells - r * perRow)) }, (_, c) => {
-              const i = r * perRow + c;
-              const filled = i < data.shown;
-              const leftover = i >= data.shown && i < data.total;
-              return (
-                <Dot
-                  key={i}
-                  filled={filled}
-                  gone={filled && knownGone}
-                  leftover={leftover}
-                  isolate={status === "correct"}
-                  onClick={filled ? takeGroup : undefined}
-                />
-              );
-            })}
-          </div>
-        ))}
+        {Array.from({ length: rows }, (_, r) => {
+          const start = r * perRow;
+          const count = Math.min(perRow, Math.max(0, cells - start));
+          const idxs = Array.from({ length: count }, (_, c) => start + c);
+          const known = idxs.filter((i) => i < data.shown);
+          const hiding = idxs.filter((i) => i >= data.shown && i < data.total);
+          const extra = idxs.filter((i) => i >= data.total);
+          const showN = status === "correct" && hiding.length > 0 && r === lastLeftoverRow;
+          return (
+            <div
+              key={r}
+              className="flex flex-nowrap items-center justify-center gap-1 rounded-[16px] border border-line bg-bg-warm p-2"
+            >
+              {known.map((i) => (
+                <Dot key={i} filled gone={knownGone} onClick={takeGroup} />
+              ))}
+              {hiding.length ? (
+                <div
+                  className="flex flex-col items-center"
+                  {...(showN ? { "data-n-isolate": "" } : {})}
+                >
+                  <div className="flex flex-nowrap gap-1">
+                    {hiding.map((i) => (
+                      <Dot key={i} filled={false} leftover isolate={status === "correct"} />
+                    ))}
+                  </div>
+                  {showN ? (
+                    <span className="mt-1 font-display text-sm text-teal">n = {question.answer}</span>
+                  ) : null}
+                </div>
+              ) : null}
+              {extra.map((i) => (
+                <Dot key={i} filled={false} />
+              ))}
+            </div>
+          );
+        })}
       </div>
-      {status === "correct" ? (
-        <p className="mt-3 text-center font-display text-lg text-teal" data-n-isolate>
-          n
-        </p>
-      ) : null}
     </Frame>
   );
 }

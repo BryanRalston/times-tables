@@ -165,8 +165,10 @@ describe("boards", () => {
     const q = welcomeFirst(rngFromSeed(1));
     const html = renderToStaticMarkup(<Board {...stub(q)} status="correct" interacted />);
     expect(html).toContain("data-n-isolate");
-    expect(html).not.toContain(`n is ${q.answer}`);
+    expect(html).toContain(`n = ${q.answer}`);
     expect(html).toContain('aria-label="leftover"');
+    expect(html).not.toContain(`n is ${q.answer}`);
+    expect(html).not.toMatch(/<p[^>]*>n<\/p>/);
   });
 
   it("place-value idle HTML does not underline or box the asked place", () => {

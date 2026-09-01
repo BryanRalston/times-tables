@@ -3,7 +3,7 @@ import { activityById } from "./curriculum";
 import { makeQuestion } from "./questions";
 import { rngFromSeed } from "./rng";
 import type { GraphData } from "./types";
-import { cardHeading, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen, splitCounted } from "./leftover";
+import { cardHeading, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen, leftoverWhyMoveMs, splitCounted } from "./leftover";
 
 describe("leftover why-move gates", () => {
   it("hides keypad, Check, and Skip until the known group is taken", () => {
@@ -23,6 +23,10 @@ describe("leftover why-move gates", () => {
 
   it("holds leftover about two seconds", () => {
     expect(leftoverHoldMs()).toBe(2000);
+  });
+
+  it("waits for the take-out why-move before the keypad", () => {
+    expect(leftoverWhyMoveMs()).toBeGreaterThanOrEqual(280);
   });
 
   it("does not hide money or compute keypads", () => {

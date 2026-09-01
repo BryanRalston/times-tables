@@ -6,6 +6,11 @@ export function leftoverHoldMs(): number {
   return 2000;
 }
 
+/** CSS `.take-out` is 280ms; keypad stays closed until that why-move finishes. */
+export function leftoverWhyMoveMs(): number {
+  return 400;
+}
+
 export function leftoverPanelOpen(args: {
   kind: string;
   needsInteract?: boolean;
