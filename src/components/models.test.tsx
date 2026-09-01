@@ -53,6 +53,14 @@ describe("boards", () => {
       expect(html).toContain(">0<");
       expect(html).toContain(String(Math.floor(d.value)));
       expect(html).toContain(d.unit);
+      expect(html).toContain("measure/");
     }
+  });
+
+  it("unit pick shows the prompt, not an empty pointer card", () => {
+    const q = makeQuestion(activityById("u8-unit")!.activity, rngFromSeed("pencil"));
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain(q.prompt);
+    expect(html).not.toMatch(/read the pointer/i);
   });
 });

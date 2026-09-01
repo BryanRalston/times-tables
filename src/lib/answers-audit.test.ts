@@ -11,6 +11,7 @@ import type {
   GraphData,
   GroupsData,
   JumpsData,
+  MeasureData,
   MoneyData,
   PerimeterData,
   PlaceValueData,
@@ -131,6 +132,8 @@ describe("answer audit", () => {
         if (d.mode === "count") {
           const cents = Object.entries(d.coins).reduce((n, [id, c]) => n + (COIN[id] ?? 0) * (c ?? 0), 0);
           expect(Number(q.answer)).toBe(cents);
+          expect(q.prompt).not.toContain(String(cents));
+          expect(q.prompt).not.toContain(moneyFmt(cents));
         }
         if (d.mode === "change") {
           expect(Number(q.answer)).toBe((d.pay ?? 0) - (d.cost ?? 0));
@@ -166,6 +169,41 @@ describe("answer audit", () => {
       if (sd.shape === "hexagon") expect(s.answer).toBe("4");
       expect(s.choices).toContain(s.answer);
     }
+  });
+
+  it("length read uses inches or centimeters on the tick set", () => {
+    for (let i = 0; i < 40; i++) {
+      const q = makeQuestion(activityById("u8-length")!.activity, rngFromSeed(`len:${i}`));
+      const d = q.data as MeasureData;
+      expect(["in", "cm"]).toContain(d.unit);
+      expect(d.value).toBeGreaterThan(0);
+      expect(d.value).toBeLessThanOrEqual(d.max);
+      expect(Number.isInteger(d.value * 2)).toBe(true);
+      expect(String(q.answer)).toBe(String(d.value));
+    }
+  });
+
+  it("mass and volume readings sit on whole ticks", () => {
+    for (const id of ["u8-mass", "u8-volume"]) {
+      for (let i = 0; i < 30; i++) {
+        const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`mv:${id}:${i}`));
+        const d = q.data as MeasureData;
+        expect(Number.isInteger(d.value)).toBe(true);
+        expect(d.value).toBeGreaterThanOrEqual(1);
+        expect(d.value).toBeLessThanOrEqual(d.max);
+        expect(d.max).toBeGreaterThanOrEqual(8);
+        expect(d.max).toBeLessThanOrEqual(12);
+      }
+    }
+  });
+
+  it("year-end measure rotates length mass and volume", () => {
+    const seen = new Set<string>();
+    for (let i = 0; i < 40; i++) {
+      const q = makeQuestion(activityById("u13-measure")!.activity, rngFromSeed(`rot:${i}`));
+      seen.add((q.data as MeasureData).attribute);
+    }
+    expect(seen).toEqual(new Set(["length", "mass", "volume"]));
   });
 
   it("jumps answer matches the hidden factor", () => {

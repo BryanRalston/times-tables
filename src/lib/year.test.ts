@@ -192,7 +192,7 @@ describe("principal holes", () => {
   });
 
   it("measure items have a numeric reading", () => {
-    for (const id of ["u8-length", "u8-mass", "u8-volume"]) {
+    for (const id of ["u8-length", "u8-mass", "u8-volume", "u13-measure"]) {
       const q = makeQuestion(activityById(id)!.activity, rngFromSeed(5));
       const d = q.data as MeasureData;
       expect(d.value).toBeGreaterThan(0);

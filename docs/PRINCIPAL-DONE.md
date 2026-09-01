@@ -18,6 +18,5 @@ A Loudoun Grade 3 teacher could recommend this for 2026–27. Not a demo.
 
 ## Still thinner than a textbook (honest, not blocking)
 
-- Measurement tools are drawings, not photos of classroom tools.
 - Phone character wallpaper is parked (plain pink) until Safari paints a real image layer reliably.
 - Combine/subdivide covers the VA triangle/quadrilateral joins, not every polygon pair in a textbook.

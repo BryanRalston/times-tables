@@ -1053,92 +1053,94 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
   const data = question.data as MeasureData;
   const ui = UI[parseLocale(useProgress((st) => st.locale))];
   if (data.mode === "unit") {
+    const p = question.prompt.toLowerCase();
+    const showPencil = /pencil|l[aá]piz|l[aá]pis/.test(p);
     return (
       <Frame shake={shake} status={status}>
-        <p className="text-center text-sm text-muted">{ui.readPointer}</p>
+        {showPencil ? (
+          <img src={asset("measure/pencil.png")} alt="" className="mx-auto h-28 object-contain" />
+        ) : null}
+        <p className="mt-2 text-center font-display text-xl leading-tight">{question.prompt}</p>
       </Frame>
     );
   }
   const max = Math.max(1, data.max);
-  const halves = data.attribute === "length" && (data.unit === "in" || data.unit === "cm");
+  const halves = data.attribute === "length";
   const steps = halves ? max * 2 : max;
   const at = halves ? data.value * 2 : data.value;
-  const x = (i: number) => 28 + (i / steps) * 204;
   const caption = (
     <p className="mt-1 text-center text-sm font-medium text-ink">
       {ui.readPointer} · {data.unit}
     </p>
   );
   if (data.attribute === "length") {
+    const x = (i: number) => 22 + (i / steps) * 236;
     const px = x(at);
+    const src = data.unit === "cm" ? asset("measure/ruler-cm.png") : asset("measure/ruler.png");
     return (
       <Frame shake={shake} status={status}>
-        <svg viewBox="0 0 260 100" className="h-36 w-full" role="img" aria-label={`${ui.readPointer} ${data.unit}`}>
-          <rect x="20" y="44" width="220" height="40" rx="5" fill="#f4e4b8" stroke="#1f1a14" strokeWidth="2.5" />
-          <rect x="28" y="22" width={Math.max(6, (at / steps) * 204)} height="16" rx="3" fill="#0d7377" />
+        <img src={src} alt="" className="mx-auto h-20 w-full object-contain sm:h-24" />
+        <svg viewBox="0 0 280 52" className="w-full" role="img" aria-label={`${ui.readPointer} ${data.unit}`}>
           {Array.from({ length: steps + 1 }, (_, i) => {
-            const major = !halves || i % 2 === 0;
+            const major = i % 2 === 0;
             return (
               <g key={i}>
-                <line x1={x(i)} y1="44" x2={x(i)} y2={major ? 72 : 58} stroke="#1f1a14" strokeWidth={major ? 2.5 : 1.5} />
+                <line x1={x(i)} y1="8" x2={x(i)} y2={major ? 28 : 18} stroke="#1f1a14" strokeWidth={major ? 2.5 : 1.4} />
                 {major ? (
-                  <text x={x(i)} y="92" textAnchor="middle" fontSize="13" fontWeight="700" fill="#1f1a14">
-                    {halves ? i / 2 : i}
+                  <text x={x(i)} y="48" textAnchor="middle" fontSize="12" fontWeight="700" fill="#1f1a14">
+                    {i / 2}
                   </text>
                 ) : null}
               </g>
             );
           })}
-          <polygon points={`${px},44 ${px - 9},18 ${px + 9},18`} fill="#c45c26" stroke="#1f1a14" strokeWidth="1.2" />
+          <polygon points={`${px},8 ${px - 8},0 ${px + 8},0`} fill="#c45c26" stroke="#1f1a14" strokeWidth="1.1" />
         </svg>
         {caption}
       </Frame>
     );
   }
   if (data.attribute === "mass") {
-    const y = 148 - (data.value / max) * 116;
+    const y = (i: number) => 148 - (i / max) * 116;
+    const py = y(data.value);
     return (
       <Frame shake={shake} status={status}>
-        <svg viewBox="0 0 140 180" className="mx-auto h-52" role="img" aria-label={`${ui.readPointer} ${data.unit}`}>
-          <rect x="52" y="20" width="56" height="136" rx="8" fill="#fffaf1" stroke="#1f1a14" strokeWidth="2.5" />
-          {Array.from({ length: max + 1 }, (_, i) => {
-            const yy = 148 - (i / max) * 116;
-            return (
+        <div className="flex items-center justify-center gap-1">
+          <svg viewBox="0 0 72 180" className="h-52" role="img" aria-label={`${ui.readPointer} ${data.unit}`}>
+            {Array.from({ length: max + 1 }, (_, i) => (
               <g key={i}>
-                <line x1="52" y1={yy} x2="42" y2={yy} stroke="#1f1a14" strokeWidth="2" />
-                <text x="38" y={yy + 5} textAnchor="end" fontSize="13" fontWeight="700" fill="#1f1a14">
+                <line x1="58" y1={y(i)} x2="48" y2={y(i)} stroke="#1f1a14" strokeWidth="2" />
+                <text x="44" y={y(i) + 5} textAnchor="end" fontSize="13" fontWeight="700" fill="#1f1a14">
                   {i}
                 </text>
               </g>
-            );
-          })}
-          <rect x="60" y={y} width="40" height={148 - y} fill="#0d7377" />
-          <polygon points={`112,${y} 128,${y - 8} 128,${y + 8}`} fill="#c45c26" stroke="#1f1a14" strokeWidth="1" />
-        </svg>
+            ))}
+            <polygon points={`60,${py} 72,${py - 8} 72,${py + 8}`} fill="#c45c26" stroke="#1f1a14" strokeWidth="1" />
+          </svg>
+          <img src={asset("measure/scale.png")} alt="" className="h-52 object-contain" />
+        </div>
         {caption}
       </Frame>
     );
   }
-  const fillH = (data.value / max) * 116;
-  const meniscus = 148 - fillH;
+  const y = (i: number) => 148 - (i / max) * 116;
+  const py = y(data.value);
   return (
     <Frame shake={shake} status={status}>
-      <svg viewBox="0 0 140 180" className="mx-auto h-52" role="img" aria-label={`${ui.readPointer} ${data.unit}`}>
-        <path d="M48,20 L112,20 L104,156 L56,156 Z" fill="#fffaf1" stroke="#1f1a14" strokeWidth="2.5" />
-        {Array.from({ length: max + 1 }, (_, i) => {
-          const yy = 148 - (i / max) * 116;
-          return (
+      <div className="flex items-center justify-center gap-1">
+        <svg viewBox="0 0 72 180" className="h-52" role="img" aria-label={`${ui.readPointer} ${data.unit}`}>
+          {Array.from({ length: max + 1 }, (_, i) => (
             <g key={i}>
-              <line x1="48" y1={yy} x2="38" y2={yy} stroke="#1f1a14" strokeWidth="2" />
-              <text x="34" y={yy + 5} textAnchor="end" fontSize="13" fontWeight="700" fill="#1f1a14">
+              <line x1="58" y1={y(i)} x2="48" y2={y(i)} stroke="#1f1a14" strokeWidth="2" />
+              <text x="44" y={y(i) + 5} textAnchor="end" fontSize="13" fontWeight="700" fill="#1f1a14">
                 {i}
               </text>
             </g>
-          );
-        })}
-        <path d={`M54,${meniscus} L106,${meniscus} L100,156 L60,156 Z`} fill="#0d7377" opacity="0.88" />
-        <polygon points={`112,${meniscus} 128,${meniscus - 8} 128,${meniscus + 8}`} fill="#c45c26" stroke="#1f1a14" strokeWidth="1" />
-      </svg>
+          ))}
+          <polygon points={`60,${py} 72,${py - 8} 72,${py + 8}`} fill="#c45c26" stroke="#1f1a14" strokeWidth="1" />
+        </svg>
+        <img src={asset("measure/beaker.png")} alt="" className="h-52 object-contain" />
+      </div>
       {caption}
     </Frame>
   );

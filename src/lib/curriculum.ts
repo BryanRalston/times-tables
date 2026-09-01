@@ -255,7 +255,7 @@ export const UNITS: UnitDef[] = [
       A("u13-two", "Two-step stories", "Then do this — with a model.", ["3.CE.1", "3.CE.2"], "word", { mode: "two" }),
       A("u13-compute", "Add and subtract mix", "To 1,000, with hundreds you can see.", ["3.CE.1"], "compute", { mode: "exact" }),
       A("u13-pattern", "Number patterns", "Increasing and decreasing +/− patterns.", ["3.PFA.1"], "pattern", { steps: [2, 3, 4, 5, 6, 8, 10] }),
-      A("u13-measure", "Measure again", "A ruler, a scale, or a beaker from the year.", ["3.MG.1"], "measure", { attribute: "length" }),
+      A("u13-measure", "Measure again", "A ruler, a scale, or a beaker from the year.", ["3.MG.1"], "measure"),
       A("u13-area", "Area stories", "Covering a space in a story.", ["3.MG.2"], "area"),
     ],
   },

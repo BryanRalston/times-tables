@@ -841,10 +841,9 @@ function measureQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const attribute = (params.attribute as MeasureData["attribute"]) ?? rng.pick(["length", "mass", "volume"]);
   if (attribute === "length") {
     const metric = rng.next() < 0.5;
-    const unit = metric ? rng.pick(["cm", "m"]) : rng.pick(["in", "ft"]);
-    const max = unit === "m" || unit === "ft" ? 8 : 8;
-    const halves = !metric && unit === "in";
-    const value = halves ? rng.int(2, 14) / 2 : rng.int(2, max);
+    const unit = metric ? "cm" : "in";
+    const max = metric ? 10 : 8;
+    const value = rng.int(1, max * 2) / 2;
     return keypadQ(rng, {
       kind: "measure",
       prompt: t().howLong(unit),
@@ -856,24 +855,26 @@ function measureQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   if (attribute === "mass") {
     const metric = rng.next() < 0.5;
     const unit = metric ? rng.pick(["g", "kg"]) : rng.pick(["oz", "lb"]);
-    const value = rng.int(2, 8);
+    const max = 10;
+    const value = rng.int(1, max);
     return keypadQ(rng, {
       kind: "measure",
       prompt: t().howHeavy(unit),
       answer: String(value),
       alts: [`${value} ${unit}`],
-      data: { attribute: "mass", system: metric ? "metric" : "us", unit, value, max: 10, mode: "read" },
+      data: { attribute: "mass", system: metric ? "metric" : "us", unit, value, max, mode: "read" },
     });
   }
   const metric = rng.next() < 0.5;
   const unit = metric ? rng.pick(["mL", "L"]) : rng.pick(["cup", "qt"]);
-  const value = rng.int(1, 6);
+  const max = 8;
+  const value = rng.int(1, max);
   return keypadQ(rng, {
     kind: "measure",
     prompt: t().howMuchLiquid(unit),
     answer: String(value),
     alts: [`${value} ${unit}`],
-    data: { attribute: "volume", system: metric ? "metric" : "us", unit, value, max: 8, mode: "read" },
+    data: { attribute: "volume", system: metric ? "metric" : "us", unit, value, max, mode: "read" },
   });
 }
 
