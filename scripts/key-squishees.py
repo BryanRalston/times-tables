@@ -20,6 +20,12 @@ def is_strict_key(r: int, g: int, b: int) -> bool:
     return g <= 32 and r >= 210 and b >= 190 and (r - g) > 160 and (b - g) > 140
 
 
+def is_chroma_bg(r: int, g: int, b: int) -> bool:
+    if is_strict_key(r, g, b):
+        return True
+    return g <= 45 and r >= 190 and b >= 70 and (r - g) > 130
+
+
 def is_hole(r: int, g: int, b: int) -> bool:
     return g < 50 and r > 220 and b > 200
 
@@ -38,7 +44,7 @@ def key_file(path: Path, strict: bool = False) -> None:
     w, h = im.size
     seen = [[False] * h for _ in range(w)]
     q: deque[tuple[int, int]] = deque()
-    keyed = is_strict_key if strict else is_key
+    keyed = is_chroma_bg if strict else is_key
 
     def consider(x: int, y: int) -> None:
         if x < 0 or y < 0 or x >= w or y >= h or seen[x][y]:
@@ -114,13 +120,20 @@ def key_file(path: Path, strict: bool = False) -> None:
 def main() -> None:
     import sys
 
-    names = [a for a in sys.argv[1:] if not a.startswith("-")]
-    files = [ROOT / n for n in names] if names else sorted(ROOT.glob("*.png"))
+    args = [a for a in sys.argv[1:] if not a.startswith("-")]
+    force_strict = "--strict" in sys.argv[1:]
+    files = []
+    if args:
+        for n in args:
+            p = Path(n)
+            files.append(p if p.is_absolute() or p.parent != Path(".") else ROOT / n)
+    else:
+        files = sorted(ROOT.glob("*.png"))
     skip = {"catalog.json"}
     for path in files:
         if path.name in skip or not path.exists():
             continue
-        key_file(path, strict=path.name in STRICT_FILES)
+        key_file(path, strict=force_strict or path.name in STRICT_FILES)
 
 
 if __name__ == "__main__":

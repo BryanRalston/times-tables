@@ -109,9 +109,16 @@ function ShopCard({
           </SquashOnPoke>
         </button>
       ) : (
-        <MagentaImg src={squisheeSrc(s.id)} alt="" className="h-20 w-20" />
+        <MagentaImg
+          src={squisheeSrc(s.id)}
+          alt=""
+          className={cn(
+            "h-20 w-20 grayscale brightness-0 contrast-200 opacity-50",
+            s.rarity === "rare" && "contrast-[250] opacity-60",
+          )}
+        />
       )}
-      <span className="mt-1 text-center text-xs font-medium">{s.name}</span>
+      <span className="mt-1 text-center text-xs font-medium">{got ? s.name : "???"}</span>
       {s.rarity === "rare" ? <span className="text-[10px] font-medium text-star">{ui.rareBadge}</span> : null}
       {got ? null : (
         <Button
@@ -120,7 +127,7 @@ function ShopCard({
           disabled={!canBuy}
           title={canBuy ? undefined : ui.notEnough}
           onClick={() => onBuy(s.id)}
-          aria-label={`${ui.buy} ${s.name}, ${price} ${ui.coins}`}
+          aria-label={`${ui.buy}, ${price} ${ui.coins}`}
         >
           {ui.buy} · {price}
         </Button>

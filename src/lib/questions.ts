@@ -625,14 +625,15 @@ function moneyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   }
   if (mode === "compare") {
     const a = randomPurse(rng, Math.min(max, 400));
-    const b = randomPurse(rng, Math.min(max, 400));
+    let b = randomPurse(rng, Math.min(max, 400));
+    if (a.cents === b.cents) b = randomPurse(rng, Math.min(max, 400));
     const ans = a.cents < b.cents ? "<" : a.cents > b.cents ? ">" : "=";
     return keypadQ(rng, {
       kind: "money",
-      prompt: `${moneyFmt(a.cents)} ○ ${moneyFmt(b.cents)}`,
+      prompt: t().compareMoney,
       answer: ans,
       input: "compare",
-      data: { coins: a.coins, mode: "compare", otherCents: b.cents } satisfies MoneyData,
+      data: { coins: a.coins, otherCoins: b.coins, mode: "compare", otherCents: b.cents } satisfies MoneyData,
     });
   }
   const purse = randomPurse(rng, max);

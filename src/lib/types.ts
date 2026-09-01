@@ -128,6 +128,7 @@ export interface ClockData {
 
 export interface MoneyData {
   coins: Partial<Record<Coin, number>>;
+  otherCoins?: Partial<Record<Coin, number>>;
   target?: number;
   mode: "count" | "make" | "compare" | "change";
   pay?: number;

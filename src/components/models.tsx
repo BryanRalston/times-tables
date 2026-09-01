@@ -3,6 +3,7 @@ import { ChoiceList } from "@/components/keypad";
 import { MagentaImg } from "@/components/magenta-video";
 import { parseLocale, PLACE, UI } from "@/lib/i18n";
 import { useProgress } from "@/lib/progress";
+import { asset } from "@/lib/art";
 import { playTap } from "@/lib/sound";
 import { squisheeSrc } from "@/lib/squishees";
 import type {
@@ -486,7 +487,6 @@ function ChoiceVisual({ question, status, shake }: BoardProps) {
   }
   if (data.visual === "combine") {
     const parts = data.parts?.length ? data.parts : ["triangle", "triangle"];
-    const result = data.result ?? data.shape ?? "quadrilateral";
     return (
       <Frame shake={shake} status={status}>
         <div className="flex items-center justify-center gap-2">
@@ -494,7 +494,9 @@ function ChoiceVisual({ question, status, shake }: BoardProps) {
           <span className="text-xl text-muted">+</span>
           <ShapePoly shape={parts[1] ?? parts[0]} sizeClass="size-16 sm:size-20" />
           <span className="text-xl text-muted">→</span>
-          <ShapePoly shape={result} fill="#dceadf" stroke="#2f6f4e" sizeClass="size-16 sm:size-20" />
+          <span className="grid size-16 place-items-center rounded-[16px] border border-dashed border-line font-display text-2xl text-muted sm:size-20">
+            ?
+          </span>
         </div>
       </Frame>
     );
@@ -628,14 +630,30 @@ function AnalogClock({ question, status, shake }: BoardProps) {
   );
 }
 
-const COIN_META: { id: Coin; label: string; cents: number; size: string; fill: string }[] = [
-  { id: "five", label: "$5", cents: 500, size: "h-12 w-20 rounded-[8px]", fill: "bg-good-soft border-good" },
-  { id: "dollar", label: "$1", cents: 100, size: "size-16", fill: "bg-good-soft border-good" },
-  { id: "quarter", label: "25¢", cents: 25, size: "size-14", fill: "bg-surface-2 border-faint" },
-  { id: "dime", label: "10¢", cents: 10, size: "size-10", fill: "bg-surface-2 border-faint" },
-  { id: "nickel", label: "5¢", cents: 5, size: "size-12", fill: "bg-surface-2 border-faint" },
-  { id: "penny", label: "1¢", cents: 1, size: "size-11", fill: "bg-star-soft border-star" },
+const COIN_META: { id: Coin; label: string; cents: number; imgClass: string }[] = [
+  { id: "five", label: "five-dollar bill", cents: 500, imgClass: "h-10 w-[5.2rem] sm:h-12 sm:w-28" },
+  { id: "dollar", label: "one-dollar bill", cents: 100, imgClass: "h-10 w-[5.2rem] sm:h-12 sm:w-28" },
+  { id: "quarter", label: "quarter", cents: 25, imgClass: "size-14 sm:size-16" },
+  { id: "nickel", label: "nickel", cents: 5, imgClass: "size-12" },
+  { id: "penny", label: "penny", cents: 1, imgClass: "size-11" },
+  { id: "dime", label: "dime", cents: 10, imgClass: "size-9" },
 ];
+
+function moneySrc(id: Coin): string {
+  return asset(`money/${id}.png`);
+}
+
+function MoneyPic({ id, className }: { id: Coin; className?: string }) {
+  const meta = COIN_META.find((m) => m.id === id)!;
+  return (
+    <img
+      src={moneySrc(id)}
+      alt={meta.label}
+      draggable={false}
+      className={cn("object-contain", meta.imgClass, className)}
+    />
+  );
+}
 
 function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProps) {
   const data = question.data as MoneyData;
@@ -659,6 +677,38 @@ function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProp
   const builtTotal = built.reduce((n, id) => n + (COIN_META.find((m) => m.id === id)?.cents ?? 0), 0);
 
   const ui = UI[parseLocale(useProgress((st) => st.locale))];
+
+  function pile(bag: Partial<Record<Coin, number>>) {
+    const list: Coin[] = [];
+    for (const meta of COIN_META) {
+      const n = bag[meta.id] ?? 0;
+      for (let i = 0; i < n; i++) list.push(meta.id);
+    }
+    return list;
+  }
+
+  if (data.mode === "compare") {
+    const left = pile(data.coins);
+    const right = pile(data.otherCoins ?? {});
+    return (
+      <Frame shake={shake} status={status}>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-wrap justify-center gap-1 rounded-[16px] border border-line p-2">
+            {left.map((id, i) => (
+              <MoneyPic key={`l-${i}`} id={id} />
+            ))}
+          </div>
+          <div className="flex flex-wrap justify-center gap-1 rounded-[16px] border border-line p-2">
+            {right.map((id, i) => (
+              <MoneyPic key={`r-${i}`} id={id} />
+            ))}
+          </div>
+        </div>
+        <p className="mt-3 text-center text-sm text-muted">{question.prompt}</p>
+      </Frame>
+    );
+  }
+
   if (data.mode === "make") {
     return (
       <Frame shake={shake} status={status}>
@@ -677,17 +727,16 @@ function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProp
                 playTap();
                 onInteract();
               }}
-              className={cn("grid place-items-center rounded-full border text-xs font-medium", meta.size, meta.fill)}
+              className="bg-transparent p-0"
+              aria-label={meta.label}
             >
-              {meta.label}
+              <MoneyPic id={meta.id} />
             </button>
           ))}
         </div>
         <p className="mb-1 mt-3 text-center text-xs text-muted">{ui.yourSet}</p>
         <div className="flex min-h-12 flex-wrap justify-center gap-1">
-          {built.map((id, i) => {
-            const meta = COIN_META.find((m) => m.id === id)!;
-            return (
+          {built.map((id, i) => (
               <button
                 type="button"
                 key={`${id}-${i}`}
@@ -696,12 +745,12 @@ function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProp
                   setBuilt(next);
                   setValue(String(next.reduce((n, c) => n + (COIN_META.find((m) => m.id === c)?.cents ?? 0), 0)));
                 }}
-                className={cn("grid place-items-center rounded-full border text-[10px] font-medium", meta.size, meta.fill)}
+                className="bg-transparent p-0"
+                aria-label={COIN_META.find((m) => m.id === id)!.label}
               >
-                {meta.label}
+                <MoneyPic id={id} />
               </button>
-            );
-          })}
+            ))}
         </div>
         <p className="mt-2 text-center font-display text-lg tabular-nums">{moneyFmt(builtTotal)}</p>
       </Frame>
@@ -718,14 +767,10 @@ function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProp
               type="button"
               key={c.key}
               onClick={() => take(c.key)}
-              className={cn(
-                "grid place-items-center rounded-full border text-xs font-medium",
-                meta.size,
-                meta.fill,
-                gone[c.key] && "scale-50 opacity-0",
-              )}
+              className={cn("bg-transparent p-0", gone[c.key] && "scale-50 opacity-0")}
+              aria-label={meta.label}
             >
-              {meta.label}
+              <MoneyPic id={c.id} />
             </button>
           );
         })}

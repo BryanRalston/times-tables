@@ -29,6 +29,9 @@ describe("boards", () => {
     }, 0);
     const html = renderToStaticMarkup(<Board {...stub(q)} />);
     expect(html).toContain("Count the coins");
+    expect(html).toContain("money/");
+    expect(html).toContain("<img");
+    expect(html).not.toContain("25¢");
     expect(html).not.toContain(moneyFmt(cents));
     expect(html).not.toMatch(/if you count them all/i);
   });

@@ -16,7 +16,7 @@ import type {
   PlaceValueData,
   TenFrameData,
 } from "./types";
-import { answersMatch } from "./utils";
+import { answersMatch, moneyFmt } from "./utils";
 
 const COIN: Record<string, number> = {
   penny: 1,
@@ -124,7 +124,7 @@ describe("answer audit", () => {
   });
 
   it("coins sum to the scored cents", () => {
-    for (const id of ["u1-coins", "u11-count", "u11-change"]) {
+    for (const id of ["u1-coins", "u11-count", "u11-change", "u11-compare"]) {
       for (let i = 0; i < 20; i++) {
         const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`m:${id}:${i}`));
         const d = q.data as MoneyData;
@@ -135,7 +135,47 @@ describe("answer audit", () => {
         if (d.mode === "change") {
           expect(Number(q.answer)).toBe((d.pay ?? 0) - (d.cost ?? 0));
         }
+        if (d.mode === "compare") {
+          const left = Object.entries(d.coins).reduce((n, [id, c]) => n + (COIN[id] ?? 0) * (c ?? 0), 0);
+          const right = Object.entries(d.otherCoins ?? {}).reduce((n, [id, c]) => n + (COIN[id] ?? 0) * (c ?? 0), 0);
+          const expected = left < right ? "<" : left > right ? ">" : "=";
+          expect(q.answer).toBe(expected);
+          expect(q.prompt).not.toContain(moneyFmt(left));
+          expect(q.prompt).not.toContain(moneyFmt(right));
+        }
       }
+    }
+  });
+
+  it("combine and subdivide answers match the parts", () => {
+    for (let i = 0; i < 40; i++) {
+      const c = makeQuestion(activityById("u4-combine")!.activity, rngFromSeed(`comb:${i}`));
+      const d = c.data as { parts?: string[]; result?: string; sides?: number };
+      expect(c.choices).toContain(c.answer);
+      if (d.parts?.join() === "triangle,triangle") {
+        expect(d.result).toBe("quadrilateral");
+        expect(d.sides).toBe(4);
+      }
+      if (d.parts?.join() === "triangle,quadrilateral") expect(d.result).toBe("pentagon");
+      if (d.parts?.join() === "quadrilateral,quadrilateral") expect(d.result).toBe("hexagon");
+      if (d.parts?.join() === "triangle,pentagon") expect(d.result).toBe("hexagon");
+      const s = makeQuestion(activityById("u4-subdivide")!.activity, rngFromSeed(`sub:${i}`));
+      const sd = s.data as { shape?: string; sides?: number };
+      if (sd.shape === "quadrilateral") expect(s.answer).toBe("2");
+      if (sd.shape === "pentagon") expect(s.answer).toBe("3");
+      if (sd.shape === "hexagon") expect(s.answer).toBe("4");
+      expect(s.choices).toContain(s.answer);
+    }
+  });
+
+  it("jumps answer matches the hidden factor", () => {
+    for (let i = 0; i < 30; i++) {
+      const q = makeQuestion(activityById("u3-jumps")!.activity, rngFromSeed(`jp:${i}`));
+      const d = q.data as JumpsData;
+      const p = d.jumps * d.size;
+      if (d.hide === "product") expect(Number(q.answer)).toBe(p);
+      if (d.hide === "jumps") expect(Number(q.answer)).toBe(d.jumps);
+      if (d.hide === "size") expect(Number(q.answer)).toBe(d.size);
     }
   });
 

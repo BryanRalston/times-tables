@@ -580,6 +580,7 @@ export type QCopy = {
   makeHint: string;
   changeMoney: (cost: string, pay: string) => string;
   howManyCents: string;
+  compareMoney: string;
   unitSquares: string;
   squaresHide: (shown: number) => string;
   periName: (name: string) => string;
@@ -691,6 +692,7 @@ export function qCopy(locale: Locale): QCopy {
       makeHint: "Arma la cantidad. Comprueba cuando el total coincida.",
       changeMoney: (cost, pay) => `Un artículo cuesta ${cost}. Pagas ${pay}. ¿Cuánto de cambio?`,
       howManyCents: "¿Cuántos centavos?",
+      compareMoney: "Compara los dos conjuntos.",
       unitSquares: "¿Cuántos cuadrados unitarios?",
       squaresHide: (shown) => `${shown} cuadrados se ven. n se esconden. ¿Área?`,
       periName: (name) => `¿Perímetro de este ${name}?`,
@@ -800,6 +802,7 @@ export function qCopy(locale: Locale): QCopy {
       makeHint: "Monte o valor. Conferir quando o total bater.",
       changeMoney: (cost, pay) => `Um item custa ${cost}. Você paga ${pay}. Quanto de troco?`,
       howManyCents: "Quantos centavos?",
+      compareMoney: "Compare os dois conjuntos.",
       unitSquares: "Quantos quadrados unitários?",
       squaresHide: (shown) => `${shown} quadrados aparecem. n se escondem. Área?`,
       periName: (name) => `Perímetro deste ${name}?`,
@@ -908,6 +911,7 @@ export function qCopy(locale: Locale): QCopy {
     makeHint: "Build the amount. Check when the total matches.",
     changeMoney: (cost, pay) => `An item costs ${cost}. You pay ${pay}. How much change?`,
     howManyCents: "How many cents?",
+    compareMoney: "Compare the two sets.",
     unitSquares: "How many unit squares?",
     squaresHide: (shown) => `${shown} squares showing. n hide. Area?`,
     periName: (name) => `Perimeter of this ${name}?`,
