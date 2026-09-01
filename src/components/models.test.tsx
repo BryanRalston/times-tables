@@ -33,6 +33,14 @@ describe("boards", () => {
     expect(html).not.toMatch(/if you count them all/i);
   });
 
+  it("pictograph icon row can wrap instead of clipping", () => {
+    const q = makeQuestion(activityById("u1-graph")!.activity, rngFromSeed("wrap:1"));
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("flex-wrap");
+    expect(html).toContain("flex-1");
+  });
+
   it("measure board has numbered ticks and a pointer", () => {
     for (const id of ["u8-length", "u8-mass", "u8-volume"]) {
       const q = makeQuestion(activityById(id)!.activity, rngFromSeed(5));

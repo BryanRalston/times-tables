@@ -708,10 +708,14 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const key = Number(params.key ?? rng.pick([1, 2]));
   const kind = (params.kind as "picto" | "bar") ?? "picto";
   if (params.collect) {
-    const trayPack = Array.from({ length: rng.int(7, 10) }, () => rng.pick(pack));
+    const focusCat = rng.pick(pack);
+    const total = rng.int(6, 8);
+    const bag = [...pack, focusCat];
+    while (bag.length < total) bag.push(rng.pick(pack));
+    const trayPack = rng.shuffle(bag);
     const counts: Record<string, number> = Object.fromEntries(labels.map((l) => [l, 0]));
     for (const p of trayPack) counts[p.label] = (counts[p.label] ?? 0) + 1;
-    const focus = rng.pick(labels);
+    const focus = focusCat.label;
     const tray = trayPack.map((p, i) => ({ id: `t-${i}`, label: p.label, symbol: p.id }));
     return keypadQ(rng, {
       kind: "graph",
@@ -731,11 +735,12 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       } satisfies GraphData,
     });
   }
-  const rows = pack.map((p) => ({ label: p.label, value: rng.int(1, 8) * key, symbol: p.id }));
+  const units = rng.shuffle([1, 2, 3, 4, 5, 6, 7, 8]).slice(0, 4);
+  const rows = pack.map((p, i) => ({ label: p.label, value: units[i]! * key, symbol: p.id }));
   const ask = rng.pick(["greatest", "least", "value", "more", "total"] as const);
-  const focus = rng.pick(rows).label;
-  const focusB = rng.pick(rows.filter((r) => r.label !== focus)).label;
   const byLabel = Object.fromEntries(rows.map((r) => [r.label, r.value]));
+  let focus = rows[0]!.label;
+  let focusB = rows[1]!.label;
   let prompt = "";
   let answer = "";
   let graphAlts: string[] | undefined;
@@ -744,19 +749,27 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const winners = rows.filter((r) => r.value === m);
     prompt = t().graphMost;
     answer = winners[0]!.label;
+    focus = winners[0]!.label;
     graphAlts = winners.slice(1).map((w) => w.label);
   } else if (ask === "least") {
     const m = Math.min(...rows.map((r) => r.value));
     const winners = rows.filter((r) => r.value === m);
     prompt = t().graphLeast;
     answer = winners[0]!.label;
+    focus = winners[0]!.label;
     graphAlts = winners.slice(1).map((w) => w.label);
   } else if (ask === "value") {
+    focus = rng.pick(rows).label;
     prompt = t().graphHowMany(focus);
     answer = String(byLabel[focus]);
   } else if (ask === "more") {
+    const a = rng.pick(rows);
+    const b = rng.pick(rows.filter((r) => r.label !== a.label));
+    const [big, small] = a.value >= b.value ? [a, b] : [b, a];
+    focus = big.label;
+    focusB = small.label;
     prompt = t().graphMore(focus, focusB);
-    answer = String(Math.abs(byLabel[focus]! - byLabel[focusB]!));
+    answer = String(big.value - small.value);
   } else {
     prompt = t().graphAll;
     answer = String(rows.reduce((n, r) => n + r.value, 0));

@@ -852,7 +852,7 @@ function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
                 )}
                 aria-label={t.label}
               >
-                <MagentaImg src={squisheeSrc(t.symbol ?? data.symbol)} alt="" className="size-8" />
+                <MagentaImg src={squisheeSrc(t.symbol ?? data.symbol)} alt="" className="size-7" />
               </button>
             ))}
           </div>
@@ -861,7 +861,7 @@ function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
       {data.kind === "picto" ? (
         <div className="space-y-2">
           {rows.map((r) => (
-            <div key={r.label} className="flex items-center gap-2">
+            <div key={r.label} className="flex items-start gap-2">
               <button
                 type="button"
                 className="w-20 shrink-0 rounded-[8px] border border-line px-1 py-0.5 text-left text-sm"
@@ -869,7 +869,7 @@ function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
               >
                 {r.label}
               </button>
-              <div className="flex flex-wrap items-center gap-0.5">
+              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-0.5">
                 {Array.from({ length: count(r.value) }, (_, i) => (
                   <MagentaImg key={i} src={squisheeSrc(sym(r))} alt="" className="size-7" />
                 ))}

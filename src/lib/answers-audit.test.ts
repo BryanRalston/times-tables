@@ -205,9 +205,54 @@ describe("answer audit", () => {
       if (d.ask === "greatest" || d.ask === "least") {
         const m = d.ask === "greatest" ? Math.max(...d.rows.map((r) => r.value)) : Math.min(...d.rows.map((r) => r.value));
         const winners = d.rows.filter((r) => r.value === m).map((r) => r.label);
+        expect(winners).toHaveLength(1);
         expect(winners).toContain(q.answer);
         for (const w of winners) expect(answersMatch(w, q.answer, q.alts)).toBe(true);
         expect(q.choices).toContain(q.answer);
+      }
+    }
+  });
+
+  it("how-many-more names the larger group first", () => {
+    const found = activityById("u1-graph")!;
+    let seen = 0;
+    for (const locale of ["en", "es", "pt-BR"] as const) {
+      for (let i = 0; i < 80; i++) {
+        const q = makeQuestion(found.activity, rngFromSeed(`more:${locale}:${i}`), locale);
+        const d = q.data as GraphData;
+        if (d.ask !== "more") continue;
+        seen += 1;
+        const byLabel = Object.fromEntries(d.rows.map((r) => [r.label, r.value]));
+        const larger = byLabel[d.focus!]!;
+        const smaller = byLabel[d.focusB!]!;
+        expect(larger, q.prompt).toBeGreaterThan(smaller);
+        expect(Number(q.answer)).toBe(larger - smaller);
+        const prompt = q.prompt.toLowerCase();
+        expect(prompt.indexOf(d.focus!.toLowerCase())).toBeGreaterThanOrEqual(0);
+        expect(prompt.indexOf(d.focus!.toLowerCase())).toBeLessThan(prompt.indexOf(d.focusB!.toLowerCase()));
+      }
+    }
+    expect(seen).toBeGreaterThan(20);
+  });
+
+  it("collect graphs show every category and a countable focus", () => {
+    for (const id of ["u1-tally", "u6-picto", "u7-bar"]) {
+      for (let i = 0; i < 40; i++) {
+        const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`collect:${id}:${i}`));
+        const d = q.data as GraphData;
+        expect(d.collect).toBe(true);
+        const tray = d.tray ?? [];
+        const counts: Record<string, number> = {};
+        for (const t of tray) counts[t.label] = (counts[t.label] ?? 0) + 1;
+        const sum = Object.values(counts).reduce((n, c) => n + c, 0);
+        expect(tray.length).toBe(sum);
+        expect(tray.length).toBeGreaterThanOrEqual(6);
+        expect(tray.length).toBeLessThanOrEqual(8);
+        for (const row of d.rows) {
+          expect(counts[row.label] ?? 0, `${id} missing ${row.label}`).toBeGreaterThanOrEqual(1);
+        }
+        expect(counts[d.focus!] ?? 0).toBeGreaterThanOrEqual(2);
+        expect(Number(q.answer)).toBe(counts[d.focus!]);
       }
     }
   });
