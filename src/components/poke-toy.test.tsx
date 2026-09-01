@@ -16,4 +16,11 @@ describe("PokeToy", () => {
     expect(renderToStaticMarkup(<PokeToy id="panda" />)).toContain("Poke Panda");
     expect(renderToStaticMarkup(<PokeToy id="peach" />)).toContain("Poke Peach");
   });
+
+  it("keeps the PNG in the tree before a poke clip paints", () => {
+    const html = renderToStaticMarkup(<PokeToy id="frog" />);
+    expect(html).toContain("frog.png");
+    expect(html).not.toContain("<video");
+    expect(html).not.toContain("<canvas");
+  });
 });

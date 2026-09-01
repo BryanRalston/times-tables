@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dealPoke, dealWhoHid, pickMiniKind } from "./minigames";
+import { dealMatch, dealPoke, dealWhoHid, pickMiniKind } from "./minigames";
 import { rngFromSeed } from "./rng";
 
 describe("minigame picker", () => {
@@ -10,8 +10,21 @@ describe("minigame picker", () => {
   });
 });
 
+describe("match", () => {
+  it("always deals two different toy ids", () => {
+    for (const owned of [[], ["frog"], ["panda"], ["frog", "cat"]]) {
+      for (let i = 0; i < 20; i++) {
+        const d = dealMatch(owned, rngFromSeed(`match:${owned.join(",")}:${i}`));
+        const toys = [...new Set(d.cards.map((c) => c.toy))];
+        expect(toys, `owned ${owned.join(",")}`).toHaveLength(2);
+        expect(d.cards).toHaveLength(4);
+      }
+    }
+  });
+});
+
 describe("who-hid and poke-this", () => {
-  it("keeps the target in the offered set", () => {
+  it("keeps the missing toy in who-hid choices and the poke target in poke choices", () => {
     for (let i = 0; i < 40; i++) {
       const hid = dealWhoHid(["panda"], rngFromSeed(`wh:${i}`));
       expect(hid.shown).toContain(hid.missing);

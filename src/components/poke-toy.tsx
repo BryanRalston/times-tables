@@ -39,9 +39,15 @@ export function PokeToy({
 }) {
   const [poking, setPoking] = useState(false);
   const [clipOn, setClipOn] = useState(false);
+  const [clipReady, setClipReady] = useState(false);
   const s = squisheeById(id);
   const clip = squisheePokeSrc(id);
   const playClip = Boolean(clip) && !skipPokeVideo();
+
+  function stopClip() {
+    setClipOn(false);
+    setClipReady(false);
+  }
 
   return (
     <button
@@ -64,13 +70,15 @@ export function PokeToy({
         className={cn("relative h-full w-full", !poking && bob && "idle-bob")}
         onRest={() => setPoking(false)}
       >
-        <MagentaImg
-          src={squisheeSrc(id)}
-          alt=""
-          className={cn("h-full w-full", clipOn && playClip && "invisible")}
-        />
+        <MagentaImg src={squisheeSrc(id)} alt="" className={cn("h-full w-full", clipReady && "invisible")} />
         {clipOn && clip ? (
-          <MagentaVideo src={clip} className="absolute inset-0 h-full w-full" onEnded={() => setClipOn(false)} />
+          <MagentaVideo
+            src={clip}
+            className="absolute inset-0 h-full w-full"
+            onReady={() => setClipReady(true)}
+            onFail={stopClip}
+            onEnded={stopClip}
+          />
         ) : null}
       </SquashOnPoke>
     </button>

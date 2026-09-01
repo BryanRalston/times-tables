@@ -14,7 +14,8 @@ function isIos(): boolean {
 }
 
 function isCoarse(): boolean {
-  return typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+  return window.matchMedia("(pointer: coarse)").matches;
 }
 
 /** iPhone / coarse pointers skip chroma-key poke clips. CSS squash still runs. */
@@ -26,12 +27,31 @@ export function MagentaImg({
   src,
   alt = "",
   className,
+  onLoad,
 }: {
   src: string;
   alt?: string;
   className?: string;
+  onLoad?: () => void;
 }) {
-  return <img src={src} alt={alt} draggable={false} className={cn("object-contain", className)} />;
+  const [dead, setDead] = useState(false);
+  if (dead) {
+    return (
+      <span className={cn("grid place-items-center font-display text-3xl text-faint", className)} aria-hidden>
+        ?
+      </span>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      draggable={false}
+      className={cn("object-contain", className)}
+      onLoad={onLoad}
+      onError={() => setDead(true)}
+    />
+  );
 }
 
 export function MagentaVideo({
@@ -39,27 +59,49 @@ export function MagentaVideo({
   className,
   loop,
   onEnded,
+  onReady,
+  onFail,
 }: {
   src: string;
   className?: string;
   loop?: boolean;
   onEnded?: () => void;
+  onReady?: () => void;
+  onFail?: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
   const skip = skipPokeVideo();
 
   useEffect(() => {
-    if (skip) return;
+    if (skip) {
+      onFail?.();
+      return;
+    }
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas) return;
+    if (!video || !canvas) {
+      onFail?.();
+      return;
+    }
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    if (!ctx) return;
+    if (!ctx) {
+      onFail?.();
+      return;
+    }
     let raf = 0;
     let stopped = false;
     let painted = false;
+
+    const fail = () => {
+      if (stopped) return;
+      stopped = true;
+      cancelAnimationFrame(raf);
+      setFailed(true);
+      onFail?.();
+    };
 
     const draw = () => {
       if (stopped) return;
@@ -83,10 +125,11 @@ export function MagentaVideo({
           if (!painted) {
             painted = true;
             setReady(true);
+            onReady?.();
           }
         }
       } catch {
-        stopped = true;
+        fail();
         return;
       }
       raf = requestAnimationFrame(draw);
@@ -94,22 +137,42 @@ export function MagentaVideo({
 
     const ended = () => onEnded?.();
     video.addEventListener("ended", ended);
-    void video.play().catch(() => undefined);
+    video.addEventListener("error", fail);
+    const watchdog = window.setTimeout(() => {
+      if (!painted) fail();
+    }, 300);
+    void video.play().catch(() => fail());
     raf = requestAnimationFrame(draw);
     return () => {
       stopped = true;
+      window.clearTimeout(watchdog);
       cancelAnimationFrame(raf);
       video.removeEventListener("ended", ended);
+      video.removeEventListener("error", fail);
       video.pause();
     };
-  }, [src, onEnded, loop, skip]);
+  }, [src, onEnded, loop, skip, onReady, onFail]);
 
-  if (skip) return null;
+  if (skip || failed) return null;
 
   return (
-    <div className={cn("relative", className)}>
-      <video ref={videoRef} src={src} muted playsInline autoPlay loop={loop} className="hidden" />
-      <canvas ref={canvasRef} className={cn("h-full w-full object-contain", !ready && "opacity-0")} />
+    <div className={cn("pointer-events-none", ready ? "relative" : "contents", className)} aria-hidden>
+      <video
+        ref={videoRef}
+        src={src}
+        muted
+        playsInline
+        autoPlay
+        loop={loop}
+        preload="auto"
+        controls={false}
+        disablePictureInPicture
+        disableRemotePlayback
+        controlsList="nodownload nofullscreen noremoteplayback"
+        tabIndex={-1}
+        className="pointer-events-none fixed -left-[9999px] -top-[9999px] h-px w-px opacity-0"
+      />
+      <canvas ref={canvasRef} className={cn("h-full w-full object-contain", !ready && "hidden")} />
     </div>
   );
 }

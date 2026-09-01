@@ -44,10 +44,13 @@ function distinctFrom(pool: string[], n: number, rng: Rng): string[] {
 
 export function dealMatch(owned: string[], rng: Rng): MatchDeal {
   const roster = houseRoster(owned);
-  const pairToys =
-    roster.length >= 2 ? distinctFrom(roster, 2, rng) : [roster[0]!, roster[0]!];
-  const a = pairToys[0]!;
-  const b = pairToys[1]!;
+  const pool = [...roster];
+  for (const id of COMMON_SQUISHEES.map((s) => s.id)) {
+    if (!pool.includes(id)) pool.push(id);
+  }
+  const pairToys = distinctFrom(pool, 2, rng);
+  const a = pairToys[0] ?? "frog";
+  const b = pairToys[1] ?? (a === "cat" ? "frog" : "cat");
   return {
     kind: "match",
     cards: rng.shuffle([

@@ -7,6 +7,8 @@ import { playCorrect, playTap, playWrong } from "@/lib/sound";
 import { squisheeById, squisheeSrc } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
+const TAP = "grid min-h-[96px] min-w-[96px] place-items-center rounded-[20px] border p-2";
+
 export function MiniGame({
   seed,
   owned,
@@ -45,8 +47,15 @@ export function MiniGame({
   );
 }
 
-function ToyFace({ id, className }: { id: string; className?: string }) {
-  return <MagentaImg src={squisheeSrc(id)} alt="" className={cn("h-20 w-20 object-contain sm:h-24 sm:w-24", className)} />;
+function ToyFace({ id, className, onLoad }: { id: string; className?: string; onLoad?: () => void }) {
+  return (
+    <MagentaImg
+      src={squisheeSrc(id)}
+      alt=""
+      className={cn("h-20 w-20 object-contain sm:h-24 sm:w-24", className)}
+      onLoad={onLoad}
+    />
+  );
 }
 
 function MatchPlay({ deal, title, onDone }: { deal: MatchDeal; title: string; onDone: () => void }) {
@@ -91,10 +100,7 @@ function MatchPlay({ deal, title, onDone }: { deal: MatchDeal; title: string; on
             <button
               key={c.id}
               type="button"
-              className={cn(
-                "grid min-h-24 place-items-center rounded-[20px] border p-2",
-                found.includes(c.id) ? "border-good bg-good-soft" : "border-line bg-surface",
-              )}
+              className={cn(TAP, found.includes(c.id) ? "border-good bg-good-soft" : "border-line bg-surface")}
               onClick={() => tap(c.id)}
               aria-label={show ? (squisheeById(c.toy)?.name ?? c.toy) : "card"}
             >
@@ -110,11 +116,20 @@ function MatchPlay({ deal, title, onDone }: { deal: MatchDeal; title: string; on
 function WhoHidPlay({ deal, title, onDone }: { deal: WhoHidDeal; title: string; onDone: () => void }) {
   const [revealed, setRevealed] = useState(true);
   const [wrong, setWrong] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState(0);
 
   useEffect(() => {
-    const t = window.setTimeout(() => setRevealed(false), 1000);
-    return () => window.clearTimeout(t);
-  }, []);
+    const started = Date.now();
+    const need = deal.shown.length;
+    const tick = window.setInterval(() => {
+      const waited = Date.now() - started;
+      if (waited >= 2200 && (loaded >= need || waited >= 4000)) {
+        setRevealed(false);
+        window.clearInterval(tick);
+      }
+    }, 80);
+    return () => window.clearInterval(tick);
+  }, [deal.shown.length, loaded]);
 
   function pick(id: string) {
     if (revealed) return;
@@ -131,17 +146,19 @@ function WhoHidPlay({ deal, title, onDone }: { deal: WhoHidDeal; title: string; 
     <>
       <h1 className="mb-4 font-display text-2xl">{title}</h1>
       <div className="mb-5 flex justify-center gap-3">
-        {deal.shown.map((id) => (
-          <span
-            key={id}
-            className={cn(
-              "grid h-24 w-24 place-items-center rounded-[20px] border border-line bg-surface",
-              !revealed && id === deal.missing && "opacity-0",
-            )}
-          >
-            <ToyFace id={id} />
-          </span>
-        ))}
+        {deal.shown.map((id) =>
+          !revealed && id === deal.missing ? (
+            <span
+              key={id}
+              className="grid min-h-[96px] min-w-[96px] place-items-center rounded-[20px] border border-dashed border-line bg-bg-warm"
+              aria-hidden
+            />
+          ) : (
+            <span key={id} className={cn(TAP, "border-line bg-surface")}>
+              <ToyFace id={id} onLoad={() => setLoaded((n) => n + 1)} />
+            </span>
+          ),
+        )}
       </div>
       {revealed ? null : (
         <div className="flex justify-center gap-3">
@@ -149,10 +166,7 @@ function WhoHidPlay({ deal, title, onDone }: { deal: WhoHidDeal; title: string; 
             <button
               key={id}
               type="button"
-              className={cn(
-                "grid place-items-center rounded-[20px] border border-line bg-surface p-2",
-                wrong === id && "border-bad",
-              )}
+              className={cn(TAP, "border-line bg-surface", wrong === id && "border-bad")}
               onClick={() => pick(id)}
               aria-label={squisheeById(id)?.name ?? id}
             >
@@ -169,6 +183,7 @@ function WhoHidPlay({ deal, title, onDone }: { deal: WhoHidDeal; title: string; 
 
 function PokePlay({ deal, title, onDone }: { deal: PokeDeal; title: string; onDone: () => void }) {
   const [poke, setPoke] = useState<string | null>(null);
+  const [miss, setMiss] = useState<string | null>(null);
 
   function tap(id: string) {
     setPoke(id);
@@ -176,6 +191,7 @@ function PokePlay({ deal, title, onDone }: { deal: PokeDeal; title: string; onDo
       playCorrect();
       window.setTimeout(onDone, 400);
     } else {
+      setMiss(id);
       playWrong();
     }
   }
@@ -188,11 +204,17 @@ function PokePlay({ deal, title, onDone }: { deal: PokeDeal; title: string; onDo
           <button
             key={id}
             type="button"
-            className="grid place-items-center rounded-[20px] border border-line bg-surface p-2"
+            className={cn(TAP, "border-line bg-surface", miss === id && "border-bad")}
             onClick={() => tap(id)}
             aria-label={squisheeById(id)?.name ?? id}
           >
-            <SquashOnPoke active={poke === id} onRest={() => setPoke(null)}>
+            <SquashOnPoke
+              active={poke === id}
+              onRest={() => {
+                setPoke(null);
+                if (miss === id) setMiss(null);
+              }}
+            >
               <ToyFace id={id} />
             </SquashOnPoke>
           </button>
