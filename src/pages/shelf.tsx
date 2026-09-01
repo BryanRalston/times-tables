@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AppHeader, AppTabs, useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
+import { SquashOnPoke } from "@/components/poke-toy";
 import { COMMON_SQUISHEES, RARE_SQUISHEES, squisheeSrc } from "@/lib/squishees";
 import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
@@ -36,13 +37,13 @@ export function ShelfPage() {
               )}
               aria-label={got ? `Poke ${s.name}` : `${s.name}, locked`}
             >
-              <span className={cn("block", poke === s.id && "squash")} onAnimationEnd={() => setPoke(null)}>
+              <SquashOnPoke active={poke === s.id} onRest={() => setPoke(null)}>
                 <MagentaImg
                   src={squisheeSrc(s.id)}
                   alt=""
                   className={cn("h-20 w-20", !got && "grayscale brightness-0 opacity-50")}
                 />
-              </span>
+              </SquashOnPoke>
               <span className="mt-1 text-xs font-medium">{got ? s.name : "???"}</span>
             </button>
           );
@@ -71,16 +72,17 @@ export function ShelfPage() {
               )}
               aria-label={got ? `Poke ${s.name}` : ui.rareHint(s.id)}
             >
-              <span
-                className={cn("block", poke === s.id && "squash", got && "rare-glow")}
-                onAnimationEnd={() => setPoke(null)}
+              <SquashOnPoke
+                active={poke === s.id}
+                className={got ? "rare-glow" : undefined}
+                onRest={() => setPoke(null)}
               >
                 <MagentaImg
                   src={squisheeSrc(s.id)}
                   alt=""
                   className={cn("h-20 w-20", !got && "grayscale brightness-0 opacity-40")}
                 />
-              </span>
+              </SquashOnPoke>
               <span className="mt-1 text-center text-xs font-medium">{got ? s.name : "???"}</span>
               {!got ? <span className="mt-1 text-center text-[10px] leading-tight text-muted">{ui.rareHint(s.id)}</span> : null}
             </button>

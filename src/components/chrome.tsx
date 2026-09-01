@@ -1,6 +1,6 @@
 import { BookOpen, Flame, Home, Settings2, Sparkles, Star } from "lucide-react";
 import type { ReactNode } from "react";
-import { Mascot } from "@/components/mascot";
+import { PokeToy } from "@/components/poke-toy";
 import { todayIso, YEAR_LABEL } from "@/lib/calendar";
 import { parseLocale, UI } from "@/lib/i18n";
 import { navigate } from "@/lib/nav";
@@ -22,7 +22,7 @@ export function AppHeader() {
 
   return (
     <header className="mb-3 flex items-center gap-3">
-      <Mascot pose="wave" size="sm" className="h-14 w-14" />
+      <PokeToy id="frog" size="sm" bob className="h-14 w-14" />
       <div className="min-w-0 flex-1">
         <p className="text-xs font-medium uppercase tracking-wide text-muted">
           {ui.grade3} · {YEAR_LABEL}

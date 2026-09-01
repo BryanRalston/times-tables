@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { AppHeader, AppTabs, useUi } from "@/components/chrome";
-import { Mascot } from "@/components/mascot";
+import { PokeToy } from "@/components/poke-toy";
 import { Button } from "@/components/ui/button";
 import { YearPath } from "@/components/year-path";
 import { todayIso } from "@/lib/calendar";
@@ -49,7 +49,7 @@ export function HomePage() {
       {!seenWelcome ? (
         <section className="frost mb-5 rounded-[24px] border border-teal p-4 shadow-soft">
           <div className="flex items-center gap-3">
-            <Mascot pose="wave" size="md" className="h-24 w-24 shrink-0" />
+            <PokeToy id="cat" size="md" className="h-24 w-24" />
             <div className="min-w-0 flex-1">
               <p className="text-xs font-medium text-teal">{ui.startHere}</p>
               <h2 className="font-display text-xl leading-tight">{ui.whatsHiding}</h2>
@@ -64,7 +64,7 @@ export function HomePage() {
 
       <section className="frost mb-6 rounded-[24px] border border-line p-4 shadow-soft">
         <div className="flex items-center gap-3">
-          <Mascot pose={done ? "star" : "wave"} size="md" className="h-24 w-24 shrink-0" />
+          <PokeToy id={done ? "peach" : "panda"} size="md" className="h-24 w-24" />
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-teal">{done ? ui.walkDone : walkLabel(walk, locale)}</p>
             <h2 className="font-display text-xl leading-tight">{unit ? unitText(unit, locale).short : ui.todaysWalk}</h2>

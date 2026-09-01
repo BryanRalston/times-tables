@@ -76,6 +76,11 @@ export function squisheeSrc(id: string): string {
   return asset(`squishees/${s.file}`);
 }
 
+export function squisheePokeSrc(id: string): string | null {
+  const s = squisheeById(id);
+  return s?.poke ? asset(`squishees/${s.poke}`) : null;
+}
+
 export function unitAllThreeStars(activities: Record<string, { stars: number }>): boolean {
   return UNITS.some((unit) => unit.activities.length > 0 && unit.activities.every((a) => (activities[a.id]?.stars ?? 0) >= 3));
 }

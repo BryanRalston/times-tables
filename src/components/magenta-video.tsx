@@ -17,6 +17,11 @@ function isCoarse(): boolean {
   return typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
 }
 
+/** iPhone / coarse pointers skip chroma-key poke clips. CSS squash still runs. */
+export function skipPokeVideo(): boolean {
+  return isIos() || isCoarse();
+}
+
 export function MagentaImg({
   src,
   alt = "",
@@ -43,7 +48,7 @@ export function MagentaVideo({
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
-  const skip = isIos() || isCoarse();
+  const skip = skipPokeVideo();
 
   useEffect(() => {
     if (skip) return;

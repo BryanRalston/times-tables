@@ -1,5 +1,4 @@
 import { useUi } from "@/components/chrome";
-import { Mascot } from "@/components/mascot";
 import { ART } from "@/lib/art";
 import { QUARTERS, UNITS, unitWindowLabel } from "@/lib/curriculum";
 import { parseLocale } from "@/lib/i18n";
@@ -49,9 +48,6 @@ export function YearPath({ suggestedId, onOpen }: { suggestedId: string; onOpen:
                   <span className="absolute -right-1 -top-1 text-lg text-star" aria-hidden>
                     ★
                   </span>
-                ) : null}
-                {st === "now" ? (
-                  <Mascot pose="wave" size="sm" className="absolute -left-16 top-1/2 h-16 w-16 -translate-y-1/2 sm:-left-20 sm:h-20 sm:w-20" />
                 ) : null}
               </button>
               <div className={cn("text-left", leftLabel && "invisible")}>

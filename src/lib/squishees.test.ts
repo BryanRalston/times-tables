@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { UNITS } from "./curriculum";
-import { COMMON_SQUISHEES, eligibleRares, pickPrize, RARE_SQUISHEES, unitAllThreeStars } from "./squishees";
+import {
+  COMMON_SQUISHEES,
+  eligibleRares,
+  pickPrize,
+  RARE_SQUISHEES,
+  squisheePokeSrc,
+  unitAllThreeStars,
+} from "./squishees";
 
 const base = {
   earned: [] as string[],
@@ -45,5 +52,14 @@ describe("rare squishees", () => {
 
   it("prefers a newly eligible rare over a common", () => {
     expect(pickPrize({ ...base, streak: 7, pct: 1 }, "kid")).toBe("crystal-axolotl");
+  });
+});
+
+describe("poke clips", () => {
+  it("is only frog and cat", () => {
+    expect(squisheePokeSrc("frog")).toMatch(/squishees\/frog-poke\.mp4$/);
+    expect(squisheePokeSrc("cat")).toMatch(/squishees\/cat-poke\.mp4$/);
+    expect(squisheePokeSrc("panda")).toBeNull();
+    expect(squisheePokeSrc("peach")).toBeNull();
   });
 });
