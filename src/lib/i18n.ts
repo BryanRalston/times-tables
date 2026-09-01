@@ -373,15 +373,15 @@ export const UI: Record<Locale, Ui> = {
 };
 
 export const NAMES: Record<Locale, string[]> = {
-  en: ["Maya", "Leo", "Priya", "Sam", "Ava", "Noah", "Elena", "Kai", "Rosa", "Ben", "Lila", "Omar", "June", "Theo", "Nia", "Wes", "Ivy", "Cole"],
-  es: ["Maya", "Leo", "Sofía", "Sam", "Ava", "Noé", "Elena", "Kai", "Rosa", "Ben", "Lucía", "Omar", "Inés", "Teo", "Nia", "Luis", "Ivy", "Nico"],
-  "pt-BR": ["Maya", "Leo", "Sofia", "Sam", "Ava", "Noé", "Elena", "Kai", "Rosa", "Ben", "Lila", "Omar", "Inês", "Theo", "Nia", "Caio", "Ivy", "Bia"],
+  en: ["Maya", "Leo", "Priya", "Sam", "Ava", "Noah", "Elena", "Kai", "Rosa", "Ben", "Lila", "Omar", "June", "Theo", "Nia", "Wes", "Ivy", "Cole", "Amir", "Zoe", "Hugo", "Mila"],
+  es: ["Maya", "Leo", "Sofía", "Sam", "Ava", "Noé", "Elena", "Kai", "Rosa", "Ben", "Lucía", "Omar", "Inés", "Teo", "Nia", "Luis", "Ivy", "Nico", "Amir", "Zoe", "Hugo", "Mila"],
+  "pt-BR": ["Maya", "Leo", "Sofia", "Sam", "Ava", "Noé", "Elena", "Kai", "Rosa", "Ben", "Lila", "Omar", "Inês", "Theo", "Nia", "Caio", "Ivy", "Bia", "Amir", "Zoe", "Hugo", "Mila"],
 };
 
 export const THINGS: Record<Locale, string[]> = {
-  en: ["apples", "stickers", "marbles", "crayons", "shells", "cards", "blocks", "beads", "squishees", "buttons", "acorns", "pencils", "erasers", "grapes"],
-  es: ["manzanas", "pegatinas", "canicas", "crayones", "conchas", "cartas", "bloques", "cuentas", "squishees", "botones", "bellotas", "lápices", "gomas", "uvas"],
-  "pt-BR": ["maçãs", "adesivos", "bolinhas", "gizes", "conchas", "cartas", "blocos", "contas", "squishees", "botões", "bolotas", "lápis", "borrachas", "uvas"],
+  en: ["apples", "stickers", "marbles", "crayons", "shells", "cards", "blocks", "beads", "squishees", "buttons", "acorns", "pencils", "erasers", "grapes", "stars", "seeds", "stamps", "ribbons"],
+  es: ["manzanas", "pegatinas", "canicas", "crayones", "conchas", "cartas", "bloques", "cuentas", "squishees", "botones", "bellotas", "lápices", "gomas", "uvas", "estrellas", "semillas", "sellos", "cintas"],
+  "pt-BR": ["maçãs", "adesivos", "bolinhas", "gizes", "conchas", "cartas", "blocos", "contas", "squishees", "botões", "bolotas", "lápis", "borrachas", "uvas", "estrelas", "sementes", "carimbos", "fitas"],
 };
 
 export const SHAPE: Record<Locale, Record<string, string>> = {
@@ -536,6 +536,9 @@ export type QCopy = {
   groupsHint: string;
   groupsOf: (g: number, s: number) => string;
   groupsEach: (g: number, product: number) => string;
+  jumpsOf: (jumps: number, size: number) => string;
+  jumpsCount: (size: number, product: number) => string;
+  jumpsSize: (jumps: number, product: number) => string;
   rowsOf: (r: number, c: number) => string;
   arrayRows: (product: number, cols: number) => string;
   arrayCols: (product: number, rows: number) => string;
@@ -558,6 +561,7 @@ export type QCopy = {
   combineTT: string;
   combineTQ: string;
   combineQQ: string;
+  combineTP: string;
   subdivideQ: string;
   subdivideP: string;
   subdivideH: string;
@@ -631,6 +635,9 @@ export function qCopy(locale: Locale): QCopy {
       groupsHint: "Cuenta un grupo, luego cuenta los grupos.",
       groupsOf: (g, s) => `${g} grupos de ${s}. ¿Cuántos en total?`,
       groupsEach: (g, product) => `${g} grupos. ${product} en total. ¿Cuántos en cada grupo?`,
+      jumpsOf: (jumps, size) => `${jumps} saltos de ${size} en la recta. ¿Dónde caes?`,
+      jumpsCount: (size, product) => `Saltos de ${size} llegan a ${product}. ¿Cuántos saltos?`,
+      jumpsSize: (jumps, product) => `${jumps} saltos iguales llegan a ${product}. ¿De cuánto es cada salto?`,
       rowsOf: (r, c) => `${r} filas de ${c}. ¿Cuántos en total?`,
       arrayRows: (product, cols) => `Un arreglo de ${product}. ${cols} en cada fila. ¿Cuántas filas?`,
       arrayCols: (product, rows) => `Un arreglo de ${product}. ${rows} filas. ¿Cuántos en cada fila?`,
@@ -653,6 +660,7 @@ export function qCopy(locale: Locale): QCopy {
       combineTT: "Dos triángulos unidos por un lado forman ¿qué polígono?",
       combineTQ: "Un triángulo unido a un cuadrilátero por un lado forma ¿qué polígono?",
       combineQQ: "Dos cuadriláteros unidos por un lado pueden formar ¿qué polígono?",
+      combineTP: "Un triángulo unido a un pentágono por un lado forma ¿qué polígono?",
       subdivideQ: "Este cuadrilátero se parte por una diagonal. ¿Cuántos triángulos?",
       subdivideP: "Este pentágono se parte desde un vértice. ¿Cuántos triángulos?",
       subdivideH: "Este hexágono se parte desde un vértice. ¿Cuántos triángulos?",
@@ -736,6 +744,9 @@ export function qCopy(locale: Locale): QCopy {
       groupsHint: "Conte um grupo, depois conte os grupos.",
       groupsOf: (g, s) => `${g} grupos de ${s}. Quantos no total?`,
       groupsEach: (g, product) => `${g} grupos. ${product} no total. Quantos em cada grupo?`,
+      jumpsOf: (jumps, size) => `${jumps} saltos de ${size} na reta. Onde você cai?`,
+      jumpsCount: (size, product) => `Saltos de ${size} chegam a ${product}. Quantos saltos?`,
+      jumpsSize: (jumps, product) => `${jumps} saltos iguais chegam a ${product}. Qual é o tamanho de cada salto?`,
       rowsOf: (r, c) => `${r} fileiras de ${c}. Quantos no total?`,
       arrayRows: (product, cols) => `Um arranjo de ${product}. ${cols} em cada fileira. Quantas fileiras?`,
       arrayCols: (product, rows) => `Um arranjo de ${product}. ${rows} fileiras. Quantos em cada fileira?`,
@@ -758,6 +769,7 @@ export function qCopy(locale: Locale): QCopy {
       combineTT: "Dois triângulos unidos por um lado formam qual polígono?",
       combineTQ: "Um triângulo unido a um quadrilátero por um lado forma qual polígono?",
       combineQQ: "Dois quadriláteros unidos por um lado podem formar qual polígono?",
+      combineTP: "Um triângulo unido a um pentágono por um lado forma qual polígono?",
       subdivideQ: "Este quadrilátero é partido na diagonal. Quantos triângulos?",
       subdivideP: "Este pentágono é partido a partir de um vértice. Quantos triângulos?",
       subdivideH: "Este hexágono é partido a partir de um vértice. Quantos triângulos?",
@@ -840,6 +852,9 @@ export function qCopy(locale: Locale): QCopy {
     groupsHint: "Count one group, then count the groups.",
     groupsOf: (g, s) => `${g} groups of ${s}. How many in all?`,
     groupsEach: (g, product) => `${g} groups. ${product} in all. How many in each group?`,
+    jumpsOf: (jumps, size) => `${jumps} jumps of ${size} on the number line. Where do you land?`,
+    jumpsCount: (size, product) => `Jumps of ${size} land on ${product}. How many jumps?`,
+    jumpsSize: (jumps, product) => `${jumps} equal jumps land on ${product}. How big is each jump?`,
     rowsOf: (r, c) => `${r} rows of ${c}. How many in all?`,
     arrayRows: (product, cols) => `An array of ${product}. ${cols} in each row. How many rows?`,
     arrayCols: (product, rows) => `An array of ${product}. ${rows} rows. How many in each row?`,
@@ -862,6 +877,7 @@ export function qCopy(locale: Locale): QCopy {
     combineTT: "Two triangles joined on a side make which polygon?",
     combineTQ: "A triangle joined to a quadrilateral on one side makes which polygon?",
     combineQQ: "Two quadrilaterals joined on a side can make which polygon?",
+    combineTP: "A triangle joined to a pentagon on one side makes which polygon?",
     subdivideQ: "This quadrilateral is split along a diagonal. How many triangles?",
     subdivideP: "This pentagon is split from one vertex. How many triangles?",
     subdivideH: "This hexagon is split from one vertex. How many triangles?",

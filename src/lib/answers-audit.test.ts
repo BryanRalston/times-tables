@@ -10,6 +10,7 @@ import type {
   FractionData,
   GraphData,
   GroupsData,
+  JumpsData,
   MoneyData,
   PerimeterData,
   PlaceValueData,
@@ -55,7 +56,7 @@ describe("answer audit", () => {
   });
 
   it("groups and arrays match the product", () => {
-    for (const id of ["u3-groups", "u3-array", "u3-factor", "u3-share", "u6-facts", "u9-groups", "u12-six"]) {
+    for (const id of ["u3-groups", "u3-jumps", "u3-array", "u3-factor", "u3-share", "u6-facts", "u9-groups", "u12-six"]) {
       for (let i = 0; i < 20; i++) {
         const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`g:${id}:${i}`));
         if (q.kind === "groups") {
@@ -67,6 +68,13 @@ describe("answer audit", () => {
             expect(Number(q.answer)).toBe(d.groups);
             expect(d.size * Number(q.answer)).toBe(p);
           }
+          if (d.hide === "size") expect(Number(q.answer)).toBe(d.size);
+        }
+        if (q.kind === "jumps") {
+          const d = q.data as JumpsData;
+          const p = d.jumps * d.size;
+          if (d.hide === "product") expect(Number(q.answer)).toBe(p);
+          if (d.hide === "jumps") expect(Number(q.answer)).toBe(d.jumps);
           if (d.hide === "size") expect(Number(q.answer)).toBe(d.size);
         }
         if (q.kind === "array") {

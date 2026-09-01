@@ -21,7 +21,8 @@ export type Kind =
   | "word"
   | "fluency"
   | "measure"
-  | "compute";
+  | "compute"
+  | "jumps";
 
 export type InputMode =
   | "keypad"
@@ -196,6 +197,12 @@ export interface ComputeData {
   mode: "exact" | "estimate";
 }
 
+export interface JumpsData {
+  size: number;
+  jumps: number;
+  hide: "product" | "jumps" | "size";
+}
+
 export interface Question {
   id: string;
   kind: Kind;
@@ -228,7 +235,8 @@ export interface Question {
     | WordData
     | FluencyData
     | MeasureData
-    | ComputeData;
+    | ComputeData
+    | JumpsData;
 }
 
 export interface ActivitySave {

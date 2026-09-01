@@ -44,6 +44,13 @@ const COMMON: Squishee[] = [
   { id: "pig", name: "Pig", theme: "animal", file: "pig.png", poke: null, rarity: "common" },
   { id: "shark", name: "Shark", theme: "animal", file: "shark.png", poke: null, rarity: "common" },
   { id: "taco", name: "Taco", theme: "food", file: "taco.png", poke: null, rarity: "common" },
+  { id: "whale", name: "Whale", theme: "animal", file: "whale.png", poke: null, rarity: "common" },
+  { id: "lemon", name: "Lemon", theme: "food", file: "lemon.png", poke: null, rarity: "common" },
+  { id: "penguin", name: "Penguin", theme: "animal", file: "penguin.png", poke: null, rarity: "common" },
+  { id: "strawberry", name: "Strawberry", theme: "food", file: "strawberry.png", poke: null, rarity: "common" },
+  { id: "otter", name: "Otter", theme: "animal", file: "otter.png", poke: null, rarity: "common" },
+  { id: "waffle", name: "Waffle", theme: "food", file: "waffle.png", poke: null, rarity: "common" },
+  { id: "cookie", name: "Cookie", theme: "food", file: "cookie.png", poke: null, rarity: "common" },
 ];
 
 const RARE: Squishee[] = [

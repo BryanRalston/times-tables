@@ -2,12 +2,15 @@ import { useUi } from "@/components/chrome";
 import { Mascot } from "@/components/mascot";
 import { ART } from "@/lib/art";
 import { QUARTERS, UNITS, unitWindowLabel } from "@/lib/curriculum";
+import { parseLocale } from "@/lib/i18n";
+import { unitText } from "@/lib/labels";
 import { unitStatus } from "@/lib/path";
 import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
 
 export function YearPath({ suggestedId, onOpen }: { suggestedId: string; onOpen: (id: string) => void }) {
   const sessions = useProgress((s) => s.sessions);
+  const locale = parseLocale(useProgress((s) => s.locale));
   const ui = useUi();
   const qName = [ui.q1, ui.q2, ui.q3, ui.q4];
   let lastQuarter = 0;
@@ -31,7 +34,7 @@ export function YearPath({ suggestedId, onOpen }: { suggestedId: string; onOpen:
             ) : null}
             <div className="relative z-10 grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-3">
               <div className={cn("text-right", !leftLabel && "invisible")}>
-                <p className="font-display text-base leading-tight sm:text-lg">{u.short}</p>
+                <p className="font-display text-base leading-tight sm:text-lg">{unitText(u, locale).short}</p>
                 <p className="text-[11px] text-muted">{unitWindowLabel(u.id)}</p>
                 {st === "now" ? <p className="text-xs font-medium text-teal">{ui.now}</p> : null}
               </div>
@@ -39,7 +42,7 @@ export function YearPath({ suggestedId, onOpen }: { suggestedId: string; onOpen:
                 type="button"
                 onClick={() => onOpen(u.id)}
                 className={cn("relative grid place-items-center", st === "now" && "node-today")}
-                aria-label={`${u.short}${st === "now" ? `, ${ui.now}` : ""}`}
+                aria-label={`${unitText(u, locale).short}${st === "now" ? `, ${ui.now}` : ""}`}
               >
                 <img src={ART.nodeOpen} alt="" draggable={false} className="h-[4.5rem] w-[4.5rem] object-contain sm:h-20 sm:w-20" />
                 {done ? (
@@ -52,7 +55,7 @@ export function YearPath({ suggestedId, onOpen }: { suggestedId: string; onOpen:
                 ) : null}
               </button>
               <div className={cn("text-left", leftLabel && "invisible")}>
-                <p className="font-display text-base leading-tight sm:text-lg">{u.short}</p>
+                <p className="font-display text-base leading-tight sm:text-lg">{unitText(u, locale).short}</p>
                 <p className="text-[11px] text-muted">{unitWindowLabel(u.id)}</p>
                 {st === "now" ? <p className="text-xs font-medium text-teal">{ui.now}</p> : null}
               </div>

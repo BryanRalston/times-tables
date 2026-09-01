@@ -20,7 +20,7 @@ function A(
   sol: string[],
   kind: ActivityDef["kind"],
   params?: Record<string, unknown>,
-  rounds = 8,
+  rounds = 10,
 ): ActivityDef {
   return { id, title, blurb, sol, kind, rounds, params };
 }
@@ -84,6 +84,7 @@ export const UNITS: UnitDef[] = [
     blurb: "Equal groups, arrays, and related facts. Meaning first. 3.CE.2 a,b.",
     activities: [
       A("u3-groups", "Equal groups", "How many groups? How many in each? How many in all?", ["3.CE.2.a"], "groups", { factors: [2, 3, 4, 5] }),
+      A("u3-jumps", "Jumps on a line", "Equal jumps on a number line. How far? How many hops?", ["3.CE.2.a"], "jumps", { factors: [2, 3, 4, 5] }),
       A("u3-array", "Arrays", "Rows and columns make a product.", ["3.CE.2.a"], "array"),
       A("u3-factor", "Missing factor", "2 × n = 8. Isolate one group, then name n.", ["3.CE.2.a"], "groups", { hide: "groups", factors: [2, 3, 4, 5] }),
       A("u3-share", "Share equally", "n groups share the total. How many in each?", ["3.CE.2.a"], "groups", { hide: "size", factors: [2, 3, 4, 5] }),

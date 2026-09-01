@@ -2,6 +2,8 @@ import { AppHeader, AppTabs, useUi } from "@/components/chrome";
 import { ART } from "@/lib/art";
 import { todayIso } from "@/lib/calendar";
 import { QUARTERS, UNITS, suggestedUnitId } from "@/lib/curriculum";
+import { parseLocale } from "@/lib/i18n";
+import { activityText, unitText } from "@/lib/labels";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
@@ -10,6 +12,7 @@ export function LessonsPage() {
   const classUnitId = useProgress((s) => s.classUnitId);
   const activities = useProgress((s) => s.activities);
   const suggested = suggestedUnitId(todayIso(), classUnitId || undefined);
+  const locale = parseLocale(useProgress((s) => s.locale));
   const ui = useUi();
   const qName = [ui.q1, ui.q2, ui.q3, ui.q4];
 
@@ -36,7 +39,7 @@ export function LessonsPage() {
                       <img src={ART.nodeOpen} alt="" className="h-12 w-12 object-contain" />
                       <span className="min-w-0 flex-1">
                         <span className="flex items-center gap-2">
-                          <span className="font-display text-lg leading-tight">{u.short}</span>
+                          <span className="font-display text-lg leading-tight">{unitText(u, locale).short}</span>
                           {now ? (
                             <span className="rounded-full bg-teal-soft px-2 py-0.5 text-[11px] font-medium text-teal">{ui.now}</span>
                           ) : null}
@@ -46,7 +49,7 @@ export function LessonsPage() {
                         </span>
                       </span>
                     </summary>
-                    <p className="mt-2 text-sm text-muted">{u.blurb}</p>
+                    <p className="mt-2 text-sm text-muted">{unitText(u, locale).blurb}</p>
                     <div className="mt-3 space-y-2">
                       {now ? (
                         <button
@@ -69,8 +72,8 @@ export function LessonsPage() {
                             )}
                           >
                             <span className="min-w-0 flex-1">
-                              <span className="block font-medium leading-tight">{a.title}</span>
-                              <span className="block text-xs text-muted">{a.blurb}</span>
+                              <span className="block font-medium leading-tight">{activityText(a, locale).title}</span>
+                              <span className="block text-xs text-muted">{activityText(a, locale).blurb}</span>
                               <span className="block text-[11px] text-faint">{a.sol.join(" · ")}</span>
                             </span>
                             <span className="text-star">{save?.stars ? "★".repeat(save.stars) : ui.play}</span>

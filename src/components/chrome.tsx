@@ -68,7 +68,7 @@ export function AppTabs({ active }: { active: "home" | "lessons" | "shelf" }) {
     </button>
   );
   return (
-    <nav className="mb-5 grid grid-cols-3 gap-1 rounded-[16px] bg-surface-2/90 p-1 backdrop-blur-md" aria-label={ui.tabsAria}>
+    <nav className="frost mb-5 grid grid-cols-3 gap-1 rounded-[16px] p-1" aria-label={ui.tabsAria}>
       {tab("home", ui.home, <Home className="size-4" />)}
       {tab("lessons", ui.lessons, <BookOpen className="size-4" />)}
       {tab("shelf", ui.shelf, <Sparkles className="size-4" />)}

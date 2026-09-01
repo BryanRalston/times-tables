@@ -18,6 +18,7 @@ import type {
   FluencyData,
   GraphData,
   GroupsData,
+  JumpsData,
   MeasureData,
   MoneyData,
   OrderData,
@@ -77,6 +78,8 @@ export function Board(props: BoardProps) {
       return <MeasureBoard {...props} />;
     case "compute":
       return <ComputeBoard {...props} />;
+    case "jumps":
+      return <NumberLine {...props} />;
     case "word":
       return <BigPrompt prompt={question.prompt} status={props.status} />;
     default:
@@ -928,6 +931,41 @@ function hundredsParts(n: number) {
     t: Math.floor((n % 100) / 10),
     o: n % 10,
   };
+}
+
+function NumberLine({ question, status, shake }: BoardProps) {
+  const data = question.data as JumpsData;
+  const product = data.size * data.jumps;
+  const max = Math.max(product, data.size);
+  const x = (n: number) => 8 + (n / max) * 84;
+  return (
+    <Frame shake={shake} status={status}>
+      <p className="mb-2 text-center font-display text-xl">{question.prompt}</p>
+      <svg viewBox="0 0 100 42" className="h-24 w-full">
+        <line x1="8" y1="24" x2="92" y2="24" stroke="#1f1a14" strokeWidth="1.5" />
+        {Array.from({ length: data.jumps + 1 }, (_, i) => {
+          const n = i * data.size;
+          return (
+            <g key={i}>
+              <line x1={x(n)} y1="18" x2={x(n)} y2="30" stroke="#1f1a14" strokeWidth="1.2" />
+              <text x={x(n)} y="38" textAnchor="middle" fontSize="5" fill="#6b6358">
+                {n}
+              </text>
+              {i < data.jumps ? (
+                <path
+                  d={`M ${x(n)} 22 Q ${(x(n) + x(n + data.size)) / 2} 8 ${x(n + data.size)} 22`}
+                  fill="none"
+                  stroke="#0d7377"
+                  strokeWidth="1.4"
+                />
+              ) : null}
+            </g>
+          );
+        })}
+        <circle cx={x(product)} cy="24" r="2.4" fill="#c45c26" />
+      </svg>
+    </Frame>
+  );
 }
 
 function ComputeBoard({ question, status, shake }: BoardProps) {

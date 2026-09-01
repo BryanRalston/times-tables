@@ -285,7 +285,12 @@ describe("geometry", () => {
       expect(q.answer).toBe(d.result);
       if (d.result === "quadrilateral") expect(d.parts).toEqual(["triangle", "triangle"]);
       if (d.result === "pentagon") expect(d.parts).toEqual(["triangle", "quadrilateral"]);
-      if (d.result === "hexagon") expect(d.parts).toEqual(["quadrilateral", "quadrilateral"]);
+      if (d.result === "hexagon") {
+        expect([
+          ["quadrilateral", "quadrilateral"],
+          ["triangle", "pentagon"],
+        ]).toContainEqual(d.parts);
+      }
     }
   });
 });

@@ -7,6 +7,7 @@ import { todayIso } from "@/lib/calendar";
 import { remainingSchoolDaysInUnit, suggestedUnitId, unitById } from "@/lib/curriculum";
 import { makeDailyWalk, walkLabel } from "@/lib/daily";
 import { parseLocale } from "@/lib/i18n";
+import { unitText } from "@/lib/labels";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 
@@ -66,7 +67,7 @@ export function HomePage() {
           <Mascot pose={done ? "star" : "wave"} size="md" className="h-24 w-24 shrink-0" />
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-teal">{done ? ui.walkDone : walkLabel(walk, locale)}</p>
-            <h2 className="font-display text-xl leading-tight">{unit?.short ?? ui.todaysWalk}</h2>
+            <h2 className="font-display text-xl leading-tight">{unit ? unitText(unit, locale).short : ui.todaysWalk}</h2>
             <p className="mt-1 text-sm text-muted">{ui.newReview(walk.fresh, walk.review, remain)}</p>
             <Button className="mt-3 w-full" size="lg" onClick={() => navigate({ id: "play", kind: "daily" })}>
               {done ? ui.walkAgain : ui.startWalk}

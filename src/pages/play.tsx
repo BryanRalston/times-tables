@@ -348,7 +348,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       {q.sol?.length ? (
         <p className="mb-1 text-center text-[11px] font-medium uppercase tracking-wide text-faint">{q.sol.join(" · ")}</p>
       ) : null}
-      {q.kind === "fluency" || q.kind === "word" || (q.kind === "tenframe" && "equation" in (q.data as object) && (q.data as { equation?: string }).equation === q.prompt) || (q.kind === "money" && (q.data as { mode?: string }).mode === "make") ? null : (
+      {q.kind === "fluency" || q.kind === "word" || q.kind === "jumps" || (q.kind === "tenframe" && "equation" in (q.data as object) && (q.data as { equation?: string }).equation === q.prompt) || (q.kind === "money" && (q.data as { mode?: string }).mode === "make") ? null : (
         <h2 className="mb-3 text-center font-display text-xl leading-tight sm:text-2xl">{q.prompt}</h2>
       )}
 

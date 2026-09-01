@@ -368,6 +368,7 @@ function shapeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       { parts: ["triangle", "triangle"], result: "quadrilateral", prompt: t().combineTT },
       { parts: ["triangle", "quadrilateral"], result: "pentagon", prompt: t().combineTQ },
       { parts: ["quadrilateral", "quadrilateral"], result: "hexagon", prompt: t().combineQQ },
+      { parts: ["triangle", "pentagon"], result: "hexagon", prompt: t().combineTP },
     ] as const;
     const j = rng.pick(joins);
     return keypadQ(rng, {
@@ -888,6 +889,30 @@ function computeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   });
 }
 
+function jumpsQ(rng: Rng, params: Record<string, unknown> = {}): Question {
+  const pool = ((params.factors as number[] | undefined) ?? [2, 3, 4, 5]).filter((n) => n >= 2);
+  const size = rng.pick(pool.length ? pool : [2, 3, 4, 5]);
+  const jumps = rng.int(2, 6);
+  const product = size * jumps;
+  const hide = (params.hide as "product" | "jumps" | "size" | undefined) ?? rng.pick(["product", "jumps", "size"]);
+  let prompt = t().jumpsOf(jumps, size);
+  let answer = String(product);
+  if (hide === "jumps") {
+    prompt = t().jumpsCount(size, product);
+    answer = String(jumps);
+  } else if (hide === "size") {
+    prompt = t().jumpsSize(jumps, product);
+    answer = String(size);
+  }
+  return keypadQ(rng, {
+    kind: "jumps",
+    prompt,
+    answer,
+    factKey: `${Math.min(size, jumps)}×${Math.max(size, jumps)}`,
+    data: { size, jumps, hide },
+  });
+}
+
 function fluencyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const pool = ((params.factors as number[] | undefined) ?? [0, 1, 2, 5, 10]).slice();
   const ops = (params.ops as Array<"+" | "−" | "×" | "÷"> | undefined) ?? ["×", "÷"];
@@ -1064,6 +1089,9 @@ export function makeQuestion(activity: ActivityDef, rng: Rng, locale: Locale | s
       break;
     case "compute":
       q = computeQ(rng, p);
+      break;
+    case "jumps":
+      q = jumpsQ(rng, p);
       break;
     default:
       q = tenframeQ(rng, p);

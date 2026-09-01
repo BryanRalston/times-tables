@@ -12,9 +12,12 @@ A Loudoun Grade 3 teacher could recommend this for 2026–27. Not a demo.
 6. **Money (3.NS.4):** count, compare, **make this amount** with bills and coins up to $5, leftover/change — `u11-make`.
 7. Graphs actually draw. Leftover dots are optional. Replay a lesson → different items, still correct. Squishee shelf + poke.
 8. A third grader can: open Home, pick a lesson, type an answer they can see, Check, go back Home.
+9. **× as equal jumps** has its own board — `u3-jumps`.
+10. Unit and lesson titles follow the UI language (English / Spanish / Brazilian Portuguese).
+11. Scored answers are audited: 25 generated items per activity, choices include the key, models match the math.
 
 ## Still thinner than a textbook (honest, not blocking)
 
-- Combine/subdivide is two triangles → quad and one split, not every polygon pair.
-- × as equal jumps on a number line is not its own board (groups/arrays cover 3.CE.2 a).
 - Measurement tools are drawings, not photos of classroom tools.
+- Phone character wallpaper is parked (plain pink) until Safari paints a real image layer reliably.
+- Combine/subdivide covers the VA triangle/quadrilateral joins, not every polygon pair in a textbook.
