@@ -26,8 +26,11 @@ export function AppHeader() {
     <header className="mb-3 flex items-center gap-3">
       <PokeToy id="frog" size="sm" bob className="h-14 w-14" />
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted">
+        <p className="flex flex-wrap items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted">
           {pathGrade === 4 ? ui.grade4 : ui.grade3} · {YEAR_LABEL}
+          {pathGrade === 4 ? (
+            <span className="rounded-full bg-star-soft px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-star">{ui.preview}</span>
+          ) : null}
         </p>
         <h1 className="font-display text-xl leading-tight sm:text-2xl">{name ? ui.namedPath(name) : pathGrade === 4 ? ui.pathGrade4 : ui.path}</h1>
       </div>

@@ -267,6 +267,12 @@ describe("locale", () => {
     expect(UI.en.grownupPoints.length).toBeGreaterThanOrEqual(5);
     expect(UI.en.grownupBlurb).toMatch(/Grade 4/);
     expect(UI.en.grownupBlurb).toMatch(/Nothing leaves/i);
+    expect(UI.en.pathGrade4).toBe("Advanced (Grade 4) — preview");
+    expect(UI.es.pathGrade4).toBe("Avanzado (4.º) — vista previa");
+    expect(UI["pt-BR"].pathGrade4).toBe("Avançado (4.º) — prévia");
+    expect(UI.en.preview).toBe("Preview");
+    expect(UI.en.grownupPoints.some((p) => /VDOE Grade 4 strands/.test(p))).toBe(true);
+    expect(UI.en.grownupPoints.some((p) => /LCPS 2026–27 year map/.test(p))).toBe(true);
   });
 
   it("spanish word story is actually Spanish", () => {

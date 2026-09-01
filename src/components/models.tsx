@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
+import { ClockFace } from "@/components/clock-face";
 import { ChoiceList } from "@/components/keypad";
 import { MagentaImg } from "@/components/magenta-video";
 import { G4Q, parseLocale, PLACE, UI } from "@/lib/i18n";
@@ -620,33 +621,10 @@ function FractionBar({ question, onInteract, status, shake }: BoardProps) {
   );
 }
 
-function ClockFace({ hours, minutes, size = "size-48" }: { hours: number; minutes: number; size?: string }) {
-  const minAngle = minutes * 6;
-  const hourAngle = (hours % 12) * 30 + minutes * 0.5;
-  return (
-    <svg viewBox="0 0 100 100" className={size}>
-      <circle cx="50" cy="50" r="46" fill="#fffaf1" stroke="#1f1a14" strokeWidth="2" />
-      {Array.from({ length: 12 }, (_, i) => {
-        const a = ((i + 1) / 12) * Math.PI * 2 - Math.PI / 2;
-        const x = 50 + Math.cos(a) * 36;
-        const y = 50 + Math.sin(a) * 36;
-        return (
-          <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#1f1a14">
-            {i + 1}
-          </text>
-        );
-      })}
-      <line x1="50" y1="50" x2={50 + Math.sin((hourAngle * Math.PI) / 180) * 22} y2={50 - Math.cos((hourAngle * Math.PI) / 180) * 22} stroke="#1f1a14" strokeWidth="3" strokeLinecap="round" />
-      <line x1="50" y1="50" x2={50 + Math.sin((minAngle * Math.PI) / 180) * 32} y2={50 - Math.cos((minAngle * Math.PI) / 180) * 32} stroke="#0d7377" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="50" cy="50" r="2.5" fill="#c45c26" />
-    </svg>
-  );
-}
-
 function AnalogClock({ question, status, shake }: BoardProps) {
   const data = question.data as ClockData;
   const extraM = data.elapsedMinutes ?? 0;
-  if (data.mode === "elapsed" && extraM > 0) {
+  if (data.mode === "elapsed") {
     let endM = data.minutes + extraM;
     let endH = data.hours + (data.elapsedHours ?? 0);
     if (endM >= 60) {
@@ -1120,9 +1098,9 @@ function ComputeBoard({ question, status, shake }: BoardProps) {
 }
 
 /** Overlay viewBoxes match keyed public/measure PNGs. */
-const RULER_FACE = { w: 1258, h: 200, x0: 168, x1: 1210, y0: 26, yMaj: 84, yMin: 54, yNum: 128 };
-const SCALE_FACE = { w: 400, h: 644, cx: 205, cy: 290, r: 148, start: 225, sweep: 270 };
-const BEAKER_FACE = { w: 413, h: 979, x: 132, fw: 188, yTop: 228, yBot: 862, tickX: 324 };
+const RULER_FACE = { w: 1229, h: 222, x0: 148, x1: 1188, y0: 36, yMaj: 92, yMin: 62, yNum: 142 };
+const SCALE_FACE = { w: 392, h: 717, cx: 170, cy: 331, r: 136, start: 225, sweep: 270 };
+const BEAKER_FACE = { w: 413, h: 979, x: 132, fw: 188, yTop: 228, yBot: 862, tickX: 250 };
 
 function ToolFace({
   src,
@@ -1284,19 +1262,19 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
             src={asset("measure/scale.png")}
             viewBox={`0 0 ${w} ${h}`}
             className="inline-block"
-            imgClass="h-64 w-auto sm:h-72"
+            imgClass="h-80 w-auto sm:h-96"
             label={label}
             over={
               <>
                 {Array.from({ length: max + 1 }, (_, i) => {
                   const d = start + (i / max) * sweep;
                   const [x1, y1] = polar(r * 0.84, d);
-                  const [x2, y2] = polar(r * 0.98, d);
-                  const [tx, ty] = polar(r * 0.68, d);
+                  const [x2, y2] = polar(r * 0.96, d);
+                  const [tx, ty] = polar(r * 0.64, d);
                   return (
                     <g key={i}>
                       <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#1f1a14" strokeWidth="3" />
-                      <text x={tx} y={ty} textAnchor="middle" dominantBaseline="middle" fontSize="28" fontWeight="700" fill="#1f1a14">
+                      <text x={tx} y={ty} textAnchor="middle" dominantBaseline="middle" fontSize="32" fontWeight="700" fill="#1f1a14">
                         {i}
                       </text>
                     </g>
@@ -1339,7 +1317,7 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
               {Array.from({ length: max + 1 }, (_, i) => (
                 <g key={i}>
                   <line x1={tickX} y1={y(i)} x2={tickX + 22} y2={y(i)} stroke="#1f1a14" strokeWidth="3" />
-                  <text x={tickX + 30} y={y(i) + 8} fontSize="42" fontWeight="700" fill="#1f1a14">
+                  <text x={tickX + 28} y={y(i) + 7} fontSize="36" fontWeight="700" fill="#1f1a14">
                     {i}
                   </text>
                 </g>

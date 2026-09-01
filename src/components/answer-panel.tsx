@@ -36,7 +36,9 @@ export function AnswerPanel({
     );
   }
   if (question.input === "clock") {
-    return <ClockKeys value={value} onChange={setValue} onCheck={() => onCheck()} disabled={disabled} />;
+    return (
+      <ClockKeys value={value} onChange={setValue} onCheck={() => onCheck()} disabled={disabled} avoid={question.answer} />
+    );
   }
   if (question.input === "order") {
     return (

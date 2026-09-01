@@ -26,6 +26,7 @@ export type Ui = {
   path: string;
   pathGrade3: string;
   pathGrade4: string;
+  preview: string;
   namedPath: (name: string) => string;
   check: string;
   yourAnswer: string;
@@ -119,7 +120,8 @@ export const UI: Record<Locale, Ui> = {
     grade4: "Grade 4",
     path: "Grade 3 Path",
     pathGrade3: "Grade 3 Path",
-    pathGrade4: "Advanced (Grade 4)",
+    pathGrade4: "Advanced (Grade 4) — preview",
+    preview: "Preview",
     namedPath: (name) => `${name}'s path`,
     check: "Check",
     yourAnswer: "Your answer",
@@ -154,13 +156,13 @@ export const UI: Record<Locale, Ui> = {
     tapAgainReset: "Tap again to reset",
     resetBlurb: "Reset clears stars, streak, and the leftover visit. It does not leave the device either.",
     grownupBlurb:
-      "LCPS 2026–27 Grade 3 year, 2023 Virginia SOLs. Nothing leaves this device — no accounts. Set Class is on to unit N for the daily walk; Lessons never lock. Coins and the shelf are optional juice. Advanced (Grade 4) is a parallel year, not the Grade 3 SOL.",
+      "LCPS 2026–27 Grade 3 year, 2023 Virginia SOLs. Nothing leaves this device — no accounts. Set Class is on to unit N for the daily walk; Lessons never lock. Coins and the shelf are optional juice. Advanced (Grade 4) — preview is VDOE Grade 4 strands, not an LCPS 2026–27 year map. Don’t demo it as the school’s Grade 4 course.",
     grownupPoints: [
       "LCPS 2026–27 Grade 3 year. 2023 Virginia SOLs.",
       "Nothing leaves this device. No accounts.",
       "Set Class is on to unit N for the daily walk. Lessons never lock.",
       "Coins and the squishee shelf are optional juice.",
-      "Advanced (Grade 4) is a parallel year, not the Grade 3 SOL.",
+      "This is VDOE Grade 4 strands, not an LCPS 2026–27 year map. Don’t demo it as the school’s Grade 4 course.",
     ],
     kidsBlurb: "Each kid has their own stars, streak, and squishee shelf. Questions shuffle per kid.",
     startHere: "Start here",
@@ -219,7 +221,8 @@ export const UI: Record<Locale, Ui> = {
     grade4: "4.º grado",
     path: "Camino de 3.º",
     pathGrade3: "Camino de 3.º",
-    pathGrade4: "Avanzado (4.º)",
+    pathGrade4: "Avanzado (4.º) — vista previa",
+    preview: "Vista previa",
     namedPath: (name) => `Camino de ${name}`,
     check: "Comprobar",
     yourAnswer: "Tu respuesta",
@@ -254,13 +257,13 @@ export const UI: Record<Locale, Ui> = {
     tapAgainReset: "Toca otra vez para reiniciar",
     resetBlurb: "Reiniciar borra estrellas, racha y la primera visita. Nada sale del aparato.",
     grownupBlurb:
-      "Año LCPS 2026–27 de 3.º, SOLs de Virginia 2023. Nada sale de este aparato — sin cuentas. Pon La clase está en la unidad N para el paseo diario; Lecciones nunca se bloquea. Las monedas y el estante son jugo opcional. Avanzado (4.º) es un año paralelo, no el SOL de 3.º.",
+      "Año LCPS 2026–27 de 3.º, SOLs de Virginia 2023. Nada sale de este aparato — sin cuentas. Pon La clase está en la unidad N para el paseo diario; Lecciones nunca se bloquea. Las monedas y el estante son jugo opcional. Avanzado (4.º) — vista previa son los estándares VDOE de 4.º, no un mapa del año LCPS 2026–27. No lo presentes como el curso de 4.º de la escuela.",
     grownupPoints: [
       "Año LCPS 2026–27 de 3.º. SOLs de Virginia 2023.",
       "Nada sale de este aparato. Sin cuentas.",
       "Pon La clase está en la unidad N para el paseo diario. Lecciones nunca se bloquea.",
       "Las monedas y el estante de squishees son jugo opcional.",
-      "Avanzado (4.º) es un año paralelo, no el SOL de 3.º.",
+      "Son los estándares VDOE de 4.º, no un mapa del año LCPS 2026–27. No lo presentes como el curso de 4.º de la escuela.",
     ],
     kidsBlurb: "Cada niña o niño tiene sus estrellas, racha y estante. Las preguntas se mezclan por persona.",
     startHere: "Empieza aquí",
@@ -319,7 +322,8 @@ export const UI: Record<Locale, Ui> = {
     grade4: "4.º ano",
     path: "Caminho do 3.º",
     pathGrade3: "Caminho do 3.º",
-    pathGrade4: "Avançado (4.º)",
+    pathGrade4: "Avançado (4.º) — prévia",
+    preview: "Prévia",
     namedPath: (name) => `Caminho de ${name}`,
     check: "Conferir",
     yourAnswer: "Sua resposta",
@@ -354,13 +358,13 @@ export const UI: Record<Locale, Ui> = {
     tapAgainReset: "Toque de novo para reiniciar",
     resetBlurb: "Reiniciar apaga estrelas, sequência e a primeira visita. Nada sai do aparelho.",
     grownupBlurb:
-      "Ano LCPS 2026–27 do 3.º, SOLs da Virgínia 2023. Nada sai deste aparelho — sem contas. Defina A turma está em na unidade N para o passeio diário; Lições nunca trava. Moedas e a estante são suco opcional. Avançado (4.º) é um ano paralelo, não o SOL do 3.º.",
+      "Ano LCPS 2026–27 do 3.º, SOLs da Virgínia 2023. Nada sai deste aparelho — sem contas. Defina A turma está em na unidade N para o passeio diário; Lições nunca trava. Moedas e a estante são suco opcional. Avançado (4.º) — prévia são os padrões VDOE do 4.º, não um mapa do ano LCPS 2026–27. Não o apresente como o curso de 4.º da escola.",
     grownupPoints: [
       "Ano LCPS 2026–27 do 3.º. SOLs da Virgínia 2023.",
       "Nada sai deste aparelho. Sem contas.",
       "Defina A turma está em na unidade N para o passeio diário. Lições nunca trava.",
       "Moedas e a estante de squishees são suco opcional.",
-      "Avançado (4.º) é um ano paralelo, não o SOL do 3.º.",
+      "São os padrões VDOE do 4.º, não um mapa do ano LCPS 2026–27. Não o apresente como o curso de 4.º da escola.",
     ],
     kidsBlurb: "Cada criança tem suas estrelas, sequência e estante. As perguntas misturam por pessoa.",
     startHere: "Comece aqui",

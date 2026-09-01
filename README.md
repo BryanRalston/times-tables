@@ -13,7 +13,7 @@ Toys on the boards are the squishee shelf (frogs, cats, pandas — poke them). C
 - **What it is:** Loudoun 2026–27 Grade 3 year. 2023 SOLs. A kid can see the math, type what they see, Check, go Home.
 - **Class is on:** Grown-ups set **unit N** so the daily walk follows the class. Lessons never lock — a child can open Q4 in August.
 - **Privacy:** nothing is sent to a server.
-- **Advanced (Grade 4)** in Grown-ups is a **parallel year**, not the Grade 3 SOL. Default path stays Grade 3.
+- **Advanced (Grade 4) — preview** in Grown-ups is VDOE Grade 4 strands, not an LCPS 2026–27 year map. Don’t demo it as the school’s Grade 4 course. Default path stays Grade 3.
 - Add to Home Screen on a class iPad (Safari → Share → Add to Home Screen). Theme color `#f4b3d0`.
 
 ## Open it

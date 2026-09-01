@@ -1,5 +1,7 @@
 import { Delete } from "lucide-react";
+import { InteractiveClock } from "@/components/clock-face";
 import { Button } from "@/components/ui/button";
+import { formatClockTime, parseClockTime, startClockTime } from "@/lib/clock";
 import { parseLocale, UI } from "@/lib/i18n";
 import { useProgress } from "@/lib/progress";
 import { cn, pad2 } from "@/lib/utils";
@@ -183,51 +185,44 @@ export function ClockKeys({
   onChange,
   onCheck,
   disabled,
+  avoid,
 }: {
   value: string;
   onChange: (v: string) => void;
   onCheck: () => void;
   disabled?: boolean;
+  avoid?: string;
 }) {
   const ui = useChrome();
-  const [hRaw, mRaw] = (value || "12:00").split(":");
-  let hours = Number(hRaw || 12);
-  let minutes = Number(mRaw || 0);
-  if (!Number.isFinite(hours)) hours = 12;
-  if (!Number.isFinite(minutes)) minutes = 0;
+  const { hours, minutes } = parseClockTime(value || startClockTime(avoid));
 
   function set(h: number, m: number) {
-    const hh = ((h - 1 + 12) % 12) + 1;
-    const mm = (m + 60) % 60;
-    onChange(`${hh}:${pad2(mm)}`);
+    onChange(formatClockTime(h, m));
   }
 
   return (
     <div className="space-y-3">
-      <p className="text-center font-display text-4xl tabular-nums">
+      <div className="flex justify-center">
+        <InteractiveClock hours={hours} minutes={minutes} onChange={onChange} disabled={disabled} />
+      </div>
+      <p className="text-center font-display text-3xl tabular-nums">
         {hours}:{pad2(minutes)}
       </p>
-      <div className="grid grid-cols-2 gap-2">
-        <Button variant="secondary" disabled={disabled} onClick={() => set(hours + 1, minutes)}>
-          {ui.hourPlus}
-        </Button>
-        <Button variant="secondary" disabled={disabled} onClick={() => set(hours - 1, minutes)}>
+      <div className="flex flex-wrap justify-center gap-1.5">
+        <Button variant="secondary" size="sm" className="h-8 px-2 text-xs" disabled={disabled} onClick={() => set(hours - 1, minutes)}>
           {ui.hourMinus}
         </Button>
-        <Button variant="secondary" disabled={disabled} onClick={() => set(hours, minutes + 5)}>
-          {ui.plus5min}
+        <Button variant="secondary" size="sm" className="h-8 px-2 text-xs" disabled={disabled} onClick={() => set(hours + 1, minutes)}>
+          {ui.hourPlus}
         </Button>
-        <Button variant="secondary" disabled={disabled} onClick={() => set(hours, minutes - 5)}>
-          {ui.minus5min}
-        </Button>
-        <Button variant="secondary" disabled={disabled} onClick={() => set(hours, minutes + 1)}>
-          {ui.plus1min}
-        </Button>
-        <Button variant="secondary" disabled={disabled} onClick={() => set(hours, minutes - 1)}>
+        <Button variant="secondary" size="sm" className="h-8 px-2 text-xs" disabled={disabled} onClick={() => set(hours, minutes - 1)}>
           {ui.minus1min}
         </Button>
+        <Button variant="secondary" size="sm" className="h-8 px-2 text-xs" disabled={disabled} onClick={() => set(hours, minutes + 1)}>
+          {ui.plus1min}
+        </Button>
       </div>
-      <Button className="w-full" size="lg" onClick={onCheck} disabled={disabled}>
+      <Button className="w-full" size="lg" onClick={onCheck} disabled={disabled || !value}>
         {ui.check}
       </Button>
     </div>
