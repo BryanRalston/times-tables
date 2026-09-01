@@ -291,6 +291,18 @@ function familyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   });
 }
 
+const SHAPE_KEYS = ["triangle", "quadrilateral", "pentagon", "hexagon", "octagon"] as const;
+
+function shapeLabel(name: string): string {
+  return SHAPE[loc][name] ?? name;
+}
+
+function shapeChoices(rng: Rng, correctKey: string): string[] {
+  const correct = shapeLabel(correctKey);
+  const rest = SHAPE_KEYS.filter((k) => k !== correctKey).map(shapeLabel);
+  return rng.shuffle([correct, ...rng.shuffle(rest).slice(0, 3)]);
+}
+
 function shapeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const sides = rng.pick([3, 4, 5, 6, 8]);
   const name = SHAPE_NAMES[sides]!;
@@ -330,15 +342,21 @@ function shapeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       { parts: ["quadrilateral", "quadrilateral"], result: "hexagon", prompt: t().combineQQ },
     ] as const;
     const j = rng.pick(joins);
-    const shapeNames = ["triangle", "quadrilateral", "pentagon", "hexagon", "octagon"] as const;
     return keypadQ(rng, {
       kind: "choice",
       prompt: j.prompt,
-      answer: SHAPE[loc][j.result] ?? j.result,
+      answer: shapeLabel(j.result),
       alts: j.result === "quadrilateral" ? ["square", "rectangle", "quad", "cuadrilátero", "quadrilátero"] : [j.result],
       input: "choice",
-      choices: rng.shuffle(shapeNames.map((n) => SHAPE[loc][n] ?? n)).filter((n, i, a) => a.indexOf(n) === i).slice(0, 4),
-      data: { visual: "combine", parts: [...j.parts], result: j.result, isPolygon: true, sides: j.result === "quadrilateral" ? 4 : j.result === "pentagon" ? 5 : 6, shape: j.result },
+      choices: shapeChoices(rng, j.result),
+      data: {
+        visual: "combine",
+        parts: [...j.parts],
+        result: j.result,
+        isPolygon: true,
+        sides: j.result === "quadrilateral" ? 4 : j.result === "pentagon" ? 5 : 6,
+        shape: j.result,
+      },
     });
   }
   if (mode === "subdivide") {
@@ -374,11 +392,11 @@ function shapeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   return keypadQ(rng, {
     kind: "choice",
     prompt: t().polygonName,
-    answer: SHAPE[loc][name] ?? name,
+    answer: shapeLabel(name),
     alts: sides === 4 ? ["rectangle", "square", "quad", name] : [name],
     input: "choice",
-    choices: rng.shuffle(["triangle", "quadrilateral", "pentagon", "hexagon", "octagon"].map((n) => SHAPE[loc][n] ?? n)).slice(0, 4).concat(SHAPE[loc][name] ?? name).filter((v, i, a) => a.indexOf(v) === i).slice(0, 4),
-    data: { visual: "shape", shape: name, sides, isPolygon: true, rotation: rng.int(-15, 15) },
+    choices: shapeChoices(rng, name),
+    data: { visual: "shape", shape: name, sides, isPolygon: true, rotation: rng.int(-12, 12) },
   });
 }
 

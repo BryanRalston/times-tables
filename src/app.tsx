@@ -1,5 +1,4 @@
 import { Component, type ErrorInfo, type ReactNode, useEffect } from "react";
-import { ART } from "@/lib/art";
 import { parseLocale } from "@/lib/i18n";
 import { useRoute } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
@@ -58,15 +57,5 @@ export function App() {
   else if (route.id === "shelf") page = <ShelfPage />;
   else if (route.id === "grownup") page = <GrownupPage />;
 
-  return (
-    <BootError>
-      <div className="wallpaper" aria-hidden>
-        <picture>
-          <source media="(max-width: 720px)" srcSet={ART.charsTall} />
-          <img src={ART.charsWide} alt="" />
-        </picture>
-      </div>
-      <div className="page-root">{page}</div>
-    </BootError>
-  );
+  return <BootError>{page}</BootError>;
 }

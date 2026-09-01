@@ -254,6 +254,42 @@ describe("locale", () => {
   });
 });
 
+describe("geometry", () => {
+  it("name-the-shape always offers the true name and matches the pictured sides", () => {
+    const found = activityById("u4-name")!;
+    for (let i = 0; i < 40; i++) {
+      const q = makeQuestion(found.activity, rngFromSeed(`shape:${i}`));
+      const d = q.data as { shape?: string; sides?: number };
+      expect(q.choices ?? []).toContain(q.answer);
+      expect(q.choices).toHaveLength(4);
+      const sides = d.sides ?? 0;
+      const names: Record<number, string> = {
+        3: "triangle",
+        4: "quadrilateral",
+        5: "pentagon",
+        6: "hexagon",
+        8: "octagon",
+      };
+      expect(d.shape).toBe(names[sides]);
+      expect(q.answer).toBe(names[sides]);
+    }
+  });
+
+  it("combine pictures match the named result", () => {
+    const found = activityById("u4-combine")!;
+    for (let i = 0; i < 20; i++) {
+      const q = makeQuestion(found.activity, rngFromSeed(`join:${i}`));
+      const d = q.data as { parts?: string[]; result?: string; sides?: number };
+      expect(q.choices ?? []).toContain(q.answer);
+      expect(d.parts).toHaveLength(2);
+      expect(q.answer).toBe(d.result);
+      if (d.result === "quadrilateral") expect(d.parts).toEqual(["triangle", "triangle"]);
+      if (d.result === "pentagon") expect(d.parts).toEqual(["triangle", "quadrilateral"]);
+      if (d.result === "hexagon") expect(d.parts).toEqual(["quadrilateral", "quadrilateral"]);
+    }
+  });
+});
+
 describe("shuffle", () => {
   it("two attempts of the same activity yield different prompts", () => {
     const found = activityById("u2-place");

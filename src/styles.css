@@ -41,11 +41,9 @@
     min-height: 100%;
   }
   html,
-  body {
-    background-color: #f4b3d0;
-  }
+  body,
   #app {
-    background-color: transparent;
+    background-color: #f4b3d0;
   }
   body {
     color: var(--color-ink);
@@ -116,30 +114,6 @@
 
 .paper-grid {
   background-image: none;
-}
-
-.wallpaper {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-.wallpaper picture,
-.wallpaper img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
-}
-.wallpaper img {
-  object-fit: cover;
-  object-position: center;
-}
-.page-root {
-  position: relative;
-  z-index: 1;
 }
 
 .frost {

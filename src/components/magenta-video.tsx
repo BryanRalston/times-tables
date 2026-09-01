@@ -2,10 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 function isMagenta(r: number, g: number, b: number): boolean {
-  return r > 140 && b > 110 && g < 130 && b > g + 40 && r > g + 40;
+  return g < 80 && r > 190 && b > 170 && r - g > 100 && b - g > 90;
 }
-
-const keyed = new Map<string, string>();
 
 function isIos(): boolean {
   if (typeof navigator === "undefined") return false;
@@ -28,61 +26,7 @@ export function MagentaImg({
   alt?: string;
   className?: string;
 }) {
-  const [url, setUrl] = useState(() => keyed.get(src) ?? src);
-
-  useEffect(() => {
-    const hit = keyed.get(src);
-    if (hit) {
-      setUrl(hit);
-      return;
-    }
-    setUrl(src);
-    if (isIos() || isCoarse()) {
-      keyed.set(src, src);
-      return;
-    }
-    const img = new Image();
-    img.onload = () => {
-      try {
-        const nw = img.naturalWidth || img.width;
-        const nh = img.naturalHeight || img.height;
-        const max = 512;
-        const scale = Math.min(1, max / Math.max(nw, nh, 1));
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.max(1, Math.round(nw * scale));
-        canvas.height = Math.max(1, Math.round(nh * scale));
-        const ctx = canvas.getContext("2d");
-        if (!ctx || !canvas.width) return;
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const d = frame.data;
-        let transparent = 0;
-        const sample = Math.min(400, d.length / 4);
-        for (let i = 0; i < sample * 4; i += 4) {
-          if ((d[i + 3] ?? 255) < 16) transparent += 1;
-        }
-        if (src.endsWith(".png") && transparent > sample * 0.2) {
-          keyed.set(src, src);
-          setUrl(src);
-          return;
-        }
-        for (let i = 0; i < d.length; i += 4) {
-          if (isMagenta(d[i]!, d[i + 1]!, d[i + 2]!)) d[i + 3] = 0;
-        }
-        ctx.putImageData(frame, 0, 0);
-        const next = canvas.toDataURL("image/png");
-        keyed.set(src, next);
-        setUrl(next);
-      } catch {
-        keyed.set(src, src);
-        setUrl(src);
-      }
-    };
-    img.onerror = () => setUrl(src);
-    img.src = src;
-  }, [src]);
-
-  return <img src={url} alt={alt} draggable={false} className={cn("object-contain", className)} />;
+  return <img src={src} alt={alt} draggable={false} className={cn("object-contain", className)} />;
 }
 
 export function MagentaVideo({

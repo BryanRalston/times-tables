@@ -410,15 +410,81 @@ function OrderNums({ question, value, setValue, status, shake }: BoardProps) {
   );
 }
 
-const POLY: Record<string, string> = {
-  triangle: "50,12 88,88 12,88",
-  quadrilateral: "18,20 86,18 82,82 14,84",
-  pentagon: "50,8 92,40 76,90 24,90 8,40",
-  hexagon: "50,8 90,30 90,70 50,92 10,70 10,30",
-  octagon: "35,8 65,8 92,35 92,65 65,92 35,92 8,65 8,35",
-  circle: "",
-  open: "12,70 20,20 50,40 80,18 88,72",
+const SHAPE_SIDES: Record<string, number> = {
+  triangle: 3,
+  quadrilateral: 4,
+  pentagon: 5,
+  hexagon: 6,
+  octagon: 8,
 };
+
+function regularPoints(sides: number, r = 40): { x: number; y: number }[] {
+  const n = Math.max(3, sides);
+  const pts: { x: number; y: number }[] = [];
+  for (let i = 0; i < n; i++) {
+    const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+    pts.push({ x: 50 + r * Math.cos(a), y: 50 + r * Math.sin(a) });
+  }
+  return pts;
+}
+
+function ShapePoly({
+  shape,
+  sides,
+  rotation = 0,
+  fill = "#d7ecec",
+  stroke = "#0d7377",
+  sizeClass = "size-40",
+  split = false,
+}: {
+  shape?: string;
+  sides?: number;
+  rotation?: number;
+  fill?: string;
+  stroke?: string;
+  sizeClass?: string;
+  split?: boolean;
+}) {
+  if (shape === "circle") {
+    return (
+      <svg viewBox="0 0 100 100" className={sizeClass}>
+        <circle cx="50" cy="50" r="36" fill={fill} stroke={stroke} strokeWidth="3" />
+      </svg>
+    );
+  }
+  if (shape === "open") {
+    return (
+      <svg viewBox="0 0 100 100" className={sizeClass}>
+        <polyline points="12,70 20,20 50,40 80,18 88,72" fill="none" stroke={stroke} strokeWidth="3" />
+      </svg>
+    );
+  }
+  const n = sides ?? SHAPE_SIDES[shape ?? ""] ?? 3;
+  const pts = shape === "quadrilateral" || n === 4 ? [
+    { x: 16, y: 30 },
+    { x: 84, y: 30 },
+    { x: 84, y: 74 },
+    { x: 16, y: 74 },
+  ] : regularPoints(n);
+  const splits =
+    split && pts.length >= 4
+      ? pts.slice(2, pts.length - 1).map((p) => ({ x1: pts[0]!.x, y1: pts[0]!.y, x2: p.x, y2: p.y }))
+      : [];
+  return (
+    <svg viewBox="0 0 100 100" className={sizeClass}>
+      <polygon
+        points={pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ")}
+        fill={fill}
+        stroke={stroke}
+        strokeWidth="3"
+        transform={`rotate(${rotation} 50 50)`}
+      />
+      {splits.map((s, i) => (
+        <line key={i} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} stroke="#c45c26" strokeWidth="2" transform={`rotate(${rotation} 50 50)`} />
+      ))}
+    </svg>
+  );
+}
 
 function ChoiceVisual({ question, status, shake }: BoardProps) {
   const data = question.data as ChoiceData;
@@ -430,20 +496,16 @@ function ChoiceVisual({ question, status, shake }: BoardProps) {
     );
   }
   if (data.visual === "combine") {
+    const parts = data.parts?.length ? data.parts : ["triangle", "triangle"];
+    const result = data.result ?? data.shape ?? "quadrilateral";
     return (
       <Frame shake={shake} status={status}>
-        <div className="flex items-center justify-center gap-3">
-          <svg viewBox="0 0 100 100" className="size-20">
-            <polygon points={POLY.triangle} fill="#d7ecec" stroke="#0d7377" strokeWidth="3" />
-          </svg>
+        <div className="flex items-center justify-center gap-2">
+          <ShapePoly shape={parts[0]} sizeClass="size-16 sm:size-20" />
           <span className="text-xl text-muted">+</span>
-          <svg viewBox="0 0 100 100" className="size-20">
-            <polygon points={POLY.triangle} fill="#d7ecec" stroke="#0d7377" strokeWidth="3" />
-          </svg>
+          <ShapePoly shape={parts[1] ?? parts[0]} sizeClass="size-16 sm:size-20" />
           <span className="text-xl text-muted">→</span>
-          <svg viewBox="0 0 100 100" className="size-20">
-            <polygon points={POLY.quadrilateral} fill="#dceadf" stroke="#2f6f4e" strokeWidth="3" />
-          </svg>
+          <ShapePoly shape={result} fill="#dceadf" stroke="#2f6f4e" sizeClass="size-16 sm:size-20" />
         </div>
       </Frame>
     );
@@ -451,32 +513,16 @@ function ChoiceVisual({ question, status, shake }: BoardProps) {
   if (data.visual === "subdivide") {
     return (
       <Frame shake={shake} status={status}>
-        <svg viewBox="0 0 100 100" className="mx-auto size-40">
-          <polygon points={POLY.quadrilateral} fill="#d7ecec" stroke="#0d7377" strokeWidth="3" />
-          <line x1="18" y1="20" x2="82" y2="82" stroke="#c45c26" strokeWidth="2" />
-        </svg>
+        <div className="flex justify-center">
+          <ShapePoly shape={data.shape} sides={data.sides} split sizeClass="mx-auto size-40" />
+        </div>
       </Frame>
     );
   }
-  const pts = POLY[data.shape ?? "triangle"] ?? POLY.triangle!;
   return (
     <Frame shake={shake} status={status}>
       <div className="flex justify-center">
-        <svg viewBox="0 0 100 100" className="size-40">
-          {data.shape === "circle" ? (
-            <circle cx="50" cy="50" r="36" fill="#d7ecec" stroke="#0d7377" strokeWidth="3" />
-          ) : data.shape === "open" ? (
-            <polyline points={pts} fill="none" stroke="#0d7377" strokeWidth="3" />
-          ) : (
-            <polygon
-              points={pts}
-              fill="#d7ecec"
-              stroke="#0d7377"
-              strokeWidth="3"
-              transform={`rotate(${data.rotation ?? 0} 50 50)`}
-            />
-          )}
-        </svg>
+        <ShapePoly shape={data.shape} sides={data.sides} rotation={data.rotation ?? 0} />
       </div>
     </Frame>
   );
