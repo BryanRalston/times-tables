@@ -1,11 +1,11 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { activityById } from "@/lib/curriculum";
-import { makeQuestion } from "@/lib/questions";
+import { makeQuestion, welcomeFirst } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
-import type { ChoiceData, ClockData, DecimalData, MeasureData, MoneyData, Question } from "@/lib/types";
+import type { ChoiceData, ClockData, DecimalData, GraphData, MeasureData, MoneyData, Question } from "@/lib/types";
 import { moneyFmt } from "@/lib/utils";
-import { BEAKER_FACE, Board, beakerMeniscusY, rulerPointerX, scaleNeedleDeg, type BoardProps } from "./models";
+import { BEAKER_FACE, Board, beakerMeniscusY, moneyBox, rulerPointerX, scaleNeedleDeg, type BoardProps } from "./models";
 
 function stub(q: Question): BoardProps {
   return {
@@ -120,6 +120,86 @@ describe("boards", () => {
     const n = Object.values(d.coins).reduce((s, c) => s + (c ?? 0), 0);
     const html = renderToStaticMarkup(<Board {...stub(q)} />);
     expect((html.match(/<img/g) ?? []).length).toBe(n);
+  });
+
+  it("count coins stay in the tree after tap and Clear restores them", () => {
+    const q = makeQuestion(activityById("u1-coins")!.activity, rngFromSeed("coins:stay"));
+    const d = q.data as MoneyData;
+    const n = Object.values(d.coins).reduce((s, c) => s + (c ?? 0), 0);
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect((html.match(/data-count-coin=/g) ?? []).length).toBe(n);
+    expect((html.match(/<img/g) ?? []).length).toBe(n);
+    expect(html).toContain("Clear");
+    expect(html).toContain('data-count-row="rest"');
+    expect(html).toContain('data-count-row="pile"');
+    expect(html).not.toContain("opacity-0");
+    expect(html).not.toContain("scale-50");
+    expect(html).toContain('data-counted="0"');
+  });
+
+  it("quarter is the largest coin and bills are larger than coins", () => {
+    expect(moneyBox("quarter").width).toBeGreaterThan(moneyBox("nickel").width);
+    expect(moneyBox("nickel").width).toBeGreaterThan(moneyBox("penny").width);
+    expect(moneyBox("penny").width).toBeGreaterThan(moneyBox("dime").width);
+    expect(moneyBox("dollar").width).toBeGreaterThan(moneyBox("quarter").width);
+    expect(moneyBox("five").width).toBeGreaterThan(moneyBox("quarter").width);
+    const q = makeQuestion(activityById("u1-coins")!.activity, rngFromSeed("coins:size"));
+    const d = q.data as MoneyData;
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    const any = (["quarter", "nickel", "penny", "dime"] as const).find((id) => (d.coins[id] ?? 0) > 0);
+    if (any) expect(html).toContain(`width:${moneyBox(any).width}px`);
+  });
+
+  it("leftover HTML does not leak n is answer while idle", () => {
+    const q = welcomeFirst(rngFromSeed(1));
+    const html = renderToStaticMarkup(<Board {...stub(q)} status="idle" />);
+    expect(html).not.toContain(`n is ${q.answer}`);
+    expect(html).toContain("6 + n = 10");
+    expect(html).toContain('aria-label="dot"');
+    expect(html).not.toContain('aria-label="empty"');
+    expect(html).not.toContain("takeable");
+    expect((html.match(/<button/g) ?? []).length).toBe(6);
+  });
+
+  it("after a correct leftover Check the board isolates n without an n is overlay", () => {
+    const q = welcomeFirst(rngFromSeed(1));
+    const html = renderToStaticMarkup(<Board {...stub(q)} status="correct" interacted />);
+    expect(html).toContain("data-n-isolate");
+    expect(html).not.toContain(`n is ${q.answer}`);
+    expect(html).toContain('aria-label="leftover"');
+  });
+
+  it("place-value idle HTML does not underline or box the asked place", () => {
+    const q = makeQuestion(activityById("u2-place")!.activity, rngFromSeed("place:idle"));
+    const idle = renderToStaticMarkup(<Board {...stub(q)} status="idle" />);
+    expect(idle).not.toContain("underline");
+    expect(idle).not.toContain("border-teal");
+    const ok = renderToStaticMarkup(<Board {...stub(q)} status="correct" />);
+    expect(ok).toContain("underline");
+    expect(ok).toContain("border-teal");
+  });
+
+  it("tally tray pictures have explicit size on first paint", () => {
+    const q = makeQuestion(activityById("u1-tally")!.activity, rngFromSeed("tally:paint"));
+    const d = q.data as GraphData;
+    const tray = d.tray ?? [];
+    expect(tray.length).toBeGreaterThan(0);
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect((html.match(/<img/g) ?? []).length).toBeGreaterThanOrEqual(tray.length);
+    expect(html).toMatch(/width="28"/);
+    expect(html).toMatch(/height="28"/);
+    expect(html).not.toMatch(/>\?<\/span>/);
+  });
+
+  it("pictograph img count equals sum of count(value)", () => {
+    const q = makeQuestion(activityById("u1-graph")!.activity, rngFromSeed("picto:icons"));
+    const d = q.data as GraphData;
+    expect(d.collect).toBeFalsy();
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    const want = d.rows.reduce((n, r) => n + Math.max(0, Math.round(r.value / Math.max(1, d.key))), 0);
+    expect((html.match(/data-picto-icon/g) ?? []).length).toBe(want);
+    expect(html).toContain("flex-wrap");
+    expect(html).toContain("overflow-visible");
   });
 
   it("combine drawing is two parts plus ? not the named result polygon", () => {

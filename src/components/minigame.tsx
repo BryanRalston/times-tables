@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { MagentaImg } from "@/components/magenta-video";
 import { SquashOnPoke } from "@/components/poke-toy";
-import { dealMini, pickMiniKind, type MatchDeal, type PokeDeal, type WhoHidDeal } from "@/lib/minigames";
+import { parseLocale, UI } from "@/lib/i18n";
+import { applyWhoHidPick, dealMini, pickMiniKind, type MatchDeal, type PokeDeal, type WhoHidDeal } from "@/lib/minigames";
+import { useProgress } from "@/lib/progress";
 import { rngFromSeed } from "@/lib/rng";
 import { playCorrect, playTap, playWrong } from "@/lib/sound";
 import { squisheeById, squisheeSrc } from "@/lib/squishees";
@@ -116,8 +118,11 @@ function MatchPlay({ deal, title, onDone }: { deal: MatchDeal; title: string; on
 }
 
 function WhoHidPlay({ deal, title, onDone }: { deal: WhoHidDeal; title: string; onDone: () => void }) {
+  const ui = UI[parseLocale(useProgress((s) => s.locale))];
   const [revealed, setRevealed] = useState(true);
   const [wrong, setWrong] = useState<string | null>(null);
+  const [hit, setHit] = useState<string | null>(null);
+  const [locked, setLocked] = useState(false);
   const [loaded, setLoaded] = useState(0);
 
   useEffect(() => {
@@ -134,41 +139,47 @@ function WhoHidPlay({ deal, title, onDone }: { deal: WhoHidDeal; title: string; 
   }, [deal.shown.length, loaded]);
 
   function pick(id: string) {
-    if (revealed) return;
-    if (id === deal.missing) {
-      playCorrect();
-      window.setTimeout(onDone, 350);
-    } else {
-      setWrong(id);
-      playWrong();
-    }
+    if (revealed || locked) return;
+    applyWhoHidPick(
+      deal.missing,
+      id,
+      () => {
+        setLocked(true);
+        setHit(id);
+        playCorrect();
+        window.setTimeout(onDone, 650);
+      },
+      () => {
+        setWrong(id);
+        playWrong();
+      },
+    );
   }
 
   return (
     <>
-      <h1 className="mb-4 font-display text-2xl">{title}</h1>
-      <div className="mb-5 flex justify-center gap-3">
-        {deal.shown.map((id) =>
-          !revealed && id === deal.missing ? (
-            <span
-              key={id}
-              className="grid min-h-[96px] min-w-[96px] place-items-center rounded-[20px] border border-dashed border-line bg-bg-warm"
-              aria-hidden
-            />
-          ) : (
-            <span key={id} className={cn(TAP, "border-line bg-surface")}>
+      <h1 className="mb-4 font-display text-2xl">{revealed ? ui.rememberToys : title}</h1>
+      {revealed ? (
+        <div className="mb-5 flex justify-center gap-3" data-who-stage="remember">
+          {deal.shown.map((id, i) => (
+            <span key={`shown-${i}-${id}`} data-who-slot={`shown-${i}`} className={cn(TAP, "border-line bg-surface")}>
               <ToyFace id={id} onLoad={() => setLoaded((n) => n + 1)} />
             </span>
-          ),
-        )}
-      </div>
-      {revealed ? null : (
-        <div className="flex justify-center gap-3">
-          {deal.choices.map((id) => (
+          ))}
+        </div>
+      ) : (
+        <div className="flex justify-center gap-3" data-who-stage="choose" aria-label={title}>
+          {deal.choices.map((id, i) => (
             <button
-              key={id}
+              key={`choice-${i}-${id}`}
+              data-who-slot={`choice-${i}`}
               type="button"
-              className={cn(TAP, "border-line bg-surface", wrong === id && "border-bad")}
+              className={cn(
+                TAP,
+                "border-line bg-surface",
+                wrong === id && "border-bad shake",
+                hit === id && "border-good bg-good-soft",
+              )}
               onClick={() => pick(id)}
               aria-label={squisheeById(id)?.name ?? id}
             >

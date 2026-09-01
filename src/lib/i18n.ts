@@ -42,6 +42,7 @@ export type Ui = {
   takeWhatYouSee: string;
   nIs: (n: string) => string;
   countCoins: string;
+  countMoney: string;
   takeCoins: string;
   bankTap: string;
   yourSet: string;
@@ -88,6 +89,10 @@ export type Ui = {
   rareBadge: string;
   pokeThe: (name: string) => string;
   whoHid: string;
+  rememberToys: string;
+  askGrownup: string;
+  enterPin: string;
+  unlockGrownup: string;
   findPairs: string;
   toShelf: string;
   schoolDaysLeft: (n: number) => string;
@@ -116,6 +121,10 @@ export type Ui = {
   lessonsIntro: string;
   unitDays: (days: number, remain: number, walks: number) => string;
   kid1: string;
+  saved: string;
+  exportSave: string;
+  importSave: string;
+  importConfirm: string;
 };
 
 export const UI: Record<Locale, Ui> = {
@@ -146,7 +155,8 @@ export const UI: Record<Locale, Ui> = {
     tryAgain: "Try again.",
     takeWhatYouSee: "Take what you can see.",
     nIs: (n) => `n is ${n}.`,
-    countCoins: "Count the coins. Type how many cents.",
+    countCoins: "Count the coins.",
+    countMoney: "Count the money.",
     takeCoins: "Take the coins you can see.",
     bankTap: "Bank — tap to add",
     yourSet: "Your set — tap to take back",
@@ -199,6 +209,10 @@ export const UI: Record<Locale, Ui> = {
     rareBadge: "Rare",
     pokeThe: (name) => `Poke the ${name}`,
     whoHid: "Who hid?",
+    rememberToys: "Remember these toys.",
+    askGrownup: "Ask a grown-up to open this page.",
+    enterPin: "Grown-up PIN",
+    unlockGrownup: "Unlock",
     findPairs: "Find the pairs",
     toShelf: "Shelf",
     schoolDaysLeft: (n) => `${n} school days left in this unit`,
@@ -229,6 +243,10 @@ export const UI: Record<Locale, Ui> = {
     unitDays: (days, remain, walks) =>
       `${days} school days in this unit · ${remain} left on the calendar · ${walks} walks done. Practice anytime — it is not a 1–2 day finish.`,
     kid1: "Kid 1",
+    saved: "Saved",
+    exportSave: "Download a save file",
+    importSave: "Load a save file",
+    importConfirm: "Replace everything on this device with that file?",
   },
   es: {
     language: "Idioma",
@@ -257,7 +275,8 @@ export const UI: Record<Locale, Ui> = {
     tryAgain: "Otra vez.",
     takeWhatYouSee: "Toma lo que ves.",
     nIs: (n) => `n es ${n}.`,
-    countCoins: "Cuenta las monedas. Escribe cuántos centavos.",
+    countCoins: "Cuenta las monedas.",
+    countMoney: "Cuenta el dinero.",
     takeCoins: "Toma las monedas que ves.",
     bankTap: "Banco — toca para sumar",
     yourSet: "Tu conjunto — toca para devolver",
@@ -310,6 +329,10 @@ export const UI: Record<Locale, Ui> = {
     rareBadge: "Raro",
     pokeThe: (name) => `Toca el ${name}`,
     whoHid: "¿Quién se escondió?",
+    rememberToys: "Recuerda estos juguetes.",
+    askGrownup: "Pídele a un adulto que abra esta página.",
+    enterPin: "PIN de un adulto",
+    unlockGrownup: "Abrir",
     findPairs: "Encuentra las parejas",
     toShelf: "Estante",
     schoolDaysLeft: (n) => `${n} días escolares en esta unidad`,
@@ -340,6 +363,10 @@ export const UI: Record<Locale, Ui> = {
     unitDays: (days, remain, walks) =>
       `${days} días escolares en esta unidad · ${remain} en el calendario · ${walks} paseos hechos. Practica cuando quieras — no se termina en 1 o 2 días.`,
     kid1: "Niño 1",
+    saved: "Guardado",
+    exportSave: "Descargar una copia",
+    importSave: "Cargar una copia",
+    importConfirm: "¿Reemplazar todo en este aparato con ese archivo?",
   },
   "pt-BR": {
     language: "Idioma",
@@ -368,7 +395,8 @@ export const UI: Record<Locale, Ui> = {
     tryAgain: "Tenta de novo.",
     takeWhatYouSee: "Pegue o que você vê.",
     nIs: (n) => `n é ${n}.`,
-    countCoins: "Conte as moedas. Digite quantos centavos.",
+    countCoins: "Conte as moedas.",
+    countMoney: "Conte o dinheiro.",
     takeCoins: "Pegue as moedas que você vê.",
     bankTap: "Banco — toque para somar",
     yourSet: "Seu conjunto — toque para devolver",
@@ -421,6 +449,10 @@ export const UI: Record<Locale, Ui> = {
     rareBadge: "Raro",
     pokeThe: (name) => `Toque o ${name}`,
     whoHid: "Quem se escondeu?",
+    rememberToys: "Lembre destes brinquedos.",
+    askGrownup: "Peça a um adulto para abrir esta página.",
+    enterPin: "PIN de um adulto",
+    unlockGrownup: "Abrir",
     findPairs: "Ache os pares",
     toShelf: "Estante",
     schoolDaysLeft: (n) => `${n} dias letivos nesta unidade`,
@@ -451,6 +483,10 @@ export const UI: Record<Locale, Ui> = {
     unitDays: (days, remain, walks) =>
       `${days} dias letivos nesta unidade · ${remain} no calendário · ${walks} passeios feitos. Pratique quando quiser — não acaba em 1 ou 2 dias.`,
     kid1: "Criança 1",
+    saved: "Salvo",
+    exportSave: "Baixar uma cópia",
+    importSave: "Carregar uma cópia",
+    importConfirm: "Substituir tudo neste aparelho por esse arquivo?",
   },
 };
 
@@ -779,12 +815,14 @@ export type QCopy = {
   changeMoney: (cost: string, pay: string) => string;
   changeHint: string;
   howManyCents: string;
+  howMuchMoney: string;
   compareMoney: string;
   unitSquares: string;
   squaresHide: (shown: number) => string;
   periName: (name: string) => string;
   periMissing: (name: string, peri: number, shown: number) => string;
   sortHowMany: (focus: string) => string;
+  sortEvery: string;
   sortHint: string;
   graphTitle: string;
   graphMost: string;
@@ -830,7 +868,7 @@ function measureEn(): QCopy["measureUnits"] {
 export function qCopy(locale: Locale): QCopy {
   if (locale === "es") {
     return {
-      leftoverHint: "Toma los puntos que ves. n es lo que se esconde.",
+      leftoverHint: "Toma los puntos que ves. Luego nombra n.",
       leftoverPieces: (shown, den) => `${shown}/${den} + n = 1. ¿Cuánto es n?`,
       leftoverPiecesHint: "Toma las piezas que ves.",
       tensHint: "Decenas que ves. n son las unidades que faltan.",
@@ -896,12 +934,14 @@ export function qCopy(locale: Locale): QCopy {
       changeMoney: (cost, pay) => `Un artículo cuesta ${cost}. Pagas ${pay}. ¿Cuánto de cambio?`,
       changeHint: "n es lo que sobra.",
       howManyCents: "¿Cuántos centavos?",
+      howMuchMoney: "¿Cuánto dinero?",
       compareMoney: "Compara los dos conjuntos.",
       unitSquares: "¿Cuántos cuadrados unitarios?",
       squaresHide: (shown) => `${shown} cuadrados se ven. n se esconden. ¿Área?`,
       periName: (name) => `¿Perímetro de este ${name}?`,
       periMissing: (name, peri, shown) => `Un ${name}. Los lados suman ${peri}. Ves ${shown}. n es el lado que falta.`,
       sortHowMany: (focus) => `Ordena cada foto. ¿Cuántos ${focus}?`,
+      sortEvery: "Ordena cada foto.",
       sortHint: "Toca una foto, luego la categoría. La gráfica crece.",
       graphTitle: "Nuestra colección",
       graphMost: "¿Cuál tiene más?",
@@ -919,7 +959,7 @@ export function qCopy(locale: Locale): QCopy {
       aboutHowMuch: (a, op, b) => `¿Más o menos cuánto es ${a} ${op} ${b}? (centena más cercana)`,
       wordBags: (name, groups, size, thing) => `${name} tiene ${groups} bolsas de ${size} ${thing}. ¿Cuántos hay en total?`,
       wordTake: (name, total, shown, thing) => `${name} tenía ${total} ${thing}. ${shown} están en el plato. ¿Cuántos se esconden?`,
-      wordTakeHint: "Toma los que ves. n se esconde.",
+      wordTakeHint: "Toma los que ves. Luego nombra n.",
       wordCompare: (name, a, thing, b) => `${name} tiene ${a} ${thing}. Un amigo tiene ${b}. ¿Cuántos más tiene ${name}?`,
       wordTwoAdd: (name, groups, size, thing, extra) =>
         `${name} tiene ${groups} paquetes de ${size} ${thing}, luego encuentra ${extra} más. ¿Cuántos ahora?`,
@@ -945,7 +985,7 @@ export function qCopy(locale: Locale): QCopy {
   }
   if (locale === "pt-BR") {
     return {
-      leftoverHint: "Pegue os pontos que você vê. n é o que está escondido.",
+      leftoverHint: "Pegue os pontos que você vê. Depois nomeie n.",
       leftoverPieces: (shown, den) => `${shown}/${den} + n = 1. Quanto é n?`,
       leftoverPiecesHint: "Pegue as peças que você vê.",
       tensHint: "Dezenas que você vê. n são as unidades que faltam.",
@@ -1011,12 +1051,14 @@ export function qCopy(locale: Locale): QCopy {
       changeMoney: (cost, pay) => `Um item custa ${cost}. Você paga ${pay}. Quanto de troco?`,
       changeHint: "n é o que sobra.",
       howManyCents: "Quantos centavos?",
+      howMuchMoney: "Quanto dinheiro?",
       compareMoney: "Compare os dois conjuntos.",
       unitSquares: "Quantos quadrados unitários?",
       squaresHide: (shown) => `${shown} quadrados aparecem. n se escondem. Área?`,
       periName: (name) => `Perímetro deste ${name}?`,
       periMissing: (name, peri, shown) => `Um ${name}. Os lados somam ${peri}. Você vê ${shown}. n é o lado que falta.`,
       sortHowMany: (focus) => `Separe cada figura. Quantos ${focus}?`,
+      sortEvery: "Separe cada figura.",
       sortHint: "Toque numa figura, depois na categoria. O gráfico cresce.",
       graphTitle: "Nossa coleção",
       graphMost: "Qual tem mais?",
@@ -1034,7 +1076,7 @@ export function qCopy(locale: Locale): QCopy {
       aboutHowMuch: (a, op, b) => `Mais ou menos quanto é ${a} ${op} ${b}? (centena mais próxima)`,
       wordBags: (name, groups, size, thing) => `${name} tem ${groups} sacos de ${size} ${thing}. Quantos há no total?`,
       wordTake: (name, total, shown, thing) => `${name} tinha ${total} ${thing}. ${shown} estão no prato. Quantos estão escondidos?`,
-      wordTakeHint: "Pegue os que você vê. n está escondido.",
+      wordTakeHint: "Pegue os que você vê. Depois nomeie n.",
       wordCompare: (name, a, thing, b) => `${name} tem ${a} ${thing}. Um amigo tem ${b}. Quantos a mais ${name} tem?`,
       wordTwoAdd: (name, groups, size, thing, extra) =>
         `${name} tem ${groups} pacotes de ${size} ${thing}, depois acha mais ${extra}. Quantos agora?`,
@@ -1059,7 +1101,7 @@ export function qCopy(locale: Locale): QCopy {
     };
   }
   return {
-    leftoverHint: "Take the dots you can see. n is what's hiding.",
+    leftoverHint: "Take the dots you can see. Then name n.",
     leftoverPieces: (shown, den) => `${shown}/${den} + n = 1. What is n?`,
     leftoverPiecesHint: "Take the pieces you can see.",
     tensHint: "Tens you can see. n is the leftover ones.",
@@ -1125,12 +1167,14 @@ export function qCopy(locale: Locale): QCopy {
     changeMoney: (cost, pay) => `An item costs ${cost}. You pay ${pay}. How much change?`,
     changeHint: "n is leftover.",
     howManyCents: "How many cents?",
+    howMuchMoney: "How much money?",
     compareMoney: "Compare the two sets.",
     unitSquares: "How many unit squares?",
     squaresHide: (shown) => `${shown} squares showing. n hide. Area?`,
     periName: (name) => `Perimeter of this ${name}?`,
     periMissing: (name, peri, shown) => `A ${name}. Sides add to ${peri}. You see ${shown}. n is the missing side.`,
     sortHowMany: (focus) => `Sort every picture. How many ${focus}?`,
+    sortEvery: "Sort every picture.",
     sortHint: "Tap a picture, then the category. The graph grows.",
     graphTitle: "Our collection",
     graphMost: "Which has the most?",
@@ -1148,7 +1192,7 @@ export function qCopy(locale: Locale): QCopy {
     aboutHowMuch: (a, op, b) => `About how much is ${a} ${op} ${b}? (nearest hundred)`,
     wordBags: (name, groups, size, thing) => `${name} has ${groups} bags of ${size} ${thing}. How many ${thing}?`,
     wordTake: (name, total, shown, thing) => `${name} had ${total} ${thing}. ${shown} are in the dish. How many are hiding?`,
-    wordTakeHint: "Take the ones you can see. n is hiding.",
+    wordTakeHint: "Take the ones you can see. Then name n.",
     wordCompare: (name, a, thing, b) => `${name} has ${a} ${thing}. A friend has ${b}. How many more does ${name} have?`,
     wordTwoAdd: (name, groups, size, thing, extra) =>
       `${name} has ${groups} packs of ${size} ${thing}, then finds ${extra} more. How many now?`,

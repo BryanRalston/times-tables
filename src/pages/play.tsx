@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnswerPanel } from "@/components/answer-panel";
+import { applyKeypadKey } from "@/components/keypad";
 import { useUi } from "@/components/chrome";
 import { MiniGame } from "@/components/minigame";
 import { Mascot, StarPop, type Pose } from "@/components/mascot";
@@ -10,14 +11,15 @@ import { todayIso } from "@/lib/calendar";
 import { activityById, suggestedUnitId } from "@/lib/curriculum";
 import { makeDailyWalk, walkLabel } from "@/lib/daily";
 import { parseLocale, UI } from "@/lib/i18n";
-import { navigate } from "@/lib/nav";
+import { cardHeading, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen } from "@/lib/leftover";
+import { aliasActivityId, navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { makeActivityRound, makeWelcomeRound } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
 import { canAffordAnything, coinsForResult } from "@/lib/coins";
 import { playCorrect, playStar, playWrong, unlockAudio } from "@/lib/sound";
 import { schoolStreak } from "@/lib/streak";
-import type { GraphData, ItemSource, Locale, Question } from "@/lib/types";
+import type { ItemSource, Locale, Question } from "@/lib/types";
 import { answersMatch } from "@/lib/utils";
 
 type Kind = "welcome" | "daily" | "activity";
@@ -65,7 +67,7 @@ function buildPack(
     };
   }
   if (kind === "activity") {
-    const found = activityById(activityId ?? "");
+    const found = activityById(aliasActivityId(activityId ?? ""));
     const items = found
       ? makeActivityRound(found.activity, rngFromSeed(`activity:${learnerId}:${found.activity.id}:${attempt}`), undefined, locale)
       : [];
@@ -190,18 +192,20 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       const t = e.target as HTMLElement | null;
       if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
       if (status !== "idle") return;
+      if (q.needsInteract && !interacted) return;
+      const leftover = q.kind === "tenframe";
       if (e.key === "Enter") {
         e.preventDefault();
         check();
       } else if (e.key === "Backspace") {
         e.preventDefault();
-        setValue((v) => v.slice(0, -1));
+        setValue((v) => applyKeypadKey(v, "back", { replace: leftover, allowDot: !leftover }));
       } else if (/^\d$/.test(e.key)) {
         e.preventDefault();
-        setValue((v) => (v + e.key).slice(0, 8));
-      } else if (e.key === ".") {
+        setValue((v) => applyKeypadKey(v, e.key, { replace: leftover, allowDot: !leftover }));
+      } else if (e.key === "." && !leftover) {
         e.preventDefault();
-        setValue((v) => (v.includes(".") ? v : `${v}.`));
+        setValue((v) => applyKeypadKey(v, ".", { allowDot: true }));
       }
     };
     window.addEventListener("keydown", onKey);
@@ -279,7 +283,8 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       setValue(given);
       playCorrect();
       if (q.factKey) noteFact(q.factKey, true);
-      holdRef.current = window.setTimeout(() => goNext(nextCorrect, misses), reduce ? 200 : 800);
+      const hold = q.kind === "tenframe" ? leftoverHoldMs() : reduce ? 200 : 800;
+      holdRef.current = window.setTimeout(() => goNext(nextCorrect, misses), hold);
     } else {
       setStatus("wrong");
       setPose("oops");
@@ -298,6 +303,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   function skip() {
     if (!q || status !== "idle") return;
+    if (q.needsInteract && !interacted) return;
     const key = q.factKey ?? q.prompt;
     const nextMisses = misses.includes(key) ? misses : [...misses, key].slice(0, 12);
     setMisses(nextMisses);
@@ -365,15 +371,21 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   if (!q) return null;
 
   const pill = sourceLabel(q.source, locale);
+  const leftover = q.kind === "tenframe";
+  const gate = { kind: q.kind, needsInteract: q.needsInteract, interacted, status };
+  const showPanel = leftoverPanelOpen(gate);
+  const showSkip = leftoverSkipOpen(gate);
   const speech =
     pose === "oops"
       ? ui.tryAgain
-      : status === "correct"
-        ? ui.nIs(q.answer)
-        : (q.hint ?? ui.takeWhatYouSee);
+      : leftover
+        ? (q.hint ?? ui.takeWhatYouSee)
+        : status === "correct"
+          ? ui.nIs(q.answer)
+          : (q.hint ?? ui.takeWhatYouSee);
 
   return (
-    <div className="mx-auto min-h-dvh max-w-lg overflow-x-hidden px-4 pb-8 pt-3">
+    <div className="mx-auto min-h-dvh max-w-lg overflow-x-hidden px-4 pb-8 pt-3 lg:max-w-5xl">
       <header className="mb-2 flex items-center gap-2">
         <button type="button" className="text-sm text-muted" onClick={() => navigate({ id: "home" })}>
           ← {ui.home}
@@ -401,40 +413,47 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       {q.sol?.length ? (
         <p className="mb-1 text-center text-[11px] font-medium uppercase tracking-wide text-faint">{q.sol.join(" · ")}</p>
       ) : null}
-      {q.kind === "fluency" || q.kind === "word" || q.kind === "jumps" || (q.kind === "tenframe" && "equation" in (q.data as object) && (q.data as { equation?: string }).equation === q.prompt) || (q.kind === "money" && (q.data as { mode?: string }).mode === "make") ? null : (
-        <h2 className="mb-3 text-center font-display text-xl leading-tight sm:text-2xl">
-          {q.kind === "graph" && (q.data as GraphData).collect && interacted && (q.data as GraphData).readPrompt
-            ? (q.data as GraphData).readPrompt
-            : q.prompt}
-        </h2>
-      )}
 
-      <Board
-        key={q.id}
-        question={q}
-        value={value}
-        setValue={setValue}
-        interacted={interacted}
-        onInteract={() => setInteracted(true)}
-        status={status}
-        shake={shake}
-      />
+      <div className="lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,22rem)] lg:items-start lg:gap-6">
+        <div>
+          {q.kind === "fluency" || q.kind === "word" || q.kind === "jumps" || (q.kind === "tenframe" && "equation" in (q.data as object) && (q.data as { equation?: string }).equation === q.prompt) || (q.kind === "money" && (q.data as { mode?: string }).mode === "make") ? null : (
+            <h2 className="mb-3 text-center font-display text-xl leading-tight sm:text-2xl">
+              {cardHeading(q, interacted)}
+            </h2>
+          )}
 
-      <div className="mt-4">
-        <AnswerPanel
-          question={q}
-          value={value}
-          setValue={setValue}
-          onCheck={check}
-          disabled={status !== "idle" || Boolean(q.needsInteract && !interacted)}
-        />
+          <Board
+            key={q.id}
+            question={q}
+            value={value}
+            setValue={setValue}
+            interacted={interacted}
+            onInteract={() => setInteracted(true)}
+            status={status}
+            shake={shake}
+          />
+
+          {q.kind === "word" || q.prompt.length > 70 ? <div className="mt-3"><ScratchPad /></div> : null}
+        </div>
+
+        <div className="mt-4 lg:mt-0">
+          {showPanel ? (
+            <AnswerPanel
+              question={q}
+              value={value}
+              setValue={setValue}
+              onCheck={check}
+              disabled={status !== "idle" || Boolean(q.needsInteract && !interacted)}
+            />
+          ) : null}
+
+          {showSkip ? (
+            <button type="button" className="mt-4 w-full text-center text-xs text-faint" onClick={skip}>
+              {ui.skip}
+            </button>
+          ) : null}
+        </div>
       </div>
-
-      {q.kind === "word" || q.prompt.length > 70 ? <div className="mt-3"><ScratchPad /></div> : null}
-
-      <button type="button" className="mt-4 w-full text-center text-xs text-faint" onClick={skip}>
-        {ui.skip}
-      </button>
     </div>
   );
 }

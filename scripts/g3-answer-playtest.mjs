@@ -335,11 +335,22 @@ async function checkActivity(page, id, kind, viewport) {
       await shotFail(page, `${viewport}-${id}`);
       return row;
     }
-    if ((id === "u1-leftover" || id === "u1-friends") && hook.needsInteract) {
-      row.ui = "fail";
-      row.note = "leftover gated Check";
-      await shotFail(page, `${viewport}-${id}`);
-      return row;
+    if (id === "u1-leftover" || id === "u1-friends" || id === "u7-add" || id === "u7-take") {
+      if (!hook.needsInteract) {
+        row.ui = "fail";
+        row.note = "leftover missing why-move gate";
+        await shotFail(page, `${viewport}-${id}`);
+        return row;
+      }
+      const check = page.getByRole("button", { name: /^Check$/i });
+      const checkCount = await check.count();
+      const enabledBefore = checkCount > 0 && !(await check.first().isDisabled());
+      if (enabledBefore) {
+        row.ui = "fail";
+        row.note = "leftover Check enabled before why-move";
+        await shotFail(page, `${viewport}-${id}`);
+        return row;
+      }
     }
     if (hook.needsInteract && (id === "u1-tally" || id === "u6-picto" || id === "u7-bar")) {
       if (!hook.checkDisabled) {
@@ -371,8 +382,17 @@ async function checkActivity(page, id, kind, viewport) {
         row.note = "collect still sorting";
         return row;
       }
-    } else if (hook.checkDisabled) {
+    } else if (hook.checkDisabled || id === "u1-leftover" || id === "u1-friends" || id === "u7-add" || id === "u7-take") {
       await interactIfNeeded(page);
+      if (id === "u1-leftover" || id === "u1-friends" || id === "u7-add" || id === "u7-take") {
+        const after = await qa(page);
+        if (after?.checkDisabled) {
+          row.ui = "fail";
+          row.note = "leftover Check still gated after why-move";
+          await shotFail(page, `${viewport}-${id}`);
+          return row;
+        }
+      }
     }
     const did = await typeAnswer(page, hook.answer);
     if (did === "skip") {
@@ -403,11 +423,14 @@ async function miniDesk(page) {
   await waitApp(page);
   for (let n = 0; n < 6; n++) {
     const t = await page.locator("#app").innerText();
-    if (/Find the pairs|Who hid\?|Poke the |Nice walk/i.test(t)) break;
+    if (/Find the pairs|Who hid\?|Remember these toys|Poke the |Nice walk/i.test(t)) break;
     const hook = await qa(page);
+    if (hook?.checkDisabled || hook?.needsInteract) {
+      await interactIfNeeded(page);
+    }
     if (hook?.answer) {
       await typeAnswer(page, hook.answer);
-      await page.waitForTimeout(900);
+      await page.waitForTimeout(hook.kind === "tenframe" ? 2200 : 900);
     } else {
       const skip = page.getByRole("button", { name: /^Skip$/i });
       if (await skip.count()) await skip.first().click();
@@ -426,7 +449,7 @@ async function miniDesk(page) {
   const emptyVid = await page.evaluate(() =>
     [...document.querySelectorAll("video")].some((v) => !v.src && v.offsetWidth > 8),
   );
-  const ok = /Find the pairs|Who hid\?|Poke the |Nice walk/i.test(t) && !emptyVid;
+  const ok = /Find the pairs|Who hid\?|Remember these toys|Poke the |Nice walk/i.test(t) && !emptyVid;
   return { ok, png, videos, emptyVid, snip: t.slice(0, 160).replace(/\s+/g, " ") };
 }
 
@@ -450,6 +473,36 @@ for (const [name, viewport] of [
   page.setDefaultTimeout(10000);
 
   if (name === "desk") {
+    try {
+      await page.goto(rawBase, { waitUntil: "domcontentloaded" });
+      await waitApp(page);
+      const coins1 = (await page.locator('button[aria-label="Coins"]').innerText()).trim();
+      const heading1 = await page.locator("h1").first().innerText();
+      const saved = await page.locator("[data-saved='1']").count();
+      await page.reload({ waitUntil: "domcontentloaded" });
+      await waitApp(page);
+      const coins2 = (await page.locator('button[aria-label="Coins"]').innerText()).trim();
+      const heading2 = await page.locator("h1").first().innerText();
+      const stored = await page.evaluate(() => {
+        const raw = localStorage.getItem("g3-path-v2");
+        const p = JSON.parse(raw || "null");
+        return p?.state?.coins ?? p?.coins;
+      });
+      const persistOk =
+        coins1 === "80" && coins2 === "80" && stored === 80 && /Maya/.test(heading1) && /Maya/.test(heading2) && saved > 0;
+      results.push({
+        id: "persist-reload",
+        kind: "persist",
+        ui: persistOk ? "ok" : "fail",
+        fn: persistOk ? "ok" : "fail",
+        note: `coins ${coins1}->${coins2} stored=${stored} saved=${saved} ${heading2}`,
+      });
+      process.stdout.write(`desk persist-reload ui=${persistOk ? "ok" : "fail"} coins ${coins1}->${coins2} stored=${stored}\n`);
+      if (!persistOk) await shotFail(page, "persist-reload");
+    } catch (e) {
+      results.push({ id: "persist-reload", kind: "persist", ui: "fail", fn: "fail", note: String(e).slice(0, 160) });
+    }
+
     try {
       const mini = await miniDesk(page);
       const fail = !mini.ok || (mini.png === 0 && !/Nice walk/i.test(mini.snip));

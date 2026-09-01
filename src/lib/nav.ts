@@ -8,6 +8,10 @@ export type Route =
   | { id: "unit"; unitId: string }
   | { id: "grownup" };
 
+export function aliasActivityId(id: string): string {
+  return id === "u1-pictograph" ? "u1-graph" : id;
+}
+
 export function parseHash(hash: string): Route {
   const h = hash.replace(/^#/, "").replace(/^\//, "");
   const parts = h.split("/").filter(Boolean);
@@ -16,7 +20,9 @@ export function parseHash(hash: string): Route {
   if (parts[0] === "play") {
     if (parts[1] === "welcome") return { id: "play", kind: "welcome" };
     if (parts[1] === "daily") return { id: "play", kind: "daily" };
-    if (parts[1] === "activity" && parts[2]) return { id: "play", kind: "activity", activityId: parts[2] };
+    if (parts[1] === "activity" && parts[2]) {
+      return { id: "play", kind: "activity", activityId: aliasActivityId(parts[2]) };
+    }
   }
   if (parts[0] === "unit" && parts[1]) return { id: "unit", unitId: parts[1] };
   if (parts[0] === "grownup") return { id: "grownup" };
@@ -25,7 +31,9 @@ export function parseHash(hash: string): Route {
 
 export function toHash(route: Route): string {
   if (route.id === "play") {
-    if (route.kind === "activity" && route.activityId) return `#/play/activity/${route.activityId}`;
+    if (route.kind === "activity" && route.activityId) {
+      return `#/play/activity/${aliasActivityId(route.activityId)}`;
+    }
     return `#/play/${route.kind}`;
   }
   if (route.id === "unit") return `#/unit/${route.unitId}`;

@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { GRADE4_UNITS, UNITS, activityById } from "./curriculum";
-import { makeQuestion, welcomeFirst, wordForm } from "./questions";
+import { makeActivityRound, makeQuestion, welcomeFirst, wordForm } from "./questions";
 import { rngFromSeed } from "./rng";
 import type {
   AreaData,
@@ -345,6 +345,7 @@ describe("answer audit", () => {
         expect(counts[d.focus!] ?? 0).toBeGreaterThanOrEqual(2);
         expect(q.needsInteract).toBe(true);
         expect(d.readPrompt?.length).toBeGreaterThan(0);
+        expect(q.prompt).not.toMatch(/how many|cu[aá]ntos|quantos/i);
         if (id === "u6-picto") expect(d.key).toBe(2);
         if (id === "u1-tally") expect(d.key).toBe(1);
         if (d.ask === "value") expect(Number(q.answer)).toBe((counts[d.focus!] ?? 0) * d.key);
@@ -379,16 +380,41 @@ describe("answer audit", () => {
     }
   });
 
-  it("leftover / what's hiding / find-n ten-frames do not gate Check", () => {
-    expect(welcomeFirst(rngFromSeed(1)).needsInteract).toBeFalsy();
+  it("leftover / what's hiding / find-n ten-frames require the why-move", () => {
+    expect(welcomeFirst(rngFromSeed(1)).needsInteract).toBe(true);
     for (const id of ["u1-leftover", "u1-friends", "u7-add", "u7-take"]) {
       for (let i = 0; i < 20; i++) {
         const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`ni:${id}:${i}`));
         expect(q.kind).toBe("tenframe");
-        expect(q.needsInteract, id).toBeFalsy();
+        expect(q.needsInteract, id).toBe(true);
         const d = q.data as TenFrameData;
         expect(Number(q.answer)).toBe(d.total - d.shown);
       }
+    }
+  });
+
+  it("number friends keep add or sub as a family inside a round", () => {
+    const found = activityById("u1-friends")!;
+    for (let i = 0; i < 24; i++) {
+      const round = makeActivityRound(found.activity, rngFromSeed(`friends-fam:${i}`));
+      const families = new Set(
+        round.map((q) => {
+          const eq = (q.data as TenFrameData).equation;
+          return eq.includes("− n =") ? "sub" : "add";
+        }),
+      );
+      expect(families.size, `round ${i}`).toBe(1);
+    }
+  });
+
+  it("leftover stays missing-addend within 10", () => {
+    const found = activityById("u1-leftover")!;
+    for (let i = 0; i < 30; i++) {
+      const q = makeQuestion(found.activity, rngFromSeed(`lo:${i}`));
+      const d = q.data as TenFrameData;
+      expect(d.equation).toMatch(/\+ n =/);
+      expect(d.total).toBeLessThanOrEqual(10);
+      expect(d.equation).not.toMatch(/− n =/);
     }
   });
 
@@ -434,8 +460,8 @@ function assertKind(activityId: string, q: Question) {
     case "tenframe": {
       const d = q.data as TenFrameData;
       expect(Number(q.answer), activityId).toBe(d.total - d.shown);
-      if (activityId === "u1-leftover" || activityId === "u1-friends") {
-        expect(q.needsInteract, activityId).toBeFalsy();
+      if (activityId === "u1-leftover" || activityId === "u1-friends" || activityId === "u7-add" || activityId === "u7-take") {
+        expect(q.needsInteract, activityId).toBe(true);
       }
       break;
     }
@@ -523,6 +549,12 @@ function assertKind(activityId: string, q: Question) {
         expect(q.prompt).not.toContain(String(cents));
         expect(q.prompt).not.toContain(moneyFmt(cents));
         expect(q.prompt).not.toMatch(/\$\d+\.\d{2}/);
+        const hasBill = Boolean(d.coins.dollar || d.coins.five);
+        if (hasBill) expect(q.prompt).not.toMatch(/cents/i);
+        if (activityId === "u1-coins") {
+          expect(hasBill).toBe(false);
+          expect(q.prompt).toBe("How many cents?");
+        }
       }
       if (d.mode === "change") expect(Number(q.answer)).toBe((d.pay ?? 0) - (d.cost ?? 0));
       break;

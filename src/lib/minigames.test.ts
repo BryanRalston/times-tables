@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dealMatch, dealPoke, dealWhoHid, pickMiniKind } from "./minigames";
+import { applyWhoHidPick, dealMatch, dealPoke, dealWhoHid, pickMiniKind } from "./minigames";
 import { rngFromSeed } from "./rng";
 
 describe("minigame picker", () => {
@@ -39,6 +39,25 @@ describe("who-hid and poke-this", () => {
       expect(poke.choices).toHaveLength(3);
       expect(new Set(poke.choices).size).toBe(3);
     }
+  });
+
+  it("miss does not call onDone", () => {
+    let done = 0;
+    let miss = 0;
+    applyWhoHidPick("frog", "cat", () => {
+      done += 1;
+    }, () => {
+      miss += 1;
+    });
+    expect(done).toBe(0);
+    expect(miss).toBe(1);
+    applyWhoHidPick("frog", "frog", () => {
+      done += 1;
+    }, () => {
+      miss += 1;
+    });
+    expect(done).toBe(1);
+    expect(miss).toBe(1);
   });
 
   it("uses frog as a house stand-in when the shelf is empty", () => {

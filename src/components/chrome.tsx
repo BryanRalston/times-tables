@@ -18,6 +18,7 @@ export function AppHeader() {
   const stars = useProgress((s) => s.stars);
   const coins = useProgress((s) => s.coins);
   const sessions = useProgress((s) => s.sessions);
+  const hydrated = useProgress((s) => s.hydrated);
   const streak = schoolStreak(sessions, todayIso());
   const ui = useUi();
   const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
@@ -33,6 +34,11 @@ export function AppHeader() {
           ) : null}
         </p>
         <h1 className="font-display text-xl leading-tight sm:text-2xl">{name ? ui.namedPath(name) : pathGrade === 4 ? ui.pathGrade4 : ui.path}</h1>
+        {hydrated ? (
+          <p className="text-[11px] font-medium text-teal" data-saved="1">
+            {ui.saved}
+          </p>
+        ) : null}
       </div>
       <div className="flex items-center gap-2 text-sm">
         <button

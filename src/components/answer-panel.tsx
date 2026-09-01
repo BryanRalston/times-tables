@@ -55,5 +55,15 @@ export function AnswerPanel({
       </div>
     );
   }
-  return <Keypad value={value} onChange={setValue} onCheck={() => onCheck()} disabled={disabled} />;
+  const leftover = question.kind === "tenframe";
+  return (
+    <Keypad
+      value={value}
+      onChange={setValue}
+      onCheck={() => onCheck()}
+      disabled={disabled}
+      replace={leftover}
+      allowDot={!leftover}
+    />
+  );
 }

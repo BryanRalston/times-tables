@@ -7,7 +7,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -16,7 +16,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -25,7 +25,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -34,7 +34,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -43,7 +43,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -52,7 +52,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -61,7 +61,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -70,7 +70,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -79,7 +79,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -88,7 +88,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -97,7 +97,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -106,7 +106,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -115,7 +115,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -124,7 +124,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -133,7 +133,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -142,7 +142,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -151,7 +151,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -160,7 +160,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -169,7 +169,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -178,7 +178,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     }
   ],
   "u1-leftover": [
@@ -189,7 +189,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "2 + n = 10",
@@ -198,7 +198,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "7 + n = 10",
@@ -207,7 +207,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 10",
@@ -216,7 +216,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "5 + n = 8",
@@ -225,7 +225,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "3 + n = 8",
@@ -234,7 +234,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "7 + n = 10",
@@ -243,7 +243,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "1 + n = 9",
@@ -252,7 +252,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "4 + n = 8",
@@ -261,7 +261,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "4 + n = 10",
@@ -270,7 +270,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "5 + n = 8",
@@ -279,7 +279,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "5 + n = 8",
@@ -288,7 +288,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "7 + n = 10",
@@ -297,7 +297,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 9",
@@ -306,7 +306,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "3 + n = 9",
@@ -315,7 +315,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "5 + n = 10",
@@ -324,7 +324,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "3 + n = 9",
@@ -333,7 +333,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "2 + n = 9",
@@ -342,7 +342,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "1 + n = 9",
@@ -351,7 +351,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "3 + n = 10",
@@ -360,7 +360,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     }
   ],
   "u1-friends": [
@@ -371,7 +371,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 11",
@@ -380,7 +380,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "7 + n = 15",
@@ -389,7 +389,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "15 − n = 9",
@@ -398,7 +398,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "10 + n = 14",
@@ -407,7 +407,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "10 + n = 18",
@@ -416,7 +416,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 13",
@@ -425,7 +425,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "6 + n = 11",
@@ -434,7 +434,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "17 − n = 14",
@@ -443,7 +443,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "16 − n = 14",
@@ -452,7 +452,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "12 + n = 20",
@@ -461,7 +461,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "12 − n = 10",
@@ -470,7 +470,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "16 + n = 19",
@@ -479,7 +479,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "13 + n = 17",
@@ -488,7 +488,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "8 + n = 13",
@@ -497,7 +497,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "9 + n = 11",
@@ -506,7 +506,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "3 + n = 10",
@@ -515,7 +515,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "19 − n = 16",
@@ -524,7 +524,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "11 + n = 17",
@@ -533,7 +533,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "12 − n = 8",
@@ -542,32 +542,10 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     }
   ],
   "u1-coins": [
-    {
-      "prompt": "How many cents?",
-      "answer": "96",
-      "alts": [
-        "$0.96"
-      ],
-      "choices": null,
-      "kind": "money",
-      "input": "keypad",
-      "needsInteract": false
-    },
-    {
-      "prompt": "How many cents?",
-      "answer": "80",
-      "alts": [
-        "$0.80"
-      ],
-      "choices": null,
-      "kind": "money",
-      "input": "keypad",
-      "needsInteract": false
-    },
     {
       "prompt": "How many cents?",
       "answer": "60",
@@ -581,9 +559,9 @@
     },
     {
       "prompt": "How many cents?",
-      "answer": "100",
+      "answer": "77",
       "alts": [
-        "$1.00"
+        "$0.77"
       ],
       "choices": null,
       "kind": "money",
@@ -592,9 +570,9 @@
     },
     {
       "prompt": "How many cents?",
-      "answer": "92",
+      "answer": "38",
       "alts": [
-        "$0.92"
+        "$0.38"
       ],
       "choices": null,
       "kind": "money",
@@ -603,53 +581,9 @@
     },
     {
       "prompt": "How many cents?",
-      "answer": "52",
+      "answer": "62",
       "alts": [
-        "$0.52"
-      ],
-      "choices": null,
-      "kind": "money",
-      "input": "keypad",
-      "needsInteract": false
-    },
-    {
-      "prompt": "How many cents?",
-      "answer": "10",
-      "alts": [
-        "$0.10"
-      ],
-      "choices": null,
-      "kind": "money",
-      "input": "keypad",
-      "needsInteract": false
-    },
-    {
-      "prompt": "How many cents?",
-      "answer": "24",
-      "alts": [
-        "$0.24"
-      ],
-      "choices": null,
-      "kind": "money",
-      "input": "keypad",
-      "needsInteract": false
-    },
-    {
-      "prompt": "How many cents?",
-      "answer": "100",
-      "alts": [
-        "$1.00"
-      ],
-      "choices": null,
-      "kind": "money",
-      "input": "keypad",
-      "needsInteract": false
-    },
-    {
-      "prompt": "How many cents?",
-      "answer": "40",
-      "alts": [
-        "$0.40"
+        "$0.62"
       ],
       "choices": null,
       "kind": "money",
@@ -669,9 +603,9 @@
     },
     {
       "prompt": "How many cents?",
-      "answer": "72",
+      "answer": "100",
       "alts": [
-        "$0.72"
+        "$1.00"
       ],
       "choices": null,
       "kind": "money",
@@ -680,9 +614,20 @@
     },
     {
       "prompt": "How many cents?",
-      "answer": "17",
+      "answer": "68",
       "alts": [
-        "$0.17"
+        "$0.68"
+      ],
+      "choices": null,
+      "kind": "money",
+      "input": "keypad",
+      "needsInteract": false
+    },
+    {
+      "prompt": "How many cents?",
+      "answer": "75",
+      "alts": [
+        "$0.75"
       ],
       "choices": null,
       "kind": "money",
@@ -702,9 +647,9 @@
     },
     {
       "prompt": "How many cents?",
-      "answer": "82",
+      "answer": "98",
       "alts": [
-        "$0.82"
+        "$0.98"
       ],
       "choices": null,
       "kind": "money",
@@ -713,9 +658,9 @@
     },
     {
       "prompt": "How many cents?",
-      "answer": "87",
+      "answer": "55",
       "alts": [
-        "$0.87"
+        "$0.55"
       ],
       "choices": null,
       "kind": "money",
@@ -724,9 +669,9 @@
     },
     {
       "prompt": "How many cents?",
-      "answer": "56",
+      "answer": "13",
       "alts": [
-        "$0.56"
+        "$0.13"
       ],
       "choices": null,
       "kind": "money",
@@ -735,9 +680,9 @@
     },
     {
       "prompt": "How many cents?",
-      "answer": "41",
+      "answer": "88",
       "alts": [
-        "$0.41"
+        "$0.88"
       ],
       "choices": null,
       "kind": "money",
@@ -746,9 +691,9 @@
     },
     {
       "prompt": "How many cents?",
-      "answer": "100",
+      "answer": "70",
       "alts": [
-        "$1.00"
+        "$0.70"
       ],
       "choices": null,
       "kind": "money",
@@ -757,9 +702,64 @@
     },
     {
       "prompt": "How many cents?",
-      "answer": "80",
+      "answer": "97",
       "alts": [
-        "$0.80"
+        "$0.97"
+      ],
+      "choices": null,
+      "kind": "money",
+      "input": "keypad",
+      "needsInteract": false
+    },
+    {
+      "prompt": "How many cents?",
+      "answer": "90",
+      "alts": [
+        "$0.90"
+      ],
+      "choices": null,
+      "kind": "money",
+      "input": "keypad",
+      "needsInteract": false
+    },
+    {
+      "prompt": "How many cents?",
+      "answer": "44",
+      "alts": [
+        "$0.44"
+      ],
+      "choices": null,
+      "kind": "money",
+      "input": "keypad",
+      "needsInteract": false
+    },
+    {
+      "prompt": "How many cents?",
+      "answer": "17",
+      "alts": [
+        "$0.17"
+      ],
+      "choices": null,
+      "kind": "money",
+      "input": "keypad",
+      "needsInteract": false
+    },
+    {
+      "prompt": "How many cents?",
+      "answer": "10",
+      "alts": [
+        "$0.10"
+      ],
+      "choices": null,
+      "kind": "money",
+      "input": "keypad",
+      "needsInteract": false
+    },
+    {
+      "prompt": "How many cents?",
+      "answer": "66",
+      "alts": [
+        "$0.66"
       ],
       "choices": null,
       "kind": "money",
@@ -769,7 +769,7 @@
   ],
   "u1-tally": [
     {
-      "prompt": "Sort every picture. How many frogs?",
+      "prompt": "Sort every picture.",
       "answer": "4",
       "alts": null,
       "choices": null,
@@ -778,7 +778,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many owls?",
+      "prompt": "Sort every picture.",
       "answer": "owls",
       "alts": [],
       "choices": [
@@ -792,7 +792,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many ducks?",
+      "prompt": "Sort every picture.",
       "answer": "owls",
       "alts": [
         "ducks"
@@ -808,7 +808,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many frogs?",
+      "prompt": "Sort every picture.",
       "answer": "frogs",
       "alts": [],
       "choices": [
@@ -822,7 +822,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many pandas?",
+      "prompt": "Sort every picture.",
       "answer": "pandas",
       "alts": [],
       "choices": [
@@ -836,7 +836,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many pandas?",
+      "prompt": "Sort every picture.",
       "answer": "bunnies",
       "alts": [],
       "choices": [
@@ -850,7 +850,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many pandas?",
+      "prompt": "Sort every picture.",
       "answer": "3",
       "alts": null,
       "choices": null,
@@ -859,7 +859,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many sharks?",
+      "prompt": "Sort every picture.",
       "answer": "pigs",
       "alts": [
         "sharks",
@@ -876,7 +876,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many pandas?",
+      "prompt": "Sort every picture.",
       "answer": "pigs",
       "alts": [
         "frogs",
@@ -893,7 +893,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many sharks?",
+      "prompt": "Sort every picture.",
       "answer": "sharks",
       "alts": [],
       "choices": [
@@ -907,7 +907,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many ducks?",
+      "prompt": "Sort every picture.",
       "answer": "sharks",
       "alts": [
         "pandas",
@@ -925,7 +925,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many owls?",
+      "prompt": "Sort every picture.",
       "answer": "sharks",
       "alts": [
         "pigs"
@@ -941,7 +941,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many sharks?",
+      "prompt": "Sort every picture.",
       "answer": "2",
       "alts": null,
       "choices": null,
@@ -950,7 +950,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many cats?",
+      "prompt": "Sort every picture.",
       "answer": "pigs",
       "alts": [
         "bunnies"
@@ -966,7 +966,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many cats?",
+      "prompt": "Sort every picture.",
       "answer": "owls",
       "alts": [],
       "choices": [
@@ -980,7 +980,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many cats?",
+      "prompt": "Sort every picture.",
       "answer": "frogs",
       "alts": [
         "cats"
@@ -996,7 +996,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many cats?",
+      "prompt": "Sort every picture.",
       "answer": "cats",
       "alts": [],
       "choices": [
@@ -1010,7 +1010,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many bunnies?",
+      "prompt": "Sort every picture.",
       "answer": "bunnies",
       "alts": [],
       "choices": [
@@ -1024,7 +1024,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many cats?",
+      "prompt": "Sort every picture.",
       "answer": "bunnies",
       "alts": [
         "cats"
@@ -1040,7 +1040,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many pigs?",
+      "prompt": "Sort every picture.",
       "answer": "2",
       "alts": null,
       "choices": null,
@@ -7429,7 +7429,7 @@
   ],
   "u6-picto": [
     {
-      "prompt": "Sort every picture. How many ducks?",
+      "prompt": "Sort every picture.",
       "answer": "ducks",
       "alts": [
         "sharks",
@@ -7447,7 +7447,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many ducks?",
+      "prompt": "Sort every picture.",
       "answer": "6",
       "alts": null,
       "choices": null,
@@ -7456,7 +7456,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many cats?",
+      "prompt": "Sort every picture.",
       "answer": "pandas",
       "alts": [
         "ducks",
@@ -7473,7 +7473,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many pigs?",
+      "prompt": "Sort every picture.",
       "answer": "frogs",
       "alts": [
         "ducks"
@@ -7489,7 +7489,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many frogs?",
+      "prompt": "Sort every picture.",
       "answer": "4",
       "alts": null,
       "choices": null,
@@ -7498,7 +7498,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many pandas?",
+      "prompt": "Sort every picture.",
       "answer": "6",
       "alts": null,
       "choices": null,
@@ -7507,7 +7507,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many bunnies?",
+      "prompt": "Sort every picture.",
       "answer": "bunnies",
       "alts": [],
       "choices": [
@@ -7521,7 +7521,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many cats?",
+      "prompt": "Sort every picture.",
       "answer": "frogs",
       "alts": [
         "cats",
@@ -7538,7 +7538,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many sharks?",
+      "prompt": "Sort every picture.",
       "answer": "6",
       "alts": null,
       "choices": null,
@@ -7547,7 +7547,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many ducks?",
+      "prompt": "Sort every picture.",
       "answer": "bunnies",
       "alts": [
         "sharks"
@@ -7563,7 +7563,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many frogs?",
+      "prompt": "Sort every picture.",
       "answer": "cats",
       "alts": [
         "bunnies"
@@ -7579,7 +7579,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many ducks?",
+      "prompt": "Sort every picture.",
       "answer": "ducks",
       "alts": [],
       "choices": [
@@ -7593,7 +7593,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many bunnies?",
+      "prompt": "Sort every picture.",
       "answer": "4",
       "alts": null,
       "choices": null,
@@ -7602,7 +7602,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many pigs?",
+      "prompt": "Sort every picture.",
       "answer": "ducks",
       "alts": [
         "cats",
@@ -7620,7 +7620,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many bunnies?",
+      "prompt": "Sort every picture.",
       "answer": "bunnies",
       "alts": [],
       "choices": [
@@ -7634,7 +7634,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many frogs?",
+      "prompt": "Sort every picture.",
       "answer": "pandas",
       "alts": [],
       "choices": [
@@ -7648,7 +7648,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many pigs?",
+      "prompt": "Sort every picture.",
       "answer": "6",
       "alts": null,
       "choices": null,
@@ -7657,7 +7657,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many cats?",
+      "prompt": "Sort every picture.",
       "answer": "sharks",
       "alts": [
         "cats"
@@ -7673,7 +7673,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many bunnies?",
+      "prompt": "Sort every picture.",
       "answer": "cats",
       "alts": [],
       "choices": [
@@ -7687,7 +7687,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many frogs?",
+      "prompt": "Sort every picture.",
       "answer": "frogs",
       "alts": [],
       "choices": [
@@ -7709,7 +7709,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Mila sees 9 acorns. Some are hiding. There are 12 in all. How many hide?",
@@ -7718,7 +7718,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Rosa sees 6 buttons. Some are hiding. There are 8 in all. How many hide?",
@@ -7727,7 +7727,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Lila sees 8 stickers. Some are hiding. There are 12 in all. How many hide?",
@@ -7736,7 +7736,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Elena sees 8 apples. Some are hiding. There are 14 in all. How many hide?",
@@ -7745,7 +7745,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Leo sees 4 buttons. Some are hiding. There are 10 in all. How many hide?",
@@ -7754,7 +7754,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Cole sees 4 buttons. Some are hiding. There are 6 in all. How many hide?",
@@ -7763,7 +7763,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Amir sees 6 marbles. Some are hiding. There are 12 in all. How many hide?",
@@ -7772,7 +7772,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "June sees 8 beads. Some are hiding. There are 14 in all. How many hide?",
@@ -7781,7 +7781,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "June sees 4 beads. Some are hiding. There are 8 in all. How many hide?",
@@ -7790,7 +7790,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Maya sees 5 squishees. Some are hiding. There are 8 in all. How many hide?",
@@ -7799,7 +7799,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Theo sees 7 stickers. Some are hiding. There are 9 in all. How many hide?",
@@ -7808,7 +7808,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Noah sees 4 blocks. Some are hiding. There are 9 in all. How many hide?",
@@ -7817,7 +7817,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Amir sees 5 seeds. Some are hiding. There are 10 in all. How many hide?",
@@ -7826,7 +7826,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Leo sees 5 pencils. Some are hiding. There are 8 in all. How many hide?",
@@ -7835,7 +7835,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Omar sees 8 seeds. Some are hiding. There are 14 in all. How many hide?",
@@ -7844,7 +7844,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Theo sees 7 blocks. Some are hiding. There are 9 in all. How many hide?",
@@ -7853,7 +7853,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Omar sees 6 stars. Some are hiding. There are 12 in all. How many hide?",
@@ -7862,7 +7862,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Maya sees 5 stamps. Some are hiding. There are 7 in all. How many hide?",
@@ -7871,7 +7871,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Ivy sees 7 stars. Some are hiding. There are 9 in all. How many hide?",
@@ -7880,7 +7880,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     }
   ],
   "u7-take": [
@@ -7891,7 +7891,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Zoe had 9 acorns. 6 are in the dish. How many are hiding?",
@@ -7900,34 +7900,34 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
-      "prompt": "Ava had 18 stamps. 3 are in the dish. How many are hiding?",
-      "answer": "15",
+      "prompt": "Ava had 18 stamps. 9 are in the dish. How many are hiding?",
+      "answer": "9",
       "alts": null,
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
-      "prompt": "Elena had 13 shells. 5 are in the dish. How many are hiding?",
-      "answer": "8",
+      "prompt": "Elena had 13 shells. 6 are in the dish. How many are hiding?",
+      "answer": "7",
       "alts": null,
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
-      "prompt": "Ivy had 18 beads. 14 are in the dish. How many are hiding?",
-      "answer": "4",
+      "prompt": "Ivy had 18 beads. 15 are in the dish. How many are hiding?",
+      "answer": "3",
       "alts": null,
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Maya had 9 buttons. 4 are in the dish. How many are hiding?",
@@ -7936,7 +7936,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "June had 8 pencils. 3 are in the dish. How many are hiding?",
@@ -7945,34 +7945,34 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
-      "prompt": "Kai had 13 shells. 8 are in the dish. How many are hiding?",
-      "answer": "5",
+      "prompt": "Kai had 13 shells. 9 are in the dish. How many are hiding?",
+      "answer": "4",
       "alts": null,
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
-      "prompt": "Cole had 18 stamps. 7 are in the dish. How many are hiding?",
-      "answer": "11",
+      "prompt": "Cole had 18 stamps. 11 are in the dish. How many are hiding?",
+      "answer": "7",
       "alts": null,
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
-      "prompt": "Hugo had 13 apples. 8 are in the dish. How many are hiding?",
-      "answer": "5",
+      "prompt": "Hugo had 13 apples. 9 are in the dish. How many are hiding?",
+      "answer": "4",
       "alts": null,
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Sam had 10 stickers. 4 are in the dish. How many are hiding?",
@@ -7981,16 +7981,16 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
-      "prompt": "Theo had 16 squishees. 10 are in the dish. How many are hiding?",
-      "answer": "6",
+      "prompt": "Theo had 16 squishees. 11 are in the dish. How many are hiding?",
+      "answer": "5",
       "alts": null,
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Leo had 11 shells. 9 are in the dish. How many are hiding?",
@@ -7999,7 +7999,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "June had 12 stickers. 5 are in the dish. How many are hiding?",
@@ -8008,7 +8008,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "Wes had 11 stickers. 7 are in the dish. How many are hiding?",
@@ -8017,43 +8017,43 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
-      "prompt": "Mila had 17 erasers. 11 are in the dish. How many are hiding?",
-      "answer": "6",
+      "prompt": "Mila had 17 erasers. 13 are in the dish. How many are hiding?",
+      "answer": "4",
       "alts": null,
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
-      "prompt": "Cole had 15 stickers. 8 are in the dish. How many are hiding?",
-      "answer": "7",
-      "alts": null,
-      "choices": null,
-      "kind": "tenframe",
-      "input": "keypad",
-      "needsInteract": false
-    },
-    {
-      "prompt": "Elena had 18 stickers. 13 are in the dish. How many are hiding?",
+      "prompt": "Cole had 15 stickers. 10 are in the dish. How many are hiding?",
       "answer": "5",
       "alts": null,
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
-      "prompt": "Amir had 15 shells. 8 are in the dish. How many are hiding?",
-      "answer": "7",
+      "prompt": "Elena had 18 stickers. 14 are in the dish. How many are hiding?",
+      "answer": "4",
       "alts": null,
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
+    },
+    {
+      "prompt": "Amir had 15 shells. 10 are in the dish. How many are hiding?",
+      "answer": "5",
+      "alts": null,
+      "choices": null,
+      "kind": "tenframe",
+      "input": "keypad",
+      "needsInteract": true
     },
     {
       "prompt": "Omar had 10 ribbons. 8 are in the dish. How many are hiding?",
@@ -8062,7 +8062,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     }
   ],
   "u7-compare": [
@@ -8795,7 +8795,7 @@
   ],
   "u7-bar": [
     {
-      "prompt": "Sort every picture. How many ducks?",
+      "prompt": "Sort every picture.",
       "answer": "bunnies",
       "alts": [
         "owls"
@@ -8811,7 +8811,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many pigs?",
+      "prompt": "Sort every picture.",
       "answer": "2",
       "alts": null,
       "choices": null,
@@ -8820,7 +8820,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many owls?",
+      "prompt": "Sort every picture.",
       "answer": "2",
       "alts": null,
       "choices": null,
@@ -8829,7 +8829,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many owls?",
+      "prompt": "Sort every picture.",
       "answer": "pigs",
       "alts": [],
       "choices": [
@@ -8843,7 +8843,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many cats?",
+      "prompt": "Sort every picture.",
       "answer": "frogs",
       "alts": [
         "sharks"
@@ -8859,7 +8859,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many sharks?",
+      "prompt": "Sort every picture.",
       "answer": "2",
       "alts": null,
       "choices": null,
@@ -8868,7 +8868,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many ducks?",
+      "prompt": "Sort every picture.",
       "answer": "pigs",
       "alts": [
         "cats"
@@ -8884,7 +8884,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many pigs?",
+      "prompt": "Sort every picture.",
       "answer": "3",
       "alts": null,
       "choices": null,
@@ -8893,7 +8893,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many ducks?",
+      "prompt": "Sort every picture.",
       "answer": "pandas",
       "alts": [
         "owls",
@@ -8910,7 +8910,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many sharks?",
+      "prompt": "Sort every picture.",
       "answer": "pandas",
       "alts": [
         "cats"
@@ -8926,7 +8926,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many ducks?",
+      "prompt": "Sort every picture.",
       "answer": "ducks",
       "alts": [],
       "choices": [
@@ -8940,7 +8940,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many frogs?",
+      "prompt": "Sort every picture.",
       "answer": "2",
       "alts": null,
       "choices": null,
@@ -8949,7 +8949,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many pandas?",
+      "prompt": "Sort every picture.",
       "answer": "pandas",
       "alts": [],
       "choices": [
@@ -8963,7 +8963,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many frogs?",
+      "prompt": "Sort every picture.",
       "answer": "sharks",
       "alts": [],
       "choices": [
@@ -8977,7 +8977,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many pandas?",
+      "prompt": "Sort every picture.",
       "answer": "2",
       "alts": null,
       "choices": null,
@@ -8986,7 +8986,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many ducks?",
+      "prompt": "Sort every picture.",
       "answer": "cats",
       "alts": [
         "ducks",
@@ -9003,7 +9003,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many pandas?",
+      "prompt": "Sort every picture.",
       "answer": "frogs",
       "alts": [
         "owls"
@@ -9019,7 +9019,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many sharks?",
+      "prompt": "Sort every picture.",
       "answer": "3",
       "alts": null,
       "choices": null,
@@ -9028,7 +9028,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many bunnies?",
+      "prompt": "Sort every picture.",
       "answer": "3",
       "alts": null,
       "choices": null,
@@ -9037,7 +9037,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "Sort every picture. How many cats?",
+      "prompt": "Sort every picture.",
       "answer": "pigs",
       "alts": [],
       "choices": [
@@ -13237,7 +13237,7 @@
   ],
   "u11-count": [
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "158",
       "alts": [
         "$1.58"
@@ -13248,7 +13248,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "293",
       "alts": [
         "$2.93"
@@ -13259,7 +13259,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "500",
       "alts": [
         "$5.00"
@@ -13270,7 +13270,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "248",
       "alts": [
         "$2.48"
@@ -13281,7 +13281,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "346",
       "alts": [
         "$3.46"
@@ -13292,7 +13292,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "228",
       "alts": [
         "$2.28"
@@ -13303,7 +13303,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "216",
       "alts": [
         "$2.16"
@@ -13314,7 +13314,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "500",
       "alts": [
         "$5.00"
@@ -13325,7 +13325,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "500",
       "alts": [
         "$5.00"
@@ -13336,7 +13336,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "348",
       "alts": [
         "$3.48"
@@ -13347,7 +13347,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "500",
       "alts": [
         "$5.00"
@@ -13358,7 +13358,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "406",
       "alts": [
         "$4.06"
@@ -13369,7 +13369,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "371",
       "alts": [
         "$3.71"
@@ -13380,7 +13380,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "500",
       "alts": [
         "$5.00"
@@ -13391,7 +13391,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "317",
       "alts": [
         "$3.17"
@@ -13402,7 +13402,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "307",
       "alts": [
         "$3.07"
@@ -13424,7 +13424,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "388",
       "alts": [
         "$3.88"
@@ -13435,7 +13435,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "257",
       "alts": [
         "$2.57"
@@ -13446,7 +13446,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many cents?",
+      "prompt": "How much money?",
       "answer": "142",
       "alts": [
         "$1.42"

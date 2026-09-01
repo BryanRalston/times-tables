@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { AnswerReadout, ClockKeys, Keypad } from "./keypad";
+import { AnswerReadout, ClockKeys, Keypad, applyKeypadKey } from "./keypad";
 
 describe("answer readout", () => {
   it("shows typed digits in a Your answer box", () => {
@@ -22,6 +22,32 @@ describe("answer readout", () => {
     expect(html).toContain("Your answer");
     expect(html).toContain("12");
     expect(html).toContain("Check");
+  });
+});
+
+describe("leftover keypad", () => {
+  it("replaces the current digit instead of concatenating", () => {
+    expect(applyKeypadKey("5", "4", { replace: true })).toBe("4");
+    expect(applyKeypadKey("", "3", { replace: true })).toBe("3");
+    expect(applyKeypadKey("3", "back", { replace: true })).toBe("");
+  });
+
+  it("still concatenates money and compute totals", () => {
+    expect(applyKeypadKey("5", "4")).toBe("54");
+    expect(applyKeypadKey("12", ".", { allowDot: true })).toBe("12.");
+    expect(applyKeypadKey("12.5", "0")).toBe("12.50");
+  });
+
+  it("omits the decimal on leftover replace-mode keys", () => {
+    const html = renderToStaticMarkup(
+      <Keypad value="" onChange={() => undefined} onCheck={() => undefined} replace allowDot={false} />,
+    );
+    expect(html).not.toContain('aria-label="."');
+    expect(html).toContain("Check");
+    const full = renderToStaticMarkup(
+      <Keypad value="12" onChange={() => undefined} onCheck={() => undefined} />,
+    );
+    expect(full).toContain('aria-label="."');
   });
 });
 

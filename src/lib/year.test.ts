@@ -89,7 +89,7 @@ describe("welcome leftover", () => {
     expect(q.prompt).toBe("6 + n = 10");
     expect(q.answer).toBe("4");
     expect(q.kind).toBe("tenframe");
-    expect(q.needsInteract).toBeFalsy();
+    expect(q.needsInteract).toBe(true);
   });
 
   it("is a short leftover run", () => {
@@ -170,6 +170,11 @@ describe("nav", () => {
     expect(parseHash("#/grownup")).toEqual({ id: "grownup" });
     expect(parseHash("#/lessons")).toEqual({ id: "lessons" });
     expect(parseHash("#/shelf")).toEqual({ id: "shelf" });
+    expect(parseHash("#/play/activity/u1-pictograph")).toEqual({
+      id: "play",
+      kind: "activity",
+      activityId: "u1-graph",
+    });
   });
 });
 
@@ -226,6 +231,7 @@ describe("principal holes", () => {
         expect(d.collect).toBe(true);
         expect(d.tray?.length).toBeGreaterThan(0);
         expect(d.readPrompt?.length).toBeGreaterThan(0);
+        expect(q.prompt).not.toMatch(/how many|cu[aá]ntos|quantos/i);
         if (d.ask === "greatest" || d.ask === "least") {
           expect(q.choices ?? []).toContain(q.answer);
         }
@@ -244,8 +250,24 @@ describe("principal holes", () => {
         return n + v * (c ?? 0);
       }, 0);
       expect(q.prompt).toBe("How many cents?");
+      expect(d.coins.dollar).toBeFalsy();
+      expect(d.coins.five).toBeFalsy();
       expect(q.prompt).not.toContain(String(cents));
       expect(q.prompt).not.toContain(moneyFmt(cents));
+    }
+  });
+
+  it("howManyCents is never used when a bill is in the bag", () => {
+    for (const id of ["u1-coins", "u11-count"]) {
+      for (let i = 0; i < 40; i++) {
+        const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`bill:${id}:${i}`));
+        const d = q.data as MoneyData;
+        const hasBill = Boolean(d.coins.dollar || d.coins.five);
+        if (id === "u1-coins") expect(hasBill).toBe(false);
+        if (hasBill) expect(q.prompt).toBe("How much money?");
+        else expect(q.prompt).toBe("How many cents?");
+        expect(q.prompt).not.toMatch(/\$\d+\.\d{2}/);
+      }
     }
   });
 });

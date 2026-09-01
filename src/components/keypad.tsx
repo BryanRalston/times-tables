@@ -11,6 +11,26 @@ function useChrome() {
 }
 
 const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0", "back"] as const;
+const KEYS_WHOLE = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "back", "0"] as const;
+
+export function applyKeypadKey(
+  value: string,
+  k: string,
+  opts: { replace?: boolean; maxLen?: number; allowDot?: boolean } = {},
+): string {
+  const replace = Boolean(opts.replace);
+  const allowDot = opts.allowDot ?? !replace;
+  const maxLen = opts.maxLen ?? (replace ? 1 : 8);
+  if (k === "back") return value.slice(0, -1);
+  if (k === ".") {
+    if (!allowDot || value.includes(".")) return value;
+    return replace ? "." : `${value}.`.slice(0, maxLen);
+  }
+  if (!/^\d$/.test(k)) return value;
+  if (replace) return k;
+  if (value.length >= maxLen) return value;
+  return (value + k).slice(0, maxLen);
+}
 
 export function AnswerReadout({
   value,
@@ -46,36 +66,35 @@ export function Keypad({
   onChange,
   onCheck,
   disabled,
+  replace,
+  allowDot = true,
   className,
 }: {
   value: string;
   onChange: (v: string) => void;
   onCheck: () => void;
   disabled?: boolean;
+  replace?: boolean;
+  allowDot?: boolean;
   className?: string;
 }) {
   const ui = useChrome();
-  function press(k: (typeof KEYS)[number]) {
+  const keys = allowDot && !replace ? KEYS : KEYS_WHOLE;
+  function press(k: string) {
     if (disabled) return;
-    if (k === "back") {
-      onChange(value.slice(0, -1));
-      return;
-    }
-    if (k === "." && value.includes(".")) return;
-    if (value.length >= 8) return;
-    onChange(value + k);
+    onChange(applyKeypadKey(value, k, { replace, allowDot: allowDot && !replace }));
   }
 
   return (
     <div className={cn("space-y-3", className)}>
       <AnswerReadout value={value} />
       <div className="grid w-full grid-cols-3 gap-2">
-        {KEYS.map((k) => (
+        {keys.map((k) => (
           <Button
             key={k}
             variant="secondary"
             size="key"
-            className="min-w-0 w-full"
+            className={cn("min-w-0 w-full", k === "0" && keys === KEYS_WHOLE && "col-span-2")}
             aria-label={k === "back" ? "Backspace" : k}
             onClick={() => press(k)}
             disabled={disabled}

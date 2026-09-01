@@ -94,6 +94,16 @@ export function dealPoke(owned: string[], rng: Rng): PokeDeal {
   };
 }
 
+export function applyWhoHidPick(
+  missing: string,
+  pick: string,
+  onHit: () => void,
+  onMiss: () => void,
+): void {
+  if (pick === missing) onHit();
+  else onMiss();
+}
+
 export function dealMini(kind: MiniKind, owned: string[], rng: Rng): MiniDeal {
   if (kind === "match") return dealMatch(owned, rng);
   if (kind === "who-hid") return dealWhoHid(owned, rng);

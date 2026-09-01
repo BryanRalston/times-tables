@@ -11,6 +11,7 @@
     "check:assets": "node scripts/check-assets.mjs",
     "check:pages": "node scripts/check-pages.mjs",
     "test:play": "node scripts/g3-answer-playtest.mjs",
+    "test:persist": "node scripts/persist-reload.mjs",
     "test:shots": "node scripts/g3-shot-gate.mjs",
     "typecheck": "tsc --noEmit"
   },

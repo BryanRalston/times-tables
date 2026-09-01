@@ -1,8 +1,8 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { ClockFace } from "@/components/clock-face";
 import { ChoiceList } from "@/components/keypad";
-import { MagentaImg } from "@/components/magenta-video";
 import { G4Q, parseLocale, PLACE, UI } from "@/lib/i18n";
+import { splitCounted } from "@/lib/leftover";
 import { useProgress } from "@/lib/progress";
 import { asset } from "@/lib/art";
 import { playTap } from "@/lib/sound";
@@ -115,38 +115,52 @@ function Frame({ children, shake, status }: { children: ReactNode; shake: number
   );
 }
 
-function Dot({ filled, gone, onClick }: { filled: boolean; gone?: boolean; onClick?: () => void }) {
+function Dot({
+  filled,
+  gone,
+  leftover,
+  isolate,
+  onClick,
+}: {
+  filled: boolean;
+  gone?: boolean;
+  leftover?: boolean;
+  isolate?: boolean;
+  onClick?: () => void;
+}) {
+  const className = cn(
+    "size-6 rounded-full border sm:size-7",
+    filled && !gone && "border-teal bg-teal",
+    (!filled || gone) && "border-line bg-surface-2",
+    leftover && isolate && "border-dashed border-star bg-star-soft",
+    gone && "take-out",
+    onClick && filled && !gone && "hover:scale-95",
+  );
+  if (filled && !gone && onClick) {
+    return (
+      <button type="button" onClick={onClick} className={className} aria-label="dot" />
+    );
+  }
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={!filled || gone || !onClick}
-      className={cn(
-        "size-6 rounded-full border transition-transform duration-200 sm:size-7",
-        filled && !gone ? "takeable border-teal bg-teal" : "border-line bg-surface-2",
-        gone && "scale-50 opacity-0",
-        onClick && filled && !gone && "hover:scale-95",
-      )}
-      aria-label={filled ? "dot" : "empty"}
+    <span
+      className={className}
+      aria-hidden={!leftover}
+      aria-label={leftover ? "leftover" : undefined}
     />
   );
 }
 
 function TenFrame({ question, onInteract, status, shake }: BoardProps) {
   const data = question.data as TenFrameData;
-  const ui = UI[parseLocale(useProgress((st) => st.locale))];
-  const [gone, setGone] = useState<boolean[]>(() => Array(data.shown).fill(false));
+  const [taken, setTaken] = useState(false);
   const cells = Math.min(20, Math.max(data.total, data.shown));
   const perRow = 5;
   const rows = Math.ceil(Math.max(cells, 10) / perRow);
+  const knownGone = taken || status === "correct";
 
-  function take(i: number) {
-    if (i >= data.shown) return;
-    setGone((g) => {
-      const n = [...g];
-      n[i] = true;
-      return n;
-    });
+  function takeGroup() {
+    if (knownGone) return;
+    setTaken(true);
     playTap();
     onInteract();
   }
@@ -160,12 +174,15 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
             {Array.from({ length: Math.min(perRow, Math.max(0, cells - r * perRow)) }, (_, c) => {
               const i = r * perRow + c;
               const filled = i < data.shown;
+              const leftover = i >= data.shown && i < data.total;
               return (
                 <Dot
                   key={i}
                   filled={filled}
-                  gone={filled && gone[i]}
-                  onClick={filled ? () => take(i) : undefined}
+                  gone={filled && knownGone}
+                  leftover={leftover}
+                  isolate={status === "correct"}
+                  onClick={filled ? takeGroup : undefined}
                 />
               );
             })}
@@ -173,7 +190,9 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
         ))}
       </div>
       {status === "correct" ? (
-        <p className="mt-3 text-center text-sm text-muted">{ui.nIs(question.answer)}</p>
+        <p className="mt-3 text-center font-display text-lg text-teal" data-n-isolate>
+          n
+        </p>
       ) : null}
     </Frame>
   );
@@ -307,11 +326,12 @@ function PlaceValue({ question, status, shake }: BoardProps) {
     const fromRight = s.length - 1 - i;
     return { ch, placeEn: enPlaces[fromRight] ?? "ones", label: locLabels[fromRight] ?? "" };
   });
+  const found = status === "correct";
   return (
     <Frame shake={shake} status={status}>
       <p className="mb-3 text-center font-display text-3xl tabular-nums sm:text-4xl">
         {cols.map((col, i) => (
-          <span key={i} className={cn("px-0.5", col.placeEn === data.place ? "text-teal underline" : "")}>
+          <span key={i} className={cn("px-0.5", found && col.placeEn === data.place && "text-teal underline")}>
             {col.ch}
           </span>
         ))}
@@ -327,7 +347,7 @@ function PlaceValue({ question, status, shake }: BoardProps) {
             key={i}
             className={cn(
               "rounded-[10px] border bg-bg-warm p-1",
-              col.placeEn === data.place ? "border-teal" : "border-line",
+              found && col.placeEn === data.place ? "border-teal" : "border-line",
             )}
           >
             <p className="font-display text-lg text-ink tabular-nums">{col.ch}</p>
@@ -662,27 +682,45 @@ function AnalogClock({ question, status, shake }: BoardProps) {
   );
 }
 
-const COIN_META: { id: Coin; label: string; cents: number; imgClass: string }[] = [
-  { id: "five", label: "five-dollar bill", cents: 500, imgClass: "h-10 w-[5.2rem] sm:h-12 sm:w-28" },
-  { id: "dollar", label: "one-dollar bill", cents: 100, imgClass: "h-10 w-[5.2rem] sm:h-12 sm:w-28" },
-  { id: "quarter", label: "quarter", cents: 25, imgClass: "size-14 sm:size-16" },
-  { id: "nickel", label: "nickel", cents: 5, imgClass: "size-12" },
-  { id: "penny", label: "penny", cents: 1, imgClass: "size-11" },
-  { id: "dime", label: "dime", cents: 10, imgClass: "size-9" },
+export const QUARTER_PX = 56;
+const COIN_RATIO: Record<Exclude<Coin, "dollar" | "five">, number> = {
+  dime: 0.74,
+  penny: 0.79,
+  nickel: 0.87,
+  quarter: 1,
+};
+const COIN_META: { id: Coin; label: string; cents: number; bill?: boolean }[] = [
+  { id: "five", label: "five-dollar bill", cents: 500, bill: true },
+  { id: "dollar", label: "one-dollar bill", cents: 100, bill: true },
+  { id: "quarter", label: "quarter", cents: 25 },
+  { id: "nickel", label: "nickel", cents: 5 },
+  { id: "penny", label: "penny", cents: 1 },
+  { id: "dime", label: "dime", cents: 10 },
 ];
 
 function moneySrc(id: Coin): string {
   return asset(`money/${id}.png`);
 }
 
+export function moneyBox(id: Coin): { width: number; height: number } {
+  if (id === "five" || id === "dollar") return { width: 112, height: 48 };
+  const r = COIN_RATIO[id];
+  const d = Math.round(QUARTER_PX * r);
+  return { width: d, height: d };
+}
+
 function MoneyPic({ id, className }: { id: Coin; className?: string }) {
   const meta = COIN_META.find((m) => m.id === id)!;
+  const box = moneyBox(id);
   return (
     <img
       src={moneySrc(id)}
       alt={meta.label}
       draggable={false}
-      className={cn("object-contain", meta.imgClass, className)}
+      width={box.width}
+      height={box.height}
+      className={cn("object-contain", meta.bill ? "rounded-sm" : "rounded-full", className)}
+      style={{ width: box.width, height: box.height }}
     />
   );
 }
@@ -690,6 +728,7 @@ function MoneyPic({ id, className }: { id: Coin; className?: string }) {
 function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProps) {
   const data = question.data as MoneyData;
   const [gone, setGone] = useState<Record<string, boolean>>({});
+  const [counted, setCounted] = useState<Record<string, boolean>>({});
   const [built, setBuilt] = useState<Coin[]>([]);
   const coins = useMemo(() => {
     const list: { key: string; id: Coin }[] = [];
@@ -789,6 +828,61 @@ function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProp
     );
   }
 
+  if (data.mode === "count") {
+    const { rest, pile } = splitCounted(coins, counted);
+    const hasBill = coins.some((c) => c.id === "dollar" || c.id === "five");
+    return (
+      <Frame shake={shake} status={status}>
+        <div data-count-row="rest" className="flex min-h-10 flex-wrap justify-center gap-2">
+          {rest.map((c) => {
+            const meta = COIN_META.find((m) => m.id === c.id)!;
+            return (
+              <button
+                type="button"
+                key={c.key}
+                data-count-coin={c.id}
+                data-counted="0"
+                onClick={() => {
+                  setCounted((g) => ({ ...g, [c.key]: true }));
+                  playTap();
+                  onInteract();
+                }}
+                className="rounded-full bg-transparent p-0"
+                aria-label={meta.label}
+              >
+                <MoneyPic id={c.id} />
+              </button>
+            );
+          })}
+        </div>
+        <div
+          data-count-row="pile"
+          className="mt-3 flex min-h-10 flex-wrap justify-center gap-2 rounded-[16px] border border-dashed border-line bg-bg-warm p-2"
+        >
+          {pile.map((c) => {
+            const meta = COIN_META.find((m) => m.id === c.id)!;
+            return (
+              <span key={c.key} data-count-coin={c.id} data-counted="1" aria-label={meta.label}>
+                <MoneyPic id={c.id} />
+              </span>
+            );
+          })}
+        </div>
+        <p className="mt-3 text-center text-sm text-muted">{hasBill ? ui.countMoney : ui.countCoins}</p>
+        <button
+          type="button"
+          className="mx-auto mt-2 block text-sm text-muted"
+          onClick={() => {
+            setCounted({});
+            setValue("");
+          }}
+        >
+          {ui.clear}
+        </button>
+      </Frame>
+    );
+  }
+
   return (
     <Frame shake={shake} status={status}>
       <div className="flex flex-wrap justify-center gap-2">
@@ -807,9 +901,7 @@ function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProp
           );
         })}
       </div>
-      <p className="mt-3 text-center text-sm text-muted">
-        {data.mode === "change" ? ui.takeCoins : ui.countCoins}
-      </p>
+      <p className="mt-3 text-center text-sm text-muted">{ui.takeCoins}</p>
     </Frame>
   );
 }
@@ -883,6 +975,20 @@ function PerimeterBoard({ question, onInteract, status, shake }: BoardProps) {
   );
 }
 
+function GraphIcon({ id, size = 28 }: { id: string; size?: number }) {
+  return (
+    <img
+      src={squisheeSrc(id)}
+      alt=""
+      width={size}
+      height={size}
+      draggable={false}
+      className={cn("object-contain", size >= 28 ? "size-7" : "inline size-5")}
+      style={{ width: size, height: size }}
+    />
+  );
+}
+
 function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
   const data = question.data as GraphData;
   const ui = UI[parseLocale(useProgress((st) => st.locale))];
@@ -930,33 +1036,37 @@ function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
                 )}
                 aria-label={t.label}
               >
-                <MagentaImg src={squisheeSrc(t.symbol ?? data.symbol)} alt="" className="size-7" />
+                <GraphIcon id={t.symbol ?? data.symbol} />
               </button>
             ))}
           </div>
         </div>
       ) : null}
       {data.kind === "picto" ? (
-        <div className="space-y-2">
-          {rows.map((r) => (
-            <div key={r.label} className="flex items-start gap-2">
-              <button
-                type="button"
-                className="w-20 shrink-0 rounded-[8px] border border-line px-1 py-0.5 text-left text-sm"
-                onClick={() => place(r.label)}
-              >
-                {r.label}
-              </button>
-              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-0.5">
-                {Array.from({ length: count(r.value) }, (_, i) => (
-                  <MagentaImg key={i} src={squisheeSrc(sym(r))} alt="" className="size-7" />
-                ))}
+        <div className="overflow-visible">
+          <div className="space-y-2">
+            {rows.map((r) => (
+              <div key={r.label} className="flex items-start gap-2">
+                <button
+                  type="button"
+                  className="w-20 shrink-0 rounded-[8px] border border-line px-1 py-0.5 text-left text-sm"
+                  onClick={() => place(r.label)}
+                >
+                  {r.label}
+                </button>
+                <div className="flex min-h-7 min-w-0 flex-1 flex-wrap content-start items-center gap-0.5 overflow-visible">
+                  {Array.from({ length: count(r.value) }, (_, i) => (
+                    <span key={i} data-picto-icon="1" className="inline-grid">
+                      <GraphIcon id={sym(r)} />
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-          <p className="flex items-center gap-1 text-xs text-muted">
-            {ui.graphKeyWord}: <MagentaImg src={squisheeSrc(data.symbol)} alt="" className="inline size-5" /> = {data.key}
-          </p>
+            ))}
+            <p className="flex flex-wrap items-center gap-1 text-xs text-muted">
+              {ui.graphKeyWord}: <GraphIcon id={data.symbol} size={20} /> = {data.key}
+            </p>
+          </div>
         </div>
       ) : (
         <div className="flex h-40 items-stretch justify-around gap-2">

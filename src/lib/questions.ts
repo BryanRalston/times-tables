@@ -71,7 +71,7 @@ export function welcomeFirst(rng: Rng): Question {
     prompt: "6 + n = 10",
     hint: t().leftoverHint,
     answer: "4",
-    needsInteract: false,
+    needsInteract: true,
     data: { total: 10, shown: 6, equation: "6 + n = 10" } satisfies TenFrameData,
   });
 }
@@ -82,14 +82,14 @@ function tenframeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const total = rng.int(minT, maxT);
   const shown = rng.int(Math.max(1, total - 8), Math.max(1, total - 2));
   const n = total - shown;
-  const sub = params.mode === "sub" || (total >= 12 && rng.next() < 0.45);
+  const sub = params.mode === "sub" || (params.mode !== "add" && total >= 12 && rng.next() < 0.45);
   const equation = sub ? `${total} − n = ${shown}` : `${shown} + n = ${total}`;
   return keypadQ(rng, {
     kind: "tenframe",
     prompt: equation,
     hint: t().leftoverHint,
     answer: String(n),
-    needsInteract: false,
+    needsInteract: true,
     data: { total, shown, equation } satisfies TenFrameData,
   });
 }
@@ -624,8 +624,11 @@ function clockQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 function randomPurse(rng: Rng, max: number): { coins: Partial<Record<Coin, number>>; cents: number } {
   const coins: Partial<Record<Coin, number>> = {};
   let cents = 0;
-  const order: Coin[] = rng.shuffle(["quarter", "dime", "nickel", "penny", "dollar", "five"]);
-  for (const c of order) {
+  const kinds: Coin[] =
+    max <= 100
+      ? rng.shuffle(["quarter", "dime", "nickel", "penny"])
+      : rng.shuffle(["quarter", "dime", "nickel", "penny", "dollar", "five"]);
+  for (const c of kinds) {
     const cap = c === "penny" ? 8 : c === "dollar" ? 3 : c === "five" ? 1 : 4;
     const n = rng.int(0, cap);
     if (!n) continue;
@@ -684,9 +687,10 @@ function moneyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     });
   }
   const purse = randomPurse(rng, max);
+  const hasBill = Boolean(purse.coins.dollar || purse.coins.five);
   return keypadQ(rng, {
     kind: "money",
-    prompt: t().howManyCents,
+    prompt: hasBill ? t().howMuchMoney : t().howManyCents,
     answer: String(purse.cents),
     alts: [moneyFmt(purse.cents)],
     data: { coins: purse.coins, mode: "count" } satisfies MoneyData,
@@ -795,7 +799,7 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     }
     return keypadQ(rng, {
       kind: "graph",
-      prompt: t().sortHowMany(focus),
+      prompt: t().sortEvery,
       hint: t().sortHint,
       answer,
       alts: graphAlts,
@@ -1119,13 +1123,13 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   }
   if (mode === "take") {
     const total = rng.int(8, 18);
-    const shown = rng.int(3, total - 2);
+    const shown = rng.int(Math.max(3, total - 9), total - 2);
     return keypadQ(rng, {
       kind: "tenframe",
       prompt: t().wordTake(name, total, shown, thing),
       hint: t().wordTakeHint,
       answer: String(total - shown),
-      needsInteract: false,
+      needsInteract: true,
       data: { total, shown, equation: `${total} − n = ${shown}` },
     });
   }
@@ -1164,7 +1168,7 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     prompt: t().wordSee(name, shown, thing, shown + n),
     hint: t().leftoverHint,
     answer: String(n),
-    needsInteract: false,
+    needsInteract: true,
     data: { total: shown + n, shown, equation: `${shown} + n = ${shown + n}` },
   });
 }
@@ -1362,7 +1366,11 @@ export function makeWelcomeRound(rng: Rng = rngRandom(), locale: Locale | string
   loc = parseLocale(locale);
   try {
     const first = welcomeFirst(rng);
-    const rest = [tenframeQ(rng, { maxTotal: 10 }), tenframeQ(rng, { minTotal: 8, maxTotal: 10 }), tenframeQ(rng, { minTotal: 10, maxTotal: 14 })];
+    const rest = [
+      tenframeQ(rng, { maxTotal: 10, mode: "add" }),
+      tenframeQ(rng, { minTotal: 8, maxTotal: 10, mode: "add" }),
+      tenframeQ(rng, { minTotal: 10, maxTotal: 14, mode: "add" }),
+    ];
     return [first, ...rest];
   } finally {
     loc = prev;
@@ -1371,12 +1379,16 @@ export function makeWelcomeRound(rng: Rng = rngRandom(), locale: Locale | string
 
 export function makeActivityRound(activity: ActivityDef, rng: Rng = rngRandom(), count?: number, locale: Locale | string = "en"): Question[] {
   const n = count ?? activity.rounds;
+  const act: ActivityDef =
+    activity.id === "u1-friends"
+      ? { ...activity, params: { ...activity.params, mode: rng.pick(["add", "sub"] as const) } }
+      : activity;
   const seen = new Set<string>();
   const out: Question[] = [];
   let guard = 0;
   while (out.length < n && guard < n * 8) {
     guard += 1;
-    const q = makeQuestion(activity, rng, locale);
+    const q = makeQuestion(act, rng, locale);
     const key = `${q.prompt}|${q.answer}`;
     if (seen.has(key)) continue;
     seen.add(key);
@@ -1385,13 +1397,13 @@ export function makeActivityRound(activity: ActivityDef, rng: Rng = rngRandom(),
   let extra = 0;
   while (out.length < n && extra < n * 12) {
     extra += 1;
-    const q = makeQuestion(activity, rng, locale);
+    const q = makeQuestion(act, rng, locale);
     const key = `${q.prompt}|${q.answer}`;
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(q);
   }
-  while (out.length < n) out.push(makeQuestion(activity, rng, locale));
+  while (out.length < n) out.push(makeQuestion(act, rng, locale));
   return out;
 }
 

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, type PersistStorage, type StorageValue } from "zustand/middleware";
 import { applyBuy, type BuyReason } from "./coins";
 import { GRADE4_SPANS, UNIT_SPANS, UNITS, unitById, unitsFor } from "./curriculum";
 import { parseLocale } from "./i18n";
@@ -7,8 +7,62 @@ import type { DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./t
 import { parsePathGrade } from "./types";
 
 const SAVE_VERSION = 7;
-const STORAGE_KEY = "g3-path-v2";
+export const STORAGE_KEY = "g3-path-v2";
+export const LEGACY_STORAGE_KEYS = ["g3-path-v1", "times-tables-progress", "times-tables-settings"] as const;
 const DEFAULT_ID = "kid-1";
+
+let persistWrites = false;
+
+function getLocalStorage(): Storage | null {
+  try {
+    const ls = globalThis.localStorage;
+    return ls ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function parseJson(raw: string | null): unknown {
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+export function unwrapSave(parsed: unknown): Partial<SaveState> | null {
+  if (!parsed || typeof parsed !== "object") return null;
+  const o = parsed as Record<string, unknown>;
+  if (o.state && typeof o.state === "object") return o.state as Partial<SaveState>;
+  return o as Partial<SaveState>;
+}
+
+export function looksLikeSave(s: Partial<SaveState> | null | undefined): boolean {
+  if (!s || typeof s !== "object") return false;
+  return (
+    typeof s.coins === "number" ||
+    typeof s.stars === "number" ||
+    typeof s.name === "string" ||
+    typeof s.version === "number" ||
+    typeof s.learnerId === "string" ||
+    typeof s.locale === "string" ||
+    typeof s.seenWelcome === "boolean" ||
+    Boolean(s.activities) ||
+    Boolean(s.learners) ||
+    Boolean(s.sessions)
+  );
+}
+
+export function readFirstSave(): Partial<SaveState> | null {
+  const ls = getLocalStorage();
+  if (!ls) return null;
+  for (const key of [STORAGE_KEY, ...LEGACY_STORAGE_KEYS]) {
+    const slice = unwrapSave(parseJson(ls.getItem(key)));
+    if (looksLikeSave(slice)) return slice;
+  }
+  return null;
+}
 
 export function emptyLearner(name = ""): LearnerSlice {
   return {
@@ -118,6 +172,29 @@ interface ProgressApi extends SaveState {
   resetAll: () => void;
 }
 
+function snapshotSave(s: SaveState): SaveState {
+  return {
+    version: s.version,
+    learnerId: s.learnerId,
+    name: s.name,
+    stars: s.stars,
+    seenWelcome: s.seenWelcome,
+    classUnitId: s.classUnitId,
+    pathGrade: s.pathGrade,
+    skipWeekend: s.skipWeekend,
+    locale: s.locale,
+    activities: s.activities,
+    badges: s.badges,
+    shaky: s.shaky,
+    sessions: s.sessions,
+    squishees: s.squishees,
+    coins: s.coins,
+    attempts: s.attempts,
+    perfectWalks: s.perfectWalks,
+    learners: s.learners,
+  };
+}
+
 function commit(get: () => ProgressApi, set: (p: Partial<ProgressApi>) => void, patch: Partial<LearnerSlice>) {
   const id = get().learnerId || DEFAULT_ID;
   const cur = sliceOf(get().learners[id] ?? get());
@@ -128,6 +205,24 @@ function commit(get: () => ProgressApi, set: (p: Partial<ProgressApi>) => void, 
     learners: { ...get().learners, [id]: next },
   });
 }
+
+const progressStorage: PersistStorage<SaveState> = {
+  getItem: (): StorageValue<SaveState> | null => {
+    const slice = readFirstSave();
+    if (!slice) return null;
+    return { state: migrate(slice), version: 0 };
+  },
+  setItem: (_name, value) => {
+    if (!persistWrites) return;
+    const ls = getLocalStorage();
+    if (!ls) return;
+    ls.setItem(STORAGE_KEY, JSON.stringify(value));
+  },
+  removeItem: (_name) => {
+    if (!persistWrites) return;
+    getLocalStorage()?.removeItem(STORAGE_KEY);
+  },
+};
 
 export const useProgress = create<ProgressApi>()(
   persist(
@@ -242,26 +337,8 @@ export const useProgress = create<ProgressApi>()(
     {
       name: STORAGE_KEY,
       skipHydration: true,
-      partialize: (s) => ({
-        version: s.version,
-        learnerId: s.learnerId,
-        name: s.name,
-        stars: s.stars,
-        seenWelcome: s.seenWelcome,
-        classUnitId: s.classUnitId,
-        pathGrade: s.pathGrade,
-        skipWeekend: s.skipWeekend,
-        locale: s.locale,
-        activities: s.activities,
-        badges: s.badges,
-        shaky: s.shaky,
-        sessions: s.sessions,
-        squishees: s.squishees,
-        coins: s.coins,
-        attempts: s.attempts,
-        perfectWalks: s.perfectWalks,
-        learners: s.learners,
-      }),
+      storage: progressStorage,
+      partialize: (s) => snapshotSave(s),
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<SaveState>;
         return { ...current, ...migrate(p) };
@@ -274,26 +351,67 @@ export function migrateSave(raw: Partial<SaveState> | null | undefined): SaveSta
   return migrate(raw);
 }
 
-export function hydrateProgress() {
-  const done = () => {
-    try {
-      useProgress.getState().setHydrated(true);
-    } catch {
-      /* ignore */
-    }
-  };
-  done();
-  let t = 0;
-  if (typeof window !== "undefined") t = window.setTimeout(done, 400);
+export function persistWritesEnabled(): boolean {
+  return persistWrites;
+}
+
+export function setPersistWrites(on: boolean): void {
+  persistWrites = on;
+}
+
+export function resetProgressMemory(): void {
+  persistWrites = false;
+  useProgress.setState({ ...empty(), hydrated: false });
+}
+
+export function exportSaveJson(): string {
+  return JSON.stringify({ state: snapshotSave(useProgress.getState()), version: 0 }, null, 2);
+}
+
+export function importSaveJson(raw: string): boolean {
+  let parsed: unknown;
   try {
-    void Promise.resolve(useProgress.persist.rehydrate()).finally(() => {
-      if (t) window.clearTimeout(t);
-      done();
-    });
+    parsed = JSON.parse(raw);
   } catch {
-    if (t) window.clearTimeout(t);
-    done();
+    return false;
   }
+  const slice = unwrapSave(parsed);
+  if (!looksLikeSave(slice)) return false;
+  persistWrites = true;
+  useProgress.setState({ ...migrate(slice), hydrated: true });
+  return true;
+}
+
+export function hydrateProgress(): Promise<void> {
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = (ok: boolean) => {
+      if (settled) return;
+      settled = true;
+      if (ok) persistWrites = true;
+      try {
+        useProgress.getState().setHydrated(true);
+      } catch {
+        /* ignore */
+      }
+      resolve();
+    };
+    try {
+      const unsub = useProgress.persist.onFinishHydration(() => finish(true));
+      void Promise.resolve(useProgress.persist.rehydrate()).then(
+        () => {
+          unsub();
+          finish(true);
+        },
+        () => {
+          unsub();
+          finish(false);
+        },
+      );
+    } catch {
+      finish(false);
+    }
+  });
 }
 
 export function unitStars(unitId: string): number {

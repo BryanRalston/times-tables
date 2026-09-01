@@ -184,17 +184,18 @@
   animation: node-pulse 1.8s ease-in-out infinite;
 }
 
-@keyframes take-bob {
-  0%,
-  100% {
-    transform: translateY(0);
+@keyframes take-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
   }
-  50% {
-    transform: translateY(-3px);
+  to {
+    transform: scale(0.45);
+    opacity: 0;
   }
 }
-.takeable {
-  animation: take-bob 1.3s ease-in-out infinite;
+.take-out {
+  animation: take-out 280ms ease-in forwards;
 }
 
 @keyframes unlock-pop {

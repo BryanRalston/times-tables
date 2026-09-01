@@ -71,7 +71,7 @@ export const UNITS: UnitDef[] = [
     sol: ["3.NS.1", "3.NS.4", "3.CE.1", "3.PS.1"],
     blurb: "Count what you can see. Collect and organize data. Name the leftover.",
     activities: [
-      A("u1-leftover", "What's hiding", "Ten-frames. Take the dots you can see, then name n.", ["3.NS.1"], "tenframe", { maxTotal: 10 }),
+      A("u1-leftover", "What's hiding", "Ten-frames. Take the dots you can see, then name n.", ["3.NS.1"], "tenframe", { maxTotal: 10, mode: "add" }),
       A("u1-friends", "Number friends", "Add and subtract on a frame, within 20.", ["3.CE.1"], "tenframe", { minTotal: 10, maxTotal: 20 }),
       A("u1-coins", "Count the coins", "Pennies, nickels, dimes, quarters — up to a dollar.", ["3.NS.4.a"], "money", { mode: "count", max: 100 }),
       A("u1-tally", "Tally and graph", "Sort the pictures. Watch the pictograph grow. Then read it.", ["3.PS.1.a", "3.PS.1.b"], "graph", { kind: "picto", collect: true }),
