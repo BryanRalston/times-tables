@@ -345,7 +345,9 @@ describe("answer audit", () => {
         expect(counts[d.focus!] ?? 0).toBeGreaterThanOrEqual(2);
         expect(q.needsInteract).toBe(true);
         expect(d.readPrompt?.length).toBeGreaterThan(0);
-        if (d.ask === "value") expect(Number(q.answer)).toBe(counts[d.focus!]);
+        if (id === "u6-picto") expect(d.key).toBe(2);
+        if (id === "u1-tally") expect(d.key).toBe(1);
+        if (d.ask === "value") expect(Number(q.answer)).toBe((counts[d.focus!] ?? 0) * d.key);
         if (d.ask === "greatest") {
           const m = Math.max(...Object.values(counts));
           expect(counts[q.answer]).toBe(m);
@@ -379,7 +381,7 @@ describe("answer audit", () => {
 
   it("leftover / what's hiding / find-n ten-frames do not gate Check", () => {
     expect(welcomeFirst(rngFromSeed(1)).needsInteract).toBeFalsy();
-    for (const id of ["u1-leftover", "u1-friends"]) {
+    for (const id of ["u1-leftover", "u1-friends", "u7-add", "u7-take"]) {
       for (let i = 0; i < 20; i++) {
         const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`ni:${id}:${i}`));
         expect(q.kind).toBe("tenframe");

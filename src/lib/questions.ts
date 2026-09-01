@@ -753,7 +753,12 @@ export function placeOnGraph(
 function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const pack = rng.shuffle(GRAPH_CATS[loc]).slice(0, 4);
   const labels = pack.map((p) => p.label);
-  const key = Number(params.key ?? rng.pick([1, 2]));
+  let key: number;
+  if (params.key != null) key = Number(params.key);
+  else if (params.collect) {
+    rng.pick([1, 2]);
+    key = 1;
+  } else key = rng.pick([1, 2]);
   const kind = (params.kind as "picto" | "bar") ?? "picto";
   if (params.collect) {
     const focusCat = rng.pick(pack);
@@ -767,7 +772,7 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const tray = trayPack.map((p, i) => ({ id: `t-${i}`, label: p.label, symbol: p.id }));
     const ask = rng.pick(["value", "greatest", "least"] as const);
     let readPrompt = t().graphHowMany(focus);
-    let answer = String(counts[focus] ?? 0);
+    let answer = String((counts[focus] ?? 0) * key);
     let graphAlts: string[] | undefined;
     let input: Question["input"] = "keypad";
     let choices: string[] | undefined;
@@ -800,7 +805,7 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       data: {
         title: t().graphTitle,
         kind,
-        key: 1,
+        key,
         symbol: pack[0]!.id,
         rows: pack.map((p) => ({ label: p.label, value: 0, symbol: p.id })),
         ask,
@@ -1120,7 +1125,7 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       prompt: t().wordTake(name, total, shown, thing),
       hint: t().wordTakeHint,
       answer: String(total - shown),
-      needsInteract: true,
+      needsInteract: false,
       data: { total, shown, equation: `${total} − n = ${shown}` },
     });
   }
@@ -1159,7 +1164,7 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     prompt: t().wordSee(name, shown, thing, shown + n),
     hint: t().leftoverHint,
     answer: String(n),
-    needsInteract: true,
+    needsInteract: false,
     data: { total: shown + n, shown, equation: `${shown} + n = ${shown + n}` },
   });
 }

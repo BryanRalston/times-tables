@@ -5,7 +5,7 @@ import { makeQuestion } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
 import type { ChoiceData, ClockData, DecimalData, MeasureData, MoneyData, Question } from "@/lib/types";
 import { moneyFmt } from "@/lib/utils";
-import { BEAKER_FACE, Board, beakerMeniscusY, type BoardProps } from "./models";
+import { BEAKER_FACE, Board, beakerMeniscusY, rulerPointerX, scaleNeedleDeg, type BoardProps } from "./models";
 
 function stub(q: Question): BoardProps {
   return {
@@ -168,5 +168,26 @@ describe("boards", () => {
     expect(t).toBeCloseTo(ratio, 5);
     expect(html).toMatch(/clip-?path/i);
     expect(html).toContain("measure/beaker");
+  });
+
+  it("scale needle rotation maps to value/max", () => {
+    const q = makeQuestion(activityById("u8-mass")!.activity, rngFromSeed("scale:deg"));
+    const d = q.data as MeasureData;
+    expect(d.attribute).toBe("mass");
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    const deg = scaleNeedleDeg(d.value, d.max);
+    expect(html).toContain(`data-scale-deg="${deg}"`);
+    expect(Number(html.match(/data-scale-deg="([^"]+)"/)?.[1])).toBe(deg);
+    expect(deg).toBe(225 + (d.value / d.max) * 270);
+  });
+
+  it("ruler pointer x maps to value/max", () => {
+    const q = makeQuestion(activityById("u8-length")!.activity, rngFromSeed("ruler:x"));
+    const d = q.data as MeasureData;
+    expect(d.attribute).toBe("length");
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    const x = rulerPointerX(d.value, d.max);
+    expect(html).toContain(`data-ruler-x="${x}"`);
+    expect(Number(html.match(/data-ruler-x="([^"]+)"/)?.[1])).toBe(x);
   });
 });

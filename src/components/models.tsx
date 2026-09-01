@@ -653,7 +653,7 @@ function AnalogClock({ question, status, shake }: BoardProps) {
   return (
     <Frame shake={shake} status={status}>
       <div className="flex justify-center">
-        <ClockFace hours={data.hours} minutes={data.minutes} />
+        <ClockFace hours={data.hours} minutes={data.minutes} size="size-36 sm:size-40" />
       </div>
       <p className="mt-2 text-center text-sm text-muted">
         {data.find === "time" ? ui.readTheHands : ui.startClock(`${data.hours}:${pad2(data.minutes)}`)}
@@ -906,7 +906,7 @@ function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
     if (!item) return;
     const nextTray = tray.filter((x) => x.id !== picked);
     setTray(nextTray);
-    setCounts((c) => ({ ...c, [label]: (c[label] ?? 0) + 1 }));
+    setCounts((c) => ({ ...c, [label]: (c[label] ?? 0) + Math.max(1, data.key) }));
     setPicked(null);
     playTap();
     if (nextTray.length === 0) onInteract();
@@ -1102,14 +1102,26 @@ function ComputeBoard({ question, status, shake }: BoardProps) {
 }
 
 /** Overlay viewBoxes match keyed public/measure PNGs. */
-const RULER_FACE = { w: 1229, h: 222, x0: 148, x1: 1188, y0: 36, yMaj: 92, yMin: 62, yNum: 142 };
-const SCALE_FACE = { w: 392, h: 717, cx: 170, cy: 331, r: 136, start: 225, sweep: 270 };
+export const RULER_FACE = { w: 1229, h: 222, x0: 148, x1: 1188, y0: 36, yMaj: 92, yMin: 62, yNum: 142 };
+/** public/measure/scale.png (732×1376). Dial is the blank white disc; start 225° = 0 on a y-down clock. */
+export const SCALE_FACE = { w: 732, h: 1000, cx: 315, cy: 637, r: 248, start: 225, sweep: 270 };
 /** Inner cavity of public/measure/beaker.png (309×919). y grows down; meniscus at yBot when value is 0. */
 export const BEAKER_FACE = { w: 309, h: 919, x: 86, fw: 142, yTop: 78, yBot: 788, tickX: 220 };
 
 export function beakerMeniscusY(value: number, max: number, face = BEAKER_FACE): number {
   const m = Math.max(1, max);
   return face.yBot - (value / m) * (face.yBot - face.yTop);
+}
+
+export function rulerPointerX(value: number, max: number, halves = true, face = RULER_FACE): number {
+  const m = Math.max(1, max);
+  const steps = halves ? m * 2 : m;
+  const at = halves ? value * 2 : value;
+  return face.x0 + (at / steps) * (face.x1 - face.x0);
+}
+
+export function scaleNeedleDeg(value: number, max: number, face = SCALE_FACE): number {
+  return face.start + (value / Math.max(1, max)) * face.sweep;
 }
 
 function ToolFace({
@@ -1203,7 +1215,6 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
   const max = Math.max(1, data.max);
   const halves = data.attribute === "length";
   const steps = halves ? max * 2 : max;
-  const at = halves ? data.value * 2 : data.value;
   const label = `${ui.readPointer} ${data.unit}`;
   const caption = (
     <p className="mt-1 text-center text-sm font-medium text-ink">
@@ -1213,7 +1224,7 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
   if (data.attribute === "length") {
     const { w, h, x0, x1, y0, yMaj, yMin, yNum } = RULER_FACE;
     const x = (i: number) => x0 + (i / steps) * (x1 - x0);
-    const px = x(at);
+    const px = rulerPointerX(data.value, max, halves);
     const src = data.unit === "cm" ? asset("measure/ruler-cm.png") : asset("measure/ruler.png");
     return (
       <Frame shake={shake} status={status}>
@@ -1246,6 +1257,9 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
                 );
               })}
               <polygon
+                data-ruler-x={px}
+                data-value={data.value}
+                data-max={max}
                 points={`${px},${y0} ${px - 12},${y0 - 20} ${px + 12},${y0 - 20}`}
                 fill="#c45c26"
                 stroke="#1f1a14"
@@ -1260,7 +1274,7 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
   }
   if (data.attribute === "mass") {
     const { w, h, cx, cy, r, start, sweep } = SCALE_FACE;
-    const deg = start + (data.value / max) * sweep;
+    const deg = scaleNeedleDeg(data.value, max);
     const polar = (radius: number, d: number) => {
       const a = (d * Math.PI) / 180;
       return [cx + Math.cos(a) * radius, cy + Math.sin(a) * radius] as const;
@@ -1272,7 +1286,7 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
             src={asset("measure/scale.png")}
             viewBox={`0 0 ${w} ${h}`}
             className="inline-block"
-            imgClass="h-80 w-auto sm:h-96"
+            imgClass="h-40 w-auto sm:h-48"
             label={label}
             over={
               <>
@@ -1290,7 +1304,7 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
                     </g>
                   );
                 })}
-                <g transform={`rotate(${deg} ${cx} ${cy})`}>
+                <g data-scale-deg={deg} data-value={data.value} data-max={max} transform={`rotate(${deg} ${cx} ${cy})`}>
                   <line x1={cx} y1={cy} x2={cx + r * 0.78} y2={cy} stroke="#1f1a14" strokeWidth="5" strokeLinecap="round" />
                   <polygon
                     points={`${cx + r * 0.88},${cy} ${cx + r * 0.7},${cy - 11} ${cx + r * 0.7},${cy + 11}`}
@@ -1319,7 +1333,7 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
           src={asset("measure/beaker.png")}
           viewBox={`0 0 ${w} ${h}`}
           className="inline-block"
-          imgClass="h-64 w-auto sm:h-72"
+          imgClass="h-48 w-auto sm:h-56"
           label={label}
           over={
             <>

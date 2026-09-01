@@ -203,7 +203,7 @@ export function ClockKeys({
   return (
     <div className="space-y-3">
       <div className="flex justify-center">
-        <InteractiveClock hours={hours} minutes={minutes} onChange={onChange} disabled={disabled} />
+        <InteractiveClock hours={hours} minutes={minutes} onChange={onChange} disabled={disabled} size="size-36 sm:size-40" />
       </div>
       <p className="text-center font-display text-3xl tabular-nums">
         {hours}:{pad2(minutes)}

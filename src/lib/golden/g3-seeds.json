@@ -7448,7 +7448,7 @@
     },
     {
       "prompt": "Sort every picture. How many ducks?",
-      "answer": "3",
+      "answer": "6",
       "alts": null,
       "choices": null,
       "kind": "graph",
@@ -7490,7 +7490,7 @@
     },
     {
       "prompt": "Sort every picture. How many frogs?",
-      "answer": "2",
+      "answer": "4",
       "alts": null,
       "choices": null,
       "kind": "graph",
@@ -7499,7 +7499,7 @@
     },
     {
       "prompt": "Sort every picture. How many pandas?",
-      "answer": "3",
+      "answer": "6",
       "alts": null,
       "choices": null,
       "kind": "graph",
@@ -7539,7 +7539,7 @@
     },
     {
       "prompt": "Sort every picture. How many sharks?",
-      "answer": "3",
+      "answer": "6",
       "alts": null,
       "choices": null,
       "kind": "graph",
@@ -7594,7 +7594,7 @@
     },
     {
       "prompt": "Sort every picture. How many bunnies?",
-      "answer": "2",
+      "answer": "4",
       "alts": null,
       "choices": null,
       "kind": "graph",
@@ -7649,7 +7649,7 @@
     },
     {
       "prompt": "Sort every picture. How many pigs?",
-      "answer": "3",
+      "answer": "6",
       "alts": null,
       "choices": null,
       "kind": "graph",
@@ -7709,7 +7709,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Mila sees 9 acorns. Some are hiding. There are 12 in all. How many hide?",
@@ -7718,7 +7718,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Rosa sees 6 buttons. Some are hiding. There are 8 in all. How many hide?",
@@ -7727,7 +7727,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Lila sees 8 stickers. Some are hiding. There are 12 in all. How many hide?",
@@ -7736,7 +7736,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Elena sees 8 apples. Some are hiding. There are 14 in all. How many hide?",
@@ -7745,7 +7745,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Leo sees 4 buttons. Some are hiding. There are 10 in all. How many hide?",
@@ -7754,7 +7754,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Cole sees 4 buttons. Some are hiding. There are 6 in all. How many hide?",
@@ -7763,7 +7763,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Amir sees 6 marbles. Some are hiding. There are 12 in all. How many hide?",
@@ -7772,7 +7772,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "June sees 8 beads. Some are hiding. There are 14 in all. How many hide?",
@@ -7781,7 +7781,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "June sees 4 beads. Some are hiding. There are 8 in all. How many hide?",
@@ -7790,7 +7790,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Maya sees 5 squishees. Some are hiding. There are 8 in all. How many hide?",
@@ -7799,7 +7799,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Theo sees 7 stickers. Some are hiding. There are 9 in all. How many hide?",
@@ -7808,7 +7808,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Noah sees 4 blocks. Some are hiding. There are 9 in all. How many hide?",
@@ -7817,7 +7817,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Amir sees 5 seeds. Some are hiding. There are 10 in all. How many hide?",
@@ -7826,7 +7826,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Leo sees 5 pencils. Some are hiding. There are 8 in all. How many hide?",
@@ -7835,7 +7835,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Omar sees 8 seeds. Some are hiding. There are 14 in all. How many hide?",
@@ -7844,7 +7844,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Theo sees 7 blocks. Some are hiding. There are 9 in all. How many hide?",
@@ -7853,7 +7853,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Omar sees 6 stars. Some are hiding. There are 12 in all. How many hide?",
@@ -7862,7 +7862,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Maya sees 5 stamps. Some are hiding. There are 7 in all. How many hide?",
@@ -7871,7 +7871,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Ivy sees 7 stars. Some are hiding. There are 9 in all. How many hide?",
@@ -7880,7 +7880,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     }
   ],
   "u7-take": [
@@ -7891,7 +7891,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Zoe had 9 acorns. 6 are in the dish. How many are hiding?",
@@ -7900,7 +7900,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Ava had 18 stamps. 3 are in the dish. How many are hiding?",
@@ -7909,7 +7909,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Elena had 13 shells. 5 are in the dish. How many are hiding?",
@@ -7918,7 +7918,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Ivy had 18 beads. 14 are in the dish. How many are hiding?",
@@ -7927,7 +7927,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Maya had 9 buttons. 4 are in the dish. How many are hiding?",
@@ -7936,7 +7936,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "June had 8 pencils. 3 are in the dish. How many are hiding?",
@@ -7945,7 +7945,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Kai had 13 shells. 8 are in the dish. How many are hiding?",
@@ -7954,7 +7954,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Cole had 18 stamps. 7 are in the dish. How many are hiding?",
@@ -7963,7 +7963,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Hugo had 13 apples. 8 are in the dish. How many are hiding?",
@@ -7972,7 +7972,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Sam had 10 stickers. 4 are in the dish. How many are hiding?",
@@ -7981,7 +7981,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Theo had 16 squishees. 10 are in the dish. How many are hiding?",
@@ -7990,7 +7990,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Leo had 11 shells. 9 are in the dish. How many are hiding?",
@@ -7999,7 +7999,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "June had 12 stickers. 5 are in the dish. How many are hiding?",
@@ -8008,7 +8008,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Wes had 11 stickers. 7 are in the dish. How many are hiding?",
@@ -8017,7 +8017,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Mila had 17 erasers. 11 are in the dish. How many are hiding?",
@@ -8026,7 +8026,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Cole had 15 stickers. 8 are in the dish. How many are hiding?",
@@ -8035,7 +8035,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Elena had 18 stickers. 13 are in the dish. How many are hiding?",
@@ -8044,7 +8044,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Amir had 15 shells. 8 are in the dish. How many are hiding?",
@@ -8053,7 +8053,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     },
     {
       "prompt": "Omar had 10 ribbons. 8 are in the dish. How many are hiding?",
@@ -8062,7 +8062,7 @@
       "choices": null,
       "kind": "tenframe",
       "input": "keypad",
-      "needsInteract": true
+      "needsInteract": false
     }
   ],
   "u7-compare": [

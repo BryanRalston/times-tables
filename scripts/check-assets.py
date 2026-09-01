@@ -30,6 +30,8 @@ ALLOW_INTERIOR_HOLES = {
 }
 
 MONEY_FILES = ["penny.png", "nickel.png", "dime.png", "quarter.png", "dollar.png", "five.png"]
+MEASURE = PUBLIC / "measure"
+MEASURE_FILES = ["beaker.png", "pencil.png", "ruler.png", "ruler-cm.png", "scale.png"]
 
 
 def squishee_files() -> list[str]:
@@ -207,33 +209,67 @@ def main() -> int:
             if two_faces(blobs, w, h):
                 fails.append(f"{name}: two face clusters ({len(blobs)} dark blobs)")
 
-    beaker = PUBLIC / "measure" / "beaker.png"
-    if not beaker.exists():
-        fails.append("missing measure/beaker.png")
-    else:
-        im = Image.open(beaker).convert("RGBA")
+    for name in MEASURE_FILES:
+        path = MEASURE / name
+        if not path.exists():
+            fails.append(f"missing measure/{name}")
+            continue
+        im = Image.open(path).convert("RGBA")
         px = im.load()
-        bw, bh = im.size
-        minx, miny, maxx, maxy = bw, bh, 0, 0
-        for y in range(bh):
-            for x in range(bw):
-                if px[x, y][3] > 16:
-                    if x < minx:
-                        minx = x
-                    if y < miny:
-                        miny = y
-                    if x > maxx:
-                        maxx = x
-                    if y > maxy:
-                        maxy = y
-        cx, cy = (minx + maxx) // 2, (miny + maxy) // 2
-        # Tube mid-height, not the hex base.
-        ty = miny + int((maxy - miny) * 0.4)
-        if px[cx, cy][3] < 16 or px[cx, ty][3] < 16:
-            fails.append("beaker.png: cylinder center is transparent (interior keyed out)")
-        mag = magenta_count(px, bw, bh)
+        w, h = im.size
+        mag = magenta_count(px, w, h)
         if mag > 8:
-            fails.append(f"beaker.png: leftover magenta {mag}px")
+            fails.append(f"measure/{name}: leftover magenta {mag}px")
+        if name == "beaker.png":
+            minx, miny, maxx, maxy = w, h, 0, 0
+            for y in range(h):
+                for x in range(w):
+                    if px[x, y][3] > 16:
+                        if x < minx:
+                            minx = x
+                        if y < miny:
+                            miny = y
+                        if x > maxx:
+                            maxx = x
+                        if y > maxy:
+                            maxy = y
+            cx, cy = (minx + maxx) // 2, (miny + maxy) // 2
+            ty = miny + int((maxy - miny) * 0.4)
+            if px[cx, cy][3] < 16 or px[cx, ty][3] < 16:
+                fails.append("beaker.png: cylinder center is transparent (interior keyed out)")
+        if name.startswith("ruler"):
+            opaque = 0
+            minx, maxx = w, 0
+            for y in range(h):
+                for x in range(w):
+                    if px[x, y][3] > 16:
+                        opaque += 1
+                        if x < minx:
+                            minx = x
+                        if x > maxx:
+                            maxx = x
+            span = maxx - minx + 1 if maxx >= minx else 0
+            if w < 800 or span < 800 or opaque < w * h * 0.25:
+                fails.append(f"{name}: ruler strip is a stub (w={w} span={span} opaque={opaque})")
+        if name == "scale.png":
+            # Printed "5 kg / 50 N" sat on the housing above the white dial.
+            dark = 0
+            tot = 0
+            # Face of the hanging box, between screws and above the dial.
+            y0, y1 = int(h * 0.12), int(h * 0.22)
+            x0, x1 = int(w * 0.34), int(w * 0.57)
+            for y in range(y0, y1):
+                for x in range(x0, x1):
+                    r, g, b, a = px[x, y]
+                    if a < 200:
+                        continue
+                    tot += 1
+                    if r < 40 and g < 40 and b < 40:
+                        dark += 1
+            if tot < 200:
+                fails.append("scale.png: housing plate region is empty")
+            elif dark > 400:
+                fails.append(f"scale.png: printed unit legend still on the plate ({dark} dark px)")
 
     for name in MONEY_FILES:
         path = MONEY / name
@@ -252,7 +288,7 @@ def main() -> int:
         for f in fails:
             print(" ", f)
         return 1
-    print(f"check-assets OK {len(files)} squishees {len(MONEY_FILES)} money")
+    print(f"check-assets OK {len(files)} squishees {len(MONEY_FILES)} money {len(MEASURE_FILES)} measure")
     return 0
 
 

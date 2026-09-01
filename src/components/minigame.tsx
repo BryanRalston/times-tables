@@ -7,7 +7,7 @@ import { playCorrect, playTap, playWrong } from "@/lib/sound";
 import { squisheeById, squisheeSrc } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
-const TAP = "grid min-h-[96px] min-w-[96px] place-items-center rounded-[20px] border p-2";
+const TAP = "grid min-h-[96px] min-w-[96px] max-h-[112px] max-w-[112px] place-items-center overflow-hidden rounded-[20px] border p-2";
 
 export function MiniGame({
   seed,
@@ -49,12 +49,14 @@ export function MiniGame({
 
 function ToyFace({ id, className, onLoad }: { id: string; className?: string; onLoad?: () => void }) {
   return (
-    <MagentaImg
-      src={squisheeSrc(id)}
-      alt=""
-      className={cn("h-20 w-20 object-contain sm:h-24 sm:w-24", className)}
-      onLoad={onLoad}
-    />
+    <span className={cn("inline-grid h-20 w-20 place-items-center overflow-hidden sm:h-24 sm:w-24", className)}>
+      <MagentaImg
+        src={squisheeSrc(id)}
+        alt=""
+        className="h-full w-full object-contain"
+        onLoad={onLoad}
+      />
+    </span>
   );
 }
 

@@ -9,6 +9,10 @@ interface G3QaQuestion {
   prompt: string;
   interacted: boolean;
   checkDisabled: boolean;
+  value: number | null;
+  max: number | null;
+  unit: string | null;
+  attribute: string | null;
 }
 
 interface Window {

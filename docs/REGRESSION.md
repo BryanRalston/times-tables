@@ -17,5 +17,9 @@ These already shipped (or shipped-and-broke). A test or script must fail if they
 | 11 | MagentaVideo hid the PNG before the canvas painted; iPhone/coarse still tried chroma-key and showed an empty glyph. PNG stays until paint; skip on iOS/coarse. | `src/components/poke-toy.test.tsx` PNG in the tree; `src/components/magenta-video.test.ts` skip. |
 | 12 | Donut (and squishees) had two faces or leftover magenta. | `scripts/check-assets.py` (`npm run check:assets`, run from `npm test`). Two-eye-pair detector + magenta + missing files. |
 | 13 | Beaker interior was keyed out (glass ring). Teal fill sat *behind* the punch-out and did not read as liquid. | `scripts/check-assets.py` beaker bbox/tube center must be opaque. `models.test.tsx` beaker `data-fill-y` equals `beakerMeniscusY(value, max)`. |
+| 14 | Spring-scale photo printed **SPRING SCALE 5 kg / 50 N** while questions use oz/lb/g/kg. Kid reads the lie, not the overlay. | `scripts/check-assets.py` dark-ink count on the housing plate (above the white dial, between screws). PNG must be a blank plate. `models.test.tsx` `data-scale-deg` = `scaleNeedleDeg(value, max)`. |
+| 15 | Ruler photo chewed to a stub / mostly transparent so overlay ticks sat on empty air. | `scripts/check-assets.py` every `public/measure/*.png` exists; ruler strip width/opaque span. `models.test.tsx` `data-ruler-x` = `rulerPointerX(value, max)`. |
+| 16 | Join/take leftover stories (`u7-add`, `u7-take`) gated **Check** until the kid tapped empty dots — same class as leftover ten-frames. | `answers-audit.test.ts` leftover ten-frames includes `u7-add` / `u7-take`; `needsInteract` falsy. |
+| 17 | `u6-picto` (tally with a key) ignored `key: 2` and always scored/legend as 1. | `answers-audit.test.ts` collect graphs: `u6-picto` key is 2 and value answers are picture-count × key. |
 
-`npm test` = vitest + asset check. `npm run test:play` = answering Playwright (local preview).
+`npm test` = vitest + asset check. `npm run test:play` = answering Playwright (local preview). `npm run test:shots` = local dump files exist (shots are gitignored).

@@ -156,6 +156,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       delete window.__G3_Q;
       return;
     }
+    const data = (q?.data ?? {}) as Record<string, unknown>;
     window.__G3_Q = q
       ? {
           answer: q.answer,
@@ -166,6 +167,10 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
           prompt: q.prompt,
           interacted,
           checkDisabled: Boolean(q.needsInteract && !interacted),
+          value: typeof data.value === "number" ? data.value : null,
+          max: typeof data.max === "number" ? data.max : null,
+          unit: typeof data.unit === "string" ? data.unit : null,
+          attribute: typeof data.attribute === "string" ? data.attribute : null,
         }
       : null;
   }, [q, interacted]);
