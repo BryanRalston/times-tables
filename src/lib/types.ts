@@ -267,6 +267,7 @@ export interface LearnerSlice {
   shaky: Record<string, number>;
   sessions: Record<string, DaySession>;
   squishees: string[];
+  coins: number;
   attempts: Record<string, number>;
   perfectWalks: number;
 }

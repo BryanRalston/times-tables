@@ -2,62 +2,48 @@ import { useState } from "react";
 import { AppHeader, AppTabs, useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
 import { SquashOnPoke } from "@/components/poke-toy";
-import { COMMON_SQUISHEES, RARE_SQUISHEES, squisheeSrc } from "@/lib/squishees";
+import { Button } from "@/components/ui/button";
+import { squisheePrice } from "@/lib/coins";
+import { COMMON_SQUISHEES, RARE_SQUISHEES, squisheeSrc, type Squishee } from "@/lib/squishees";
+import { playTap } from "@/lib/sound";
 import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
 
-export function LockedRareMark() {
-  return (
-    <span className="grid h-20 w-20 place-items-center" aria-hidden>
-      <span className="grid h-16 w-16 place-items-center rounded-[42%] bg-faint/35 text-2xl font-display leading-none text-muted">
-        ?
-      </span>
-    </span>
-  );
-}
-
 export function ShelfPage() {
   const earned = useProgress((s) => s.squishees);
+  const coins = useProgress((s) => s.coins);
+  const buySquishee = useProgress((s) => s.buySquishee);
   const [poke, setPoke] = useState<string | null>(null);
   const ui = useUi();
   const haveCommon = COMMON_SQUISHEES.filter((s) => earned.includes(s.id)).length;
   const haveRare = RARE_SQUISHEES.filter((s) => earned.includes(s.id)).length;
 
+  function buy(id: string) {
+    const r = buySquishee(id);
+    if (r.ok) playTap();
+  }
+
   return (
     <div className="mx-auto min-h-dvh max-w-xl px-4 pb-16 pt-4">
       <AppHeader />
       <AppTabs active="shelf" />
+      <p className="mb-3 text-center text-sm font-medium text-teal">
+        {ui.coins}: {coins}
+      </p>
       <h2 className="font-display text-2xl">{ui.squisheeShelf}</h2>
       <p className="mb-4 text-sm text-muted">{ui.shelfBlurb(haveCommon, COMMON_SQUISHEES.length)}</p>
       <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-        {COMMON_SQUISHEES.map((s) => {
-          const got = earned.includes(s.id);
-          return (
-            <button
-              key={s.id}
-              type="button"
-              disabled={!got}
-              onClick={() => {
-                if (!got) return;
-                setPoke(s.id);
-              }}
-              className={cn(
-                "frost flex flex-col items-center rounded-[20px] border border-line p-2",
-                got ? "shadow-soft" : "opacity-60",
-              )}
-              aria-label={got ? `Poke ${s.name}` : `${s.name}, locked`}
-            >
-              <SquashOnPoke active={poke === s.id} onRest={() => setPoke(null)}>
-                <MagentaImg
-                  src={squisheeSrc(s.id)}
-                  alt=""
-                  className={cn("h-20 w-20", !got && "grayscale brightness-0 opacity-50")}
-                />
-              </SquashOnPoke>
-              <span className="mt-1 text-xs font-medium">{got ? s.name : "???"}</span>
-            </button>
-          );
-        })}
+        {COMMON_SQUISHEES.map((s) => (
+          <ShopCard
+            key={s.id}
+            s={s}
+            got={earned.includes(s.id)}
+            coins={coins}
+            poke={poke}
+            setPoke={setPoke}
+            onBuy={buy}
+          />
+        ))}
       </div>
 
       <h2 className="mt-8 font-display text-2xl">{ui.rareShelf}</h2>
@@ -65,36 +51,80 @@ export function ShelfPage() {
         {ui.rareBlurb} {haveRare} / {RARE_SQUISHEES.length}
       </p>
       <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-        {RARE_SQUISHEES.map((s) => {
-          const got = earned.includes(s.id);
-          return (
-            <button
-              key={s.id}
-              type="button"
-              disabled={!got}
-              onClick={() => {
-                if (!got) return;
-                setPoke(s.id);
-              }}
-              className={cn(
-                "frost flex flex-col items-center rounded-[20px] border p-2",
-                got ? "border-star shadow-soft" : "border-line opacity-70",
-              )}
-              aria-label={got ? `Poke ${s.name}` : ui.rareHint(s.id)}
-            >
-              {got ? (
-                <SquashOnPoke active={poke === s.id} className="rare-glow" onRest={() => setPoke(null)}>
-                  <MagentaImg src={squisheeSrc(s.id)} alt="" className="h-20 w-20" />
-                </SquashOnPoke>
-              ) : (
-                <LockedRareMark />
-              )}
-              <span className="mt-1 text-center text-xs font-medium">{got ? s.name : "???"}</span>
-              {!got ? <span className="mt-1 text-center text-[10px] leading-tight text-muted">{ui.rareHint(s.id)}</span> : null}
-            </button>
-          );
-        })}
+        {RARE_SQUISHEES.map((s) => (
+          <ShopCard
+            key={s.id}
+            s={s}
+            got={earned.includes(s.id)}
+            coins={coins}
+            poke={poke}
+            setPoke={setPoke}
+            onBuy={buy}
+          />
+        ))}
       </div>
+    </div>
+  );
+}
+
+function ShopCard({
+  s,
+  got,
+  coins,
+  poke,
+  setPoke,
+  onBuy,
+}: {
+  s: Squishee;
+  got: boolean;
+  coins: number;
+  poke: string | null;
+  setPoke: (id: string | null) => void;
+  onBuy: (id: string) => void;
+}) {
+  const ui = useUi();
+  const price = squisheePrice(s.id);
+  const canBuy = !got && coins >= price;
+  return (
+    <div
+      className={cn(
+        "frost flex flex-col items-center rounded-[20px] border p-2",
+        got && s.rarity === "rare" ? "border-star shadow-soft" : "border-line",
+        got && "shadow-soft",
+      )}
+    >
+      {got ? (
+        <button
+          type="button"
+          onClick={() => setPoke(s.id)}
+          aria-label={`Poke ${s.name}`}
+          className="bg-transparent p-0"
+        >
+          <SquashOnPoke
+            active={poke === s.id}
+            className={s.rarity === "rare" ? "rare-glow" : undefined}
+            onRest={() => setPoke(null)}
+          >
+            <MagentaImg src={squisheeSrc(s.id)} alt="" className="h-20 w-20" />
+          </SquashOnPoke>
+        </button>
+      ) : (
+        <MagentaImg src={squisheeSrc(s.id)} alt="" className="h-20 w-20" />
+      )}
+      <span className="mt-1 text-center text-xs font-medium">{s.name}</span>
+      {s.rarity === "rare" ? <span className="text-[10px] font-medium text-star">{ui.rareBadge}</span> : null}
+      {got ? null : (
+        <Button
+          size="sm"
+          className="mt-2 h-9 w-full px-1 text-xs"
+          disabled={!canBuy}
+          title={canBuy ? undefined : ui.notEnough}
+          onClick={() => onBuy(s.id)}
+          aria-label={`${ui.buy} ${s.name}, ${price} ${ui.coins}`}
+        >
+          {ui.buy} · {price}
+        </Button>
+      )}
     </div>
   );
 }

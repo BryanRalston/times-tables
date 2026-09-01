@@ -1,6 +1,4 @@
 import { asset } from "@/lib/art";
-import { UNITS } from "@/lib/curriculum";
-import { rngFromSeed } from "@/lib/rng";
 
 export type Rarity = "common" | "rare";
 
@@ -11,18 +9,6 @@ export interface Squishee {
   file: string;
   poke: string | null;
   rarity: Rarity;
-}
-
-export type EarnKind = "welcome" | "daily" | "activity";
-
-export interface EarnContext {
-  earned: string[];
-  stars: number;
-  perfectWalks: number;
-  streak: number;
-  activities: Record<string, { stars: number }>;
-  kind: EarnKind;
-  pct: number;
 }
 
 const COMMON: Squishee[] = [
@@ -79,52 +65,4 @@ export function squisheeSrc(id: string): string {
 export function squisheePokeSrc(id: string): string | null {
   const s = squisheeById(id);
   return s?.poke ? asset(`squishees/${s.poke}`) : null;
-}
-
-export function unitAllThreeStars(activities: Record<string, { stars: number }>): boolean {
-  return UNITS.some((unit) => unit.activities.length > 0 && unit.activities.every((a) => (activities[a.id]?.stars ?? 0) >= 3));
-}
-
-export function eligibleRares(ctx: EarnContext): string[] {
-  const have = new Set(ctx.earned);
-  const out: string[] = [];
-  const add = (id: string, ok: boolean) => {
-    if (ok && !have.has(id)) out.push(id);
-  };
-  add("crystal-axolotl", ctx.streak >= 7);
-  add("galaxy-narwhal", ctx.stars >= 50);
-  add("golden-dragon", unitAllThreeStars(ctx.activities));
-  add("rainbow-cupcake", ctx.perfectWalks >= 10);
-  add("aurora-jelly", ctx.kind === "welcome" && ctx.pct >= 1);
-  add(
-    "star-mochi",
-    COMMON.every((c) => have.has(c.id)),
-  );
-  return out;
-}
-
-export function pickPrize(ctx: EarnContext, learnerId: string): string | null {
-  const rares = eligibleRares(ctx);
-  if (rares.length) return rares[0]!;
-  if (ctx.pct < 0.7) return null;
-  const locked = COMMON.filter((s) => !ctx.earned.includes(s.id));
-  if (!locked.length) return null;
-  const rng = rngFromSeed(`squishee:${learnerId}:${ctx.earned.length}:${ctx.earned.join(",")}`);
-  return rng.pick(locked).id;
-}
-
-/** @deprecated use pickPrize */
-export function nextSquishee(earned: string[], learnerId: string, count: number): string | null {
-  return pickPrize(
-    {
-      earned,
-      stars: 0,
-      perfectWalks: 0,
-      streak: 0,
-      activities: {},
-      kind: "daily",
-      pct: 1,
-    },
-    `${learnerId}:${count}`,
-  );
 }

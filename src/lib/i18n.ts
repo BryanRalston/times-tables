@@ -64,13 +64,19 @@ export type Ui = {
   yearMap: string;
   lessonsMenu: string;
   nothingLeaves: string;
-  youEarned: (name: string) => string;
-  youFoundRare: (name: string) => string;
+  youEarnedCoins: (n: number) => string;
   squisheeShelf: string;
   rareShelf: string;
   shelfBlurb: (have: number, total: number) => string;
   rareBlurb: string;
-  rareHint: (id: string) => string;
+  coins: string;
+  buy: string;
+  notEnough: string;
+  rareBadge: string;
+  pokeThe: (name: string) => string;
+  whoHid: string;
+  findPairs: string;
+  toShelf: string;
   schoolDaysLeft: (n: number) => string;
   newReview: (fresh: number, review: number, remain: number) => string;
   hourPlus: string;
@@ -148,21 +154,19 @@ export const UI: Record<Locale, Ui> = {
     yearMap: "The year map.",
     lessonsMenu: "is the menu — pick any unit, any day.",
     nothingLeaves: "Nothing leaves this device.",
-    youEarned: (name) => `You earned ${name}!`,
-    youFoundRare: (name) => `You found a rare — ${name}!`,
-    squisheeShelf: "Squishee shelf",
+    youEarnedCoins: (n) => `You earned ${n} coins!`,
+    squisheeShelf: "Squishee shop",
     rareShelf: "Rare squishees",
-    shelfBlurb: (have, total) => `Finish a walk or a lesson to earn a toy. Poke the ones you have — ${have} of ${total}.`,
-    rareBlurb: "Hidden. Harder. The shelf only tells you a riddle until you find one.",
-    rareHint: (id) =>
-      ({
-        "crystal-axolotl": "Seven school mornings in a row.",
-        "galaxy-narwhal": "Fifty little stars.",
-        "golden-dragon": "Every trail in a unit shining.",
-        "rainbow-cupcake": "Ten perfect walks.",
-        "aurora-jelly": "What’s hiding, all the way.",
-        "star-mochi": "Friends first. Then the last toy.",
-      })[id] ?? "A secret in the year.",
+    shelfBlurb: (have, total) => `Spend coins on a toy. Poke the ones you have — ${have} of ${total}.`,
+    rareBlurb: "Rares cost more coins.",
+    coins: "Coins",
+    buy: "Buy",
+    notEnough: "Need more coins",
+    rareBadge: "Rare",
+    pokeThe: (name) => `Poke the ${name}`,
+    whoHid: "Who hid?",
+    findPairs: "Find the pairs",
+    toShelf: "Shelf",
     schoolDaysLeft: (n) => `${n} school days left in this unit`,
     newReview: (fresh, review, remain) => `${fresh} new · ${review} review · ${remain} school days left in this unit`,
     hourPlus: "Hour +",
@@ -239,21 +243,19 @@ export const UI: Record<Locale, Ui> = {
     yearMap: "El mapa del año.",
     lessonsMenu: "es el menú — elige cualquier unidad, cualquier día.",
     nothingLeaves: "Nada sale de este aparato.",
-    youEarned: (name) => `¡Ganaste ${name}!`,
-    youFoundRare: (name) => `¡Encontraste uno raro — ${name}!`,
-    squisheeShelf: "Estante de squishees",
+    youEarnedCoins: (n) => `¡Ganaste ${n} monedas!`,
+    squisheeShelf: "Tienda de squishees",
     rareShelf: "Squishees raros",
-    shelfBlurb: (have, total) => `Termina un paseo o una lección para ganar un juguete. Toca los que tienes — ${have} de ${total}.`,
-    rareBlurb: "Escondidos. Más difíciles. El estante solo dice un acertijo hasta que encuentras uno.",
-    rareHint: (id) =>
-      ({
-        "crystal-axolotl": "Siete mañanas de escuela seguidas.",
-        "galaxy-narwhal": "Cincuenta estrellitas.",
-        "golden-dragon": "Cada sendero de una unidad brillando.",
-        "rainbow-cupcake": "Diez paseos perfectos.",
-        "aurora-jelly": "Lo que se esconde, hasta el final.",
-        "star-mochi": "Primero los amigos. Luego el último juguete.",
-      })[id] ?? "Un secreto del año.",
+    shelfBlurb: (have, total) => `Gasta monedas en un juguete. Toca los que tienes — ${have} de ${total}.`,
+    rareBlurb: "Los raros cuestan más monedas.",
+    coins: "Monedas",
+    buy: "Comprar",
+    notEnough: "Faltan monedas",
+    rareBadge: "Raro",
+    pokeThe: (name) => `Toca el ${name}`,
+    whoHid: "¿Quién se escondió?",
+    findPairs: "Encuentra las parejas",
+    toShelf: "Estante",
     schoolDaysLeft: (n) => `${n} días escolares en esta unidad`,
     newReview: (fresh, review, remain) => `${fresh} nuevas · ${review} repaso · ${remain} días escolares en esta unidad`,
     hourPlus: "Hora +",
@@ -330,21 +332,19 @@ export const UI: Record<Locale, Ui> = {
     yearMap: "O mapa do ano.",
     lessonsMenu: "é o menu — escolha qualquer unidade, qualquer dia.",
     nothingLeaves: "Nada sai deste aparelho.",
-    youEarned: (name) => `Você ganhou ${name}!`,
-    youFoundRare: (name) => `Você achou um raro — ${name}!`,
-    squisheeShelf: "Estante de squishees",
+    youEarnedCoins: (n) => `Você ganhou ${n} moedas!`,
+    squisheeShelf: "Loja de squishees",
     rareShelf: "Squishees raros",
-    shelfBlurb: (have, total) => `Termine um passeio ou uma lição para ganhar um brinquedo. Toque nos que você tem — ${have} de ${total}.`,
-    rareBlurb: "Escondidos. Mais difíceis. A estante só conta uma charada até você achar um.",
-    rareHint: (id) =>
-      ({
-        "crystal-axolotl": "Sete manhãs de aula seguidas.",
-        "galaxy-narwhal": "Cinquenta estrelinhas.",
-        "golden-dragon": "Toda trilha de uma unidade brilhando.",
-        "rainbow-cupcake": "Dez passeios perfeitos.",
-        "aurora-jelly": "O que está escondido, até o fim.",
-        "star-mochi": "Amigos primeiro. Depois o último brinquedo.",
-      })[id] ?? "Um segredo do ano.",
+    shelfBlurb: (have, total) => `Gaste moedas num brinquedo. Toque nos que você tem — ${have} de ${total}.`,
+    rareBlurb: "Os raros custam mais moedas.",
+    coins: "Moedas",
+    buy: "Comprar",
+    notEnough: "Faltam moedas",
+    rareBadge: "Raro",
+    pokeThe: (name) => `Toque o ${name}`,
+    whoHid: "Quem se escondeu?",
+    findPairs: "Ache os pares",
+    toShelf: "Estante",
     schoolDaysLeft: (n) => `${n} dias letivos nesta unidade`,
     newReview: (fresh, review, remain) => `${fresh} novas · ${review} revisão · ${remain} dias letivos nesta unidade`,
     hourPlus: "Hora +",

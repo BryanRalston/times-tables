@@ -1,16 +1,11 @@
-import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { RARE_SQUISHEES } from "@/lib/squishees";
-import { LockedRareMark } from "./shelf";
+import { COMMON_PRICE, RARE_PRICE, squisheePrice } from "@/lib/coins";
 
-describe("locked rares", () => {
-  it("uses one mystery mark, not the real PNG", () => {
-    const html = renderToStaticMarkup(<LockedRareMark />);
-    expect(html).toContain("?");
-    expect(html).not.toContain("<img");
-    for (const s of RARE_SQUISHEES) {
-      expect(html).not.toContain(s.file);
-      expect(html).not.toContain(s.id);
-    }
+describe("shop prices", () => {
+  it("commons cost 10 and rares cost 50", () => {
+    expect(squisheePrice("frog")).toBe(COMMON_PRICE);
+    expect(squisheePrice("panda")).toBe(COMMON_PRICE);
+    expect(squisheePrice("aurora-jelly")).toBe(RARE_PRICE);
+    expect(squisheePrice("crystal-axolotl")).toBe(RARE_PRICE);
   });
 });

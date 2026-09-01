@@ -1,13 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { todayIso } from "./calendar";
+import { applyBuy, type BuyReason } from "./coins";
 import { UNIT_SPANS, UNITS, unitById } from "./curriculum";
 import { parseLocale } from "./i18n";
-import { pickPrize, type EarnKind } from "./squishees";
-import { schoolStreak } from "./streak";
 import type { DaySession, LearnerSlice, Locale, SaveState } from "./types";
 
-const SAVE_VERSION = 5;
+const SAVE_VERSION = 6;
 const STORAGE_KEY = "g3-path-v2";
 const DEFAULT_ID = "kid-1";
 
@@ -21,6 +19,7 @@ export function emptyLearner(name = ""): LearnerSlice {
     shaky: {},
     sessions: {},
     squishees: [],
+    coins: 0,
     attempts: {},
     perfectWalks: 0,
   };
@@ -36,6 +35,7 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
     shaky: s.shaky,
     sessions: s.sessions,
     squishees: s.squishees ?? [],
+    coins: typeof s.coins === "number" ? Math.max(0, Math.floor(s.coins)) : 0,
     attempts: s.attempts ?? {},
     perfectWalks: s.perfectWalks ?? 0,
   };
@@ -67,6 +67,7 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
     shaky: raw.shaky ?? {},
     sessions: raw.sessions ?? {},
     squishees: raw.squishees ?? [],
+    coins: typeof raw.coins === "number" ? raw.coins : 0,
     attempts: raw.attempts ?? {},
     perfectWalks: raw.perfectWalks ?? 0,
   });
@@ -103,7 +104,8 @@ interface ProgressApi extends SaveState {
   recordSession: (session: DaySession) => void;
   noteFact: (key: string, ok: boolean) => void;
   beginPlay: (activityId: string) => number;
-  earnSquishee: (opts: { pct: number; kind: EarnKind }) => string | null;
+  awardCoins: (n: number) => void;
+  buySquishee: (id: string) => { ok: boolean; reason: BuyReason };
   switchLearner: (id: string) => void;
   addLearner: (name: string) => string;
   resetAll: () => void;
@@ -183,23 +185,15 @@ export const useProgress = create<ProgressApi>()(
         commit(get, set, { attempts });
         return n;
       },
-      earnSquishee: ({ pct, kind }) => {
-        const st = get();
-        const next = pickPrize(
-          {
-            earned: st.squishees,
-            stars: st.stars,
-            perfectWalks: st.perfectWalks,
-            streak: schoolStreak(st.sessions, todayIso()),
-            activities: st.activities,
-            kind,
-            pct,
-          },
-          st.learnerId,
-        );
-        if (!next) return null;
-        commit(get, set, { squishees: [...st.squishees, next] });
-        return next;
+      awardCoins: (n) => {
+        const add = Math.max(0, Math.floor(n));
+        if (!add) return;
+        commit(get, set, { coins: get().coins + add });
+      },
+      buySquishee: (id) => {
+        const r = applyBuy(get().coins, get().squishees, id);
+        if (r.ok) commit(get, set, { coins: r.coins, squishees: r.squishees });
+        return { ok: r.ok, reason: r.reason };
       },
       switchLearner: (id) => {
         const kid = get().learners[id];
@@ -249,6 +243,7 @@ export const useProgress = create<ProgressApi>()(
         shaky: s.shaky,
         sessions: s.sessions,
         squishees: s.squishees,
+        coins: s.coins,
         attempts: s.attempts,
         perfectWalks: s.perfectWalks,
         learners: s.learners,
@@ -260,6 +255,10 @@ export const useProgress = create<ProgressApi>()(
     },
   ),
 );
+
+export function migrateSave(raw: Partial<SaveState> | null | undefined): SaveState {
+  return migrate(raw);
+}
 
 export function hydrateProgress() {
   const done = () => {

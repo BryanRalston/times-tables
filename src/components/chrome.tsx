@@ -1,4 +1,4 @@
-import { BookOpen, Flame, Home, Settings2, Sparkles, Star } from "lucide-react";
+import { BookOpen, Coins, Flame, Home, Settings2, Sparkles, Star } from "lucide-react";
 import type { ReactNode } from "react";
 import { PokeToy } from "@/components/poke-toy";
 import { todayIso, YEAR_LABEL } from "@/lib/calendar";
@@ -16,6 +16,7 @@ export function useUi() {
 export function AppHeader() {
   const name = useProgress((s) => s.name);
   const stars = useProgress((s) => s.stars);
+  const coins = useProgress((s) => s.coins);
   const sessions = useProgress((s) => s.sessions);
   const streak = schoolStreak(sessions, todayIso());
   const ui = useUi();
@@ -30,6 +31,15 @@ export function AppHeader() {
         <h1 className="font-display text-xl leading-tight sm:text-2xl">{name ? ui.namedPath(name) : ui.path}</h1>
       </div>
       <div className="flex items-center gap-2 text-sm">
+        <button
+          type="button"
+          className="inline-flex items-center gap-1 rounded-full bg-teal/15 px-2 py-1 text-teal"
+          onClick={() => navigate({ id: "shelf" })}
+          aria-label={ui.coins}
+        >
+          <Coins className="size-4" />
+          {coins}
+        </button>
         <span className="inline-flex items-center gap-1 rounded-full bg-star-soft px-2 py-1 text-star">
           <Star className="size-4 fill-current" />
           {stars}

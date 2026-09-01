@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnswerPanel } from "@/components/answer-panel";
 import { useUi } from "@/components/chrome";
-import { MagentaImg } from "@/components/magenta-video";
+import { MiniGame } from "@/components/minigame";
 import { Mascot, StarPop, type Pose } from "@/components/mascot";
 import { Board } from "@/components/models";
 import { ScratchPad } from "@/components/scratch";
@@ -14,8 +14,8 @@ import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { makeActivityRound, makeWelcomeRound } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
+import { canAffordAnything, coinsForResult } from "@/lib/coins";
 import { playCorrect, playStar, playWrong, unlockAudio } from "@/lib/sound";
-import { squisheeById, squisheeSrc } from "@/lib/squishees";
 import { schoolStreak } from "@/lib/streak";
 import type { ItemSource, Locale, Question } from "@/lib/types";
 import { answersMatch } from "@/lib/utils";
@@ -115,7 +115,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const recordRound = useProgress((s) => s.recordRound);
   const recordSession = useProgress((s) => s.recordSession);
   const noteFact = useProgress((s) => s.noteFact);
-  const earnSquishee = useProgress((s) => s.earnSquishee);
+  const awardCoins = useProgress((s) => s.awardCoins);
 
   const [pack] = useState(() => {
     const st = useProgress.getState();
@@ -125,7 +125,8 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     const locale = parseLocale(st.locale);
     return buildPack(kind, activityId, st.classUnitId, st.skipWeekend, st.shaky, st.learnerId, attempt, locale);
   });
-  const [prize, setPrize] = useState<string | null>(null);
+  const [coinsEarned, setCoinsEarned] = useState(0);
+  const [finishPhase, setFinishPhase] = useState<"play" | "summary" | null>(null);
   const [i, setI] = useState(0);
   const [value, setValue] = useState("");
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
@@ -212,10 +213,12 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       });
     }
     if (kind === "welcome") markWelcome();
-    const toy = earnSquishee({ pct, kind });
-    setPrize(toy);
+    const gained = coinsForResult(nextCorrect, total);
+    awardCoins(gained);
+    setCoinsEarned(gained);
     playStar();
     setPose("star");
+    setFinishPhase("play");
     setDone(true);
   }
 
@@ -276,33 +279,50 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     );
   }
 
+  if (done && finishPhase === "play") {
+    const st = useProgress.getState();
+    return (
+      <MiniGame
+        seed={`minigame:${st.learnerId}:${pack.activityId}:${pack.date}`}
+        owned={st.squishees}
+        skipLabel={ui.skip}
+        pokePrompt={ui.pokeThe}
+        whoHidLabel={ui.whoHid}
+        matchLabel={ui.findPairs}
+        onDone={() => setFinishPhase("summary")}
+      />
+    );
+  }
+
   if (done) {
     const streak = schoolStreak(sessions, pack.date);
+    const st = useProgress.getState();
+    const shop = canAffordAnything(st.coins, st.squishees);
     return (
       <div className="mx-auto grid min-h-dvh max-w-lg place-items-center px-4 py-8">
         <div className="w-full text-center">
           <div className="mx-auto grid h-52 w-52 place-items-center">
-            {prize ? (
-              <MagentaImg src={squisheeSrc(prize)} alt="" className="h-44 w-44 squash sm:h-52 sm:w-52" />
-            ) : (
-              <Mascot pose="celebrate" hop size="lg" className="mx-auto" />
-            )}
+            <Mascot pose="celebrate" hop size="lg" className="mx-auto" />
           </div>
           <h1 className="mt-2 font-display text-3xl">{ui.niceWalk}</h1>
           <p className="text-muted">
             {ui.of(correct, pack.items.length)} · {pack.title}
           </p>
           {kind === "daily" ? <p className="mt-1 text-sm text-star">{ui.streak(streak)}</p> : null}
-          {prize ? (
-            <p className="mt-4 text-sm text-teal">
-              {squisheeById(prize)?.rarity === "rare"
-                ? ui.youFoundRare(squisheeById(prize)?.name ?? prize)
-                : ui.youEarned(squisheeById(prize)?.name ?? prize)}
-            </p>
-          ) : null}
+          <p className="mt-4 text-sm text-teal">{ui.youEarnedCoins(coinsEarned)}</p>
           <Button className="mt-6 w-full" size="lg" onClick={() => navigate({ id: "home" }, { replace: true })}>
             {ui.home}
           </Button>
+          {shop ? (
+            <Button
+              className="mt-3 w-full"
+              size="lg"
+              variant="secondary"
+              onClick={() => navigate({ id: "shelf" }, { replace: true })}
+            >
+              {ui.toShelf}
+            </Button>
+          ) : null}
         </div>
       </div>
     );
