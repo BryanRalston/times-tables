@@ -191,9 +191,11 @@ function Groups({ question, onInteract, status, shake }: BoardProps) {
             )}
             aria-label={`group ${g + 1}`}
           >
-            {Array.from({ length: Math.max(size, 1) }, (_, i) => (
-              <span key={i} className={cn("size-4 rounded-full sm:size-5", size === 0 ? "border border-dashed border-faint" : "bg-teal")} />
-            ))}
+            {size === 0 ? (
+              <span className="px-1 text-[10px] text-faint">0</span>
+            ) : (
+              Array.from({ length: size }, (_, i) => <span key={i} className="size-4 rounded-full bg-teal sm:size-5" />)
+            )}
           </button>
         ))}
       </div>
@@ -232,7 +234,6 @@ function tensOnes(n: number) {
 
 function PlaceValue({ question, status, shake }: BoardProps) {
   const data = question.data as PlaceValueData;
-  const parts = tensOnes(data.number);
   const s = String(data.number);
   const locale = parseLocale(useProgress((st) => st.locale));
   if (data.mode === "word") {
@@ -264,7 +265,7 @@ function PlaceValue({ question, status, shake }: BoardProps) {
         <div className="flex flex-wrap items-end justify-center gap-6 text-center text-xs text-muted">
           <div>
             <div className="flex gap-0.5">
-              {Array.from({ length: parts.tens }, (_, i) => (
+              {Array.from({ length: Math.floor((data.number % 100) / 10) }, (_, i) => (
                 <span key={i} className="h-12 w-2.5 rounded-sm bg-teal" />
               ))}
             </div>
@@ -282,54 +283,39 @@ function PlaceValue({ question, status, shake }: BoardProps) {
       </Frame>
     );
   }
+  const enPlaces = ["ones", "tens", "hundreds", "thousands", "ten thousands", "hundred thousands"];
+  const locLabels = PLACE[locale];
+  const cols = s.split("").map((ch, i) => {
+    const fromRight = s.length - 1 - i;
+    return { ch, placeEn: enPlaces[fromRight] ?? "ones", label: locLabels[fromRight] ?? "" };
+  });
   return (
     <Frame shake={shake} status={status}>
       <p className="mb-3 text-center font-display text-3xl tabular-nums sm:text-4xl">
-        {s.split("").map((ch, i) => (
-          <span key={i} className={cn("px-0.5", Number(ch) === data.digit && i === s.length - 1 - ["ones", "tens", "hundreds", "thousands"].indexOf(data.place) ? "text-teal underline" : "")}>
-            {ch}
+        {cols.map((col, i) => (
+          <span key={i} className={cn("px-0.5", col.placeEn === data.place ? "text-teal underline" : "")}>
+            {col.ch}
           </span>
         ))}
       </p>
-      <div className="flex flex-wrap justify-center gap-3 text-center text-xs text-muted">
-        {parts.thousands ? (
-          <div>
-            <div className="grid grid-cols-3 gap-0.5">
-              {Array.from({ length: parts.thousands }, (_, i) => (
-                <span key={i} className="size-6 rounded-[4px] bg-q4" />
-              ))}
-            </div>
-            thousands
+      <div
+        className={cn(
+          "grid gap-1 text-center text-[9px] leading-tight text-muted",
+          s.length >= 6 ? "grid-cols-6" : s.length === 5 ? "grid-cols-5" : "grid-cols-4",
+        )}
+      >
+        {cols.map((col, i) => (
+          <div
+            key={i}
+            className={cn(
+              "rounded-[10px] border bg-bg-warm p-1",
+              col.placeEn === data.place ? "border-teal" : "border-line",
+            )}
+          >
+            <p className="font-display text-lg text-ink tabular-nums">{col.ch}</p>
+            {col.label}
           </div>
-        ) : null}
-        {parts.hundreds ? (
-          <div>
-            <div className="flex flex-wrap justify-center gap-0.5">
-              {Array.from({ length: parts.hundreds }, (_, i) => (
-                <span key={i} className="size-6 rounded-[3px] bg-q2" />
-              ))}
-            </div>
-            hundreds
-          </div>
-        ) : null}
-        {parts.tens ? (
-          <div>
-            <div className="flex gap-0.5">
-              {Array.from({ length: parts.tens }, (_, i) => (
-                <span key={i} className="h-10 w-2 rounded-sm bg-teal" />
-              ))}
-            </div>
-            tens
-          </div>
-        ) : null}
-        <div>
-          <div className="flex flex-wrap gap-0.5">
-            {Array.from({ length: parts.ones }, (_, i) => (
-              <span key={i} className="size-3 rounded-[2px] bg-star" />
-            ))}
-          </div>
-          ones
-        </div>
+        ))}
       </div>
     </Frame>
   );
@@ -387,12 +373,12 @@ function OrderNums({ question, value, setValue, status, shake }: BoardProps) {
     <Frame shake={shake} status={status}>
       <p className="mb-3 text-center text-sm text-muted">{question.prompt}</p>
       <div className="flex flex-wrap justify-center gap-2">
-        {labels.map((n) => {
+        {labels.map((n, i) => {
           const used = picked.includes(n);
           return (
             <button
               type="button"
-              key={n}
+              key={`${n}-${i}`}
               disabled={used}
               onClick={() => setValue([...picked, n].join(" "))}
               className={cn(
@@ -576,8 +562,11 @@ function FractionBar({ question, onInteract, status, shake }: BoardProps) {
   return (
     <Frame shake={shake} status={status}>
       {Array.from({ length: bars }, (_, b) => {
-        const thisShaded = b === 0 ? Math.min(den, shaded) : data.mode === "compare" ? (data.num2 ?? 0) : Math.max(0, shaded - den);
-        const thisDen = b === 1 && data.den2 ? data.den2 : den;
+        const thisDen = b === 1 && data.mode === "compare" && data.den2 ? data.den2 : den;
+        const thisShaded =
+          data.mode === "compare" && b === 1
+            ? (data.num2 ?? 0)
+            : Math.max(0, Math.min(thisDen, shaded - b * den));
         return (
           <div key={b} className="mb-2 flex h-12 overflow-hidden rounded-[12px] border border-line">
             {Array.from({ length: thisDen }, (_, i) => (

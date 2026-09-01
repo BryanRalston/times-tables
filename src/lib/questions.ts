@@ -57,6 +57,11 @@ function keypadQ(rng: Rng, partial: Omit<Question, "id" | "input"> & { input?: Q
   return { id: qid(rng), input: partial.input ?? "keypad", ...partial };
 }
 
+function ensureChoices(rng: Rng, answer: string, pool: string[]): string[] {
+  const rest = [...new Set(pool.filter((x) => x !== answer))];
+  return rng.shuffle([answer, ...rng.shuffle(rest).slice(0, 3)]);
+}
+
 export function welcomeFirst(rng: Rng): Question {
   return keypadQ(rng, {
     kind: "tenframe",
@@ -88,11 +93,11 @@ function tenframeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 
 function groupsQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const pool = ((params.factors as number[] | undefined) ?? [2, 3, 4, 5]).filter((n) => n >= 0);
-  const nonzero = pool.filter((n) => n > 0);
-  const size = rng.pick(nonzero.length ? nonzero : [2, 3, 4, 5]);
+  const hide = (params.hide as GroupsData["hide"] | undefined) ?? rng.pick(["groups", "size", "product"]);
+  const sizePool = hide === "groups" ? pool.filter((n) => n >= 1) : pool.filter((n) => n > 0 || hide === "product");
+  const size = rng.pick(sizePool.length ? sizePool : [2, 3, 4, 5]);
   const groups = rng.int(2, 6);
   const product = size * groups;
-  const hide = (params.hide as GroupsData["hide"] | undefined) ?? rng.pick(["groups", "size", "product"]);
   let prompt = "";
   let answer = "";
   let equation = "";
@@ -164,15 +169,20 @@ function placeValueQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const n = rng.int(102500, 987654);
     const words = wordForm(n, loc);
     const distractors = [wordForm(n + 1000, loc), wordForm(Math.max(n - 10000, 102500), loc), wordForm(n + 100000 > 999999 ? n - 100000 : n + 100000, loc)];
-    const choices = rng.shuffle([words, ...distractors]).filter((v, i, a) => a.indexOf(v) === i).slice(0, 4);
+    const wordChoices = ensureChoices(rng, words, distractors);
     const toWords = rng.next() < 0.5;
     const shown = n.toLocaleString("en-US");
+    const numChoices = ensureChoices(
+      rng,
+      shown,
+      [n + 1000, Math.max(n - 10000, 102500), n + 100, n + 10].map((x) => x.toLocaleString("en-US")),
+    );
     return keypadQ(rng, {
       kind: "placevalue",
       prompt: toWords ? t().whichInWords(shown) : t().whichNumber(words),
       answer: toWords ? words : shown,
       input: "choice",
-      choices: toWords ? choices : rng.shuffle([n, n + 1000, Math.max(n - 10000, 102500), n + 100].map((x) => x.toLocaleString("en-US"))).slice(0, 4),
+      choices: toWords ? wordChoices : numChoices,
       data: { number: n, digit: Number(String(n)[0]), place: "hundred thousands", mode: "word", words } satisfies PlaceValueData,
     });
   }
@@ -182,12 +192,15 @@ function placeValueQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const max = digits === 3 ? 980 : digits === 4 ? 9876 : digits === 5 ? 98000 : 987654;
   const n = rng.int(min, max);
   const s = String(n);
-  const idx = rng.int(0, s.length - 1);
+  const counts: Record<string, number> = {};
+  for (const ch of s) counts[ch] = (counts[ch] ?? 0) + 1;
+  const uniqueIdx = [...s].map((_, i) => i).filter((i) => counts[s[i]!] === 1);
+  const idx = uniqueIdx.length ? rng.pick(uniqueIdx) : rng.int(0, s.length - 1);
   const digit = Number(s[idx]);
   const placeEn = PLACES[s.length - 1 - idx]!;
   const place = PLACE[loc][s.length - 1 - idx]!;
   const value = digit * 10 ** (s.length - 1 - idx);
-  const mode = rng.pick(["place", "value"] as const);
+  const mode = uniqueIdx.length ? rng.pick(["place", "value"] as const) : "value";
   const pool = PLACE[loc].slice(0, Math.max(4, s.length));
   const shown = n.toLocaleString("en-US");
   if (mode === "place") {
@@ -197,7 +210,7 @@ function placeValueQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       answer: place,
       alts: [placeEn, place.replace(/s$/, "")],
       input: "choice",
-      choices: rng.shuffle([...pool]),
+      choices: ensureChoices(rng, place, pool),
       data: { number: n, digit, place: placeEn, mode },
     });
   }
@@ -241,7 +254,8 @@ function compareQ(rng: Rng): Question {
 function orderQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   if (params.fractions) {
     const den = rng.pick([4, 5, 6, 8, 10]);
-    const nums = rng.shuffle([1, 2, 3, den - 1]).slice(0, 3);
+    const nums = rng.shuffle([...new Set([1, 2, Math.max(1, den - 1), Math.min(den - 1, 3)])]).slice(0, 3);
+    if (nums.length < 3) nums.push(den > 4 ? 4 : 1);
     const dir = rng.pick(["asc", "desc"] as const);
     const sorted = [...nums].sort((x, y) => (dir === "asc" ? x - y : y - x));
     return keypadQ(rng, {
@@ -253,7 +267,11 @@ function orderQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       choices: nums.map((n) => `${n}/${den}`),
     });
   }
-  const numbers = [rng.int(100, 9000), rng.int(100, 9000), rng.int(100, 9000)];
+  const numbers: number[] = [];
+  while (numbers.length < 3) {
+    const n = rng.int(100, 9000);
+    if (!numbers.includes(n)) numbers.push(n);
+  }
   const dir = rng.pick(["asc", "desc"] as const);
   const sorted = [...numbers].sort((a, b) => (dir === "asc" ? a - b : b - a));
   return keypadQ(rng, {
@@ -273,19 +291,29 @@ function familyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const p = a * b;
   const facts = [`${a} × ${b} = ${p}`, `${b} × ${a} = ${p}`, `${p} ÷ ${a} = ${b}`, `${p} ÷ ${b} = ${a}`];
   const ask = rng.pick(facts);
+  const evalFact = (s: string) => {
+    const m = s.match(/(\d+)\s*([×÷+\u2212-])\s*(\d+)\s*=\s*(\d+)/);
+    if (!m) return false;
+    const x = Number(m[1]);
+    const op = m[2];
+    const y = Number(m[3]);
+    const r = Number(m[4]);
+    const v = op === "×" ? x * y : op === "÷" ? x / y : op === "+" ? x + y : x - y;
+    return v === r;
+  };
   const wrong = [
     `${a} × ${b} = ${p + a}`,
     `${p} ÷ ${a} = ${b + 1}`,
     `${a + 1} × ${b} = ${p}`,
-    `${p} − ${a} = ${b}`,
-  ];
-  const choices = rng.shuffle([ask, rng.pick(wrong), rng.pick(wrong.filter((w) => w !== ask))]);
+    `${a} × ${b + 1} = ${p}`,
+    `${p} − ${a} = ${b + 1}`,
+  ].filter((w) => w !== ask && !evalFact(w));
   return keypadQ(rng, {
     kind: "choice",
     prompt: t().familyFact(a, b),
     answer: ask,
     input: "choice",
-    choices,
+    choices: ensureChoices(rng, ask, wrong),
     factKey: `${Math.min(a, b)}×${Math.max(a, b)}`,
     data: { visual: "none" },
   });
@@ -371,7 +399,7 @@ function shapeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       prompt: s.prompt,
       answer: s.answer,
       input: "choice",
-      choices: rng.shuffle(["2", "3", "4", "1", "5"]).slice(0, 4),
+      choices: ensureChoices(rng, s.answer, ["1", "2", "3", "4", "5", "6"]),
       data: { visual: "subdivide", shape: s.shape, sides: s.sides, isPolygon: true },
     });
   }
@@ -479,11 +507,20 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   if (mode === "benchmark") {
     const num = rng.int(1, den);
     const v = num / den;
-    const bench = v < 0.25 ? "0" : v < 0.75 ? "1/2" : "1";
+    const d0 = Math.abs(v - 0);
+    const dHalf = Math.abs(v - 0.5);
+    const d1 = Math.abs(v - 1);
+    const nearest = Math.min(d0, dHalf, d1);
+    const alts = [
+      d0 === nearest ? "0" : "",
+      dHalf === nearest ? "1/2" : "",
+      d1 === nearest ? "1" : "",
+    ].filter(Boolean);
     return keypadQ(rng, {
       kind: "fraction",
       prompt: t().closerTo(`${num}/${den}`),
-      answer: bench,
+      answer: alts[0]!,
+      alts: alts.slice(1),
       input: "choice",
       choices: ["0", "1/2", "1"],
       data: { num, den, mode: "benchmark", shaded: num },
@@ -700,15 +737,19 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const byLabel = Object.fromEntries(rows.map((r) => [r.label, r.value]));
   let prompt = "";
   let answer = "";
+  let graphAlts: string[] | undefined;
   if (ask === "greatest") {
     const m = Math.max(...rows.map((r) => r.value));
     const winners = rows.filter((r) => r.value === m);
     prompt = t().graphMost;
     answer = winners[0]!.label;
+    graphAlts = winners.slice(1).map((w) => w.label);
   } else if (ask === "least") {
     const m = Math.min(...rows.map((r) => r.value));
+    const winners = rows.filter((r) => r.value === m);
     prompt = t().graphLeast;
-    answer = rows.find((r) => r.value === m)!.label;
+    answer = winners[0]!.label;
+    graphAlts = winners.slice(1).map((w) => w.label);
   } else if (ask === "value") {
     prompt = t().graphHowMany(focus);
     answer = String(byLabel[focus]);
@@ -724,6 +765,7 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     prompt,
     hint: key > 1 ? t().graphKey(key) : undefined,
     answer,
+    alts: graphAlts,
     input: ask === "greatest" || ask === "least" ? "choice" : "keypad",
     choices: ask === "greatest" || ask === "least" ? labels : undefined,
     data: {
@@ -742,18 +784,17 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 function patternQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const step = rng.pick(((params.steps as number[]) ?? [2, 5, 10]).filter((n) => n > 0));
   const down = params.dir === "down" || (params.dir !== "up" && rng.next() < 0.45);
-  const start = down ? rng.int(20, 40) : rng.int(0, 8);
+  const start = down ? rng.int(step * 5, step * 5 + 20) : rng.int(0, 8);
   const delta = down ? -step : step;
   const seq: (number | null)[] = Array.from({ length: 6 }, (_, i) => start + i * delta);
   if (params.mode === "describe") {
     const rule = down ? `−${step}` : `+${step}`;
-    const choices = rng.shuffle([rule, down ? `+${step}` : `−${step}`, `+${step + 1}`, `×${step}`]).slice(0, 4);
     return keypadQ(rng, {
       kind: "pattern",
       prompt: t().patternRule,
       answer: rule,
       input: "choice",
-      choices,
+      choices: ensureChoices(rng, rule, [down ? `+${step}` : `−${step}`, `+${step + 1}`, `×${step}`]),
       data: { seq, step: delta, dir: down ? "down" : "up", rule },
     });
   }

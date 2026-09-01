@@ -1,0 +1,225 @@
+import { describe, expect, it } from "vitest";
+import { UNITS, activityById } from "./curriculum";
+import { makeQuestion, wordForm } from "./questions";
+import { rngFromSeed } from "./rng";
+import type {
+  AreaData,
+  ArrayData,
+  ClockData,
+  ComputeData,
+  FractionData,
+  GraphData,
+  GroupsData,
+  MoneyData,
+  PerimeterData,
+  PlaceValueData,
+  TenFrameData,
+} from "./types";
+import { answersMatch } from "./utils";
+
+const COIN: Record<string, number> = {
+  penny: 1,
+  nickel: 5,
+  dime: 10,
+  quarter: 25,
+  dollar: 100,
+  five: 500,
+};
+
+describe("answer audit", () => {
+  it("every activity's choices include the scored answer", () => {
+    for (const unit of UNITS) {
+      for (const activity of unit.activities) {
+        for (let i = 0; i < 25; i++) {
+          const q = makeQuestion(activity, rngFromSeed(`${activity.id}:${i}`));
+          if (q.input === "choice") {
+            expect(q.choices?.includes(q.answer), `${activity.id} missing ${q.answer}`).toBe(true);
+            expect((q.choices ?? []).length).toBeGreaterThanOrEqual(2);
+          }
+          expect(q.answer.length).toBeGreaterThan(0);
+        }
+      }
+    }
+  });
+
+  it("ten-frame n is total minus shown", () => {
+    for (const id of ["u1-leftover", "u1-friends"]) {
+      for (let i = 0; i < 20; i++) {
+        const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`tf:${id}:${i}`));
+        const d = q.data as TenFrameData;
+        expect(Number(q.answer)).toBe(d.total - d.shown);
+        expect(d.shown).toBeGreaterThan(0);
+        expect(d.shown).toBeLessThan(d.total);
+      }
+    }
+  });
+
+  it("groups and arrays match the product", () => {
+    for (const id of ["u3-groups", "u3-array", "u3-factor", "u3-share", "u6-facts", "u9-groups", "u12-six"]) {
+      for (let i = 0; i < 20; i++) {
+        const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`g:${id}:${i}`));
+        if (q.kind === "groups") {
+          const d = q.data as GroupsData;
+          const p = d.groups * d.size;
+          if (d.hide === "product") expect(Number(q.answer)).toBe(p);
+          if (d.hide === "groups") {
+            expect(d.size).toBeGreaterThan(0);
+            expect(Number(q.answer)).toBe(d.groups);
+            expect(d.size * Number(q.answer)).toBe(p);
+          }
+          if (d.hide === "size") expect(Number(q.answer)).toBe(d.size);
+        }
+        if (q.kind === "array") {
+          const d = q.data as ArrayData;
+          const p = d.rows * d.cols;
+          if (d.hide === "product") expect(Number(q.answer)).toBe(p);
+          if (d.hide === "rows") expect(Number(q.answer)).toBe(d.rows);
+          if (d.hide === "cols") expect(Number(q.answer)).toBe(d.cols);
+        }
+      }
+    }
+  });
+
+  it("place-value digit is unique and value matches the place", () => {
+    const found = activityById("u2-place")!;
+    for (let i = 0; i < 40; i++) {
+      const q = makeQuestion(found.activity, rngFromSeed(`pv:${i}`));
+      const d = q.data as PlaceValueData;
+      const s = String(d.number);
+      const fromRight = ["ones", "tens", "hundreds", "thousands", "ten thousands", "hundred thousands"].indexOf(d.place);
+      expect(fromRight).toBeGreaterThanOrEqual(0);
+      const idx = s.length - 1 - fromRight;
+      expect(s[idx]).toBe(String(d.digit));
+      if (q.data && (q.data as PlaceValueData).mode === "place") {
+        expect(s.split(String(d.digit)).length - 1).toBe(1);
+      }
+      if ((q.data as PlaceValueData).mode === "value") {
+        expect(Number(q.answer)).toBe(d.digit * 10 ** fromRight);
+      }
+    }
+  });
+
+  it("word form round-trips six-digit numbers", () => {
+    expect(wordForm(165724)).toBe("one hundred sixty-five thousand seven hundred twenty-four");
+    expect(wordForm(100000)).toBe("one hundred thousand");
+    expect(wordForm(101)).toBe("one hundred one");
+    const found = activityById("u2-word")!;
+    for (let i = 0; i < 20; i++) {
+      const q = makeQuestion(found.activity, rngFromSeed(`w:${i}`));
+      expect(q.choices).toContain(q.answer);
+      const n = (q.data as PlaceValueData).number;
+      const words = wordForm(n);
+      expect(answersMatch(q.answer, q.answer, q.alts)).toBe(true);
+      expect(words.length).toBeGreaterThan(0);
+      expect(n).toBeGreaterThanOrEqual(100000);
+    }
+  });
+
+  it("coins sum to the scored cents", () => {
+    for (const id of ["u1-coins", "u11-count", "u11-change"]) {
+      for (let i = 0; i < 20; i++) {
+        const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`m:${id}:${i}`));
+        const d = q.data as MoneyData;
+        if (d.mode === "count") {
+          const cents = Object.entries(d.coins).reduce((n, [id, c]) => n + (COIN[id] ?? 0) * (c ?? 0), 0);
+          expect(Number(q.answer)).toBe(cents);
+        }
+        if (d.mode === "change") {
+          expect(Number(q.answer)).toBe((d.pay ?? 0) - (d.cost ?? 0));
+        }
+      }
+    }
+  });
+
+  it("fractions: shaded pieces match the named fraction", () => {
+    for (const id of ["u5-name", "u5-unit", "u5-leftover", "u5-mixed", "u10-equiv", "u10-bench"]) {
+      for (let i = 0; i < 15; i++) {
+        const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`f:${id}:${i}`));
+        const d = q.data as FractionData;
+        if (id === "u5-name") expect(q.answer).toBe(`${d.num}/${d.den}`);
+        if (id === "u5-unit") expect(q.answer).toBe(`1/${d.den}`);
+        if (id === "u5-leftover") expect(q.answer).toBe(`${d.den - d.num}/${d.den}`);
+        if (id === "u5-mixed") {
+          const shaded = d.shaded ?? d.num;
+          const whole = Math.floor(shaded / d.den);
+          const rem = shaded % d.den;
+          expect(q.answer).toBe(`${whole} ${rem}/${d.den}`);
+        }
+        if (id === "u10-equiv") expect(Number(q.answer)).toBe(d.num * ((d.den2 ?? d.den) / d.den));
+        if (id === "u10-bench") {
+          expect(["0", "1/2", "1"]).toContain(q.answer);
+          expect(q.choices).toContain(q.answer);
+        }
+      }
+    }
+  });
+
+  it("clocks, compute, perimeter, area, and patterns are internally consistent", () => {
+    for (let i = 0; i < 20; i++) {
+      const clock = makeQuestion(activityById("u11-clock")!.activity, rngFromSeed(`c:${i}`));
+      const cd = clock.data as ClockData;
+      expect(clock.answer).toBe(`${cd.hours}:${String(cd.minutes).padStart(2, "0")}`);
+
+      const elapsed = makeQuestion(activityById("u11-elapsed")!.activity, rngFromSeed(`e:${i}`));
+      expect(Number(elapsed.answer)).toBeGreaterThanOrEqual(1);
+      expect(Number(elapsed.answer)).toBeLessThanOrEqual(3);
+
+      const exact = makeQuestion(activityById("u7-exact")!.activity, rngFromSeed(`x:${i}`));
+      const xd = exact.data as ComputeData;
+      expect(Number(exact.answer)).toBe(xd.op === "+" ? xd.a + xd.b : xd.a - xd.b);
+
+      const peri = makeQuestion(activityById("u8-peri")!.activity, rngFromSeed(`p:${i}`));
+      const pd = peri.data as PerimeterData;
+      expect(Number(peri.answer)).toBe(pd.sides.reduce((a, b) => a + b, 0));
+
+      const miss = makeQuestion(activityById("u8-missing")!.activity, rngFromSeed(`pm:${i}`));
+      const md = miss.data as PerimeterData;
+      expect(Number(miss.answer)).toBe(md.sides[md.hideIndex ?? 0]);
+
+      const area = makeQuestion(activityById("u8-area")!.activity, rngFromSeed(`a:${i}`));
+      const ad = area.data as AreaData;
+      expect(Number(area.answer)).toBe(ad.cells.flat().filter(Boolean).length);
+
+      const pat = makeQuestion(activityById("u6-skip")!.activity, rngFromSeed(`pat:${i}`));
+      const seq = (pat.data as { seq: (number | null)[]; step: number }).seq;
+      const step = (pat.data as { step: number }).step;
+      const filled = seq.map((n) => (n == null ? Number(pat.answer) : n));
+      for (let k = 1; k < filled.length; k++) expect(filled[k]! - filled[k - 1]!).toBe(step);
+      expect(filled.every((n) => n >= 0)).toBe(true);
+    }
+  });
+
+  it("graph ties accept every winner", () => {
+    const found = activityById("u1-graph")!;
+    for (let i = 0; i < 40; i++) {
+      const q = makeQuestion(found.activity, rngFromSeed(`gr:${i}`));
+      const d = q.data as GraphData;
+      if (d.ask === "greatest" || d.ask === "least") {
+        const m = d.ask === "greatest" ? Math.max(...d.rows.map((r) => r.value)) : Math.min(...d.rows.map((r) => r.value));
+        const winners = d.rows.filter((r) => r.value === m).map((r) => r.label);
+        expect(winners).toContain(q.answer);
+        for (const w of winners) expect(answersMatch(w, q.answer, q.alts)).toBe(true);
+        expect(q.choices).toContain(q.answer);
+      }
+    }
+  });
+
+  it("related-fact distractors are actually false", () => {
+    const found = activityById("u3-family")!;
+    for (let i = 0; i < 30; i++) {
+      const q = makeQuestion(found.activity, rngFromSeed(`fam:${i}`));
+      expect(q.choices).toContain(q.answer);
+      for (const c of q.choices ?? []) {
+        const m = c.match(/(\d+)\s*([×÷+\u2212-])\s*(\d+)\s*=\s*(\d+)/);
+        expect(m).toBeTruthy();
+        const a = Number(m![1]);
+        const op = m![2];
+        const b = Number(m![3]);
+        const r = Number(m![4]);
+        const trueVal = op === "×" ? a * b : op === "÷" ? a / b : op === "+" ? a + b : a - b;
+        if (c === q.answer) expect(trueVal).toBe(r);
+        else expect(trueVal).not.toBe(r);
+      }
+    }
+  });
+});
