@@ -89,6 +89,7 @@ describe("welcome leftover", () => {
     expect(q.prompt).toBe("6 + n = 10");
     expect(q.answer).toBe("4");
     expect(q.kind).toBe("tenframe");
+    expect(q.needsInteract).toBeFalsy();
   });
 
   it("is a short leftover run", () => {

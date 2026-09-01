@@ -71,7 +71,6 @@ export function welcomeFirst(rng: Rng): Question {
     prompt: "6 + n = 10",
     hint: t().leftoverHint,
     answer: "4",
-    needsInteract: true,
     data: { total: 10, shown: 6, equation: "6 + n = 10" } satisfies TenFrameData,
   });
 }
@@ -89,7 +88,6 @@ function tenframeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     prompt: equation,
     hint: t().leftoverHint,
     answer: String(n),
-    needsInteract: true,
     data: { total, shown, equation } satisfies TenFrameData,
   });
 }

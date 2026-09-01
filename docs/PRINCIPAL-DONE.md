@@ -23,4 +23,4 @@ A Loudoun Grade 3 teacher could recommend this for 2026–27. Not a demo.
 
 ## Recommendation
 
-**2026-09-01.** Grade 3 Path meets this bar for a 2026–27 LCPS recommendation: a third grader can see the model, do the work (sort, take leftover, then Check), and a grown-up can set the class unit in sixty seconds. Wallpaper stays parked. Combine/subdivide stays the VA triangle/quad set. Not perfect. Ready to show a principal.
+**2026-09-01.** Grade 3 Path meets this bar for a 2026–27 LCPS recommendation: a third grader can see the model, sort the data cycle, then Check. Leftover dots stay optional. A grown-up can set the class unit in sixty seconds. Wallpaper stays parked. Combine/subdivide stays the VA triangle/quad set. Not perfect. Ready to show a principal.
