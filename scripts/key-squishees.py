@@ -9,7 +9,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1] / "public" / "squishees"
 
 
-STRICT_FILES = {"aurora-jelly.png", "crystal-axolotl.png", "rainbow-cupcake.png"}
+STRICT_FILES = {"aurora-jelly.png", "crystal-axolotl.png", "rainbow-cupcake.png", "donut.png"}
 
 
 def is_key(r: int, g: int, b: int) -> bool:
