@@ -30,33 +30,28 @@ export function YearPath({ suggestedId, onOpen }: { suggestedId: string; onOpen:
               <div className={cn("text-right", !leftLabel && "invisible")}>
                 <p className="font-display text-base leading-tight sm:text-lg">{u.short}</p>
                 <p className="text-[11px] text-muted">{unitWindowLabel(u.id)}</p>
-                {st === "today" ? <p className="text-xs font-medium text-teal">Today</p> : null}
+                {st === "now" ? <p className="text-xs font-medium text-teal">Now</p> : null}
               </div>
               <button
                 type="button"
                 onClick={() => onOpen(u.id)}
-                className={cn("relative grid place-items-center", st === "today" && "node-today")}
-                aria-label={`${u.short}${st === "locked" ? ", locked" : ""}`}
+                className={cn("relative grid place-items-center", st === "now" && "node-today")}
+                aria-label={`${u.short}${st === "now" ? ", now" : ""}`}
               >
-                <img
-                  src={st === "locked" ? ART.nodeLocked : ART.nodeOpen}
-                  alt=""
-                  draggable={false}
-                  className={cn("h-[4.5rem] w-[4.5rem] object-contain sm:h-20 sm:w-20", st === "open" && "unlock-pop")}
-                />
-                {done && st !== "locked" ? (
+                <img src={ART.nodeOpen} alt="" draggable={false} className="h-[4.5rem] w-[4.5rem] object-contain sm:h-20 sm:w-20" />
+                {done ? (
                   <span className="absolute -right-1 -top-1 text-lg text-star" aria-hidden>
                     ★
                   </span>
                 ) : null}
-                {st === "today" ? (
+                {st === "now" ? (
                   <Mascot pose="wave" size="sm" className="absolute -left-16 top-1/2 h-16 w-16 -translate-y-1/2 sm:-left-20 sm:h-20 sm:w-20" />
                 ) : null}
               </button>
               <div className={cn("text-left", leftLabel && "invisible")}>
                 <p className="font-display text-base leading-tight sm:text-lg">{u.short}</p>
                 <p className="text-[11px] text-muted">{unitWindowLabel(u.id)}</p>
-                {st === "today" ? <p className="text-xs font-medium text-teal">Today</p> : null}
+                {st === "now" ? <p className="text-xs font-medium text-teal">Now</p> : null}
               </div>
             </div>
           </li>

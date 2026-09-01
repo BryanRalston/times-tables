@@ -1,22 +1,20 @@
-import { Flame, Settings2, Star } from "lucide-react";
 import { useMemo } from "react";
+import { AppHeader, AppTabs } from "@/components/chrome";
 import { Mascot } from "@/components/mascot";
 import { Button } from "@/components/ui/button";
 import { YearPath } from "@/components/year-path";
-import { todayIso, YEAR_LABEL } from "@/lib/calendar";
+import { todayIso } from "@/lib/calendar";
 import { remainingSchoolDaysInUnit, suggestedUnitId, unitById } from "@/lib/curriculum";
 import { makeDailyWalk, walkLabel } from "@/lib/daily";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
-import { schoolStreak } from "@/lib/streak";
 
 export function HomePage() {
-  const name = useProgress((s) => s.name);
-  const stars = useProgress((s) => s.stars);
   const classUnitId = useProgress((s) => s.classUnitId);
   const skipWeekend = useProgress((s) => s.skipWeekend);
   const shaky = useProgress((s) => s.shaky);
   const sessions = useProgress((s) => s.sessions);
+  const seenWelcome = useProgress((s) => s.seenWelcome);
   const date = todayIso();
   const suggested = suggestedUnitId(date, classUnitId || undefined);
   const unit = unitById(suggested);
@@ -25,31 +23,28 @@ export function HomePage() {
     [date, classUnitId, skipWeekend, shaky],
   );
   const done = Boolean(sessions[walk.date]?.completed);
-  const streak = schoolStreak(sessions, date);
   const remain = remainingSchoolDaysInUnit(suggested, walk.schoolDate);
 
   return (
     <div className="paper-grid mx-auto min-h-dvh max-w-xl px-4 pb-16 pt-4">
-      <header className="mb-4 flex items-center gap-3">
-        <Mascot pose="wave" size="sm" className="h-14 w-14" />
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted">Grade 3 · {YEAR_LABEL}</p>
-          <h1 className="font-display text-2xl">{name ? `${name}'s path` : "Grade 3 Path"}</h1>
-        </div>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="inline-flex items-center gap-1 rounded-full bg-star-soft px-2 py-1 text-star">
-            <Star className="size-4 fill-current" />
-            {stars}
-          </span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-star-soft px-2 py-1 text-star">
-            <Flame className="size-4" />
-            {streak}
-          </span>
-          <button type="button" className="grid size-10 place-items-center rounded-[12px] text-muted" onClick={() => navigate({ id: "grownup" })} aria-label="Grown-ups">
-            <Settings2 className="size-5" />
-          </button>
-        </div>
-      </header>
+      <AppHeader />
+      <AppTabs active="home" />
+
+      {!seenWelcome ? (
+        <section className="mb-5 rounded-[24px] border border-teal bg-teal-soft p-4 shadow-soft">
+          <div className="flex items-center gap-3">
+            <Mascot pose="wave" size="md" className="h-24 w-24 shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-teal">Start here</p>
+              <h2 className="font-display text-xl leading-tight">What's hiding</h2>
+              <p className="mt-1 text-sm text-muted">6 + n = 10 on a ten-frame. Then Home and every lesson.</p>
+              <Button className="mt-3 w-full" size="lg" onClick={() => navigate({ id: "play", kind: "welcome" })}>
+                Play leftover
+              </Button>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="mb-6 rounded-[24px] border border-line bg-surface p-4 shadow-soft">
         <div className="flex items-center gap-3">
@@ -67,7 +62,9 @@ export function HomePage() {
         </div>
       </section>
 
-      <p className="mb-2 text-center text-sm text-muted">A school-year map. Units last weeks. Facts walk with you all year.</p>
+      <p className="mb-3 text-center text-sm text-muted">
+        The year map. <button type="button" className="font-medium text-teal" onClick={() => navigate({ id: "lessons" })}>Lessons</button> is the menu — pick any unit, any day.
+      </p>
       <YearPath suggestedId={suggested} onOpen={(id) => navigate({ id: "unit", unitId: id })} />
       <p className="mt-6 text-center text-xs text-faint">Nothing leaves this device.</p>
     </div>

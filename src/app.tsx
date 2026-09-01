@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { Mascot } from "@/components/mascot";
-import { navigate, useRoute } from "@/lib/nav";
+import { useRoute } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { unlockAudio } from "@/lib/sound";
 import { GrownupPage } from "@/pages/grownup";
 import { HomePage } from "@/pages/home";
+import { LessonsPage } from "@/pages/lessons";
 import { PlayPage } from "@/pages/play";
 import { UnitPage } from "@/pages/unit";
 
@@ -18,7 +19,6 @@ function Splash() {
 
 export function App() {
   const hydrated = useProgress((s) => s.hydrated);
-  const seenWelcome = useProgress((s) => s.seenWelcome);
   const route = useRoute();
 
   useEffect(() => {
@@ -27,18 +27,11 @@ export function App() {
     return () => window.removeEventListener("pointerdown", on);
   }, []);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    if (!seenWelcome && route.id === "home") {
-      navigate({ id: "play", kind: "welcome" }, { replace: true });
-    }
-  }, [hydrated, seenWelcome, route]);
-
   if (!hydrated) return <Splash />;
-  if (!seenWelcome && route.id !== "play") return <Splash />;
 
   if (route.id === "play") return <PlayPage kind={route.kind} activityId={route.activityId} />;
   if (route.id === "unit") return <UnitPage unitId={route.unitId} />;
+  if (route.id === "lessons") return <LessonsPage />;
   if (route.id === "grownup") return <GrownupPage />;
   return <HomePage />;
 }

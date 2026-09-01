@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 export type Route =
   | { id: "home" }
+  | { id: "lessons" }
   | { id: "play"; kind: "welcome" | "daily" | "activity"; activityId?: string }
   | { id: "unit"; unitId: string }
   | { id: "grownup" };
@@ -9,6 +10,7 @@ export type Route =
 export function parseHash(hash: string): Route {
   const h = hash.replace(/^#/, "").replace(/^\//, "");
   const parts = h.split("/").filter(Boolean);
+  if (parts[0] === "lessons") return { id: "lessons" };
   if (parts[0] === "play") {
     if (parts[1] === "welcome") return { id: "play", kind: "welcome" };
     if (parts[1] === "daily") return { id: "play", kind: "daily" };
@@ -25,6 +27,7 @@ export function toHash(route: Route): string {
     return `#/play/${route.kind}`;
   }
   if (route.id === "unit") return `#/unit/${route.unitId}`;
+  if (route.id === "lessons") return "#/lessons";
   if (route.id === "grownup") return "#/grownup";
   return "#/";
 }

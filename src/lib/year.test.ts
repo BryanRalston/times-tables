@@ -3,6 +3,7 @@ import { SCHOOL_DAYS, isSchoolDay, prevSchoolDay, weekdayName } from "./calendar
 import { UNITS, WELCOME_ACTIVITY, suggestedUnitId, unitById } from "./curriculum";
 import { makeDailyWalk } from "./daily";
 import { parseHash } from "./nav";
+import { isUnitOpen, unitStatus } from "./path";
 import { makeQuestion, makeWelcomeRound, welcomeFirst } from "./questions";
 import { rngFromSeed } from "./rng";
 import { schoolStreak } from "./streak";
@@ -127,5 +128,15 @@ describe("nav", () => {
     expect(parseHash("#/play/activity/u3-groups")).toEqual({ id: "play", kind: "activity", activityId: "u3-groups" });
     expect(parseHash("#/unit/u2")).toEqual({ id: "unit", unitId: "u2" });
     expect(parseHash("#/grownup")).toEqual({ id: "grownup" });
+    expect(parseHash("#/lessons")).toEqual({ id: "lessons" });
+  });
+});
+
+describe("path", () => {
+  it("never locks a unit — calendar only marks now", () => {
+    const later = UNITS.find((u) => u.id === "u11")!;
+    expect(unitStatus(later, "u1")).toBe("open");
+    expect(unitStatus(UNITS[0]!, "u1")).toBe("now");
+    expect(isUnitOpen(later, "u1")).toBe(true);
   });
 });

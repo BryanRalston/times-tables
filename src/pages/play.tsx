@@ -254,7 +254,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
           </p>
           {kind === "daily" ? <p className="mt-1 text-sm text-star">School-day streak {streak}</p> : null}
           <Button className="mt-6 w-full" size="lg" onClick={() => navigate({ id: "home" }, { replace: true })}>
-            The path
+            Home
           </Button>
         </div>
       </div>
@@ -277,13 +277,9 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   return (
     <div className="paper-grid mx-auto min-h-dvh max-w-lg overflow-x-hidden px-4 pb-8 pt-3">
       <header className="mb-2 flex items-center gap-2">
-        {kind === "welcome" ? (
-          <span className="text-sm font-medium">What's hiding</span>
-        ) : (
-          <button type="button" className="text-sm text-muted" onClick={() => navigate({ id: "home" })}>
-            ← Path
-          </button>
-        )}
+        <button type="button" className="text-sm text-muted" onClick={() => navigate({ id: "home" })}>
+          ← Home
+        </button>
         <div className="mx-2 h-2 flex-1 overflow-hidden rounded-full bg-surface-2">
           <div className="h-full bg-teal transition-[width] duration-300" style={{ width: `${(i / pack.items.length) * 100}%` }} />
         </div>
@@ -324,11 +320,9 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
       {q.kind === "word" || q.prompt.length > 70 ? <div className="mt-3"><ScratchPad /></div> : null}
 
-      {kind !== "welcome" ? (
-        <button type="button" className="mt-4 w-full text-center text-xs text-faint" onClick={skip}>
-          Skip
-        </button>
-      ) : null}
+      <button type="button" className="mt-4 w-full text-center text-xs text-faint" onClick={skip}>
+        Skip
+      </button>
     </div>
   );
 }

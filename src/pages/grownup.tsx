@@ -19,7 +19,7 @@ export function GrownupPage() {
   return (
     <div className="paper-grid mx-auto min-h-dvh max-w-lg px-4 py-6">
       <button type="button" className="mb-4 text-sm text-muted" onClick={() => navigate({ id: "home" })}>
-        ← Path
+        ← Home
       </button>
       <div className="flex items-center gap-3">
         <Mascot pose="think" size="sm" />
@@ -29,7 +29,7 @@ export function GrownupPage() {
         </div>
       </div>
       <p className="mt-3 text-sm text-muted">
-        The year map follows the LCPS 2026–27 calendar. Set the unit if class is ahead or behind. Daily walks stay 8–12 new plus review — a unit cannot be finished in a weekend.
+        Class is on only changes the suggested daily walk. Every lesson stays playable — she can pick Q4 in August. Daily walks stay 8–12 new plus review; a unit cannot be finished in a weekend.
       </p>
 
       <label className="mt-6 block text-sm font-medium">

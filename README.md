@@ -1,6 +1,6 @@
 # Grade 3 Path
 
-A school-year of LCPS 2026–27 math trails. First visit is the leftover `6 + n = 10`. After that, home is a Duolingo-style year map with an IXL-style skill walk that lasts Monday–Friday all year.
+A school-year of LCPS 2026–27 math trails. Home is today's walk plus a year map. **Lessons** is the menu: every unit, every activity, nothing locked. Leftover `6 + n = 10` is the loud first lesson, not a trap.
 
 Times tables are a family on that path (equal groups, then 2s 5s 10s, then 3s 4s 8s 9s), not the product title. Nothing is sent to a server. No accounts.
 
@@ -33,9 +33,9 @@ The old single-file leftover page lives in `legacy/`.
 
 ## Play
 
-1. Brand-new visit lands on `6 + n = 10` on a ten-frame. Take the 6. Type 4. A short leftover run, then the year map.
-2. **Start today's walk** — 8–12 new items on the current unit plus 3–5 review. Fluency walks all year. Units last weeks; you cannot finish one in a weekend.
-3. Nix thinks while you work, hops on a correct leftover, oops on a miss, and celebrates the walk (a 6s clip, not every keystroke). Rem shows on review.
-4. Grown-ups (gear) set **class is on unit N** if the room is ahead or behind the calendar.
+1. Home has **Home** and **Lessons**. A first visit offers leftover `6 + n = 10` as **Start here**. You can leave for Home after any card.
+2. **Lessons** lists every unit and activity. Calendar marks **Now**. It does not lock Q4 in August.
+3. **Start today's walk** — 8–12 new plus 3–5 review on the suggested unit. Grown-ups set **class is on unit N** to change that suggestion only.
+4. Nix thinks while you work, hops on a correct leftover, oops on a miss, and celebrates the walk. Rem shows on review.
 
 Progress stays in `localStorage` on this device.
