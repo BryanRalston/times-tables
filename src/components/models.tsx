@@ -1,0 +1,738 @@
+import { useMemo, useState, type ReactNode } from "react";
+import { ChoiceList } from "@/components/keypad";
+import { playTap } from "@/lib/sound";
+import type {
+  AreaData,
+  ArrayData,
+  BuildData,
+  ChoiceData,
+  ClockData,
+  Coin,
+  CompareData,
+  FractionData,
+  FluencyData,
+  GraphData,
+  GroupsData,
+  MoneyData,
+  OrderData,
+  PerimeterData,
+  PlaceValueData,
+  Question,
+  TenFrameData,
+} from "@/lib/types";
+import { cn, moneyFmt, pad2 } from "@/lib/utils";
+
+export interface BoardProps {
+  question: Question;
+  value: string;
+  setValue: (v: string) => void;
+  interacted: boolean;
+  onInteract: () => void;
+  status: "idle" | "correct" | "wrong";
+  shake: number;
+}
+
+export function Board(props: BoardProps) {
+  const { question } = props;
+  switch (question.kind) {
+    case "tenframe":
+      return <TenFrame {...props} />;
+    case "groups":
+      return <Groups {...props} />;
+    case "array":
+      return <ArrayGrid {...props} />;
+    case "placevalue":
+      return <PlaceValue {...props} />;
+    case "build":
+      return <BuildNumber {...props} />;
+    case "compare":
+      return <CompareNums {...props} />;
+    case "order":
+      return <OrderNums {...props} />;
+    case "choice":
+      return <ChoiceVisual {...props} />;
+    case "fraction":
+      return <FractionBar {...props} />;
+    case "clock":
+      return <AnalogClock {...props} />;
+    case "money":
+      return <MoneyBoard {...props} />;
+    case "area":
+      return <AreaBoard {...props} />;
+    case "perimeter":
+      return <PerimeterBoard {...props} />;
+    case "graph":
+      return <GraphBoard {...props} />;
+    case "pattern":
+      return <PatternBoard {...props} />;
+    case "fluency":
+      return <FluencyBoard {...props} />;
+    case "word":
+      return <BigPrompt prompt={question.prompt} status={props.status} />;
+    default:
+      return null;
+  }
+}
+
+function Frame({ children, shake, status }: { children: ReactNode; shake: number; status: BoardProps["status"] }) {
+  return (
+    <div
+      key={shake}
+      className={cn(
+        "rounded-[24px] border bg-surface p-4 shadow-soft sm:p-5",
+        status === "correct" && "border-good bg-good-soft",
+        status === "wrong" && "border-bad shake",
+        status === "idle" && "border-line",
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+function Dot({ filled, gone, onClick }: { filled: boolean; gone?: boolean; onClick?: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={!filled || gone || !onClick}
+      className={cn(
+        "size-6 rounded-full border transition-transform duration-200 sm:size-7",
+        filled && !gone ? "takeable border-teal bg-teal" : "border-line bg-surface-2",
+        gone && "scale-50 opacity-0",
+        onClick && filled && !gone && "hover:scale-95",
+      )}
+      aria-label={filled ? "dot" : "empty"}
+    />
+  );
+}
+
+function TenFrame({ question, onInteract, status, shake }: BoardProps) {
+  const data = question.data as TenFrameData;
+  const [gone, setGone] = useState<boolean[]>(() => Array(data.shown).fill(false));
+  const cells = Math.min(20, Math.max(data.total, data.shown));
+  const rows = cells > 10 ? 2 : 1;
+
+  function take(i: number) {
+    if (i >= data.shown) return;
+    setGone((g) => {
+      const n = [...g];
+      n[i] = true;
+      return n;
+    });
+    playTap();
+    onInteract();
+  }
+
+  return (
+    <Frame shake={shake} status={status}>
+      <p className="mb-3 text-center font-display text-2xl sm:text-3xl">{data.equation}</p>
+      <div className="flex flex-col items-center gap-2">
+        {Array.from({ length: rows }, (_, r) => (
+          <div key={r} className="flex flex-nowrap justify-center gap-1 rounded-[16px] border border-line bg-bg-warm p-2">
+            {Array.from({ length: r === 0 ? Math.min(10, cells) : cells - 10 }, (_, c) => {
+              const i = r * 10 + c;
+              const filled = i < data.shown;
+              return (
+                <Dot
+                  key={i}
+                  filled={filled}
+                  gone={filled && gone[i]}
+                  onClick={filled ? () => take(i) : undefined}
+                />
+              );
+            })}
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 text-center text-sm text-muted">
+        {status === "correct" ? `n = ${question.answer}` : "Take the dots you can see. n is what's hiding."}
+      </p>
+    </Frame>
+  );
+}
+
+function Groups({ question, onInteract, status, shake }: BoardProps) {
+  const data = question.data as GroupsData;
+  const [taken, setTaken] = useState(false);
+  const groups = Math.max(1, data.groups);
+  const size = Math.max(0, data.size);
+
+  function isolate() {
+    setTaken(true);
+    playTap();
+    onInteract();
+  }
+
+  return (
+    <Frame shake={shake} status={status}>
+      <p className="mb-3 text-center font-display text-xl sm:text-2xl">{data.equation}</p>
+      <div className="flex flex-wrap justify-center gap-3">
+        {Array.from({ length: groups }, (_, g) => (
+          <button
+            type="button"
+            key={g}
+            onClick={isolate}
+            className={cn(
+              "flex flex-wrap gap-1 rounded-[16px] border border-line bg-bg-warm p-2",
+              taken && g === 0 && "border-teal bg-teal-soft",
+              taken && g > 0 && "opacity-40",
+            )}
+            aria-label={`group ${g + 1}`}
+          >
+            {Array.from({ length: Math.max(size, 1) }, (_, i) => (
+              <span key={i} className={cn("size-4 rounded-full sm:size-5", size === 0 ? "border border-dashed border-faint" : "bg-teal")} />
+            ))}
+          </button>
+        ))}
+      </div>
+      <p className="mt-3 text-center text-sm text-muted">
+        {data.hide === "product" ? "Count them all." : "Tap a group to isolate it, then name n."}
+      </p>
+    </Frame>
+  );
+}
+
+function ArrayGrid({ question, status, shake }: BoardProps) {
+  const data = question.data as ArrayData;
+  return (
+    <Frame shake={shake} status={status}>
+      <p className="mb-3 text-center text-sm text-muted">{question.prompt}</p>
+      <div className="flex flex-col items-center gap-1">
+        {Array.from({ length: data.rows }, (_, r) => (
+          <div key={r} className="flex gap-1">
+            {Array.from({ length: data.cols }, (_, c) => (
+              <span key={c} className="size-5 rounded-[4px] bg-teal sm:size-6" />
+            ))}
+          </div>
+        ))}
+      </div>
+    </Frame>
+  );
+}
+
+function tensOnes(n: number) {
+  const thousands = Math.floor(n / 1000);
+  const hundreds = Math.floor((n % 1000) / 100);
+  const tens = Math.floor((n % 100) / 10);
+  const ones = n % 10;
+  return { thousands, hundreds, tens, ones };
+}
+
+function PlaceValue({ question, status, shake }: BoardProps) {
+  const data = question.data as PlaceValueData;
+  const parts = tensOnes(data.number);
+  const s = String(data.number);
+  if (data.mode === "expanded") {
+    const tens = Math.floor(data.number / 10) * 10;
+    const ones = data.digit;
+    return (
+      <Frame shake={shake} status={status}>
+        <p className="mb-3 text-center font-display text-2xl sm:text-3xl">{tens} + n = {data.number}</p>
+        <div className="flex flex-wrap items-end justify-center gap-6 text-center text-xs text-muted">
+          <div>
+            <div className="flex gap-0.5">
+              {Array.from({ length: parts.tens }, (_, i) => (
+                <span key={i} className="h-12 w-2.5 rounded-sm bg-teal" />
+              ))}
+            </div>
+            tens you can see
+          </div>
+          <div>
+            <div className="flex flex-wrap gap-0.5">
+              {Array.from({ length: Math.max(ones, 1) }, (_, i) => (
+                <span key={i} className="size-3 rounded-[2px] border border-dashed border-star bg-star-soft" />
+              ))}
+            </div>
+            n ones hiding
+          </div>
+        </div>
+      </Frame>
+    );
+  }
+  return (
+    <Frame shake={shake} status={status}>
+      <p className="mb-3 text-center font-display text-3xl tabular-nums sm:text-4xl">
+        {s.split("").map((ch, i) => (
+          <span key={i} className={cn("px-0.5", Number(ch) === data.digit && i === s.length - 1 - ["ones", "tens", "hundreds", "thousands"].indexOf(data.place) ? "text-teal underline" : "")}>
+            {ch}
+          </span>
+        ))}
+      </p>
+      <div className="flex flex-wrap justify-center gap-3 text-center text-xs text-muted">
+        {parts.thousands ? (
+          <div>
+            <div className="grid grid-cols-3 gap-0.5">
+              {Array.from({ length: parts.thousands }, (_, i) => (
+                <span key={i} className="size-6 rounded-[4px] bg-q4" />
+              ))}
+            </div>
+            thousands
+          </div>
+        ) : null}
+        {parts.hundreds ? (
+          <div>
+            <div className="flex flex-wrap justify-center gap-0.5">
+              {Array.from({ length: parts.hundreds }, (_, i) => (
+                <span key={i} className="size-6 rounded-[3px] bg-q2" />
+              ))}
+            </div>
+            hundreds
+          </div>
+        ) : null}
+        {parts.tens ? (
+          <div>
+            <div className="flex gap-0.5">
+              {Array.from({ length: parts.tens }, (_, i) => (
+                <span key={i} className="h-10 w-2 rounded-sm bg-teal" />
+              ))}
+            </div>
+            tens
+          </div>
+        ) : null}
+        <div>
+          <div className="flex flex-wrap gap-0.5">
+            {Array.from({ length: parts.ones }, (_, i) => (
+              <span key={i} className="size-3 rounded-[2px] bg-star" />
+            ))}
+          </div>
+          ones
+        </div>
+      </div>
+    </Frame>
+  );
+}
+
+function BuildNumber({ question, status, shake }: BoardProps) {
+  const data = question.data as BuildData;
+  const parts = tensOnes(data.target);
+  return (
+    <Frame shake={shake} status={status}>
+      <p className="mb-3 text-center font-display text-3xl tabular-nums">{data.target}</p>
+      <div className="grid grid-cols-4 gap-2 text-center text-xs text-muted">
+        {[
+          ["Th", parts.thousands],
+          ["H", parts.hundreds],
+          ["T", parts.tens],
+          ["O", parts.ones],
+        ].map(([label, n]) => (
+          <div key={String(label)} className="rounded-[12px] border border-line bg-bg-warm p-2">
+            <p className="font-display text-xl text-ink">{n}</p>
+            {label}
+          </div>
+        ))}
+      </div>
+    </Frame>
+  );
+}
+
+function CompareNums({ question, status, shake }: BoardProps) {
+  const data = question.data as CompareData;
+  const max = Math.max(data.a, data.b, 1);
+  return (
+    <Frame shake={shake} status={status}>
+      <div className="flex items-end justify-center gap-8">
+        {[data.a, data.b].map((n, i) => (
+          <div key={i} className="flex flex-col items-center gap-2">
+            <div
+              className={cn("w-10 rounded-t-md", i === 0 ? "bg-teal" : "bg-star")}
+              style={{ height: `${Math.max(12, (n / max) * 96)}px` }}
+            />
+            <span className="font-display text-2xl tabular-nums sm:text-3xl">{n}</span>
+          </div>
+        ))}
+      </div>
+      {question.input === "compare" ? <p className="mt-3 text-center text-faint">○</p> : null}
+    </Frame>
+  );
+}
+
+function OrderNums({ question, value, setValue, status, shake }: BoardProps) {
+  const data = question.data as OrderData;
+  const picked = value ? value.split(" ").filter(Boolean) : [];
+  const labels = question.choices ?? data.numbers.map(String);
+  return (
+    <Frame shake={shake} status={status}>
+      <p className="mb-3 text-center text-sm text-muted">{question.prompt}</p>
+      <div className="flex flex-wrap justify-center gap-2">
+        {labels.map((n) => {
+          const used = picked.includes(n);
+          return (
+            <button
+              type="button"
+              key={n}
+              disabled={used}
+              onClick={() => setValue([...picked, n].join(" "))}
+              className={cn(
+                "h-12 min-w-16 rounded-[14px] border px-3 font-display text-xl tabular-nums",
+                used ? "border-line bg-bg-warm text-faint" : "border-line bg-surface",
+              )}
+            >
+              {n}
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-3 text-center font-display text-lg tabular-nums">{picked.join("  →  ") || "Tap in order"}</p>
+    </Frame>
+  );
+}
+
+const POLY: Record<string, string> = {
+  triangle: "50,12 88,88 12,88",
+  quadrilateral: "18,20 86,18 82,82 14,84",
+  pentagon: "50,8 92,40 76,90 24,90 8,40",
+  hexagon: "50,8 90,30 90,70 50,92 10,70 10,30",
+  octagon: "35,8 65,8 92,35 92,65 65,92 35,92 8,65 8,35",
+  circle: "",
+  open: "12,70 20,20 50,40 80,18 88,72",
+};
+
+function ChoiceVisual({ question, status, shake }: BoardProps) {
+  const data = question.data as ChoiceData;
+  const pts = POLY[data.shape ?? "triangle"] ?? POLY.triangle!;
+  return (
+    <Frame shake={shake} status={status}>
+      <div className="flex justify-center">
+        <svg viewBox="0 0 100 100" className="size-40">
+          {data.shape === "circle" ? (
+            <circle cx="50" cy="50" r="36" fill="#d7ecec" stroke="#0d7377" strokeWidth="3" />
+          ) : data.shape === "open" ? (
+            <polyline points={pts} fill="none" stroke="#0d7377" strokeWidth="3" />
+          ) : (
+            <polygon
+              points={pts}
+              fill="#d7ecec"
+              stroke="#0d7377"
+              strokeWidth="3"
+              transform={`rotate(${data.rotation ?? 0} 50 50)`}
+            />
+          )}
+        </svg>
+      </div>
+    </Frame>
+  );
+}
+
+function FractionBar({ question, onInteract, status, shake }: BoardProps) {
+  const data = question.data as FractionData;
+  const den = Math.max(1, data.den);
+  const shaded = data.shaded ?? data.num;
+  const [gone, setGone] = useState<boolean[]>(() => Array(den).fill(false));
+
+  function take(i: number) {
+    if (i >= (data.num ?? 0) && data.mode !== "leftover") return;
+    if (data.mode === "leftover" && i >= data.num) return;
+    setGone((g) => {
+      const n = [...g];
+      n[i] = true;
+      return n;
+    });
+    playTap();
+    onInteract();
+  }
+
+  const bars = data.mode === "mixed" ? Math.ceil(shaded / den) : data.mode === "compare" ? 2 : 1;
+
+  return (
+    <Frame shake={shake} status={status}>
+      {Array.from({ length: bars }, (_, b) => {
+        const thisShaded = b === 0 ? Math.min(den, shaded) : data.mode === "compare" ? (data.num2 ?? 0) : Math.max(0, shaded - den);
+        const thisDen = b === 1 && data.den2 ? data.den2 : den;
+        return (
+          <div key={b} className="mb-2 flex h-12 overflow-hidden rounded-[12px] border border-line">
+            {Array.from({ length: thisDen }, (_, i) => (
+              <button
+                type="button"
+                key={i}
+                onClick={() => take(i)}
+                className={cn(
+                  "h-full flex-1 border-r border-line last:border-r-0",
+                  i < thisShaded && !gone[i] ? "bg-teal" : "bg-surface",
+                  gone[i] && "bg-bg-warm",
+                )}
+                aria-label={`piece ${i + 1}`}
+              />
+            ))}
+          </div>
+        );
+      })}
+      {data.mode === "compare" ? (
+        <p className="text-center font-display text-xl">
+          {data.num}/{data.den} ○ {data.num2}/{data.den2}
+        </p>
+      ) : null}
+    </Frame>
+  );
+}
+
+function AnalogClock({ question, status, shake }: BoardProps) {
+  const data = question.data as ClockData;
+  const minAngle = data.minutes * 6;
+  const hourAngle = (data.hours % 12) * 30 + data.minutes * 0.5;
+  return (
+    <Frame shake={shake} status={status}>
+      <div className="flex justify-center">
+        <svg viewBox="0 0 100 100" className="size-48">
+          <circle cx="50" cy="50" r="46" fill="#fffaf1" stroke="#1f1a14" strokeWidth="2" />
+          {Array.from({ length: 12 }, (_, i) => {
+            const a = ((i + 1) / 12) * Math.PI * 2 - Math.PI / 2;
+            const x = 50 + Math.cos(a) * 36;
+            const y = 50 + Math.sin(a) * 36;
+            return (
+              <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#1f1a14">
+                {i + 1}
+              </text>
+            );
+          })}
+          <line x1="50" y1="50" x2={50 + Math.sin((hourAngle * Math.PI) / 180) * 22} y2={50 - Math.cos((hourAngle * Math.PI) / 180) * 22} stroke="#1f1a14" strokeWidth="3" strokeLinecap="round" />
+          <line x1="50" y1="50" x2={50 + Math.sin((minAngle * Math.PI) / 180) * 32} y2={50 - Math.cos((minAngle * Math.PI) / 180) * 32} stroke="#0d7377" strokeWidth="2" strokeLinecap="round" />
+          <circle cx="50" cy="50" r="2.5" fill="#c45c26" />
+        </svg>
+      </div>
+      <p className="mt-2 text-center text-sm text-muted">
+        {data.find === "time" ? "Read the hands." : `Start ${data.hours}:${pad2(data.minutes)}`}
+      </p>
+    </Frame>
+  );
+}
+
+const COIN_META: { id: Coin; label: string; cents: number; size: string; fill: string }[] = [
+  { id: "dollar", label: "$1", cents: 100, size: "size-16", fill: "bg-good-soft border-good" },
+  { id: "quarter", label: "25¢", cents: 25, size: "size-14", fill: "bg-surface-2 border-faint" },
+  { id: "dime", label: "10¢", cents: 10, size: "size-10", fill: "bg-surface-2 border-faint" },
+  { id: "nickel", label: "5¢", cents: 5, size: "size-12", fill: "bg-surface-2 border-faint" },
+  { id: "penny", label: "1¢", cents: 1, size: "size-11", fill: "bg-star-soft border-star" },
+];
+
+function MoneyBoard({ question, onInteract, status, shake }: BoardProps) {
+  const data = question.data as MoneyData;
+  const [gone, setGone] = useState<Record<string, boolean>>({});
+  const coins = useMemo(() => {
+    const list: { key: string; id: Coin }[] = [];
+    for (const meta of COIN_META) {
+      const n = data.coins[meta.id] ?? 0;
+      for (let i = 0; i < n; i++) list.push({ key: `${meta.id}-${i}`, id: meta.id });
+    }
+    return list;
+  }, [data.coins]);
+
+  function take(key: string) {
+    setGone((g) => ({ ...g, [key]: true }));
+    playTap();
+    onInteract();
+  }
+
+  const total = coins.reduce((n, c) => n + (COIN_META.find((m) => m.id === c.id)?.cents ?? 0), 0);
+
+  return (
+    <Frame shake={shake} status={status}>
+      <div className="flex flex-wrap justify-center gap-2">
+        {coins.map((c) => {
+          const meta = COIN_META.find((m) => m.id === c.id)!;
+          return (
+            <button
+              type="button"
+              key={c.key}
+              onClick={() => take(c.key)}
+              className={cn(
+                "grid place-items-center rounded-full border text-xs font-medium",
+                meta.size,
+                meta.fill,
+                gone[c.key] && "scale-50 opacity-0",
+              )}
+            >
+              {meta.label}
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-3 text-center text-sm text-muted">
+        {data.mode === "change" ? "Take the dimes you can see." : `${moneyFmt(total)} if you count them all.`}
+      </p>
+    </Frame>
+  );
+}
+
+function AreaBoard({ question, onInteract, status, shake }: BoardProps) {
+  const data = question.data as AreaData;
+  const [gone, setGone] = useState<Record<string, boolean>>({});
+  return (
+    <Frame shake={shake} status={status}>
+      <div className="flex flex-col items-center gap-0.5">
+        {data.cells.map((row, r) => (
+          <div key={r} className="flex gap-0.5">
+            {row.map((on, c) => (
+              <button
+                type="button"
+                key={`${r}-${c}`}
+                disabled={!on}
+                onClick={() => {
+                  setGone((g) => ({ ...g, [`${r}-${c}`]: true }));
+                  playTap();
+                  onInteract();
+                }}
+                className={cn(
+                  "size-7 rounded-[4px] border sm:size-8",
+                  on && !gone[`${r}-${c}`] ? "border-teal bg-teal" : "border-line bg-surface",
+                  gone[`${r}-${c}`] && "opacity-30",
+                )}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      <p className="mt-2 text-center text-xs text-muted">{data.unit}</p>
+    </Frame>
+  );
+}
+
+function PerimeterBoard({ question, onInteract, status, shake }: BoardProps) {
+  const data = question.data as PerimeterData;
+  const n = data.sides.length;
+  const pts = Array.from({ length: n }, (_, i) => {
+    const a = (i / n) * Math.PI * 2 - Math.PI / 2;
+    return `${50 + Math.cos(a) * 36},${50 + Math.sin(a) * 36}`;
+  });
+  const mids = pts.map((p, i) => {
+    const [x1, y1] = p.split(",").map(Number) as [number, number];
+    const [x2, y2] = pts[(i + 1) % n]!.split(",").map(Number) as [number, number];
+    return { x: (x1 + x2) / 2, y: (y1 + y2) / 2, i };
+  });
+  return (
+    <Frame shake={shake} status={status}>
+      <svg viewBox="0 0 100 100" className="mx-auto size-48">
+        <polygon points={pts.join(" ")} fill="#d7ecec" stroke="#0d7377" strokeWidth="2" />
+        {mids.map((m) => (
+          <text
+            key={m.i}
+            x={m.x}
+            y={m.y}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fontSize="7"
+            fill="#1f1a14"
+            onClick={() => onInteract()}
+          >
+            {data.hideIndex === m.i ? "n" : data.sides[m.i]}
+          </text>
+        ))}
+      </svg>
+      <p className="text-center text-sm text-muted">{data.name}</p>
+    </Frame>
+  );
+}
+
+function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
+  const data = question.data as GraphData;
+  const max = Math.max(...data.rows.map((r) => r.value), 1);
+  return (
+    <Frame shake={shake} status={status}>
+      <p className="mb-2 text-center text-sm font-medium">{data.title}</p>
+      {data.kind === "picto" ? (
+        <div className="space-y-2">
+          {data.rows.map((r) => (
+            <div key={r.label} className="flex items-center gap-2">
+              <span className="w-20 text-sm">{r.label}</span>
+              <button type="button" className="tracking-widest text-lg" onClick={() => onInteract()} aria-label={`${r.label} pictures`}>
+                {data.symbol.repeat(Math.max(1, r.value / data.key))}
+              </button>
+            </div>
+          ))}
+          <p className="text-xs text-muted">Key: {data.symbol} = {data.key}</p>
+        </div>
+      ) : (
+        <div className="flex h-36 items-end justify-around gap-2">
+          {data.rows.map((r) => (
+            <button type="button" key={r.label} className="flex flex-1 flex-col items-center gap-1" onClick={() => onInteract()}>
+              <div className="w-full rounded-t-md bg-teal" style={{ height: `${(r.value / max) * 100}%` }} />
+              <span className="text-[11px]">{r.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </Frame>
+  );
+}
+
+function PatternBoard({ question, status, shake }: BoardProps) {
+  const data = question.data as { seq: (number | null)[]; step: number };
+  return (
+    <Frame shake={shake} status={status}>
+      <div className="flex flex-wrap justify-center gap-2">
+        {data.seq.map((n, i) => (
+          <span
+            key={i}
+            className={cn(
+              "grid size-12 place-items-center rounded-[14px] border font-display text-xl tabular-nums",
+              n == null ? "border-teal bg-teal-soft" : "border-line bg-surface",
+            )}
+          >
+            {n ?? "n"}
+          </span>
+        ))}
+      </div>
+    </Frame>
+  );
+}
+
+function FluencyBoard({ question, status, shake }: BoardProps) {
+  const data = question.data as FluencyData;
+  const times = data.op === "×" && data.a > 0 && data.b > 0 && data.a <= 6 && data.b <= 10;
+  const div =
+    data.op === "÷" && data.b > 0 && data.a % data.b === 0 && data.a / data.b <= 6 && data.b <= 10 && data.a / data.b >= 1;
+  const addSmall = (data.op === "+" || data.op === "−") && data.a <= 20 && data.b <= 20;
+  if (times || div) {
+    const groups = times ? data.a : data.a / data.b;
+    const size = times ? data.b : data.b;
+    return (
+      <Frame shake={shake} status={status}>
+        <p className="mb-3 text-center font-display text-2xl sm:text-3xl">{question.prompt}</p>
+        <div className="flex flex-wrap justify-center gap-2">
+          {Array.from({ length: groups }, (_, g) => (
+            <div key={g} className="flex flex-wrap gap-1 rounded-[12px] border border-line bg-bg-warm p-1.5">
+              {Array.from({ length: size }, (_, i) => (
+                <span key={i} className="size-3 rounded-full bg-teal sm:size-4" />
+              ))}
+            </div>
+          ))}
+        </div>
+      </Frame>
+    );
+  }
+  if (addSmall) {
+    const shown = data.op === "+" ? data.a : data.b;
+    const total = data.op === "+" ? data.a + data.b : data.a;
+    return (
+      <Frame shake={shake} status={status}>
+        <p className="mb-3 text-center font-display text-2xl sm:text-3xl">{question.prompt}</p>
+        <div className="flex flex-wrap justify-center gap-1">
+          {Array.from({ length: Math.min(total, 20) }, (_, i) => (
+            <span
+              key={i}
+              className={cn("size-4 rounded-full sm:size-5", i < shown ? "bg-teal" : "border border-dashed border-faint")}
+            />
+          ))}
+        </div>
+      </Frame>
+    );
+  }
+  return <BigPrompt prompt={question.prompt} status={status} />;
+}
+
+function BigPrompt({ prompt, status }: { prompt: string; status: BoardProps["status"] }) {
+  return (
+    <div
+      className={cn(
+        "rounded-[24px] border bg-surface p-5 text-center font-display text-2xl shadow-soft sm:text-3xl",
+        status === "correct" && "border-good bg-good-soft",
+        status === "wrong" && "border-bad shake",
+        status === "idle" && "border-line",
+      )}
+    >
+      {prompt}
+    </div>
+  );
+}
+
+export { ChoiceList };

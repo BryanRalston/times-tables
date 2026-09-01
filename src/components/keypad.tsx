@@ -1,0 +1,208 @@
+import { Delete } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn, pad2 } from "@/lib/utils";
+
+const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0", "back"] as const;
+
+export function Keypad({
+  value,
+  onChange,
+  onCheck,
+  disabled,
+  className,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onCheck: () => void;
+  disabled?: boolean;
+  className?: string;
+}) {
+  function press(k: (typeof KEYS)[number]) {
+    if (disabled) return;
+    if (k === "back") {
+      onChange(value.slice(0, -1));
+      return;
+    }
+    if (k === "." && value.includes(".")) return;
+    if (value.length >= 8) return;
+    onChange(value + k);
+  }
+
+  return (
+    <div className={cn("grid w-full grid-cols-3 gap-2", className)}>
+      {KEYS.map((k) => (
+        <Button
+          key={k}
+          variant="secondary"
+          size="key"
+          className="min-w-0 w-full"
+          aria-label={k === "back" ? "Backspace" : k}
+          onClick={() => press(k)}
+          disabled={disabled}
+        >
+          {k === "back" ? <Delete className="size-5" /> : k}
+        </Button>
+      ))}
+      <Button className="col-span-3" size="lg" onClick={onCheck} disabled={disabled || value.length === 0}>
+        Check
+      </Button>
+    </div>
+  );
+}
+
+export function CompareKeys({
+  onPick,
+  disabled,
+  includeNeq,
+}: {
+  onPick: (s: string) => void;
+  disabled?: boolean;
+  includeNeq?: boolean;
+}) {
+  const keys = includeNeq ? ["<", "=", ">", "≠"] : ["<", "=", ">"];
+  return (
+    <div className={cn("grid gap-2", includeNeq ? "grid-cols-4" : "grid-cols-3")}>
+      {keys.map((k) => (
+        <Button key={k} variant="secondary" size="lg" className="text-2xl" disabled={disabled} onClick={() => onPick(k)}>
+          {k}
+        </Button>
+      ))}
+    </div>
+  );
+}
+
+export function FractionKeys({
+  value,
+  onChange,
+  onCheck,
+  disabled,
+  mixed,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onCheck: () => void;
+  disabled?: boolean;
+  mixed?: boolean;
+}) {
+  const parts = value.split(" ");
+  const mixedWhole = mixed ? (parts.length > 1 ? parts[0] : parts[0]?.includes("/") ? "" : (parts[0] ?? "")) : "";
+  const frac = mixed ? (parts.length > 1 ? parts[1] : parts[0]?.includes("/") ? parts[0] : "") : value;
+  const [num = "", den = ""] = (frac ?? "").split("/");
+  const which = mixed && mixedWhole === "" && !num ? "w" : num === "" ? "n" : den === "" ? "d" : "d";
+
+  function set(part: "w" | "n" | "d", digit: string) {
+    let w = mixedWhole ?? "";
+    let n = num;
+    let d = den;
+    if (part === "w") w = (w + digit).slice(0, 2);
+    if (part === "n") n = (n + digit).slice(0, 3);
+    if (part === "d") d = (d + digit).slice(0, 3);
+    onChange(mixed ? `${w} ${n}/${d}`.trim() : `${n}/${d}`);
+  }
+
+  function back() {
+    if (den) onChange(mixed ? `${mixedWhole} ${num}/`.trim() : `${num}/`);
+    else if (num) onChange(mixed ? `${mixedWhole} `.trim() : "");
+    else if (mixedWhole) onChange("");
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-end justify-center gap-3 font-display text-3xl tabular-nums">
+        {mixed ? <span className="min-w-10 border-b-2 border-ink pb-1 text-center">{mixedWhole || " "}</span> : null}
+        <span className="flex flex-col items-center">
+          <span className="min-w-12 border-b-2 border-ink pb-1 text-center">{num || " "}</span>
+          <span className="min-w-12 pt-1 text-center">{den || " "}</span>
+        </span>
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((k) => (
+          <Button key={k} variant="secondary" size="key" disabled={disabled} onClick={() => set(which, k)}>
+            {k}
+          </Button>
+        ))}
+        <Button variant="secondary" size="key" disabled={disabled} onClick={back}>
+          <Delete className="size-5" />
+        </Button>
+        <Button variant="secondary" size="key" disabled={disabled} onClick={() => set(which, "0")}>
+          0
+        </Button>
+        <Button variant="secondary" size="key" disabled={disabled} onClick={() => onChange(mixed ? `${mixedWhole} ${num}/`.trim() : `${num}/`)}>
+          /
+        </Button>
+      </div>
+      <Button className="w-full" size="lg" onClick={onCheck} disabled={disabled || value.length === 0}>
+        Check
+      </Button>
+    </div>
+  );
+}
+
+export function ClockKeys({
+  value,
+  onChange,
+  onCheck,
+  disabled,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onCheck: () => void;
+  disabled?: boolean;
+}) {
+  const [hRaw, mRaw] = (value || "12:00").split(":");
+  let hours = Number(hRaw || 12);
+  let minutes = Number(mRaw || 0);
+  if (!Number.isFinite(hours)) hours = 12;
+  if (!Number.isFinite(minutes)) minutes = 0;
+
+  function set(h: number, m: number) {
+    const hh = ((h - 1 + 12) % 12) + 1;
+    const mm = (m + 60) % 60;
+    onChange(`${hh}:${pad2(mm)}`);
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-center font-display text-4xl tabular-nums">
+        {hours}:{pad2(minutes)}
+      </p>
+      <div className="grid grid-cols-2 gap-2">
+        <Button variant="secondary" disabled={disabled} onClick={() => set(hours + 1, minutes)}>
+          Hour +
+        </Button>
+        <Button variant="secondary" disabled={disabled} onClick={() => set(hours - 1, minutes)}>
+          Hour −
+        </Button>
+        <Button variant="secondary" disabled={disabled} onClick={() => set(hours, minutes + 5)}>
+          +5 min
+        </Button>
+        <Button variant="secondary" disabled={disabled} onClick={() => set(hours, minutes - 5)}>
+          −5 min
+        </Button>
+      </div>
+      <Button className="w-full" size="lg" onClick={onCheck} disabled={disabled}>
+        Check
+      </Button>
+    </div>
+  );
+}
+
+export function ChoiceList({
+  choices,
+  onPick,
+  disabled,
+}: {
+  choices: string[];
+  onPick: (s: string) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="grid gap-2">
+      {choices.map((c) => (
+        <Button key={c} variant="secondary" className="w-full justify-start text-left" disabled={disabled} onClick={() => onPick(c)}>
+          {c}
+        </Button>
+      ))}
+    </div>
+  );
+}

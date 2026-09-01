@@ -1,0 +1,338 @@
+import { SCHOOL_DAYS, lastSchoolDayOnOrBefore, schoolDayIndex, todayIso } from "./calendar";
+import type { ActivityDef, QuarterId, UnitDef } from "./types";
+
+export const QUARTERS: {
+  id: QuarterId;
+  name: string;
+  span: string;
+  months: number[];
+}[] = [
+  { id: 1, name: "Quarter 1", span: "Aug – Oct", months: [8, 9, 10] },
+  { id: 2, name: "Quarter 2", span: "Nov – Jan", months: [11, 12, 1] },
+  { id: 3, name: "Quarter 3", span: "Feb – Mar", months: [2, 3] },
+  { id: 4, name: "Quarter 4", span: "Apr – Jun", months: [4, 5, 6] },
+];
+
+function A(
+  id: string,
+  title: string,
+  blurb: string,
+  sol: string[],
+  kind: ActivityDef["kind"],
+  params?: Record<string, unknown>,
+  rounds = 8,
+): ActivityDef {
+  return { id, title, blurb, sol, kind, rounds, params };
+}
+
+export const UNITS: UnitDef[] = [
+  {
+    id: "u1",
+    number: 1,
+    quarter: 1,
+    title: "Building a Mathematical Community",
+    short: "Community & data",
+    sol: ["3.NS.1", "3.NS.4", "3.CE.1", "3.PS.1"],
+    blurb: "Count what you can see. Name the leftover. Start the data cycle.",
+    activities: [
+      A("u1-leftover", "What's hiding", "Ten-frames. Take the dots you can see, then name n.", ["3.NS.1"], "tenframe", { maxTotal: 10 }),
+      A("u1-friends", "Number friends", "Add and subtract on a frame, within 20.", ["3.CE.1"], "tenframe", { minTotal: 10, maxTotal: 20 }),
+      A("u1-coins", "Count the coins", "Pennies, nickels, dimes, quarters — up to a dollar.", ["3.NS.4.a"], "money", { mode: "count", max: 100 }),
+      A("u1-graph", "Read a pictograph", "A picture stands for a number. Read the key.", ["3.PS.1.a", "3.PS.1.b"], "graph", { kind: "picto", key: 1 }),
+      A("u1-bar", "Read a bar graph", "Which bar is tallest? How many more?", ["3.PS.1.c", "3.PS.1.e"], "graph", { kind: "bar", key: 1 }),
+    ],
+  },
+  {
+    id: "u2",
+    number: 2,
+    quarter: 1,
+    title: "Place Value, Addition & Subtraction",
+    short: "Place value",
+    sol: ["3.NS.1", "3.NS.2"],
+    blurb: "Read, write, build, compare, and order numbers.",
+    activities: [
+      A("u2-place", "Place and value", "Name the place and value of a digit.", ["3.NS.1.a", "3.NS.1.b"], "placevalue"),
+      A("u2-build", "Build the number", "Compose a number with thousands, hundreds, tens, and ones.", ["3.NS.1.c"], "build"),
+      A("u2-expanded", "Tens you can see", "60 + n = 64. Leftover ones on a tens-and-ones board.", ["3.NS.1", "3.CE.1"], "placevalue", { mode: "expanded" }),
+      A("u2-compare", "Compare", "Greater than, less than, equal to — up to 9,999.", ["3.NS.2.a"], "compare"),
+      A("u2-order", "Put in order", "Least to greatest, or the other way.", ["3.NS.2.b"], "order"),
+    ],
+  },
+  {
+    id: "u3",
+    number: 3,
+    quarter: 1,
+    title: "Multiplication & Division · Models",
+    short: "Equal groups",
+    sol: ["3.CE.2.a", "3.CE.2.b"],
+    blurb: "Equal groups, arrays, and related facts. Meaning first.",
+    activities: [
+      A("u3-groups", "Equal groups", "How many groups? How many in each? How many in all?", ["3.CE.2.a"], "groups", { factors: [2, 3, 4, 5] }),
+      A("u3-array", "Arrays", "Rows and columns make a product.", ["3.CE.2.a"], "array"),
+      A("u3-factor", "Missing factor", "2 × n = 8. Isolate one group, then name n.", ["3.CE.2.a"], "groups", { hide: "groups", factors: [2, 3, 4, 5] }),
+      A("u3-share", "Share equally", "n groups share the total. How many in each?", ["3.CE.2.a"], "groups", { hide: "size", factors: [2, 3, 4, 5] }),
+      A("u3-family", "Related facts", "One model, four facts.", ["3.CE.2.b"], "choice", { mode: "family" }),
+    ],
+  },
+  {
+    id: "u4",
+    number: 4,
+    quarter: 2,
+    title: "Polygons",
+    short: "Polygons",
+    sol: ["3.MG.4"],
+    blurb: "Name polygons. Count sides and vertices. Leftover sides on a named shape.",
+    activities: [
+      A("u4-name", "Name the shape", "Look at the polygon. Name it.", ["3.MG.4.a"], "choice", { mode: "name" }),
+      A("u4-sides", "Count the sides", "How many sides? How many vertices?", ["3.MG.4.a"], "choice", { mode: "sides" }),
+      A("u4-leftover", "Leftover sides", "A pentagon with 3 sides drawn. n is hiding.", ["3.MG.4"], "perimeter", { mode: "leftover" }),
+      A("u4-vs", "Polygon or not", "Closed, straight sides — or not.", ["3.MG.4.a"], "choice", { mode: "isPolygon" }),
+      A("u4-attr", "Attributes", "Sides, vertices, and names together.", ["3.MG.4.b"], "choice", { mode: "attr" }),
+    ],
+  },
+  {
+    id: "u5",
+    number: 5,
+    quarter: 2,
+    title: "Fraction Models",
+    short: "Fraction models",
+    sol: ["3.NS.3"],
+    blurb: "Name, build, and leftover pieces on a bar. Unit fractions first.",
+    activities: [
+      A("u5-name", "Name the fraction", "Shaded pieces of a bar.", ["3.NS.3.a"], "fraction", { mode: "name" }),
+      A("u5-unit", "Unit fractions", "One piece of n equal parts.", ["3.NS.3.a"], "fraction", { mode: "unit" }),
+      A("u5-leftover", "Leftover pieces", "Some pieces showing. n pieces hide.", ["3.NS.3"], "fraction", { mode: "leftover" }),
+      A("u5-mixed", "Wholes and leftover", "Mixed numbers on stacked bars.", ["3.NS.3.b"], "fraction", { mode: "mixed" }),
+      A("u5-set", "Of a set", "Shaded of a group of same-size pieces.", ["3.NS.3.a"], "fraction", { mode: "name", set: true }),
+    ],
+  },
+  {
+    id: "u6",
+    number: 6,
+    quarter: 2,
+    title: "0s, 1s, 2s, 5s, 10s",
+    short: "0s 1s 2s 5s 10s",
+    sol: ["3.CE.2"],
+    blurb: "Facts that fit skip counting. Models, then the fact.",
+    activities: [
+      A("u6-facts", "Facts on groups", "0, 1, 2, 5, and 10 as equal groups.", ["3.CE.2"], "groups", { factors: [0, 1, 2, 5, 10] }),
+      A("u6-array", "Easy arrays", "Rows of 2, 5, or 10.", ["3.CE.2"], "array", { factors: [2, 5, 10] }),
+      A("u6-factor", "Missing factor", "5 × n = 30. Isolate one group.", ["3.CE.2"], "groups", { hide: "groups", factors: [2, 5, 10] }),
+      A("u6-skip", "Skip count", "The pattern is hiding a number.", ["3.CE.2"], "pattern", { steps: [2, 5, 10] }),
+      A("u6-zero", "Zeros and ones", "×0, ×1, and families with a model.", ["3.CE.2"], "fluency", { factors: [0, 1] }),
+    ],
+  },
+  {
+    id: "u7",
+    number: 7,
+    quarter: 3,
+    title: "Word Problems",
+    short: "Word problems",
+    sol: ["3.CE.1", "3.CE.2", "3.PS.1"],
+    blurb: "A story, a model, then n. One step, then two.",
+    activities: [
+      A("u7-add", "Join and leftover", "A join story on a frame.", ["3.CE.1"], "word", { mode: "add" }),
+      A("u7-groups", "Groups in a story", "Equal groups hiding in words.", ["3.CE.2"], "word", { mode: "groups" }),
+      A("u7-take", "Take-from leftover", "How many are hiding after some leave.", ["3.CE.1"], "word", { mode: "take" }),
+      A("u7-compare", "How many more", "Compare two amounts in a story.", ["3.CE.1"], "word", { mode: "compare" }),
+      A("u7-two", "Then do this", "Two steps. Scratch pad is there if you need it.", ["3.CE.1", "3.CE.2"], "word", { mode: "two" }),
+    ],
+  },
+  {
+    id: "u8",
+    number: 8,
+    quarter: 3,
+    title: "Perimeter & Area",
+    short: "Perimeter & area",
+    sol: ["3.MG.2"],
+    blurb: "Unit squares and leftover sides. Area is covering. Perimeter is around.",
+    activities: [
+      A("u8-area", "Cover the grid", "How many unit squares?", ["3.MG.2.a"], "area"),
+      A("u8-leftover", "Leftover squares", "Some squares showing. n hide.", ["3.MG.2.a"], "area", { hide: true }),
+      A("u8-peri", "Around the shape", "Add the sides you can see.", ["3.MG.2.b"], "perimeter"),
+      A("u8-missing", "Missing side", "Perimeter you know. One side is n.", ["3.MG.2.b"], "perimeter", { hide: true }),
+      A("u8-rect", "Rows and columns", "Area of a rectangle as an array.", ["3.MG.2.a"], "array", { area: true }),
+    ],
+  },
+  {
+    id: "u9",
+    number: 9,
+    quarter: 3,
+    title: "3s, 4s, 8s, 9s",
+    short: "3s 4s 8s 9s",
+    sol: ["3.CE.2"],
+    blurb: "Harder tables, still on groups and arrays. Then the fact.",
+    activities: [
+      A("u9-groups", "Groups of 3, 4, 8, 9", "Equal groups on those tables.", ["3.CE.2"], "groups", { factors: [3, 4, 8, 9] }),
+      A("u9-array", "Arrays", "Rows of 3, 4, 8, or 9.", ["3.CE.2"], "array", { factors: [3, 4, 8, 9] }),
+      A("u9-factor", "Missing factor", "4 × n = 32. Isolate one group.", ["3.CE.2"], "groups", { hide: "groups", factors: [3, 4, 8, 9] }),
+      A("u9-family", "Related facts", "One array, four facts.", ["3.CE.2.b"], "choice", { mode: "family", factors: [3, 4, 8, 9] }),
+      A("u9-mix", "Mixed facts", "× and ÷ on 3s 4s 8s 9s.", ["3.CE.2"], "fluency", { factors: [3, 4, 8, 9] }),
+    ],
+  },
+  {
+    id: "u10",
+    number: 10,
+    quarter: 4,
+    title: "Compare Fractions",
+    short: "Compare fractions",
+    sol: ["3.NS.3"],
+    blurb: "Same whole. Bars, benchmarks, and equivalent pieces.",
+    activities: [
+      A("u10-compare", "Which is more?", "Two bars, same whole.", ["3.NS.3.c"], "fraction", { mode: "compare" }),
+      A("u10-bench", "Near 0, ½, 1", "Benchmark the fraction on a bar.", ["3.NS.3.c"], "fraction", { mode: "benchmark" }),
+      A("u10-equiv", "Same amount", "Different pieces, same bar.", ["3.NS.3.d"], "fraction", { mode: "equiv" }),
+      A("u10-order", "Put fractions in order", "Least to greatest on bars.", ["3.NS.3.c"], "order", { fractions: true }),
+      A("u10-leftover", "Leftover of the whole", "Shaded plus n makes 1.", ["3.NS.3"], "fraction", { mode: "leftover" }),
+    ],
+  },
+  {
+    id: "u11",
+    number: 11,
+    quarter: 4,
+    title: "Time & Money",
+    short: "Time & money",
+    sol: ["3.MG.1", "3.NS.4"],
+    blurb: "Read a clock. Elapsed time. Coins to a dollar, leftover change.",
+    activities: [
+      A("u11-clock", "Read the clock", "Hour and minute hands.", ["3.MG.1.a"], "clock", { mode: "read" }),
+      A("u11-elapsed", "Elapsed time", "Start, end, or how long.", ["3.MG.1.b"], "clock", { mode: "elapsed" }),
+      A("u11-count", "Count the coins", "Up to a few dollars.", ["3.NS.4.a"], "money", { mode: "count", max: 200 }),
+      A("u11-make", "Make a dollar", "Coins that add to 100¢.", ["3.NS.4.b"], "money", { mode: "make" }),
+      A("u11-change", "Leftover to a dollar", "Dimes you can see. n is hiding.", ["3.NS.4"], "money", { mode: "change" }),
+    ],
+  },
+  {
+    id: "u12",
+    number: 12,
+    quarter: 4,
+    title: "Fluency",
+    short: "Fluency",
+    sol: ["3.CE.2"],
+    blurb: "Mixed facts on models. The year of tables, still not a speed quiz.",
+    activities: [
+      A("u12-mix", "Mixed facts", "0–10 tables, × and ÷.", ["3.CE.2"], "fluency", { factors: [0, 1, 2, 3, 4, 5, 8, 9, 10] }),
+      A("u12-factor", "Missing factor mix", "Isolate a group, name n.", ["3.CE.2"], "groups", { hide: "groups", factors: [2, 3, 4, 5, 8, 9, 10] }),
+      A("u12-family", "Related mix", "One model, four facts.", ["3.CE.2.b"], "choice", { mode: "family" }),
+      A("u12-array", "Array mix", "Rows and columns from the year.", ["3.CE.2"], "array"),
+      A("u12-add", "Add and subtract mix", "Within 1,000, with a reason.", ["3.CE.1"], "fluency", { ops: ["+", "−"] }),
+    ],
+  },
+  {
+    id: "u13",
+    number: 13,
+    quarter: 4,
+    title: "Dig Deeper",
+    short: "Dig deeper",
+    sol: ["3.CE.1", "3.CE.2", "3.PS.1", "3.MG.2"],
+    blurb: "Two-step stories, mixed models, and patterns. Still a walk, not a test.",
+    activities: [
+      A("u13-two", "Two-step stories", "Then do this — with a model.", ["3.CE.1", "3.CE.2"], "word", { mode: "two" }),
+      A("u13-mixed", "Mixed models", "Frame, groups, bars — whichever fits.", ["3.CE.2"], "word", { mode: "mixed" }),
+      A("u13-pattern", "Number patterns", "What's hiding in the sequence?", ["3.PS.1"], "pattern", { steps: [2, 3, 4, 5, 6, 8, 10] }),
+      A("u13-area", "Area stories", "Covering a space in a story.", ["3.MG.2"], "area"),
+      A("u13-challenge", "Leftover challenge", "A leftover hiding in a bigger model.", ["3.CE.1"], "tenframe", { minTotal: 12, maxTotal: 20 }),
+    ],
+  },
+];
+
+export const WELCOME_ACTIVITY: ActivityDef = {
+  id: "welcome",
+  title: "What's hiding",
+  blurb: "Take the dots you can see. Then name n.",
+  sol: ["3.NS.1"],
+  kind: "tenframe",
+  rounds: 4,
+  params: { welcome: true, maxTotal: 10 },
+};
+
+/** School-day spans per unit, matching LCPS quarter lengths. */
+export const UNIT_SPANS: { id: string; start: number; end: number }[] = [
+  { id: "u1", start: 0, end: 15 },
+  { id: "u2", start: 16, end: 32 },
+  { id: "u3", start: 33, end: 48 },
+  { id: "u4", start: 49, end: 62 },
+  { id: "u5", start: 63, end: 76 },
+  { id: "u6", start: 77, end: 91 },
+  { id: "u7", start: 92, end: 106 },
+  { id: "u8", start: 107, end: 121 },
+  { id: "u9", start: 122, end: 136 },
+  { id: "u10", start: 137, end: 147 },
+  { id: "u11", start: 148, end: 158 },
+  { id: "u12", start: 159, end: 169 },
+  { id: "u13", start: 170, end: 179 },
+];
+
+export function unitById(id: string): UnitDef | undefined {
+  return UNITS.find((u) => u.id === id);
+}
+
+export function activityById(id: string): { unit: UnitDef; activity: ActivityDef } | undefined {
+  if (id === WELCOME_ACTIVITY.id) {
+    return { unit: UNITS[0]!, activity: WELCOME_ACTIVITY };
+  }
+  for (const unit of UNITS) {
+    const activity = unit.activities.find((a) => a.id === id);
+    if (activity) return { unit, activity };
+  }
+  return undefined;
+}
+
+export function suggestedUnitId(iso?: string, classUnitId?: string): string {
+  if (classUnitId && unitById(classUnitId)) return classUnitId;
+  const raw = iso ?? todayIso();
+  if (!SCHOOL_DAYS.length) return "u1";
+  if (raw < SCHOOL_DAYS[0]!) return "u1";
+  const day = schoolDayIndex(raw) >= 0 ? raw : lastSchoolDayOnOrBefore(raw) ?? raw;
+  const idx = schoolDayIndex(day);
+  if (idx < 0) return "u13";
+  const span = UNIT_SPANS.find((s) => idx >= s.start && idx <= s.end);
+  return span?.id ?? "u1";
+}
+
+export function unitSpanDays(unitId: string): number {
+  const s = UNIT_SPANS.find((x) => x.id === unitId);
+  return s ? s.end - s.start + 1 : 0;
+}
+
+export function fluencyFactorsForUnit(unitId: string): number[] {
+  const n = unitById(unitId)?.number ?? 1;
+  if (n >= 12) return [0, 1, 2, 3, 4, 5, 8, 9, 10];
+  if (n >= 9) return [0, 1, 2, 3, 4, 5, 8, 9, 10];
+  if (n >= 6) return [0, 1, 2, 5, 10];
+  return [1, 2, 5];
+}
+
+export function earlierUnits(unitId: string): UnitDef[] {
+  const u = unitById(unitId);
+  if (!u) return [];
+  return UNITS.filter((x) => x.number < u.number);
+}
+
+export function quarterForUnit(unitId: string): QuarterId {
+  return unitById(unitId)?.quarter ?? 1;
+}
+
+export function unitWindowLabel(unitId: string): string {
+  const s = UNIT_SPANS.find((x) => x.id === unitId);
+  if (!s) return "";
+  const a = SCHOOL_DAYS[s.start];
+  const b = SCHOOL_DAYS[s.end];
+  if (!a || !b) return `${s.end - s.start + 1} school days`;
+  const fmt = (iso: string) => {
+    const [, m, d] = iso.split("-");
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${months[Number(m) - 1]} ${Number(d)}`;
+  };
+  return `${fmt(a)} – ${fmt(b)} · ${s.end - s.start + 1} school days`;
+}
+
+export function remainingSchoolDaysInUnit(unitId: string, iso: string): number {
+  const s = UNIT_SPANS.find((x) => x.id === unitId);
+  if (!s) return 0;
+  const idx = schoolDayIndex(iso);
+  if (idx < 0) return s.end - s.start + 1;
+  if (idx > s.end) return 0;
+  if (idx < s.start) return s.end - s.start + 1;
+  return s.end - idx;
+}

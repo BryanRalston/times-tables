@@ -1,0 +1,2353 @@
+﻿const test = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const engine = require("../js/practice.js");
+
+function pageMarkup() {
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const scriptAt = html.indexOf("<script>");
+  return scriptAt >= 0 ? html.slice(0, scriptAt) : html;
+}
+
+function rngFrom(values) {
+  let index = 0;
+  return () => {
+    const value = values[index % values.length];
+    index += 1;
+    return value;
+  };
+}
+
+test("multiply question uses the selected table", () => {
+  const question = engine.makeQuestion(7, 8, "multiply");
+  assert.equal(question.prompt, "7 ├ù 8");
+  assert.equal(question.answer, 56);
+  assert.equal(question.operation, "multiply");
+});
+
+test("divide question stays inside the selected table", () => {
+  const question = engine.makeQuestion(7, 8, "divide");
+  assert.equal(question.prompt, "56 ├╖ 7");
+  assert.equal(question.answer, 8);
+  assert.equal(question.fact, "7 ├ù 8");
+});
+
+test("mix picks from the supplied rng", () => {
+  const multiply = engine.makeQuestion(4, 5, "mix", () => 0.1);
+  const divide = engine.makeQuestion(4, 5, "mix", () => 0.9);
+  assert.equal(multiply.operation, "multiply");
+  assert.equal(divide.operation, "divide");
+});
+
+test("round only uses selected tables", () => {
+  const round = engine.buildRound(
+    { tables: [3, 9], operation: "multiply", timerSeconds: 0, questionCount: 12 },
+    rngFrom([0.2, 0.8, 0.1, 0.6]),
+  );
+  assert.equal(round.questions.length, 12);
+  for (const question of round.questions) {
+    assert.ok([3, 9].includes(question.left));
+  }
+});
+
+test("gradeAnswer treats only exact integers as correct", () => {
+  const question = engine.makeQuestion(6, 7, "multiply");
+  assert.deepEqual(engine.gradeAnswer(question, "42"), { ok: true, empty: false, given: 42 });
+  assert.deepEqual(engine.gradeAnswer(question, "41"), { ok: false, empty: false, given: 41 });
+  assert.equal(engine.gradeAnswer(question, "").empty, true);
+  assert.equal(engine.gradeAnswer(question, "abc").empty, true);
+});
+
+test("summarize counts score and missed facts", () => {
+  const first = engine.makeQuestion(2, 4, "multiply");
+  const second = engine.makeQuestion(5, 5, "multiply");
+  const summary = engine.summarize([
+    { question: first, ok: true, given: 8 },
+    { question: second, ok: false, given: 20 },
+  ]);
+  assert.equal(summary.correct, 1);
+  assert.equal(summary.asked, 2);
+  assert.equal(summary.accuracy, 50);
+  assert.equal(summary.missed[0].prompt, "5 ├ù 5");
+});
+
+test("normalizeSettings falls back to a playable default", () => {
+  const settings = engine.normalizeSettings({ tables: ["nope"], operation: "add", timerSeconds: 12 });
+  assert.ok(settings.tables.length > 0);
+  assert.equal(settings.operation, "multiply");
+  assert.equal(settings.topic, "times");
+  assert.equal(settings.difficulty, "3-digit");
+  assert.equal(settings.timerSeconds, 0);
+});
+
+function cyclingRng() {
+  return rngFrom([0.01, 0.18, 0.33, 0.47, 0.61, 0.74, 0.88, 0.96, 0.09, 0.22, 0.41, 0.55, 0.69, 0.83, 0.12]);
+}
+
+test("add questions are multi-digit, not facts within 20", () => {
+  const round = engine.buildRound(
+    { topic: "add", difficulty: "2-digit", timerSeconds: 0, questionCount: 24 },
+    cyclingRng(),
+  );
+  assert.equal(round.questions.length, 24);
+  for (const question of round.questions) {
+    assert.equal(question.operation, "add");
+    assert.ok(question.left >= 10 && question.left <= 99);
+    assert.ok(question.right >= 10 && question.right <= 99);
+    assert.equal(question.answer, question.left + question.right);
+    assert.ok(question.answer >= 20);
+  }
+});
+
+test("3-digit add uses a number in the hundreds", () => {
+  const round = engine.buildRound(
+    { topic: "add", difficulty: "3-digit", timerSeconds: 0, questionCount: 20 },
+    cyclingRng(),
+  );
+  for (const question of round.questions) {
+    assert.equal(question.operation, "add");
+    assert.ok(Math.max(question.left, question.right) >= 100);
+    assert.ok(Math.max(question.left, question.right) <= 999);
+    assert.equal(question.answer, question.left + question.right);
+  }
+});
+
+test("thousands add includes a number in the thousands", () => {
+  const round = engine.buildRound(
+    { topic: "add", difficulty: "thousands", timerSeconds: 0, questionCount: 16 },
+    cyclingRng(),
+  );
+  for (const question of round.questions) {
+    assert.equal(question.operation, "add");
+    assert.ok(Math.max(question.left, question.right) >= 1000);
+    assert.ok(question.answer === question.left + question.right);
+  }
+});
+
+test("subtract answers stay non-negative", () => {
+  for (const difficulty of engine.DIFFICULTIES) {
+    const round = engine.buildRound(
+      { topic: "subtract", difficulty, timerSeconds: 0, questionCount: 20 },
+      cyclingRng(),
+    );
+    for (const question of round.questions) {
+      assert.equal(question.operation, "subtract");
+      assert.ok(question.left >= question.right);
+      assert.ok(question.answer >= 0);
+      assert.equal(question.answer, question.left - question.right);
+    }
+  }
+});
+
+test("2-digit subtract uses two 2-digit numbers", () => {
+  const round = engine.buildRound(
+    { topic: "subtract", difficulty: "2-digit", timerSeconds: 0, questionCount: 20 },
+    cyclingRng(),
+  );
+  for (const question of round.questions) {
+    assert.ok(question.left >= 20 && question.left <= 99);
+    assert.ok(question.right >= 10 && question.right <= question.left);
+  }
+});
+
+test("thousands subtract is mostly bigger than a 2-digit take-away", () => {
+  const round = engine.buildRound(
+    { topic: "subtract", difficulty: "thousands", timerSeconds: 0, questionCount: 24 },
+    cyclingRng(),
+  );
+  let chunky = 0;
+  for (const question of round.questions) {
+    assert.ok(question.left >= 1000);
+    if (question.right >= 100) {
+      chunky += 1;
+    }
+  }
+  assert.ok(chunky >= 16, `expected mostly 3+ digit subtrahends, got ${chunky}`);
+});
+
+test("mix includes add, subtract, multiply, and divide", () => {
+  const seen = new Set();
+  let tick = 0;
+  const round = engine.buildRound(
+    {
+      topic: "mix",
+      tables: [3, 7],
+      difficulty: "2-digit",
+      timerSeconds: 0,
+      questionCount: 48,
+    },
+    () => {
+      tick += 1;
+      return (tick % 97) / 97;
+    },
+  );
+  for (const question of round.questions) {
+    seen.add(question.operation);
+    if (question.operation === "multiply") {
+      assert.ok([3, 7].includes(question.left));
+    }
+    if (question.operation === "divide") {
+      assert.ok([3, 7].includes(question.right));
+    }
+    if (question.operation === "subtract") {
+      assert.ok(question.answer >= 0);
+    }
+  }
+  assert.deepEqual([...seen].sort(), ["add", "divide", "multiply", "subtract"]);
+});
+
+test("times tables still ignore add/sub topics when topic is times", () => {
+  const round = engine.buildRound(
+    { tables: [4], operation: "divide", topic: "times", timerSeconds: 0, questionCount: 8 },
+    rngFrom([0.2, 0.8, 0.1, 0.6]),
+  );
+  for (const question of round.questions) {
+    assert.equal(question.operation, "divide");
+    assert.equal(question.right, 4);
+  }
+});
+
+test("replay round repeats the missed questions", () => {
+  const missed = [
+    engine.makeAddQuestion(347, 86),
+    engine.makeSubtractQuestion(1205, 478),
+  ];
+  const round = engine.buildReplayRound(
+    missed,
+    { topic: "add", difficulty: "3-digit", timerSeconds: 0, questionCount: 6 },
+    rngFrom([0.2, 0.9, 0.1]),
+  );
+  assert.equal(round.questions.length, 6);
+  for (const question of round.questions) {
+    assert.ok(["347 + 86", "1205 ΓêÆ 478"].includes(question.prompt));
+  }
+});
+
+test("subtitle follows the chosen topic", () => {
+  assert.equal(engine.subtitleFor({ topic: "add" }), "Addition practice");
+  assert.equal(engine.subtitleFor({ topic: "subtract" }), "Subtraction practice");
+  assert.equal(engine.subtitleFor({ topic: "mix" }), "A mix of + ΓêÆ ├ù ├╖");
+  assert.equal(engine.subtitleFor({ topic: "missing" }), "What's hiding?");
+  assert.equal(engine.subtitleFor({ topic: "onestep" }), "What number is n?");
+  assert.equal(engine.subtitleFor({ topic: "twostep" }), "Then do this");
+  assert.equal(engine.subtitleFor({ topic: "shapes" }), "Shapes practice");
+  assert.equal(engine.subtitleFor({ topic: "times", operation: "multiply" }), "Multiplication practice");
+  assert.equal(engine.subtitleFor({ topic: "times", operation: "divide" }), "Division practice");
+});
+
+test("normalizeSettings keeps a shapes topic and focus", () => {
+  const settings = engine.normalizeSettings({ topic: "shapes", shapeFocus: "measure" });
+  assert.equal(settings.topic, "shapes");
+  assert.equal(settings.shapeFocus, "measure");
+  assert.equal(engine.normalizeSettings({ topic: "shapes", shapeFocus: "nope" }).shapeFocus, "mix");
+});
+
+test("shapes name questions are multiple choice and show a picture", () => {
+  const round = engine.buildRound(
+    { topic: "shapes", shapeFocus: "names", timerSeconds: 0, questionCount: 12 },
+    cyclingRng(),
+  );
+  const seen = new Set();
+  for (const question of round.questions) {
+    assert.equal(question.kind, "name");
+    assert.equal(question.answerKind, "choice");
+    assert.ok(engine.SHAPE_IDS.includes(question.shape));
+    if (question.shape === "square") {
+      assert.equal(question.figure.boxWidth, question.figure.boxHeight);
+    }
+    if (question.shape === "rectangle") {
+      assert.notEqual(question.figure.boxWidth, question.figure.boxHeight);
+    }
+    assert.equal(question.answer, question.shape === "lshape" ? "L shape" : question.shape);
+    assert.ok(question.figureSvg.includes("<svg"));
+    assert.ok(question.choices.some((choice) => choice.value === question.answer));
+    seen.add(question.shape);
+  }
+  assert.ok(seen.size >= 4);
+});
+
+test("circle has no straight sides and no corners", () => {
+  const sides = engine.makeShapeQuestion({ shapeFocus: "count" }, rngFrom([0.1, 0.9, 0.2]));
+  const corners = engine.makeShapeQuestion({ shapeFocus: "count" }, rngFrom([0.8, 0.9, 0.2]));
+  assert.equal(sides.shape, "circle");
+  assert.equal(sides.kind, "sides");
+  assert.equal(sides.answer, 0);
+  assert.match(sides.prompt, /straight sides/i);
+  assert.ok(sides.figureSvg.includes("circle"));
+  assert.equal(corners.shape, "circle");
+  assert.equal(corners.kind, "corners");
+  assert.equal(corners.answer, 0);
+  assert.ok(corners.figureSvg.includes("circle"));
+});
+
+test("sides and corners match the picture", () => {
+  const expected = {
+    triangle: { sides: 3, corners: 3 },
+    square: { sides: 4, corners: 4 },
+    rectangle: { sides: 4, corners: 4 },
+    pentagon: { sides: 5, corners: 5 },
+    hexagon: { sides: 6, corners: 6 },
+    circle: { sides: 0, corners: 0 },
+  };
+  const round = engine.buildRound(
+    { topic: "shapes", shapeFocus: "count", timerSeconds: 0, questionCount: 36 },
+    cyclingRng(),
+  );
+  for (const question of round.questions) {
+    assert.ok(question.kind === "sides" || question.kind === "corners");
+    assert.equal(question.answerKind, "number");
+    assert.equal(question.answer, expected[question.shape][question.kind]);
+    assert.ok(question.figureSvg.includes("<svg"));
+  }
+});
+
+test("rectangle and square perimeter add the labeled sides", () => {
+  const round = engine.buildRound(
+    { topic: "shapes", shapeFocus: "measure", timerSeconds: 0, questionCount: 40 },
+    cyclingRng(),
+  );
+  let perimeters = 0;
+  let areas = 0;
+  for (const question of round.questions) {
+    assert.ok(question.figureSvg.includes("<svg"));
+    if (question.kind === "perimeter") {
+      perimeters += 1;
+      const sum = question.figure.sideLengths.reduce((total, value) => total + value, 0);
+      assert.equal(question.answer, sum);
+      for (const value of question.figure.sideLengths) {
+        assert.ok(question.figureSvg.includes(`>${value}</text>`));
+      }
+      if (question.shape === "square") {
+        assert.equal(question.answer, 4 * question.figure.side);
+      }
+      if (question.shape === "rectangle") {
+        assert.equal(question.answer, 2 * (question.figure.length + question.figure.width));
+        assert.notEqual(question.figure.length, question.figure.width);
+      }
+    }
+    if (question.kind === "area") {
+      areas += 1;
+      assert.ok(question.shape === "square" || question.shape === "rectangle");
+      assert.equal(question.answer, question.figure.length * question.figure.width);
+      assert.ok(question.figure.showGrid);
+      assert.ok(question.figureSvg.includes("<rect"));
+    }
+  }
+  assert.ok(perimeters >= 8);
+  assert.ok(areas >= 4);
+});
+
+test("gradeAnswer accepts a shape name tap", () => {
+  const question = engine.makeShapeQuestion({ shapeFocus: "names" }, () => 0.1);
+  assert.equal(question.kind, "name");
+  assert.deepEqual(engine.gradeAnswer(question, question.answer), {
+    ok: true,
+    empty: false,
+    given: question.answer,
+  });
+  assert.equal(engine.gradeAnswer(question, "circle").ok, question.answer === "circle");
+  assert.equal(engine.gradeAnswer(question, "").empty, true);
+});
+
+test("normalizeSettings keeps a missing-number topic", () => {
+  const settings = engine.normalizeSettings({ topic: "missing" });
+  assert.equal(settings.topic, "missing");
+  assert.equal(engine.subtitleFor(settings), "What's hiding?");
+  assert.equal(engine.markFor(settings), "n");
+  assert.equal(engine.usesWorkspace(settings), false);
+});
+
+test("first missing-number question is 8 + n = 12", () => {
+  const question = engine.makeMissingQuestion({ tables: [3, 4] }, rngFrom([0.2, 0.8]), { first: true });
+  assert.equal(question.topic, "missing");
+  assert.equal(question.operation, "add");
+  assert.equal(question.token, "n");
+  assert.equal(question.slot, "right");
+  assert.equal(question.prompt, "8 + n = 12");
+  assert.equal(question.left, 8);
+  assert.equal(question.right, 4);
+  assert.equal(question.answer, 4);
+  assert.equal(question.result, 12);
+  assert.equal(question.known, 8);
+  assert.equal(question.hint, "n is hiding");
+  assert.ok(!/variable|algebra/i.test(`${question.prompt} ${question.hint} ${question.review}`));
+});
+
+test("missing-number why-model is take-from-both for 8 + n = 12", () => {
+  const question = engine.makeMissingQuestion({}, () => 0, { first: true });
+  const model = engine.whyModel(question);
+  assert.equal(engine.usesWhyModel(question), true);
+  assert.equal(model.kind, "balance");
+  assert.equal(model.known, 8);
+  assert.equal(model.hidden, 4);
+  assert.equal(model.total, 12);
+  assert.equal(model.slot, "right");
+  assert.equal(engine.whyLeftover(model), 4);
+  assert.equal(engine.whyCaption(model, "idle"), "");
+  assert.equal(engine.whyCaption(model, "lift"), "What's left?");
+  assert.equal(engine.whyCaption(model, "reveal"), "8 + 4 = 12");
+  assert.ok(!/Take \d+ from both/.test(engine.whyCaption(model, "idle")));
+  assert.ok(!/Take \d+ from both/.test(engine.whyNudge(model)));
+});
+
+test("after isolation the written prompt is n = leftover", () => {
+  const question = engine.makeMissingQuestion({}, () => 0, { first: true });
+  assert.equal(engine.whyPrompt(question, "idle").prompt, "8 + n = 12");
+  assert.equal(engine.whyPrompt(question, "lift").prompt, "8 + n = 12");
+  assert.doesNotMatch(engine.whyPrompt(question, "lift").prompt, /^n = 4$/);
+  assert.equal(engine.whyPrompt(question, "reveal").prompt, "n = 4");
+  assert.match(engine.whyPrompt(question, "reveal").promptHtml, /n.* = 4/);
+});
+
+test("isolated n hold is a beat on the leftover board, not an instant skip", () => {
+  const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  const addend = engine.makeMissingQuestion({}, () => 0, { first: true });
+  const sub = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  const factor = engine.makeFactorQuestion({}, () => 0, { first: true });
+  const times = engine.makeQuestion(7, 8, "multiply");
+  assert.ok(engine.isolatedHoldMs(sense) >= 1600);
+  assert.equal(engine.isolatedHoldMs(sense), engine.ISOLATED_HOLD_MS);
+  assert.equal(engine.isolatedHoldMs(addend), engine.ISOLATED_HOLD_MS);
+  assert.equal(engine.isolatedHoldMs(sub), engine.ISOLATED_HOLD_MS);
+  assert.equal(engine.isolatedHoldMs(factor), engine.ISOLATED_HOLD_MS);
+  assert.equal(engine.isolatedHoldMs(times), 0);
+  assert.equal(engine.whyPrompt(sense, "reveal").prompt, "n = 4");
+  assert.equal(engine.whyLeftover(engine.whyModel(sense)), 4);
+  assert.equal(engine.shouldAdvanceAfterGrade(sense, engine.gradeAnswer(sense, "4")), true);
+  assert.equal(engine.shouldAdvanceAfterGrade(sense, engine.gradeAnswer(sense, "5")), false);
+});
+
+test("after a correct leftover the isolated-n beat holds before advancing", () => {
+  const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  const addend = engine.makeMissingQuestion({}, () => 0, { first: true });
+  const sub = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  const factor = engine.makeFactorQuestion({}, () => 0, { first: true });
+  const times = engine.makeQuestion(7, 8, "multiply");
+  const correct = engine.leftoverHoldPlan(sense, engine.gradeAnswer(sense, "4"));
+  assert.equal(correct.kind, "isolated");
+  assert.ok(correct.holdMs >= 2000);
+  assert.equal(correct.holdMs, engine.ISOLATED_HOLD_MS);
+  assert.equal(correct.hideKeypad, true);
+  assert.equal(correct.keepModel, true);
+  assert.equal(correct.prompt, "n = 4");
+  assert.equal(engine.leftoverHoldPlan(addend, engine.gradeAnswer(addend, "4")).kind, "isolated");
+  assert.equal(engine.leftoverHoldPlan(sub, engine.gradeAnswer(sub, "4")).kind, "isolated");
+  assert.equal(engine.leftoverHoldPlan(factor, engine.gradeAnswer(factor, "4")).kind, "isolated");
+  const miss = engine.leftoverHoldPlan(sense, engine.gradeAnswer(sense, "5"));
+  assert.equal(miss.kind, "stay");
+  assert.equal(miss.holdMs, 0);
+  assert.equal(miss.hideKeypad, false);
+  const ordinary = engine.leftoverHoldPlan(times, engine.gradeAnswer(times, "56"));
+  assert.equal(ordinary.kind, "advance");
+  assert.equal(ordinary.holdMs, 0);
+  assert.equal(ordinary.hideKeypad, false);
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const submit = html.slice(html.indexOf("function submitAnswer"), html.indexOf("function pressKey"));
+  const show = html.slice(html.indexOf("function showQuestion"), html.indexOf("function clearTimers"));
+  const hold = html.slice(html.indexOf("function holdIsolatedN"), html.indexOf("function setAnswer"));
+  assert.match(submit, /leftoverHoldPlan/);
+  assert.match(submit, /applyHoldPlan/);
+  assert.match(submit, /state\.advanceId = window\.setTimeout/);
+  assert.match(submit, /state\.holdingIsolated = false/);
+  assert.match(show, /if \(state\.holdingIsolated\)/);
+  assert.match(hold, /els\.keypad\.hidden = true/);
+  assert.match(hold, /els\.why\.hidden = false/);
+  assert.match(hold, /dataset\.isolatedHold = "true"/);
+  assert.doesNotMatch(hold, /renderWhyModel/);
+  assert.doesNotMatch(hold, /showQuestion\(/);
+});
+
+test("why-nudge does not name the known amount", () => {
+  const question = engine.makeMissingQuestion({}, rngFrom([0.2, 0.8]));
+  const model = engine.whyModel(question);
+  assert.equal(engine.usesWhyModel(question), true);
+  assert.equal(engine.whyNudge(model), "");
+  assert.doesNotMatch(engine.whyNudge(model), new RegExp(String(model.known)));
+  assert.doesNotMatch(engine.whyCaption(model, "idle"), /Take \d+ from both/);
+  assert.notEqual(engine.whyNudge(model), String(model.hidden));
+  assert.equal(engine.whyCaption(model, "lift"), "What's left?");
+});
+
+test("isolated prompt follows leftover when n is on either side", () => {
+  const question = engine.makeMissingQuestion({}, rngFrom([0.1, 0.2]));
+  const model = engine.whyModel(question);
+  const leftover = model.total - model.known;
+  assert.equal(engine.whyLeftover(model), leftover);
+  assert.equal(engine.whyPrompt(question, "idle").prompt, question.prompt);
+  assert.equal(engine.whyPrompt(question, "lift").prompt, question.prompt);
+  assert.equal(engine.whyPrompt(question, "reveal").prompt, `n = ${leftover}`);
+  assert.notEqual(engine.whyPrompt(question, "lift").prompt, engine.whyPrompt(question, "reveal").prompt);
+});
+
+test("ordinary wrong answers still advance", () => {
+  const question = engine.makeQuestion(6, 7, "multiply");
+  const wrong = engine.gradeAnswer(question, "41");
+  assert.equal(wrong.ok, false);
+  assert.equal(engine.shouldAdvanceAfterGrade(question, wrong), true);
+});
+
+test("before why-move leftover digits do not become the answer", () => {
+  const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  const addend = engine.makeMissingQuestion({}, () => 0, { first: true });
+  const sub = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  const factor = engine.makeFactorQuestion({}, () => 0, { first: true });
+  const times = engine.makeQuestion(7, 8, "multiply");
+  assert.equal(engine.leftoverTypingAllowed(sense, false), false);
+  assert.equal(engine.leftoverTypingAllowed(addend, false), false);
+  assert.equal(engine.leftoverTypingAllowed(sub, false), false);
+  assert.equal(engine.leftoverTypingAllowed(factor, false), false);
+  assert.equal(engine.leftoverTypingAllowed(times, false), true);
+  assert.equal(engine.appendAnswerDigit("", "4", sense, false), "");
+  assert.equal(engine.appendAnswerDigit("", "5", sense, false), "");
+  assert.equal(engine.appendAnswerDigit("4", "2", sense, false), "4");
+  assert.equal(engine.appendAnswerDigit("", "4", addend, false), "");
+  assert.equal(engine.appendAnswerDigit("", "4", sub, false), "");
+  assert.equal(engine.appendAnswerDigit("", "4", factor, false), "");
+  assert.equal(engine.appendAnswerDigit("", "5", times, false), "5");
+});
+
+test("after why-move leftover keypad replaces so 5 then 4 is 4", () => {
+  const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  const addend = engine.makeMissingQuestion({}, () => 0, { first: true });
+  const sub = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  const factor = engine.makeFactorQuestion({}, () => 0, { first: true });
+  const times = engine.makeQuestion(7, 8, "multiply");
+  assert.equal(engine.leftoverTypingAllowed(sense, true), true);
+  assert.equal(engine.leftoverTypingAllowed(addend, true), true);
+  assert.equal(engine.leftoverTypingAllowed(sub, true), true);
+  assert.equal(engine.leftoverTypingAllowed(factor, true), true);
+  assert.equal(engine.whyLeftover(engine.whyModel(sense)), 4);
+  assert.equal(engine.appendAnswerDigit("", "5", sense, true), "5");
+  assert.equal(engine.appendAnswerDigit("5", "4", sense, true), "4");
+  assert.equal(engine.appendAnswerDigit("5", "4", addend, true), "4");
+  assert.equal(engine.appendAnswerDigit("5", "4", sub, true), "4");
+  assert.equal(engine.appendAnswerDigit("5", "4", factor, true), "4");
+  assert.equal(engine.appendAnswerDigit("5", "4", times, true), "54");
+  assert.equal(engine.appendAnswerDigit("54", "3", times, true), "543");
+});
+
+test("wrong leftover guess tilts and does not advance", () => {
+  const question = engine.makeMissingQuestion({}, () => 0, { first: true });
+  const model = engine.whyModel(question);
+  const wrong = engine.gradeAnswer(question, "5");
+  const right = engine.gradeAnswer(question, "4");
+  assert.equal(wrong.ok, false);
+  assert.equal(engine.shouldAdvanceAfterGrade(question, wrong), false);
+  assert.equal(engine.whyTilt(model, 5), "left");
+  assert.equal(engine.whyTilt(model, 3), "right");
+  assert.equal(engine.whyTilt(model, 4), "level");
+  assert.equal(right.ok, true);
+  assert.equal(engine.shouldAdvanceAfterGrade(question, right), true);
+});
+
+test("missing-number round is missing addend only, small numbers", () => {
+  const slots = new Set();
+  const tokens = new Set();
+  let tick = 0;
+  const round = engine.buildRound(
+    { topic: "missing", tables: [3, 7], timerSeconds: 0, questionCount: 20 },
+    () => {
+      tick += 1;
+      return (tick % 97) / 97;
+    },
+  );
+  assert.equal(round.questions.length, engine.WHY_RUN_LENGTH);
+  assert.equal(round.questions[0].prompt, "8 + n = 12");
+  assert.equal(round.questions[0].answer, 4);
+  for (const question of round.questions) {
+    assert.equal(question.topic, "missing");
+    assert.equal(question.operation, "add");
+    assert.equal(question.symbol, "+");
+    assert.ok(["left", "right"].includes(question.slot));
+    assert.ok(question.prompt.includes("="));
+    assert.ok(question.prompt.includes("n"));
+    assert.match(question.prompt, /^(n \+ \d+|\d+ \+ n) = \d+$/);
+    assert.ok(!question.prompt.includes("├ù"));
+    assert.ok(!question.prompt.includes("├╖"));
+    assert.ok(!question.prompt.includes("ΓêÆ"));
+    assert.ok(!/\d+n/.test(question.prompt.replace(" + n", "")));
+    assert.equal(question.answer, question.slot === "left" ? question.left : question.right);
+    assert.ok(question.answer >= 1 && question.answer <= 9);
+    assert.ok(question.result <= 20);
+    assert.ok(question.left <= 12);
+    assert.ok(question.right <= 12);
+    assert.ok(Math.max(question.left, question.right) < 1000);
+    assert.equal(question.result, question.left + question.right);
+    assert.equal(question.fullPrompt, true);
+    const model = engine.whyModel(question);
+    assert.equal(model.known + model.hidden, model.total);
+    assert.equal(model.hidden, question.answer);
+    tokens.add(question.token);
+    slots.add(question.slot);
+    assert.ok(!/variable|algebra/i.test(`${question.prompt} ${question.hint}`));
+  }
+  assert.ok(slots.has("left") && slots.has("right"));
+  assert.deepEqual([...tokens], ["n"]);
+});
+
+test("gradeAnswer scores the hidden number, not the total", () => {
+  const question = engine.makeMissingQuestion({ tables: [4] }, () => 0.2, { first: true });
+  assert.deepEqual(engine.gradeAnswer(question, String(question.answer)), {
+    ok: true,
+    empty: false,
+    given: question.answer,
+  });
+  assert.equal(engine.gradeAnswer(question, String(question.result)).ok, question.result === question.answer);
+  assert.equal(engine.gradeAnswer(question, "").empty, true);
+});
+
+test("normalizeSettings keeps a one-step Find n topic", () => {
+  const settings = engine.normalizeSettings({ topic: "onestep" });
+  assert.equal(settings.topic, "onestep");
+  assert.equal(engine.subtitleFor(settings), "What number is n?");
+  assert.equal(engine.markFor(settings), "n");
+  assert.equal(engine.usesWorkspace(settings), true);
+});
+
+test("first one-step question is n plus a number", () => {
+  const question = engine.makeOnestepQuestion({}, rngFrom([0.2, 0.8]), { first: true });
+  assert.equal(question.topic, "onestep");
+  assert.equal(question.form, "n+a");
+  assert.equal(question.token, "n");
+  assert.match(question.prompt, /^n \+ \d+ = \d+$/);
+  assert.equal(question.answer, question.prompt.match(/^n \+ (\d+) = (\d+)$/).slice(1).reduce((a, b) => Number(b) - Number(a)));
+  assert.equal(question.hint, "Find n");
+  assert.ok(!/variable|algebra|equation|system|inequal/i.test(`${question.prompt} ${question.hint} ${question.review}`));
+});
+
+test("one-step round stays one operation and includes 3n and n/3 style", () => {
+  const seen = new Set();
+  let tick = 0;
+  const round = engine.buildRound(
+    { topic: "onestep", timerSeconds: 0, questionCount: 48 },
+    () => {
+      tick += 1;
+      return (tick % 97) / 97;
+    },
+  );
+  assert.equal(round.questions.length, 48);
+  assert.equal(round.questions[0].form, "n+a");
+  assert.match(round.questions[0].prompt, /^n \+ \d+ = \d+$/);
+  for (const question of round.questions) {
+    assert.equal(question.topic, "onestep");
+    assert.ok(engine.ONESTEP_FORMS.includes(question.form));
+    assert.ok(question.prompt.includes("n"));
+    assert.ok(question.prompt.includes("="));
+    assert.equal((question.prompt.match(/=/g) || []).length, 1);
+    assert.ok(question.answer >= 1);
+    assert.equal(Number.isInteger(question.answer), true);
+    if (question.form === "n+a") {
+      assert.equal(question.answer + question.left, question.right);
+    }
+    if (question.form === "a+n") {
+      assert.equal(question.left + question.answer, question.right);
+    }
+    if (question.form === "n-a") {
+      assert.equal(question.answer - question.left, question.right);
+    }
+    if (question.form === "a-n") {
+      assert.equal(question.left - question.answer, question.right);
+    }
+    if (question.form === "an") {
+      assert.equal(question.left * question.answer, question.right);
+      assert.match(question.prompt, /^\d+n = \d+$/);
+    }
+    if (question.form === "n/a") {
+      assert.equal(question.answer / question.left, question.right);
+      assert.match(question.prompt, /^n\/\d+ = \d+$/);
+    }
+    if (question.form === "a/n") {
+      assert.equal(question.left / question.answer, question.right);
+      assert.match(question.prompt, /^\d+\/n = \d+$/);
+    }
+    assert.ok(!/variable|algebra|equation|two-step|system|inequal|graph/i.test(`${question.prompt} ${question.hint}`));
+    seen.add(question.form);
+  }
+  assert.ok(seen.has("n+a"));
+  assert.ok(seen.has("a-n"));
+  assert.ok(seen.has("an"));
+  assert.ok(seen.has("n/a"));
+});
+
+test("gradeAnswer scores n, not the other number", () => {
+  const question = engine.makeOnestepQuestion({}, () => 0.2, { first: true });
+  assert.deepEqual(engine.gradeAnswer(question, String(question.answer)), {
+    ok: true,
+    empty: false,
+    given: question.answer,
+  });
+  assert.equal(engine.gradeAnswer(question, String(question.right)).ok, question.right === question.answer);
+});
+
+test("new progress recommends Find n facts and keeps original topics quiet", () => {
+  const progress = engine.normalizeProgress(null);
+  assert.equal(progress.recommended, "missing");
+  assert.equal(engine.isSkillUnlocked(progress, "onestep"), false);
+  assert.equal(engine.isSkillUnlocked(progress, "twostep"), false);
+  assert.deepEqual(engine.otherSkills(progress, "missing"), ["times", "add", "subtract", "mix", "shapes"]);
+  assert.equal(engine.skillCopy("missing").title, "Find n");
+  assert.equal(engine.skillCopy("onestep").title, "Find n");
+  assert.equal(engine.skillCopy("twostep").title, "Find n");
+  assert.equal(engine.skillCopy("twostep").blurb, "Then do this");
+});
+
+test("a strong Find n round unlocks one-step and recommends it", () => {
+  const after = engine.applyRoundProgress(
+    engine.emptyProgress(),
+    "missing",
+    { asked: 10, accuracy: 100 },
+    10,
+  );
+  assert.equal(engine.isSkillFluent(after, "missing"), true);
+  assert.equal(engine.isSkillUnlocked(after, "onestep"), true);
+  assert.equal(engine.isSkillUnlocked(after, "twostep"), false);
+  assert.equal(after.recommended, "onestep");
+  assert.ok(after.unlocked.includes("onestep"));
+  assert.ok(!after.unlocked.includes("twostep"));
+  assert.ok(engine.otherSkills(after, "onestep").includes("missing"));
+  assert.ok(engine.otherSkills(after, "onestep").includes("times"));
+  assert.ok(!engine.otherSkills(after, "onestep").includes("twostep"));
+});
+
+test("a weak round keeps that skill as the recommendation", () => {
+  const after = engine.applyRoundProgress(
+    engine.emptyProgress(),
+    "add",
+    { asked: 10, accuracy: 40 },
+    2,
+  );
+  assert.equal(after.lastStruggled, "add");
+  assert.equal(after.recommended, "add");
+  assert.equal(engine.isSkillUnlocked(after, "onestep"), false);
+});
+
+test("recovering from a struggle returns to the Find n path", () => {
+  const struggled = engine.applyRoundProgress(
+    engine.emptyProgress(),
+    "add",
+    { asked: 10, accuracy: 40 },
+    1,
+  );
+  const recovered = engine.applyRoundProgress(
+    struggled,
+    "add",
+    { asked: 10, accuracy: 100 },
+    10,
+  );
+  assert.equal(recovered.lastStruggled, null);
+  assert.equal(recovered.recommended, "missing");
+});
+
+test("Find n facts stay the old missing-number style", () => {
+  const question = engine.makeMissingQuestion({ tables: [3, 4] }, rngFrom([0.2, 0.8]), { first: true });
+  assert.equal(question.topic, "missing");
+  assert.match(question.prompt, /^\d+ \+ n = \d+$/);
+  assert.notEqual(question.topic, "onestep");
+});
+
+test("normalizeSettings keeps a two-step Find n topic", () => {
+  const settings = engine.normalizeSettings({ topic: "twostep" });
+  assert.equal(settings.topic, "twostep");
+  assert.equal(engine.subtitleFor(settings), "Then do this");
+  assert.equal(engine.markFor(settings), "n");
+  assert.equal(engine.usesWorkspace(settings), true);
+});
+
+test("first two-step question is a small 3n + 4 style problem", () => {
+  const question = engine.makeTwostepQuestion({}, rngFrom([0.2, 0.8]), { first: true });
+  assert.equal(question.topic, "twostep");
+  assert.equal(question.form, "an+b");
+  assert.equal(question.token, "n");
+  assert.match(question.prompt, /^\d+n \+ \d+ = \d+$/);
+  assert.equal(question.a * question.answer + question.b, question.c);
+  assert.equal(question.hint, "Then do this");
+  assert.ok(!/variable|algebra|equation|system|inequal|graph|parenthes/i.test(`${question.prompt} ${question.hint} ${question.review}`));
+});
+
+test("two-step round stays two operations and includes the four kid forms", () => {
+  const seen = new Set();
+  let tick = 0;
+  const round = engine.buildRound(
+    { topic: "twostep", timerSeconds: 0, questionCount: 48 },
+    () => {
+      tick += 1;
+      return (tick % 97) / 97;
+    },
+  );
+  assert.equal(round.questions.length, 48);
+  assert.equal(round.questions[0].form, "an+b");
+  assert.match(round.questions[0].prompt, /^\d+n \+ \d+ = \d+$/);
+  for (const question of round.questions) {
+    assert.equal(question.topic, "twostep");
+    assert.ok(engine.TWOSTEP_FORMS.includes(question.form));
+    assert.ok(question.prompt.includes("n"));
+    assert.ok(question.prompt.includes("="));
+    assert.equal((question.prompt.match(/=/g) || []).length, 1);
+    assert.ok(!question.prompt.includes("("));
+    assert.ok(!question.prompt.includes(")"));
+    assert.equal((question.prompt.match(/n/g) || []).length, 1);
+    assert.ok(question.answer >= 0);
+    assert.equal(Number.isInteger(question.answer), true);
+    assert.equal(Number.isInteger(question.a), true);
+    assert.equal(Number.isInteger(question.b), true);
+    assert.equal(Number.isInteger(question.c), true);
+    assert.ok(question.c >= 0);
+    if (question.form === "an+b") {
+      assert.equal(question.a * question.answer + question.b, question.c);
+      assert.match(question.prompt, /^\d+n \+ \d+ = \d+$/);
+    }
+    if (question.form === "n/a+b") {
+      assert.equal(question.answer / question.a + question.b, question.c);
+      assert.match(question.prompt, /^n\/\d+ \+ \d+ = \d+$/);
+    }
+    if (question.form === "an-b") {
+      assert.equal(question.a * question.answer - question.b, question.c);
+      assert.match(question.prompt, /^\d+n ΓêÆ \d+ = \d+$/);
+    }
+    if (question.form === "a-bn") {
+      assert.equal(question.a - question.b * question.answer, question.c);
+      assert.match(question.prompt, /^\d+ ΓêÆ \d+n = \d+$/);
+    }
+    assert.ok(!/variable|algebra|equation|two-step|system|inequal|graph/i.test(`${question.prompt} ${question.hint}`));
+    seen.add(question.form);
+  }
+  assert.ok(seen.has("an+b"));
+  assert.ok(seen.has("n/a+b"));
+  assert.ok(seen.has("an-b"));
+  assert.ok(seen.has("a-bn"));
+});
+
+test("gradeAnswer scores n on a two-step problem, not the other numbers", () => {
+  const question = engine.makeTwostepQuestion({}, () => 0.2, { first: true });
+  assert.deepEqual(engine.gradeAnswer(question, String(question.answer)), {
+    ok: true,
+    empty: false,
+    given: question.answer,
+  });
+  assert.equal(engine.gradeAnswer(question, String(question.c)).ok, question.c === question.answer);
+  assert.equal(engine.gradeAnswer(question, String(question.b)).ok, question.b === question.answer);
+});
+
+test("a strong one-step round unlocks two-step and recommends Find n again", () => {
+  const afterMissing = engine.applyRoundProgress(
+    engine.emptyProgress(),
+    "missing",
+    { asked: 10, accuracy: 100 },
+    10,
+  );
+  const after = engine.applyRoundProgress(
+    afterMissing,
+    "onestep",
+    { asked: 10, accuracy: 100 },
+    10,
+  );
+  assert.equal(engine.isSkillFluent(after, "onestep"), true);
+  assert.equal(engine.isSkillUnlocked(after, "twostep"), true);
+  assert.equal(after.recommended, "twostep");
+  assert.ok(after.unlocked.includes("twostep"));
+  assert.equal(engine.skillCopy(after.recommended).title, "Find n");
+  assert.equal(engine.skillCopy(after.recommended).blurb, "Then do this");
+  assert.ok(engine.otherSkills(after, "twostep").includes("onestep"));
+  assert.ok(engine.otherSkills(after, "twostep").includes("missing"));
+  assert.ok(engine.otherSkills(after, "twostep").includes("times"));
+  assert.ok(!engine.otherSkills(after, "twostep").includes("twostep"));
+});
+
+test("saved one-step fluency already recommends two-step", () => {
+  const progress = engine.normalizeProgress({
+    unlocked: ["onestep"],
+    fluency: {
+      missing: { strongRounds: 1, bestStreak: 10, lastAccuracy: 100, lastAsked: 10 },
+      onestep: { strongRounds: 1, bestStreak: 10, lastAccuracy: 100, lastAsked: 10 },
+    },
+  });
+  assert.equal(progress.recommended, "twostep");
+  assert.equal(engine.isSkillUnlocked(progress, "twostep"), true);
+  assert.equal(engine.isSkillUnlocked(progress, "onestep"), true);
+});
+
+test("an 8-streak on one-step is enough to unlock two-step", () => {
+  const afterMissing = engine.applyRoundProgress(
+    engine.emptyProgress(),
+    "missing",
+    { asked: 4, accuracy: 100 },
+    8,
+  );
+  const after = engine.applyRoundProgress(
+    afterMissing,
+    "onestep",
+    { asked: 8, accuracy: 100 },
+    8,
+  );
+  assert.equal(engine.isSkillFluent(after, "onestep"), true);
+  assert.equal(after.recommended, "twostep");
+});
+
+test("one-step rounds stay one-step even after two-step exists", () => {
+  const round = engine.buildRound(
+    { topic: "onestep", timerSeconds: 0, questionCount: 12 },
+    cyclingRng(),
+  );
+  for (const question of round.questions) {
+    assert.equal(question.topic, "onestep");
+    assert.ok(engine.ONESTEP_FORMS.includes(question.form));
+    assert.notEqual(question.topic, "twostep");
+  }
+});
+
+test("mix stays numbers-only and times tables still work", () => {
+  const mix = engine.buildRound(
+    {
+      topic: "mix",
+      tables: [4],
+      difficulty: "2-digit",
+      timerSeconds: 0,
+      questionCount: 24,
+    },
+    cyclingRng(),
+  );
+  for (const question of mix.questions) {
+    assert.ok(["add", "subtract", "multiply", "divide"].includes(question.operation));
+    assert.notEqual(question.topic, "shapes");
+    assert.notEqual(question.topic, "missing");
+  }
+  const times = engine.buildRound(
+    { topic: "times", tables: [8], operation: "multiply", timerSeconds: 0, questionCount: 6 },
+    rngFrom([0.2, 0.8, 0.1, 0.6]),
+  );
+  for (const question of times.questions) {
+    assert.equal(question.operation, "multiply");
+    assert.equal(question.left, 8);
+  }
+});
+
+test("product name is n / What's hiding, not Times Tables", () => {
+  assert.equal(engine.PRODUCT_NAME, "n");
+  assert.equal(engine.PRODUCT_BLURB, "What's hiding");
+  const titles = engine.trailChapters().map((chapter) => chapter.title).join(" ");
+  assert.doesNotMatch(titles, /SAT|calculus|Khan/i);
+  assert.equal(engine.trailChapters()[0].id, "grade-3");
+  assert.equal(engine.trailChapters()[0].nodes.map((node) => node.id).join(","), "number-sense,missing-addend,missing-subtrahend,times-facts");
+});
+
+test("empty progress first paint is the Number sense leftover board not the trail", () => {
+  const progress = engine.normalizeProgress(null);
+  assert.equal(progress.coins, engine.STARTER_COINS);
+  assert.equal(progress.coins, 3);
+  assert.deepEqual(progress.completedNodes, []);
+  assert.deepEqual(progress.unlockedNodes, []);
+  assert.equal(engine.opensOnFirstLeftover(progress), true);
+  assert.equal(engine.opensOnFirstLeftover(engine.emptyProgress()), true);
+  assert.equal(engine.opensOnFirstLeftover(undefined), true);
+  assert.equal(engine.startNode().topic, "sense");
+  const first = engine.makeSenseQuestion({}, () => 0, { first: true });
+  assert.equal(first.prompt, "6 + n = 10");
+  assert.equal(first.known, 6);
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.equal(engine.nextPricedUnlock(progress).id, "missing-addend");
+  assert.equal(engine.nextPricedUnlock(progress).cost, 12);
+  assert.equal(engine.chapterStatus(progress, "grade-4"), "closed");
+  assert.doesNotMatch(pageMarkup(), /Round length/i);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, ["number-sense"]);
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../js/practice.js"), "utf8");
+  const trailOpen = html.indexOf('id="screen-trail"');
+  const trailTag = html.slice(html.lastIndexOf("<section", trailOpen), html.indexOf(">", trailOpen) + 1);
+  assert.match(trailTag, /\bhidden\b/);
+  const boot = html.slice(html.lastIndexOf("renderKeypad()"), html.lastIndexOf("})();"));
+  assert.match(source, /function opensOnFirstLeftover/);
+  assert.match(html, /function opensOnFirstLeftover/);
+  assert.match(boot, /opensOnFirstLeftover\(state\.progress\)/);
+  assert.match(boot, /beginRound\(readSetup\(engine\.startNode\(\)\.topic\)\)/);
+  assert.match(boot, /showTrail\("grade"/);
+  assert.ok(boot.indexOf("opensOnFirstLeftover") < boot.indexOf("beginRound"));
+  assert.ok(boot.indexOf("beginRound") < boot.indexOf("showTrail"));
+  const chapters = html.slice(
+    html.indexOf('els.changeTables.addEventListener'),
+    html.indexOf('els.playAgain.addEventListener'),
+  );
+  assert.match(chapters, /recordRoundProgress/);
+  assert.ok(chapters.indexOf("recordRoundProgress") < chapters.indexOf("showTrail"));
+  assert.match(chapters, /showTrail\("grade", engine\.START_CHAPTER_ID\)/);
+});
+
+test("return visits with a finished leftover open the Grade 3 path", () => {
+  let progress = engine.emptyProgress();
+  assert.equal(engine.opensOnFirstLeftover(progress), true);
+  let earned = 0;
+  for (let streak = 1; streak <= engine.WHY_RUN_LENGTH; streak += 1) {
+    const payout = engine.payoutCoins({
+      ok: true,
+      usesWhy: true,
+      whyDone: true,
+      streak,
+      earnedThisRound: earned,
+    });
+    earned += payout;
+    progress = engine.applyCoinPayout(progress, payout);
+  }
+  progress = engine.applyRoundProgress(progress, "sense", {
+    asked: engine.WHY_RUN_LENGTH,
+    accuracy: 100,
+  }, engine.WHY_RUN_LENGTH);
+  assert.ok(progress.coins >= 12);
+  assert.equal(engine.opensOnFirstLeftover(progress), false);
+  assert.ok(progress.completedNodes.includes("number-sense"));
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(progress, "number-sense")), "Replay");
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), false);
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.deepEqual(engine.loudPathAction(progress), {
+    kind: "priced",
+    id: "missing-addend",
+    cost: 12,
+  });
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), true);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, []);
+  assert.equal(engine.chapterStatus(progress, "grade-4"), "closed");
+
+  const spent = engine.spendUnlock(progress);
+  assert.equal(engine.opensOnFirstLeftover(spent.progress), false);
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const boot = html.slice(html.lastIndexOf("renderKeypad()"), html.lastIndexOf("})();"));
+  assert.match(boot, /opensOnFirstLeftover\(state\.progress\)/);
+  assert.match(boot, /showTrail\("grade", engine\.START_CHAPTER_ID\)/);
+});
+
+test("playing the leftover board finishes Number sense the same as Start-then-4-cards", () => {
+  const fresh = engine.emptyProgress();
+  assert.equal(engine.opensOnFirstLeftover(fresh), true);
+  assert.equal(engine.nodeStatus(fresh, "number-sense"), "current");
+  assert.equal(engine.nodeAction(engine.nodeStatus(fresh, "number-sense")), "Start");
+  assert.equal(engine.canStartNode(fresh, "missing-addend"), false);
+
+  let progress = fresh;
+  let earned = 0;
+  for (let streak = 1; streak <= engine.WHY_RUN_LENGTH; streak += 1) {
+    const payout = engine.payoutCoins({
+      ok: true,
+      usesWhy: true,
+      whyDone: true,
+      streak,
+      earnedThisRound: earned,
+    });
+    earned += payout;
+    progress = engine.applyCoinPayout(progress, payout);
+  }
+  progress = engine.applyRoundProgress(progress, "sense", {
+    asked: engine.WHY_RUN_LENGTH,
+    accuracy: 100,
+  }, engine.WHY_RUN_LENGTH);
+  assert.ok(progress.coins >= 12);
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(progress, "number-sense")), "Replay");
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), false);
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.deepEqual(engine.loudPathAction(progress), {
+    kind: "priced",
+    id: "missing-addend",
+    cost: 12,
+  });
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), true);
+  assert.equal(engine.canStartNode(progress, "missing-addend"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, []);
+  assert.equal(engine.chapterStatus(progress, "grade-4"), "closed");
+  const blocked = engine.spendUnlock(engine.emptyProgress());
+  assert.equal(blocked.ok, false);
+  const spent = engine.spendUnlock(progress);
+  assert.equal(spent.ok, true);
+  assert.equal(spent.unlocked.id, "missing-addend");
+  assert.equal(engine.canStartNode(spent.progress, "missing-addend"), true);
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const record = html.slice(
+    html.indexOf("function recordRoundProgress"),
+    html.indexOf("function finishRound"),
+  );
+  assert.match(record, /applyRoundProgress/);
+  assert.match(record, /summary\.asked/);
+  const finish = html.slice(html.indexOf("function finishRound"), html.indexOf("function startTimer"));
+  assert.match(finish, /recordRoundProgress/);
+  assert.doesNotMatch(finish.slice(0, finish.indexOf("whyRunReturnsToPath")), /showScreen\("results"\)/);
+  const submit = html.slice(html.indexOf("function submitAnswer"), html.indexOf("function pressKey"));
+  assert.match(submit, /recordRoundProgress/);
+  assert.match(submit, /whyRunLength\(state\.settings\.topic\)/);
+  assert.ok(submit.indexOf("recordRoundProgress") < submit.indexOf("leftoverHoldPlan") || submit.indexOf("recordRoundProgress") < submit.indexOf("applyHoldPlan"));
+  const chapters = html.slice(
+    html.indexOf('els.changeTables.addEventListener'),
+    html.indexOf('els.playAgain.addEventListener'),
+  );
+  assert.match(chapters, /recordRoundProgress\(\)/);
+  assert.ok(chapters.indexOf("recordRoundProgress") < chapters.indexOf("clearTimers"));
+  assert.ok(chapters.indexOf("recordRoundProgress") < chapters.indexOf("showTrail"));
+});
+
+test("first leftover paint has no loud Chapters hop", () => {
+  const fresh = engine.emptyProgress();
+  assert.equal(fresh.coins, 3);
+  assert.equal(engine.opensOnFirstLeftover(fresh), true);
+  assert.equal(engine.quietFirstLeftoverHops(fresh), true);
+  assert.equal(engine.quietFirstLeftoverHops(null), true);
+  assert.equal(engine.quietFirstLeftoverHops(undefined), true);
+  assert.equal(engine.chapterStatus(fresh, "grade-4"), "closed");
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(fresh, id)) === "Start",
+  );
+  assert.deepEqual(starts, ["number-sense"]);
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../js/practice.js"), "utf8");
+  const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+  const hopCss = css.slice(css.indexOf(".practice-card.is-board.is-first-leftover .actions"));
+  assert.match(source, /function quietFirstLeftoverHops/);
+  assert.match(html, /function quietFirstLeftoverHops/);
+  assert.match(html, /function paintFirstLeftoverHops/);
+  assert.match(css, /\.practice-card\.is-board\.is-first-leftover \.actions/);
+  assert.match(hopCss, /display:\s*none/);
+  const paint = html.slice(
+    html.indexOf("function paintFirstLeftoverHops"),
+    html.indexOf("function updateChrome"),
+  );
+  assert.match(paint, /quietFirstLeftoverHops\(state\.progress\)/);
+  assert.match(paint, /is-first-leftover/);
+  assert.match(paint, /els\.restart\.hidden = quiet/);
+  assert.match(paint, /els\.changeTables\.hidden = quiet/);
+  const show = html.slice(html.indexOf("function showQuestion"), html.indexOf("function clearTimers"));
+  const chrome = html.slice(html.indexOf("function updateChrome"), html.indexOf("function renderCoinHud"));
+  assert.match(show, /paintFirstLeftoverHops/);
+  assert.match(chrome, /paintFirstLeftoverHops/);
+  const hops = html.slice(
+    html.indexOf("els.restart.addEventListener"),
+    html.indexOf("els.playAgain.addEventListener"),
+  );
+  assert.match(hops, /quietFirstLeftoverHops\(state\.progress\)/);
+  assert.ok(hops.indexOf("quietFirstLeftoverHops") < hops.indexOf("beginRound"));
+  assert.ok(hops.indexOf("quietFirstLeftoverHops") < hops.indexOf("showTrail"));
+  assert.doesNotMatch(pageMarkup().slice(0, pageMarkup().indexOf('id="screen-practice"')), /Round length/i);
+});
+
+test("after a 4-card leftover run the path has quiet Replay, loud 12, and Chapters", () => {
+  let progress = engine.emptyProgress();
+  assert.equal(engine.quietFirstLeftoverHops(progress), true);
+  let earned = 0;
+  for (let streak = 1; streak <= engine.WHY_RUN_LENGTH; streak += 1) {
+    const payout = engine.payoutCoins({
+      ok: true,
+      usesWhy: true,
+      whyDone: true,
+      streak,
+      earnedThisRound: earned,
+    });
+    earned += payout;
+    progress = engine.applyCoinPayout(progress, payout);
+  }
+  progress = engine.applyRoundProgress(progress, "sense", {
+    asked: engine.WHY_RUN_LENGTH,
+    accuracy: 100,
+  }, engine.WHY_RUN_LENGTH);
+  assert.ok(progress.coins >= 12);
+  assert.equal(engine.opensOnFirstLeftover(progress), false);
+  assert.equal(engine.quietFirstLeftoverHops(progress), false);
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(progress, "number-sense")), "Replay");
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), false);
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.deepEqual(engine.loudPathAction(progress), {
+    kind: "priced",
+    id: "missing-addend",
+    cost: 12,
+  });
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), true);
+  assert.equal(engine.canStartNode(progress, "missing-addend"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, []);
+  assert.equal(engine.chapterStatus(progress, "grade-4"), "closed");
+  const blocked = engine.spendUnlock(engine.emptyProgress());
+  assert.equal(blocked.ok, false);
+  assert.ok(!progress.unlockedNodes.includes("missing-addend"));
+
+  const markup = pageMarkup();
+  const trail = markup.slice(markup.indexOf('id="screen-trail"'), markup.indexOf('id="screen-practice"'));
+  assert.match(trail, /id="back-chapters"/);
+  assert.match(trail, />Chapters</);
+  const practice = markup.slice(markup.indexOf('id="screen-practice"'), markup.indexOf('id="screen-results"'));
+  assert.match(practice, /id="change-tables"/);
+  assert.match(practice, />Chapters</);
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const paint = html.slice(
+    html.indexOf("function paintFirstLeftoverHops"),
+    html.indexOf("function updateChrome"),
+  );
+  assert.match(paint, /els\.changeTables\.hidden = quiet/);
+  const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+  assert.match(css, /\.node\.is-replay \.btn-quiet/);
+  const render = html.slice(html.indexOf("function renderGradePath"), html.indexOf("function startPlayableNode"));
+  assert.match(render, /status === "replay" \? "btn btn-quiet" : "btn btn-primary"/);
+});
+
+test("first visit opens Grade 3 and only number sense is Start", () => {
+  const progress = engine.normalizeProgress(null);
+  assert.equal(progress.coins, engine.STARTER_COINS);
+  assert.equal(engine.chapterStatus(progress, "grade-3"), "open");
+  assert.equal(engine.chapterStatus(progress, "grade-4"), "closed");
+  assert.equal(engine.chapterStatus(progress, "algebra-2"), "closed");
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "current");
+  assert.equal(engine.nodeAction("current"), "Start");
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.equal(engine.nodeStatus(progress, "missing-subtrahend"), "locked");
+  assert.equal(engine.nodeStatus(progress, "times-facts"), "locked");
+  assert.equal(engine.isNodePlayable("number-sense"), true);
+  assert.equal(engine.isNodePlayable("missing-addend"), true);
+  assert.equal(engine.isNodePlayable("missing-subtrahend"), true);
+  assert.equal(engine.isNodePlayable("times-facts"), true);
+  assert.equal(engine.canStartNode(progress, "number-sense"), true);
+  assert.equal(engine.canStartNode(progress, "missing-addend"), false);
+  assert.equal(engine.canStartNode(progress, "missing-subtrahend"), false);
+  assert.equal(engine.canStartNode(progress, "times-facts"), false);
+  assert.equal(engine.startNode().topic, "sense");
+  const next = engine.nextPricedUnlock(progress);
+  assert.equal(next.kind, "node");
+  assert.equal(next.id, "missing-addend");
+  assert.equal(next.cost, engine.NODE_UNLOCK_COST);
+  assert.ok(progress.coins < next.cost);
+  const loud = engine.loudPathAction(progress);
+  assert.equal(loud.kind, "start");
+  assert.equal(loud.id, "number-sense");
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), true);
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, ["number-sense"]);
+});
+
+test("5 coins and empty unlocks still leave only number sense as Start", () => {
+  const progress = engine.normalizeProgress({
+    coins: 5,
+    unlockedNodes: [],
+    completedNodes: [],
+    fluency: {
+      sense: { lastAsked: 4, lastAccuracy: 100 },
+      missing: { lastAsked: 4, lastAccuracy: 100 },
+    },
+  });
+  assert.equal(progress.coins, 5);
+  assert.deepEqual(progress.unlockedNodes, []);
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "current");
+  assert.equal(engine.nodeAction(engine.nodeStatus(progress, "number-sense")), "Start");
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.equal(engine.nodeStatus(progress, "missing-subtrahend"), "locked");
+  assert.equal(engine.nodeStatus(progress, "times-facts"), "locked");
+  assert.equal(engine.canStartNode(progress, "number-sense"), true);
+  assert.equal(engine.canStartNode(progress, "missing-addend"), false);
+  assert.equal(engine.canStartNode(progress, "missing-subtrahend"), false);
+  assert.equal(engine.canStartNode(progress, "times-facts"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, ["number-sense"]);
+  assert.equal(engine.nextPricedUnlock(progress).id, "missing-addend");
+  assert.equal(engine.nextPricedUnlock(progress).cost, engine.NODE_UNLOCK_COST);
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), true);
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), false);
+});
+
+test("playing number sense does not grant later Grade 3 nodes", () => {
+  const after = engine.applyRoundProgress(
+    engine.normalizeProgress({ coins: 5, unlockedNodes: [] }),
+    "sense",
+    { asked: 4, accuracy: 100 },
+    3,
+  );
+  assert.ok(after.completedNodes.includes("number-sense"));
+  assert.ok(!after.unlockedNodes.includes("missing-addend"));
+  assert.ok(!after.unlockedNodes.includes("missing-subtrahend"));
+  assert.ok(!after.unlockedNodes.includes("times-facts"));
+  assert.equal(engine.nodeStatus(after, "number-sense"), "replay");
+  assert.equal(engine.nodeStatus(after, "missing-addend"), "priced");
+  assert.equal(engine.canStartNode(after, "missing-addend"), false);
+  assert.equal(engine.canStartNode(after, "missing-subtrahend"), false);
+  assert.equal(engine.canStartNode(after, "times-facts"), false);
+});
+
+test("leftover save with every Grade 3 node unlocked still shows one Start", () => {
+  const leftover = engine.normalizeProgress({
+    coins: 5,
+    unlockedNodes: ["missing-addend", "missing-subtrahend", "times-facts"],
+  });
+  assert.equal(engine.nodeStatus(leftover, "number-sense"), "replay");
+  assert.equal(engine.nodeStatus(leftover, "missing-addend"), "replay");
+  assert.equal(engine.nodeStatus(leftover, "missing-subtrahend"), "replay");
+  assert.equal(engine.nodeStatus(leftover, "times-facts"), "current");
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(leftover, id)) === "Start",
+  );
+  assert.deepEqual(starts, ["times-facts"]);
+});
+
+test("correct n after the why-move earns coins; miss and skip-move pay 0", () => {
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: 1, earnedThisRound: 0 }), engine.COIN_BASE);
+  assert.equal(engine.payoutCoins({ ok: false, usesWhy: true, whyDone: true, streak: 4, earnedThisRound: 0 }), 0);
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: false, streak: 4, earnedThisRound: 0 }), 0);
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: false, whyDone: true, streak: 4, earnedThisRound: 0 }), 0);
+});
+
+test("streak bonus is small and a round cap stops grinding one family", () => {
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: 2, earnedThisRound: 0 }), engine.COIN_BASE);
+  assert.equal(
+    engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: engine.COIN_STREAK_AT, earnedThisRound: 0 }),
+    engine.COIN_BASE + engine.COIN_STREAK_BONUS,
+  );
+  assert.equal(
+    engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: 20, earnedThisRound: 0 }),
+    engine.COIN_BASE + engine.COIN_STREAK_BONUS,
+  );
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: 8, earnedThisRound: engine.COIN_ROUND_CAP }), 0);
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: 8, earnedThisRound: engine.COIN_ROUND_CAP - 1 }), 1);
+  let earned = 0;
+  for (let streak = 1; streak <= 20; streak += 1) {
+    earned += engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak, earnedThisRound: earned });
+  }
+  assert.equal(earned, engine.COIN_ROUND_CAP);
+  assert.ok(engine.STARTER_COINS + engine.COIN_ROUND_CAP >= engine.NODE_UNLOCK_COST);
+  assert.ok(engine.STARTER_COINS + engine.COIN_ROUND_CAP < engine.NODE_UNLOCK_COST * 2);
+});
+
+test("a short honest number-sense run can buy missing addend", () => {
+  let progress = engine.emptyProgress();
+  let earned = 0;
+  for (let streak = 1; streak <= 4; streak += 1) {
+    const payout = engine.payoutCoins({
+      ok: true,
+      usesWhy: true,
+      whyDone: true,
+      streak,
+      earnedThisRound: earned,
+    });
+    earned += payout;
+    progress = engine.applyCoinPayout(progress, payout);
+  }
+  assert.ok(progress.coins >= engine.NODE_UNLOCK_COST);
+  const spent = engine.spendUnlock(progress);
+  assert.equal(spent.ok, true);
+  assert.equal(spent.unlocked.id, "missing-addend");
+  assert.equal(engine.nodeStatus(spent.progress, "number-sense"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "number-sense")), "Replay");
+  assert.equal(engine.nodeStatus(spent.progress, "missing-addend"), "current");
+  assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "missing-addend")), "Start");
+  assert.equal(engine.canStartNode(spent.progress, "missing-addend"), true);
+  assert.equal(engine.nodeStatus(spent.progress, "missing-subtrahend"), "priced");
+  assert.equal(engine.nextPricedUnlock(spent.progress).id, "missing-subtrahend");
+  assert.deepEqual(engine.loudPathAction(spent.progress), {
+    kind: "start",
+    id: "missing-addend",
+  });
+  assert.equal(engine.isLoudPathNode(spent.progress, "missing-addend"), true);
+  assert.equal(engine.isLoudPathNode(spent.progress, "missing-subtrahend"), false);
+  assert.equal(engine.canStartNode(spent.progress, "missing-addend"), true);
+  assert.equal(engine.canStartNode(spent.progress, "missing-subtrahend"), false);
+  assert.equal(engine.canStartNode(spent.progress, "times-facts"), false);
+  assert.equal(engine.chapterStatus(spent.progress, "grade-4"), "closed");
+});
+
+test("cannot unlock the next node without earning the rest", () => {
+  const blocked = engine.spendUnlock(engine.emptyProgress());
+  assert.equal(blocked.ok, false);
+  assert.equal(blocked.reason, "coins");
+  assert.equal(blocked.progress.coins, engine.STARTER_COINS);
+  assert.equal(engine.nodeStatus(blocked.progress, "missing-addend"), "priced");
+});
+
+test("looks are a cheap sink and never skip the why-move", () => {
+  const rich = engine.applyCoinPayout(engine.emptyProgress(), 8);
+  const bought = engine.spendLook(rich, "leaf");
+  assert.equal(bought.ok, true);
+  assert.equal(bought.progress.look, "leaf");
+  assert.equal(bought.progress.coins, rich.coins - engine.LOOK_COST);
+  const again = engine.spendLook(bought.progress, "leaf");
+  assert.equal(again.reason, "owned");
+  assert.equal(again.progress.coins, bought.progress.coins);
+  const broke = engine.spendLook(engine.emptyProgress(), "leaf");
+  assert.equal(broke.ok, false);
+  assert.equal(broke.progress.look, "ink");
+});
+
+test("finishing a missing-addend round marks that node for replay", () => {
+  const opened = engine.spendUnlock(engine.applyCoinPayout(engine.emptyProgress(), 12));
+  const after = engine.applyRoundProgress(opened.progress, "missing", { asked: 4, accuracy: 100 }, 3);
+  assert.ok(after.completedNodes.includes("missing-addend"));
+  assert.equal(engine.nodeStatus(after, "missing-addend"), "replay");
+  assert.equal(engine.nodeAction("replay"), "Replay");
+  assert.equal(engine.nodeStatus(after, "missing-subtrahend"), "priced");
+});
+
+test("buying later Grade 3 nodes teaches times facts and never opens Grade 4", () => {
+  let progress = engine.applyCoinPayout(engine.emptyProgress(), 40);
+  const first = engine.spendUnlock(progress);
+  const second = engine.spendUnlock(first.progress);
+  const third = engine.spendUnlock(second.progress);
+  assert.equal(first.unlocked.id, "missing-addend");
+  assert.equal(engine.canStartNode(first.progress, "missing-addend"), true);
+  assert.equal(engine.nodeStatus(first.progress, "number-sense"), "replay");
+  assert.equal(second.unlocked.id, "missing-subtrahend");
+  assert.equal(engine.canStartNode(second.progress, "missing-subtrahend"), true);
+  assert.equal(engine.nodeStatus(second.progress, "missing-addend"), "replay");
+  assert.equal(third.unlocked.id, "times-facts");
+  assert.equal(engine.isNodePlayable("times-facts"), true);
+  assert.equal(engine.canStartNode(third.progress, "times-facts"), true);
+  assert.equal(engine.nodeStatus(third.progress, "times-facts"), "current");
+  assert.equal(engine.nodeAction(engine.nodeStatus(third.progress, "times-facts")), "Start");
+  assert.equal(engine.nodeStatus(third.progress, "number-sense"), "replay");
+  assert.equal(engine.nodeStatus(third.progress, "missing-addend"), "replay");
+  assert.equal(engine.nodeStatus(third.progress, "missing-subtrahend"), "replay");
+  assert.equal(engine.nextPricedUnlock(third.progress), null);
+  assert.equal(engine.chapterStatus(third.progress, "grade-4"), "closed");
+  const blocked = engine.spendUnlock(third.progress);
+  assert.equal(blocked.ok, false);
+  assert.equal(engine.chapterStatus(blocked.progress, "grade-4"), "closed");
+  assert.equal(engine.isNodePlayable("missing-factor"), false);
+  assert.equal(engine.canStartNode(blocked.progress, "missing-factor"), false);
+});
+
+test("first missing-subtrahend question is 12 ΓêÆ n = 8", () => {
+  const question = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  assert.equal(question.topic, "subtrahend");
+  assert.equal(question.operation, "subtract");
+  assert.equal(question.token, "n");
+  assert.equal(question.slot, "right");
+  assert.equal(question.prompt, "12 ΓêÆ n = 8");
+  assert.equal(question.left, 12);
+  assert.equal(question.right, 4);
+  assert.equal(question.result, 8);
+  assert.equal(question.answer, 4);
+  assert.equal(question.known, 8);
+  assert.equal(question.hint, "n is hiding");
+  assert.ok(!/variable|algebra|inverse|add n/i.test(`${question.prompt} ${question.hint} ${question.review}`));
+});
+
+test("missing-subtrahend why-model puts minuend against known leftover", () => {
+  const question = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  const model = engine.whyModel(question);
+  assert.equal(engine.usesWhyModel(question), true);
+  assert.equal(model.kind, "balance");
+  assert.equal(model.family, "subtrahend");
+  assert.equal(model.total, 12);
+  assert.equal(model.known, 8);
+  assert.equal(model.hidden, 4);
+  assert.equal(engine.whyLeftover(model), 4);
+  assert.equal(engine.whyCaption(model, "idle"), "");
+  assert.equal(engine.whyCaption(model, "lift"), "What's left?");
+  assert.equal(engine.whyCaption(model, "reveal"), "12 ΓêÆ 4 = 8");
+  assert.equal(engine.whyPrompt(question, "idle").prompt, "12 ΓêÆ n = 8");
+  assert.equal(engine.whyPrompt(question, "lift").prompt, "12 ΓêÆ n = 8");
+  assert.equal(engine.whyPrompt(question, "reveal").prompt, "n = 4");
+  assert.doesNotMatch(engine.whyNudge(model), /12|8|add|inverse/i);
+});
+
+test("wrong leftover on missing subtrahend tilts and does not advance", () => {
+  const question = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  const model = engine.whyModel(question);
+  const wrong = engine.gradeAnswer(question, "5");
+  const right = engine.gradeAnswer(question, "4");
+  assert.equal(wrong.ok, false);
+  assert.equal(engine.shouldAdvanceAfterGrade(question, wrong), false);
+  assert.equal(engine.whyTilt(model, 5), "left");
+  assert.equal(engine.whyTilt(model, 3), "right");
+  assert.equal(engine.whyTilt(model, 4), "level");
+  assert.equal(right.ok, true);
+  assert.equal(engine.shouldAdvanceAfterGrade(question, right), true);
+});
+
+test("missing-subtrahend round stays take-away n, small numbers", () => {
+  let tick = 0;
+  const round = engine.buildRound(
+    { topic: "subtrahend", timerSeconds: 0, questionCount: 20 },
+    () => {
+      tick += 1;
+      return (tick % 97) / 97;
+    },
+  );
+  assert.equal(round.questions.length, engine.WHY_RUN_LENGTH);
+  assert.equal(round.questions[0].prompt, "12 ΓêÆ n = 8");
+  assert.equal(round.questions[0].answer, 4);
+  for (const question of round.questions) {
+    assert.equal(question.topic, "subtrahend");
+    assert.equal(question.operation, "subtract");
+    assert.match(question.prompt, /^\d+ ΓêÆ n = \d+$/);
+    assert.ok(!question.prompt.includes("├ù"));
+    assert.ok(!question.prompt.includes("├╖"));
+    assert.ok(!question.prompt.includes("+"));
+    assert.ok(question.answer >= 1 && question.answer <= 9);
+    assert.ok(question.left <= 20);
+    assert.ok(question.result <= 12);
+    assert.ok(question.left < 1000);
+    assert.equal(question.left - question.answer, question.result);
+    assert.equal(question.fullPrompt, true);
+    const model = engine.whyModel(question);
+    assert.equal(model.family, "subtrahend");
+    assert.equal(model.total - model.known, model.hidden);
+    assert.equal(model.hidden, question.answer);
+    assert.equal(engine.whyPrompt(question, "lift").prompt, question.prompt);
+    assert.equal(engine.whyPrompt(question, "reveal").prompt, `n = ${model.hidden}`);
+    assert.ok(!/variable|algebra|inverse/i.test(`${question.prompt} ${question.hint}`));
+  }
+});
+
+test("missing addend rounds stay addend-only after subtrahend exists", () => {
+  const addend = engine.buildRound(
+    { topic: "missing", timerSeconds: 0, questionCount: 8 },
+    cyclingRng(),
+  );
+  assert.equal(addend.questions[0].prompt, "8 + n = 12");
+  for (const question of addend.questions) {
+    assert.equal(question.topic, "missing");
+    assert.equal(question.operation, "add");
+    assert.equal(engine.whyModel(question).family, "addend");
+    assert.ok(!question.prompt.includes("ΓêÆ"));
+  }
+});
+
+test("playableTopic only allows the four Grade 3 teaching families", () => {
+  assert.equal(engine.playableTopic("sense"), "sense");
+  assert.equal(engine.playableTopic("missing"), "missing");
+  assert.equal(engine.playableTopic("subtrahend"), "subtrahend");
+  assert.equal(engine.playableTopic("factor"), "factor");
+  assert.equal(engine.playableTopic("times"), "sense");
+  assert.equal(engine.playableTopic("onestep"), "sense");
+  assert.equal(engine.normalizeSettings({ topic: "sense" }).topic, "sense");
+  assert.equal(engine.normalizeSettings({ topic: "factor" }).topic, "factor");
+  assert.equal(engine.normalizeSettings({ topic: "subtrahend" }).topic, "subtrahend");
+  assert.equal(engine.subtitleFor({ topic: "sense" }), "What's hiding?");
+  assert.equal(engine.subtitleFor({ topic: "factor" }), "What's hiding?");
+  assert.equal(engine.subtitleFor({ topic: "subtrahend" }), "What's hiding?");
+  assert.equal(engine.usesWorkspace({ topic: "sense" }), false);
+  assert.equal(engine.usesWorkspace({ topic: "factor" }), false);
+  assert.equal(engine.usesWorkspace({ topic: "subtrahend" }), false);
+});
+
+test("a missing-subtrahend round marks that node for replay, not times facts", () => {
+  const first = engine.spendUnlock(engine.applyCoinPayout(engine.emptyProgress(), 24));
+  const opened = engine.spendUnlock(first.progress);
+  const after = engine.applyRoundProgress(
+    opened.progress,
+    "subtrahend",
+    { asked: 4, accuracy: 100 },
+    3,
+  );
+  assert.ok(after.completedNodes.includes("missing-subtrahend"));
+  assert.ok(!after.completedNodes.includes("times-facts"));
+  assert.ok(!after.completedNodes.includes("number-sense"));
+  assert.equal(engine.nodeStatus(after, "missing-subtrahend"), "replay");
+  assert.equal(engine.nodeAction("replay"), "Replay");
+  assert.equal(engine.nodeStatus(after, "times-facts"), "priced");
+});
+
+test("coins still require why-move plus correct n on subtrahend", () => {
+  const question = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  assert.equal(engine.usesWhyModel(question), true);
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: 1, earnedThisRound: 0 }), engine.COIN_BASE);
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: false, streak: 4, earnedThisRound: 0 }), 0);
+  assert.equal(engine.payoutCoins({ ok: false, usesWhy: true, whyDone: true, streak: 4, earnedThisRound: 0 }), 0);
+});
+
+test("first number-sense question hides 4 on a ten-frame", () => {
+  const question = engine.makeSenseQuestion({}, () => 0, { first: true });
+  assert.equal(question.topic, "sense");
+  assert.equal(question.operation, "add");
+  assert.equal(question.token, "n");
+  assert.equal(question.prompt, "6 + n = 10");
+  assert.equal(question.known, 6);
+  assert.equal(question.answer, 4);
+  assert.equal(question.result, 10);
+  assert.equal(question.hint, "n is hiding");
+  assert.ok(!/variable|algebra|flashcard|quiz/i.test(`${question.prompt} ${question.hint} ${question.review}`));
+});
+
+test("number-sense why-model is a ten-frame hide, then n = leftover", () => {
+  const question = engine.makeSenseQuestion({}, () => 0, { first: true });
+  const model = engine.whyModel(question);
+  assert.equal(engine.usesWhyModel(question), true);
+  assert.equal(model.kind, "frame");
+  assert.equal(model.family, "sense");
+  assert.equal(model.known, 6);
+  assert.equal(model.hidden, 4);
+  assert.equal(model.total, 10);
+  assert.equal(engine.whyLeftover(model), 4);
+  assert.equal(engine.whyCaption(model, "idle"), "");
+  assert.equal(engine.whyCaption(model, "lift"), "What's left?");
+  assert.equal(engine.whyCaption(model, "reveal"), "6 + 4 = 10");
+  assert.equal(engine.whyPrompt(question, "idle").prompt, "6 + n = 10");
+  assert.equal(engine.whyPrompt(question, "lift").prompt, "6 + n = 10");
+  assert.equal(engine.whyPrompt(question, "reveal").prompt, "n = 4");
+  assert.equal(engine.whyNudge(model), "");
+  assert.doesNotMatch(engine.whyNudge(model), /6|4|10/);
+});
+
+test("wrong leftover on number sense tilts and does not advance", () => {
+  const question = engine.makeSenseQuestion({}, () => 0, { first: true });
+  const model = engine.whyModel(question);
+  const wrong = engine.gradeAnswer(question, "5");
+  const right = engine.gradeAnswer(question, "4");
+  assert.equal(wrong.ok, false);
+  assert.equal(engine.shouldAdvanceAfterGrade(question, wrong), false);
+  assert.equal(engine.whyTilt(model, 5), "left");
+  assert.equal(engine.whyTilt(model, 3), "right");
+  assert.equal(engine.whyTilt(model, 4), "level");
+  assert.equal(right.ok, true);
+  assert.equal(engine.shouldAdvanceAfterGrade(question, right), true);
+});
+
+test("number-sense round stays hide/count within 20", () => {
+  let tick = 0;
+  const round = engine.buildRound(
+    { topic: "sense", timerSeconds: 0, questionCount: 20 },
+    () => {
+      tick += 1;
+      return (tick % 97) / 97;
+    },
+  );
+  assert.equal(round.questions.length, engine.WHY_RUN_LENGTH);
+  assert.equal(round.questions[0].prompt, "6 + n = 10");
+  let sawTwenty = false;
+  for (const question of round.questions) {
+    assert.equal(question.topic, "sense");
+    assert.equal(question.operation, "add");
+    assert.match(question.prompt, /^\d+ \+ n = \d+$/);
+    assert.ok(!question.prompt.includes("├ù"));
+    assert.ok(question.answer >= 1 && question.answer <= 9);
+    assert.ok(question.result <= 20);
+    assert.ok(question.known <= 10);
+    assert.ok(question.left < 100);
+    assert.equal(question.known + question.answer, question.result);
+    const model = engine.whyModel(question);
+    assert.equal(model.kind, "frame");
+    assert.equal(model.total - model.known, model.hidden);
+    assert.equal(engine.whyPrompt(question, "lift").prompt, question.prompt);
+    assert.equal(engine.whyPrompt(question, "reveal").prompt, `n = ${model.hidden}`);
+    if (question.result > 10) {
+      sawTwenty = true;
+      assert.equal(question.known, 10);
+    }
+    assert.ok(!/variable|algebra|SAT|calculus/i.test(`${question.prompt} ${question.hint}`));
+  }
+  assert.equal(sawTwenty, true);
+});
+
+test("first times-facts question is missing factor 2 ├ù n = 8", () => {
+  const question = engine.makeFactorQuestion({}, () => 0, { first: true });
+  assert.equal(question.topic, "factor");
+  assert.equal(question.operation, "multiply");
+  assert.equal(question.token, "n");
+  assert.equal(question.prompt, "2 ├ù n = 8");
+  assert.equal(question.groups, 2);
+  assert.equal(question.answer, 4);
+  assert.equal(question.result, 8);
+  assert.equal(question.known, 4);
+  assert.equal(question.hint, "n is hiding");
+  assert.ok(!/variable|algebra|keypad|quiz/i.test(`${question.prompt} ${question.hint} ${question.review}`));
+});
+
+test("times-facts why-model isolates one group, then n = leftover", () => {
+  const question = engine.makeFactorQuestion({}, () => 0, { first: true });
+  const model = engine.whyModel(question);
+  assert.equal(engine.usesWhyModel(question), true);
+  assert.equal(model.kind, "groups");
+  assert.equal(model.family, "factor");
+  assert.equal(model.groups, 2);
+  assert.equal(model.known, 4);
+  assert.equal(model.hidden, 4);
+  assert.equal(model.total, 8);
+  assert.equal(engine.whyLeftover(model), 4);
+  assert.equal(engine.whyCaption(model, "lift"), "What's left?");
+  assert.equal(engine.whyCaption(model, "reveal"), "2 ├ù 4 = 8");
+  assert.equal(engine.whyPrompt(question, "idle").prompt, "2 ├ù n = 8");
+  assert.equal(engine.whyPrompt(question, "lift").prompt, "2 ├ù n = 8");
+  assert.equal(engine.whyPrompt(question, "reveal").prompt, "n = 4");
+  assert.doesNotMatch(engine.whyNudge(model), /2|4|8|├ù/);
+});
+
+test("wrong leftover on missing factor tilts and does not advance", () => {
+  const question = engine.makeFactorQuestion({}, () => 0, { first: true });
+  const model = engine.whyModel(question);
+  const wrong = engine.gradeAnswer(question, "5");
+  const right = engine.gradeAnswer(question, "4");
+  assert.equal(wrong.ok, false);
+  assert.equal(engine.shouldAdvanceAfterGrade(question, wrong), false);
+  assert.equal(engine.whyTilt(model, 5), "left");
+  assert.equal(engine.whyTilt(model, 3), "right");
+  assert.equal(engine.whyTilt(model, 4), "level");
+  assert.equal(right.ok, true);
+  assert.equal(engine.shouldAdvanceAfterGrade(question, right), true);
+});
+
+test("times-facts round is missing factor, not a product keypad quiz", () => {
+  let tick = 0;
+  const round = engine.buildRound(
+    { topic: "factor", tables: [7, 8], timerSeconds: 0, questionCount: 20 },
+    () => {
+      tick += 1;
+      return (tick % 97) / 97;
+    },
+  );
+  assert.equal(round.questions.length, engine.WHY_RUN_LENGTH);
+  assert.equal(round.questions[0].prompt, "2 ├ù n = 8");
+  for (const question of round.questions) {
+    assert.equal(question.topic, "factor");
+    assert.equal(question.operation, "multiply");
+    assert.match(question.prompt, /^\d+ ├ù n = \d+$/);
+    assert.ok(!/^\d+ ├ù \d+$/.test(question.prompt));
+    assert.ok(question.groups >= 2 && question.groups <= 5);
+    assert.ok(question.answer >= 2 && question.answer <= 10);
+    assert.ok(question.result <= 25);
+    assert.equal(question.groups * question.answer, question.result);
+    assert.equal(question.known, (question.groups - 1) * question.answer);
+    const model = engine.whyModel(question);
+    assert.equal(model.kind, "groups");
+    assert.equal(model.total - model.known, model.hidden);
+    assert.equal(engine.whyPrompt(question, "lift").prompt, question.prompt);
+    assert.equal(engine.whyPrompt(question, "reveal").prompt, `n = ${model.hidden}`);
+    assert.ok(!/variable|algebra|SAT|calculus/i.test(`${question.prompt} ${question.hint}`));
+  }
+});
+
+test("coins still require why-move plus correct n on sense and factor", () => {
+  const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  const factor = engine.makeFactorQuestion({}, () => 0, { first: true });
+  assert.equal(engine.usesWhyModel(sense), true);
+  assert.equal(engine.usesWhyModel(factor), true);
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: true, streak: 1, earnedThisRound: 0 }), engine.COIN_BASE);
+  assert.equal(engine.payoutCoins({ ok: true, usesWhy: true, whyDone: false, streak: 4, earnedThisRound: 0 }), 0);
+  assert.equal(engine.payoutCoins({ ok: false, usesWhy: true, whyDone: true, streak: 4, earnedThisRound: 0 }), 0);
+});
+
+test("finishing sense or factor marks that Grade 3 node for replay", () => {
+  const afterSense = engine.applyRoundProgress(engine.emptyProgress(), "sense", { asked: 4, accuracy: 100 }, 3);
+  assert.ok(afterSense.completedNodes.includes("number-sense"));
+  assert.equal(engine.nodeStatus(afterSense, "number-sense"), "replay");
+  assert.equal(engine.nodeStatus(afterSense, "missing-addend"), "priced");
+  const opened = engine.spendUnlock(engine.applyCoinPayout(engine.emptyProgress(), 40));
+  const afterFactor = engine.applyRoundProgress(
+    engine.spendUnlock(engine.spendUnlock(opened.progress).progress).progress,
+    "factor",
+    { asked: 4, accuracy: 100 },
+    3,
+  );
+  assert.ok(afterFactor.completedNodes.includes("times-facts"));
+  assert.equal(engine.nodeStatus(afterFactor, "times-facts"), "replay");
+  assert.equal(engine.chapterStatus(afterFactor, "grade-4"), "closed");
+});
+
+test("old saves that already opened later Grade 3 nodes keep missing addend", () => {
+  const progress = engine.normalizeProgress({
+    coins: 6,
+    unlockedNodes: ["missing-subtrahend"],
+    completedNodes: ["missing-addend"],
+  });
+  assert.ok(progress.unlockedNodes.includes("missing-addend"));
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "replay");
+  assert.equal(engine.canStartNode(progress, "missing-addend"), true);
+  assert.equal(engine.canStartNode(progress, "missing-subtrahend"), true);
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "replay");
+  assert.equal(engine.nodeStatus(progress, "missing-subtrahend"), "current");
+  assert.equal(engine.nodeStatus(progress, "times-facts"), "priced");
+});
+
+test("Grade 3 path markup is trail + Start, not a quiz settings page", () => {
+  const markup = pageMarkup();
+  const trailStart = markup.indexOf('id="screen-trail"');
+  const practiceStart = markup.indexOf('id="screen-practice"');
+  assert.ok(trailStart >= 0 && practiceStart > trailStart);
+  const trail = markup.slice(trailStart, practiceStart);
+  assert.match(trail, /Number sense/);
+  assert.match(trail, /Start/);
+  assert.match(trail, /Missing addend/);
+  assert.match(trail, /id="back-chapters"/);
+  assert.match(trail, /Grade 3/);
+  assert.doesNotMatch(trail, /Round length/i);
+  assert.doesNotMatch(trail, /<legend>Timer<\/legend>/);
+  assert.doesNotMatch(trail, /<legend>Questions<\/legend>/);
+  assert.doesNotMatch(trail, /name="timer"/);
+  assert.doesNotMatch(trail, /name="count"/);
+  assert.doesNotMatch(trail, />Settings</);
+  assert.doesNotMatch(trail, /Looks/);
+  assert.doesNotMatch(markup, /Round length/i);
+  assert.doesNotMatch(markup, /name="timer"/);
+  assert.doesNotMatch(markup, /name="count"/);
+  const starts = (trail.match(/>Start</g) || []).length;
+  assert.equal(starts, 1);
+});
+
+test("puzzle chrome keeps Restart quieter than the board and OK", () => {
+  const markup = pageMarkup();
+  const practice = markup.slice(markup.indexOf('id="screen-practice"'), markup.indexOf('id="screen-results"'));
+  assert.match(practice, /id="restart-round"/);
+  assert.match(practice, /btn-quiet/);
+  assert.match(practice, /id="change-tables"/);
+  assert.match(practice, /class="hud"/);
+  assert.match(practice, /id="why-model"/);
+  assert.match(practice, /id="keypad"/);
+});
+
+test("why-model cards do not show Score, Streak, or 1/20", () => {
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+  const boardHud = css.slice(css.indexOf(".practice-card.is-board .hud"));
+  assert.match(css, /\.practice-card\.is-board \.hud/);
+  assert.match(boardHud, /display:\s*none/);
+  const practice = html.slice(html.indexOf('id="screen-practice"'), html.indexOf('id="screen-results"'));
+  const show = html.slice(html.indexOf("function showQuestion"), html.indexOf("function clearTimers"));
+  const hud = html.slice(html.indexOf("function updateHud"), html.indexOf("const PLACE_LABELS"));
+  assert.doesNotMatch(practice, /1\s*\/\s*20/);
+  assert.match(practice, /id="practice-hud"/);
+  assert.match(show, /updateHud/);
+  assert.match(hud, /els\.hud\.hidden = isBoard/);
+  assert.match(hud, /if \(isBoard\) \{\s*return;/);
+  const header = html.slice(html.indexOf("<header"), html.indexOf("</header>"));
+  assert.doesNotMatch(header, /Score|Streak|1\s*\/\s*20/);
+});
+
+test("a short why-model run returns to the Grade 3 path", () => {
+  assert.equal(engine.WHY_RUN_LENGTH, 4);
+  assert.ok(engine.WHY_RUN_LENGTH < 20);
+  assert.equal(engine.whyRunLength("sense"), engine.WHY_RUN_LENGTH);
+  assert.equal(engine.whyRunLength("missing"), engine.WHY_RUN_LENGTH);
+  assert.equal(engine.whyRunLength("subtrahend"), engine.WHY_RUN_LENGTH);
+  assert.equal(engine.whyRunLength("factor"), engine.WHY_RUN_LENGTH);
+  assert.equal(engine.whyRunLength("times"), 0);
+  assert.equal(engine.whyRunReturnsToPath("sense"), true);
+  assert.equal(engine.whyRunReturnsToPath("missing"), true);
+  assert.equal(engine.whyRunReturnsToPath("times"), false);
+  assert.equal(engine.normalizeSettings({ topic: "sense", questionCount: 20 }).questionCount, engine.WHY_RUN_LENGTH);
+  assert.equal(engine.normalizeSettings({ topic: "times", questionCount: 20 }).questionCount, 20);
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const finish = html.slice(html.indexOf("function finishRound"), html.indexOf("function startTimer"));
+  assert.match(finish, /whyRunReturnsToPath/);
+  assert.match(finish, /showTrail\("grade"/);
+  assert.match(finish, /recordRoundProgress/);
+  assert.match(html, /function recordRoundProgress/);
+  assert.match(html, /applyRoundProgress/);
+  assert.doesNotMatch(finish.slice(0, finish.indexOf("whyRunReturnsToPath")), /showScreen\("results"\)/);
+
+  let progress = engine.emptyProgress();
+  let earned = 0;
+  for (let streak = 1; streak <= engine.WHY_RUN_LENGTH; streak += 1) {
+    const payout = engine.payoutCoins({
+      ok: true,
+      usesWhy: true,
+      whyDone: true,
+      streak,
+      earnedThisRound: earned,
+    });
+    earned += payout;
+    progress = engine.applyCoinPayout(progress, payout);
+  }
+  progress = engine.applyRoundProgress(progress, "sense", {
+    asked: engine.WHY_RUN_LENGTH,
+    accuracy: 100,
+  }, engine.WHY_RUN_LENGTH);
+  assert.ok(progress.coins >= engine.NODE_UNLOCK_COST);
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(progress, "number-sense")), "Replay");
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.equal(engine.nextPricedUnlock(progress).id, "missing-addend");
+  assert.equal(engine.nextPricedUnlock(progress).cost, 12);
+  const loud = engine.loudPathAction(progress);
+  assert.equal(loud.kind, "priced");
+  assert.equal(loud.id, "missing-addend");
+  assert.equal(loud.cost, 12);
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), true);
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, []);
+  assert.equal(engine.canStartNode(progress, "missing-addend"), false);
+  assert.equal(engine.chapterStatus(progress, "grade-4"), "closed");
+});
+
+test("after a fluent short run the priced 12 is loud and Replay is quiet", () => {
+  let progress = engine.emptyProgress();
+  let earned = 0;
+  for (let streak = 1; streak <= engine.WHY_RUN_LENGTH; streak += 1) {
+    const payout = engine.payoutCoins({
+      ok: true,
+      usesWhy: true,
+      whyDone: true,
+      streak,
+      earnedThisRound: earned,
+    });
+    earned += payout;
+    progress = engine.applyCoinPayout(progress, payout);
+  }
+  progress = engine.applyRoundProgress(progress, "sense", {
+    asked: engine.WHY_RUN_LENGTH,
+    accuracy: 100,
+  }, engine.WHY_RUN_LENGTH);
+  assert.ok(progress.coins >= 12);
+  assert.equal(engine.nodeStatus(progress, "number-sense"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(progress, "number-sense")), "Replay");
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), false);
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "priced");
+  assert.deepEqual(engine.loudPathAction(progress), {
+    kind: "priced",
+    id: "missing-addend",
+    cost: 12,
+  });
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), true);
+  assert.equal(engine.canStartNode(progress, "missing-addend"), false);
+  const blocked = engine.normalizeProgress(progress);
+  assert.ok(!blocked.unlockedNodes.includes("missing-addend"));
+  const spent = engine.spendUnlock(progress);
+  assert.equal(spent.ok, true);
+  assert.equal(spent.unlocked.id, "missing-addend");
+  assert.equal(engine.nodeStatus(spent.progress, "missing-addend"), "current");
+  assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "missing-addend")), "Start");
+  assert.equal(engine.isLoudPathNode(spent.progress, "missing-addend"), true);
+  assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "number-sense")), "Replay");
+  assert.equal(engine.isLoudPathNode(spent.progress, "number-sense"), false);
+  assert.equal(engine.nodeStatus(spent.progress, "missing-subtrahend"), "priced");
+  assert.deepEqual(engine.loudPathAction(spent.progress), {
+    kind: "start",
+    id: "missing-addend",
+  });
+  assert.equal(engine.isLoudPathNode(spent.progress, "missing-subtrahend"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(spent.progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, ["missing-addend"]);
+  assert.equal(engine.chapterStatus(spent.progress, "grade-4"), "closed");
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+  const render = html.slice(html.indexOf("function renderGradePath"), html.indexOf("function tryUnlock"));
+  assert.match(css, /\.node\.is-priced\.is-loud/);
+  assert.match(css, /\.node\.is-replay \.btn-quiet/);
+  assert.match(css, /\.node\.is-replay \.node-title/);
+  assert.doesNotMatch(css, /\.node\.is-current,\s*\.node\.is-replay \{/);
+  assert.match(render, /isLoudPathNode/);
+  assert.match(render, /status === "replay" \? "btn btn-quiet" : "btn btn-primary"/);
+  assert.match(render, /loud \? "btn btn-primary" : "btn"/);
+  assert.match(render, /classList\.add\("is-loud"\)/);
+});
+
+test("after spendUnlock of addend with coins 5 Start is louder than the priced 12", () => {
+  let progress = engine.emptyProgress();
+  let earned = 0;
+  for (let streak = 1; streak <= engine.WHY_RUN_LENGTH; streak += 1) {
+    const payout = engine.payoutCoins({
+      ok: true,
+      usesWhy: true,
+      whyDone: true,
+      streak,
+      earnedThisRound: earned,
+    });
+    earned += payout;
+    progress = engine.applyCoinPayout(progress, payout);
+  }
+  progress = engine.applyRoundProgress(progress, "sense", {
+    asked: engine.WHY_RUN_LENGTH,
+    accuracy: 100,
+  }, engine.WHY_RUN_LENGTH);
+  assert.equal(progress.coins, 17);
+  assert.ok(!progress.unlockedNodes.includes("missing-addend"));
+  const spent = engine.spendUnlock(progress);
+  assert.equal(spent.ok, true);
+  assert.equal(spent.unlocked.id, "missing-addend");
+  assert.equal(spent.progress.coins, 5);
+  assert.equal(engine.nodeStatus(spent.progress, "missing-addend"), "current");
+  assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "missing-addend")), "Start");
+  assert.equal(engine.canStartNode(spent.progress, "missing-addend"), true);
+  assert.deepEqual(engine.loudPathAction(spent.progress), {
+    kind: "start",
+    id: "missing-addend",
+  });
+  assert.equal(engine.isLoudPathNode(spent.progress, "missing-addend"), true);
+  assert.equal(engine.nodeStatus(spent.progress, "number-sense"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(spent.progress, "number-sense")), "Replay");
+  assert.equal(engine.isLoudPathNode(spent.progress, "number-sense"), false);
+  assert.equal(engine.nodeStatus(spent.progress, "missing-subtrahend"), "priced");
+  assert.equal(engine.isLoudPathNode(spent.progress, "missing-subtrahend"), false);
+  assert.equal(engine.canStartNode(spent.progress, "missing-subtrahend"), false);
+  assert.equal(engine.canStartNode(spent.progress, "times-facts"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(spent.progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, ["missing-addend"]);
+  assert.equal(engine.nodeStatus(spent.progress, "times-facts"), "locked");
+  assert.equal(engine.chapterStatus(spent.progress, "grade-4"), "closed");
+  const again = engine.spendUnlock(spent.progress);
+  assert.equal(again.ok, false);
+  assert.equal(again.reason, "coins");
+  assert.equal(engine.nodeStatus(again.progress, "missing-subtrahend"), "priced");
+  assert.equal(engine.isLoudPathNode(again.progress, "missing-subtrahend"), false);
+  assert.equal(engine.isLoudPathNode(again.progress, "missing-addend"), true);
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../js/practice.js"), "utf8");
+  assert.doesNotMatch(html, /boughtAhead/);
+  assert.doesNotMatch(source, /boughtAhead/);
+  assert.match(html, /if \(currentId\) \{\s*return \{ kind: "start", id: currentId \};/);
+  assert.match(source, /if \(currentId\) \{\s*return \{ kind: "start", id: currentId \};/);
+  assert.match(html, /normalized\.coins >= next\.cost/);
+  assert.match(source, /normalized\.coins >= next\.cost/);
+});
+
+test("after a fluent addend run with coins >= 12 the next 12 is loud again", () => {
+  const opened = engine.spendUnlock(engine.applyCoinPayout(engine.emptyProgress(), 12));
+  assert.equal(opened.ok, true);
+  assert.equal(opened.unlocked.id, "missing-addend");
+  let progress = engine.applyCoinPayout(opened.progress, 12);
+  progress = engine.applyRoundProgress(progress, "missing", {
+    asked: engine.WHY_RUN_LENGTH,
+    accuracy: 100,
+  }, engine.WHY_RUN_LENGTH);
+  assert.ok(progress.coins >= 12);
+  assert.equal(engine.nodeStatus(progress, "missing-addend"), "replay");
+  assert.equal(engine.nodeAction(engine.nodeStatus(progress, "missing-addend")), "Replay");
+  assert.equal(engine.isLoudPathNode(progress, "missing-addend"), false);
+  assert.equal(engine.isLoudPathNode(progress, "number-sense"), false);
+  assert.equal(engine.nodeStatus(progress, "missing-subtrahend"), "priced");
+  assert.deepEqual(engine.loudPathAction(progress), {
+    kind: "priced",
+    id: "missing-subtrahend",
+    cost: 12,
+  });
+  assert.equal(engine.isLoudPathNode(progress, "missing-subtrahend"), true);
+  assert.equal(engine.canStartNode(progress, "missing-subtrahend"), false);
+  const starts = ["number-sense", "missing-addend", "missing-subtrahend", "times-facts"].filter(
+    (id) => engine.nodeAction(engine.nodeStatus(progress, id)) === "Start",
+  );
+  assert.deepEqual(starts, []);
+  assert.equal(engine.chapterStatus(progress, "grade-4"), "closed");
+});
+
+test("after spend with leftover coins Start stays louder than the next 12", () => {
+  const opened = engine.spendUnlock(engine.applyCoinPayout(engine.emptyProgress(), 24));
+  assert.equal(opened.ok, true);
+  assert.equal(opened.unlocked.id, "missing-addend");
+  assert.ok(opened.progress.coins >= 12);
+  assert.equal(engine.nodeStatus(opened.progress, "missing-addend"), "current");
+  assert.deepEqual(engine.loudPathAction(opened.progress), {
+    kind: "start",
+    id: "missing-addend",
+  });
+  assert.equal(engine.isLoudPathNode(opened.progress, "missing-addend"), true);
+  assert.equal(engine.nodeStatus(opened.progress, "missing-subtrahend"), "priced");
+  assert.equal(engine.isLoudPathNode(opened.progress, "missing-subtrahend"), false);
+  const second = engine.spendUnlock(opened.progress);
+  assert.equal(second.ok, true);
+  assert.equal(second.unlocked.id, "missing-subtrahend");
+  assert.equal(engine.nodeStatus(second.progress, "missing-subtrahend"), "current");
+  assert.deepEqual(engine.loudPathAction(second.progress), {
+    kind: "start",
+    id: "missing-subtrahend",
+  });
+});
+
+test("isolated-n beat still hides the keypad and holds the leftover board", () => {
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  assert.match(html, /function holdIsolatedN/);
+  assert.match(html, /classList\.add\("is-isolated"\)/);
+  assert.match(html, /els\.keypad\.hidden = true/);
+  assert.match(html, /state\.holdingIsolated = true/);
+  assert.ok(engine.ISOLATED_HOLD_MS >= 1600);
+  const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  const plan = engine.leftoverHoldPlan(sense, engine.gradeAnswer(sense, "4"));
+  assert.equal(engine.isolatedHoldMs(sense), engine.ISOLATED_HOLD_MS);
+  assert.equal(plan.kind, "isolated");
+  assert.equal(plan.hideKeypad, true);
+  assert.equal(plan.keepModel, true);
+  assert.equal(engine.whyPrompt(sense, "reveal").prompt, "n = 4");
+});
+
+test("every Number sense leftover holds isolated-n before the next card or path hop", () => {
+  let tick = 0;
+  const round = engine.buildRound(
+    { topic: "sense", timerSeconds: 0, questionCount: 20 },
+    () => {
+      tick += 1;
+      return (tick % 97) / 97;
+    },
+  );
+  assert.equal(round.questions.length, engine.WHY_RUN_LENGTH);
+  for (const question of round.questions) {
+    const model = engine.whyModel(question);
+    assert.equal(model.kind, "frame");
+    assert.equal(model.family, "sense");
+    const leftover = engine.whyLeftover(model);
+    const plan = engine.leftoverHoldPlan(question, engine.gradeAnswer(question, String(leftover)));
+    assert.equal(plan.kind, "isolated");
+    assert.ok(plan.holdMs >= 2000);
+    assert.equal(plan.holdMs, engine.ISOLATED_HOLD_MS);
+    assert.equal(plan.hideKeypad, true);
+    assert.equal(plan.keepModel, true);
+    assert.equal(plan.prompt, `${question.token} = ${leftover}`);
+    assert.equal(engine.whyPrompt(question, "reveal").prompt, plan.prompt);
+  }
+
+  const addend = engine.makeMissingQuestion({}, () => 0, { first: true });
+  const sub = engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true });
+  const factor = engine.makeFactorQuestion({}, () => 0, { first: true });
+  for (const question of [addend, sub, factor]) {
+    const leftover = engine.whyLeftover(engine.whyModel(question));
+    const plan = engine.leftoverHoldPlan(question, engine.gradeAnswer(question, String(leftover)));
+    assert.equal(plan.kind, "isolated");
+    assert.ok(plan.holdMs >= 2000);
+    assert.equal(plan.hideKeypad, true);
+    assert.equal(plan.keepModel, true);
+  }
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const submit = html.slice(html.indexOf("function submitAnswer"), html.indexOf("function pressKey"));
+  const show = html.slice(html.indexOf("function showQuestion"), html.indexOf("function clearTimers"));
+  const finish = html.slice(html.indexOf("function finishRound"), html.indexOf("function startTimer"));
+  const shouldEnd = html.slice(
+    html.indexOf("function shouldEndAfterAnswer"),
+    html.indexOf("function submitAnswer"),
+  );
+  const hold = html.slice(html.indexOf("function holdIsolatedN"), html.indexOf("function setAnswer"));
+  const timeout = submit.slice(submit.indexOf("state.advanceId = window.setTimeout"));
+  assert.match(show, /if \(state\.holdingIsolated\) \{\s*return;/);
+  assert.match(finish, /if \(state\.holdingIsolated\) \{\s*return;/);
+  assert.match(shouldEnd, /if \(state\.holdingIsolated\) \{\s*return false;/);
+  assert.match(submit, /if \(plan\.kind !== "isolated"\) \{\s*state\.asked \+= 1;/);
+  assert.match(timeout, /if \(plan\.kind === "isolated"\) \{\s*state\.asked \+= 1;/);
+  assert.match(timeout, /state\.holdingIsolated = false/);
+  assert.match(timeout, /finishRound/);
+  assert.match(timeout, /showQuestion/);
+  assert.ok(timeout.indexOf("asked += 1") < timeout.indexOf("holdingIsolated = false"));
+  assert.ok(timeout.indexOf("holdingIsolated = false") < timeout.indexOf("finishRound"));
+  assert.ok(timeout.indexOf("holdingIsolated = false") < timeout.indexOf("showQuestion"));
+  assert.match(hold, /els\.keypad\.hidden = true/);
+  assert.match(hold, /els\.why\.hidden = false/);
+  assert.match(hold, /dataset\.isolatedHold = "true"/);
+  assert.doesNotMatch(hold, /showQuestion\(/);
+  assert.doesNotMatch(hold, /finishRound\(/);
+  assert.doesNotMatch(submit.slice(0, submit.indexOf("state.advanceId")), /showQuestion\(/);
+  assert.doesNotMatch(submit.slice(0, submit.indexOf("state.advanceId")), /finishRound\(/);
+});
+
+test("leftover keypad waits for the why-move, then isolated-n still holds", () => {
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const show = html.slice(html.indexOf("function showQuestion"), html.indexOf("function clearTimers"));
+  const move = html.slice(html.indexOf("function doWhyMove"), html.indexOf("function nudgeWhyMove"));
+  const press = html.slice(html.indexOf("function pressKey"), html.indexOf("function renderKeypad"));
+  const hold = html.slice(html.indexOf("function holdIsolatedN"), html.indexOf("function setAnswer"));
+  assert.match(show, /leftoverTypingAllowed/);
+  assert.match(show, /els\.keypad\.hidden/);
+  assert.match(move, /leftoverTypingAllowed/);
+  assert.match(move, /classList\.add\("is-lifted"\)/);
+  assert.match(press, /leftoverTypingAllowed/);
+  assert.match(press, /appendAnswerDigit\(state\.buffer, key, question, whyDone\)/);
+  assert.match(press, /nudgeWhyMove/);
+  assert.match(html, /is-board:not\(\.is-lifted\) \.keypad/);
+  assert.match(hold, /els\.keypad\.hidden = true/);
+  const sense = engine.makeSenseQuestion({}, () => 0, { first: true });
+  assert.equal(engine.leftoverTypingAllowed(sense, false), false);
+  assert.equal(engine.appendAnswerDigit("", "4", sense, false), "");
+  assert.equal(engine.appendAnswerDigit("", "5", sense, true), "5");
+  assert.equal(engine.appendAnswerDigit("5", "4", sense, true), "4");
+  const plan = engine.leftoverHoldPlan(sense, engine.gradeAnswer(sense, "4"));
+  assert.equal(plan.kind, "isolated");
+  assert.equal(plan.hideKeypad, true);
+  assert.equal(plan.keepModel, true);
+  assert.equal(plan.prompt, "n = 4");
+  assert.ok(plan.holdMs >= 2000);
+});
+
+test("after why-move the heading stays unsolved until leftover OK", () => {
+  const cards = [
+    engine.makeSenseQuestion({}, () => 0, { first: true }),
+    engine.makeMissingQuestion({}, () => 0, { first: true }),
+    engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true }),
+    engine.makeFactorQuestion({}, () => 0, { first: true }),
+  ];
+  for (const question of cards) {
+    const leftover = engine.whyLeftover(engine.whyModel(question));
+    const isolated = `${question.token} = ${leftover}`;
+    assert.equal(engine.whyPrompt(question, "idle").prompt, question.prompt);
+    assert.equal(engine.whyPrompt(question, "lift").prompt, question.prompt);
+    assert.equal(engine.whyPrompt(question, "lift").promptHtml, question.promptHtml);
+    assert.notEqual(engine.whyPrompt(question, "lift").prompt, isolated);
+    assert.doesNotMatch(engine.whyPrompt(question, "lift").prompt, /^n = /);
+    const plan = engine.leftoverHoldPlan(question, engine.gradeAnswer(question, String(leftover)));
+    assert.equal(plan.kind, "isolated");
+    assert.equal(plan.prompt, isolated);
+    assert.equal(plan.hideKeypad, true);
+    assert.ok(plan.holdMs >= 2000);
+    assert.equal(engine.whyPrompt(question, "reveal").prompt, isolated);
+  }
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../js/practice.js"), "utf8");
+  const htmlWhy = html.slice(html.indexOf("function whyPrompt"), html.indexOf("function whyTilt"));
+  const jsWhy = source.slice(source.indexOf("function whyPrompt"), source.indexOf("function whyTilt"));
+  const move = html.slice(html.indexOf("function doWhyMove"), html.indexOf("function nudgeWhyMove"));
+  const hold = html.slice(html.indexOf("function holdIsolatedN"), html.indexOf("function setAnswer"));
+  assert.match(htmlWhy, /phase === "reveal"/);
+  assert.doesNotMatch(htmlWhy, /phase === "lift" \|\| phase === "reveal"/);
+  assert.match(jsWhy, /phase === "reveal"/);
+  assert.doesNotMatch(jsWhy, /phase === "lift" \|\| phase === "reveal"/);
+  assert.match(move, /setWhyPrompt\(question, "lift"\)/);
+  assert.match(hold, /setWhyPrompt\(question, "reveal"\)/);
+});
+
+test("before the why-move the known group is takeable on the model, not a lecture", () => {
+  const cards = [
+    engine.makeSenseQuestion({}, () => 0, { first: true }),
+    engine.makeMissingQuestion({}, () => 0, { first: true }),
+    engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true }),
+    engine.makeFactorQuestion({}, () => 0, { first: true }),
+  ];
+  const lecture = /Take the ones you can see first|Leave one group|Take the same from both first/;
+  for (const question of cards) {
+    const model = engine.whyModel(question);
+    assert.equal(engine.usesWhyModel(question), true);
+    assert.equal(engine.whyCaption(model, "idle"), "");
+    assert.equal(engine.whyNudge(model), "");
+    assert.doesNotMatch(engine.whyCaption(model, "idle"), lecture);
+    assert.doesNotMatch(engine.whyNudge(model), lecture);
+    assert.equal(engine.whyCaption(model, "lift"), "What's left?");
+    assert.equal(engine.whyPrompt(question, "lift").prompt, question.prompt);
+    assert.doesNotMatch(engine.whyPrompt(question, "lift").prompt, /^n = /);
+    const leftover = engine.whyLeftover(model);
+    const plan = engine.leftoverHoldPlan(question, engine.gradeAnswer(question, String(leftover)));
+    assert.equal(plan.kind, "isolated");
+    assert.equal(plan.hideKeypad, true);
+    assert.equal(engine.leftoverTypingAllowed(question, false), false);
+    assert.equal(engine.leftoverTypingAllowed(question, true), true);
+  }
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../js/practice.js"), "utf8");
+  const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+  const idleTake = css.slice(css.indexOf('.why-model[data-phase="idle"] .why-take'));
+  const liftBlock = css.slice(
+    css.indexOf('.why-model[data-phase="lift"] .take-away'),
+    css.indexOf(".why-model.is-tilt-left"),
+  );
+  const move = html.slice(html.indexOf("function doWhyMove"), html.indexOf("function nudgeWhyMove"));
+  const hold = html.slice(html.indexOf("function holdIsolatedN"), html.indexOf("function setAnswer"));
+  const show = html.slice(html.indexOf("function showQuestion"), html.indexOf("function clearTimers"));
+  assert.match(idleTake, /animation:\s*why-takeable/);
+  assert.match(css, /@keyframes why-takeable/);
+  assert.match(css, /@keyframes why-takeable-glow/);
+  assert.match(css, /\[data-phase="idle"\] \.why-take \.why-tile/);
+  assert.doesNotMatch(liftBlock, /why-takeable/);
+  assert.match(move, /dataset\.phase = "lift"/);
+  assert.match(move, /classList\.add\("is-lifted"\)/);
+  assert.match(move, /leftoverTypingAllowed/);
+  assert.match(move, /setWhyPrompt\(question, "lift"\)/);
+  assert.match(hold, /setWhyPrompt\(question, "reveal"\)/);
+  assert.match(show, /leftoverTypingAllowed/);
+  assert.match(show, /setFeedback\(isBoard \? ""/);
+  assert.match(css, /box-shadow: 0 0 10px 3px/);
+  assert.doesNotMatch(html, /Take the ones you can see first/);
+  assert.doesNotMatch(source, /Take the ones you can see first/);
+  assert.doesNotMatch(html, /Take the same from both first/);
+  assert.doesNotMatch(source, /Take the same from both first/);
+});
+
+test("tapping leftover cells or the n box bounces toward the takeable group", () => {
+  const cards = [
+    engine.makeSenseQuestion({}, () => 0, { first: true }),
+    engine.makeMissingQuestion({}, () => 0, { first: true }),
+    engine.makeMissingSubtrahendQuestion({}, () => 0, { first: true }),
+    engine.makeFactorQuestion({}, () => 0, { first: true }),
+  ];
+  const lecture = /Take the ones you can see first|Leave one group|Take the same from both first|put the missing/;
+  for (const question of cards) {
+    const model = engine.whyModel(question);
+    assert.equal(engine.whyNudge(model), "");
+    assert.equal(engine.whyCaption(model, "idle"), "");
+    assert.doesNotMatch(engine.whyNudge(model), lecture);
+    assert.doesNotMatch(engine.whyCaption(model, "idle"), lecture);
+    assert.equal(engine.leftoverTypingAllowed(question, false), false);
+    assert.equal(engine.whyPrompt(question, "lift").prompt, question.prompt);
+  }
+
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../js/practice.js"), "utf8");
+  const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+  const frame = html.slice(html.indexOf("function renderWhyFrame"), html.indexOf("function renderWhyGroups"));
+  const groups = html.slice(html.indexOf("function renderWhyGroups"), html.indexOf("function renderWhyBalance"));
+  const tiles = html.slice(html.indexOf("function appendWhyTiles"), html.indexOf("function setWhyTakeOffset"));
+  const finish = html.slice(html.indexOf("function finishWhyBoard"), html.indexOf("function clusterColumns"));
+  const rest = html.slice(html.indexOf("function bindWhyRest"), html.indexOf("function renderWhyModel"));
+  const take = html.slice(html.indexOf("function bindWhyTake"), html.indexOf("function bindWhyRest"));
+  const move = html.slice(html.indexOf("function doWhyMove"), html.indexOf("function nudgeWhyMove"));
+  const nudge = html.slice(html.indexOf("function nudgeWhyMove"), html.indexOf("function clearWhyTilt"));
+  const makeN = html.slice(html.indexOf("function makeWhyN"), html.indexOf("function makeWhyCaption"));
+
+  assert.match(frame, /classList\.add\("is-hide", "why-rest"\)/);
+  assert.match(makeN, /className = "why-n why-rest"/);
+  assert.match(groups, /why-n-stack why-rest/);
+  assert.match(groups, /why-clusters why-rest/);
+  assert.match(tiles, /why-group why-rest/);
+  assert.match(finish, /bindWhyTake\(question\)/);
+  assert.match(finish, /bindWhyRest\(question, board\)/);
+  assert.match(rest, /closest\("\.why-take"\)/);
+  assert.match(rest, /closest\("\.why-rest"\)/);
+  assert.match(rest, /nudgeWhyMove\(question\)/);
+  assert.doesNotMatch(rest, /doWhyMove/);
+  assert.match(take, /doWhyMove\(question\)/);
+  assert.doesNotMatch(take, /nudgeWhyMove/);
+  assert.match(move, /dataset\.phase = "lift"/);
+  assert.match(move, /classList\.add\("is-lifted"\)/);
+  assert.match(nudge, /classList\.add\("is-nudge"\)/);
+  assert.match(nudge, /whyNudge/);
+  assert.match(css, /@keyframes why-nudge/);
+  assert.match(css, /\.why-take\.is-nudge/);
+  assert.match(css, /animation:\s*why-takeable/);
+  assert.match(css, /@keyframes why-takeable-glow/);
+  assert.doesNotMatch(html, /Take the ones you can see first/);
+  assert.doesNotMatch(source, /Take the ones you can see first/);
+  assert.doesNotMatch(html, /put the missing ones here/i);
+});
+
+test("is-nudge clears after the nudge so the idle takeable bob returns", () => {
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../js/practice.js"), "utf8");
+  const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+  const idleTake = css.slice(css.indexOf('.why-model[data-phase="idle"] .why-take'));
+  const idleNudge = css.slice(
+    css.indexOf('.why-model[data-phase="idle"] .why-take.is-nudge'),
+    css.indexOf("@keyframes why-takeable"),
+  );
+  const rest = html.slice(html.indexOf("function bindWhyRest"), html.indexOf("function renderWhyModel"));
+  const take = html.slice(html.indexOf("function bindWhyTake"), html.indexOf("function bindWhyRest"));
+  const move = html.slice(html.indexOf("function doWhyMove"), html.indexOf("function nudgeWhyMove"));
+  const nudge = html.slice(html.indexOf("function nudgeWhyMove"), html.indexOf("function clearWhyTilt"));
+  const addAt = nudge.indexOf('classList.add("is-nudge")');
+  const timeoutAt = nudge.indexOf("setTimeout");
+  const clearAfter = nudge.slice(timeoutAt);
+
+  assert.match(idleTake, /animation:\s*why-takeable/);
+  assert.match(idleNudge, /animation:\s*why-nudge 0\.45s/);
+  assert.match(nudge, /classList\.add\("is-nudge"\)/);
+  assert.match(nudge, /clearTimeout\(state\.whyId\)/);
+  assert.match(nudge, /setTimeout/);
+  assert.match(nudge, /,\s*450\)/);
+  assert.ok(addAt >= 0 && timeoutAt > addAt);
+  assert.match(clearAfter, /classList\.remove\("is-nudge"\)/);
+  assert.match(rest, /nudgeWhyMove\(question\)/);
+  assert.doesNotMatch(rest, /doWhyMove/);
+  assert.match(take, /doWhyMove\(question\)/);
+  assert.doesNotMatch(take, /nudgeWhyMove/);
+  assert.match(move, /dataset\.phase = "lift"/);
+  assert.match(move, /classList\.add\("is-lifted"\)/);
+  assert.doesNotMatch(html, /Take the ones you can see first/);
+  assert.doesNotMatch(source, /Take the ones you can see first/);
+});

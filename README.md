@@ -1,47 +1,41 @@
-# n / What's hiding
+# Grade 3 Path
 
-A single-file, offline math page. A first visit opens on the leftover. After that, home is the Grade 3 path. Chapters is how you see later years. Nothing is sent to a server. No accounts.
+A school-year of LCPS 2026–27 math trails. First visit is the leftover `6 + n = 10`. After that, home is a Duolingo-style year map with an IXL-style skill walk that lasts Monday–Friday all year.
 
-Times tables is a family on the Grade 3 path, not the product title.
+Times tables are a family on that path (equal groups, then 2s 5s 10s, then 3s 4s 8s 9s), not the product title. Nothing is sent to a server. No accounts.
+
+Nix (fox) coaches. Rem (raccoon) sits on review.
 
 ## Open it
 
-Double-click `index.html`, or:
-
 ```bash
-python3 -m http.server 8080
+npm install
+npm run dev
 ```
 
-Then open [http://localhost:8080](http://localhost:8080).
+Then open [http://localhost:5173/times-tables/](http://localhost:5173/times-tables/).
+
+```bash
+npm test
+npm run build
+npm run preview
+```
 
 ## GitHub Pages
 
-This repo is one static file at the root. After Pages is set to **main** / **(root)**:
+Live:
 
 https://bryanralston.github.io/times-tables/
 
-## For parents
+The Vite `base` is `/times-tables/`. A GitHub Action builds `dist` on push to `main` and deploys it. In the repo: **Settings → Pages → Source: GitHub Actions**.
 
-Brand-new visit, taps in order:
+The old single-file leftover page lives in `legacy/`.
 
-1. Open the live page. You land on `6 + n = 10` on a ten-frame. The 6 is takeable. Coins are 3. There is no **Start** on a trail first, and no **Chapters** hop off that first leftover. After the short run you land on the Grade 3 path; Missing addend shows **12**. Later grades stay behind **Chapters**. There is no **Round length**, **Timer**, or **Questions** picker. You do not first tap through a settings door or a wall of closed grades.
-2. Drag the dots you can see off the frame. Tapping leftover cells or the n box bounces toward those dots — it does not sit mute and does not cover the model with a lecture. The heading stays `6 + n = 10`. Type the leftover in the n-box. A wrong leftover tilts; the board stays.
-3. A correct leftover holds a beat: you still see `n = 4` on the level frame, leftover cells vs the n-box, before the next card. No popup. Score does not jump the beat.
-4. Coins are the quiet number in the corner. A correct n **after** the drag earns coins. Miss, skip, or tapping OK before the move earns 0.
-5. After a few why-moves — not a 20-question quiz — you land on the Grade 3 path. The loud next action is **12** on **Missing addend**. Number sense is quiet **Replay**. A return visit opens that path, not the leftover. Spend 12 coins on **Missing addend**. It becomes **Start** — that's the loud tap. **Missing subtrahend** still shows **12**, quieter until they earn 12 again. Times tables facts stay hollow until the one in front is bought.
-6. Tap **Start** on **Missing addend**. First card is `8 + n = 12`. Drag the known dots off both pans, then type `n = leftover`. A miss then the right leftover replaces, so 5 then 4 is 4. Same isolated-n beat.
-7. Spend 12 coins on **Missing subtrahend**. It becomes **Start**. Earlier purchased nodes stay **Replay**.
-8. Tap **Start** on **Missing subtrahend**. First card is `12 − n = 8`. Drag the known leftover off both pans, then type `n = 4`.
-9. Spend 12 coins on **Times tables facts**. It becomes **Start**, not Coming-forever.
-10. Tap **Start** on **Times tables facts**. First card is `2 × n = 8`. Drag the extra group off both pans so one group is left, then type `n = leftover`.
+## Play
 
-Other grades stay closed chapters. There is no cosmetics shop and no real-money shop.
+1. Brand-new visit lands on `6 + n = 10` on a ten-frame. Take the 6. Type 4. A short leftover run, then the year map.
+2. **Start today's walk** — 8–12 new items on the current unit plus 3–5 review. Fluency walks all year. Units last weeks; you cannot finish one in a weekend.
+3. Nix thinks while you work, hops on a correct leftover, oops on a miss, and celebrates the walk (a 6s clip, not every keystroke). Rem shows on review.
+4. Grown-ups (gear) set **class is on unit N** if the room is ahead or behind the calendar.
 
-## Practice
-
-- **Number sense:** hide and count on a ten-frame, first within 10, then a short stretch toward 20. A short run of living puzzles, then back to the Grade 3 path. Drag the dots you can see, then type n.
-- **Missing addend:** `8 + n = 12` style, small numbers. Drag the known cluster off both pans, then type n.
-- **Missing subtrahend:** `12 − n = 8` style after you spend to open it. Same board: take the known amount from both pans, then type n.
-- **Times tables facts:** missing factor on that same board family. Isolate one group, then type n. Not a 7 × 8 keypad quiz.
-- First visit is the leftover board, not a trail they have to **Start**. Path is for return visits.
-- Progress and coins stay in the browser (`localStorage`)
+Progress stays in `localStorage` on this device.
