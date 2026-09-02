@@ -7,10 +7,9 @@ import { isUnitOpen, unitStatus } from "./path";
 import { UI } from "./i18n";
 import { makeActivityRound, makeQuestion, makeWelcomeRound, placeOnGraph, welcomeFirst, wordForm } from "./questions";
 import type { GraphData, MeasureData, MoneyData, PlaceValueData } from "./types";
-import { moneyFmt } from "./utils";
 import { rngFromSeed } from "./rng";
 import { schoolStreak } from "./streak";
-import { answersMatch } from "./utils";
+import { answersMatch, keypadAllowsDot, moneyFmt, moneySpeech } from "./utils";
 
 describe("calendar", () => {
   it("has 180 school days", () => {
@@ -138,6 +137,21 @@ describe("answers", () => {
     expect(answersMatch("5", "4")).toBe(false);
     expect(answersMatch("$1.00", "100", ["$1.00"])).toBe(true);
     expect(answersMatch("3:05", "3:5")).toBe(true);
+    expect(answersMatch("9:05", "9:05")).toBe(true);
+    expect(moneySpeech("78")).toBe("$0.78");
+    expect(moneySpeech("0.78")).toBe("$0.78");
+    expect(UI.en.nIs(moneySpeech("78"))).toBe("n is $0.78.");
+  });
+
+  it("puts the decimal key only on money count change and make", () => {
+    expect(keypadAllowsDot({ kind: "tenframe", data: {} })).toBe(false);
+    expect(keypadAllowsDot({ kind: "fluency", data: {} })).toBe(false);
+    expect(keypadAllowsDot({ kind: "clock", data: { mode: "elapsed" } })).toBe(false);
+    expect(keypadAllowsDot({ kind: "area", data: {} })).toBe(false);
+    expect(keypadAllowsDot({ kind: "money", data: { mode: "count" } })).toBe(true);
+    expect(keypadAllowsDot({ kind: "money", data: { mode: "change" } })).toBe(true);
+    expect(keypadAllowsDot({ kind: "money", data: { mode: "make" } })).toBe(true);
+    expect(keypadAllowsDot({ kind: "money", data: { mode: "compare" } })).toBe(false);
   });
 });
 

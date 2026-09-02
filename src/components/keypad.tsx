@@ -1,7 +1,7 @@
 import { Delete } from "lucide-react";
 import { InteractiveClock } from "@/components/clock-face";
 import { Button } from "@/components/ui/button";
-import { formatClockTime, parseClockTime, startClockTime } from "@/lib/clock";
+import { displayedClockTime, formatClockTime, parseClockTime } from "@/lib/clock";
 import { parseLocale, UI } from "@/lib/i18n";
 import { useProgress } from "@/lib/progress";
 import { cn, pad2 } from "@/lib/utils";
@@ -208,12 +208,13 @@ export function ClockKeys({
 }: {
   value: string;
   onChange: (v: string) => void;
-  onCheck: () => void;
+  onCheck: (time: string) => void;
   disabled?: boolean;
   avoid?: string;
 }) {
   const ui = useChrome();
-  const { hours, minutes } = parseClockTime(value || startClockTime(avoid));
+  const face = displayedClockTime(value, avoid);
+  const { hours, minutes } = parseClockTime(face);
 
   function set(h: number, m: number) {
     onChange(formatClockTime(h, m));
@@ -241,7 +242,7 @@ export function ClockKeys({
           {ui.plus1min}
         </Button>
       </div>
-      <Button className="w-full" size="lg" onClick={onCheck} disabled={disabled || !value}>
+      <Button className="w-full" size="lg" onClick={() => onCheck(formatClockTime(hours, minutes))} disabled={disabled}>
         {ui.check}
       </Button>
     </div>

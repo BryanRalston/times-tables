@@ -1,5 +1,9 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { activityById } from "@/lib/curriculum";
+import { makeQuestion, welcomeFirst } from "@/lib/questions";
+import { rngFromSeed } from "@/lib/rng";
+import { AnswerPanel } from "./answer-panel";
 import { AnswerReadout, ClockKeys, Keypad, applyKeypadKey } from "./keypad";
 
 describe("answer readout", () => {
@@ -62,5 +66,35 @@ describe("clock keys", () => {
     expect(html).toContain("Hour +");
     expect(html).toContain("+1 min");
     expect(html).not.toContain("+5 min");
+    expect(html).toContain("Check");
+    expect(html).not.toMatch(/ disabled(=""|>)/);
+  });
+});
+
+describe("answer panel keypad", () => {
+  it("omits the decimal on leftover and fluency, and shows it on money change and count", () => {
+    const leftover = welcomeFirst(rngFromSeed("dot:left"));
+    const leftHtml = renderToStaticMarkup(
+      <AnswerPanel question={leftover} value="" setValue={() => undefined} onCheck={() => undefined} />,
+    );
+    expect(leftHtml).not.toContain('aria-label="."');
+
+    const fluency = makeQuestion(activityById("u9-mix")!.activity, rngFromSeed("dot:flu"));
+    const fluHtml = renderToStaticMarkup(
+      <AnswerPanel question={fluency} value="" setValue={() => undefined} onCheck={() => undefined} />,
+    );
+    expect(fluHtml).not.toContain('aria-label="."');
+
+    const change = makeQuestion(activityById("u11-change")!.activity, rngFromSeed("dot:chg"));
+    const chgHtml = renderToStaticMarkup(
+      <AnswerPanel question={change} value="" setValue={() => undefined} onCheck={() => undefined} />,
+    );
+    expect(chgHtml).toContain('aria-label="."');
+
+    const count = makeQuestion(activityById("u11-count")!.activity, rngFromSeed("dot:cnt"));
+    const cntHtml = renderToStaticMarkup(
+      <AnswerPanel question={count} value="" setValue={() => undefined} onCheck={() => undefined} />,
+    );
+    expect(cntHtml).toContain('aria-label="."');
   });
 });

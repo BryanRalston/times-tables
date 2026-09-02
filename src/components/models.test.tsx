@@ -50,14 +50,18 @@ describe("boards", () => {
       const d = q.data as MeasureData;
       const html = renderToStaticMarkup(<Board {...stub(q)} />);
       expect(html).toContain("polygon");
-      expect(html).toContain("inset-0");
       expect(html).toContain(">0<");
       expect(html).toContain(String(Math.floor(d.value)));
       expect(html).toContain(d.unit);
-      expect(html).toContain("measure/");
       if (d.attribute === "mass") {
-        expect(html).toContain("measure/scale");
+        expect(html).toContain("data-scale-deg");
         expect(html).toMatch(/rotate\(/);
+        expect(html).toContain("h-64");
+        expect(html).toContain('font-size="18"');
+        expect(html).not.toContain("measure/scale");
+      } else {
+        expect(html).toContain("inset-0");
+        expect(html).toContain("measure/");
       }
       if (d.attribute === "volume") {
         expect(html).toContain("measure/beaker");
@@ -226,7 +230,12 @@ describe("boards", () => {
       const q = makeQuestion(activityById(id)!.activity, rngFromSeed("ptr:5"));
       const html = renderToStaticMarkup(<Board {...stub(q)} />);
       expect(html, id).toContain("polygon");
-      expect(html, id).toContain("measure/");
+      if (id === "u8-mass") {
+        expect(html, id).toContain("data-scale-deg");
+        expect(html, id).not.toContain("measure/scale");
+      } else {
+        expect(html, id).toContain("measure/");
+      }
     }
   });
 

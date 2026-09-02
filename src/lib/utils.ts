@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { clockTimesMatch } from "./clock";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -9,8 +10,23 @@ export function moneyFmt(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
+/** Speak integer-cent answers as $0.78, not bare 78. */
+export function moneySpeech(answer: string): string {
+  const t = answer.trim().replace(/^\$/, "");
+  if (/^\d+$/.test(t)) return moneyFmt(Number(t));
+  if (/^\d+\.\d{1,2}$/.test(t)) return moneyFmt(Math.round(Number(t) * 100));
+  return answer;
+}
+
 export function pad2(n: number): string {
   return n.toString().padStart(2, "0");
+}
+
+/** Decimal key only for money count / change / make. */
+export function keypadAllowsDot(q: { kind: string; data?: unknown }): boolean {
+  if (q.kind !== "money") return false;
+  const mode = (q.data as { mode?: string } | undefined)?.mode;
+  return mode === "count" || mode === "change" || mode === "make";
 }
 
 export function answersMatch(given: string, answer: string, alts: string[] = []): boolean {
@@ -25,16 +41,28 @@ export function answersMatch(given: string, answer: string, alts: string[] = [])
   return false;
 }
 
+export function questionCorrect(
+  given: string,
+  q: { input: string; answer: string; alts?: string[]; data: unknown },
+): boolean {
+  if (q.input === "clock") {
+    const d = q.data as { hours?: number; minutes?: number };
+    if (typeof d.hours === "number" && typeof d.minutes === "number") {
+      return clockTimesMatch(given, d.hours, d.minutes);
+    }
+  }
+  return answersMatch(given, q.answer, q.alts);
+}
+
 function normalize(s: string): string {
   return s.trim().toLowerCase().replace(/\s+/g, " ").replace(/,/g, "");
 }
 
 function timeMatch(a: string, b: string): boolean {
   const re = /^(\d{1,2}):(\d{1,2})$/;
-  const ma = a.match(re);
   const mb = b.match(re);
-  if (!ma || !mb) return false;
-  return Number(ma[1]) === Number(mb[1]) && Number(ma[2]) === Number(mb[2]);
+  if (!mb) return false;
+  return clockTimesMatch(a, Number(mb[1]), Number(mb[2]));
 }
 
 function moneyMatch(a: string, b: string): boolean {

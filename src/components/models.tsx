@@ -1232,8 +1232,8 @@ function ComputeBoard({ question, status, shake }: BoardProps) {
 
 /** Overlay viewBoxes match keyed public/measure PNGs. */
 export const RULER_FACE = { w: 1229, h: 222, x0: 148, x1: 1188, y0: 36, yMaj: 92, yMin: 62, yNum: 142 };
-/** public/measure/scale.png (732×1376). Dial is the blank white disc; start 225° = 0 on a y-down clock. */
-export const SCALE_FACE = { w: 732, h: 1000, cx: 315, cy: 637, r: 248, start: 225, sweep: 270 };
+/** Drawn hanging-scale dial. start 225° = 0 on a y-down clock; sweep 270° to max. */
+export const SCALE_FACE = { w: 220, h: 268, cx: 110, cy: 118, r: 78, start: 225, sweep: 270 };
 /** Inner cavity of public/measure/beaker.png (309×919). y grows down; meniscus at yBot when value is 0. */
 export const BEAKER_FACE = { w: 309, h: 919, x: 86, fw: 142, yTop: 78, yBot: 788, tickX: 220 };
 
@@ -1411,41 +1411,42 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
     return (
       <Frame shake={shake} status={status}>
         <div className="flex justify-center">
-          <ToolFace
-            src={asset("measure/scale.png")}
-            viewBox={`0 0 ${w} ${h}`}
-            className="inline-block"
-            imgClass="h-40 w-auto sm:h-48"
-            label={label}
-            over={
-              <>
-                {Array.from({ length: max + 1 }, (_, i) => {
-                  const d = start + (i / max) * sweep;
-                  const [x1, y1] = polar(r * 0.84, d);
-                  const [x2, y2] = polar(r * 0.96, d);
-                  const [tx, ty] = polar(r * 0.64, d);
-                  return (
-                    <g key={i}>
-                      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#1f1a14" strokeWidth="3" />
-                      <text x={tx} y={ty} textAnchor="middle" dominantBaseline="middle" fontSize="32" fontWeight="700" fill="#1f1a14">
-                        {i}
-                      </text>
-                    </g>
-                  );
-                })}
-                <g data-scale-deg={deg} data-value={data.value} data-max={max} transform={`rotate(${deg} ${cx} ${cy})`}>
-                  <line x1={cx} y1={cy} x2={cx + r * 0.78} y2={cy} stroke="#1f1a14" strokeWidth="5" strokeLinecap="round" />
-                  <polygon
-                    points={`${cx + r * 0.88},${cy} ${cx + r * 0.7},${cy - 11} ${cx + r * 0.7},${cy + 11}`}
-                    fill="#c45c26"
-                    stroke="#1f1a14"
-                    strokeWidth="1.1"
-                  />
-                  <circle cx={cx} cy={cy} r="9" fill="#1f1a14" />
+          <svg viewBox={`0 0 ${w} ${h}`} className="h-64 w-auto sm:h-72" role="img" aria-label={label}>
+            <path d="M102 8 h16 a8 8 0 0 1 8 8 v10 h-32 V16 a8 8 0 0 1 8-8 z" fill="#1f1a14" />
+            <circle cx={cx} cy="10" r="6" fill="none" stroke="#fffaf1" strokeWidth="2.5" />
+            <rect x="36" y="26" width="148" height="232" rx="26" fill="#d7ecec" stroke="#1f1a14" strokeWidth="3" />
+            <circle cx={cx} cy={cy} r={r + 10} fill="#0d7377" stroke="#1f1a14" strokeWidth="3" />
+            <circle cx={cx} cy={cy} r={r} fill="#fffaf1" stroke="#1f1a14" strokeWidth="2.5" />
+            {Array.from({ length: max + 1 }, (_, i) => {
+              const d = start + (i / max) * sweep;
+              const [x1, y1] = polar(r * 0.82, d);
+              const [x2, y2] = polar(r * 0.96, d);
+              const [tx, ty] = polar(r * 0.62, d);
+              return (
+                <g key={i}>
+                  <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#1f1a14" strokeWidth="3" />
+                  <text x={tx} y={ty} textAnchor="middle" dominantBaseline="middle" fontSize="18" fontWeight="700" fill="#1f1a14">
+                    {i}
+                  </text>
                 </g>
-              </>
-            }
-          />
+              );
+            })}
+            <g data-scale-deg={deg} data-value={data.value} data-max={max} transform={`rotate(${deg} ${cx} ${cy})`}>
+              <line x1={cx} y1={cy} x2={cx + r * 0.72} y2={cy} stroke="#1f1a14" strokeWidth="5" strokeLinecap="round" />
+              <polygon
+                points={`${cx + r * 0.88},${cy} ${cx + r * 0.68},${cy - 9} ${cx + r * 0.68},${cy + 9}`}
+                fill="#c45c26"
+                stroke="#1f1a14"
+                strokeWidth="1.2"
+              />
+              <circle cx={cx} cy={cy} r="8" fill="#1f1a14" />
+              <circle cx={cx} cy={cy} r="3.5" fill="#c45c26" />
+            </g>
+            <rect x="78" y="214" width="64" height="28" rx="8" fill="#fffaf1" stroke="#1f1a14" strokeWidth="2" />
+            <text x={cx} y="233" textAnchor="middle" fontSize="12" fontWeight="700" fill="#1f1a14">
+              {data.unit}
+            </text>
+          </svg>
         </div>
         {caption}
       </Frame>

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { parseLocale, UI } from "@/lib/i18n";
 import { useProgress } from "@/lib/progress";
 import type { Question } from "@/lib/types";
+import { keypadAllowsDot } from "@/lib/utils";
 
 export function AnswerPanel({
   question,
@@ -37,7 +38,7 @@ export function AnswerPanel({
   }
   if (question.input === "clock") {
     return (
-      <ClockKeys value={value} onChange={setValue} onCheck={() => onCheck()} disabled={disabled} avoid={question.answer} />
+      <ClockKeys value={value} onChange={setValue} onCheck={(time) => onCheck(time)} disabled={disabled} avoid={question.answer} />
     );
   }
   if (question.input === "order") {
@@ -63,7 +64,7 @@ export function AnswerPanel({
       onCheck={() => onCheck()}
       disabled={disabled}
       replace={leftover}
-      allowDot={!leftover}
+      allowDot={keypadAllowsDot(question)}
     />
   );
 }

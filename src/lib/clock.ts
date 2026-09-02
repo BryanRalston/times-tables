@@ -32,10 +32,23 @@ export function applyHandAngle(
   return { hours: h === 0 ? 12 : h, minutes };
 }
 
+/** Wrap minutes into hours, then hours onto a 1–12 clock. */
+export function wrapClockParts(hours: number, minutes: number): { hours: number; minutes: number } {
+  let h = Math.trunc(hours);
+  let m = Math.trunc(minutes);
+  if (!Number.isFinite(h)) h = 12;
+  if (!Number.isFinite(m)) m = 0;
+  const extra = Math.floor(m / 60);
+  h += extra;
+  m -= extra * 60;
+  h = ((h % 12) + 12) % 12;
+  if (h === 0) h = 12;
+  return { hours: h, minutes: m };
+}
+
 export function formatClockTime(hours: number, minutes: number): string {
-  const hh = ((hours - 1 + 12) % 12) + 1;
-  const mm = ((minutes % 60) + 60) % 60;
-  return `${hh}:${String(mm).padStart(2, "0")}`;
+  const t = wrapClockParts(hours, minutes);
+  return `${t.hours}:${String(t.minutes).padStart(2, "0")}`;
 }
 
 export function parseClockTime(value: string, fallback = "12:00"): { hours: number; minutes: number } {
@@ -44,9 +57,23 @@ export function parseClockTime(value: string, fallback = "12:00"): { hours: numb
   let minutes = Number(mRaw || 0);
   if (!Number.isFinite(hours)) hours = 12;
   if (!Number.isFinite(minutes)) minutes = 0;
-  return { hours: ((hours - 1 + 12) % 12) + 1, minutes: ((minutes % 60) + 60) % 60 };
+  return wrapClockParts(hours, minutes);
 }
 
 export function startClockTime(avoid?: string): string {
   return avoid === "12:00" ? "3:00" : "12:00";
+}
+
+/** Time shown on the answer face: parent value, or the start face when value is empty. */
+export function displayedClockTime(value: string, avoid?: string): string {
+  const { hours, minutes } = parseClockTime(value || startClockTime(avoid));
+  return formatClockTime(hours, minutes);
+}
+
+/** Whole-minute match on a 1–12 clock. `given` is h:mm from the answer face. */
+export function clockTimesMatch(given: string, hours: number, minutes: number): boolean {
+  if (!/^\d{1,2}:\d{1,2}$/.test(given.trim())) return false;
+  const got = parseClockTime(given.trim());
+  const want = wrapClockParts(hours, minutes);
+  return got.hours === want.hours && got.minutes === want.minutes;
 }

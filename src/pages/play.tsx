@@ -19,8 +19,8 @@ import { rngFromSeed } from "@/lib/rng";
 import { canAffordAnything, coinsForResult } from "@/lib/coins";
 import { playCorrect, playStar, playWrong, unlockAudio } from "@/lib/sound";
 import { schoolStreak } from "@/lib/streak";
-import type { ItemSource, Locale, Question } from "@/lib/types";
-import { answersMatch } from "@/lib/utils";
+import type { ItemSource, Locale, MoneyData, Question } from "@/lib/types";
+import { keypadAllowsDot, moneySpeech, questionCorrect } from "@/lib/utils";
 
 type Kind = "welcome" | "daily" | "activity";
 
@@ -194,16 +194,17 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       if (status !== "idle") return;
       if (q.needsInteract && !interacted) return;
       const leftover = q.kind === "tenframe";
+      const allowDot = keypadAllowsDot(q);
       if (e.key === "Enter") {
         e.preventDefault();
         check();
       } else if (e.key === "Backspace") {
         e.preventDefault();
-        setValue((v) => applyKeypadKey(v, "back", { replace: leftover, allowDot: !leftover }));
+        setValue((v) => applyKeypadKey(v, "back", { replace: leftover, allowDot }));
       } else if (/^\d$/.test(e.key)) {
         e.preventDefault();
-        setValue((v) => applyKeypadKey(v, e.key, { replace: leftover, allowDot: !leftover }));
-      } else if (e.key === "." && !leftover) {
+        setValue((v) => applyKeypadKey(v, e.key, { replace: leftover, allowDot }));
+      } else if (e.key === "." && allowDot) {
         e.preventDefault();
         setValue((v) => applyKeypadKey(v, ".", { allowDot: true }));
       }
@@ -273,7 +274,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     }
     const given = override ?? value;
     if (!given.length) return;
-    if (answersMatch(given, q.answer, q.alts)) {
+    if (questionCorrect(given, q)) {
       const nextCorrect = correct + 1;
       setCorrect(nextCorrect);
       setStatus("correct");
@@ -375,13 +376,18 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const gate = { kind: q.kind, needsInteract: q.needsInteract, interacted, status };
   const showPanel = leftoverPanelOpen(gate);
   const showSkip = leftoverSkipOpen(gate);
+  const moneyMode = q.kind === "money" ? (q.data as MoneyData).mode : null;
+  const spokenN =
+    q.kind === "money" && (moneyMode === "count" || moneyMode === "change" || moneyMode === "make")
+      ? moneySpeech(q.answer)
+      : q.answer;
   const speech =
     pose === "oops"
       ? ui.tryAgain
       : leftover
         ? (q.hint ?? ui.takeWhatYouSee)
         : status === "correct"
-          ? ui.nIs(q.answer)
+          ? ui.nIs(spokenN)
           : (q.hint ?? ui.takeWhatYouSee);
 
   return (
