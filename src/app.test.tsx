@@ -50,9 +50,12 @@ describe("first-visit leftover door", () => {
     expect(html).toContain("place-content-center");
     expect(html).toContain("data-leftover-board");
     expect(html).toContain("max-w-none");
-    expect(html).toContain("minmax(0,1fr)");
+    expect(html).toContain("md:grid-rows-[auto_minmax(0,1fr)_auto]");
+    expect(html).toContain("md:place-content-stretch");
+    expect(html).not.toContain("lg:grid-rows-[auto_minmax(0,1fr)_auto]");
     expect(html).not.toContain("lg:grid-cols-");
     expect(html).not.toContain("lg:max-w-3xl");
+    expect(html).not.toContain("sm:max-w-2xl");
   });
 
   it("empty Guest at a catalog hash still opens leftover, not Lessons or Shelf", () => {
@@ -103,8 +106,19 @@ describe("first-visit leftover door", () => {
     expect(play).toContain('kind === "welcome"');
     expect(play).toContain("place-content-center");
     expect(play).toContain("max-w-none");
-    expect(play).toContain("minmax(0,1fr)");
+    expect(play).toContain("md:grid-rows-[auto_minmax(0,1fr)_auto]");
+    expect(play).toContain("md:place-content-stretch");
     expect(play).toContain("grid-cols-1");
+    expect(play).not.toContain("lg:grid-rows-[auto_minmax(0,1fr)_auto]");
     expect(play).not.toContain("lg:max-w-3xl");
+    expect(play).not.toContain("sm:max-w-2xl");
+    const css = readFileSync(join(HERE, "styles.css"), "utf8");
+    expect(css).toContain("[data-welcome-leftover] [data-leftover-board]");
+    expect(css).toContain("@media (min-width: 768px)");
+    expect(css).not.toMatch(/@media \(min-width: 1024px\)\s*\{\s*\[data-welcome-leftover\]/);
+    const models = readFileSync(join(HERE, "components/models.tsx"), "utf8");
+    expect(models).toContain("md:min-h-72");
+    expect(models).not.toContain("lg:min-h-72");
+    expect(models).not.toMatch(/leftover &&[^;]*lg:max-w-/);
   });
 });

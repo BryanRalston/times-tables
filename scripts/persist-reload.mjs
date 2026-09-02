@@ -144,8 +144,11 @@ async function assertBoardLayout(page, viewport) {
   if (viewport.width >= 1920 && box.width < 1340) {
     throw new Error(`leftover too narrow at ${viewport.width}: w=${box.width} (want ≥ 1340)`);
   }
-  if (viewport.width >= 1024 && box.height < 280) {
-    throw new Error(`leftover too short at laptop h=${box.height} vh=${viewport.height}`);
+  const minH = Math.max(280, Math.round(viewport.height * 0.45));
+  if (viewport.width >= 768 && box.height < minH) {
+    throw new Error(
+      `leftover too short at ${viewport.width}x${viewport.height} h=${box.height} (want ≥ ${minH}; tablet must fill without waiting for lg)`,
+    );
   }
   if (box.height < 150) throw new Error(`leftover too short ${box.height}`);
 }
@@ -175,40 +178,30 @@ async function dragKnown(page, dots) {
   await page.mouse.up();
 }
 
+async function assertWhyMove(browser, url, viewport, how) {
+  const ctx = await browser.newContext({ viewport });
+  await ctx.addInitScript(watchCatalog);
+  const page = await ctx.newPage();
+  page.setDefaultTimeout(12000);
+  const first = await firstGotoLeftover(page, url);
+  if (how === "drag") await dragKnown(page, first.dots);
+  else if (how === "take-all") await page.locator("[data-known-group]").first().click({ timeout: 1500 });
+  else await first.dots.first().click({ force: true });
+  if (await first.check.count()) throw new Error(`leftover Check present before why-move wait (${how} ${viewport.width})`);
+  await page.waitForTimeout(450);
+  if (!(await first.check.count())) throw new Error(`leftover Check missing after ${how} why-move ${viewport.width}`);
+  await assertKeypadOnScreen(page, viewport);
+  await ctx.close();
+}
+
 async function assertFirstVisitLeftover(browser, url) {
-  const dragCtx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
-  await dragCtx.addInitScript(watchCatalog);
-  const dragPage = await dragCtx.newPage();
-  dragPage.setDefaultTimeout(12000);
-  const drag = await firstGotoLeftover(dragPage, url);
-  await dragKnown(dragPage, drag.dots);
-  if (await drag.check.count()) throw new Error("leftover Check present before why-move wait (drag)");
-  await dragPage.waitForTimeout(450);
-  if (!(await drag.check.count())) throw new Error("leftover Check missing after drag why-move");
-  await dragCtx.close();
-
-  const takeCtx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
-  await takeCtx.addInitScript(watchCatalog);
-  const takePage = await takeCtx.newPage();
-  takePage.setDefaultTimeout(12000);
-  const take = await firstGotoLeftover(takePage, url);
-  await takePage.locator("[data-known-group]").first().click({ timeout: 1500 });
-  if (await take.check.count()) throw new Error("leftover Check present before why-move wait (take-all)");
-  await takePage.waitForTimeout(450);
-  if (!(await take.check.count())) throw new Error("leftover Check missing after take-all why-move");
-  await takeCtx.close();
-
-  const clickCtx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
-  await clickCtx.addInitScript(watchCatalog);
-  const clickPage = await clickCtx.newPage();
-  clickPage.setDefaultTimeout(12000);
-  const click = await firstGotoLeftover(clickPage, url);
-  await click.dots.first().click({ force: true });
-  if (await click.check.count()) throw new Error("leftover Check present before why-move wait (mouse click)");
-  await clickPage.waitForTimeout(450);
-  if (!(await click.check.count())) throw new Error("leftover Check missing after mouse click why-move");
-  await assertKeypadOnScreen(clickPage, { width: 1280, height: 800 });
-  await clickCtx.close();
+  const desk = { width: 1280, height: 800 };
+  const tablet = { width: 768, height: 1024 };
+  await assertWhyMove(browser, url, desk, "drag");
+  await assertWhyMove(browser, url, desk, "take-all");
+  await assertWhyMove(browser, url, desk, "click");
+  await assertWhyMove(browser, url, tablet, "drag");
+  await assertWhyMove(browser, url, tablet, "click");
 }
 
 const preview = await ensurePreview();
@@ -242,13 +235,15 @@ try {
   console.log("persist-reload OK coins=12 name=Maya");
 
   await assertFirstVisitLeftover(browser, rawBase);
-  console.log("first-visit leftover OK first goto + drag + take-all + mouse click");
+  console.log("first-visit leftover OK first goto + drag + take-all + mouse click at 1280 and 768");
 
   for (const vp of [
     { width: 390, height: 844 },
     { width: 768, height: 1024 },
+    { width: 820, height: 1180 },
     { width: 1024, height: 768 },
     { width: 1280, height: 800 },
+    { width: 1366, height: 768 },
     { width: 1440, height: 900 },
     { width: 1920, height: 1080 },
   ]) {

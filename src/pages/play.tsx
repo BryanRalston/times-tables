@@ -409,14 +409,14 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       <div
         className={cn(
           "mx-auto grid min-h-dvh w-full max-w-none grid-cols-1 place-content-center place-items-stretch gap-4 overflow-x-hidden px-4 py-5",
-          "lg:h-dvh lg:grid-rows-[auto_minmax(0,1fr)_auto] lg:place-content-stretch lg:gap-3 lg:px-8 lg:py-4",
+          "md:h-dvh md:grid-rows-[auto_minmax(0,1fr)_auto] md:place-content-stretch md:gap-3 md:px-6 md:py-4 lg:px-8",
         )}
         data-welcome-leftover="1"
         {...(showPanel ? { "data-panel": "1" } : {})}
       >
         <div className="flex flex-col items-center">
           <div className="relative">
-            <Mascot who={who} pose={pose} hop={hop} size="md" className="lg:h-20 lg:w-20" />
+            <Mascot who={who} pose={pose} hop={hop} size="md" className="md:h-24 md:w-24 lg:h-20 lg:w-20" />
             <StarPop show={star} />
           </div>
           {showSpeech ? (
@@ -424,7 +424,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
           ) : null}
         </div>
 
-        <div className="flex h-full min-h-0 w-full items-stretch">{board}</div>
+        <div className="h-full min-h-0 w-full min-w-0">{board}</div>
 
         {panel ? <div className="mx-auto w-full max-w-sm lg:max-w-md">{panel}</div> : null}
       </div>
