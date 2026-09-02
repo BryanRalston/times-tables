@@ -214,6 +214,14 @@ describe("boards", () => {
     expect(html).toMatch(/width="28"/);
     expect(html).toMatch(/height="28"/);
     expect(html).not.toMatch(/>\?<\/span>/);
+    expect(html).toContain("squishees/");
+    for (const item of tray) {
+      const id = item.symbol ?? d.symbol;
+      expect(html).toContain(`squishees/${id}.png`);
+    }
+    expect(html).toContain(`squishees/${d.symbol}.png`);
+    expect(html).not.toMatch(/src=""/);
+    expect(html).not.toMatch(/src="undefined"/);
   });
 
   it("pictograph img count equals sum of count(value)", () => {

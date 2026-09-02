@@ -17,9 +17,12 @@ export function leftoverPanelOpen(args: {
   interacted: boolean;
   status: "idle" | "correct" | "wrong";
 }): boolean {
-  if (!isLeftoverFrame(args.kind)) return true;
-  if (args.status === "correct") return false;
-  if (args.needsInteract && !args.interacted) return false;
+  if (isLeftoverFrame(args.kind)) {
+    if (args.status === "correct") return false;
+    if (args.needsInteract && !args.interacted) return false;
+    return true;
+  }
+  if (args.kind === "graph" && args.needsInteract && !args.interacted) return false;
   return true;
 }
 

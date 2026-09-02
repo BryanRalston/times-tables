@@ -1083,6 +1083,7 @@ function GraphIcon({ id, size = 28 }: { id: string; size?: number }) {
       alt=""
       width={size}
       height={size}
+      data-squishee={id}
       draggable={false}
       className={cn("object-contain", size >= 28 ? "size-7" : "inline size-5")}
       style={{ width: size, height: size }}

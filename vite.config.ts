@@ -16,9 +16,34 @@ function spa404() {
   };
 }
 
+function baseRedirect() {
+  const to = "/times-tables/";
+  const bounce = (req: { url?: string }, res: { statusCode: number; setHeader: (k: string, v: string) => void; end: () => void }, next: () => void) => {
+    const raw = req.url ?? "/";
+    const path = raw.split("?")[0];
+    if (path === "/" || path === "/index.html") {
+      const q = raw.includes("?") ? raw.slice(raw.indexOf("?")) : "";
+      res.statusCode = 302;
+      res.setHeader("Location", `${to}${q}`);
+      res.end();
+      return;
+    }
+    next();
+  };
+  return {
+    name: "base-redirect",
+    configureServer(server: { middlewares: { use: (fn: typeof bounce) => void } }) {
+      server.middlewares.use(bounce);
+    },
+    configurePreviewServer(server: { middlewares: { use: (fn: typeof bounce) => void } }) {
+      server.middlewares.use(bounce);
+    },
+  };
+}
+
 export default defineConfig({
   base: "/times-tables/",
-  plugins: [react(), tailwindcss(), spa404()],
+  plugins: [react(), tailwindcss(), spa404(), baseRedirect()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

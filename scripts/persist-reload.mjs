@@ -309,6 +309,47 @@ try {
   await leftoverPlayable(browser, rawBase, { width: 1280, height: 800 }, "click");
   await leftoverPlayable(browser, rawBase, { width: 1280, height: 800 }, "drag");
   console.log("leftover classroom card click+drag OK at 768 and 1280");
+
+  for (const vp of [
+    { width: 390, height: 844 },
+    { width: 1280, height: 800 },
+  ]) {
+    const ctx = await browser.newContext({ viewport: vp });
+    await ctx.addInitScript(seedStorage);
+    const p = await ctx.newPage();
+    p.setDefaultTimeout(12000);
+    const u = new URL(rawBase);
+    u.hash = "#/play/activity/u1-tally";
+    await p.goto(u.href, { waitUntil: "domcontentloaded" });
+    await p.waitForFunction(() => (document.querySelector("#app")?.innerText || "").length > 8, null, { timeout: 12000 });
+    const text = await p.locator("#app").innerText();
+    if (!/Sort every picture/i.test(text)) throw new Error(`tally ${vp.width} missing sort heading: ${text.slice(0, 200)}`);
+    if (await p.getByRole("button", { name: /^Check$/i }).count()) {
+      throw new Error(`tally ${vp.width} Check/keypad during sort`);
+    }
+    const rail = await p.locator("button.w-full.justify-start").count();
+    if (rail) throw new Error(`tally ${vp.width} ChoiceList rail during sort (${rail})`);
+    const srcs = await p.evaluate(() =>
+      [...document.querySelectorAll("#app img")].map((img) => img.getAttribute("src") || img.src).filter(Boolean),
+    );
+    const toys = srcs.filter((s) => /squishees\/[a-z0-9-]+\.(png|jpg)/i.test(s));
+    if (toys.length < 6) throw new Error(`tally ${vp.width} squishee imgs ${toys.length} srcs=${srcs.slice(0, 8).join(",")}`);
+    const origin = new URL(rawBase).origin;
+    const bad = [];
+    for (const src of [...new Set(toys)]) {
+      const abs = src.startsWith("http") ? src : origin + src;
+      const res = await p.request.get(abs);
+      if (res.status() !== 200) bad.push(`${abs}→${res.status()}`);
+    }
+    if (bad.length) throw new Error(`tally ${vp.width} img 404 ${bad.join(" ")}`);
+    const dead = await p.evaluate(() =>
+      [...document.querySelectorAll("#app span")].some((s) => (s.textContent || "").trim() === "?"),
+    );
+    if (dead) throw new Error(`tally ${vp.width} mascot died to ?`);
+    await p.screenshot({ path: join(shotDir, `tally-${vp.width}x${vp.height}.png`) });
+    await ctx.close();
+    console.log(`tally sort OK ${vp.width}x${vp.height} imgs=${toys.length}`);
+  }
 } finally {
   if (browser) await browser.close();
   if (preview) preview.kill();

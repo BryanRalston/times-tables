@@ -34,6 +34,14 @@ describe("leftover why-move gates", () => {
     expect(leftoverPanelOpen(money)).toBe(true);
     expect(leftoverSkipOpen(money)).toBe(true);
   });
+
+  it("hides graph collect ChoiceList until the tray is sorted", () => {
+    const waiting = { kind: "graph", needsInteract: true, interacted: false, status: "idle" as const };
+    expect(leftoverPanelOpen(waiting)).toBe(false);
+    expect(leftoverSkipOpen(waiting)).toBe(false);
+    expect(leftoverPanelOpen({ ...waiting, interacted: true })).toBe(true);
+    expect(leftoverSkipOpen({ ...waiting, interacted: true })).toBe(true);
+  });
 });
 
 describe("collect heading", () => {
@@ -42,9 +50,13 @@ describe("collect heading", () => {
     const d = q.data as GraphData;
     expect(q.prompt).toBe("Sort every picture.");
     expect(q.prompt).not.toMatch(/how many/i);
+    expect(cardHeading(q, false)).toBe("Sort every picture.");
     expect(cardHeading(q, false)).not.toMatch(/how many|which has/i);
     expect(d.readPrompt?.length).toBeGreaterThan(0);
     expect(cardHeading(q, true)).toBe(d.readPrompt);
+    expect(leftoverPanelOpen({ kind: q.kind, needsInteract: q.needsInteract, interacted: false, status: "idle" })).toBe(
+      false,
+    );
   });
 });
 

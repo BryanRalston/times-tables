@@ -27,6 +27,8 @@ if (!/<script(?![^>]*type=["']module["'])[^>]*>[\s\S]*?#\/play\/welcome/.test(ht
   fail("leftover boot must be a classic (non-module) script so it runs before React");
 }
 if (!existsSync(nojekyll)) fail("dist/.nojekyll missing");
+const catPng = resolve("dist/squishees/cat.png");
+if (!existsSync(catPng)) fail("dist/squishees/cat.png missing");
 
 console.log("check-pages OK dist/index.html");
 
@@ -47,6 +49,13 @@ try {
   } else {
     console.log(`check-pages OK live ${live}`);
   }
+  const assetUrl = new URL("squishees/cat.png", live.endsWith("/") ? live : `${live}/`).href;
+  const ac2 = new AbortController();
+  const t2 = setTimeout(() => ac2.abort(), 8000);
+  const img = await fetch(assetUrl, { signal: ac2.signal, redirect: "follow", method: "HEAD" });
+  clearTimeout(t2);
+  if (!img.ok) console.warn(`check-pages WARN live asset ${assetUrl} status=${img.status} (fail-open)`);
+  else console.log(`check-pages OK live asset ${assetUrl}`);
 } catch (e) {
   console.warn(`check-pages WARN live GET skipped: ${String(e).slice(0, 120)}`);
 }

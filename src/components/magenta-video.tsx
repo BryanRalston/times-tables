@@ -34,24 +34,33 @@ export function MagentaImg({
   className?: string;
   onLoad?: () => void;
 }) {
-  const [dead, setDead] = useState(false);
-  if (dead) {
-    return (
-      <span className={cn("grid place-items-center font-display text-3xl text-faint", className)} aria-hidden>
-        ?
-      </span>
-    );
-  }
+  const [cur, setCur] = useState(src);
+  useEffect(() => setCur(src), [src]);
   return (
     <img
-      src={src}
+      src={cur}
       alt={alt}
       draggable={false}
       className={cn("object-contain", className)}
       onLoad={onLoad}
-      onError={() => setDead(true)}
+      onError={() => {
+        const next = fallbackPublicSrc(cur);
+        if (next && next !== cur) setCur(next);
+      }}
     />
   );
+}
+
+/** If BASE_URL-prefixed public files 404 (dev opened at / not /times-tables/), retry the unprefixed path. */
+export function fallbackPublicSrc(src: string): string | null {
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+  if (base && (src.startsWith(`${base}/`) || src.includes(`${base}/`))) {
+    return src.replace(base, "") || null;
+  }
+  if (base && src.startsWith("/") && !src.startsWith(`${base}/`)) {
+    return `${base}${src}`;
+  }
+  return null;
 }
 
 export function MagentaVideo({

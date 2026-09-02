@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { skipPokeVideo } from "./magenta-video";
+import { fallbackPublicSrc, skipPokeVideo } from "./magenta-video";
 
 describe("MagentaVideo skip", () => {
   const nav = globalThis.navigator;
@@ -36,5 +36,13 @@ describe("MagentaVideo skip", () => {
       value: { matchMedia: (q: string) => ({ matches: q.includes("pointer: coarse") }) },
     });
     expect(skipPokeVideo()).toBe(true);
+  });
+});
+
+describe("MagentaImg public fallback", () => {
+  it("retries unprefixed public files if BASE_URL 404s", () => {
+    expect(fallbackPublicSrc("/times-tables/squishees/cat.png")).toBe("/squishees/cat.png");
+    expect(fallbackPublicSrc("/squishees/cat.png")).toBe("/times-tables/squishees/cat.png");
+    expect(fallbackPublicSrc("/times-tables/squishees/cat.png")).not.toBe("/times-tables/squishees/cat.png");
   });
 });
