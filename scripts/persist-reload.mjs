@@ -106,6 +106,49 @@ async function firstGotoLeftover(page, url) {
   return { check, dots };
 }
 
+async function assertBoardLayout(page, viewport) {
+  const board = page.locator("[data-leftover-board]");
+  const box = await board.boundingBox();
+  if (!box) throw new Error("leftover board has no box");
+  const cx = box.x + box.width / 2;
+  const mid = viewport.width / 2;
+  console.log(
+    `board ${viewport.width}x${viewport.height} x=${Math.round(box.x)} w=${Math.round(box.width)} h=${Math.round(box.height)} cx=${Math.round(cx)}`,
+  );
+  if (Math.abs(cx - mid) > Math.max(80, viewport.width * 0.12)) {
+    throw new Error(
+      `leftover not centered cx=${cx} vw=${viewport.width} x=${box.x} w=${box.width}`,
+    );
+  }
+  if (viewport.width <= 430) {
+    if (box.x + box.width > viewport.width + 8) {
+      throw new Error(`phone leftover overflow x=${box.x} w=${box.width} vw=${viewport.width}`);
+    }
+    if (box.width < 240) throw new Error(`phone leftover too narrow ${box.width}`);
+    return;
+  }
+  const minW = Math.min(420, viewport.width * 0.55);
+  if (box.width < minW) throw new Error(`leftover too narrow ${box.width} vw=${viewport.width}`);
+  if (box.height < 150) throw new Error(`leftover too short ${box.height}`);
+  if (box.width < viewport.width * 0.35 && box.x < viewport.width * 0.15) {
+    throw new Error(`postage-stamp leftover x=${box.x} w=${box.width} vw=${viewport.width}`);
+  }
+}
+
+async function assertKeypadOnScreen(page, viewport) {
+  const check = page.getByRole("button", { name: /^Check$/i });
+  await check.waitFor({ state: "visible", timeout: 3000 });
+  const box = await check.boundingBox();
+  if (!box) throw new Error("Check has no box");
+  if (box.x + box.width < 8 || box.x > viewport.width - 8) {
+    throw new Error(`Check off-screen x=${box.x} w=${box.width} vw=${viewport.width}`);
+  }
+  if (box.y + 8 < 0) throw new Error(`Check above viewport y=${box.y}`);
+  if (box.y > viewport.height) {
+    throw new Error(`Check below viewport y=${box.y} vh=${viewport.height}`);
+  }
+}
+
 async function dragKnown(page, dots) {
   const box = await dots.first().boundingBox();
   if (!box) throw new Error("known dot has no box");
@@ -139,6 +182,18 @@ async function assertFirstVisitLeftover(browser, url) {
   await takePage.waitForTimeout(450);
   if (!(await take.check.count())) throw new Error("leftover Check missing after take-all why-move");
   await takeCtx.close();
+
+  const clickCtx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  await clickCtx.addInitScript(watchCatalog);
+  const clickPage = await clickCtx.newPage();
+  clickPage.setDefaultTimeout(12000);
+  const click = await firstGotoLeftover(clickPage, url);
+  await click.dots.first().click({ force: true });
+  if (await click.check.count()) throw new Error("leftover Check present before why-move wait (mouse click)");
+  await clickPage.waitForTimeout(450);
+  if (!(await click.check.count())) throw new Error("leftover Check missing after mouse click why-move");
+  await assertKeypadOnScreen(clickPage, { width: 1280, height: 800 });
+  await clickCtx.close();
 }
 
 const preview = await ensurePreview();
@@ -172,7 +227,29 @@ try {
   console.log("persist-reload OK coins=12 name=Maya");
 
   await assertFirstVisitLeftover(browser, rawBase);
-  console.log("first-visit leftover OK first goto + drag + take-all");
+  console.log("first-visit leftover OK first goto + drag + take-all + mouse click");
+
+  for (const vp of [
+    { width: 390, height: 844 },
+    { width: 768, height: 1024 },
+    { width: 1024, height: 768 },
+    { width: 1280, height: 800 },
+    { width: 1440, height: 900 },
+  ]) {
+    const lay = await browser.newContext({ viewport: vp });
+    await lay.addInitScript(watchCatalog);
+    const p = await lay.newPage();
+    p.setDefaultTimeout(12000);
+    const first = await firstGotoLeftover(p, rawBase);
+    await assertBoardLayout(p, vp);
+    const catalog = await p.evaluate(() => window.__G3_CATALOG === true);
+    if (catalog) throw new Error(`catalog on ${vp.width} first goto`);
+    await first.dots.first().click({ force: true });
+    await p.waitForTimeout(450);
+    await assertKeypadOnScreen(p, vp);
+    await lay.close();
+    console.log(`leftover layout OK ${vp.width}x${vp.height}`);
+  }
 } finally {
   if (browser) await browser.close();
   if (preview) preview.kill();

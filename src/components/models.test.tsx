@@ -165,6 +165,8 @@ describe("boards", () => {
     expect(html).toContain('aria-label="dot"');
     expect(html).toContain("data-known-group");
     expect(html).toContain("known group");
+    expect(html).toContain("data-leftover-board");
+    expect(html).toContain("known-glow");
     expect(html).not.toContain('aria-label="empty"');
     expect(html).not.toContain("takeable");
     expect(html).toContain("6 + n = 10");
@@ -173,7 +175,11 @@ describe("boards", () => {
     const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "models.tsx"), "utf8");
     expect(src).toContain("data-known-group");
     expect(src).toContain("pointermove");
+    expect(src).toContain("pointerup");
     expect(src).toContain("bindTake");
+    expect(src).toContain("missTake");
+    expect(src).toContain("lg:size-12");
+    expect(src).toContain("onClick={takeGroup}");
   });
 
   it("after a correct leftover Check the board isolates n without an n is overlay", () => {

@@ -47,6 +47,9 @@ describe("first-visit leftover door", () => {
     expect(html).not.toContain("Take the dots you can see");
     expect(html).not.toContain("← Home");
     expect(html).not.toContain("Nice walk");
+    expect(html).toContain("place-content-center");
+    expect(html).toContain("data-leftover-board");
+    expect(html).not.toContain("lg:grid-cols-");
   });
 
   it("empty Guest at a catalog hash still opens leftover, not Lessons or Shelf", () => {
@@ -95,5 +98,8 @@ describe("first-visit leftover door", () => {
     expect(play).toContain('navigate({ id: "path" }');
     expect(play).toContain("quietWelcome");
     expect(play).toContain('kind === "welcome"');
+    expect(play).toContain("place-content-center");
+    expect(play).toContain("lg:max-w-3xl");
+    expect(play).toContain("grid-cols-1");
   });
 });

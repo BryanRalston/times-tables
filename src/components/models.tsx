@@ -99,16 +99,31 @@ export function Board(props: BoardProps) {
   }
 }
 
-function Frame({ children, shake, status }: { children: ReactNode; shake: number; status: BoardProps["status"] }) {
+function Frame({
+  children,
+  shake,
+  status,
+  leftover,
+  onMiss,
+}: {
+  children: ReactNode;
+  shake: number;
+  status: BoardProps["status"];
+  leftover?: boolean;
+  onMiss?: (e: { target: EventTarget | null }) => void;
+}) {
   return (
     <div
       key={shake}
       className={cn(
         "frost rounded-[24px] border p-4 shadow-soft sm:p-5",
+        leftover && "w-full lg:min-h-72 lg:p-8",
         status === "correct" && "border-good bg-good-soft",
         status === "wrong" && "border-bad shake",
         status === "idle" && "border-line",
       )}
+      {...(leftover ? { "data-leftover-board": "" } : {})}
+      onClick={onMiss}
     >
       {children}
     </div>
@@ -131,17 +146,18 @@ function Dot({
   onPointerDown?: (e: { clientX: number; clientY: number; pointerId: number; button: number }) => void;
 }) {
   const className = cn(
-    "size-6 rounded-full border sm:size-7",
+    "size-7 rounded-full border sm:size-8 lg:size-12",
     filled && !gone && "border-teal bg-teal",
     (!filled || gone) && "border-line bg-surface-2",
     leftover && isolate && "border-dashed border-star bg-star-soft",
     gone && "take-out",
-    onClick && filled && !gone && "hover:scale-95",
+    onClick && filled && !gone && "known-glow",
   );
   if (filled && !gone && onClick) {
     return (
       <button
         type="button"
+        draggable={false}
         onClick={onClick}
         onPointerDown={onPointerDown}
         className={className}
@@ -161,6 +177,7 @@ function Dot({
 function TenFrame({ question, onInteract, status, shake }: BoardProps) {
   const data = question.data as TenFrameData;
   const [taken, setTaken] = useState(false);
+  const [nudge, setNudge] = useState(0);
   const taking = useRef(false);
   const whyRef = useRef(0);
   const cells = Math.min(20, Math.max(data.total, data.shown));
@@ -185,27 +202,41 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
     const x = e.clientX;
     const y = e.clientY;
     const id = e.pointerId;
+    let dragged = false;
     const move = (ev: PointerEvent) => {
       if (ev.pointerId !== id) return;
       if (Math.hypot(ev.clientX - x, ev.clientY - y) >= 10) {
+        dragged = true;
         takeGroup();
         drop();
       }
     };
     const drop = () => {
       window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", drop);
+      window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", drop);
     };
+    const onUp = (ev: PointerEvent) => {
+      if (ev.pointerId !== id) return;
+      drop();
+      if (!dragged) takeGroup();
+    };
     window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", drop);
+    window.addEventListener("pointerup", onUp);
     window.addEventListener("pointercancel", drop);
   }
 
+  function missTake(e: { target: EventTarget | null }) {
+    if (taking.current || knownGone) return;
+    const el = e.target as HTMLElement | null;
+    if (el?.closest("[data-known-group]")) return;
+    setNudge((n) => n + 1);
+  }
+
   return (
-    <Frame shake={shake} status={status}>
-      <p className="mb-3 text-center font-display text-2xl sm:text-3xl">{data.equation}</p>
-      <div className="flex flex-col items-center gap-2">
+    <Frame shake={shake} status={status} leftover onMiss={missTake}>
+      <p className="mb-3 text-center font-display text-3xl sm:text-4xl lg:text-5xl">{data.equation}</p>
+      <div className="flex flex-col items-center gap-2 lg:gap-3">
         {Array.from({ length: rows }, (_, r) => {
           const start = r * perRow;
           const count = Math.min(perRow, Math.max(0, cells - start));
@@ -217,14 +248,19 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
           return (
             <div
               key={r}
-              className="flex flex-nowrap items-center justify-center gap-1 rounded-[16px] border border-line bg-bg-warm p-2"
+              className="flex flex-nowrap items-center justify-center gap-1.5 rounded-[16px] border border-line bg-bg-warm p-2 lg:gap-2 lg:p-3"
             >
               {known.length ? (
                 <div
                   data-known-group=""
                   role="group"
                   aria-label="known group"
-                  className="flex flex-nowrap items-center justify-center gap-1"
+                  className={cn(
+                    "flex flex-nowrap items-center justify-center gap-1.5 lg:gap-2",
+                    !knownGone && "known-idle",
+                    nudge ? "known-bounce" : null,
+                  )}
+                  key={nudge}
                   onPointerDown={bindTake}
                   onClick={takeGroup}
                 >

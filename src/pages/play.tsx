@@ -20,7 +20,7 @@ import { canAffordAnything, coinsForResult } from "@/lib/coins";
 import { playCorrect, playStar, playWrong, unlockAudio } from "@/lib/sound";
 import { schoolStreak } from "@/lib/streak";
 import type { ItemSource, Locale, Question } from "@/lib/types";
-import { keypadAllowsDot, pandaLine, questionCorrect } from "@/lib/utils";
+import { cn, keypadAllowsDot, pandaLine, questionCorrect } from "@/lib/utils";
 
 type Kind = "welcome" | "daily" | "activity";
 
@@ -385,7 +385,17 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   return (
     <div
-      className="mx-auto min-h-dvh max-w-lg overflow-x-hidden px-4 pb-8 pt-3 lg:max-w-5xl"
+      className={cn(
+        "mx-auto min-h-dvh overflow-x-hidden px-4",
+        quietWelcome
+          ? cn(
+              "grid w-full grid-cols-1 place-items-stretch gap-5 py-6",
+              showPanel
+                ? "max-w-lg content-start sm:max-w-2xl lg:max-w-5xl"
+                : "max-w-xl place-content-center sm:max-w-2xl lg:max-w-3xl",
+            )
+          : "max-w-lg pb-8 pt-3 lg:max-w-5xl",
+      )}
       {...(quietWelcome ? { "data-welcome-leftover": "1" } : {})}
     >
       {quietWelcome ? null : (
@@ -402,7 +412,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         </header>
       )}
 
-      <div className="flex items-end gap-2">
+      <div className={cn("flex", quietWelcome ? "flex-col items-center" : "items-end gap-2")}>
         <div className="relative">
           <Mascot who={who} pose={pose} hop={hop} size="md" />
           <StarPop show={star} />
@@ -420,7 +430,13 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         <p className="mb-1 text-center text-[11px] font-medium uppercase tracking-wide text-faint">{q.sol.join(" · ")}</p>
       ) : null}
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,22rem)] lg:items-start lg:gap-6">
+      <div
+        className={cn(
+          (!quietWelcome || showPanel) &&
+            "lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,22rem)] lg:items-start lg:gap-6",
+          quietWelcome && !showPanel && "mx-auto w-full min-w-0",
+        )}
+      >
         <div>
           {q.kind === "fluency" || q.kind === "word" || q.kind === "jumps" || (q.kind === "tenframe" && "equation" in (q.data as object) && (q.data as { equation?: string }).equation === q.prompt) || (q.kind === "money" && (q.data as { mode?: string }).mode === "make") ? null : (
             <h2 className="mb-3 text-center font-display text-xl leading-tight sm:text-2xl">
@@ -442,7 +458,13 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
           {q.kind === "word" || q.prompt.length > 70 ? <div className="mt-3"><ScratchPad /></div> : null}
         </div>
 
-        <div className="mt-4 lg:mt-0">
+        <div
+          className={cn(
+            "mt-4",
+            quietWelcome ? "mx-auto w-full max-w-sm" : "lg:mt-0",
+            quietWelcome && showPanel && "lg:mx-0 lg:mt-0 lg:max-w-none",
+          )}
+        >
           {showPanel ? (
             <AnswerPanel
               question={q}

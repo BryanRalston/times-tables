@@ -153,6 +153,45 @@
   animation: idle-bob 2.6s ease-in-out infinite;
 }
 
+@keyframes known-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(13 115 119 / 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgb(13 115 119 / 0);
+  }
+}
+.known-glow {
+  animation: known-glow 1.6s ease-out infinite;
+}
+.known-idle {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+@keyframes known-bounce {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-7px);
+  }
+  40% {
+    transform: translateX(7px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}
+.known-bounce {
+  animation: known-bounce 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
 @keyframes star-pop {
   0% {
     transform: scale(0) rotate(-18deg);
