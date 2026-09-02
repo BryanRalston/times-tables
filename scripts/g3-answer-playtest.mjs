@@ -168,6 +168,22 @@ async function waitApp(page) {
   await page.waitForFunction(() => (document.querySelector("#app")?.innerText || "").length > 8, null, { timeout: 12000 });
 }
 
+function watchCatalog() {
+  window.__G3_CATALOG = false;
+  const bad = /Play leftover|Start today's walk|The year map/;
+  const scan = () => {
+    const t = document.querySelector("#app")?.innerText || "";
+    if (t && bad.test(t)) window.__G3_CATALOG = true;
+  };
+  const start = () => {
+    const app = document.getElementById("app");
+    if (app) new MutationObserver(scan).observe(app, { childList: true, subtree: true, characterData: true });
+    scan();
+  };
+  if (document.body) start();
+  else document.addEventListener("DOMContentLoaded", start);
+}
+
 async function checkFirstVisit(page) {
   const row = { id: "first-visit-leftover", kind: "welcome", ui: "ok", fn: "ok", note: "", viewport: "fresh" };
   try {
@@ -186,6 +202,29 @@ async function checkFirstVisit(page) {
       row.fn = "fail";
       row.note = "empty Guest painted Home catalog";
       await shotFail(page, "first-visit-home");
+      return row;
+    }
+    const catalog = await page.evaluate(() => window.__G3_CATALOG === true);
+    const hash = await page.evaluate(() => location.hash);
+    if (catalog) {
+      row.ui = "fail";
+      row.fn = "fail";
+      row.note = "catalog flashed on first navigation";
+      await shotFail(page, "first-visit-flash");
+      return row;
+    }
+    if (hash !== "#/play/welcome") {
+      row.ui = "fail";
+      row.fn = "fail";
+      row.note = `hash ${hash} on first goto`;
+      await shotFail(page, "first-visit-hash");
+      return row;
+    }
+    if (/Your answer/i.test(text) || /\b1\/4\b/.test(text) || /Take the dots you can see/i.test(text)) {
+      row.ui = "fail";
+      row.fn = "fail";
+      row.note = "quiz chrome on leftover welcome";
+      await shotFail(page, "first-visit-chrome");
       return row;
     }
     const check = page.getByRole("button", { name: /^Check$/i });
@@ -509,7 +548,8 @@ async function miniDesk(page) {
   await waitApp(page);
   for (let n = 0; n < 6; n++) {
     const t = await page.locator("#app").innerText();
-    if (/Find the pairs|Who hid\?|Remember these toys|Poke the |Nice walk/i.test(t)) break;
+    if (/Number sense|Missing addend/i.test(t)) break;
+    if (/Remember these toys|Nice walk|You earned/i.test(t)) break;
     const hook = await qa(page);
     if (hook?.checkDisabled || hook?.needsInteract) {
       await interactIfNeeded(page);
@@ -525,18 +565,10 @@ async function miniDesk(page) {
   }
   await page.waitForTimeout(400);
   const t = await page.locator("#app").innerText();
-  const png = await page.evaluate(
-    () =>
-      [...document.querySelectorAll("#app img")].filter(
-        (img) => (img.getAttribute("src") || "").includes("squishees/") && img.naturalWidth > 0,
-      ).length,
-  );
-  const videos = await page.locator("video").count();
-  const emptyVid = await page.evaluate(() =>
-    [...document.querySelectorAll("video")].some((v) => !v.src && v.offsetWidth > 8),
-  );
-  const ok = /Find the pairs|Who hid\?|Remember these toys|Poke the |Nice walk/i.test(t) && !emptyVid;
-  return { ok, png, videos, emptyVid, snip: t.slice(0, 160).replace(/\s+/g, " ") };
+  const dump = /Remember these toys|Nice walk|You earned/i.test(t);
+  const path = /Number sense/i.test(t) && /Missing addend/i.test(t) && /\b12\b/.test(t);
+  const ok = path && !dump;
+  return { ok, png: 0, videos: 0, emptyVid: false, dump, snip: t.slice(0, 200).replace(/\s+/g, " ") };
 }
 
 const preview = await ensurePreview();
@@ -551,6 +583,7 @@ try {
 
 {
   const fresh = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  await fresh.addInitScript(watchCatalog);
   const page = await fresh.newPage();
   page.setDefaultTimeout(10000);
   const row = await checkFirstVisit(page);
@@ -601,15 +634,15 @@ for (const [name, viewport] of [
 
     try {
       const mini = await miniDesk(page);
-      const fail = !mini.ok || (mini.png === 0 && !/Nice walk/i.test(mini.snip));
+      const fail = !mini.ok;
       results.push({
-        id: "minigame-desk",
-        kind: "minigame",
+        id: "leftover-path",
+        kind: "path",
         ui: fail ? "fail" : "ok",
         fn: mini.ok ? "ok" : "fail",
-        note: `png=${mini.png} video=${mini.videos} emptyVid=${mini.emptyVid} ${mini.snip}`,
+        note: mini.snip,
       });
-      if (fail) await shotFail(page, "minigame-desk");
+      if (fail) await shotFail(page, "leftover-path");
     } catch (e) {
       results.push({ id: "minigame-desk", kind: "minigame", ui: "fail", fn: "fail", note: String(e).slice(0, 160) });
     }

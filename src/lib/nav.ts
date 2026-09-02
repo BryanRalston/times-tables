@@ -4,6 +4,7 @@ export type Route =
   | { id: "home" }
   | { id: "lessons" }
   | { id: "shelf" }
+  | { id: "path" }
   | { id: "play"; kind: "welcome" | "daily" | "activity"; activityId?: string }
   | { id: "unit"; unitId: string }
   | { id: "grownup" };
@@ -17,6 +18,7 @@ export function parseHash(hash: string): Route {
   const parts = h.split("/").filter(Boolean);
   if (parts[0] === "lessons") return { id: "lessons" };
   if (parts[0] === "shelf") return { id: "shelf" };
+  if (parts[0] === "path") return { id: "path" };
   if (parts[0] === "play") {
     if (parts[1] === "welcome") return { id: "play", kind: "welcome" };
     if (parts[1] === "daily") return { id: "play", kind: "daily" };
@@ -47,6 +49,7 @@ export function toHash(route: Route): string {
   if (route.id === "unit") return `#/unit/${route.unitId}`;
   if (route.id === "lessons") return "#/lessons";
   if (route.id === "shelf") return "#/shelf";
+  if (route.id === "path") return "#/path";
   if (route.id === "grownup") return "#/grownup";
   return "#/";
 }

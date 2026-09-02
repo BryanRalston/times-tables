@@ -65,7 +65,23 @@ async function launchBrowser() {
   }
 }
 
-async function assertFirstVisitLeftover(page, url) {
+function watchCatalog() {
+  window.__G3_CATALOG = false;
+  const bad = /Play leftover|Start today's walk|The year map/;
+  const scan = () => {
+    const t = document.querySelector("#app")?.innerText || "";
+    if (t && bad.test(t)) window.__G3_CATALOG = true;
+  };
+  const start = () => {
+    const app = document.getElementById("app");
+    if (app) new MutationObserver(scan).observe(app, { childList: true, subtree: true, characterData: true });
+    scan();
+  };
+  if (document.body) start();
+  else document.addEventListener("DOMContentLoaded", start);
+}
+
+async function firstGotoLeftover(page, url) {
   await page.goto(url, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => (document.querySelector("#app")?.innerText || "").length > 8, null, { timeout: 12000 });
   const text = await page.locator("#app").innerText();
@@ -73,6 +89,13 @@ async function assertFirstVisitLeftover(page, url) {
   if (/Play leftover/i.test(text)) throw new Error("first visit showed Play leftover CTA");
   if (/Start today's walk/i.test(text)) throw new Error("first visit showed today's walk CTA");
   if (/The year map/i.test(text)) throw new Error("first visit showed year map");
+  if (/Your answer/i.test(text)) throw new Error("first visit YOUR ANSWER chrome");
+  if (/\b1\/4\b/.test(text)) throw new Error("first visit 1/4 progress");
+  if (/Take the dots you can see/i.test(text)) throw new Error("first visit lecture caption");
+  const catalog = await page.evaluate(() => window.__G3_CATALOG === true);
+  if (catalog) throw new Error("catalog painted on first navigation (not leftover-first)");
+  const hash = await page.evaluate(() => location.hash);
+  if (hash !== "#/play/welcome") throw new Error(`first visit hash ${hash}, want #/play/welcome`);
   const check = page.getByRole("button", { name: /^Check$/i });
   if (await check.count()) throw new Error("first visit Check before why-move");
   const skip = page.getByRole("button", { name: /^Skip$/i });
@@ -80,10 +103,42 @@ async function assertFirstVisitLeftover(page, url) {
   const dots = page.getByRole("button", { name: "dot" });
   const n = await dots.count();
   if (n !== 6) throw new Error(`first visit knowns ${n}, want 6`);
-  await dots.first().click({ timeout: 1500 });
-  if (await check.count()) throw new Error("leftover Check present before why-move wait");
-  await page.waitForTimeout(450);
-  if (!(await check.count())) throw new Error("leftover Check missing after why-move");
+  return { check, dots };
+}
+
+async function dragKnown(page, dots) {
+  const box = await dots.first().boundingBox();
+  if (!box) throw new Error("known dot has no box");
+  const x = box.x + box.width / 2;
+  const y = box.y + box.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 48, y, { steps: 8 });
+  await page.mouse.up();
+}
+
+async function assertFirstVisitLeftover(browser, url) {
+  const dragCtx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  await dragCtx.addInitScript(watchCatalog);
+  const dragPage = await dragCtx.newPage();
+  dragPage.setDefaultTimeout(12000);
+  const drag = await firstGotoLeftover(dragPage, url);
+  await dragKnown(dragPage, drag.dots);
+  if (await drag.check.count()) throw new Error("leftover Check present before why-move wait (drag)");
+  await dragPage.waitForTimeout(450);
+  if (!(await drag.check.count())) throw new Error("leftover Check missing after drag why-move");
+  await dragCtx.close();
+
+  const takeCtx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  await takeCtx.addInitScript(watchCatalog);
+  const takePage = await takeCtx.newPage();
+  takePage.setDefaultTimeout(12000);
+  const take = await firstGotoLeftover(takePage, url);
+  await takePage.locator("[data-known-group]").first().click({ timeout: 1500 });
+  if (await take.check.count()) throw new Error("leftover Check present before why-move wait (take-all)");
+  await takePage.waitForTimeout(450);
+  if (!(await take.check.count())) throw new Error("leftover Check missing after take-all why-move");
+  await takeCtx.close();
 }
 
 const preview = await ensurePreview();
@@ -116,12 +171,8 @@ try {
   }
   console.log("persist-reload OK coins=12 name=Maya");
 
-  const fresh = await browser.newContext({ viewport: { width: 1280, height: 800 } });
-  const first = await fresh.newPage();
-  first.setDefaultTimeout(12000);
-  await assertFirstVisitLeftover(first, rawBase);
-  await fresh.close();
-  console.log("first-visit leftover OK 6 + n = 10");
+  await assertFirstVisitLeftover(browser, rawBase);
+  console.log("first-visit leftover OK first goto + drag + take-all");
 } finally {
   if (browser) await browser.close();
   if (preview) preview.kill();

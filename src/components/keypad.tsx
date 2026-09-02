@@ -68,6 +68,7 @@ export function Keypad({
   disabled,
   replace,
   allowDot = true,
+  quiet,
   className,
 }: {
   value: string;
@@ -76,6 +77,7 @@ export function Keypad({
   disabled?: boolean;
   replace?: boolean;
   allowDot?: boolean;
+  quiet?: boolean;
   className?: string;
 }) {
   const ui = useChrome();
@@ -87,7 +89,15 @@ export function Keypad({
 
   return (
     <div className={cn("space-y-3", className)}>
-      <AnswerReadout value={value} />
+      {quiet ? (
+        value ? (
+          <p className="text-center font-display text-5xl leading-tight tabular-nums" aria-live="polite">
+            {value}
+          </p>
+        ) : null
+      ) : (
+        <AnswerReadout value={value} />
+      )}
       <div className="grid w-full grid-cols-3 gap-2">
         {keys.map((k) => (
           <Button

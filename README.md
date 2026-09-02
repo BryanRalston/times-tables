@@ -39,7 +39,7 @@ The old single-file leftover page lives in `legacy/`.
 
 ## Play
 
-1. First visit: already on leftover `6 + n = 10` (What's hiding). Then Home and every lesson.
+1. First visit: already on leftover `6 + n = 10` (What's hiding) — no Home catalog, no reload. After that short run: Number sense Replay, Missing addend **12**. Then Home and every lesson.
 2. **Lessons** lists every unit. Calendar marks **Now**. It does not lock.
 3. **Start today's walk** — 8–12 new plus 3–5 review. Grown-ups set **class is on unit N** to change that suggestion only.
 4. Sort pictures, then read the graph you made. Take leftover dots you can see. Check is gated until that work is done.

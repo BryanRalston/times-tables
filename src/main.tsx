@@ -1,7 +1,10 @@
 import { createRoot } from "react-dom/client";
 import { App } from "@/app";
+import { applyFirstVisitHash } from "@/lib/first-visit";
 import { hydrateProgress } from "@/lib/progress";
 import "@/styles.css";
+
+applyFirstVisitHash();
 
 const el = document.getElementById("app");
 if (!el) throw new Error("missing #app");

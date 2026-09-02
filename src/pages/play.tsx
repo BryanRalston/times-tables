@@ -116,7 +116,6 @@ function sourceLabel(src: ItemSource | undefined, locale: Locale): string | null
 export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string }) {
   const sessions = useProgress((s) => s.sessions);
   const markWelcome = useProgress((s) => s.markWelcome);
-  const seenWelcome = useProgress((s) => s.seenWelcome);
   const recordRound = useProgress((s) => s.recordRound);
   const recordSession = useProgress((s) => s.recordSession);
   const noteFact = useProgress((s) => s.noteFact);
@@ -254,6 +253,10 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     setCoinsEarned(gained);
     playStar();
     setPose("star");
+    if (kind === "welcome") {
+      navigate({ id: "path" }, { replace: true });
+      return;
+    }
     setFinishPhase("play");
     setDone(true);
   }
@@ -374,32 +377,39 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   const pill = sourceLabel(q.source, locale);
   const gate = { kind: q.kind, needsInteract: q.needsInteract, interacted, status };
+  const quietWelcome = kind === "welcome";
   const showPanel = leftoverPanelOpen(gate);
-  const showSkip = leftoverSkipOpen(gate);
+  const showSkip = !quietWelcome && leftoverSkipOpen(gate);
   const speech = pandaLine(q, locale, pose === "oops" ? "wrong" : status);
+  const showSpeech = !quietWelcome || status === "wrong" || pose === "oops";
 
   return (
-    <div className="mx-auto min-h-dvh max-w-lg overflow-x-hidden px-4 pb-8 pt-3 lg:max-w-5xl">
-      <header className="mb-2 flex items-center gap-2">
-        {kind === "welcome" && !seenWelcome ? null : (
+    <div
+      className="mx-auto min-h-dvh max-w-lg overflow-x-hidden px-4 pb-8 pt-3 lg:max-w-5xl"
+      {...(quietWelcome ? { "data-welcome-leftover": "1" } : {})}
+    >
+      {quietWelcome ? null : (
+        <header className="mb-2 flex items-center gap-2">
           <button type="button" className="text-sm text-muted" onClick={() => navigate({ id: "home" })}>
             ← {ui.home}
           </button>
-        )}
-        <div className="mx-2 h-2 flex-1 overflow-hidden rounded-full bg-surface-2">
-          <div className="h-full bg-teal transition-[width] duration-300" style={{ width: `${(i / pack.items.length) * 100}%` }} />
-        </div>
-        <span className="text-xs tabular-nums text-muted">
-          {i + 1}/{pack.items.length}
-        </span>
-      </header>
+          <div className="mx-2 h-2 flex-1 overflow-hidden rounded-full bg-surface-2">
+            <div className="h-full bg-teal transition-[width] duration-300" style={{ width: `${(i / pack.items.length) * 100}%` }} />
+          </div>
+          <span className="text-xs tabular-nums text-muted">
+            {i + 1}/{pack.items.length}
+          </span>
+        </header>
+      )}
 
       <div className="flex items-end gap-2">
         <div className="relative">
           <Mascot who={who} pose={pose} hop={hop} size="md" />
           <StarPop show={star} />
         </div>
-        <p className="mb-4 max-w-[14rem] rounded-[18px] border border-line bg-surface px-3 py-2 text-sm">{speech}</p>
+        {showSpeech ? (
+          <p className="mb-4 max-w-[14rem] rounded-[18px] border border-line bg-surface px-3 py-2 text-sm">{speech}</p>
+        ) : null}
       </div>
 
       {pill ? (

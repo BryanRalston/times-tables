@@ -64,6 +64,7 @@ export function AnswerPanel({
       onCheck={() => onCheck()}
       disabled={disabled}
       replace={leftover}
+      quiet={leftover}
       allowDot={keypadAllowsDot(question)}
     />
   );

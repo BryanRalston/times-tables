@@ -2,6 +2,7 @@ import { COMMON_SQUISHEES, RARE_SQUISHEES, squisheeById } from "@/lib/squishees"
 
 export const COMMON_PRICE = 10;
 export const RARE_PRICE = 50;
+export const MISSING_ADDEND_PRICE = 12;
 
 export function coinsForResult(correct: number, total: number): number {
   const pct = total <= 0 ? 0 : correct / total;

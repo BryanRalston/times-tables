@@ -33,6 +33,9 @@ export type Ui = {
   skip: string;
   play: string;
   playLeftover: string;
+  numberSense: string;
+  missingAddend: string;
+  replay: string;
   startWalk: string;
   walkAgain: string;
   walkDone: string;
@@ -149,6 +152,9 @@ export const UI: Record<Locale, Ui> = {
     skip: "Skip",
     play: "Play",
     playLeftover: "Play leftover",
+    numberSense: "Number sense",
+    missingAddend: "Missing addend",
+    replay: "Replay",
     startWalk: "Start today's walk",
     walkAgain: "Walk again",
     walkDone: "Walk done",
@@ -271,6 +277,9 @@ export const UI: Record<Locale, Ui> = {
     skip: "Saltar",
     play: "Jugar",
     playLeftover: "Jugar a lo que se esconde",
+    numberSense: "Sentido numérico",
+    missingAddend: "Sumando que falta",
+    replay: "Otra vez",
     startWalk: "Empezar el paseo de hoy",
     walkAgain: "Pasear otra vez",
     walkDone: "Paseo listo",
@@ -393,6 +402,9 @@ export const UI: Record<Locale, Ui> = {
     skip: "Pular",
     play: "Jogar",
     playLeftover: "Jogar o que está escondido",
+    numberSense: "Sentido numérico",
+    missingAddend: "Parcela que falta",
+    replay: "De novo",
     startWalk: "Começar o passeio de hoje",
     walkAgain: "Passear de novo",
     walkDone: "Passeio feito",

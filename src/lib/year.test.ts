@@ -223,6 +223,7 @@ describe("nav", () => {
     expect(parseHash("#/grownup")).toEqual({ id: "grownup" });
     expect(parseHash("#/lessons")).toEqual({ id: "lessons" });
     expect(parseHash("#/shelf")).toEqual({ id: "shelf" });
+    expect(parseHash("#/path")).toEqual({ id: "path" });
     expect(parseHash("#/play/activity/u1-pictograph")).toEqual({
       id: "play",
       kind: "activity",
@@ -239,11 +240,13 @@ describe("nav", () => {
     expect(doorRoute(false, { id: "shelf" })).toEqual(leftover);
     expect(doorRoute(false, { id: "unit", unitId: "u1" })).toEqual(leftover);
     expect(doorRoute(false, { id: "play", kind: "daily" })).toEqual(leftover);
+    expect(doorRoute(false, { id: "path" })).toEqual(leftover);
     expect(doorRoute(false, leftover)).toEqual(leftover);
     expect(doorRoute(false, { id: "grownup" })).toEqual({ id: "grownup" });
     expect(doorRoute(true, { id: "home" })).toEqual({ id: "home" });
     expect(doorRoute(true, leftover)).toEqual(leftover);
     expect(doorRoute(true, { id: "lessons" })).toEqual({ id: "lessons" });
+    expect(doorRoute(true, { id: "path" })).toEqual({ id: "path" });
   });
 });
 

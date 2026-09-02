@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { activityById } from "@/lib/curriculum";
@@ -156,13 +159,21 @@ describe("boards", () => {
 
   it("leftover HTML does not leak n is answer while idle", () => {
     const q = welcomeFirst(rngFromSeed(1));
-    const html = renderToStaticMarkup(<Board {...stub(q)} status="idle" />);
+    const html = renderToStaticMarkup(<Board {...stub(q)} status="idle" value="5" />);
     expect(html).not.toContain(`n is ${q.answer}`);
     expect(html).toContain("6 + n = 10");
     expect(html).toContain('aria-label="dot"');
+    expect(html).toContain("data-known-group");
+    expect(html).toContain("known group");
     expect(html).not.toContain('aria-label="empty"');
     expect(html).not.toContain("takeable");
-    expect((html.match(/<button/g) ?? []).length).toBe(6);
+    expect(html).toContain("6 + n = 10");
+    expect(html).not.toContain(">5<");
+    expect((html.match(/aria-label="dot"/g) ?? []).length).toBe(6);
+    const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "models.tsx"), "utf8");
+    expect(src).toContain("data-known-group");
+    expect(src).toContain("pointermove");
+    expect(src).toContain("bindTake");
   });
 
   it("after a correct leftover Check the board isolates n without an n is overlay", () => {

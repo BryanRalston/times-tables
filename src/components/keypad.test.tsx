@@ -44,10 +44,11 @@ describe("leftover keypad", () => {
 
   it("omits the decimal on leftover replace-mode keys", () => {
     const html = renderToStaticMarkup(
-      <Keypad value="" onChange={() => undefined} onCheck={() => undefined} replace allowDot={false} />,
+      <Keypad value="" onChange={() => undefined} onCheck={() => undefined} replace allowDot={false} quiet />,
     );
     expect(html).not.toContain('aria-label="."');
     expect(html).toContain("Check");
+    expect(html).not.toContain("Your answer");
     const full = renderToStaticMarkup(
       <Keypad value="12" onChange={() => undefined} onCheck={() => undefined} />,
     );
@@ -78,6 +79,7 @@ describe("answer panel keypad", () => {
       <AnswerPanel question={leftover} value="" setValue={() => undefined} onCheck={() => undefined} />,
     );
     expect(leftHtml).not.toContain('aria-label="."');
+    expect(leftHtml).not.toContain("Your answer");
 
     const fluency = makeQuestion(activityById("u9-mix")!.activity, rngFromSeed("dot:flu"));
     const fluHtml = renderToStaticMarkup(

@@ -32,8 +32,9 @@ describe("first-visit leftover door", () => {
     const html = renderToStaticMarkup(<App />);
     expect(html).toContain("6 + n = 10");
     expect(html).toContain('aria-label="dot"');
+    expect(html).toContain("data-welcome-leftover");
+    expect(html).toContain("known group");
     expect((html.match(/aria-label="dot"/g) ?? []).length).toBe(6);
-    expect(html).toContain("Take the dots you can see");
     expect(html).not.toContain("Play leftover");
     expect(html).not.toMatch(/Start today(?:'|&#x27;)s walk/);
     expect(html).not.toContain("The year map.");
@@ -42,7 +43,10 @@ describe("first-visit leftover door", () => {
     expect(html).not.toContain("Check");
     expect(html).not.toContain("Skip");
     expect(html).not.toContain("Your answer");
+    expect(html).not.toContain("1/4");
+    expect(html).not.toContain("Take the dots you can see");
     expect(html).not.toContain("← Home");
+    expect(html).not.toContain("Nice walk");
   });
 
   it("empty Guest at a catalog hash still opens leftover, not Lessons or Shelf", () => {
@@ -72,7 +76,7 @@ describe("first-visit leftover door", () => {
     expect(html).not.toContain("6 + n = 10");
   });
 
-  it("Home is not a leftover CTA stacked on today's walk", () => {
+  it("Home is not a leftover CTA stacked on today's walk, and App never defaults to HomePage for unseen guests", () => {
     const src = readFileSync(join(HERE, "pages/home.tsx"), "utf8");
     expect(src).not.toContain("playLeftover");
     expect(src).not.toContain('kind: "welcome"');
@@ -81,5 +85,15 @@ describe("first-visit leftover door", () => {
     const app = readFileSync(join(HERE, "app.tsx"), "utf8");
     expect(app).toContain("doorRoute");
     expect(app).toContain("seenWelcome");
+    expect(app).toContain('!seenWelcome && route.id !== "grownup"');
+    expect(app).not.toMatch(/let page:\s*ReactNode\s*=\s*<HomePage/);
+    expect(app).not.toContain('navigate({ id: "play", kind: "welcome" }');
+    const main = readFileSync(join(HERE, "main.tsx"), "utf8");
+    expect(main.indexOf("applyFirstVisitHash")).toBeGreaterThan(-1);
+    expect(main.indexOf("applyFirstVisitHash")).toBeLessThan(main.indexOf("hydrateProgress"));
+    const play = readFileSync(join(HERE, "pages/play.tsx"), "utf8");
+    expect(play).toContain('navigate({ id: "path" }');
+    expect(play).toContain("quietWelcome");
+    expect(play).toContain('kind === "welcome"');
   });
 });

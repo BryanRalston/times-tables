@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { applyBuy, canAffordAnything, coinsForResult, COMMON_PRICE, RARE_PRICE, squisheePrice } from "./coins";
+import { applyBuy, canAffordAnything, coinsForResult, COMMON_PRICE, MISSING_ADDEND_PRICE, RARE_PRICE, squisheePrice } from "./coins";
 import { migrateSave } from "./progress";
 import type { LearnerSlice } from "./types";
 
 describe("coinsForResult", () => {
   it("matches the locked payouts", () => {
     expect(coinsForResult(4, 4)).toBe(12);
+    expect(MISSING_ADDEND_PRICE).toBe(12);
+    expect(coinsForResult(4, 4)).toBe(MISSING_ADDEND_PRICE);
     expect(coinsForResult(10, 10)).toBe(18);
     expect(coinsForResult(7, 10)).toBe(13);
     expect(coinsForResult(4, 10)).toBe(9);

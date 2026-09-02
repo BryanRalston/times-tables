@@ -1,11 +1,12 @@
 import { Component, type ErrorInfo, type ReactNode, useEffect } from "react";
 import { parseLocale } from "@/lib/i18n";
-import { doorRoute, navigate, useRoute } from "@/lib/nav";
+import { doorRoute, useRoute } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { unlockAudio } from "@/lib/sound";
 import { GrownupPage } from "@/pages/grownup";
 import { HomePage } from "@/pages/home";
 import { LessonsPage } from "@/pages/lessons";
+import { PathPage } from "@/pages/path";
 import { PlayPage } from "@/pages/play";
 import { ShelfPage } from "@/pages/shelf";
 import { UnitPage } from "@/pages/unit";
@@ -40,7 +41,6 @@ export function App() {
   const raw = useRoute();
   const seenWelcome = useProgress((s) => s.seenWelcome);
   const route = doorRoute(seenWelcome, raw);
-  const rawKind = raw.id === "play" ? raw.kind : "";
 
   useEffect(() => {
     const on = () => unlockAudio();
@@ -52,20 +52,18 @@ export function App() {
     document.documentElement.lang = locale;
   }, [locale]);
 
-  useEffect(() => {
-    if (seenWelcome) return;
-    if (raw.id === "grownup") return;
-    if (raw.id === "play" && rawKind === "welcome") return;
-    navigate({ id: "play", kind: "welcome" }, { replace: true });
-  }, [seenWelcome, raw.id, rawKind]);
-
-  let page: ReactNode = <HomePage />;
-  if (route.id === "play") {
-    page = <PlayPage key={`${route.kind}:${route.activityId ?? ""}`} kind={route.kind} activityId={route.activityId} />;
-  } else if (route.id === "unit") page = <UnitPage unitId={route.unitId} />;
+  let page: ReactNode;
+  if (!seenWelcome && route.id !== "grownup") {
+    page = <PlayPage key="welcome" kind="welcome" />;
+  } else if (route.id === "play") {
+    const playKey = route.kind === "welcome" ? "welcome" : `${route.kind}:${route.activityId ?? ""}`;
+    page = <PlayPage key={playKey} kind={route.kind} activityId={route.activityId} />;
+  } else if (route.id === "path") page = <PathPage />;
+  else if (route.id === "unit") page = <UnitPage unitId={route.unitId} />;
   else if (route.id === "lessons") page = <LessonsPage />;
   else if (route.id === "shelf") page = <ShelfPage />;
   else if (route.id === "grownup") page = <GrownupPage />;
+  else page = <HomePage />;
 
   return <BootError>{page}</BootError>;
 }

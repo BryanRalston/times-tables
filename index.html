@@ -21,6 +21,35 @@
         margin: 0;
       }
     </style>
+    <script>
+      (function () {
+        try {
+          var hash = location.hash || "";
+          if (hash.indexOf("play/welcome") !== -1 || hash.indexOf("grownup") !== -1) return;
+          var keys = ["g3-path-v2", "g3-path-v1", "times-tables-progress", "times-tables-settings"];
+          var seen = false;
+          for (var i = 0; i < keys.length; i++) {
+            var raw = localStorage.getItem(keys[i]);
+            if (!raw) continue;
+            var p = JSON.parse(raw);
+            var s = p && p.state && typeof p.state === "object" ? p.state : p;
+            if (!s) continue;
+            if (s.seenWelcome === true) {
+              seen = true;
+              break;
+            }
+            var id = s.learnerId || "kid-1";
+            if (s.learners && s.learners[id] && s.learners[id].seenWelcome === true) {
+              seen = true;
+              break;
+            }
+          }
+          if (!seen) {
+            history.replaceState(null, "", location.pathname + location.search + "#/play/welcome");
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>

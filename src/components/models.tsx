@@ -121,12 +121,14 @@ function Dot({
   leftover,
   isolate,
   onClick,
+  onPointerDown,
 }: {
   filled: boolean;
   gone?: boolean;
   leftover?: boolean;
   isolate?: boolean;
   onClick?: () => void;
+  onPointerDown?: (e: { clientX: number; clientY: number; pointerId: number; button: number }) => void;
 }) {
   const className = cn(
     "size-6 rounded-full border sm:size-7",
@@ -138,7 +140,13 @@ function Dot({
   );
   if (filled && !gone && onClick) {
     return (
-      <button type="button" onClick={onClick} className={className} aria-label="dot" />
+      <button
+        type="button"
+        onClick={onClick}
+        onPointerDown={onPointerDown}
+        className={className}
+        aria-label="dot"
+      />
     );
   }
   return (
@@ -171,6 +179,29 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
     whyRef.current = window.setTimeout(onInteract, leftoverWhyMoveMs());
   }
 
+  function bindTake(e: { clientX: number; clientY: number; pointerId: number; button: number }) {
+    if (taking.current || knownGone) return;
+    if (e.button && e.button !== 0) return;
+    const x = e.clientX;
+    const y = e.clientY;
+    const id = e.pointerId;
+    const move = (ev: PointerEvent) => {
+      if (ev.pointerId !== id) return;
+      if (Math.hypot(ev.clientX - x, ev.clientY - y) >= 10) {
+        takeGroup();
+        drop();
+      }
+    };
+    const drop = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", drop);
+      window.removeEventListener("pointercancel", drop);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", drop);
+    window.addEventListener("pointercancel", drop);
+  }
+
   return (
     <Frame shake={shake} status={status}>
       <p className="mb-3 text-center font-display text-2xl sm:text-3xl">{data.equation}</p>
@@ -188,9 +219,20 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
               key={r}
               className="flex flex-nowrap items-center justify-center gap-1 rounded-[16px] border border-line bg-bg-warm p-2"
             >
-              {known.map((i) => (
-                <Dot key={i} filled gone={knownGone} onClick={takeGroup} />
-              ))}
+              {known.length ? (
+                <div
+                  data-known-group=""
+                  role="group"
+                  aria-label="known group"
+                  className="flex flex-nowrap items-center justify-center gap-1"
+                  onPointerDown={bindTake}
+                  onClick={takeGroup}
+                >
+                  {known.map((i) => (
+                    <Dot key={i} filled gone={knownGone} onClick={takeGroup} onPointerDown={bindTake} />
+                  ))}
+                </div>
+              ) : null}
               {hiding.length ? (
                 <div
                   className="flex flex-col items-center"
