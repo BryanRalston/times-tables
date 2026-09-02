@@ -192,6 +192,31 @@
   animation: known-bounce 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
+[data-leftover-board] {
+  container-type: inline-size;
+  container-name: leftover;
+}
+[data-leftover-board] .leftover-eq {
+  font-size: clamp(1.875rem, 7.5cqi, 5.25rem);
+}
+[data-leftover-board] .leftover-dot {
+  width: clamp(1.75rem, min(10.5cqi, 12vh), 8.25rem);
+  height: clamp(1.75rem, min(10.5cqi, 12vh), 8.25rem);
+}
+[data-leftover-board] .leftover-row {
+  gap: clamp(0.35rem, 1.6cqi, 1.35rem);
+  padding: clamp(0.5rem, 1.8cqi, 1.35rem);
+}
+@media (min-width: 1024px) {
+  [data-welcome-leftover] [data-leftover-board] {
+    min-height: 100%;
+  }
+}
+[data-welcome-leftover][data-panel] [data-leftover-board] .leftover-dot {
+  width: clamp(1.75rem, min(8cqi, 8vh), 4.75rem);
+  height: clamp(1.75rem, min(8cqi, 8vh), 4.75rem);
+}
+
 @keyframes star-pop {
   0% {
     transform: scale(0) rotate(-18deg);

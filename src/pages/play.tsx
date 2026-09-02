@@ -382,37 +382,70 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const showSkip = !quietWelcome && leftoverSkipOpen(gate);
   const speech = pandaLine(q, locale, pose === "oops" ? "wrong" : status);
   const showSpeech = !quietWelcome || status === "wrong" || pose === "oops";
+  const board = (
+    <Board
+      key={q.id}
+      question={q}
+      value={value}
+      setValue={setValue}
+      interacted={interacted}
+      onInteract={() => setInteracted(true)}
+      status={status}
+      shake={shake}
+    />
+  );
+  const panel = showPanel ? (
+    <AnswerPanel
+      question={q}
+      value={value}
+      setValue={setValue}
+      onCheck={check}
+      disabled={status !== "idle" || Boolean(q.needsInteract && !interacted)}
+    />
+  ) : null;
+
+  if (quietWelcome) {
+    return (
+      <div
+        className={cn(
+          "mx-auto grid min-h-dvh w-full max-w-none grid-cols-1 place-content-center place-items-stretch gap-4 overflow-x-hidden px-4 py-5",
+          "lg:h-dvh lg:grid-rows-[auto_minmax(0,1fr)_auto] lg:place-content-stretch lg:gap-3 lg:px-8 lg:py-4",
+        )}
+        data-welcome-leftover="1"
+        {...(showPanel ? { "data-panel": "1" } : {})}
+      >
+        <div className="flex flex-col items-center">
+          <div className="relative">
+            <Mascot who={who} pose={pose} hop={hop} size="md" className="lg:h-20 lg:w-20" />
+            <StarPop show={star} />
+          </div>
+          {showSpeech ? (
+            <p className="mt-2 max-w-[14rem] rounded-[18px] border border-line bg-surface px-3 py-2 text-sm">{speech}</p>
+          ) : null}
+        </div>
+
+        <div className="flex h-full min-h-0 w-full items-stretch">{board}</div>
+
+        {panel ? <div className="mx-auto w-full max-w-sm lg:max-w-md">{panel}</div> : null}
+      </div>
+    );
+  }
 
   return (
-    <div
-      className={cn(
-        "mx-auto min-h-dvh overflow-x-hidden px-4",
-        quietWelcome
-          ? cn(
-              "grid w-full grid-cols-1 place-items-stretch gap-5 py-6",
-              showPanel
-                ? "max-w-lg content-start sm:max-w-2xl lg:max-w-5xl"
-                : "max-w-xl place-content-center sm:max-w-2xl lg:max-w-3xl",
-            )
-          : "max-w-lg pb-8 pt-3 lg:max-w-5xl",
-      )}
-      {...(quietWelcome ? { "data-welcome-leftover": "1" } : {})}
-    >
-      {quietWelcome ? null : (
-        <header className="mb-2 flex items-center gap-2">
-          <button type="button" className="text-sm text-muted" onClick={() => navigate({ id: "home" })}>
-            ← {ui.home}
-          </button>
-          <div className="mx-2 h-2 flex-1 overflow-hidden rounded-full bg-surface-2">
-            <div className="h-full bg-teal transition-[width] duration-300" style={{ width: `${(i / pack.items.length) * 100}%` }} />
-          </div>
-          <span className="text-xs tabular-nums text-muted">
-            {i + 1}/{pack.items.length}
-          </span>
-        </header>
-      )}
+    <div className="mx-auto min-h-dvh max-w-lg overflow-x-hidden px-4 pb-8 pt-3 lg:max-w-5xl">
+      <header className="mb-2 flex items-center gap-2">
+        <button type="button" className="text-sm text-muted" onClick={() => navigate({ id: "home" })}>
+          ← {ui.home}
+        </button>
+        <div className="mx-2 h-2 flex-1 overflow-hidden rounded-full bg-surface-2">
+          <div className="h-full bg-teal transition-[width] duration-300" style={{ width: `${(i / pack.items.length) * 100}%` }} />
+        </div>
+        <span className="text-xs tabular-nums text-muted">
+          {i + 1}/{pack.items.length}
+        </span>
+      </header>
 
-      <div className={cn("flex", quietWelcome ? "flex-col items-center" : "items-end gap-2")}>
+      <div className="flex items-end gap-2">
         <div className="relative">
           <Mascot who={who} pose={pose} hop={hop} size="md" />
           <StarPop show={star} />
@@ -430,13 +463,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         <p className="mb-1 text-center text-[11px] font-medium uppercase tracking-wide text-faint">{q.sol.join(" · ")}</p>
       ) : null}
 
-      <div
-        className={cn(
-          (!quietWelcome || showPanel) &&
-            "lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,22rem)] lg:items-start lg:gap-6",
-          quietWelcome && !showPanel && "mx-auto w-full min-w-0",
-        )}
-      >
+      <div className="lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,22rem)] lg:items-start lg:gap-6">
         <div>
           {q.kind === "fluency" || q.kind === "word" || q.kind === "jumps" || (q.kind === "tenframe" && "equation" in (q.data as object) && (q.data as { equation?: string }).equation === q.prompt) || (q.kind === "money" && (q.data as { mode?: string }).mode === "make") ? null : (
             <h2 className="mb-3 text-center font-display text-xl leading-tight sm:text-2xl">
@@ -444,36 +471,13 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
             </h2>
           )}
 
-          <Board
-            key={q.id}
-            question={q}
-            value={value}
-            setValue={setValue}
-            interacted={interacted}
-            onInteract={() => setInteracted(true)}
-            status={status}
-            shake={shake}
-          />
+          {board}
 
           {q.kind === "word" || q.prompt.length > 70 ? <div className="mt-3"><ScratchPad /></div> : null}
         </div>
 
-        <div
-          className={cn(
-            "mt-4",
-            quietWelcome ? "mx-auto w-full max-w-sm" : "lg:mt-0",
-            quietWelcome && showPanel && "lg:mx-0 lg:mt-0 lg:max-w-none",
-          )}
-        >
-          {showPanel ? (
-            <AnswerPanel
-              question={q}
-              value={value}
-              setValue={setValue}
-              onCheck={check}
-              disabled={status !== "idle" || Boolean(q.needsInteract && !interacted)}
-            />
-          ) : null}
+        <div className="mt-4 lg:mt-0">
+          {panel}
 
           {showSkip ? (
             <button type="button" className="mt-4 w-full text-center text-xs text-faint" onClick={skip}>

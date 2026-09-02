@@ -49,7 +49,10 @@ describe("first-visit leftover door", () => {
     expect(html).not.toContain("Nice walk");
     expect(html).toContain("place-content-center");
     expect(html).toContain("data-leftover-board");
+    expect(html).toContain("max-w-none");
+    expect(html).toContain("minmax(0,1fr)");
     expect(html).not.toContain("lg:grid-cols-");
+    expect(html).not.toContain("lg:max-w-3xl");
   });
 
   it("empty Guest at a catalog hash still opens leftover, not Lessons or Shelf", () => {
@@ -99,7 +102,9 @@ describe("first-visit leftover door", () => {
     expect(play).toContain("quietWelcome");
     expect(play).toContain('kind === "welcome"');
     expect(play).toContain("place-content-center");
-    expect(play).toContain("lg:max-w-3xl");
+    expect(play).toContain("max-w-none");
+    expect(play).toContain("minmax(0,1fr)");
     expect(play).toContain("grid-cols-1");
+    expect(play).not.toContain("lg:max-w-3xl");
   });
 });

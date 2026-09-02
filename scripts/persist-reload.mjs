@@ -1,6 +1,11 @@
 import { spawn } from "node:child_process";
+import { mkdirSync } from "node:fs";
 import { createConnection } from "node:net";
+import { join } from "node:path";
 import { chromium } from "playwright-core";
+
+const shotDir = join("scripts", "playtest-out");
+mkdirSync(shotDir, { recursive: true });
 
 const rawBase = process.env.PLAYTEST_URL ?? "http://127.0.0.1:4173/times-tables/";
 
@@ -112,10 +117,11 @@ async function assertBoardLayout(page, viewport) {
   if (!box) throw new Error("leftover board has no box");
   const cx = box.x + box.width / 2;
   const mid = viewport.width / 2;
+  const fill = box.width / viewport.width;
   console.log(
-    `board ${viewport.width}x${viewport.height} x=${Math.round(box.x)} w=${Math.round(box.width)} h=${Math.round(box.height)} cx=${Math.round(cx)}`,
+    `board ${viewport.width}x${viewport.height} x=${Math.round(box.x)} w=${Math.round(box.width)} h=${Math.round(box.height)} cx=${Math.round(cx)} fill=${fill.toFixed(2)}`,
   );
-  if (Math.abs(cx - mid) > Math.max(80, viewport.width * 0.12)) {
+  if (Math.abs(cx - mid) > Math.max(48, viewport.width * 0.08)) {
     throw new Error(
       `leftover not centered cx=${cx} vw=${viewport.width} x=${box.x} w=${box.width}`,
     );
@@ -124,15 +130,24 @@ async function assertBoardLayout(page, viewport) {
     if (box.x + box.width > viewport.width + 8) {
       throw new Error(`phone leftover overflow x=${box.x} w=${box.width} vw=${viewport.width}`);
     }
-    if (box.width < 240) throw new Error(`phone leftover too narrow ${box.width}`);
+    if (fill < 0.8) throw new Error(`phone leftover fill ${fill.toFixed(2)} w=${box.width}`);
     return;
   }
-  const minW = Math.min(420, viewport.width * 0.55);
-  if (box.width < minW) throw new Error(`leftover too narrow ${box.width} vw=${viewport.width}`);
-  if (box.height < 150) throw new Error(`leftover too short ${box.height}`);
-  if (box.width < viewport.width * 0.35 && box.x < viewport.width * 0.15) {
-    throw new Error(`postage-stamp leftover x=${box.x} w=${box.width} vw=${viewport.width}`);
+  if (fill < 0.7) {
+    throw new Error(
+      `leftover postcard fill ${fill.toFixed(2)} w=${box.width} vw=${viewport.width} (want ≥ 0.70)`,
+    );
   }
+  if (viewport.width >= 1280 && box.width < 900) {
+    throw new Error(`leftover too narrow at ${viewport.width}: w=${box.width} (want ≥ 900)`);
+  }
+  if (viewport.width >= 1920 && box.width < 1340) {
+    throw new Error(`leftover too narrow at ${viewport.width}: w=${box.width} (want ≥ 1340)`);
+  }
+  if (viewport.width >= 1024 && box.height < 280) {
+    throw new Error(`leftover too short at laptop h=${box.height} vh=${viewport.height}`);
+  }
+  if (box.height < 150) throw new Error(`leftover too short ${box.height}`);
 }
 
 async function assertKeypadOnScreen(page, viewport) {
@@ -235,6 +250,7 @@ try {
     { width: 1024, height: 768 },
     { width: 1280, height: 800 },
     { width: 1440, height: 900 },
+    { width: 1920, height: 1080 },
   ]) {
     const lay = await browser.newContext({ viewport: vp });
     await lay.addInitScript(watchCatalog);
@@ -242,11 +258,13 @@ try {
     p.setDefaultTimeout(12000);
     const first = await firstGotoLeftover(p, rawBase);
     await assertBoardLayout(p, vp);
+    await p.screenshot({ path: join(shotDir, `leftover-${vp.width}x${vp.height}.png`) });
     const catalog = await p.evaluate(() => window.__G3_CATALOG === true);
     if (catalog) throw new Error(`catalog on ${vp.width} first goto`);
     await first.dots.first().click({ force: true });
     await p.waitForTimeout(450);
     await assertKeypadOnScreen(p, vp);
+    await p.screenshot({ path: join(shotDir, `leftover-key-${vp.width}x${vp.height}.png`) });
     await lay.close();
     console.log(`leftover layout OK ${vp.width}x${vp.height}`);
   }

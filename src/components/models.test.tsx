@@ -179,6 +179,8 @@ describe("boards", () => {
     expect(src).toContain("bindTake");
     expect(src).toContain("missTake");
     expect(src).toContain("lg:size-12");
+    expect(src).toContain("leftover-dot");
+    expect(src).toContain("leftover-eq");
     expect(src).toContain("onClick={takeGroup}");
   });
 

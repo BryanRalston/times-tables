@@ -117,7 +117,7 @@ function Frame({
       key={shake}
       className={cn(
         "frost rounded-[24px] border p-4 shadow-soft sm:p-5",
-        leftover && "w-full lg:min-h-72 lg:p-8",
+        leftover && "flex h-full w-full min-h-0 flex-col justify-center lg:min-h-72 lg:p-8 xl:p-10",
         status === "correct" && "border-good bg-good-soft",
         status === "wrong" && "border-bad shake",
         status === "idle" && "border-line",
@@ -137,6 +137,7 @@ function Dot({
   isolate,
   onClick,
   onPointerDown,
+  className: extra,
 }: {
   filled: boolean;
   gone?: boolean;
@@ -144,9 +145,11 @@ function Dot({
   isolate?: boolean;
   onClick?: () => void;
   onPointerDown?: (e: { clientX: number; clientY: number; pointerId: number; button: number }) => void;
+  className?: string;
 }) {
   const className = cn(
-    "size-7 rounded-full border sm:size-8 lg:size-12",
+    "size-7 rounded-full border sm:size-8 lg:size-12 leftover-dot",
+    extra,
     filled && !gone && "border-teal bg-teal",
     (!filled || gone) && "border-line bg-surface-2",
     leftover && isolate && "border-dashed border-star bg-star-soft",
@@ -235,8 +238,8 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
 
   return (
     <Frame shake={shake} status={status} leftover onMiss={missTake}>
-      <p className="mb-3 text-center font-display text-3xl sm:text-4xl lg:text-5xl">{data.equation}</p>
-      <div className="flex flex-col items-center gap-2 lg:gap-3">
+      <p className="leftover-eq mb-3 text-center font-display text-3xl sm:text-4xl lg:text-5xl">{data.equation}</p>
+      <div className="flex flex-col items-center justify-center gap-2 lg:gap-4">
         {Array.from({ length: rows }, (_, r) => {
           const start = r * perRow;
           const count = Math.min(perRow, Math.max(0, cells - start));
@@ -248,7 +251,7 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
           return (
             <div
               key={r}
-              className="flex flex-nowrap items-center justify-center gap-1.5 rounded-[16px] border border-line bg-bg-warm p-2 lg:gap-2 lg:p-3"
+              className="leftover-row flex w-full flex-nowrap items-center justify-center gap-1.5 rounded-[16px] border border-line bg-bg-warm p-2 lg:gap-2 lg:p-3"
             >
               {known.length ? (
                 <div
@@ -257,6 +260,7 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
                   aria-label="known group"
                   className={cn(
                     "flex flex-nowrap items-center justify-center gap-1.5 lg:gap-2",
+                    known.length === perRow && "w-full justify-evenly",
                     !knownGone && "known-idle",
                     nudge ? "known-bounce" : null,
                   )}
