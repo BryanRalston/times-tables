@@ -29,6 +29,14 @@ export function parseHash(hash: string): Route {
   return { id: "home" };
 }
 
+/** Empty Guest (`seenWelcome: false`) opens already on leftover, not Home catalog. Grown-ups stay reachable. */
+export function doorRoute(seenWelcome: boolean, route: Route): Route {
+  if (seenWelcome) return route;
+  if (route.id === "grownup") return route;
+  if (route.id === "play" && route.kind === "welcome") return route;
+  return { id: "play", kind: "welcome" };
+}
+
 export function toHash(route: Route): string {
   if (route.id === "play") {
     if (route.kind === "activity" && route.activityId) {

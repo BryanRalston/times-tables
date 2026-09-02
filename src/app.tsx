@@ -1,6 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode, useEffect } from "react";
 import { parseLocale } from "@/lib/i18n";
-import { useRoute } from "@/lib/nav";
+import { doorRoute, navigate, useRoute } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { unlockAudio } from "@/lib/sound";
 import { GrownupPage } from "@/pages/grownup";
@@ -37,7 +37,10 @@ class BootError extends Component<{ children: ReactNode }, { message: string | n
 
 export function App() {
   const locale = parseLocale(useProgress((s) => s.locale));
-  const route = useRoute();
+  const raw = useRoute();
+  const seenWelcome = useProgress((s) => s.seenWelcome);
+  const route = doorRoute(seenWelcome, raw);
+  const rawKind = raw.id === "play" ? raw.kind : "";
 
   useEffect(() => {
     const on = () => unlockAudio();
@@ -48,6 +51,13 @@ export function App() {
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
+
+  useEffect(() => {
+    if (seenWelcome) return;
+    if (raw.id === "grownup") return;
+    if (raw.id === "play" && rawKind === "welcome") return;
+    navigate({ id: "play", kind: "welcome" }, { replace: true });
+  }, [seenWelcome, raw.id, rawKind]);
 
   let page: ReactNode = <HomePage />;
   if (route.id === "play") {

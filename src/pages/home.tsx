@@ -17,7 +17,6 @@ export function HomePage() {
   const skipWeekend = useProgress((s) => s.skipWeekend);
   const shaky = useProgress((s) => s.shaky);
   const sessions = useProgress((s) => s.sessions);
-  const seenWelcome = useProgress((s) => s.seenWelcome);
   const learnerId = useProgress((s) => s.learnerId);
   const attempts = useProgress((s) => s.attempts);
   const locale = parseLocale(useProgress((s) => s.locale));
@@ -47,22 +46,6 @@ export function HomePage() {
     <div className="mx-auto min-h-dvh max-w-xl px-4 pb-16 pt-4">
       <AppHeader />
       <AppTabs active="home" />
-
-      {!seenWelcome ? (
-        <section className="frost mb-5 rounded-[24px] border border-teal p-4 shadow-soft">
-          <div className="flex items-center gap-3">
-            <PokeToy id="cat" size="md" className="h-24 w-24" />
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-teal">{ui.startHere}</p>
-              <h2 className="font-display text-xl leading-tight">{ui.whatsHiding}</h2>
-              <p className="mt-1 text-sm text-muted">{ui.leftoverBlurb}</p>
-              <Button className="mt-3 w-full" size="lg" onClick={() => navigate({ id: "play", kind: "welcome" })}>
-                {ui.playLeftover}
-              </Button>
-            </div>
-          </div>
-        </section>
-      ) : null}
 
       <section className="frost mb-6 rounded-[24px] border border-line p-4 shadow-soft">
         <div className="flex items-center gap-3">

@@ -65,6 +65,27 @@ async function launchBrowser() {
   }
 }
 
+async function assertFirstVisitLeftover(page, url) {
+  await page.goto(url, { waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => (document.querySelector("#app")?.innerText || "").length > 8, null, { timeout: 12000 });
+  const text = await page.locator("#app").innerText();
+  if (!text.includes("6 + n = 10")) throw new Error(`first visit missing leftover board: ${text.slice(0, 220)}`);
+  if (/Play leftover/i.test(text)) throw new Error("first visit showed Play leftover CTA");
+  if (/Start today's walk/i.test(text)) throw new Error("first visit showed today's walk CTA");
+  if (/The year map/i.test(text)) throw new Error("first visit showed year map");
+  const check = page.getByRole("button", { name: /^Check$/i });
+  if (await check.count()) throw new Error("first visit Check before why-move");
+  const skip = page.getByRole("button", { name: /^Skip$/i });
+  if (await skip.count()) throw new Error("first visit Skip before why-move");
+  const dots = page.getByRole("button", { name: "dot" });
+  const n = await dots.count();
+  if (n !== 6) throw new Error(`first visit knowns ${n}, want 6`);
+  await dots.first().click({ timeout: 1500 });
+  if (await check.count()) throw new Error("leftover Check present before why-move wait");
+  await page.waitForTimeout(450);
+  if (!(await check.count())) throw new Error("leftover Check missing after why-move");
+}
+
 const preview = await ensurePreview();
 let browser;
 try {
@@ -94,6 +115,13 @@ try {
     throw new Error(`after reload coins=${coins2} stored=${stored} heading=${heading2}`);
   }
   console.log("persist-reload OK coins=12 name=Maya");
+
+  const fresh = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const first = await fresh.newPage();
+  first.setDefaultTimeout(12000);
+  await assertFirstVisitLeftover(first, rawBase);
+  await fresh.close();
+  console.log("first-visit leftover OK 6 + n = 10");
 } finally {
   if (browser) await browser.close();
   if (preview) preview.kill();

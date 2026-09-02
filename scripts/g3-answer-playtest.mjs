@@ -168,6 +168,73 @@ async function waitApp(page) {
   await page.waitForFunction(() => (document.querySelector("#app")?.innerText || "").length > 8, null, { timeout: 12000 });
 }
 
+async function checkFirstVisit(page) {
+  const row = { id: "first-visit-leftover", kind: "welcome", ui: "ok", fn: "ok", note: "", viewport: "fresh" };
+  try {
+    await page.goto(rawBase, { waitUntil: "domcontentloaded" });
+    await waitApp(page);
+    const text = await page.locator("#app").innerText();
+    if (!text.includes("6 + n = 10")) {
+      row.ui = "fail";
+      row.fn = "fail";
+      row.note = `missing leftover board: ${text.slice(0, 180).replace(/\s+/g, " ")}`;
+      await shotFail(page, "first-visit");
+      return row;
+    }
+    if (/Play leftover/i.test(text) || /Start today's walk/i.test(text) || /The year map/i.test(text)) {
+      row.ui = "fail";
+      row.fn = "fail";
+      row.note = "empty Guest painted Home catalog";
+      await shotFail(page, "first-visit-home");
+      return row;
+    }
+    const check = page.getByRole("button", { name: /^Check$/i });
+    if (await check.count()) {
+      row.ui = "fail";
+      row.fn = "fail";
+      row.note = "leftover Check present before why-move";
+      await shotFail(page, "first-visit-check");
+      return row;
+    }
+    const dots = page.getByRole("button", { name: "dot" });
+    const n = await dots.count();
+    if (n !== 6) {
+      row.ui = "fail";
+      row.fn = "fail";
+      row.note = `known group dots ${n}`;
+      await shotFail(page, "first-visit-dots");
+      return row;
+    }
+    await dots.first().click({ timeout: 1500 });
+    if (await check.count()) {
+      row.ui = "fail";
+      row.fn = "fail";
+      row.note = "leftover Check present before why-move wait";
+      await shotFail(page, "first-visit-why");
+      return row;
+    }
+    await page.waitForTimeout(450);
+    if (!(await check.count())) {
+      row.ui = "fail";
+      row.fn = "fail";
+      row.note = "leftover Check missing after why-move";
+      await shotFail(page, "first-visit-after");
+      return row;
+    }
+    row.note = "6 + n = 10, 6 dots, Check after why-move";
+  } catch (e) {
+    row.ui = "fail";
+    row.fn = "fail";
+    row.note = String(e).slice(0, 180);
+    try {
+      await shotFail(page, "first-visit-err");
+    } catch {
+      /* ignore */
+    }
+  }
+  return row;
+}
+
 async function qa(page) {
   return page.evaluate(() => window.__G3_Q ?? null);
 }
@@ -480,6 +547,16 @@ try {
 } catch (e) {
   if (preview) preview.kill();
   throw e;
+}
+
+{
+  const fresh = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const page = await fresh.newPage();
+  page.setDefaultTimeout(10000);
+  const row = await checkFirstVisit(page);
+  results.push(row);
+  process.stdout.write(`fresh first-visit-leftover ui=${row.ui} fn=${row.fn} ${row.note}\n`);
+  await fresh.close();
 }
 
 for (const [name, viewport] of [

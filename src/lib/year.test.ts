@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { SCHOOL_DAYS, isSchoolDay, prevSchoolDay, weekdayName } from "./calendar";
 import { GRADE3_SOLS, UNITS, WELCOME_ACTIVITY, activityById, coversSol, fluencyFactorsForUnit, suggestedUnitId, unitById } from "./curriculum";
 import { makeDailyWalk } from "./daily";
-import { parseHash } from "./nav";
+import { doorRoute, parseHash } from "./nav";
 import { isUnitOpen, unitStatus } from "./path";
 import { qCopy, UI } from "./i18n";
 import { makeActivityRound, makeQuestion, makeWelcomeRound, placeOnGraph, welcomeFirst, wordForm } from "./questions";
@@ -215,6 +215,7 @@ describe("streak", () => {
 describe("nav", () => {
   it("parses hash routes", () => {
     expect(parseHash("")).toEqual({ id: "home" });
+    expect(parseHash("#/")).toEqual({ id: "home" });
     expect(parseHash("#/play/welcome")).toEqual({ id: "play", kind: "welcome" });
     expect(parseHash("#/play/daily")).toEqual({ id: "play", kind: "daily" });
     expect(parseHash("#/play/activity/u3-groups")).toEqual({ id: "play", kind: "activity", activityId: "u3-groups" });
@@ -227,6 +228,22 @@ describe("nav", () => {
       kind: "activity",
       activityId: "u1-graph",
     });
+  });
+
+  it("sends an empty Guest from Home (and catalog hashes) onto leftover, not a two-CTA Home", () => {
+    const leftover = { id: "play" as const, kind: "welcome" as const };
+    expect(doorRoute(false, { id: "home" })).toEqual(leftover);
+    expect(doorRoute(false, parseHash(""))).toEqual(leftover);
+    expect(doorRoute(false, parseHash("#/"))).toEqual(leftover);
+    expect(doorRoute(false, { id: "lessons" })).toEqual(leftover);
+    expect(doorRoute(false, { id: "shelf" })).toEqual(leftover);
+    expect(doorRoute(false, { id: "unit", unitId: "u1" })).toEqual(leftover);
+    expect(doorRoute(false, { id: "play", kind: "daily" })).toEqual(leftover);
+    expect(doorRoute(false, leftover)).toEqual(leftover);
+    expect(doorRoute(false, { id: "grownup" })).toEqual({ id: "grownup" });
+    expect(doorRoute(true, { id: "home" })).toEqual({ id: "home" });
+    expect(doorRoute(true, leftover)).toEqual(leftover);
+    expect(doorRoute(true, { id: "lessons" })).toEqual({ id: "lessons" });
   });
 });
 
