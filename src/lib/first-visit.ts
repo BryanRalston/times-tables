@@ -1,4 +1,5 @@
 import { parseHash } from "./nav";
+import { isPhoneViewport } from "./viewport";
 
 export const WELCOME_HASH = "#/play/welcome";
 export const SAVE_KEYS = ["g3-path-v2", "g3-path-v1", "times-tables-progress", "times-tables-settings"] as const;
@@ -37,8 +38,9 @@ export function storageShowsWelcome(ls: Pick<Storage, "getItem"> | null | undefi
   return false;
 }
 
-/** Empty Guest catalog hashes become leftover. Grown-ups stay. Already-welcome hash stays. */
-export function shouldOpenLeftover(hash: string, seenWelcome: boolean): boolean {
+/** Phone empty Guest catalog hashes become leftover. Tablet/laptop keep the full app. Grown-ups stay. Already-welcome hash stays. */
+export function shouldOpenLeftover(hash: string, seenWelcome: boolean, phone = true): boolean {
+  if (!phone) return false;
   if (seenWelcome) return false;
   const route = parseHash(hash);
   if (route.id === "grownup") return false;
@@ -46,12 +48,13 @@ export function shouldOpenLeftover(hash: string, seenWelcome: boolean): boolean 
   return true;
 }
 
-/** Set leftover hash before React can paint Home. No-op if already there or they have seen welcome. */
+/** Phone only: set leftover hash before React can paint Home. No-op at 768px and up. */
 export function applyFirstVisitHash(): boolean {
   if (typeof window === "undefined") return false;
   try {
     const seen = storageShowsWelcome(window.localStorage);
-    if (!shouldOpenLeftover(window.location.hash, seen)) return false;
+    const phone = isPhoneViewport();
+    if (!shouldOpenLeftover(window.location.hash, seen, phone)) return false;
     const next = `${window.location.pathname}${window.location.search}${WELCOME_HASH}`;
     window.history.replaceState(null, "", next);
     return true;

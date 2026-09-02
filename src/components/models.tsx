@@ -117,7 +117,7 @@ function Frame({
       key={shake}
       className={cn(
         "frost rounded-[24px] border p-4 shadow-soft sm:p-5",
-        leftover && "flex h-full w-full min-h-0 min-w-0 flex-col justify-center md:min-h-72 md:p-8 xl:p-10",
+        leftover && "flex w-full flex-col justify-center",
         status === "correct" && "border-good bg-good-soft",
         status === "wrong" && "border-bad shake",
         status === "idle" && "border-line",

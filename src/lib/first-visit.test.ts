@@ -3,10 +3,19 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { saveShowsWelcome, shouldOpenLeftover, WELCOME_HASH } from "./first-visit";
+import { isPhoneViewport, PHONE_MAX_PX } from "./viewport";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 describe("first-visit leftover hash", () => {
+  it("treats 390 as phone leftover door and 768+ as full app", () => {
+    expect(PHONE_MAX_PX).toBe(767);
+    expect(isPhoneViewport(390)).toBe(true);
+    expect(isPhoneViewport(767)).toBe(true);
+    expect(isPhoneViewport(768)).toBe(false);
+    expect(isPhoneViewport(1280)).toBe(false);
+  });
+
   it("treats empty and unseen saves as leftover, and seenWelcome as Home", () => {
     expect(saveShowsWelcome(null)).toBe(false);
     expect(saveShowsWelcome({})).toBe(false);
@@ -19,6 +28,9 @@ describe("first-visit leftover hash", () => {
     expect(shouldOpenLeftover("#/play/welcome", false)).toBe(false);
     expect(shouldOpenLeftover("#/grownup", false)).toBe(false);
     expect(shouldOpenLeftover("#/", true)).toBe(false);
+    expect(shouldOpenLeftover("#/", false, false)).toBe(false);
+    expect(shouldOpenLeftover("#/lessons", false, false)).toBe(false);
+    expect(shouldOpenLeftover("#/", false, true)).toBe(true);
   });
 
   it("index.html boot script sets leftover hash before the React module", () => {
@@ -31,6 +43,8 @@ describe("first-visit leftover hash", () => {
     expect(html).toContain("seenWelcome");
     expect(html).toContain("history.replaceState");
     expect(html).toContain(WELCOME_HASH);
+    expect(html).toContain(`max-width: ${PHONE_MAX_PX}px`);
+    expect(html).toMatch(/matchMedia\("\(max-width: 767px\)"\)/);
     expect(html.indexOf("<script>")).toBeLessThan(html.indexOf('type="module"'));
   });
 });

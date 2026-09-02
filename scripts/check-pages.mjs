@@ -20,6 +20,9 @@ if (html.includes("%BASE_URL%")) fail("dist/index.html still has unsubstituted %
 if (!html.includes("#/play/welcome") || !html.includes("g3-path-v2") || !html.includes("seenWelcome") || !html.includes("history.replaceState")) {
   fail("dist/index.html missing first-visit leftover boot script");
 }
+if (!html.includes("max-width: 767px") || !html.includes("matchMedia")) {
+  fail("leftover boot must skip replaceState to #/play/welcome at 768px and up");
+}
 if (!/<script(?![^>]*type=["']module["'])[^>]*>[\s\S]*?#\/play\/welcome/.test(html)) {
   fail("leftover boot must be a classic (non-module) script so it runs before React");
 }

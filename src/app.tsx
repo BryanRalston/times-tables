@@ -1,6 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode, useEffect } from "react";
 import { parseLocale } from "@/lib/i18n";
-import { doorRoute, useRoute } from "@/lib/nav";
+import { doorRoute, usePhoneDoor, useRoute } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { unlockAudio } from "@/lib/sound";
 import { GrownupPage } from "@/pages/grownup";
@@ -40,7 +40,8 @@ export function App() {
   const locale = parseLocale(useProgress((s) => s.locale));
   const raw = useRoute();
   const seenWelcome = useProgress((s) => s.seenWelcome);
-  const route = doorRoute(seenWelcome, raw);
+  const phone = usePhoneDoor();
+  const route = doorRoute(seenWelcome, raw, phone);
 
   useEffect(() => {
     const on = () => unlockAudio();
@@ -53,9 +54,7 @@ export function App() {
   }, [locale]);
 
   let page: ReactNode;
-  if (!seenWelcome && route.id !== "grownup") {
-    page = <PlayPage key="welcome" kind="welcome" />;
-  } else if (route.id === "play") {
+  if (route.id === "play") {
     const playKey = route.kind === "welcome" ? "welcome" : `${route.kind}:${route.activityId ?? ""}`;
     page = <PlayPage key={playKey} kind={route.kind} activityId={route.activityId} />;
   } else if (route.id === "path") page = <PathPage />;

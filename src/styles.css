@@ -198,36 +198,24 @@
   container-type: inline-size;
   container-name: leftover;
 }
-[data-leftover-board] .leftover-eq {
-  font-size: clamp(1.875rem, 7.5cqi, 5.25rem);
-}
-[data-leftover-board] .leftover-dot {
-  width: clamp(1.75rem, min(10.5cqi, 12vh), 8.25rem);
-  height: clamp(1.75rem, min(10.5cqi, 12vh), 8.25rem);
-}
-[data-leftover-board] .leftover-row {
-  gap: clamp(0.35rem, 1.6cqi, 1.35rem);
-  padding: clamp(0.5rem, 1.8cqi, 1.35rem);
-}
 [data-welcome-leftover] {
   width: 100%;
   max-width: none;
 }
-@media (min-width: 768px) {
-  [data-welcome-leftover] {
-    height: 100dvh;
-    min-height: 100dvh;
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    place-content: stretch;
-  }
-  [data-welcome-leftover] [data-leftover-board] {
-    width: 100%;
-    min-height: 100%;
-  }
+[data-welcome-leftover] [data-leftover-board] .leftover-eq {
+  font-size: clamp(1.875rem, 7.5cqi, 3.5rem);
+}
+[data-welcome-leftover] [data-leftover-board] .leftover-dot {
+  width: clamp(1.75rem, min(10.5cqi, 12vh), 3.5rem);
+  height: clamp(1.75rem, min(10.5cqi, 12vh), 3.5rem);
+}
+[data-welcome-leftover] [data-leftover-board] .leftover-row {
+  gap: clamp(0.35rem, 1.6cqi, 1.35rem);
+  padding: clamp(0.5rem, 1.8cqi, 1.35rem);
 }
 [data-welcome-leftover][data-panel] [data-leftover-board] .leftover-dot {
-  width: clamp(1.75rem, min(8cqi, 8vh), 4.75rem);
-  height: clamp(1.75rem, min(8cqi, 8vh), 4.75rem);
+  width: clamp(1.75rem, min(8cqi, 8vh), 2.75rem);
+  height: clamp(1.75rem, min(8cqi, 8vh), 2.75rem);
 }
 
 @keyframes star-pop {

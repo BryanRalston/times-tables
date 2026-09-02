@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { isPhoneViewport, PHONE_MAX_PX } from "./viewport";
 
 export type Route =
   | { id: "home" }
@@ -31,10 +32,24 @@ export function parseHash(hash: string): Route {
   return { id: "home" };
 }
 
-/** Empty Guest (`seenWelcome: false`) opens already on leftover, not Home catalog. Grown-ups stay reachable. */
-export function doorRoute(seenWelcome: boolean, route: Route): Route {
+export function usePhoneDoor(): boolean {
+  const [phone, setPhone] = useState(() => isPhoneViewport());
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
+    const mq = window.matchMedia(`(max-width: ${PHONE_MAX_PX}px)`);
+    const on = () => setPhone(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  return phone;
+}
+
+/** Phone empty Guest opens leftover. Tablet/laptop keep the hashed route (Home catalog). Grown-ups stay reachable. */
+export function doorRoute(seenWelcome: boolean, route: Route, phone = true): Route {
   if (seenWelcome) return route;
   if (route.id === "grownup") return route;
+  if (!phone) return route;
   if (route.id === "play" && route.kind === "welcome") return route;
   return { id: "play", kind: "welcome" };
 }

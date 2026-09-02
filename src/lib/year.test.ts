@@ -231,7 +231,7 @@ describe("nav", () => {
     });
   });
 
-  it("sends an empty Guest from Home (and catalog hashes) onto leftover, not a two-CTA Home", () => {
+  it("sends a phone empty Guest from Home (and catalog hashes) onto leftover, not a two-CTA Home", () => {
     const leftover = { id: "play" as const, kind: "welcome" as const };
     expect(doorRoute(false, { id: "home" })).toEqual(leftover);
     expect(doorRoute(false, parseHash(""))).toEqual(leftover);
@@ -247,6 +247,14 @@ describe("nav", () => {
     expect(doorRoute(true, leftover)).toEqual(leftover);
     expect(doorRoute(true, { id: "lessons" })).toEqual({ id: "lessons" });
     expect(doorRoute(true, { id: "path" })).toEqual({ id: "path" });
+  });
+
+  it("keeps tablet/laptop empty Guest on the hashed catalog, not leftover", () => {
+    expect(doorRoute(false, { id: "home" }, false)).toEqual({ id: "home" });
+    expect(doorRoute(false, { id: "lessons" }, false)).toEqual({ id: "lessons" });
+    expect(doorRoute(false, { id: "shelf" }, false)).toEqual({ id: "shelf" });
+    expect(doorRoute(false, { id: "play", kind: "welcome" }, false)).toEqual({ id: "play", kind: "welcome" });
+    expect(doorRoute(false, { id: "grownup" }, false)).toEqual({ id: "grownup" });
   });
 });
 

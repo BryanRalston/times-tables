@@ -184,8 +184,8 @@ function watchCatalog() {
   else document.addEventListener("DOMContentLoaded", start);
 }
 
-async function checkFirstVisit(page) {
-  const row = { id: "first-visit-leftover", kind: "welcome", ui: "ok", fn: "ok", note: "", viewport: "fresh" };
+async function checkFirstVisitPhone(page) {
+  const row = { id: "first-visit-leftover", kind: "welcome", ui: "ok", fn: "ok", note: "", viewport: "phone" };
   try {
     await page.goto(rawBase, { waitUntil: "domcontentloaded" });
     await waitApp(page);
@@ -267,6 +267,57 @@ async function checkFirstVisit(page) {
     row.note = String(e).slice(0, 180);
     try {
       await shotFail(page, "first-visit-err");
+    } catch {
+      /* ignore */
+    }
+  }
+  return row;
+}
+
+async function checkFirstVisitDesk(page) {
+  const row = { id: "first-visit-shell", kind: "home", ui: "ok", fn: "ok", note: "", viewport: "desk" };
+  try {
+    await page.goto(rawBase, { waitUntil: "domcontentloaded" });
+    await waitApp(page);
+    const text = await page.locator("#app").innerText();
+    if (await page.locator("[data-welcome-leftover]").count()) {
+      row.ui = "fail";
+      row.fn = "fail";
+      row.note = "laptop first visit leftover kiosk";
+      await shotFail(page, "first-visit-kiosk");
+      return row;
+    }
+    if (!/Start today's walk/i.test(text) || !/The year map/i.test(text)) {
+      row.ui = "fail";
+      row.fn = "fail";
+      row.note = `laptop missing shell: ${text.slice(0, 180).replace(/\s+/g, " ")}`;
+      await shotFail(page, "first-visit-shell");
+      return row;
+    }
+    const home = page.getByRole("button", { name: /^Home$/i });
+    const lessons = page.getByRole("button", { name: /^Lessons$/i });
+    const shelf = page.getByRole("button", { name: /^Shelf$/i });
+    if (!(await home.count()) || !(await lessons.count()) || !(await shelf.count())) {
+      row.ui = "fail";
+      row.fn = "fail";
+      row.note = "laptop missing Home|Lessons|Shelf";
+      await shotFail(page, "first-visit-tabs");
+      return row;
+    }
+    if (/Play leftover/i.test(text)) {
+      row.ui = "fail";
+      row.fn = "fail";
+      row.note = "Play leftover CTA on laptop Home";
+      await shotFail(page, "first-visit-cta");
+      return row;
+    }
+    row.note = "Home walk + year map + tabs";
+  } catch (e) {
+    row.ui = "fail";
+    row.fn = "fail";
+    row.note = String(e).slice(0, 180);
+    try {
+      await shotFail(page, "first-visit-desk-err");
     } catch {
       /* ignore */
     }
@@ -582,14 +633,22 @@ try {
 }
 
 {
-  const fresh = await browser.newContext({ viewport: { width: 1280, height: 800 } });
-  await fresh.addInitScript(watchCatalog);
-  const page = await fresh.newPage();
-  page.setDefaultTimeout(10000);
-  const row = await checkFirstVisit(page);
-  results.push(row);
-  process.stdout.write(`fresh first-visit-leftover ui=${row.ui} fn=${row.fn} ${row.note}\n`);
-  await fresh.close();
+  const freshPhone = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await freshPhone.addInitScript(watchCatalog);
+  const phonePage = await freshPhone.newPage();
+  phonePage.setDefaultTimeout(10000);
+  const phoneRow = await checkFirstVisitPhone(phonePage);
+  results.push(phoneRow);
+  process.stdout.write(`fresh first-visit-leftover ui=${phoneRow.ui} fn=${phoneRow.fn} ${phoneRow.note}\n`);
+  await freshPhone.close();
+
+  const freshDesk = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const deskPage = await freshDesk.newPage();
+  deskPage.setDefaultTimeout(10000);
+  const deskRow = await checkFirstVisitDesk(deskPage);
+  results.push(deskRow);
+  process.stdout.write(`fresh first-visit-shell ui=${deskRow.ui} fn=${deskRow.fn} ${deskRow.note}\n`);
+  await freshDesk.close();
 }
 
 for (const [name, viewport] of [

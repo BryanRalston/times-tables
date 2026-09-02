@@ -46,7 +46,11 @@
               break;
             }
           }
-          if (!seen) {
+          var phone = true;
+          try {
+            phone = window.matchMedia("(max-width: 767px)").matches;
+          } catch (e2) {}
+          if (!seen && phone) {
             history.replaceState(null, "", location.pathname + location.search + "#/play/welcome");
           }
         } catch (e) {}

@@ -12,7 +12,7 @@ import { activityById, suggestedUnitId } from "@/lib/curriculum";
 import { makeDailyWalk, walkLabel } from "@/lib/daily";
 import { parseLocale, UI } from "@/lib/i18n";
 import { cardHeading, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen } from "@/lib/leftover";
-import { aliasActivityId, navigate } from "@/lib/nav";
+import { aliasActivityId, navigate, usePhoneDoor } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { makeActivityRound, makeWelcomeRound } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
@@ -20,7 +20,7 @@ import { canAffordAnything, coinsForResult } from "@/lib/coins";
 import { playCorrect, playStar, playWrong, unlockAudio } from "@/lib/sound";
 import { schoolStreak } from "@/lib/streak";
 import type { ItemSource, Locale, Question } from "@/lib/types";
-import { cn, keypadAllowsDot, pandaLine, questionCorrect } from "@/lib/utils";
+import { keypadAllowsDot, pandaLine, questionCorrect } from "@/lib/utils";
 
 type Kind = "welcome" | "daily" | "activity";
 
@@ -150,6 +150,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const who = q?.source === "review" ? "rem" : "nix";
   const ui = useUi();
   const locale = parseLocale(useProgress((s) => s.locale));
+  const phone = usePhoneDoor();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -377,7 +378,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   const pill = sourceLabel(q.source, locale);
   const gate = { kind: q.kind, needsInteract: q.needsInteract, interacted, status };
-  const quietWelcome = kind === "welcome";
+  const quietWelcome = kind === "welcome" && phone;
   const showPanel = leftoverPanelOpen(gate);
   const showSkip = !quietWelcome && leftoverSkipOpen(gate);
   const speech = pandaLine(q, locale, pose === "oops" ? "wrong" : status);
@@ -407,16 +408,13 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   if (quietWelcome) {
     return (
       <div
-        className={cn(
-          "mx-auto grid min-h-dvh w-full max-w-none grid-cols-1 place-content-center place-items-stretch gap-4 overflow-x-hidden px-4 py-5",
-          "md:h-dvh md:grid-rows-[auto_minmax(0,1fr)_auto] md:place-content-stretch md:gap-3 md:px-6 md:py-4 lg:px-8",
-        )}
+        className="mx-auto grid min-h-dvh w-full max-w-none grid-cols-1 place-content-center place-items-stretch gap-4 overflow-x-hidden px-4 py-5"
         data-welcome-leftover="1"
         {...(showPanel ? { "data-panel": "1" } : {})}
       >
         <div className="flex flex-col items-center">
           <div className="relative">
-            <Mascot who={who} pose={pose} hop={hop} size="md" className="md:h-24 md:w-24 lg:h-20 lg:w-20" />
+            <Mascot who={who} pose={pose} hop={hop} size="md" />
             <StarPop show={star} />
           </div>
           {showSpeech ? (
@@ -463,7 +461,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         <p className="mb-1 text-center text-[11px] font-medium uppercase tracking-wide text-faint">{q.sol.join(" · ")}</p>
       ) : null}
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,22rem)] lg:items-start lg:gap-6">
+      <div className={showPanel ? "lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,22rem)] lg:items-start lg:gap-6" : undefined}>
         <div>
           {q.kind === "fluency" || q.kind === "word" || q.kind === "jumps" || (q.kind === "tenframe" && "equation" in (q.data as object) && (q.data as { equation?: string }).equation === q.prompt) || (q.kind === "money" && (q.data as { mode?: string }).mode === "make") ? null : (
             <h2 className="mb-3 text-center font-display text-xl leading-tight sm:text-2xl">
@@ -471,7 +469,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
             </h2>
           )}
 
-          {board}
+          <div className={q.kind === "tenframe" ? "mx-auto w-full max-w-xl" : undefined}>{board}</div>
 
           {q.kind === "word" || q.prompt.length > 70 ? <div className="mt-3"><ScratchPad /></div> : null}
         </div>
