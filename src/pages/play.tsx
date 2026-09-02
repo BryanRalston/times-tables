@@ -19,8 +19,8 @@ import { rngFromSeed } from "@/lib/rng";
 import { canAffordAnything, coinsForResult } from "@/lib/coins";
 import { playCorrect, playStar, playWrong, unlockAudio } from "@/lib/sound";
 import { schoolStreak } from "@/lib/streak";
-import type { ItemSource, Locale, MoneyData, Question } from "@/lib/types";
-import { keypadAllowsDot, moneySpeech, questionCorrect } from "@/lib/utils";
+import type { ItemSource, Locale, Question } from "@/lib/types";
+import { keypadAllowsDot, pandaLine, questionCorrect } from "@/lib/utils";
 
 type Kind = "welcome" | "daily" | "activity";
 
@@ -372,23 +372,10 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   if (!q) return null;
 
   const pill = sourceLabel(q.source, locale);
-  const leftover = q.kind === "tenframe";
   const gate = { kind: q.kind, needsInteract: q.needsInteract, interacted, status };
   const showPanel = leftoverPanelOpen(gate);
   const showSkip = leftoverSkipOpen(gate);
-  const moneyMode = q.kind === "money" ? (q.data as MoneyData).mode : null;
-  const spokenN =
-    q.kind === "money" && (moneyMode === "count" || moneyMode === "change" || moneyMode === "make")
-      ? moneySpeech(q.answer)
-      : q.answer;
-  const speech =
-    pose === "oops"
-      ? ui.tryAgain
-      : leftover
-        ? (q.hint ?? ui.takeWhatYouSee)
-        : status === "correct"
-          ? ui.nIs(spokenN)
-          : (q.hint ?? ui.takeWhatYouSee);
+  const speech = pandaLine(q, locale, pose === "oops" ? "wrong" : status);
 
   return (
     <div className="mx-auto min-h-dvh max-w-lg overflow-x-hidden px-4 pb-8 pt-3 lg:max-w-5xl">

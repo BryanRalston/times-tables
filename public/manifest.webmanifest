@@ -1,7 +1,7 @@
 {
-  "name": "Grade 3 Path",
-  "short_name": "Grade 3 Path",
-  "description": "LCPS 2026–27 Grade 3 math. Nothing leaves this device.",
+  "name": "Squishee Math",
+  "short_name": "Squishee Math",
+  "description": "Squishee Math — LCPS 2026–27 Grade 3 math. Nothing leaves this device.",
   "start_url": "/times-tables/",
   "scope": "/times-tables/",
   "display": "standalone",

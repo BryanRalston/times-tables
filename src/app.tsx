@@ -25,7 +25,7 @@ class BootError extends Component<{ children: ReactNode }, { message: string | n
     if (this.state.message) {
       return (
         <div style={{ padding: 24, fontFamily: "system-ui, sans-serif", color: "#1f1a14" }}>
-          <h1 style={{ fontSize: 28, margin: "0 0 8px" }}>Grade 3 Path</h1>
+          <h1 style={{ fontSize: 28, margin: "0 0 8px" }}>Squishee Math</h1>
           <p>This phone hit a bug. Close the tab and open the link again.</p>
           <pre style={{ whiteSpace: "pre-wrap", fontSize: 12, opacity: 0.7 }}>{this.state.message}</pre>
         </div>

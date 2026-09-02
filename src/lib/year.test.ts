@@ -4,12 +4,12 @@ import { GRADE3_SOLS, UNITS, WELCOME_ACTIVITY, activityById, coversSol, fluencyF
 import { makeDailyWalk } from "./daily";
 import { parseHash } from "./nav";
 import { isUnitOpen, unitStatus } from "./path";
-import { UI } from "./i18n";
+import { qCopy, UI } from "./i18n";
 import { makeActivityRound, makeQuestion, makeWelcomeRound, placeOnGraph, welcomeFirst, wordForm } from "./questions";
 import type { GraphData, MeasureData, MoneyData, PlaceValueData } from "./types";
 import { rngFromSeed } from "./rng";
 import { schoolStreak } from "./streak";
-import { answersMatch, keypadAllowsDot, moneyFmt, moneySpeech } from "./utils";
+import { answersMatch, correctSpeech, keypadAllowsDot, moneyFmt, moneySpeech, pandaLine } from "./utils";
 
 describe("calendar", () => {
   it("has 180 school days", () => {
@@ -140,7 +140,45 @@ describe("answers", () => {
     expect(answersMatch("9:05", "9:05")).toBe(true);
     expect(moneySpeech("78")).toBe("$0.78");
     expect(moneySpeech("0.78")).toBe("$0.78");
-    expect(UI.en.nIs(moneySpeech("78"))).toBe("n is $0.78.");
+    expect(correctSpeech({ kind: "money", answer: "78", data: { mode: "count" } }, "en")).toBe("That's $0.78.");
+  });
+
+  it("panda uses kid speech, not n is", () => {
+    const clock = { kind: "clock", answer: "4:52", data: { hours: 4, minutes: 52, mode: "read", find: "time" } };
+    expect(correctSpeech(clock, "en")).toContain("It's 4:52");
+    expect(correctSpeech(clock, "en")).not.toMatch(/n is/i);
+    expect(correctSpeech(clock, "es")).toContain("4:52");
+    expect(correctSpeech(clock, "es")).not.toMatch(/n es/i);
+
+    const money = { kind: "money", answer: "78", data: { mode: "count" } };
+    expect(correctSpeech(money, "en")).toMatch(/That's \$0\.78/);
+    expect(correctSpeech(money, "en")).not.toMatch(/n is/);
+    expect(correctSpeech({ kind: "money", answer: "8", data: { mode: "change" } }, "en")).toMatch(/That's \$0\.08/);
+
+    const shape = { kind: "choice", answer: "pentagon", data: { visual: "shape", shape: "pentagon" } };
+    expect(correctSpeech(shape, "en")).toMatch(/That's a pentagon/);
+    expect(correctSpeech(shape, "en")).not.toMatch(/n is pentagon/i);
+
+    const owls = { kind: "graph", answer: "owls", data: {} };
+    expect(correctSpeech(owls, "en")).toMatch(/That's owls/);
+
+    const num = { kind: "area", answer: "12", data: {} };
+    expect(correctSpeech(num, "en")).toBe("That's 12.");
+
+    const leftover = {
+      kind: "tenframe",
+      answer: "4",
+      hint: "Take the dots you can see. Then name n.",
+      data: {},
+    };
+    expect(pandaLine(leftover, "en", "idle")).not.toMatch(/n is leftover/i);
+    expect(pandaLine(leftover, "en", "correct")).not.toMatch(/n is leftover/i);
+    expect(pandaLine(leftover, "en", "correct")).not.toMatch(/n is 4/);
+    expect(pandaLine(leftover, "en", "wrong")).toBe("Try again.");
+    expect(qCopy("en").changeHint).toBe("How much change?");
+    expect(qCopy("en").changeHint).not.toMatch(/n is leftover/i);
+    expect(qCopy("es").changeHint).not.toMatch(/n es/i);
+    expect(qCopy("pt-BR").changeHint).not.toMatch(/n é/i);
   });
 
   it("puts the decimal key only on money count change and make", () => {

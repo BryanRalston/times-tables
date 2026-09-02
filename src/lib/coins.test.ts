@@ -39,6 +39,8 @@ describe("buySquishee", () => {
 
   it("charges rare price", () => {
     expect(squisheePrice("aurora-jelly")).toBe(RARE_PRICE);
+    expect(squisheePrice("sleepy-moon")).toBe(RARE_PRICE);
+    expect(squisheePrice("blush-cloud")).toBe(RARE_PRICE);
     expect(applyBuy(49, [], "aurora-jelly").reason).toBe("poor");
     const r = applyBuy(50, [], "aurora-jelly");
     expect(r.ok).toBe(true);

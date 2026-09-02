@@ -37,6 +37,16 @@ const COMMON: Squishee[] = [
   { id: "otter", name: "Otter", theme: "animal", file: "otter.png", poke: null, rarity: "common" },
   { id: "waffle", name: "Waffle", theme: "food", file: "waffle.png", poke: null, rarity: "common" },
   { id: "cookie", name: "Cookie", theme: "food", file: "cookie.png", poke: null, rarity: "common" },
+  { id: "capybara", name: "Capybara", theme: "animal", file: "capybara.png", poke: null, rarity: "common" },
+  { id: "axolotl", name: "Axolotl", theme: "animal", file: "axolotl.png", poke: null, rarity: "common" },
+  { id: "red-panda", name: "Red Panda", theme: "animal", file: "red-panda.png", poke: null, rarity: "common" },
+  { id: "boba", name: "Boba", theme: "food", file: "boba.png", poke: null, rarity: "common" },
+  { id: "toast", name: "Toast", theme: "food", file: "toast.png", poke: null, rarity: "common" },
+  { id: "cactus", name: "Cactus", theme: "food", file: "cactus.png", poke: null, rarity: "common" },
+  { id: "mushroom", name: "Mushroom", theme: "food", file: "mushroom.png", poke: null, rarity: "common" },
+  { id: "dumpling", name: "Dumpling", theme: "food", file: "dumpling.png", poke: null, rarity: "common" },
+  { id: "matcha", name: "Matcha", theme: "food", file: "matcha.png", poke: null, rarity: "common" },
+  { id: "sloth", name: "Sloth", theme: "animal", file: "sloth.png", poke: null, rarity: "common" },
 ];
 
 const RARE: Squishee[] = [
@@ -46,6 +56,8 @@ const RARE: Squishee[] = [
   { id: "rainbow-cupcake", name: "Rainbow Cupcake", theme: "food", file: "rainbow-cupcake.png", poke: null, rarity: "rare" },
   { id: "aurora-jelly", name: "Aurora Jelly", theme: "animal", file: "aurora-jelly.png", poke: null, rarity: "rare" },
   { id: "star-mochi", name: "Star Mochi", theme: "food", file: "star-mochi.png", poke: null, rarity: "rare" },
+  { id: "sleepy-moon", name: "Sleepy Moon", theme: "animal", file: "sleepy-moon.png", poke: null, rarity: "rare" },
+  { id: "blush-cloud", name: "Blush Cloud", theme: "animal", file: "blush-cloud.png", poke: null, rarity: "rare" },
 ];
 
 export const SQUISHEES: Squishee[] = [...COMMON, ...RARE];

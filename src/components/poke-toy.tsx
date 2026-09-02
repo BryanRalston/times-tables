@@ -16,7 +16,8 @@ export function SquashOnPoke({
 }) {
   return (
     <span
-      className={cn("block", active && "squash", className)}
+      data-squash={active ? "1" : "0"}
+      className={cn("block overflow-visible", active && "squash", className)}
       onAnimationEnd={(e: AnimationEvent<HTMLSpanElement>) => {
         if (e.animationName === "squash") onRest?.();
       }}
@@ -38,6 +39,7 @@ export function PokeToy({
   className?: string;
 }) {
   const [poking, setPoking] = useState(false);
+  const [pokeTick, setPokeTick] = useState(0);
   const [clipOn, setClipOn] = useState(false);
   const [clipReady, setClipReady] = useState(false);
   const s = squisheeById(id);
@@ -53,7 +55,7 @@ export function PokeToy({
     <button
       type="button"
       className={cn(
-        "relative shrink-0 touch-manipulation select-none border-0 bg-transparent p-0",
+        "relative shrink-0 touch-manipulation select-none overflow-visible border-0 bg-transparent p-0",
         size === "sm" && "h-20 w-20",
         size === "md" && "h-32 w-32",
         size === "lg" && "h-44 w-44 sm:h-52 sm:w-52",
@@ -61,13 +63,15 @@ export function PokeToy({
       )}
       aria-label={s ? `Poke ${s.name}` : "Poke"}
       onClick={() => {
+        setPokeTick((n) => n + 1);
         setPoking(true);
         if (playClip) setClipOn(true);
       }}
     >
       <SquashOnPoke
+        key={pokeTick}
         active={poking}
-        className={cn("relative h-full w-full", !poking && bob && "idle-bob")}
+        className={cn("relative h-full w-full overflow-visible", !poking && bob && "idle-bob")}
         onRest={() => setPoking(false)}
       >
         <MagentaImg src={squisheeSrc(id)} alt="" className={cn("h-full w-full", clipReady && "invisible")} />

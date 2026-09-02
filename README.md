@@ -1,4 +1,4 @@
-# Grade 3 Path
+# Squishee Math
 
 A school-year of **LCPS 2026–27 Grade 3** math, mapped to the 2023 Virginia SOLs. Home is today's walk plus the year map. **Lessons** is every unit, every activity — nothing locks.
 

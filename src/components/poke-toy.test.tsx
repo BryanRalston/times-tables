@@ -17,6 +17,15 @@ describe("PokeToy", () => {
     expect(renderToStaticMarkup(<PokeToy id="peach" />)).toContain("Poke Peach");
   });
 
+  it("owned avocado is a poke button with squash machinery", () => {
+    const html = renderToStaticMarkup(<PokeToy id="avocado" />);
+    expect(html).toContain("Poke Avocado");
+    expect(html).toContain("<button");
+    expect(html).toContain("overflow-visible");
+    expect(html).toContain("data-squash");
+    expect(html).not.toContain("pointer-events-none");
+  });
+
   it("keeps the PNG in the tree before a poke clip paints", () => {
     const html = renderToStaticMarkup(<PokeToy id="frog" />);
     expect(html).toContain("frog.png");
