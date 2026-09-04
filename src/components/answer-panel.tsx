@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { parseLocale, UI } from "@/lib/i18n";
 import { useProgress } from "@/lib/progress";
 import type { Question } from "@/lib/types";
-import { keypadAllowsDot } from "@/lib/utils";
+import { keypadAllowsDot, moneyCountHasBill } from "@/lib/utils";
 
 export function AnswerPanel({
   question,
@@ -66,6 +66,7 @@ export function AnswerPanel({
       replace={leftover}
       quiet={leftover}
       allowDot={keypadAllowsDot(question)}
+      prefix={moneyCountHasBill(question) ? "$" : undefined}
     />
   );
 }

@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { PokeToy } from "./poke-toy";
+import { PokeStrip, PokeToy } from "./poke-toy";
 
 describe("PokeToy", () => {
   it("is a poke button, not a pointer-events-none image", () => {
@@ -31,5 +31,37 @@ describe("PokeToy", () => {
     expect(html).toContain("frog.png");
     expect(html).not.toContain("<video");
     expect(html).not.toContain("<canvas");
+    expect(html).not.toContain("poke-strip");
+    expect(html).not.toContain("frog-poke-strip.png");
+  });
+
+  it("PokeStrip is a steps sprite, not a video", () => {
+    const html = renderToStaticMarkup(
+      <PokeStrip src="/times-tables/squishees/cat-poke-strip.png" frames={16} fps={12} />,
+    );
+    expect(html).toContain("poke-strip");
+    expect(html).toContain("cat-poke-strip.png");
+    expect(html).toContain("steps(16, jump-none)");
+    expect(html).not.toContain("<video");
+    expect(html).not.toContain("<canvas");
+  });
+
+  it("cheer autoplay does not squash or use the poke clip", () => {
+    const avocado = renderToStaticMarkup(<PokeToy id="avocado" cheer />);
+    expect(avocado).toContain('data-cheer="1"');
+    expect(avocado).toContain('data-squash="0"');
+    expect(avocado).not.toContain('data-squash="1"');
+    expect(avocado).toContain("avocado-cheer");
+    expect(avocado).not.toContain("avocado-poke");
+    expect(avocado).not.toContain("unlock-pop");
+    expect(avocado).not.toMatch(/[\s"]squash[\s"]/);
+
+    const panda = renderToStaticMarkup(<PokeToy id="panda" cheer />);
+    expect(panda).toContain('data-cheer="1"');
+    expect(panda).toContain('data-squash="0"');
+    expect(panda).toContain("panda-cheer");
+    expect(panda).not.toContain("panda-poke");
+    expect(panda).not.toContain("unlock-pop");
+    expect(panda).not.toMatch(/[\s"]squash[\s"]/);
   });
 });

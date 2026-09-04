@@ -61,6 +61,10 @@ export type Ui = {
   nearestHundred: string;
   nearestThousand: string;
   tapPicture: string;
+  nowReadGraph: string;
+  countedTray: string;
+  tapCoinsIn: string;
+  tapMoneyIn: string;
   now: string;
   unitPage: string;
   anotherKid: string;
@@ -180,6 +184,10 @@ export const UI: Record<Locale, Ui> = {
     nearestHundred: "Nearest hundred",
     nearestThousand: "Nearest thousand",
     tapPicture: "Tap a picture, then its category.",
+    nowReadGraph: "Now read the graph.",
+    countedTray: "Counted",
+    tapCoinsIn: "Tap each coin into the tray, then type the cents.",
+    tapMoneyIn: "Tap each bill and coin into the tray, then type dollars and cents.",
     now: "Now",
     unitPage: "Unit page",
     anotherKid: "Another kid",
@@ -305,6 +313,10 @@ export const UI: Record<Locale, Ui> = {
     nearestHundred: "Centena más cercana",
     nearestThousand: "Millar más cercano",
     tapPicture: "Toca una foto, luego su categoría.",
+    nowReadGraph: "Ahora lee la gráfica.",
+    countedTray: "Contadas",
+    tapCoinsIn: "Toca cada moneda y ponla en la bandeja, luego escribe los centavos.",
+    tapMoneyIn: "Toca cada billete y moneda y ponlos en la bandeja, luego escribe dólares y centavos.",
     now: "Ahora",
     unitPage: "Página de la unidad",
     anotherKid: "Otra niña o niño",
@@ -430,6 +442,10 @@ export const UI: Record<Locale, Ui> = {
     nearestHundred: "Centena mais próxima",
     nearestThousand: "Milhar mais próximo",
     tapPicture: "Toque numa figura, depois na categoria.",
+    nowReadGraph: "Agora leia o gráfico.",
+    countedTray: "Contadas",
+    tapCoinsIn: "Toque cada moeda para a bandeja, depois escreva os centavos.",
+    tapMoneyIn: "Toque cada nota e moeda para a bandeja, depois escreva dólares e centavos.",
     now: "Agora",
     unitPage: "Página da unidade",
     anotherKid: "Outra criança",
@@ -835,6 +851,8 @@ export type QCopy = {
   changeMoney: (cost: string, pay: string) => string;
   changeHint: string;
   howManyCents: string;
+  tapCoinsIn: string;
+  tapMoneyIn: string;
   howMuchMoney: string;
   compareMoney: string;
   unitSquares: string;
@@ -954,6 +972,8 @@ export function qCopy(locale: Locale): QCopy {
       changeMoney: (cost, pay) => `Un artículo cuesta ${cost}. Pagas ${pay}. ¿Cuánto de cambio?`,
       changeHint: "¿Cuánto de cambio?",
       howManyCents: "¿Cuántos centavos?",
+      tapCoinsIn: "Toca cada moneda y ponla en la bandeja, luego escribe los centavos.",
+      tapMoneyIn: "Toca cada billete y moneda y ponlos en la bandeja, luego escribe dólares y centavos.",
       howMuchMoney: "¿Cuánto dinero?",
       compareMoney: "Compara los dos conjuntos.",
       unitSquares: "¿Cuántos cuadrados unitarios?",
@@ -1071,6 +1091,8 @@ export function qCopy(locale: Locale): QCopy {
       changeMoney: (cost, pay) => `Um item custa ${cost}. Você paga ${pay}. Quanto de troco?`,
       changeHint: "Quanto de troco?",
       howManyCents: "Quantos centavos?",
+      tapCoinsIn: "Toque cada moeda para a bandeja, depois escreva os centavos.",
+      tapMoneyIn: "Toque cada nota e moeda para a bandeja, depois escreva dólares e centavos.",
       howMuchMoney: "Quanto dinheiro?",
       compareMoney: "Compare os dois conjuntos.",
       unitSquares: "Quantos quadrados unitários?",
@@ -1187,6 +1209,8 @@ export function qCopy(locale: Locale): QCopy {
     changeMoney: (cost, pay) => `An item costs ${cost}. You pay ${pay}. How much change?`,
     changeHint: "How much change?",
     howManyCents: "How many cents?",
+    tapCoinsIn: "Tap each coin into the tray, then type the cents.",
+    tapMoneyIn: "Tap each bill and coin into the tray, then type dollars and cents.",
     howMuchMoney: "How much money?",
     compareMoney: "Compare the two sets.",
     unitSquares: "How many unit squares?",

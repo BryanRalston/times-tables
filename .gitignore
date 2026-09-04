@@ -6,3 +6,7 @@ dist
 .vite
 *.local
 scripts/playtest-out/
+scripts/__pycache__/
+kitchen/
+_laptop-fail.jpeg
+_last_brief.txt

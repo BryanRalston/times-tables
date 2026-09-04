@@ -144,6 +144,21 @@ describe("boards", () => {
     expect(html).toContain('data-counted="0"');
   });
 
+  it("count-with-bills empty tray names dollars and cents", () => {
+    let q = makeQuestion(activityById("u11-count")!.activity, rngFromSeed("coins:board"));
+    for (let i = 0; i < 80; i++) {
+      const next = makeQuestion(activityById("u11-count")!.activity, rngFromSeed(`bill:u11-count:${i}`));
+      const d = next.data as MoneyData;
+      if (d.coins.dollar || d.coins.five) {
+        q = next;
+        break;
+      }
+    }
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain("Tap each bill and coin into the tray, then type dollars and cents.");
+    expect(html).not.toContain("type the cents.");
+  });
+
   it("quarter is the largest coin and bills are larger than coins", () => {
     expect(moneyBox("quarter").width).toBeGreaterThan(moneyBox("nickel").width);
     expect(moneyBox("nickel").width).toBeGreaterThan(moneyBox("penny").width);
@@ -182,6 +197,7 @@ describe("boards", () => {
     expect(src).toContain("leftover-dot");
     expect(src).toContain("leftover-eq");
     expect(src).toContain("onClick={takeGroup}");
+    expect(src).toContain("grid-cols-5");
   });
 
   it("after a correct leftover Check the board isolates n without an n is overlay", () => {

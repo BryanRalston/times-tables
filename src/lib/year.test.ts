@@ -136,6 +136,11 @@ describe("answers", () => {
     expect(answersMatch("4", "4/8", ["4"])).toBe(true);
     expect(answersMatch("5", "4")).toBe(false);
     expect(answersMatch("$1.00", "100", ["$1.00"])).toBe(true);
+    expect(answersMatch("5", "$5.00")).toBe(true);
+    expect(answersMatch("5.00", "500")).toBe(true);
+    expect(answersMatch("5", "$5.25")).toBe(false);
+    expect(answersMatch("525", "$5.25")).toBe(true);
+    expect(answersMatch("8", "8")).toBe(true);
     expect(answersMatch("3:05", "3:5")).toBe(true);
     expect(answersMatch("9:05", "9:05")).toBe(true);
     expect(moneySpeech("78")).toBe("$0.78");
@@ -314,6 +319,12 @@ describe("principal holes", () => {
         expect(q.prompt).not.toMatch(/how many|cu[aá]ntos|quantos/i);
         if (d.ask === "greatest" || d.ask === "least") {
           expect(q.choices ?? []).toContain(q.answer);
+          const tray = d.tray ?? [];
+          const counts: Record<string, number> = {};
+          for (const t of tray) counts[t.label] = (counts[t.label] ?? 0) + 1;
+          const m =
+            d.ask === "greatest" ? Math.max(...Object.values(counts)) : Math.min(...Object.values(counts));
+          expect(d.rows.filter((r) => (counts[r.label] ?? 0) === m)).toHaveLength(1);
         }
       }
     }
@@ -343,12 +354,49 @@ describe("principal holes", () => {
         const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`bill:${id}:${i}`));
         const d = q.data as MoneyData;
         const hasBill = Boolean(d.coins.dollar || d.coins.five);
+        const cents = Object.entries(d.coins).reduce((n, [id, c]) => {
+          const v = id === "penny" ? 1 : id === "nickel" ? 5 : id === "dime" ? 10 : id === "quarter" ? 25 : id === "dollar" ? 100 : 500;
+          return n + v * (c ?? 0);
+        }, 0);
         if (id === "u1-coins") expect(hasBill).toBe(false);
-        if (hasBill) expect(q.prompt).toBe("How much money?");
-        else expect(q.prompt).toBe("How many cents?");
+        if (hasBill) {
+          expect(q.prompt).toBe("How much money?");
+          expect(q.prompt).not.toMatch(/cents/i);
+          expect(q.answer).toBe(moneyFmt(cents));
+          expect(q.alts ?? []).toContain(String(cents));
+          expect(q.hint).toBe(qCopy("en").tapMoneyIn);
+          expect(q.hint).not.toMatch(/type the cents/i);
+        } else {
+          expect(q.prompt).toBe("How many cents?");
+          expect(q.answer).toBe(String(cents));
+          expect(q.hint).toBe(qCopy("en").tapCoinsIn);
+        }
+        expect(answersMatch(String(cents), q.answer, q.alts)).toBe(true);
         expect(q.prompt).not.toMatch(/\$\d+\.\d{2}/);
+        expect(q.prompt).not.toContain(moneyFmt(cents));
       }
     }
+  });
+
+  it("seeded u11-count with a five scores dollars, and 5 / 5.00 / 500 all match $5.00", () => {
+    let found = false;
+    for (let i = 0; i < 80; i++) {
+      const q = makeQuestion(activityById("u11-count")!.activity, rngFromSeed(`bill:u11-count:${i}`));
+      const d = q.data as MoneyData;
+      const cents = Object.entries(d.coins).reduce((n, [id, c]) => {
+        const v = id === "penny" ? 1 : id === "nickel" ? 5 : id === "dime" ? 10 : id === "quarter" ? 25 : id === "dollar" ? 100 : 500;
+        return n + v * (c ?? 0);
+      }, 0);
+      if (!d.coins.five || cents !== 500) continue;
+      expect(q.answer).toMatch(/^\$\d+\.\d{2}$/);
+      expect(q.answer).toBe("$5.00");
+      expect(answersMatch("5", q.answer, q.alts)).toBe(true);
+      expect(answersMatch("5.00", q.answer, q.alts)).toBe(true);
+      expect(answersMatch("500", q.answer, q.alts)).toBe(true);
+      found = true;
+      break;
+    }
+    expect(found).toBe(true);
   });
 });
 

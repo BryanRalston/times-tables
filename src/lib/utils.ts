@@ -30,6 +30,14 @@ export function keypadAllowsDot(q: { kind: string; data?: unknown }): boolean {
   return mode === "count" || mode === "change" || mode === "make";
 }
 
+/** Count-with-bills keypad shows $; leftover/fluency/coin-only do not. */
+export function moneyCountHasBill(q: { kind: string; data?: unknown }): boolean {
+  if (q.kind !== "money") return false;
+  const d = q.data as { mode?: string; coins?: Partial<Record<string, number>> } | undefined;
+  if (d?.mode !== "count") return false;
+  return Boolean(d.coins?.dollar || d.coins?.five);
+}
+
 export function answersMatch(given: string, answer: string, alts: string[] = []): boolean {
   const n = normalize(given);
   if (n === normalize(answer)) return true;
@@ -66,16 +74,24 @@ function timeMatch(a: string, b: string): boolean {
   return clockTimesMatch(a, Number(mb[1]), Number(mb[2]));
 }
 
+function moneyCentsSet(s: string): number[] {
+  const t = s.replace(/\$/g, "");
+  if (/^\d+$/.test(t)) {
+    const n = Number(t);
+    if (n >= 100) return n < 10000 ? [n] : [];
+    const dollars = n * 100;
+    return dollars < 10000 ? [n, dollars] : [n];
+  }
+  if (/^\d+\.\d{1,2}$/.test(t)) {
+    const n = Math.round(Number(t) * 100);
+    return n < 10000 ? [n] : [];
+  }
+  return [];
+}
+
 function moneyMatch(a: string, b: string): boolean {
-  const cents = (s: string) => {
-    const t = s.replace(/\$/g, "");
-    if (/^\d+$/.test(t)) return Number(t);
-    if (/^\d+\.\d{1,2}$/.test(t)) return Math.round(Number(t) * 100);
-    return null;
-  };
-  const ca = cents(a);
-  const cb = cents(b);
-  return ca != null && cb != null && ca === cb && ca < 10000;
+  const bs = new Set(moneyCentsSet(b));
+  return moneyCentsSet(a).some((c) => bs.has(c));
 }
 
 function orderMatch(a: string, b: string): boolean {
@@ -171,10 +187,20 @@ export function pandaLine(
   q: { kind: string; answer: string; hint?: string; data?: unknown },
   locale: Locale,
   status: "idle" | "correct" | "wrong",
+  interacted = false,
 ): string {
   const ui = UI[locale];
   if (status === "wrong") return ui.tryAgain;
   if (q.kind === "tenframe") return q.hint ?? ui.takeWhatYouSee;
   if (status === "correct") return correctSpeech(q, locale);
+  if (q.kind === "graph") {
+    const d = (q.data ?? {}) as { collect?: boolean };
+    if (d.collect && interacted) return ui.nowReadGraph;
+    if (d.collect) return q.hint ?? ui.tapPicture;
+  }
+  if (q.kind === "money") {
+    if (moneyCountHasBill(q)) return q.hint ?? ui.tapMoneyIn;
+    return q.hint ?? ui.tapCoinsIn;
+  }
   return q.hint ?? ui.takeWhatYouSee;
 }

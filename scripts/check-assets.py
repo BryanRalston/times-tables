@@ -39,6 +39,11 @@ def squishee_files() -> list[str]:
     return re.findall(r'file:\s*"([^"]+\.png)"', text)
 
 
+def poke_strip_files() -> list[str]:
+    text = SRC.read_text(encoding="utf-8")
+    return re.findall(r'src:\s*"([^"]+-strip\.png)"', text)
+
+
 def is_magenta(r: int, g: int, b: int, a: int) -> bool:
     return a > 16 and g < 80 and r > 190 and b > 150 and (r - g) > 100 and (b - g) > 70
 
@@ -270,6 +275,16 @@ def main() -> int:
                 fails.append("scale.png: housing plate region is empty")
             elif dark > 400:
                 fails.append(f"scale.png: printed unit legend still on the plate ({dark} dark px)")
+
+    for name in poke_strip_files():
+        path = SQUISH / name
+        if not path.exists():
+            fails.append(f"missing poke strip {name}")
+            continue
+        im = Image.open(path).convert("RGBA")
+        mag = magenta_count(im.load(), *im.size)
+        if mag > 8:
+            fails.append(f"{name}: leftover magenta {mag}px")
 
     for name in MONEY_FILES:
         path = MONEY / name

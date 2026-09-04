@@ -38,8 +38,9 @@ def is_strict_fringe(r: int, g: int, b: int) -> bool:
     return g < 80 and r > 190 and b > 150 and (r - g) > 100 and (b - g) > 70
 
 
-def key_file(path: Path, strict: bool = False) -> None:
-    im = Image.open(path).convert("RGBA")
+def key_image(im: Image.Image, strict: bool = False) -> Image.Image:
+    """Flood-fill chroma from edges. Same keyer as key_file; in-memory RGBA."""
+    im = im.convert("RGBA").copy()
     px = im.load()
     w, h = im.size
     seen = [[False] * h for _ in range(w)]
@@ -113,7 +114,13 @@ def key_file(path: Path, strict: bool = False) -> None:
         for x, y in choke:
             px[x, y] = (0, 0, 0, 0)
 
+    return im
+
+
+def key_file(path: Path, strict: bool = False) -> None:
+    im = key_image(Image.open(path), strict=strict)
     im.save(path, "PNG")
+    w, h = im.size
     print(f"keyed {path.name} {w}x{h}{' strict' if strict else ''}")
 
 

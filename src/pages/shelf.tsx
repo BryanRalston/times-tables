@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { AppHeader, AppTabs, useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
 import { PokeToy } from "@/components/poke-toy";
@@ -19,6 +20,7 @@ export function ShelfPage() {
   function buy(id: string) {
     const r = buySquishee(id);
     if (r.ok) playTap();
+    return r.ok;
   }
 
   return (
@@ -54,15 +56,19 @@ export function ShopCard({
   got,
   coins,
   onBuy,
+  cheer = false,
 }: {
   s: Squishee;
   got: boolean;
   coins: number;
-  onBuy: (id: string) => void;
+  onBuy: (id: string) => boolean | void;
+  cheer?: boolean;
 }) {
   const ui = useUi();
+  const [justBought, setJustBought] = useState(cheer);
   const price = squisheePrice(s.id);
   const canBuy = !got && coins >= price;
+  const playCheer = justBought;
   return (
     <div
       className={cn(
@@ -75,6 +81,8 @@ export function ShopCard({
         <PokeToy
           id={s.id}
           size="sm"
+          cheer={playCheer}
+          onCheerEnd={() => setJustBought(false)}
           className={cn("h-20 w-20 overflow-visible", s.rarity === "rare" && "rare-glow")}
         />
       ) : (
@@ -88,7 +96,9 @@ export function ShopCard({
           className="mt-2 h-9 w-full px-1 text-xs"
           disabled={!canBuy}
           title={canBuy ? undefined : ui.notEnough}
-          onClick={() => onBuy(s.id)}
+          onClick={() => {
+            if (onBuy(s.id)) setJustBought(true);
+          }}
           aria-label={`${ui.buy}, ${price} ${ui.coins}`}
         >
           {ui.buy} · {price}

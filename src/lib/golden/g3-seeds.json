@@ -770,7 +770,7 @@
   "u1-tally": [
     {
       "prompt": "Sort every picture.",
-      "answer": "4",
+      "answer": "2",
       "alts": null,
       "choices": null,
       "kind": "graph",
@@ -779,7 +779,7 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "owls",
+      "answer": "frogs",
       "alts": [],
       "choices": [
         "frogs",
@@ -793,10 +793,8 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "owls",
-      "alts": [
-        "ducks"
-      ],
+      "answer": "sharks",
+      "alts": [],
       "choices": [
         "owls",
         "cats",
@@ -809,41 +807,13 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "frogs",
+      "answer": "owls",
       "alts": [],
       "choices": [
         "ducks",
         "owls",
         "frogs",
         "pigs"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "pandas",
-      "alts": [],
-      "choices": [
-        "ducks",
-        "pandas",
-        "frogs",
-        "pigs"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "bunnies",
-      "alts": [],
-      "choices": [
-        "pandas",
-        "pigs",
-        "bunnies",
-        "frogs"
       ],
       "kind": "graph",
       "input": "choice",
@@ -860,81 +830,36 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "pigs",
-      "alts": [
-        "sharks",
-        "pandas"
+      "answer": "2",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "pandas",
+      "alts": [],
+      "choices": [
+        "frogs",
+        "bunnies",
+        "pandas",
+        "cats"
       ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "ducks",
+      "alts": [],
       "choices": [
         "ducks",
         "pigs",
         "sharks",
         "pandas"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "pigs",
-      "alts": [
-        "frogs",
-        "sharks"
-      ],
-      "choices": [
-        "pandas",
-        "pigs",
-        "frogs",
-        "sharks"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "sharks",
-      "alts": [],
-      "choices": [
-        "owls",
-        "cats",
-        "sharks",
-        "pigs"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "sharks",
-      "alts": [
-        "pandas",
-        "cats",
-        "ducks"
-      ],
-      "choices": [
-        "sharks",
-        "pandas",
-        "cats",
-        "ducks"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "sharks",
-      "alts": [
-        "pigs"
-      ],
-      "choices": [
-        "sharks",
-        "pigs",
-        "owls",
-        "cats"
       ],
       "kind": "graph",
       "input": "choice",
@@ -951,18 +876,67 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "pigs",
-      "alts": [
-        "bunnies"
-      ],
+      "answer": "owls",
+      "alts": [],
       "choices": [
+        "owls",
         "cats",
         "sharks",
-        "pigs",
-        "bunnies"
+        "pigs"
       ],
       "kind": "graph",
       "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "pandas",
+      "alts": [],
+      "choices": [
+        "sharks",
+        "pandas",
+        "cats",
+        "ducks"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "sharks",
+      "alts": [],
+      "choices": [
+        "sharks",
+        "pigs",
+        "owls",
+        "cats"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "bunnies",
+      "alts": [],
+      "choices": [
+        "ducks",
+        "bunnies",
+        "sharks",
+        "pandas"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "2",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
       "needsInteract": true
     },
     {
@@ -981,10 +955,8 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "frogs",
-      "alts": [
-        "cats"
-      ],
+      "answer": "ducks",
+      "alts": [],
       "choices": [
         "owls",
         "frogs",
@@ -997,7 +969,7 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "cats",
+      "answer": "frogs",
       "alts": [],
       "choices": [
         "bunnies",
@@ -1011,7 +983,7 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "bunnies",
+      "answer": "ducks",
       "alts": [],
       "choices": [
         "ducks",
@@ -1025,10 +997,8 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "bunnies",
-      "alts": [
-        "cats"
-      ],
+      "answer": "ducks",
+      "alts": [],
       "choices": [
         "owls",
         "ducks",
@@ -1041,11 +1011,16 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "2",
-      "alts": null,
-      "choices": null,
+      "answer": "ducks",
+      "alts": [],
+      "choices": [
+        "frogs",
+        "bunnies",
+        "pigs",
+        "ducks"
+      ],
       "kind": "graph",
-      "input": "keypad",
+      "input": "choice",
       "needsInteract": true
     }
   ],
@@ -7430,25 +7405,7 @@
   "u6-picto": [
     {
       "prompt": "Sort every picture.",
-      "answer": "ducks",
-      "alts": [
-        "sharks",
-        "pandas",
-        "frogs"
-      ],
-      "choices": [
-        "ducks",
-        "sharks",
-        "pandas",
-        "frogs"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "6",
+      "answer": "4",
       "alts": null,
       "choices": null,
       "kind": "graph",
@@ -7458,30 +7415,11 @@
     {
       "prompt": "Sort every picture.",
       "answer": "pandas",
-      "alts": [
-        "ducks",
-        "owls"
-      ],
+      "alts": [],
       "choices": [
-        "cats",
-        "pandas",
-        "ducks",
-        "owls"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "frogs",
-      "alts": [
-        "ducks"
-      ],
-      "choices": [
+        "bunnies",
         "pigs",
-        "frogs",
-        "cats",
+        "pandas",
         "ducks"
       ],
       "kind": "graph",
@@ -7508,7 +7446,30 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "bunnies",
+      "answer": "4",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "pigs",
+      "alts": [],
+      "choices": [
+        "ducks",
+        "pigs",
+        "frogs",
+        "pandas"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "pandas",
       "alts": [],
       "choices": [
         "pandas",
@@ -7522,71 +7483,13 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "frogs",
-      "alts": [
-        "cats",
-        "pandas"
-      ],
+      "answer": "pigs",
+      "alts": [],
       "choices": [
         "frogs",
         "pigs",
         "cats",
         "pandas"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "6",
-      "alts": null,
-      "choices": null,
-      "kind": "graph",
-      "input": "keypad",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "bunnies",
-      "alts": [
-        "sharks"
-      ],
-      "choices": [
-        "bunnies",
-        "cats",
-        "ducks",
-        "sharks"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "cats",
-      "alts": [
-        "bunnies"
-      ],
-      "choices": [
-        "frogs",
-        "ducks",
-        "cats",
-        "bunnies"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "ducks",
-      "alts": [],
-      "choices": [
-        "cats",
-        "frogs",
-        "ducks",
-        "pigs"
       ],
       "kind": "graph",
       "input": "choice",
@@ -7595,61 +7498,6 @@
     {
       "prompt": "Sort every picture.",
       "answer": "4",
-      "alts": null,
-      "choices": null,
-      "kind": "graph",
-      "input": "keypad",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "ducks",
-      "alts": [
-        "cats",
-        "owls",
-        "pigs"
-      ],
-      "choices": [
-        "ducks",
-        "cats",
-        "owls",
-        "pigs"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "bunnies",
-      "alts": [],
-      "choices": [
-        "pandas",
-        "pigs",
-        "bunnies",
-        "frogs"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "pandas",
-      "alts": [],
-      "choices": [
-        "cats",
-        "owls",
-        "pandas",
-        "frogs"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "6",
       "alts": null,
       "choices": null,
       "kind": "graph",
@@ -7659,9 +7507,114 @@
     {
       "prompt": "Sort every picture.",
       "answer": "sharks",
-      "alts": [
-        "cats"
+      "alts": [],
+      "choices": [
+        "bunnies",
+        "cats",
+        "ducks",
+        "sharks"
       ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "4",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "pigs",
+      "alts": [],
+      "choices": [
+        "cats",
+        "frogs",
+        "ducks",
+        "pigs"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "cats",
+      "alts": [],
+      "choices": [
+        "cats",
+        "bunnies",
+        "frogs",
+        "pigs"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "pigs",
+      "alts": [],
+      "choices": [
+        "ducks",
+        "cats",
+        "owls",
+        "pigs"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "pandas",
+      "alts": [],
+      "choices": [
+        "pandas",
+        "pigs",
+        "bunnies",
+        "frogs"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "frogs",
+      "alts": [],
+      "choices": [
+        "cats",
+        "owls",
+        "pandas",
+        "frogs"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "pigs",
+      "alts": [],
+      "choices": [
+        "cats",
+        "pandas",
+        "owls",
+        "pigs"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "sharks",
+      "alts": [],
       "choices": [
         "pandas",
         "sharks",
@@ -7674,7 +7627,7 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "cats",
+      "answer": "bunnies",
       "alts": [],
       "choices": [
         "sharks",
@@ -7688,16 +7641,11 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "frogs",
-      "alts": [],
-      "choices": [
-        "frogs",
-        "sharks",
-        "bunnies",
-        "ducks"
-      ],
+      "answer": "4",
+      "alts": null,
+      "choices": null,
       "kind": "graph",
-      "input": "choice",
+      "input": "keypad",
       "needsInteract": true
     }
   ],
@@ -8796,31 +8744,6 @@
   "u7-bar": [
     {
       "prompt": "Sort every picture.",
-      "answer": "bunnies",
-      "alts": [
-        "owls"
-      ],
-      "choices": [
-        "bunnies",
-        "ducks",
-        "pigs",
-        "owls"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "2",
-      "alts": null,
-      "choices": null,
-      "kind": "graph",
-      "input": "keypad",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
       "answer": "2",
       "alts": null,
       "choices": null,
@@ -8833,10 +8756,10 @@
       "answer": "pigs",
       "alts": [],
       "choices": [
-        "owls",
-        "pigs",
+        "pandas",
+        "cats",
         "sharks",
-        "bunnies"
+        "pigs"
       ],
       "kind": "graph",
       "input": "choice",
@@ -8845,14 +8768,12 @@
     {
       "prompt": "Sort every picture.",
       "answer": "frogs",
-      "alts": [
-        "sharks"
-      ],
+      "alts": [],
       "choices": [
+        "bunnies",
         "frogs",
         "cats",
-        "owls",
-        "sharks"
+        "owls"
       ],
       "kind": "graph",
       "input": "choice",
@@ -8865,22 +8786,6 @@
       "choices": null,
       "kind": "graph",
       "input": "keypad",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "pigs",
-      "alts": [
-        "cats"
-      ],
-      "choices": [
-        "pigs",
-        "ducks",
-        "frogs",
-        "cats"
-      ],
-      "kind": "graph",
-      "input": "choice",
       "needsInteract": true
     },
     {
@@ -8894,16 +8799,13 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "pandas",
-      "alts": [
-        "owls",
-        "bunnies"
-      ],
+      "answer": "owls",
+      "alts": [],
       "choices": [
-        "ducks",
-        "pandas",
         "owls",
-        "bunnies"
+        "bunnies",
+        "sharks",
+        "frogs"
       ],
       "kind": "graph",
       "input": "choice",
@@ -8911,15 +8813,86 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "pandas",
-      "alts": [
-        "cats"
+      "answer": "2",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "frogs",
+      "alts": [],
+      "choices": [
+        "bunnies",
+        "ducks",
+        "frogs",
+        "pigs"
       ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "2",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "3",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "3",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "pigs",
+      "alts": [],
+      "choices": [
+        "pigs",
+        "ducks",
+        "frogs",
+        "sharks"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "2",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "pandas",
+      "alts": [],
       "choices": [
         "sharks",
         "frogs",
         "pandas",
-        "cats"
+        "owls"
       ],
       "kind": "graph",
       "input": "choice",
@@ -8930,47 +8903,10 @@
       "answer": "ducks",
       "alts": [],
       "choices": [
+        "pigs",
         "ducks",
-        "pandas",
-        "frogs",
-        "cats"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "2",
-      "alts": null,
-      "choices": null,
-      "kind": "graph",
-      "input": "keypad",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "pandas",
-      "alts": [],
-      "choices": [
-        "pandas",
-        "ducks",
-        "owls",
-        "cats"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "sharks",
-      "alts": [],
-      "choices": [
         "sharks",
-        "frogs",
-        "pandas",
-        "owls"
+        "pandas"
       ],
       "kind": "graph",
       "input": "choice",
@@ -8978,20 +8914,8 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "2",
-      "alts": null,
-      "choices": null,
-      "kind": "graph",
-      "input": "keypad",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "cats",
-      "alts": [
-        "ducks",
-        "owls"
-      ],
+      "answer": "bunnies",
+      "alts": [],
       "choices": [
         "bunnies",
         "cats",
@@ -9004,10 +8928,8 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "frogs",
-      "alts": [
-        "owls"
-      ],
+      "answer": "owls",
+      "alts": [],
       "choices": [
         "pigs",
         "frogs",
@@ -9020,34 +8942,34 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "3",
-      "alts": null,
-      "choices": null,
-      "kind": "graph",
-      "input": "keypad",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "3",
-      "alts": null,
-      "choices": null,
-      "kind": "graph",
-      "input": "keypad",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "pigs",
+      "answer": "pandas",
       "alts": [],
       "choices": [
         "cats",
-        "owls",
-        "bunnies",
-        "pigs"
+        "pandas",
+        "frogs",
+        "sharks"
       ],
       "kind": "graph",
       "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "3",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "2",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
       "needsInteract": true
     }
   ],
@@ -13238,9 +13160,9 @@
   "u11-count": [
     {
       "prompt": "How much money?",
-      "answer": "158",
+      "answer": "$1.58",
       "alts": [
-        "$1.58"
+        "158"
       ],
       "choices": null,
       "kind": "money",
@@ -13249,9 +13171,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "293",
+      "answer": "$2.93",
       "alts": [
-        "$2.93"
+        "293"
       ],
       "choices": null,
       "kind": "money",
@@ -13260,9 +13182,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "500",
+      "answer": "$5.00",
       "alts": [
-        "$5.00"
+        "500"
       ],
       "choices": null,
       "kind": "money",
@@ -13271,9 +13193,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "248",
+      "answer": "$2.48",
       "alts": [
-        "$2.48"
+        "248"
       ],
       "choices": null,
       "kind": "money",
@@ -13282,9 +13204,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "346",
+      "answer": "$3.46",
       "alts": [
-        "$3.46"
+        "346"
       ],
       "choices": null,
       "kind": "money",
@@ -13293,9 +13215,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "228",
+      "answer": "$2.28",
       "alts": [
-        "$2.28"
+        "228"
       ],
       "choices": null,
       "kind": "money",
@@ -13304,9 +13226,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "216",
+      "answer": "$2.16",
       "alts": [
-        "$2.16"
+        "216"
       ],
       "choices": null,
       "kind": "money",
@@ -13315,9 +13237,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "500",
+      "answer": "$5.00",
       "alts": [
-        "$5.00"
+        "500"
       ],
       "choices": null,
       "kind": "money",
@@ -13326,9 +13248,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "500",
+      "answer": "$5.00",
       "alts": [
-        "$5.00"
+        "500"
       ],
       "choices": null,
       "kind": "money",
@@ -13337,9 +13259,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "348",
+      "answer": "$3.48",
       "alts": [
-        "$3.48"
+        "348"
       ],
       "choices": null,
       "kind": "money",
@@ -13348,9 +13270,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "500",
+      "answer": "$5.00",
       "alts": [
-        "$5.00"
+        "500"
       ],
       "choices": null,
       "kind": "money",
@@ -13359,9 +13281,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "406",
+      "answer": "$4.06",
       "alts": [
-        "$4.06"
+        "406"
       ],
       "choices": null,
       "kind": "money",
@@ -13370,9 +13292,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "371",
+      "answer": "$3.71",
       "alts": [
-        "$3.71"
+        "371"
       ],
       "choices": null,
       "kind": "money",
@@ -13381,9 +13303,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "500",
+      "answer": "$5.00",
       "alts": [
-        "$5.00"
+        "500"
       ],
       "choices": null,
       "kind": "money",
@@ -13392,9 +13314,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "317",
+      "answer": "$3.17",
       "alts": [
-        "$3.17"
+        "317"
       ],
       "choices": null,
       "kind": "money",
@@ -13403,9 +13325,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "307",
+      "answer": "$3.07",
       "alts": [
-        "$3.07"
+        "307"
       ],
       "choices": null,
       "kind": "money",
@@ -13425,9 +13347,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "388",
+      "answer": "$3.88",
       "alts": [
-        "$3.88"
+        "388"
       ],
       "choices": null,
       "kind": "money",
@@ -13436,9 +13358,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "257",
+      "answer": "$2.57",
       "alts": [
-        "$2.57"
+        "257"
       ],
       "choices": null,
       "kind": "money",
@@ -13447,9 +13369,9 @@
     },
     {
       "prompt": "How much money?",
-      "answer": "142",
+      "answer": "$1.42",
       "alts": [
-        "$1.42"
+        "142"
       ],
       "choices": null,
       "kind": "money",

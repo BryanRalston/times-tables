@@ -39,4 +39,23 @@ describe("shop tiles", () => {
     expect(html).toContain("avocado.png");
     expect(html).toContain("pointer-events-none");
   });
+
+  it("buy cheer does not apply squash and never uses the poke clip", () => {
+    const avocado = squisheeById("avocado")!;
+    const av = renderToStaticMarkup(<ShopCard s={avocado} got coins={0} onBuy={() => {}} cheer />);
+    expect(av).toContain('data-cheer="1"');
+    expect(av).toContain("avocado-cheer");
+    expect(av).not.toContain("avocado-poke");
+    expect(av).not.toContain("unlock-pop");
+    expect(av).not.toContain('data-squash="1"');
+    expect(av).not.toMatch(/[\s"]squash[\s"]/);
+
+    const panda = squisheeById("panda")!;
+    const html = renderToStaticMarkup(<ShopCard s={panda} got coins={0} onBuy={() => {}} cheer />);
+    expect(html).toContain('data-cheer="1"');
+    expect(html).toContain("panda-cheer");
+    expect(html).not.toContain("panda-poke");
+    expect(html).not.toContain('data-squash="1"');
+    expect(html).not.toMatch(/[\s"]squash[\s"]/);
+  });
 });

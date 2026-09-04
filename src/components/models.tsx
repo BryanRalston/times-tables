@@ -251,7 +251,7 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
           return (
             <div
               key={r}
-              className="leftover-row flex w-full flex-nowrap items-center justify-center gap-1.5 rounded-[16px] border border-line bg-bg-warm p-2 lg:gap-2 lg:p-3"
+              className="leftover-row grid w-full grid-cols-5 items-center justify-items-center gap-1.5 rounded-[16px] border border-line bg-bg-warm p-2 lg:gap-2 lg:p-3"
             >
               {known.length ? (
                 <div
@@ -259,8 +259,7 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
                   role="group"
                   aria-label="known group"
                   className={cn(
-                    "flex flex-nowrap items-center justify-center gap-1.5 lg:gap-2",
-                    known.length === perRow && "w-full justify-evenly",
+                    "contents",
                     !knownGone && "known-idle",
                     nudge ? "known-bounce" : null,
                   )}
@@ -275,17 +274,17 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
               ) : null}
               {hiding.length ? (
                 <div
-                  className="flex flex-col items-center"
+                  className="contents"
                   {...(showN ? { "data-n-isolate": "" } : {})}
                 >
-                  <div className="flex flex-nowrap gap-1">
-                    {hiding.map((i) => (
-                      <Dot key={i} filled={false} leftover isolate={status === "correct"} />
-                    ))}
-                  </div>
-                  {showN ? (
-                    <span className="mt-1 font-display text-sm text-teal">n = {question.answer}</span>
-                  ) : null}
+                  {hiding.map((i) => (
+                    <span key={i} className="flex flex-col items-center">
+                      <Dot filled={false} leftover isolate={status === "correct"} />
+                      {showN && i === hiding[hiding.length - 1] ? (
+                        <span className="mt-1 font-display text-sm text-teal">n = {question.answer}</span>
+                      ) : null}
+                    </span>
+                  ))}
                 </div>
               ) : null}
               {extra.map((i) => (
@@ -934,7 +933,7 @@ function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProp
     const hasBill = coins.some((c) => c.id === "dollar" || c.id === "five");
     return (
       <Frame shake={shake} status={status}>
-        <div data-count-row="rest" className="flex min-h-10 flex-wrap justify-center gap-2">
+        <div data-count-row="rest" className="flex min-h-10 flex-wrap content-start justify-center gap-2 pb-1">
           {rest.map((c) => {
             const meta = COIN_META.find((m) => m.id === c.id)!;
             return (
@@ -956,18 +955,23 @@ function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProp
             );
           })}
         </div>
+        <p className="mt-2 text-center text-xs font-medium text-muted">{ui.countedTray}</p>
         <div
           data-count-row="pile"
-          className="mt-3 flex min-h-10 flex-wrap justify-center gap-2 rounded-[16px] border border-dashed border-line bg-bg-warm p-2"
+          className="mt-1 flex min-h-14 flex-wrap justify-center gap-2 rounded-[16px] border border-dashed border-line bg-bg-warm p-2"
         >
-          {pile.map((c) => {
-            const meta = COIN_META.find((m) => m.id === c.id)!;
-            return (
-              <span key={c.key} data-count-coin={c.id} data-counted="1" aria-label={meta.label}>
-                <MoneyPic id={c.id} />
-              </span>
-            );
-          })}
+          {pile.length ? (
+            pile.map((c) => {
+              const meta = COIN_META.find((m) => m.id === c.id)!;
+              return (
+                <span key={c.key} data-count-coin={c.id} data-counted="1" aria-label={meta.label}>
+                  <MoneyPic id={c.id} />
+                </span>
+              );
+            })
+          ) : (
+            <span className="self-center text-xs text-faint">{hasBill ? ui.tapMoneyIn : ui.tapCoinsIn}</span>
+          )}
         </div>
         <p className="mt-3 text-center text-sm text-muted">{hasBill ? ui.countMoney : ui.countCoins}</p>
         <button

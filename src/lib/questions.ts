@@ -691,8 +691,9 @@ function moneyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   return keypadQ(rng, {
     kind: "money",
     prompt: hasBill ? t().howMuchMoney : t().howManyCents,
-    answer: String(purse.cents),
-    alts: [moneyFmt(purse.cents)],
+    hint: hasBill ? t().tapMoneyIn : t().tapCoinsIn,
+    answer: hasBill ? moneyFmt(purse.cents) : String(purse.cents),
+    alts: [hasBill ? String(purse.cents) : moneyFmt(purse.cents)],
     data: { coins: purse.coins, mode: "count" } satisfies MoneyData,
   });
 }
@@ -765,16 +766,23 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   } else key = rng.pick([1, 2]);
   const kind = (params.kind as "picto" | "bar") ?? "picto";
   if (params.collect) {
-    const focusCat = rng.pick(pack);
-    const total = rng.int(6, 8);
-    const bag = [...pack, focusCat];
-    while (bag.length < total) bag.push(rng.pick(pack));
+    const ask = rng.pick(["value", "greatest", "least"] as const);
+    const parts =
+      ask === "greatest" || ask === "least" ? rng.shuffle([3, 2, 2, 1]) : null;
+    const bag = parts
+      ? pack.flatMap((p, i) => Array.from({ length: parts[i]! }, () => p))
+      : (() => {
+          const focusCat = rng.pick(pack);
+          const total = rng.int(6, 8);
+          const start = [...pack, focusCat];
+          while (start.length < total) start.push(rng.pick(pack));
+          return start;
+        })();
     const trayPack = rng.shuffle(bag);
     const counts: Record<string, number> = Object.fromEntries(labels.map((l) => [l, 0]));
     for (const p of trayPack) counts[p.label] = (counts[p.label] ?? 0) + 1;
-    const focus = focusCat.label;
-    const tray = trayPack.map((p, i) => ({ id: `t-${i}`, label: p.label, symbol: p.id }));
-    const ask = rng.pick(["value", "greatest", "least"] as const);
+    const focus = labels.filter((l) => (counts[l] ?? 0) >= 2)[0] ?? pack[0]!.label;
+    const trayFixed = trayPack.map((p, i) => ({ id: `t-${i}`, label: p.label, symbol: p.id }));
     let readPrompt = t().graphHowMany(focus);
     let answer = String((counts[focus] ?? 0) * key);
     let graphAlts: string[] | undefined;
@@ -815,7 +823,7 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
         ask,
         focus,
         collect: true,
-        tray,
+        tray: trayFixed,
         readPrompt,
       } satisfies GraphData,
     });

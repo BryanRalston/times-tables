@@ -36,14 +36,17 @@ export function AnswerReadout({
   value,
   empty = "?",
   label,
+  prefix,
 }: {
   value: string;
   empty?: string;
   label?: string;
+  prefix?: string;
 }) {
   const ui = useChrome();
   const shown = value.length > 0;
   const shownLabel = label ?? ui.yourAnswer;
+  const display = shown ? `${prefix ?? ""}${value}` : empty;
   return (
     <div className="frost rounded-[20px] border-2 border-ink px-4 py-3 text-center shadow-soft">
       <p className="text-xs font-medium uppercase tracking-wide text-muted">{shownLabel}</p>
@@ -53,9 +56,9 @@ export function AnswerReadout({
           shown ? "text-ink" : "text-faint",
         )}
         aria-live="polite"
-        aria-label={shown ? `${shownLabel} ${value}` : `${shownLabel} empty`}
+        aria-label={shown ? `${shownLabel} ${display}` : `${shownLabel} empty`}
       >
-        {shown ? value : empty}
+        {display}
       </p>
     </div>
   );
@@ -69,6 +72,7 @@ export function Keypad({
   replace,
   allowDot = true,
   quiet,
+  prefix,
   className,
 }: {
   value: string;
@@ -78,6 +82,7 @@ export function Keypad({
   replace?: boolean;
   allowDot?: boolean;
   quiet?: boolean;
+  prefix?: string;
   className?: string;
 }) {
   const ui = useChrome();
@@ -96,7 +101,7 @@ export function Keypad({
           </p>
         ) : null
       ) : (
-        <AnswerReadout value={value} />
+        <AnswerReadout value={value} prefix={prefix} />
       )}
       <div className="grid w-full grid-cols-3 gap-2">
         {keys.map((k) => (

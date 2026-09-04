@@ -99,4 +99,38 @@ describe("answer panel keypad", () => {
     );
     expect(cntHtml).toContain('aria-label="."');
   });
+
+  it("prefixes $ on count-with-bills, not leftover or coin-only", () => {
+    const leftover = welcomeFirst(rngFromSeed("dot:left"));
+    const leftHtml = renderToStaticMarkup(
+      <AnswerPanel question={leftover} value="4" setValue={() => undefined} onCheck={() => undefined} />,
+    );
+    expect(leftHtml).not.toContain("$4");
+
+    const coins = makeQuestion(activityById("u1-coins")!.activity, rngFromSeed("dot:cnt"));
+    const coinHtml = renderToStaticMarkup(
+      <AnswerPanel question={coins} value="5" setValue={() => undefined} onCheck={() => undefined} />,
+    );
+    expect(coinHtml).toContain(">5<");
+    expect(coinHtml).not.toContain("$5");
+
+    let bill = makeQuestion(activityById("u11-count")!.activity, rngFromSeed("dot:cnt"));
+    for (let i = 0; i < 80; i++) {
+      const q = makeQuestion(activityById("u11-count")!.activity, rngFromSeed(`bill:u11-count:${i}`));
+      const d = q.data as { coins?: { dollar?: number; five?: number } };
+      if (d.coins?.dollar || d.coins?.five) {
+        bill = q;
+        break;
+      }
+    }
+    const billHtml = renderToStaticMarkup(
+      <AnswerPanel question={bill} value="5" setValue={() => undefined} onCheck={() => undefined} />,
+    );
+    expect(billHtml).toContain("$5");
+    const emptyBill = renderToStaticMarkup(
+      <AnswerPanel question={bill} value="" setValue={() => undefined} onCheck={() => undefined} />,
+    );
+    expect(emptyBill).toContain("?");
+    expect(emptyBill).not.toContain("$?");
+  });
 });

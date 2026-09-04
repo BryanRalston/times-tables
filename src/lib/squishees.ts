@@ -2,26 +2,85 @@ import { asset } from "@/lib/art";
 
 export type Rarity = "common" | "rare";
 
+export interface PokeStripMeta {
+  frames: number;
+  fps: number;
+  cell: number;
+  src: string;
+}
+
 export interface Squishee {
   id: string;
   name: string;
   theme: "animal" | "food";
   file: string;
   poke: string | null;
+  pokeStrip?: PokeStripMeta | null;
+  cheer?: string | null;
+  cheerStrip?: PokeStripMeta | null;
   rarity: Rarity;
+}
+
+/** Kitchen sprite filename: public/squishees/<id>-poke-strip.png */
+export function pokeStripFile(id: string): string {
+  return `${id}-poke-strip.png`;
+}
+
+export function pokeStripJsonFile(id: string): string {
+  return `${id}-poke-strip.json`;
+}
+
+export function cheerFile(id: string): string {
+  return `${id}-cheer.mp4`;
+}
+
+export function cheerStripFile(id: string): string {
+  return `${id}-cheer-strip.png`;
+}
+
+export function cheerStripJsonFile(id: string): string {
+  return `${id}-cheer-strip.json`;
+}
+
+function withWiredCheer(s: Squishee): Squishee {
+  return {
+    ...s,
+    cheer: cheerFile(s.id),
+    cheerStrip: { frames: 36, fps: 24, cell: 384, src: cheerStripFile(s.id) },
+  };
+}
+
+export function parsePokeStripJson(raw: unknown): PokeStripMeta | null {
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Record<string, unknown>;
+  const frames = Number(o.frames);
+  const fps = Number(o.fps);
+  const cell = Number(o.cell);
+  const src = typeof o.src === "string" ? o.src.replace(/\\/g, "/").trim() : "";
+  if (!Number.isInteger(frames) || frames < 2 || frames > 64) return null;
+  if (!Number.isFinite(fps) || fps < 1 || fps > 30) return null;
+  if (!Number.isInteger(cell) || cell < 16 || cell > 1024) return null;
+  if (!src.endsWith(".png") || src.includes("..") || src.includes(":")) return null;
+  const file = src.split("/").pop() ?? "";
+  if (!file.endsWith("-strip.png")) return null;
+  return { frames, fps, cell, src: file };
+}
+
+export function pokeStripSrc(meta: PokeStripMeta): string {
+  return asset(`squishees/${meta.src}`);
 }
 
 const COMMON: Squishee[] = [
   { id: "avocado", name: "Avocado", theme: "food", file: "avocado.png", poke: null, rarity: "common" },
   { id: "bear", name: "Bear", theme: "animal", file: "bear.png", poke: null, rarity: "common" },
   { id: "bun", name: "Bun", theme: "food", file: "bun.png", poke: null, rarity: "common" },
-  { id: "bunny", name: "Bunny", theme: "animal", file: "bunny.png", poke: null, rarity: "common" },
-  { id: "cat", name: "Cat", theme: "animal", file: "cat.png", poke: "cat-poke.mp4", rarity: "common" },
+  { id: "bunny", name: "Bunny", theme: "animal", file: "bunny.png", poke: "bunny-poke.mp4", pokeStrip: { frames: 16, fps: 12, cell: 384, src: "bunny-poke-strip.png" }, rarity: "common" },
+  { id: "cat", name: "Cat", theme: "animal", file: "cat.png", poke: "cat-poke.mp4", pokeStrip: { frames: 16, fps: 12, cell: 384, src: "cat-poke-strip.png" }, rarity: "common" },
   { id: "chick", name: "Chick", theme: "animal", file: "chick.png", poke: null, rarity: "common" },
   { id: "corn", name: "Corn", theme: "food", file: "corn.png", poke: null, rarity: "common" },
   { id: "donut", name: "Donut", theme: "food", file: "donut.png", poke: null, rarity: "common" },
   { id: "duck", name: "Duck", theme: "animal", file: "duck.png", poke: null, rarity: "common" },
-  { id: "frog", name: "Frog", theme: "animal", file: "frog.png", poke: "frog-poke.mp4", rarity: "common" },
+  { id: "frog", name: "Frog", theme: "animal", file: "frog.png", poke: "frog-poke.mp4", pokeStrip: { frames: 16, fps: 12, cell: 384, src: "frog-poke-strip.png" }, rarity: "common" },
   { id: "grape", name: "Grape", theme: "food", file: "grape.png", poke: null, rarity: "common" },
   { id: "melon", name: "Melon", theme: "food", file: "melon.png", poke: null, rarity: "common" },
   { id: "owl", name: "Owl", theme: "animal", file: "owl.png", poke: null, rarity: "common" },
@@ -47,7 +106,7 @@ const COMMON: Squishee[] = [
   { id: "dumpling", name: "Dumpling", theme: "food", file: "dumpling.png", poke: null, rarity: "common" },
   { id: "matcha", name: "Matcha", theme: "food", file: "matcha.png", poke: null, rarity: "common" },
   { id: "sloth", name: "Sloth", theme: "animal", file: "sloth.png", poke: null, rarity: "common" },
-];
+].map(withWiredCheer);
 
 const RARE: Squishee[] = [
   { id: "crystal-axolotl", name: "Crystal Axolotl", theme: "animal", file: "crystal-axolotl.png", poke: null, rarity: "rare" },
@@ -58,7 +117,7 @@ const RARE: Squishee[] = [
   { id: "star-mochi", name: "Star Mochi", theme: "food", file: "star-mochi.png", poke: null, rarity: "rare" },
   { id: "sleepy-moon", name: "Sleepy Moon", theme: "animal", file: "sleepy-moon.png", poke: null, rarity: "rare" },
   { id: "blush-cloud", name: "Blush Cloud", theme: "animal", file: "blush-cloud.png", poke: null, rarity: "rare" },
-];
+].map(withWiredCheer);
 
 export const SQUISHEES: Squishee[] = [...COMMON, ...RARE];
 export const COMMON_SQUISHEES = COMMON;
@@ -77,4 +136,23 @@ export function squisheeSrc(id: string): string {
 export function squisheePokeSrc(id: string): string | null {
   const s = squisheeById(id);
   return s?.poke ? asset(`squishees/${s.poke}`) : null;
+}
+
+export function squisheePokeStrip(id: string): PokeStripMeta | null {
+  const s = squisheeById(id);
+  const meta = parsePokeStripJson(s?.pokeStrip ?? null);
+  if (!meta) return null;
+  return { ...meta, src: pokeStripSrc(meta) };
+}
+
+export function squisheeCheerSrc(id: string): string | null {
+  const s = squisheeById(id);
+  return s?.cheer ? asset(`squishees/${s.cheer}`) : null;
+}
+
+export function squisheeCheerStrip(id: string): PokeStripMeta | null {
+  const s = squisheeById(id);
+  const meta = parsePokeStripJson(s?.cheerStrip ?? null);
+  if (!meta) return null;
+  return { ...meta, src: pokeStripSrc(meta) };
 }

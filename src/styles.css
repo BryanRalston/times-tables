@@ -300,6 +300,25 @@
   animation: squash 560ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+@keyframes poke-strip {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 100% 0%;
+  }
+}
+.poke-strip {
+  display: block;
+  background-repeat: no-repeat;
+  background-position: 0% 0%;
+}
+.poke-strip-run {
+  animation-name: poke-strip;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
 .rare-glow {
   border-radius: 9999px;
   box-shadow: 0 0 0 3px rgb(196 92 38 / 0.45), 0 0 18px rgb(196 92 38 / 0.55);

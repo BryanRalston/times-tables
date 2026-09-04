@@ -103,6 +103,7 @@ export function MagentaVideo({
     let raf = 0;
     let stopped = false;
     let painted = false;
+    let lastT = -1;
 
     const fail = () => {
       if (stopped) return;
@@ -116,6 +117,12 @@ export function MagentaVideo({
       if (stopped) return;
       try {
         if (video.readyState >= 2 && video.videoWidth) {
+          const t = video.currentTime;
+          if (t === lastT && painted) {
+            raf = requestAnimationFrame(draw);
+            return;
+          }
+          lastT = t;
           const max = 480;
           const scale = Math.min(1, max / Math.max(video.videoWidth, video.videoHeight, 1));
           const w = Math.max(1, Math.round(video.videoWidth * scale));

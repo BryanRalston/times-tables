@@ -381,7 +381,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const quietWelcome = kind === "welcome" && phone;
   const showPanel = leftoverPanelOpen(gate);
   const showSkip = !quietWelcome && leftoverSkipOpen(gate);
-  const speech = pandaLine(q, locale, pose === "oops" ? "wrong" : status);
+  const speech = pandaLine(q, locale, pose === "oops" ? "wrong" : status, interacted);
   const showSpeech = !quietWelcome || status === "wrong" || pose === "oops";
   const board = (
     <Board

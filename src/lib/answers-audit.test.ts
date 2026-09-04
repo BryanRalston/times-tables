@@ -144,7 +144,16 @@ describe("answer audit", () => {
         const d = q.data as MoneyData;
         if (d.mode === "count") {
           const cents = Object.entries(d.coins).reduce((n, [id, c]) => n + (COIN[id] ?? 0) * (c ?? 0), 0);
-          expect(Number(q.answer)).toBe(cents);
+          const hasBill = Boolean(d.coins.dollar || d.coins.five);
+          expect(answersMatch(String(cents), q.answer, q.alts)).toBe(true);
+          expect(answersMatch(moneyFmt(cents), q.answer, q.alts)).toBe(true);
+          if (hasBill) {
+            expect(q.answer).toBe(moneyFmt(cents));
+            expect(q.alts ?? []).toContain(String(cents));
+            expect(q.prompt).not.toMatch(/cents/i);
+          } else {
+            expect(q.answer).toBe(String(cents));
+          }
           expect(q.prompt).not.toContain(String(cents));
           expect(q.prompt).not.toContain(moneyFmt(cents));
         }
@@ -352,10 +361,12 @@ describe("answer audit", () => {
         if (d.ask === "greatest") {
           const m = Math.max(...Object.values(counts));
           expect(counts[q.answer]).toBe(m);
+          expect(d.rows.filter((r) => (counts[r.label] ?? 0) === m)).toHaveLength(1);
         }
         if (d.ask === "least") {
           const m = Math.min(...Object.values(counts));
           expect(counts[q.answer]).toBe(m);
+          expect(d.rows.filter((r) => (counts[r.label] ?? 0) === m)).toHaveLength(1);
         }
       }
     }
@@ -545,12 +556,19 @@ function assertKind(activityId: string, q: Question) {
       const d = q.data as MoneyData;
       if (d.mode === "count") {
         const cents = Object.entries(d.coins).reduce((n, [id, c]) => n + (COIN[id] ?? 0) * (c ?? 0), 0);
-        expect(Number(q.answer), activityId).toBe(cents);
+        const hasBill = Boolean(d.coins.dollar || d.coins.five);
+        expect(answersMatch(String(cents), q.answer, q.alts), activityId).toBe(true);
+        expect(answersMatch(moneyFmt(cents), q.answer, q.alts), activityId).toBe(true);
+        if (hasBill) {
+          expect(q.answer, activityId).toBe(moneyFmt(cents));
+          expect(q.alts ?? [], activityId).toContain(String(cents));
+          expect(q.prompt).not.toMatch(/cents/i);
+        } else {
+          expect(q.answer, activityId).toBe(String(cents));
+        }
         expect(q.prompt).not.toContain(String(cents));
         expect(q.prompt).not.toContain(moneyFmt(cents));
         expect(q.prompt).not.toMatch(/\$\d+\.\d{2}/);
-        const hasBill = Boolean(d.coins.dollar || d.coins.five);
-        if (hasBill) expect(q.prompt).not.toMatch(/cents/i);
         if (activityId === "u1-coins") {
           expect(hasBill).toBe(false);
           expect(q.prompt).toBe("How many cents?");
