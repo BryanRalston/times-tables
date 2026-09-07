@@ -116,3 +116,13 @@ export function HomeLink({ className }: { className?: string }) {
     </button>
   );
 }
+
+export function AppShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="min-h-dvh w-full lg:px-6 lg:py-5" data-app-shell="1">
+      <div className="mx-auto min-h-dvh w-full max-w-6xl px-4 pb-16 pt-4 lg:min-h-[calc(100dvh-2.5rem)] lg:rounded-[28px] lg:border lg:border-line lg:bg-surface lg:px-8 lg:py-6 lg:shadow-soft">
+        {children}
+      </div>
+    </div>
+  );
+}

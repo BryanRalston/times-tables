@@ -1,4 +1,4 @@
-import { AppHeader, AppTabs, useUi } from "@/components/chrome";
+import { AppHeader, AppShell, AppTabs, useUi } from "@/components/chrome";
 import { ART } from "@/lib/art";
 import { todayIso } from "@/lib/calendar";
 import { QUARTERS, suggestedUnitId, unitsFor } from "@/lib/curriculum";
@@ -18,7 +18,7 @@ export function LessonsPage() {
   const qName = [ui.q1, ui.q2, ui.q3, ui.q4];
 
   return (
-    <div className="mx-auto min-h-dvh max-w-xl px-4 pb-16 pt-4">
+    <AppShell>
       <AppHeader />
       <AppTabs active="lessons" />
       <h2 className="font-display text-2xl">{ui.lessons}</h2>
@@ -31,7 +31,7 @@ export function LessonsPage() {
             <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted">
               {qName[q.id - 1] ?? q.name} · {q.span}
             </h3>
-            <div className="space-y-2">
+            <div className="grid gap-2 lg:grid-cols-2">
               {units.map((u) => {
                 const now = u.id === suggested;
                 return (
@@ -96,6 +96,6 @@ export function LessonsPage() {
           </section>
         );
       })}
-    </div>
+    </AppShell>
   );
 }

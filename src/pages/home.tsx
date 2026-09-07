@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { AppHeader, AppTabs, useUi } from "@/components/chrome";
+import { AppHeader, AppShell, AppTabs, useUi } from "@/components/chrome";
 import { PokeToy } from "@/components/poke-toy";
 import { Button } from "@/components/ui/button";
 import { YearPath } from "@/components/year-path";
@@ -45,7 +45,7 @@ export function HomePage() {
   const remain = remainingSchoolDaysInUnit(suggested, walk.schoolDate);
 
   return (
-    <div className="mx-auto min-h-dvh max-w-xl px-4 pb-16 pt-4">
+    <AppShell>
       <AppHeader />
       <AppTabs active="home" />
 
@@ -72,6 +72,6 @@ export function HomePage() {
       </p>
       <YearPath suggestedId={suggested} onOpen={(id) => navigate({ id: "unit", unitId: id })} />
       <p className="mt-6 text-center text-xs text-faint">{ui.nothingLeaves}</p>
-    </div>
+    </AppShell>
   );
 }

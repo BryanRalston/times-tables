@@ -14,28 +14,36 @@ describe("shop prices", () => {
 });
 
 describe("shop tiles", () => {
-  it("shows real squishee art on locked tiles, not a brightness-0 silhouette", () => {
+  it("locked tiles are mystery silhouettes, not full-color spoilers", () => {
     const html = renderToStaticMarkup(<ShelfPage />);
-    expect(html).toContain("squishees/");
+    expect(html).toContain("data-silhouette");
+    expect(html).toContain("squishee-silhouette");
+    expect(html).toContain("???");
     expect(html).toContain("frog.png");
-    expect(html).not.toContain("brightness-0");
-    expect(html).not.toContain("???");
+    expect(html).not.toContain("Poke Bear");
   });
 
   it("owned avocado tile is a poke button with squash machinery", () => {
     const avocado = squisheeById("avocado")!;
     const html = renderToStaticMarkup(<ShopCard s={avocado} got coins={0} onBuy={() => {}} />);
     expect(html).toContain("Poke Avocado");
+    expect(html).toContain("Avocado");
     expect(html).toContain("<button");
     expect(html).toContain("overflow-visible");
     expect(html).toContain("data-squash");
-    expect(html).not.toContain("pointer-events-none");
+    expect(html).toContain("data-owned-poke");
+    expect(html).not.toContain("data-silhouette");
+    expect(html).not.toMatch(/<button[^>]*pointer-events-none/);
   });
 
   it("locked avocado is buy-only, not a poke button", () => {
     const avocado = squisheeById("avocado")!;
     const html = renderToStaticMarkup(<ShopCard s={avocado} got={false} coins={0} onBuy={() => {}} />);
     expect(html).not.toContain("Poke Avocado");
+    expect(html).not.toContain(">Avocado<");
+    expect(html).toContain("???");
+    expect(html).toContain("data-silhouette");
+    expect(html).toContain("squishee-silhouette");
     expect(html).toContain("avocado.png");
     expect(html).toContain("pointer-events-none");
   });

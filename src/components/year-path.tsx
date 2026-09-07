@@ -16,7 +16,7 @@ export function YearPath({ suggestedId, onOpen }: { suggestedId: string; onOpen:
   let lastQuarter = 0;
 
   return (
-    <ol className="relative mx-auto max-w-lg overflow-x-hidden pb-8">
+    <ol className="relative mx-auto w-full max-w-3xl overflow-x-hidden pb-8">
       <div className="absolute bottom-10 left-1/2 top-6 w-1.5 -translate-x-1/2 rounded-full bg-line" aria-hidden />
       {unitsFor(pathGrade).map((u, i) => {
         const st = unitStatus(u, suggestedId);

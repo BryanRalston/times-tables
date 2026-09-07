@@ -136,6 +136,7 @@ describe("first-visit leftover door", () => {
     expect(html).toContain("Home, lessons, and shelf");
     expect(html).toContain("Squishee Math");
     expect(html).toContain("data-mute-sounds");
+    expect(html).toContain("data-app-shell");
     expect(html).not.toContain("Play leftover");
     expect(html).not.toContain("6 + n = 10");
     expect(html).not.toContain(">Score<");
@@ -168,6 +169,9 @@ describe("first-visit leftover door", () => {
     expect(play).toContain("data-show-correct");
     expect(play).toContain("REVEAL_AFTER_MISSES");
     expect(play).toContain("holdMsFor");
+    expect(play).toContain("data-play-page");
+    expect(play).toContain("data-play-keys");
+    expect(play).toContain("flex min-h-dvh");
     expect(play).not.toContain("md:grid-rows-[auto_minmax(0,1fr)_auto]");
     expect(play).not.toContain("lg:max-w-3xl");
     expect(play).not.toMatch(/Score\s*\/\s*Streak/);
@@ -177,9 +181,14 @@ describe("first-visit leftover door", () => {
     expect(chrome).toContain("ui.lessons");
     expect(chrome).toContain("ui.shelf");
     expect(chrome).toContain("data-mute-sounds");
+    expect(chrome).toContain("max-w-6xl");
+    expect(chrome).toContain("data-app-shell");
     expect(chrome).not.toMatch(/Score\s*\/\s*Streak/);
     const css = readFileSync(join(HERE, "styles.css"), "utf8");
     expect(css).toContain("[data-welcome-leftover] [data-leftover-board] .leftover-dot");
+    expect(css).toContain(".squishee-silhouette");
+    expect(css).toContain("[data-play-keys]");
+    expect(css).toContain("position: sticky");
     expect(css).not.toMatch(/@media \(min-width: 768px\)\s*\{\s*\[data-welcome-leftover\]/);
     expect(css).not.toMatch(/@media \(min-width: 1024px\)\s*\{\s*\[data-welcome-leftover\]/);
     const models = readFileSync(join(HERE, "components/models.tsx"), "utf8");

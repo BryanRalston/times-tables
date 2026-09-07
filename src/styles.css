@@ -342,3 +342,43 @@ details > summary::-webkit-details-marker {
   white-space: nowrap;
   border: 0;
 }
+
+.squishee-silhouette {
+  filter: brightness(0);
+  opacity: 0.34;
+}
+
+@media (max-width: 767px) {
+  [data-play-keys] {
+    position: sticky;
+    bottom: 0;
+    z-index: 30;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding: 0.4rem 1rem max(0.55rem, env(safe-area-inset-bottom, 0px));
+    background: linear-gradient(180deg, rgb(244 179 208 / 0) 0%, #f4b3d0 22%);
+  }
+  [data-play-keys] [data-keypad] {
+    gap: 0.4rem;
+  }
+  [data-play-keys] button.h-14 {
+    height: 2.75rem;
+  }
+  [data-play-keys] button.h-14.text-lg,
+  [data-play-keys] button.col-span-3 {
+    height: 2.85rem;
+  }
+  [data-play-page] .leftover-dot {
+    width: 1.65rem;
+    height: 1.65rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  html,
+  body,
+  #app {
+    background-color: #f4b3d0;
+    background-image: radial-gradient(1200px 600px at 50% -10%, #ffd3e8, #f4b3d0 55%);
+  }
+}

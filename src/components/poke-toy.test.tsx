@@ -8,7 +8,8 @@ describe("PokeToy", () => {
     expect(html).toContain("Poke Frog");
     expect(html).toContain("frog.png");
     expect(html).toContain("<button");
-    expect(html).not.toContain("pointer-events-none");
+    expect(html).toContain("data-owned-poke");
+    expect(html).not.toMatch(/<button[^>]*pointer-events-none/);
   });
 
   it("renders catalog toys used on home", () => {
@@ -23,7 +24,8 @@ describe("PokeToy", () => {
     expect(html).toContain("<button");
     expect(html).toContain("overflow-visible");
     expect(html).toContain("data-squash");
-    expect(html).not.toContain("pointer-events-none");
+    expect(html).toContain("data-owned-poke");
+    expect(html).not.toMatch(/<button[^>]*pointer-events-none/);
   });
 
   it("keeps the PNG in the tree before a poke clip paints", () => {

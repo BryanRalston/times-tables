@@ -32,7 +32,7 @@ export function UnitPage({ unitId }: { unitId: string }) {
   const copy = unitText(unit, locale);
 
   return (
-    <div className="mx-auto min-h-dvh max-w-lg px-4 py-6">
+    <div className="mx-auto min-h-dvh max-w-3xl px-4 py-6 lg:max-w-5xl">
       <div className="mb-4 flex items-center justify-between">
         <HomeLink />
         <button type="button" className="text-sm text-teal" onClick={() => navigate({ id: "lessons" })}>

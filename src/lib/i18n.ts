@@ -137,6 +137,7 @@ export type Ui = {
   mute: string;
   unmute: string;
   sounds: string;
+  mystery: string;
   practiceToday: string;
   questionsN: (n: number) => string;
   correctPct: (n: number) => string;
@@ -281,6 +282,7 @@ export const UI: Record<Locale, Ui> = {
     mute: "Mute sounds",
     unmute: "Unmute sounds",
     sounds: "Sounds",
+    mystery: "???",
     practiceToday: "Today",
     questionsN: (n) => `${n} questions`,
     correctPct: (n) => `${n}% correct`,
@@ -423,6 +425,7 @@ export const UI: Record<Locale, Ui> = {
     mute: "Silenciar sonidos",
     unmute: "Activar sonidos",
     sounds: "Sonidos",
+    mystery: "???",
     practiceToday: "Hoy",
     questionsN: (n) => `${n} preguntas`,
     correctPct: (n) => `${n}% correctas`,
@@ -565,6 +568,7 @@ export const UI: Record<Locale, Ui> = {
     mute: "Silenciar sons",
     unmute: "Ativar sons",
     sounds: "Sons",
+    mystery: "???",
     practiceToday: "Hoje",
     questionsN: (n) => `${n} perguntas`,
     correctPct: (n) => `${n}% corretas`,

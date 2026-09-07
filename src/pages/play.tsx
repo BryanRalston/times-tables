@@ -514,8 +514,11 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   }
 
   return (
-    <div className="mx-auto min-h-dvh max-w-lg overflow-x-hidden px-4 pb-8 pt-3 lg:max-w-5xl">
-      <header className="mb-2 flex items-center gap-2">
+    <div
+      className="mx-auto flex min-h-dvh max-w-lg flex-col overflow-x-hidden px-4 pt-3 lg:max-w-5xl"
+      data-play-page="1"
+    >
+      <header className="mb-2 flex shrink-0 items-center gap-2">
         <button type="button" className="text-sm text-muted" onClick={() => navigate({ id: "home" })}>
           ← {ui.home}
         </button>
@@ -528,26 +531,32 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         {muteBtn}
       </header>
 
-      <div className="flex items-end gap-2">
-        <div className="relative">
-          <Mascot who={who} pose={pose} hop={hop} size="md" />
-          <StarPop show={star} />
-        </div>
-        {showSpeech ? (
-          <p className="mb-4 max-w-[14rem] rounded-[18px] border border-line bg-surface px-3 py-2 text-sm">{speech}</p>
-        ) : null}
-      </div>
+      <div
+        className={
+          showPanel
+            ? "flex min-h-0 flex-1 flex-col lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,22rem)] lg:items-start lg:gap-6"
+            : "flex min-h-0 flex-1 flex-col"
+        }
+      >
+        <div className="min-h-0 flex-1 overflow-y-auto pb-3 lg:overflow-visible">
+          <div className="flex items-end gap-2">
+            <div className="relative">
+              <Mascot who={who} pose={pose} hop={hop} size="sm" />
+              <StarPop show={star} />
+            </div>
+            {showSpeech ? (
+              <p className="mb-3 max-w-[14rem] rounded-[18px] border border-line bg-surface px-3 py-2 text-sm">{speech}</p>
+            ) : null}
+          </div>
 
-      {pill ? (
-        <p className="mb-2 text-center text-[11px] font-medium uppercase tracking-wide text-muted">{pill}</p>
-      ) : null}
+          {pill ? (
+            <p className="mb-2 text-center text-[11px] font-medium uppercase tracking-wide text-muted">{pill}</p>
+          ) : null}
 
-      {q.sol?.length ? (
-        <p className="mb-1 text-center text-[11px] font-medium uppercase tracking-wide text-faint">{q.sol.join(" · ")}</p>
-      ) : null}
+          {q.sol?.length ? (
+            <p className="mb-1 text-center text-[11px] font-medium uppercase tracking-wide text-faint">{q.sol.join(" · ")}</p>
+          ) : null}
 
-      <div className={showPanel ? "lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,22rem)] lg:items-start lg:gap-6" : undefined}>
-        <div>
           {q.kind === "fluency" || q.kind === "word" || q.kind === "jumps" || (q.kind === "tenframe" && "equation" in (q.data as object) && (q.data as { equation?: string }).equation === q.prompt) || (q.kind === "money" && (q.data as { mode?: string }).mode === "make") ? null : (
             <h2 className="mb-3 text-center font-display text-xl leading-tight sm:text-2xl">
               {cardHeading(q, interacted)}
@@ -559,16 +568,18 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
           {q.kind === "word" || q.prompt.length > 70 ? <div className="mt-3"><ScratchPad /></div> : null}
         </div>
 
-        <div className="mt-4 lg:mt-0">
-          {panel}
-          {shownAnswer}
+        {showPanel || shownAnswer || showSkip ? (
+          <div className="shrink-0 lg:mt-0" data-play-keys="1">
+            {panel}
+            {shownAnswer}
 
-          {showSkip ? (
-            <button type="button" className="mt-4 w-full text-center text-xs text-faint" onClick={skip}>
-              {ui.skip}
-            </button>
-          ) : null}
-        </div>
+            {showSkip ? (
+              <button type="button" className="mt-3 w-full text-center text-xs text-faint" onClick={skip}>
+                {ui.skip}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </div>
   );

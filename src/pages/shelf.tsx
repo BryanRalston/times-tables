@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AppHeader, AppTabs, useUi } from "@/components/chrome";
+import { AppHeader, AppShell, AppTabs, useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
 import { PokeToy } from "@/components/poke-toy";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ export function ShelfPage() {
   }
 
   return (
-    <div className="mx-auto min-h-dvh max-w-xl px-4 pb-16 pt-4">
+    <AppShell>
       <AppHeader />
       <AppTabs active="shelf" />
       <p className="mb-3 text-center text-sm font-medium text-teal">
@@ -32,7 +32,7 @@ export function ShelfPage() {
       </p>
       <h2 className="font-display text-2xl">{ui.squisheeShelf}</h2>
       <p className="mb-4 text-sm text-muted">{ui.shelfBlurb(haveCommon, COMMON_SQUISHEES.length)}</p>
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
         {COMMON_SQUISHEES.map((s) => (
           <ShopCard key={s.id} s={s} got={earned.includes(s.id)} coins={coins} onBuy={buy} />
         ))}
@@ -42,12 +42,12 @@ export function ShelfPage() {
       <p className="mb-4 text-sm text-muted">
         {ui.rareBlurb} {haveRare} / {RARE_SQUISHEES.length}
       </p>
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
         {RARE_SQUISHEES.map((s) => (
           <ShopCard key={s.id} s={s} got={earned.includes(s.id)} coins={coins} onBuy={buy} />
         ))}
       </div>
-    </div>
+    </AppShell>
   );
 }
 
@@ -86,10 +86,12 @@ export function ShopCard({
           className={cn("h-20 w-20 overflow-visible", s.rarity === "rare" && "rare-glow")}
         />
       ) : (
-        <MagentaImg src={squisheeSrc(s.id)} alt="" className="pointer-events-none h-20 w-20" />
+        <span data-silhouette="1" className="grid h-20 w-20 place-items-center" aria-hidden>
+          <MagentaImg src={squisheeSrc(s.id)} alt="" className="squishee-silhouette pointer-events-none h-20 w-20" />
+        </span>
       )}
-      <span className="mt-1 text-center text-xs font-medium">{s.name}</span>
-      {s.rarity === "rare" ? <span className="text-[10px] font-medium text-star">{ui.rareBadge}</span> : null}
+      <span className="mt-1 text-center text-xs font-medium">{got ? s.name : ui.mystery}</span>
+      {got && s.rarity === "rare" ? <span className="text-[10px] font-medium text-star">{ui.rareBadge}</span> : null}
       {got ? null : (
         <Button
           size="sm"

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type AnimationEvent, type ReactNode } from "react";
 import { MagentaImg, MagentaVideo, skipPokeVideo } from "@/components/magenta-video";
+import { playTap } from "@/lib/sound";
 import {
   squisheeById,
   squisheeCheerSrc,
@@ -125,6 +126,12 @@ export function PokeToy({
     return () => window.clearTimeout(t);
   }, [cheerPop]);
 
+  useEffect(() => {
+    if (!cheer) return;
+    const t = window.setTimeout(() => onCheerEndRef.current?.(), 2800);
+    return () => window.clearTimeout(t);
+  }, [cheer]);
+
   const videoSrc = cheer ? cheerClip : pokeClip;
   const strip = cheer ? cheerStrip : pokeStrip;
   const playPokeClip = Boolean(pokeClip) && !skipVideo;
@@ -158,12 +165,17 @@ export function PokeToy({
         className,
       )}
       aria-label={s ? `Poke ${s.name}` : "Poke"}
+      data-owned-poke="1"
       onClick={() => {
-        if (cheer) return;
+        if (cheer) onCheerEndRef.current?.();
+        playTap();
         setPokeTick((n) => n + 1);
         setPoking(true);
-        if (playPokeClip) setClipOn(true);
-        else if (playPokeStrip) setStripOn(true);
+        if (playPokeClip) {
+          setClipOn(true);
+        } else if (playPokeStrip) {
+          setStripOn(true);
+        }
       }}
     >
       <SquashOnPoke
@@ -177,11 +189,15 @@ export function PokeToy({
         onRest={() => setPoking(false)}
         onPopEnd={() => onCheerEndRef.current?.()}
       >
-        <MagentaImg src={squisheeSrc(id)} alt="" className={cn("h-full w-full", (clipReady || stripOn) && "invisible")} />
+        <MagentaImg
+          src={squisheeSrc(id)}
+          alt=""
+          className={cn("pointer-events-none h-full w-full", (clipReady || stripOn) && "invisible")}
+        />
         {clipOn && videoSrc ? (
           <MagentaVideo
             src={videoSrc}
-            className="absolute inset-0 h-full w-full"
+            className="pointer-events-none absolute inset-0 h-full w-full"
             onReady={() => setClipReady(true)}
             onFail={cheer ? stopCheer : stopClip}
             onEnded={cheer ? stopCheer : stopClip}
