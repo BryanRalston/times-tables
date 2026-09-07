@@ -134,8 +134,13 @@ describe("first-visit leftover door", () => {
     expect(html).toMatch(/Start today(?:'|&#x27;)s walk/);
     expect(html).toContain("The year map.");
     expect(html).toContain("Home, lessons, and shelf");
+    expect(html).toContain("Squishee Math");
+    expect(html).toContain("data-mute-sounds");
     expect(html).not.toContain("Play leftover");
     expect(html).not.toContain("6 + n = 10");
+    expect(html).not.toContain(">Score<");
+    expect(html).not.toMatch(/Score\s*\/\s*Streak/);
+    expect(html).not.toContain("1/20");
   });
 
   it("Home is not a leftover CTA stacked on today's walk; leftover kiosk is phone-only", () => {
@@ -159,8 +164,20 @@ describe("first-visit leftover door", () => {
     expect(play).toContain('kind === "welcome" && phone');
     expect(play).toContain("place-content-center");
     expect(play).toContain("max-w-xl");
+    expect(play).toContain("data-mute-sounds");
+    expect(play).toContain("data-show-correct");
+    expect(play).toContain("REVEAL_AFTER_MISSES");
+    expect(play).toContain("holdMsFor");
     expect(play).not.toContain("md:grid-rows-[auto_minmax(0,1fr)_auto]");
     expect(play).not.toContain("lg:max-w-3xl");
+    expect(play).not.toMatch(/Score\s*\/\s*Streak/);
+    expect(play).not.toContain(">Score<");
+    const chrome = readFileSync(join(HERE, "components/chrome.tsx"), "utf8");
+    expect(chrome).toContain("ui.home");
+    expect(chrome).toContain("ui.lessons");
+    expect(chrome).toContain("ui.shelf");
+    expect(chrome).toContain("data-mute-sounds");
+    expect(chrome).not.toMatch(/Score\s*\/\s*Streak/);
     const css = readFileSync(join(HERE, "styles.css"), "utf8");
     expect(css).toContain("[data-welcome-leftover] [data-leftover-board] .leftover-dot");
     expect(css).not.toMatch(/@media \(min-width: 768px\)\s*\{\s*\[data-welcome-leftover\]/);

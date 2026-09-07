@@ -1,12 +1,31 @@
 import { create } from "zustand";
 import { persist, type PersistStorage, type StorageValue } from "zustand/middleware";
+import { todayIso } from "./calendar";
 import { applyBuy, type BuyReason } from "./coins";
 import { GRADE4_SPANS, UNIT_SPANS, UNITS, unitById, unitsFor } from "./curriculum";
 import { parseLocale } from "./i18n";
+import {
+  applyBests,
+  bumpFact,
+  emptyBests,
+  emptyFacts,
+  emptyRun,
+  emptyToday,
+  kindKey,
+  parseBests,
+  parseFacts,
+  parseRun,
+  parseToday,
+  recordRun,
+  recordToday,
+  runAverageMs,
+  shakyFromFacts,
+} from "./practice";
+import { schoolStreak } from "./streak";
 import type { DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
 import { parsePathGrade } from "./types";
 
-const SAVE_VERSION = 7;
+const SAVE_VERSION = 8;
 export const STORAGE_KEY = "g3-path-v2";
 export const LEGACY_STORAGE_KEYS = ["g3-path-v1", "times-tables-progress", "times-tables-settings"] as const;
 const DEFAULT_ID = "kid-1";
@@ -77,6 +96,10 @@ export function emptyLearner(name = ""): LearnerSlice {
     coins: 0,
     attempts: {},
     perfectWalks: 0,
+    facts: emptyFacts(),
+    bests: emptyBests(),
+    today: emptyToday(),
+    runHonest: emptyRun(),
   };
 }
 
@@ -93,6 +116,10 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
     coins: typeof s.coins === "number" ? Math.max(0, Math.floor(s.coins)) : 0,
     attempts: s.attempts ?? {},
     perfectWalks: s.perfectWalks ?? 0,
+    facts: parseFacts(s.facts),
+    bests: parseBests(s.bests),
+    today: parseToday(s.today),
+    runHonest: parseRun(s.runHonest),
   };
 }
 
@@ -105,6 +132,7 @@ function empty(): SaveState {
     pathGrade: 3,
     skipWeekend: true,
     locale: "en",
+    soundOn: true,
     learners: { [DEFAULT_ID]: kid },
     ...kid,
   };
@@ -126,6 +154,10 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
     coins: typeof raw.coins === "number" ? raw.coins : 0,
     attempts: raw.attempts ?? {},
     perfectWalks: raw.perfectWalks ?? 0,
+    facts: parseFacts(raw.facts),
+    bests: parseBests(raw.bests),
+    today: parseToday(raw.today),
+    runHonest: parseRun(raw.runHonest),
   });
   const learners = { ...(raw.learners ?? {}) };
   if (!learners[learnerId]) learners[learnerId] = fromFlat;
@@ -141,6 +173,7 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
     pathGrade,
     skipWeekend: raw.skipWeekend !== false,
     locale: parseLocale(raw.locale),
+    soundOn: raw.soundOn !== false,
     learners,
     ...cur,
   };
@@ -164,6 +197,8 @@ interface ProgressApi extends SaveState {
   }) => void;
   recordSession: (session: DaySession) => void;
   noteFact: (key: string, ok: boolean) => void;
+  noteAttempt: (opts: { key?: string; kind?: string; ok: boolean; ms?: number; date?: string }) => void;
+  setSoundOn: (on: boolean) => void;
   beginPlay: (activityId: string) => number;
   awardCoins: (n: number) => void;
   buySquishee: (id: string) => { ok: boolean; reason: BuyReason };
@@ -183,6 +218,7 @@ function snapshotSave(s: SaveState): SaveState {
     pathGrade: s.pathGrade,
     skipWeekend: s.skipWeekend,
     locale: s.locale,
+    soundOn: s.soundOn,
     activities: s.activities,
     badges: s.badges,
     shaky: s.shaky,
@@ -191,6 +227,10 @@ function snapshotSave(s: SaveState): SaveState {
     coins: s.coins,
     attempts: s.attempts,
     perfectWalks: s.perfectWalks,
+    facts: s.facts,
+    bests: s.bests,
+    today: s.today,
+    runHonest: s.runHonest,
     learners: s.learners,
   };
 }
@@ -250,9 +290,15 @@ export const useProgress = create<ProgressApi>()(
         };
         const pct = total === 0 ? 0 : correct / total;
         const stars = Math.max(prev.stars, pct >= 1 ? 3 : pct >= 0.7 ? 2 : pct >= 0.4 ? 1 : 0);
+        const avg = runAverageMs(get().runHonest);
         commit(get, set, {
           stars: get().stars + earned,
           perfectWalks: get().perfectWalks + (total > 0 && correct === total ? 1 : 0),
+          bests: applyBests(get().bests, {
+            accuracy: total >= 5 ? pct : undefined,
+            avgMs: avg ?? undefined,
+          }),
+          runHonest: emptyRun(),
           activities: {
             ...get().activities,
             [activityId]: {
@@ -266,30 +312,40 @@ export const useProgress = create<ProgressApi>()(
         });
       },
       recordSession: (session) => {
+        const sessions = {
+          ...get().sessions,
+          [session.date]: session,
+        };
+        const streak = schoolStreak(sessions, session.date);
         commit(get, set, {
-          sessions: {
-            ...get().sessions,
-            [session.date]: session,
-          },
+          sessions,
+          bests: applyBests(get().bests, {
+            streak,
+            accuracy: session.total >= 5 ? session.correct / session.total : undefined,
+          }),
         });
       },
       noteFact: (key, ok) => {
-        const shaky = { ...get().shaky };
-        if (ok) {
-          if (shaky[key]) {
-            shaky[key] -= 1;
-            if (shaky[key] <= 0) delete shaky[key];
-          }
-        } else {
-          shaky[key] = (shaky[key] ?? 0) + 1;
-        }
-        commit(get, set, { shaky });
+        get().noteAttempt({ key, ok });
       },
+      noteAttempt: ({ key, kind, ok, ms, date }) => {
+        let facts = get().facts ?? emptyFacts();
+        if (key) facts = bumpFact(facts, key, ok, ms);
+        if (kind) facts = bumpFact(facts, kindKey(kind), ok, ms);
+        const today = recordToday(get().today, date || todayIso(), ok, ms);
+        commit(get, set, {
+          facts,
+          shaky: shakyFromFacts(facts, get().shaky),
+          today,
+          runHonest: recordRun(get().runHonest, ok, ms),
+        });
+      },
+      setSoundOn: (on) => set({ soundOn: Boolean(on) }),
       beginPlay: (activityId) => {
         const attempts = { ...get().attempts };
         const n = (attempts[activityId] ?? 0) + 1;
         attempts[activityId] = n;
-        commit(get, set, { attempts });
+        commit(get, set, { attempts, runHonest: emptyRun() });
         return n;
       },
       awardCoins: (n) => {
@@ -329,6 +385,7 @@ export const useProgress = create<ProgressApi>()(
           pathGrade: get().pathGrade,
           skipWeekend: get().skipWeekend,
           locale: get().locale,
+          soundOn: get().soundOn !== false,
           learners: { ...get().learners, [id]: kid },
           ...kid,
         });

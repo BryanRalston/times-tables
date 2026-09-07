@@ -171,6 +171,25 @@ describe("progress persist", () => {
     expect(localStorage.getItem("g3-path-v1")).toContain("Leo");
   });
 
+  it("records fact accuracy, today, and personal bests without wiping coins", async () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: seedKid(), version: 0 }));
+    await hydrateProgress();
+    useProgress.getState().noteAttempt({ key: "7×8", kind: "fluency", ok: false, ms: 1800, date: "2026-09-15" });
+    useProgress.getState().noteAttempt({ key: "7×8", kind: "fluency", ok: false, ms: 1600, date: "2026-09-15" });
+    useProgress.getState().noteAttempt({ key: "7×8", kind: "fluency", ok: true, ms: 1400, date: "2026-09-15" });
+    const s = useProgress.getState();
+    expect(s.coins).toBe(12);
+    expect(s.facts["7×8"]?.miss).toBe(2);
+    expect(s.facts["7×8"]?.ok).toBe(1);
+    expect(s.facts["kind:fluency"]?.ok).toBe(1);
+    expect(s.today.questions).toBe(3);
+    expect(s.today.correct).toBe(1);
+    expect(s.shaky["7×8"]).toBeGreaterThan(0);
+    expect(s.soundOn).toBe(true);
+    s.setSoundOn(false);
+    expect(useProgress.getState().soundOn).toBe(false);
+  });
+
   it("does not call resetAll from main boot", () => {
     const main = readFileSync(join(HERE, "../main.tsx"), "utf8");
     expect(main).toContain("hydrateProgress");

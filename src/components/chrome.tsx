@@ -1,4 +1,4 @@
-import { BookOpen, Coins, Flame, Home, Settings2, Sparkles, Star } from "lucide-react";
+import { BookOpen, Coins, Flame, Home, Settings2, Sparkles, Star, Volume2, VolumeX } from "lucide-react";
 import type { ReactNode } from "react";
 import { PokeToy } from "@/components/poke-toy";
 import { todayIso, YEAR_LABEL } from "@/lib/calendar";
@@ -22,6 +22,8 @@ export function AppHeader() {
   const streak = schoolStreak(sessions, todayIso());
   const ui = useUi();
   const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
+  const soundOn = useProgress((s) => s.soundOn !== false);
+  const setSoundOn = useProgress((s) => s.setSoundOn);
 
   return (
     <header className="mb-3 flex items-center gap-3">
@@ -58,6 +60,16 @@ export function AppHeader() {
           <Flame className="size-4" />
           {streak}
         </span>
+        <button
+          type="button"
+          className="grid size-10 place-items-center rounded-[12px] text-muted"
+          onClick={() => setSoundOn(!soundOn)}
+          aria-label={soundOn ? ui.mute : ui.unmute}
+          data-mute-sounds="1"
+          data-sound-on={soundOn ? "1" : "0"}
+        >
+          {soundOn ? <Volume2 className="size-5" /> : <VolumeX className="size-5" />}
+        </button>
         <button
           type="button"
           className="grid size-10 place-items-center rounded-[12px] text-muted"

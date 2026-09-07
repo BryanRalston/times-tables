@@ -9,6 +9,7 @@ import {
   UNITS,
 } from "./curriculum";
 import { parseLocale, UI, type Locale } from "./i18n";
+import { mergeFactsFromShaky, pickBiasedActivity, weakKeys, type FactStat } from "./practice";
 import { makeFluencyItem, makeQuestion, withSource } from "./questions";
 import { rngFromSeed, type Rng } from "./rng";
 import type { ActivityDef, ItemSource, Question, UnitDef } from "./types";
@@ -29,22 +30,29 @@ export interface DailyWalk {
   review: number;
 }
 
-function pickActivity(unit: UnitDef, rng: Rng): ActivityDef {
-  return rng.pick(unit.activities);
+function pickActivity(unit: UnitDef, rng: Rng, facts: Record<string, FactStat>): ActivityDef {
+  return pickBiasedActivity(unit.activities, rng, facts);
 }
 
-function reviewQuestion(unit: UnitDef, earlier: UnitDef[], shaky: string[], rng: Rng, locale: Locale): Question {
-  if (shaky.length && rng.next() < 0.35) {
+function reviewQuestion(
+  unit: UnitDef,
+  earlier: UnitDef[],
+  shaky: string[],
+  rng: Rng,
+  locale: Locale,
+  facts: Record<string, FactStat>,
+): Question {
+  if (shaky.length && rng.next() < 0.72) {
     const fact = rng.pick(shaky);
     const [a, b] = fact.split("×").map(Number);
     if (a != null && b != null && !Number.isNaN(a) && !Number.isNaN(b)) {
-      const q = makeFluencyItem(rng, [a, b]);
+      const q = makeFluencyItem(rng, [a, b], [fact]);
       return withSource(q, "review");
     }
   }
   const pool = earlier.length ? earlier : [unit];
   const u = rng.pick(pool);
-  const q = makeQuestion(pickActivity(u, rng), rng, locale);
+  const q = makeQuestion(pickActivity(u, rng, facts), rng, locale);
   return withSource(q, "review");
 }
 
@@ -78,6 +86,7 @@ export function makeDailyWalk(opts: {
   classUnitId?: string;
   skipWeekend?: boolean;
   shaky?: Record<string, number>;
+  facts?: Record<string, FactStat>;
   learnerId?: string;
   attempt?: number;
   locale?: Locale | string;
@@ -106,25 +115,27 @@ export function makeDailyWalk(opts: {
   }
 
   const earlier = earlierUnits(unit.id);
+  const facts = mergeFactsFromShaky(opts.facts ?? {}, opts.shaky ?? {});
   const shakyKeys = Object.entries(opts.shaky ?? {})
     .sort((a, b) => b[1] - a[1])
     .map(([k]) => k);
+  const weak = weakKeys(facts);
   const factors = fluencyFactorsForUnit(unit.id);
   const items: Question[] = [];
 
   for (let i = 0; i < counts.fresh; i++) {
-    items.push(withSource(makeQuestion(pickActivity(unit, rng), rng, locale), "fresh"));
+    items.push(withSource(makeQuestion(pickActivity(unit, rng, facts), rng, locale), "fresh"));
   }
   for (let i = 0; i < counts.review; i++) {
-    items.push(reviewQuestion(unit, earlier, shakyKeys, rng, locale));
+    items.push(reviewQuestion(unit, earlier, shakyKeys, rng, locale, facts));
   }
   for (let i = 0; i < counts.fluency; i++) {
-    items.push(withSource(makeFluencyItem(rng, factors), "fluency"));
+    items.push(withSource(makeFluencyItem(rng, factors, weak), "fluency"));
   }
   for (let i = 0; i < counts.fridayExtra; i++) {
     const src: ItemSource = "friday";
-    if (rng.next() < 0.5) items.push(withSource(makeFluencyItem(rng, factors), src));
-    else items.push(reviewQuestion(unit, earlier.length ? earlier : [unit], shakyKeys, rng, locale));
+    if (rng.next() < 0.5) items.push(withSource(makeFluencyItem(rng, factors, weak), src));
+    else items.push(reviewQuestion(unit, earlier.length ? earlier : [unit], shakyKeys, rng, locale, facts));
   }
 
   const shuffledTail = rng.shuffle(items.slice(counts.fresh));

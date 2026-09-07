@@ -19,6 +19,9 @@ describe("leftover why-move gates", () => {
     const done = { ...ready, status: "correct" as const };
     expect(leftoverPanelOpen(done)).toBe(false);
     expect(leftoverSkipOpen(done)).toBe(false);
+    const miss = { ...ready, status: "wrong" as const };
+    expect(leftoverPanelOpen(miss)).toBe(true);
+    expect(leftoverSkipOpen(miss)).toBe(false);
   });
 
   it("holds leftover about two seconds", () => {

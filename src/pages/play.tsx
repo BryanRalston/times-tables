@@ -1,3 +1,4 @@
+import { Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AnswerPanel } from "@/components/answer-panel";
 import { applyKeypadKey } from "@/components/keypad";
@@ -13,14 +14,15 @@ import { makeDailyWalk, walkLabel } from "@/lib/daily";
 import { parseLocale, UI } from "@/lib/i18n";
 import { cardHeading, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen } from "@/lib/leftover";
 import { aliasActivityId, navigate, usePhoneDoor } from "@/lib/nav";
+import { holdMsFor, REVEAL_AFTER_MISSES, WRONG_REVEAL_MS, WRONG_RETRY_MS, type FactStat } from "@/lib/practice";
 import { useProgress } from "@/lib/progress";
 import { makeActivityRound, makeWelcomeRound } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
 import { canAffordAnything, coinsForResult } from "@/lib/coins";
-import { playCorrect, playStar, playWrong, unlockAudio } from "@/lib/sound";
+import { playCorrect, playStar, playStreak, playWrong, unlockAudio } from "@/lib/sound";
 import { schoolStreak } from "@/lib/streak";
 import type { ItemSource, Locale, Question } from "@/lib/types";
-import { keypadAllowsDot, pandaLine, questionCorrect } from "@/lib/utils";
+import { correctSpeech, keypadAllowsDot, pandaLine, questionCorrect } from "@/lib/utils";
 
 type Kind = "welcome" | "daily" | "activity";
 
@@ -47,6 +49,7 @@ function buildPack(
   classUnitId: string,
   skipWeekend: boolean,
   shaky: Record<string, number>,
+  facts: Record<string, FactStat>,
   learnerId: string,
   attempt: number,
   locale: Locale,
@@ -69,7 +72,13 @@ function buildPack(
   if (kind === "activity") {
     const found = activityById(aliasActivityId(activityId ?? ""));
     const items = found
-      ? makeActivityRound(found.activity, rngFromSeed(`activity:${learnerId}:${found.activity.id}:${attempt}`), undefined, locale)
+      ? makeActivityRound(
+          found.activity,
+          rngFromSeed(`activity:${learnerId}:${found.activity.id}:${attempt}`),
+          undefined,
+          locale,
+          facts,
+        )
       : [];
     return {
       title: found?.activity.title ?? ui.play,
@@ -87,6 +96,7 @@ function buildPack(
     classUnitId: classUnitId || undefined,
     skipWeekend,
     shaky,
+    facts,
     learnerId,
     attempt,
     locale,
@@ -118,8 +128,10 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const markWelcome = useProgress((s) => s.markWelcome);
   const recordRound = useProgress((s) => s.recordRound);
   const recordSession = useProgress((s) => s.recordSession);
-  const noteFact = useProgress((s) => s.noteFact);
+  const noteAttempt = useProgress((s) => s.noteAttempt);
   const awardCoins = useProgress((s) => s.awardCoins);
+  const soundOn = useProgress((s) => s.soundOn !== false);
+  const setSoundOn = useProgress((s) => s.setSoundOn);
 
   const [pack] = useState(() => {
     const st = useProgress.getState();
@@ -127,7 +139,18 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     const key = playKey(kind, activityId, unitGuess);
     const attempt = st.beginPlay(key);
     const locale = parseLocale(st.locale);
-    return buildPack(kind, activityId, st.classUnitId, st.skipWeekend, st.shaky, st.learnerId, attempt, locale, st.pathGrade ?? 3);
+    return buildPack(
+      kind,
+      activityId,
+      st.classUnitId,
+      st.skipWeekend,
+      st.shaky,
+      st.facts ?? {},
+      st.learnerId,
+      attempt,
+      locale,
+      st.pathGrade ?? 3,
+    );
   });
   const [coinsEarned, setCoinsEarned] = useState(0);
   const [finishPhase, setFinishPhase] = useState<"play" | "summary" | null>(null);
@@ -142,8 +165,12 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const [star, setStar] = useState(false);
   const [pose, setPose] = useState<Pose>("think");
   const [interacted, setInteracted] = useState(false);
+  const [cardMisses, setCardMisses] = useState(0);
+  const [reveal, setReveal] = useState(false);
+  const [combo, setCombo] = useState(0);
   const holdRef = useRef(0);
   const recorded = useRef(false);
+  const startedAt = useRef(typeof performance !== "undefined" ? performance.now() : Date.now());
 
   const q = pack.items[i];
   const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -221,6 +248,19 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     setStar(false);
     setPose("think");
     setInteracted(false);
+    setCardMisses(0);
+    setReveal(false);
+    startedAt.current = typeof performance !== "undefined" ? performance.now() : Date.now();
+  }
+
+  function elapsedMs() {
+    const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+    return Math.round(now - startedAt.current);
+  }
+
+  function track(ok: boolean) {
+    if (!q) return;
+    noteAttempt({ key: q.factKey, kind: q.kind, ok, ms: elapsedMs(), date: pack.date });
   }
 
   function finish(nextCorrect: number, nextMisses: string[]) {
@@ -281,29 +321,43 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     if (!given.length) return;
     if (questionCorrect(given, q)) {
       const nextCorrect = correct + 1;
+      const nextCombo = combo + 1;
       setCorrect(nextCorrect);
+      setCombo(nextCombo);
       setStatus("correct");
       setPose("celebrate");
       setHop(true);
       setStar(true);
       setValue(given);
-      playCorrect();
-      if (q.factKey) noteFact(q.factKey, true);
-      const hold = q.kind === "tenframe" ? leftoverHoldMs() : reduce ? 200 : 800;
+      setReveal(false);
+      if (nextCombo >= 3) playStreak();
+      else playCorrect();
+      track(true);
+      const hold = holdMsFor(q.kind, leftoverHoldMs(), reduce);
       holdRef.current = window.setTimeout(() => goNext(nextCorrect, misses), hold);
     } else {
+      const nextCardMiss = cardMisses + 1;
+      setCardMisses(nextCardMiss);
+      setCombo(0);
       setStatus("wrong");
       setPose("oops");
       setShake((n) => n + 1);
       playWrong();
-      if (q.factKey) noteFact(q.factKey, false);
+      track(false);
       const key = q.factKey ?? q.prompt;
-      setMisses((m) => (m.includes(key) ? m : [...m, key].slice(0, 12)));
-      holdRef.current = window.setTimeout(() => {
-        setStatus("idle");
-        setPose("think");
-        setHop(false);
-      }, 450);
+      const nextMisses = misses.includes(key) ? misses : [...misses, key].slice(0, 12);
+      setMisses(nextMisses);
+      if (nextCardMiss >= REVEAL_AFTER_MISSES) {
+        setReveal(true);
+        setValue(q.answer);
+        holdRef.current = window.setTimeout(() => goNext(correct, nextMisses), reduce ? 280 : WRONG_REVEAL_MS);
+      } else {
+        holdRef.current = window.setTimeout(() => {
+          setStatus("idle");
+          setPose("think");
+          setHop(false);
+        }, reduce ? 160 : WRONG_RETRY_MS);
+      }
     }
   }
 
@@ -313,7 +367,8 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     const key = q.factKey ?? q.prompt;
     const nextMisses = misses.includes(key) ? misses : [...misses, key].slice(0, 12);
     setMisses(nextMisses);
-    if (q.factKey) noteFact(q.factKey, false);
+    setCombo(0);
+    track(false);
     goNext(correct, nextMisses);
   }
 
@@ -381,8 +436,29 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const quietWelcome = kind === "welcome" && phone;
   const showPanel = leftoverPanelOpen(gate);
   const showSkip = !quietWelcome && leftoverSkipOpen(gate);
-  const speech = pandaLine(q, locale, pose === "oops" ? "wrong" : status, interacted);
-  const showSpeech = !quietWelcome || status === "wrong" || pose === "oops";
+  const speech = reveal
+    ? q.kind === "tenframe"
+      ? ui.tryAgain
+      : correctSpeech(q, locale)
+    : pandaLine(q, locale, pose === "oops" ? "wrong" : status, interacted);
+  const showSpeech = !quietWelcome || status === "wrong" || pose === "oops" || reveal;
+  const muteBtn = (
+    <button
+      type="button"
+      className="grid size-9 place-items-center rounded-[12px] text-muted"
+      onClick={() => setSoundOn(!soundOn)}
+      aria-label={soundOn ? ui.mute : ui.unmute}
+      data-mute-sounds="1"
+      data-sound-on={soundOn ? "1" : "0"}
+    >
+      {soundOn ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
+    </button>
+  );
+  const shownAnswer = reveal ? (
+    <p className="mt-2 text-center text-sm text-good" data-show-correct="1">
+      {q.kind === "tenframe" ? q.answer : speech}
+    </p>
+  ) : null;
   const board = (
     <Board
       key={q.id}
@@ -412,6 +488,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         data-welcome-leftover="1"
         {...(showPanel ? { "data-panel": "1" } : {})}
       >
+        <div className="flex justify-end">{muteBtn}</div>
         <div className="flex flex-col items-center">
           <div className="relative">
             <Mascot who={who} pose={pose} hop={hop} size="md" />
@@ -424,7 +501,14 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
         <div className="h-full min-h-0 w-full min-w-0">{board}</div>
 
-        {panel ? <div className="mx-auto w-full max-w-sm lg:max-w-md">{panel}</div> : null}
+        {panel ? (
+          <div className="mx-auto w-full max-w-sm lg:max-w-md">
+            {panel}
+            {shownAnswer}
+          </div>
+        ) : (
+          shownAnswer
+        )}
       </div>
     );
   }
@@ -441,6 +525,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         <span className="text-xs tabular-nums text-muted">
           {i + 1}/{pack.items.length}
         </span>
+        {muteBtn}
       </header>
 
       <div className="flex items-end gap-2">
@@ -476,6 +561,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
         <div className="mt-4 lg:mt-0">
           {panel}
+          {shownAnswer}
 
           {showSkip ? (
             <button type="button" className="mt-4 w-full text-center text-xs text-faint" onClick={skip}>

@@ -2,7 +2,7 @@ import { Component, type ErrorInfo, type ReactNode, useEffect } from "react";
 import { parseLocale } from "@/lib/i18n";
 import { doorRoute, usePhoneDoor, useRoute } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
-import { unlockAudio } from "@/lib/sound";
+import { setSoundMuted, unlockAudio } from "@/lib/sound";
 import { GrownupPage } from "@/pages/grownup";
 import { HomePage } from "@/pages/home";
 import { LessonsPage } from "@/pages/lessons";
@@ -42,6 +42,11 @@ export function App() {
   const seenWelcome = useProgress((s) => s.seenWelcome);
   const phone = usePhoneDoor();
   const route = doorRoute(seenWelcome, raw, phone);
+  const soundOn = useProgress((s) => s.soundOn !== false);
+
+  useEffect(() => {
+    setSoundMuted(!soundOn);
+  }, [soundOn]);
 
   useEffect(() => {
     const on = () => unlockAudio();

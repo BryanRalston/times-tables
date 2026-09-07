@@ -294,6 +294,31 @@ export interface DaySession {
   completed: boolean;
 }
 
+export interface FactStat {
+  ok: number;
+  miss: number;
+  ms: number;
+}
+
+export interface PersonalBests {
+  streak: number;
+  accuracy: number;
+  avgMs: number;
+}
+
+export interface TodayPractice {
+  date: string;
+  questions: number;
+  correct: number;
+  ms: number;
+  honestN: number;
+}
+
+export interface HonestRun {
+  n: number;
+  sum: number;
+}
+
 export interface LearnerSlice {
   name: string;
   stars: number;
@@ -306,6 +331,10 @@ export interface LearnerSlice {
   coins: number;
   attempts: Record<string, number>;
   perfectWalks: number;
+  facts: Record<string, FactStat>;
+  bests: PersonalBests;
+  today: TodayPractice;
+  runHonest: HonestRun;
 }
 
 export interface SaveState extends LearnerSlice {
@@ -315,5 +344,6 @@ export interface SaveState extends LearnerSlice {
   pathGrade: PathGrade;
   skipWeekend: boolean;
   locale: Locale;
+  soundOn: boolean;
   learners: Record<string, LearnerSlice>;
 }

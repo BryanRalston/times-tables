@@ -16,6 +16,7 @@ export function HomePage() {
   const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
   const skipWeekend = useProgress((s) => s.skipWeekend);
   const shaky = useProgress((s) => s.shaky);
+  const facts = useProgress((s) => s.facts);
   const sessions = useProgress((s) => s.sessions);
   const learnerId = useProgress((s) => s.learnerId);
   const attempts = useProgress((s) => s.attempts);
@@ -32,12 +33,13 @@ export function HomePage() {
         classUnitId: classUnitId || undefined,
         skipWeekend,
         shaky,
+        facts,
         learnerId,
         attempt: nextAttempt,
         locale,
         grade: pathGrade,
       }),
-    [date, classUnitId, skipWeekend, shaky, learnerId, nextAttempt, locale, pathGrade],
+    [date, classUnitId, skipWeekend, shaky, facts, learnerId, nextAttempt, locale, pathGrade],
   );
   const done = Boolean(sessions[walk.date]?.completed);
   const remain = remainingSchoolDaysInUnit(suggested, walk.schoolDate);

@@ -1,4 +1,15 @@
 import { G4Q, GRAPH_CATS, NAMES, PLACE, qCopy, SHAPE, THINGS, parseLocale, wordForm as formWords, type Locale } from "./i18n";
+import {
+  leftoverKey,
+  maybePreferFactor,
+  maybePreferShown,
+  maybePreferTimes,
+  preferParams,
+  timesKey,
+  weakKeys,
+  keyMatchesWeak,
+  type FactStat,
+} from "./practice";
 import type { Rng } from "./rng";
 import { rngRandom } from "./rng";
 import type {
@@ -72,6 +83,7 @@ export function welcomeFirst(rng: Rng): Question {
     hint: t().leftoverHint,
     answer: "4",
     needsInteract: true,
+    factKey: leftoverKey(6, 4, 10, false),
     data: { total: 10, shown: 6, equation: "6 + n = 10" } satisfies TenFrameData,
   });
 }
@@ -80,7 +92,8 @@ function tenframeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const minT = Number(params.minTotal ?? 8);
   const maxT = Number(params.maxTotal ?? 10);
   const total = rng.int(minT, maxT);
-  const shown = rng.int(Math.max(1, total - 8), Math.max(1, total - 2));
+  let shown = rng.int(Math.max(1, total - 8), Math.max(1, total - 2));
+  shown = maybePreferShown(shown, params.preferShown, rng, total);
   const n = total - shown;
   const sub = params.mode === "sub" || (params.mode !== "add" && total >= 12 && rng.next() < 0.45);
   const equation = sub ? `${total} − n = ${shown}` : `${shown} + n = ${total}`;
@@ -90,6 +103,7 @@ function tenframeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     hint: t().leftoverHint,
     answer: String(n),
     needsInteract: true,
+    factKey: leftoverKey(shown, n, total, sub),
     data: { total, shown, equation } satisfies TenFrameData,
   });
 }
@@ -98,7 +112,9 @@ function groupsQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const pool = ((params.factors as number[] | undefined) ?? [2, 3, 4, 5]).filter((n) => n >= 0);
   const hide = (params.hide as GroupsData["hide"] | undefined) ?? rng.pick(["groups", "size", "product"]);
   const sizePool = hide === "groups" ? pool.filter((n) => n >= 1) : pool.filter((n) => n > 0 || hide === "product");
-  const size = rng.pick(sizePool.length ? sizePool : [2, 3, 4, 5]);
+  const sizePick = sizePool.length ? sizePool : [2, 3, 4, 5];
+  let size = rng.pick(sizePick);
+  size = maybePreferFactor(size, params.preferFact, sizePick, rng);
   const groups = rng.int(2, size >= 11 ? 4 : 6);
   const product = size * groups;
   let prompt = "";
@@ -130,7 +146,9 @@ function groupsQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 
 function arrayQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const pool = (params.factors as number[] | undefined) ?? [2, 3, 4, 5, 6];
-  const cols = rng.pick(pool.filter((n) => n >= 2 && n <= 12));
+  const colPool = pool.filter((n) => n >= 2 && n <= 12);
+  let cols = rng.pick(colPool.length ? colPool : [2, 3, 4, 5, 6]);
+  cols = maybePreferFactor(cols, params.preferFact, colPool.length ? colPool : [2, 3, 4, 5, 6], rng);
   const rows = rng.int(2, 6);
   const hide = rng.pick(["rows", "cols", "product"] as const);
   const product = rows * cols;
@@ -490,6 +508,7 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       alts: [String(n)],
       input: "fraction",
       needsInteract: true,
+      factKey: `leftover-frac:${den}`,
       data: { num: shown, den, mode: "leftover", shaded: shown },
     });
   }
@@ -1032,7 +1051,9 @@ function computeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 
 function jumpsQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const pool = ((params.factors as number[] | undefined) ?? [2, 3, 4, 5]).filter((n) => n >= 2);
-  const size = rng.pick(pool.length ? pool : [2, 3, 4, 5]);
+  const sizePick = pool.length ? pool : [2, 3, 4, 5];
+  let size = rng.pick(sizePick);
+  size = maybePreferFactor(size, params.preferFact, sizePick, rng);
   const jumps = rng.int(2, 6);
   const product = size * jumps;
   const hide = (params.hide as "product" | "jumps" | "size" | undefined) ?? rng.pick(["product", "jumps", "size"]);
@@ -1057,6 +1078,29 @@ function jumpsQ(rng: Rng, params: Record<string, unknown> = {}): Question {
 function fluencyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const pool = ((params.factors as number[] | undefined) ?? [0, 1, 2, 5, 10]).slice();
   const ops = (params.ops as Array<"+" | "−" | "×" | "÷"> | undefined) ?? ["×", "÷"];
+  const prefer = maybePreferTimes(params.preferFact, rng);
+  if (prefer && !params.twoByOne && (ops.includes("×") || ops.includes("÷"))) {
+    const a = prefer.a;
+    const b = prefer.b;
+    const op: "×" | "÷" = a === 0 || b === 0 ? "×" : rng.pick(ops.filter((o) => o === "×" || o === "÷") as Array<"×" | "÷">);
+    if (op === "÷" && a > 0) {
+      const product = a * b;
+      return keypadQ(rng, {
+        kind: "fluency",
+        prompt: `${product} ÷ ${a}`,
+        answer: String(b),
+        factKey: timesKey(a, b),
+        data: { a: product, b: a, op: "÷" },
+      });
+    }
+    return keypadQ(rng, {
+      kind: "fluency",
+      prompt: `${a} × ${b}`,
+      answer: String(a * b),
+      factKey: timesKey(a, b),
+      data: { a, b, op: "×" },
+    });
+  }
   if (params.twoByOne) {
     const tens = rng.int(1, 4) * 10;
     const ones = rng.int(1, 9);
@@ -1125,7 +1169,7 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       kind: "groups",
       prompt: t().wordBags(name, groups, size, thing),
       answer: String(groups * size),
-      factKey: `${Math.min(groups, size)}×${Math.max(groups, size)}`,
+      factKey: timesKey(groups, size),
       data: { groups, size, hide: "product", equation: `${groups} × ${size} = n` },
     });
   }
@@ -1138,6 +1182,7 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       hint: t().wordTakeHint,
       answer: String(total - shown),
       needsInteract: true,
+      factKey: leftoverKey(shown, total - shown, total, true),
       data: { total, shown, equation: `${total} − n = ${shown}` },
     });
   }
@@ -1177,6 +1222,7 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     hint: t().leftoverHint,
     answer: String(n),
     needsInteract: true,
+    factKey: leftoverKey(shown, n, shown + n, false),
     data: { total: shown + n, shown, equation: `${shown} + n = ${shown + n}` },
   });
 }
@@ -1385,12 +1431,21 @@ export function makeWelcomeRound(rng: Rng = rngRandom(), locale: Locale | string
   }
 }
 
-export function makeActivityRound(activity: ActivityDef, rng: Rng = rngRandom(), count?: number, locale: Locale | string = "en"): Question[] {
+export function makeActivityRound(
+  activity: ActivityDef,
+  rng: Rng = rngRandom(),
+  count?: number,
+  locale: Locale | string = "en",
+  facts?: Record<string, FactStat>,
+): Question[] {
   const n = count ?? activity.rounds;
-  const act: ActivityDef =
+  const prefer = facts && Object.keys(facts).length ? preferParams(activity, facts, rng) : null;
+  const weak = facts && Object.keys(facts).length ? weakKeys(facts) : [];
+  const base: ActivityDef =
     activity.id === "u1-friends"
       ? { ...activity, params: { ...activity.params, mode: rng.pick(["add", "sub"] as const) } }
       : activity;
+  const act: ActivityDef = prefer ? { ...base, params: { ...base.params, ...prefer } } : base;
   const seen = new Set<string>();
   const out: Question[] = [];
   let guard = 0;
@@ -1399,6 +1454,7 @@ export function makeActivityRound(activity: ActivityDef, rng: Rng = rngRandom(),
     const q = makeQuestion(act, rng, locale);
     const key = `${q.prompt}|${q.answer}`;
     if (seen.has(key)) continue;
+    if (weak.length && q.factKey && !keyMatchesWeak(q.factKey, weak) && rng.next() < 0.65) continue;
     seen.add(key);
     out.push(q);
   }
@@ -1415,8 +1471,9 @@ export function makeActivityRound(activity: ActivityDef, rng: Rng = rngRandom(),
   return out;
 }
 
-export function makeFluencyItem(rng: Rng, factors: number[]): Question {
-  return fluencyQ(rng, { factors, ops: ["×", "÷"] });
+export function makeFluencyItem(rng: Rng, factors: number[], preferKeys?: string[]): Question {
+  const hit = (preferKeys ?? []).find((k) => /^\d+×\d+$/.test(k));
+  return fluencyQ(rng, { factors, ops: ["×", "÷"], ...(hit ? { preferFact: hit } : {}) });
 }
 
 export function withSource(q: Question, source: ItemSource): Question {

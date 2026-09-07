@@ -89,6 +89,7 @@ describe("welcome leftover", () => {
     expect(q.answer).toBe("4");
     expect(q.kind).toBe("tenframe");
     expect(q.needsInteract).toBe(true);
+    expect(q.factKey).toBe("friends:6");
   });
 
   it("is a short leftover run", () => {

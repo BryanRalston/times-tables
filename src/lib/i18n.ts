@@ -134,6 +134,19 @@ export type Ui = {
   exportSave: string;
   importSave: string;
   importConfirm: string;
+  mute: string;
+  unmute: string;
+  sounds: string;
+  practiceToday: string;
+  questionsN: (n: number) => string;
+  correctPct: (n: number) => string;
+  avgSeconds: (s: string) => string;
+  needsPractice: string;
+  needsNone: string;
+  personalBests: string;
+  bestStreak: (n: number) => string;
+  bestAccuracy: (n: number) => string;
+  fastestAvg: (s: string) => string;
 };
 
 export const UI: Record<Locale, Ui> = {
@@ -265,6 +278,19 @@ export const UI: Record<Locale, Ui> = {
     exportSave: "Download a save file",
     importSave: "Load a save file",
     importConfirm: "Replace everything on this device with that file?",
+    mute: "Mute sounds",
+    unmute: "Unmute sounds",
+    sounds: "Sounds",
+    practiceToday: "Today",
+    questionsN: (n) => `${n} questions`,
+    correctPct: (n) => `${n}% correct`,
+    avgSeconds: (s) => `Average ${s}s`,
+    needsPractice: "Needs practice",
+    needsNone: "Nothing flagged yet.",
+    personalBests: "Personal bests",
+    bestStreak: (n) => `Best school-day streak ${n}`,
+    bestAccuracy: (n) => `Best accuracy ${n}%`,
+    fastestAvg: (s) => `Fastest honest average ${s}s`,
   },
   es: {
     language: "Idioma",
@@ -394,6 +420,19 @@ export const UI: Record<Locale, Ui> = {
     exportSave: "Descargar una copia",
     importSave: "Cargar una copia",
     importConfirm: "¿Reemplazar todo en este aparato con ese archivo?",
+    mute: "Silenciar sonidos",
+    unmute: "Activar sonidos",
+    sounds: "Sonidos",
+    practiceToday: "Hoy",
+    questionsN: (n) => `${n} preguntas`,
+    correctPct: (n) => `${n}% correctas`,
+    avgSeconds: (s) => `Promedio ${s}s`,
+    needsPractice: "Necesita práctica",
+    needsNone: "Nada marcado aún.",
+    personalBests: "Mejores marcas",
+    bestStreak: (n) => `Mejor racha de días escolares ${n}`,
+    bestAccuracy: (n) => `Mejor precisión ${n}%`,
+    fastestAvg: (s) => `Promedio honesto más rápido ${s}s`,
   },
   "pt-BR": {
     language: "Idioma",
@@ -523,6 +562,19 @@ export const UI: Record<Locale, Ui> = {
     exportSave: "Baixar uma cópia",
     importSave: "Carregar uma cópia",
     importConfirm: "Substituir tudo neste aparelho por esse arquivo?",
+    mute: "Silenciar sons",
+    unmute: "Ativar sons",
+    sounds: "Sons",
+    practiceToday: "Hoje",
+    questionsN: (n) => `${n} perguntas`,
+    correctPct: (n) => `${n}% corretas`,
+    avgSeconds: (s) => `Média ${s}s`,
+    needsPractice: "Precisa de prática",
+    needsNone: "Nada marcado ainda.",
+    personalBests: "Melhores marcas",
+    bestStreak: (n) => `Melhor sequência de dias letivos ${n}`,
+    bestAccuracy: (n) => `Melhor precisão ${n}%`,
+    fastestAvg: (s) => `Média honesta mais rápida ${s}s`,
   },
 };
 

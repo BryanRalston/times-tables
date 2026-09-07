@@ -2,16 +2,18 @@ import { Delete } from "lucide-react";
 import { useState } from "react";
 import { Mascot } from "@/components/mascot";
 import { Button } from "@/components/ui/button";
-import { YEAR_LABEL } from "@/lib/calendar";
+import { todayIso, YEAR_LABEL } from "@/lib/calendar";
 import { unitsFor } from "@/lib/curriculum";
-import { LOCALES, LOCALE_NATIVE, parseLocale, UI } from "@/lib/i18n";
+import { LOCALES, LOCALE_NATIVE, parseLocale, UI, type Ui } from "@/lib/i18n";
 import { navigate } from "@/lib/nav";
+import { formatAvgSeconds, needsPracticeList, todayView } from "@/lib/practice";
 import { exportSaveJson, importSaveJson, useProgress } from "@/lib/progress";
+import type { FactStat, PersonalBests, TodayPractice } from "@/lib/types";
 
 const GROWNUP_PIN = "2026";
 const PIN_KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "back", "0"] as const;
 
-export function GrownupPage() {
+export function GrownupPage({ unlocked: startUnlocked = false }: { unlocked?: boolean } = {}) {
   const name = useProgress((s) => s.name);
   const learnerId = useProgress((s) => s.learnerId);
   const classUnitId = useProgress((s) => s.classUnitId);
@@ -25,13 +27,19 @@ export function GrownupPage() {
   const addLearner = useProgress((s) => s.addLearner);
   const resetAll = useProgress((s) => s.resetAll);
   const learners = useProgress((s) => s.learners);
+  const soundOn = useProgress((s) => s.soundOn !== false);
+  const setSoundOn = useProgress((s) => s.setSoundOn);
+  const facts = useProgress((s) => s.facts);
+  const shaky = useProgress((s) => s.shaky);
+  const today = useProgress((s) => s.today);
+  const bests = useProgress((s) => s.bests);
   const ui = UI[locale];
   const roster = Object.entries(learners).map(([id, k]) => ({
     id,
     name: k.name.trim() || (id === "kid-1" ? ui.kid1 : ui.play),
   }));
   const [armed, setArmed] = useState(false);
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(startUnlocked);
   const [pin, setPin] = useState("");
   const [pinShake, setPinShake] = useState(0);
   const [importNote, setImportNote] = useState("");
@@ -182,6 +190,24 @@ export function GrownupPage() {
         {ui.weekendExtraUses}
       </label>
 
+      <label className="frost mt-4 flex items-center gap-3 rounded-[16px] border border-line p-3 text-sm">
+        <input
+          type="checkbox"
+          checked={soundOn}
+          onChange={(e) => setSoundOn(e.target.checked)}
+          data-sound-toggle="1"
+        />
+        {ui.sounds}
+      </label>
+
+      <PracticeSummary
+        ui={ui}
+        facts={facts}
+        shaky={shaky}
+        today={today}
+        bests={bests}
+      />
+
       <div className="frost mt-8 rounded-[16px] border border-line p-4">
         <p className="text-sm text-muted">{ui.nothingLeaves}</p>
         <Button
@@ -238,6 +264,54 @@ export function GrownupPage() {
           {armed ? ui.tapAgainReset : ui.resetDevice}
         </Button>
       </div>
+    </div>
+  );
+}
+
+function PracticeSummary({
+  ui,
+  facts,
+  shaky,
+  today,
+  bests,
+}: {
+  ui: Ui;
+  facts: Record<string, FactStat>;
+  shaky: Record<string, number>;
+  today: TodayPractice;
+  bests: PersonalBests;
+}) {
+  const view = todayView(today ?? { date: "", questions: 0, correct: 0, ms: 0, honestN: 0 }, todayIso());
+  const needs = needsPracticeList(facts ?? {}, shaky ?? {});
+  const pct = view.pct == null ? null : Math.round(view.pct * 100);
+  const avg = view.avgMs == null ? null : formatAvgSeconds(view.avgMs);
+  const bestPct = bests?.accuracy ? Math.round(bests.accuracy * 100) : 0;
+  const bestAvg = bests?.avgMs ? formatAvgSeconds(bests.avgMs) : null;
+
+  return (
+    <div className="frost mt-8 rounded-[16px] border border-line p-4" data-practice-summary="1">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted">{ui.practiceToday}</p>
+      <p className="mt-2 text-sm">{ui.questionsN(view.questions)}</p>
+      {pct != null ? <p className="text-sm">{ui.correctPct(pct)}</p> : null}
+      {avg ? <p className="text-sm text-muted">{ui.avgSeconds(avg)}</p> : null}
+
+      <p className="mt-4 text-xs font-medium uppercase tracking-wide text-muted">{ui.needsPractice}</p>
+      {needs.length ? (
+        <ul className="mt-2 flex flex-wrap gap-2" data-needs-practice="1">
+          {needs.map((label) => (
+            <li key={label} className="rounded-full bg-star-soft px-2.5 py-1 text-sm text-star">
+              {label}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-2 text-sm text-muted">{ui.needsNone}</p>
+      )}
+
+      <p className="mt-4 text-xs font-medium uppercase tracking-wide text-muted">{ui.personalBests}</p>
+      <p className="mt-2 text-sm text-muted">{ui.bestStreak(bests?.streak ?? 0)}</p>
+      {bestPct ? <p className="text-sm text-muted">{ui.bestAccuracy(bestPct)}</p> : null}
+      {bestAvg ? <p className="text-sm text-muted">{ui.fastestAvg(bestAvg)}</p> : null}
     </div>
   );
 }

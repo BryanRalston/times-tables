@@ -1,6 +1,16 @@
 let ctx: AudioContext | null = null;
+let muted = false;
+
+export function setSoundMuted(on: boolean) {
+  muted = Boolean(on);
+}
+
+export function soundMuted(): boolean {
+  return muted;
+}
 
 function ac(): AudioContext | null {
+  if (muted) return null;
   if (typeof window === "undefined") return null;
   if (!ctx) {
     const C = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -11,6 +21,7 @@ function ac(): AudioContext | null {
 }
 
 export function unlockAudio() {
+  if (muted) return;
   const c = ac();
   if (c && c.state === "suspended") void c.resume();
 }
@@ -58,4 +69,13 @@ export function playTap() {
   const c = ac();
   if (!c) return;
   tone(880, c.currentTime, 0.04, "sine", 0.025);
+}
+
+export function playStreak() {
+  const c = ac();
+  if (!c) return;
+  const t = c.currentTime;
+  tone(659.25, t, 0.07, "sine", 0.04);
+  tone(783.99, t + 0.06, 0.08, "sine", 0.04);
+  tone(1046.5, t + 0.13, 0.12, "sine", 0.045);
 }

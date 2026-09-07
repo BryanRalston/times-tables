@@ -30,10 +30,26 @@ describe("grown-up lock", () => {
     expect(html).not.toContain("Download a save file");
     expect(html).not.toContain("data-export-save");
     expect(html).not.toContain("data-import-save");
+    expect(html).not.toContain("data-practice-summary");
+    expect(html).not.toContain("Needs practice");
     const src = readFileSync(join(HERE, "grownup.tsx"), "utf8");
     expect(src).toContain("exportSaveJson");
     expect(src).toContain("importSaveJson");
     expect(src).toContain("resetAll");
     expect(src).toContain('GROWNUP_PIN = "2026"');
+  });
+
+  it("shows today's practice, needs-practice, and personal bests after the PIN", () => {
+    const html = renderToStaticMarkup(<GrownupPage unlocked />);
+    expect(html).toContain("data-practice-summary");
+    expect(html).toContain("Needs practice");
+    expect(html).toContain("Today");
+    expect(html).toContain("Personal bests");
+    expect(html).toContain("Sounds");
+    expect(html).toContain("data-sound-toggle");
+    expect(html).toContain("Download a save file");
+    expect(html).not.toContain("data-grownup-lock");
+    expect(html).not.toContain('value="4"');
+    expect(html).not.toContain("pathGrade4");
   });
 });

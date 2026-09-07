@@ -42,7 +42,7 @@ export function cheerStripJsonFile(id: string): string {
   return `${id}-cheer-strip.json`;
 }
 
-function withWiredCheer(s: Squishee): Squishee {
+function withWiredCheer<T extends { id: string }>(s: T): T & { cheer: string; cheerStrip: PokeStripMeta } {
   return {
     ...s,
     cheer: cheerFile(s.id),
@@ -70,7 +70,7 @@ export function pokeStripSrc(meta: PokeStripMeta): string {
   return asset(`squishees/${meta.src}`);
 }
 
-const COMMON: Squishee[] = [
+const COMMON = [
   { id: "avocado", name: "Avocado", theme: "food", file: "avocado.png", poke: null, rarity: "common" },
   { id: "bear", name: "Bear", theme: "animal", file: "bear.png", poke: null, rarity: "common" },
   { id: "bun", name: "Bun", theme: "food", file: "bun.png", poke: null, rarity: "common" },
@@ -106,9 +106,9 @@ const COMMON: Squishee[] = [
   { id: "dumpling", name: "Dumpling", theme: "food", file: "dumpling.png", poke: null, rarity: "common" },
   { id: "matcha", name: "Matcha", theme: "food", file: "matcha.png", poke: null, rarity: "common" },
   { id: "sloth", name: "Sloth", theme: "animal", file: "sloth.png", poke: null, rarity: "common" },
-].map(withWiredCheer);
+].map(withWiredCheer) as Squishee[];
 
-const RARE: Squishee[] = [
+const RARE = [
   { id: "crystal-axolotl", name: "Crystal Axolotl", theme: "animal", file: "crystal-axolotl.png", poke: null, rarity: "rare" },
   { id: "galaxy-narwhal", name: "Galaxy Narwhal", theme: "animal", file: "galaxy-narwhal.png", poke: null, rarity: "rare" },
   { id: "golden-dragon", name: "Golden Dragon", theme: "animal", file: "golden-dragon.png", poke: null, rarity: "rare" },
@@ -117,7 +117,7 @@ const RARE: Squishee[] = [
   { id: "star-mochi", name: "Star Mochi", theme: "food", file: "star-mochi.png", poke: null, rarity: "rare" },
   { id: "sleepy-moon", name: "Sleepy Moon", theme: "animal", file: "sleepy-moon.png", poke: null, rarity: "rare" },
   { id: "blush-cloud", name: "Blush Cloud", theme: "animal", file: "blush-cloud.png", poke: null, rarity: "rare" },
-].map(withWiredCheer);
+].map(withWiredCheer) as Squishee[];
 
 export const SQUISHEES: Squishee[] = [...COMMON, ...RARE];
 export const COMMON_SQUISHEES = COMMON;
