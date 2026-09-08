@@ -233,6 +233,7 @@ describe("first-visit Home door", () => {
     expect(css).toContain("@keyframes candy-travel-hop");
     expect(css).toContain(".candy-fog");
     expect(css).toContain(".candy-fog-mist");
+    expect(css).toContain("box-shadow: 0 0 16px 7px rgb(60 210 255 / 0.38)");
     expect(css).toContain("aspect-ratio: 2 / 5");
     expect(css).toContain("object-fit: cover");
     expect(css).toContain("mask-image");

@@ -15,7 +15,8 @@ export const TALL_MAP_SIZE = { w: 1536, h: 1024 } as const;
 
 /**
  * CSS `aspect-ratio` width/height for the Lessons world.
- * Taller than the 3:2 PNG so the trail scrolls; object-fit cover crops the sides.
+ * Taller than the 3:2 PNG so painted pads are large enough for hopper/numbers
+ * and the trail scrolls. object-fit cover crops only the far sides.
  */
 export const CANDY_WORLD_ASPECT = 2 / 5;
 

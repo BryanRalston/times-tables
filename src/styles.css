@@ -1006,10 +1006,7 @@ details > summary::-webkit-details-marker {
 }
 .candy-node-now .candy-node-disc {
   background: transparent;
-  box-shadow:
-    0 0 0 5px rgb(255 255 255 / 0.42),
-    0 0 0 10px rgb(80 220 255 / 0.28),
-    0 0 18px 6px rgb(60 210 255 / 0.32);
+  box-shadow: 0 0 16px 7px rgb(60 210 255 / 0.38);
 }
 .candy-node-locked .candy-node-disc {
   color: #6a6a74;
