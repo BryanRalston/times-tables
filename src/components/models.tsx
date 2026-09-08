@@ -116,11 +116,14 @@ function Frame({
     <div
       key={shake}
       className={cn(
-        "frost rounded-[24px] border p-4 shadow-soft sm:p-5",
-        leftover && "flex w-full flex-col justify-center",
-        status === "correct" && "border-good bg-good-soft",
-        status === "wrong" && "border-bad shake",
-        status === "idle" && "border-line",
+        leftover
+          ? "flex w-full flex-col justify-center"
+          : "frost rounded-[24px] border p-4 shadow-soft sm:p-5",
+        !leftover && status === "correct" && "border-good bg-good-soft",
+        leftover && status === "correct" && "ring-2 ring-good",
+        status === "wrong" && "shake",
+        !leftover && status === "wrong" && "border-bad",
+        !leftover && status === "idle" && "border-line",
       )}
       {...(leftover ? { "data-leftover-board": "" } : {})}
       onClick={onMiss}
@@ -148,10 +151,10 @@ function Dot({
   className?: string;
 }) {
   const className = cn(
-    "size-7 rounded-full border sm:size-8 lg:size-12 leftover-dot",
+    "leftover-dot size-11 min-h-11 min-w-11 rounded-full border-2 sm:size-12",
     extra,
-    filled && !gone && "border-teal bg-teal",
-    (!filled || gone) && "border-line bg-surface-2",
+    filled && !gone && "border-teal bg-teal token-glow",
+    (!filled || gone) && "border-[#e8a0b8] bg-transparent",
     leftover && isolate && "border-dashed border-star bg-star-soft",
     gone && "take-out",
     onClick && filled && !gone && "known-glow",
@@ -238,8 +241,8 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
 
   return (
     <Frame shake={shake} status={status} leftover onMiss={missTake}>
-      <p className="leftover-eq mb-3 text-center font-display text-3xl sm:text-4xl lg:text-5xl">{data.equation}</p>
-      <div className="flex flex-col items-center justify-center gap-2 lg:gap-4">
+      <p className="leftover-eq mb-4 text-center text-ink">{data.equation}</p>
+      <div className="flex flex-col items-center justify-center gap-1.5">
         {Array.from({ length: rows }, (_, r) => {
           const start = r * perRow;
           const count = Math.min(perRow, Math.max(0, cells - start));
@@ -251,7 +254,7 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
           return (
             <div
               key={r}
-              className="leftover-row grid w-full grid-cols-5 items-center justify-items-center gap-1.5 rounded-[16px] border border-line bg-bg-warm p-2 lg:gap-2 lg:p-3"
+              className="leftover-row grid w-full grid-cols-5 items-center justify-items-center"
             >
               {known.length ? (
                 <div
@@ -280,9 +283,6 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
                   {hiding.map((i) => (
                     <span key={i} className="flex flex-col items-center">
                       <Dot filled={false} leftover isolate={status === "correct"} />
-                      {showN && i === hiding[hiding.length - 1] ? (
-                        <span className="mt-1 font-display text-sm text-teal">n = {question.answer}</span>
-                      ) : null}
                     </span>
                   ))}
                 </div>

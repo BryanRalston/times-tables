@@ -45,13 +45,9 @@ export function usePhoneDoor(): boolean {
   return phone;
 }
 
-/** Phone empty Guest opens leftover. Tablet/laptop keep the hashed route (Home catalog). Grown-ups stay reachable. */
-export function doorRoute(seenWelcome: boolean, route: Route, phone = true): Route {
-  if (seenWelcome) return route;
-  if (route.id === "grownup") return route;
-  if (!phone) return route;
-  if (route.id === "play" && route.kind === "welcome") return route;
-  return { id: "play", kind: "welcome" };
+/** Home is the door. First visit keeps the hashed route — leftover is never a trap. */
+export function doorRoute(_seenWelcome: boolean, route: Route, _phone = true): Route {
+  return route;
 }
 
 export function toHash(route: Route): string {

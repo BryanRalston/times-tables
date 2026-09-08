@@ -70,12 +70,11 @@ async function launchBrowser() {
   }
 }
 
-function watchCatalog() {
-  window.__G3_CATALOG = false;
-  const bad = /Play leftover|Start today's walk|The year map/;
+function watchLeftoverTrap() {
+  window.__G3_LEFTOVER_TRAP = false;
   const scan = () => {
     const t = document.querySelector("#app")?.innerText || "";
-    if (t && bad.test(t)) window.__G3_CATALOG = true;
+    if (t && /6 \+ n = 10/.test(t) && !/Today's walk/.test(t)) window.__G3_LEFTOVER_TRAP = true;
   };
   const start = () => {
     const app = document.getElementById("app");
@@ -92,33 +91,7 @@ function welcomeUrl(base) {
   return u.href;
 }
 
-async function firstGotoPhoneLeftover(page, url) {
-  await page.goto(url, { waitUntil: "domcontentloaded" });
-  await page.waitForFunction(() => (document.querySelector("#app")?.innerText || "").length > 8, null, { timeout: 12000 });
-  const text = await page.locator("#app").innerText();
-  if (!text.includes("6 + n = 10")) throw new Error(`phone first visit missing leftover board: ${text.slice(0, 220)}`);
-  if (/Play leftover/i.test(text)) throw new Error("phone first visit showed Play leftover CTA");
-  if (/Start today's walk/i.test(text)) throw new Error("phone first visit showed today's walk CTA");
-  if (/The year map/i.test(text)) throw new Error("phone first visit showed year map");
-  if (/Your answer/i.test(text)) throw new Error("phone first visit YOUR ANSWER chrome");
-  if (/\b1\/4\b/.test(text)) throw new Error("phone first visit 1/4 progress");
-  if (/Take the dots you can see/i.test(text)) throw new Error("phone first visit lecture caption");
-  const catalog = await page.evaluate(() => window.__G3_CATALOG === true);
-  if (catalog) throw new Error("catalog painted on phone first navigation (not leftover-first)");
-  const hash = await page.evaluate(() => location.hash);
-  if (hash !== "#/play/welcome") throw new Error(`phone first visit hash ${hash}, want #/play/welcome`);
-  if (await page.locator("[data-welcome-leftover]").count() < 1) throw new Error("phone first visit missing leftover kiosk");
-  const check = page.getByRole("button", { name: /^Check$/i });
-  if (await check.count()) throw new Error("phone first visit Check before why-move");
-  const skip = page.getByRole("button", { name: /^Skip$/i });
-  if (await skip.count()) throw new Error("phone first visit Skip before why-move");
-  const dots = page.getByRole("button", { name: "dot" });
-  const n = await dots.count();
-  if (n !== 6) throw new Error(`phone first visit knowns ${n}, want 6`);
-  return { check, dots };
-}
-
-async function firstGotoShell(page, url, viewport) {
+async function firstGotoHome(page, url, viewport) {
   await page.goto(url, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => (document.querySelector("#app")?.innerText || "").length > 8, null, { timeout: 12000 });
   const text = await page.locator("#app").innerText();
@@ -126,8 +99,9 @@ async function firstGotoShell(page, url, viewport) {
     throw new Error(`${viewport.width} first visit leftover kiosk`);
   }
   if (/Play leftover/i.test(text)) throw new Error(`${viewport.width} first visit Play leftover CTA`);
-  if (!/Start today's walk/i.test(text)) throw new Error(`${viewport.width} first visit missing today's walk: ${text.slice(0, 180)}`);
-  if (!/The year map/i.test(text)) throw new Error(`${viewport.width} first visit missing year map`);
+  if (!/Today's walk/i.test(text)) throw new Error(`${viewport.width} first visit missing today's walk: ${text.slice(0, 180)}`);
+  if (!/Start/i.test(text)) throw new Error(`${viewport.width} first visit missing Start: ${text.slice(0, 180)}`);
+  if (!/All units/i.test(text)) throw new Error(`${viewport.width} first visit missing All units`);
   const home = page.getByRole("button", { name: /^Home$/i });
   const lessons = page.getByRole("button", { name: /^Lessons$/i });
   const shelf = page.getByRole("button", { name: /^Shelf$/i });
@@ -140,42 +114,20 @@ async function firstGotoShell(page, url, viewport) {
   }
 }
 
-async function assertPhoneBoard(page, viewport) {
-  const board = page.locator("[data-leftover-board]");
-  const box = await board.boundingBox();
-  if (!box) throw new Error("phone leftover board has no box");
-  const fill = box.width / viewport.width;
-  console.log(
-    `phone board ${viewport.width}x${viewport.height} x=${Math.round(box.x)} w=${Math.round(box.width)} h=${Math.round(box.height)} fill=${fill.toFixed(2)}`,
-  );
-  if (box.x + box.width > viewport.width + 8) {
-    throw new Error(`phone leftover overflow x=${box.x} w=${box.width} vw=${viewport.width}`);
-  }
-  if (fill < 0.8) throw new Error(`phone leftover fill ${fill.toFixed(2)} w=${box.width}`);
-}
-
-async function assertClassroomCard(page, viewport) {
+async function assertTrayInShell(page, viewport) {
   const board = page.locator("[data-leftover-board]");
   const box = await board.boundingBox();
   if (!box) throw new Error("leftover board has no box");
-  const cx = box.x + box.width / 2;
-  const mid = viewport.width / 2;
-  const fill = box.width / viewport.width;
+  const shell = page.locator(".app-phone");
+  const stage = (await shell.boundingBox()) ?? { x: 0, width: viewport.width };
+  const fill = box.width / stage.width;
   console.log(
-    `card ${viewport.width}x${viewport.height} x=${Math.round(box.x)} w=${Math.round(box.width)} h=${Math.round(box.height)} fill=${fill.toFixed(2)}`,
+    `tray ${viewport.width}x${viewport.height} x=${Math.round(box.x)} w=${Math.round(box.width)} shell=${Math.round(stage.width)} fill=${fill.toFixed(2)}`,
   );
-  if (Math.abs(cx - mid) > Math.max(48, viewport.width * 0.12)) {
-    throw new Error(`leftover card not centered cx=${cx} vw=${viewport.width}`);
+  if (box.x + box.width > viewport.width + 8) {
+    throw new Error(`leftover overflow x=${box.x} w=${box.width} vw=${viewport.width}`);
   }
-  if (fill > 0.82) {
-    throw new Error(`leftover billboard fill ${fill.toFixed(2)} w=${box.width} vw=${viewport.width}`);
-  }
-  if (fill < 0.35) {
-    throw new Error(`leftover stamp fill ${fill.toFixed(2)} w=${box.width} vw=${viewport.width}`);
-  }
-  if (box.height > viewport.height * 0.72) {
-    throw new Error(`leftover billboard height h=${box.height} vh=${viewport.height}`);
-  }
+  if (fill < 0.7) throw new Error(`leftover tray fill ${fill.toFixed(2)} of shell ${stage.width}`);
 }
 
 async function assertKeypadOnScreen(page, viewport) {
@@ -218,7 +170,7 @@ async function leftoverPlayable(browser, url, viewport, how) {
   const dots = page.getByRole("button", { name: "dot" });
   const n = await dots.count();
   if (n !== 6) throw new Error(`leftover knowns ${n} at ${viewport.width}`);
-  await assertClassroomCard(page, viewport);
+  await assertTrayInShell(page, viewport);
   const check = page.getByRole("button", { name: /^Check$/i });
   if (how === "drag") await dragKnown(page, dots);
   else if (how === "take-all") await page.locator("[data-known-group]").first().click({ timeout: 1500 });
@@ -230,19 +182,26 @@ async function leftoverPlayable(browser, url, viewport, how) {
   await ctx.close();
 }
 
-async function assertPhoneWhyMove(browser, url, how) {
-  const viewport = { width: 390, height: 844 };
+async function leftoverWhyMove(browser, url, viewport, how) {
   const ctx = await browser.newContext({ viewport });
-  await ctx.addInitScript(watchCatalog);
   const page = await ctx.newPage();
   page.setDefaultTimeout(12000);
-  const first = await firstGotoPhoneLeftover(page, url);
-  if (how === "drag") await dragKnown(page, first.dots);
+  await page.goto(welcomeUrl(url), { waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => (document.querySelector("#app")?.innerText || "").length > 8, null, { timeout: 12000 });
+  if (await page.locator("[data-welcome-leftover]").count()) {
+    throw new Error(`leftover kiosk at ${viewport.width}`);
+  }
+  if (!(await page.getByRole("button", { name: /^Home$/i }).count())) {
+    throw new Error(`leftover at ${viewport.width} missing Home tab`);
+  }
+  const dots = page.getByRole("button", { name: "dot" });
+  const check = page.getByRole("button", { name: /^Check$/i });
+  if (how === "drag") await dragKnown(page, dots);
   else if (how === "take-all") await page.locator("[data-known-group]").first().click({ timeout: 1500 });
-  else await first.dots.first().click({ force: true });
-  if (await first.check.count()) throw new Error(`phone leftover Check present before why-move wait (${how})`);
+  else await dots.first().click({ force: true });
+  if (await check.count()) throw new Error(`leftover Check present before why-move wait (${how})`);
   await page.waitForTimeout(450);
-  if (!(await first.check.count())) throw new Error(`phone leftover Check missing after ${how} why-move`);
+  if (!(await check.count())) throw new Error(`leftover Check missing after ${how} why-move`);
   await assertKeypadOnScreen(page, viewport);
   await ctx.close();
 }
@@ -258,38 +217,36 @@ try {
   await page.goto(rawBase, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => (document.querySelector("#app")?.innerText || "").length > 8);
   const coins1 = (await page.locator('button[aria-label="Coins"]').innerText()).trim();
-  const heading1 = await page.locator("h1").first().innerText();
+  const word1 = await page.locator("#app").innerText();
   const saved = await page.locator("[data-saved='1']").count();
-  if (coins1 !== "12" || !/Maya/.test(heading1) || !saved) {
-    throw new Error(`first paint coins=${coins1} heading=${heading1} saved=${saved}`);
+  if (coins1 !== "12" || !/Squishee Math/.test(word1) || !saved) {
+    throw new Error(`first paint coins=${coins1} saved=${saved} text=${word1.slice(0, 80)}`);
   }
   await page.reload({ waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => (document.querySelector("#app")?.innerText || "").length > 8);
   const coins2 = (await page.locator('button[aria-label="Coins"]').innerText()).trim();
-  const heading2 = await page.locator("h1").first().innerText();
+  const word2 = await page.locator("#app").innerText();
   const stored = await page.evaluate(() => {
     const raw = localStorage.getItem("g3-path-v2");
     const p = JSON.parse(raw || "null");
     return p?.state?.coins ?? p?.coins;
   });
-  if (coins2 !== "12" || stored !== 12 || !/Maya/.test(heading2)) {
-    throw new Error(`after reload coins=${coins2} stored=${stored} heading=${heading2}`);
+  if (coins2 !== "12" || stored !== 12 || !/Squishee Math/.test(word2)) {
+    throw new Error(`after reload coins=${coins2} stored=${stored}`);
   }
-  console.log("persist-reload OK coins=12 name=Maya");
+  console.log("persist-reload OK coins=12 wordmark");
 
   const phoneVp = { width: 390, height: 844 };
   const phoneCtx = await browser.newContext({ viewport: phoneVp });
-  await phoneCtx.addInitScript(watchCatalog);
   const phonePage = await phoneCtx.newPage();
   phonePage.setDefaultTimeout(12000);
-  await firstGotoPhoneLeftover(phonePage, rawBase);
-  await assertPhoneBoard(phonePage, phoneVp);
-  await phonePage.screenshot({ path: join(shotDir, "leftover-390x844.png") });
+  await firstGotoHome(phonePage, rawBase, phoneVp);
+  await phonePage.screenshot({ path: join(shotDir, "home-390x844.png") });
   await phoneCtx.close();
-  await assertPhoneWhyMove(browser, rawBase, "click");
-  await assertPhoneWhyMove(browser, rawBase, "drag");
-  await assertPhoneWhyMove(browser, rawBase, "take-all");
-  console.log("phone first-visit leftover OK");
+  await leftoverWhyMove(browser, rawBase, phoneVp, "click");
+  await leftoverWhyMove(browser, rawBase, phoneVp, "drag");
+  await leftoverWhyMove(browser, rawBase, phoneVp, "take-all");
+  console.log("phone first-visit Home + leftover why-move OK");
 
   for (const vp of [
     { width: 768, height: 1024 },
@@ -298,7 +255,7 @@ try {
     const lay = await browser.newContext({ viewport: vp });
     const p = await lay.newPage();
     p.setDefaultTimeout(12000);
-    await firstGotoShell(p, rawBase, vp);
+    await firstGotoHome(p, rawBase, vp);
     await p.screenshot({ path: join(shotDir, `shell-${vp.width}x${vp.height}.png`) });
     await lay.close();
     console.log(`md+ first-visit shell OK ${vp.width}x${vp.height}`);

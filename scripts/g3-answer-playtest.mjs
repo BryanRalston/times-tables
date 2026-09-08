@@ -168,99 +168,44 @@ async function waitApp(page) {
   await page.waitForFunction(() => (document.querySelector("#app")?.innerText || "").length > 8, null, { timeout: 12000 });
 }
 
-function watchCatalog() {
-  window.__G3_CATALOG = false;
-  const bad = /Play leftover|Start today's walk|The year map/;
-  const scan = () => {
-    const t = document.querySelector("#app")?.innerText || "";
-    if (t && bad.test(t)) window.__G3_CATALOG = true;
-  };
-  const start = () => {
-    const app = document.getElementById("app");
-    if (app) new MutationObserver(scan).observe(app, { childList: true, subtree: true, characterData: true });
-    scan();
-  };
-  if (document.body) start();
-  else document.addEventListener("DOMContentLoaded", start);
-}
-
 async function checkFirstVisitPhone(page) {
-  const row = { id: "first-visit-leftover", kind: "welcome", ui: "ok", fn: "ok", note: "", viewport: "phone" };
+  const row = { id: "first-visit-home", kind: "home", ui: "ok", fn: "ok", note: "", viewport: "phone" };
   try {
     await page.goto(rawBase, { waitUntil: "domcontentloaded" });
     await waitApp(page);
     const text = await page.locator("#app").innerText();
-    if (!text.includes("6 + n = 10")) {
+    if (await page.locator("[data-welcome-leftover]").count()) {
       row.ui = "fail";
       row.fn = "fail";
-      row.note = `missing leftover board: ${text.slice(0, 180).replace(/\s+/g, " ")}`;
+      row.note = "phone first visit leftover kiosk";
       await shotFail(page, "first-visit");
       return row;
     }
-    if (/Play leftover/i.test(text) || /Start today's walk/i.test(text) || /The year map/i.test(text)) {
+    if (!/Today's walk/i.test(text) || !/Start/i.test(text) || !/All units/i.test(text)) {
       row.ui = "fail";
       row.fn = "fail";
-      row.note = "empty Guest painted Home catalog";
+      row.note = `phone missing Home shell: ${text.slice(0, 180).replace(/\s+/g, " ")}`;
       await shotFail(page, "first-visit-home");
       return row;
     }
-    const catalog = await page.evaluate(() => window.__G3_CATALOG === true);
-    const hash = await page.evaluate(() => location.hash);
-    if (catalog) {
+    const home = page.getByRole("button", { name: /^Home$/i });
+    const lessons = page.getByRole("button", { name: /^Lessons$/i });
+    const shelf = page.getByRole("button", { name: /^Shelf$/i });
+    if (!(await home.count()) || !(await lessons.count()) || !(await shelf.count())) {
       row.ui = "fail";
       row.fn = "fail";
-      row.note = "catalog flashed on first navigation";
-      await shotFail(page, "first-visit-flash");
+      row.note = "phone missing Home|Lessons|Shelf";
+      await shotFail(page, "first-visit-tabs");
       return row;
     }
-    if (hash !== "#/play/welcome") {
+    if (/Play leftover/i.test(text) || text.includes("6 + n = 10")) {
       row.ui = "fail";
       row.fn = "fail";
-      row.note = `hash ${hash} on first goto`;
-      await shotFail(page, "first-visit-hash");
+      row.note = "leftover-as-door on phone Home";
+      await shotFail(page, "first-visit-door");
       return row;
     }
-    if (/Your answer/i.test(text) || /\b1\/4\b/.test(text) || /Take the dots you can see/i.test(text)) {
-      row.ui = "fail";
-      row.fn = "fail";
-      row.note = "quiz chrome on leftover welcome";
-      await shotFail(page, "first-visit-chrome");
-      return row;
-    }
-    const check = page.getByRole("button", { name: /^Check$/i });
-    if (await check.count()) {
-      row.ui = "fail";
-      row.fn = "fail";
-      row.note = "leftover Check present before why-move";
-      await shotFail(page, "first-visit-check");
-      return row;
-    }
-    const dots = page.getByRole("button", { name: "dot" });
-    const n = await dots.count();
-    if (n !== 6) {
-      row.ui = "fail";
-      row.fn = "fail";
-      row.note = `known group dots ${n}`;
-      await shotFail(page, "first-visit-dots");
-      return row;
-    }
-    await dots.first().click({ timeout: 1500 });
-    if (await check.count()) {
-      row.ui = "fail";
-      row.fn = "fail";
-      row.note = "leftover Check present before why-move wait";
-      await shotFail(page, "first-visit-why");
-      return row;
-    }
-    await page.waitForTimeout(450);
-    if (!(await check.count())) {
-      row.ui = "fail";
-      row.fn = "fail";
-      row.note = "leftover Check missing after why-move";
-      await shotFail(page, "first-visit-after");
-      return row;
-    }
-    row.note = "6 + n = 10, 6 dots, Check after why-move";
+    row.note = "Home Continue + tabs";
   } catch (e) {
     row.ui = "fail";
     row.fn = "fail";
@@ -287,7 +232,7 @@ async function checkFirstVisitDesk(page) {
       await shotFail(page, "first-visit-kiosk");
       return row;
     }
-    if (!/Start today's walk/i.test(text) || !/The year map/i.test(text)) {
+    if (!/Today's walk/i.test(text) || !/Start/i.test(text) || !/All units/i.test(text)) {
       row.ui = "fail";
       row.fn = "fail";
       row.note = `laptop missing shell: ${text.slice(0, 180).replace(/\s+/g, " ")}`;
@@ -311,7 +256,7 @@ async function checkFirstVisitDesk(page) {
       await shotFail(page, "first-visit-cta");
       return row;
     }
-    row.note = "Home walk + year map + tabs";
+    row.note = "Home Continue + tabs";
   } catch (e) {
     row.ui = "fail";
     row.fn = "fail";
@@ -634,12 +579,11 @@ try {
 
 {
   const freshPhone = await browser.newContext({ viewport: { width: 390, height: 844 } });
-  await freshPhone.addInitScript(watchCatalog);
   const phonePage = await freshPhone.newPage();
   phonePage.setDefaultTimeout(10000);
   const phoneRow = await checkFirstVisitPhone(phonePage);
   results.push(phoneRow);
-  process.stdout.write(`fresh first-visit-leftover ui=${phoneRow.ui} fn=${phoneRow.fn} ${phoneRow.note}\n`);
+  process.stdout.write(`fresh first-visit-home ui=${phoneRow.ui} fn=${phoneRow.fn} ${phoneRow.note}\n`);
   await freshPhone.close();
 
   const freshDesk = await browser.newContext({ viewport: { width: 1280, height: 800 } });
@@ -665,25 +609,25 @@ for (const [name, viewport] of [
       await page.goto(rawBase, { waitUntil: "domcontentloaded" });
       await waitApp(page);
       const coins1 = (await page.locator('button[aria-label="Coins"]').innerText()).trim();
-      const heading1 = await page.locator("h1").first().innerText();
+      const text1 = await page.locator("#app").innerText();
       const saved = await page.locator("[data-saved='1']").count();
       await page.reload({ waitUntil: "domcontentloaded" });
       await waitApp(page);
       const coins2 = (await page.locator('button[aria-label="Coins"]').innerText()).trim();
-      const heading2 = await page.locator("h1").first().innerText();
+      const text2 = await page.locator("#app").innerText();
       const stored = await page.evaluate(() => {
         const raw = localStorage.getItem("g3-path-v2");
         const p = JSON.parse(raw || "null");
         return p?.state?.coins ?? p?.coins;
       });
       const persistOk =
-        coins1 === "80" && coins2 === "80" && stored === 80 && /Maya/.test(heading1) && /Maya/.test(heading2) && saved > 0;
+        coins1 === "80" && coins2 === "80" && stored === 80 && /Squishee Math/.test(text1) && /Squishee Math/.test(text2) && saved > 0;
       results.push({
         id: "persist-reload",
         kind: "persist",
         ui: persistOk ? "ok" : "fail",
         fn: persistOk ? "ok" : "fail",
-        note: `coins ${coins1}->${coins2} stored=${stored} saved=${saved} ${heading2}`,
+        note: `coins ${coins1}->${coins2} stored=${stored} saved=${saved}`,
       });
       process.stdout.write(`desk persist-reload ui=${persistOk ? "ok" : "fail"} coins ${coins1}->${coins2} stored=${stored}\n`);
       if (!persistOk) await shotFail(page, "persist-reload");

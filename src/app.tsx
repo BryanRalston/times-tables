@@ -1,6 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode, useEffect } from "react";
 import { parseLocale } from "@/lib/i18n";
-import { doorRoute, usePhoneDoor, useRoute } from "@/lib/nav";
+import { useRoute } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { setSoundMuted, unlockAudio } from "@/lib/sound";
 import { GrownupPage } from "@/pages/grownup";
@@ -38,10 +38,7 @@ class BootError extends Component<{ children: ReactNode }, { message: string | n
 
 export function App() {
   const locale = parseLocale(useProgress((s) => s.locale));
-  const raw = useRoute();
-  const seenWelcome = useProgress((s) => s.seenWelcome);
-  const phone = usePhoneDoor();
-  const route = doorRoute(seenWelcome, raw, phone);
+  const route = useRoute();
   const soundOn = useProgress((s) => s.soundOn !== false);
 
   useEffect(() => {

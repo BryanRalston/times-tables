@@ -237,16 +237,16 @@ describe("nav", () => {
     });
   });
 
-  it("sends a phone empty Guest from Home (and catalog hashes) onto leftover, not a two-CTA Home", () => {
+  it("never traps first visit on leftover — Home and catalog hashes stay", () => {
     const leftover = { id: "play" as const, kind: "welcome" as const };
-    expect(doorRoute(false, { id: "home" })).toEqual(leftover);
-    expect(doorRoute(false, parseHash(""))).toEqual(leftover);
-    expect(doorRoute(false, parseHash("#/"))).toEqual(leftover);
-    expect(doorRoute(false, { id: "lessons" })).toEqual(leftover);
-    expect(doorRoute(false, { id: "shelf" })).toEqual(leftover);
-    expect(doorRoute(false, { id: "unit", unitId: "u1" })).toEqual(leftover);
-    expect(doorRoute(false, { id: "play", kind: "daily" })).toEqual(leftover);
-    expect(doorRoute(false, { id: "path" })).toEqual(leftover);
+    expect(doorRoute(false, { id: "home" })).toEqual({ id: "home" });
+    expect(doorRoute(false, parseHash(""))).toEqual({ id: "home" });
+    expect(doorRoute(false, parseHash("#/"))).toEqual({ id: "home" });
+    expect(doorRoute(false, { id: "lessons" })).toEqual({ id: "lessons" });
+    expect(doorRoute(false, { id: "shelf" })).toEqual({ id: "shelf" });
+    expect(doorRoute(false, { id: "unit", unitId: "u1" })).toEqual({ id: "unit", unitId: "u1" });
+    expect(doorRoute(false, { id: "play", kind: "daily" })).toEqual({ id: "play", kind: "daily" });
+    expect(doorRoute(false, { id: "path" })).toEqual({ id: "path" });
     expect(doorRoute(false, leftover)).toEqual(leftover);
     expect(doorRoute(false, { id: "grownup" })).toEqual({ id: "grownup" });
     expect(doorRoute(true, { id: "home" })).toEqual({ id: "home" });

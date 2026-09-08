@@ -3,59 +3,32 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#f4b3d0" />
+    <meta name="theme-color" content="#f4b8d0" />
     <meta
       name="description"
-      content="Squishee Math — a school-year of LCPS 2026–27 math trails. Leftover first, then the year map. Nothing leaves this device."
+      content="Squishee Math — a school-year of LCPS 2026–27 math trails. Home first, then the year map. Nothing leaves this device."
     />
     <title>Squishee Math</title>
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
     <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
     <link rel="apple-touch-icon" href="%BASE_URL%squishees/frog.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
       html,
       body,
       #app {
-        background: #f4b3d0;
+        background: #f4b8d0;
         width: 100%;
         min-height: 100%;
         min-height: 100dvh;
         margin: 0;
       }
     </style>
-    <script>
-      (function () {
-        try {
-          var hash = location.hash || "";
-          if (hash.indexOf("play/welcome") !== -1 || hash.indexOf("grownup") !== -1) return;
-          var keys = ["g3-path-v2", "g3-path-v1", "times-tables-progress", "times-tables-settings"];
-          var seen = false;
-          for (var i = 0; i < keys.length; i++) {
-            var raw = localStorage.getItem(keys[i]);
-            if (!raw) continue;
-            var p = JSON.parse(raw);
-            var s = p && p.state && typeof p.state === "object" ? p.state : p;
-            if (!s) continue;
-            if (s.seenWelcome === true) {
-              seen = true;
-              break;
-            }
-            var id = s.learnerId || "kid-1";
-            if (s.learners && s.learners[id] && s.learners[id].seenWelcome === true) {
-              seen = true;
-              break;
-            }
-          }
-          var phone = true;
-          try {
-            phone = window.matchMedia("(max-width: 767px)").matches;
-          } catch (e2) {}
-          if (!seen && phone) {
-            history.replaceState(null, "", location.pathname + location.search + "#/play/welcome");
-          }
-        } catch (e) {}
-      })();
-    </script>
   </head>
   <body>
     <div id="app"></div>

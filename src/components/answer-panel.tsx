@@ -65,6 +65,7 @@ export function AnswerPanel({
       disabled={disabled}
       replace={leftover}
       quiet={leftover}
+      docked
       allowDot={keypadAllowsDot(question)}
       prefix={moneyCountHasBill(question) ? "$" : undefined}
     />

@@ -1,15 +1,19 @@
 import { useMemo } from "react";
-import { AppHeader, AppShell, AppTabs, useUi } from "@/components/chrome";
-import { PokeToy } from "@/components/poke-toy";
-import { Button } from "@/components/ui/button";
-import { YearPath } from "@/components/year-path";
+import { AppHeader, AppScene, AppTabs, WalkMark, useUi } from "@/components/chrome";
 import { todayIso } from "@/lib/calendar";
 import { remainingSchoolDaysInUnit, suggestedUnitId, unitById } from "@/lib/curriculum";
-import { makeDailyWalk, walkLabel } from "@/lib/daily";
+import { makeDailyWalk } from "@/lib/daily";
 import { parseLocale } from "@/lib/i18n";
 import { unitText } from "@/lib/labels";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
+
+const FAMILIES = [
+  { id: "u1-leftover", label: "numberSense" as const },
+  { id: "u1-friends", label: "missingAddend" as const },
+  { id: "u7-take", label: "missingSubtrahend" as const },
+  { id: "u6-facts", label: "timesFacts" as const },
+];
 
 export function HomePage() {
   const classUnitId = useProgress((s) => s.classUnitId);
@@ -20,6 +24,7 @@ export function HomePage() {
   const sessions = useProgress((s) => s.sessions);
   const learnerId = useProgress((s) => s.learnerId);
   const attempts = useProgress((s) => s.attempts);
+  const activities = useProgress((s) => s.activities);
   const locale = parseLocale(useProgress((s) => s.locale));
   const ui = useUi();
   const date = todayIso();
@@ -43,35 +48,62 @@ export function HomePage() {
   );
   const done = Boolean(sessions[walk.date]?.completed);
   const remain = remainingSchoolDaysInUnit(suggested, walk.schoolDate);
+  const unitShort = unit ? unitText(unit, locale).short : ui.todaysWalk;
+  const leftoverDone = Boolean(activities["u1-leftover"]?.plays);
 
   return (
-    <AppShell>
+    <AppScene scene="hills" tabs={<AppTabs active="home" />}>
       <AppHeader />
-      <AppTabs active="home" />
-
-      <section className="frost mb-6 rounded-[24px] border border-line p-4 shadow-soft">
-        <div className="flex items-center gap-3">
-          <PokeToy id={done ? "peach" : "panda"} size="md" className="h-24 w-24" />
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-teal">{done ? ui.walkDone : walkLabel(walk, locale)}</p>
-            <h2 className="font-display text-xl leading-tight">{unit ? unitText(unit, locale).short : ui.todaysWalk}</h2>
-            <p className="mt-1 text-sm text-muted">{ui.newReview(walk.fresh, walk.review, remain)}</p>
-            <Button className="mt-3 w-full" size="lg" onClick={() => navigate({ id: "play", kind: "daily" })}>
-              {done ? ui.walkAgain : ui.startWalk}
-            </Button>
-          </div>
-        </div>
+      <section className="continue-card" data-continue-card="1">
+        <WalkMark />
+        <h2 className="font-display text-[1.65rem] font-semibold leading-tight text-ink">{ui.todaysWalk}</h2>
+        <p className="mt-1 text-sm font-semibold text-muted">
+          {unitShort} · {walk.fresh} {ui.fresh.toLowerCase()}
+        </p>
+        <p className="sr-only">{ui.newReview(walk.fresh, walk.review, remain)}</p>
+        <button
+          type="button"
+          className="start-loud"
+          onClick={() => navigate({ id: "play", kind: "daily" })}
+        >
+          {done ? ui.walkAgain : ui.start}
+        </button>
       </section>
 
-      <p className="frost mb-3 rounded-[16px] border border-line p-3 text-center text-sm text-muted">
-        {ui.yearMap}{" "}
-        <button type="button" className="font-medium text-teal" onClick={() => navigate({ id: "lessons" })}>
-          {ui.lessons}
-        </button>{" "}
-        {ui.lessonsMenu}
-      </p>
-      <YearPath suggestedId={suggested} onOpen={(id) => navigate({ id: "unit", unitId: id })} />
-      <p className="mt-6 text-center text-xs text-faint">{ui.nothingLeaves}</p>
-    </AppShell>
+      {leftoverDone ? (
+        <button
+          type="button"
+          className="ghost-replay"
+          onClick={() => navigate({ id: "play", kind: "activity", activityId: "u1-leftover" })}
+        >
+          {ui.replay} · {ui.numberSense}
+        </button>
+      ) : null}
+
+      <button type="button" className="all-units" onClick={() => navigate({ id: "lessons" })}>
+        {ui.allUnits}
+      </button>
+
+      <div className="year-beads" data-year-beads="1">
+        {FAMILIES.map((f, i) => {
+          const played = Boolean(activities[f.id]?.plays);
+          const now = !played && (i === 0 || Boolean(activities[FAMILIES[i - 1].id]?.plays));
+          return (
+            <button
+              key={f.id}
+              type="button"
+              className="year-bead"
+              data-now={now ? "1" : "0"}
+              data-done={played ? "1" : "0"}
+              onClick={() => navigate({ id: "play", kind: "activity", activityId: f.id })}
+            >
+              <i />
+              {ui[f.label]}
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-auto pb-2 text-center text-[11px] text-faint">{ui.nothingLeaves}</p>
+    </AppScene>
   );
 }

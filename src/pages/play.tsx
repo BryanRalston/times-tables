@@ -1,8 +1,7 @@
-import { Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AnswerPanel } from "@/components/answer-panel";
 import { applyKeypadKey } from "@/components/keypad";
-import { useUi } from "@/components/chrome";
+import { AppHeader, AppScene, AppTabs, useUi } from "@/components/chrome";
 import { MiniGame } from "@/components/minigame";
 import { Mascot, StarPop, type Pose } from "@/components/mascot";
 import { Board } from "@/components/models";
@@ -13,7 +12,7 @@ import { activityById, suggestedUnitId } from "@/lib/curriculum";
 import { makeDailyWalk, walkLabel } from "@/lib/daily";
 import { parseLocale, UI } from "@/lib/i18n";
 import { cardHeading, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen } from "@/lib/leftover";
-import { aliasActivityId, navigate, usePhoneDoor } from "@/lib/nav";
+import { aliasActivityId, navigate } from "@/lib/nav";
 import { holdMsFor, REVEAL_AFTER_MISSES, WRONG_REVEAL_MS, WRONG_RETRY_MS, type FactStat } from "@/lib/practice";
 import { useProgress } from "@/lib/progress";
 import { makeActivityRound, makeWelcomeRound } from "@/lib/questions";
@@ -21,7 +20,7 @@ import { rngFromSeed } from "@/lib/rng";
 import { canAffordAnything, coinsForResult } from "@/lib/coins";
 import { playCorrect, playStar, playStreak, playWrong, unlockAudio } from "@/lib/sound";
 import { schoolStreak } from "@/lib/streak";
-import type { ItemSource, Locale, Question } from "@/lib/types";
+import type { Locale, Question } from "@/lib/types";
 import { correctSpeech, keypadAllowsDot, pandaLine, questionCorrect } from "@/lib/utils";
 
 type Kind = "welcome" | "daily" | "activity";
@@ -114,15 +113,6 @@ function buildPack(
   };
 }
 
-function sourceLabel(src: ItemSource | undefined, locale: Locale): string | null {
-  const ui = UI[locale];
-  if (src === "review") return ui.review;
-  if (src === "fluency") return ui.fluencyLabel;
-  if (src === "friday") return ui.fridayCheck;
-  if (src === "fresh") return ui.fresh;
-  return null;
-}
-
 export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string }) {
   const sessions = useProgress((s) => s.sessions);
   const markWelcome = useProgress((s) => s.markWelcome);
@@ -130,8 +120,6 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const recordSession = useProgress((s) => s.recordSession);
   const noteAttempt = useProgress((s) => s.noteAttempt);
   const awardCoins = useProgress((s) => s.awardCoins);
-  const soundOn = useProgress((s) => s.soundOn !== false);
-  const setSoundOn = useProgress((s) => s.setSoundOn);
 
   const [pack] = useState(() => {
     const st = useProgress.getState();
@@ -177,7 +165,6 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const who = q?.source === "review" ? "rem" : "nix";
   const ui = useUi();
   const locale = parseLocale(useProgress((s) => s.locale));
-  const phone = usePhoneDoor();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -374,9 +361,12 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   if (!pack.items.length) {
     return (
-      <div className="grid min-h-dvh place-items-center p-6">
-        <Button onClick={() => navigate({ id: "home" })}>{ui.path}</Button>
-      </div>
+      <AppScene scene="play" tabs={<AppTabs active="play" />}>
+        <AppHeader variant="play" />
+        <div className="grid flex-1 place-items-center p-6">
+          <Button onClick={() => navigate({ id: "home" })}>{ui.path}</Button>
+        </div>
+      </AppScene>
     );
   }
 
@@ -400,7 +390,9 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     const st = useProgress.getState();
     const shop = canAffordAnything(st.coins, st.squishees);
     return (
-      <div className="mx-auto grid min-h-dvh max-w-lg place-items-center px-4 py-8">
+      <AppScene scene="hills" tabs={<AppTabs active="home" />}>
+        <AppHeader />
+        <div className="grid flex-1 place-items-center px-4 py-8">
         <div className="w-full text-center">
           <div className="mx-auto grid h-52 w-52 place-items-center">
             <Mascot pose="celebrate" hop size="lg" className="mx-auto" />
@@ -425,40 +417,41 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
             </Button>
           ) : null}
         </div>
-      </div>
+        </div>
+      </AppScene>
     );
   }
 
   if (!q) return null;
 
-  const pill = sourceLabel(q.source, locale);
+  const leftover = q.kind === "tenframe";
   const gate = { kind: q.kind, needsInteract: q.needsInteract, interacted, status };
-  const quietWelcome = kind === "welcome" && phone;
   const showPanel = leftoverPanelOpen(gate);
-  const showSkip = !quietWelcome && leftoverSkipOpen(gate);
+  const showSkip = leftoverSkipOpen(gate);
   const speech = reveal
-    ? q.kind === "tenframe"
+    ? leftover
       ? ui.tryAgain
       : correctSpeech(q, locale)
     : pandaLine(q, locale, pose === "oops" ? "wrong" : status, interacted);
-  const showSpeech = !quietWelcome || status === "wrong" || pose === "oops" || reveal;
-  const muteBtn = (
-    <button
-      type="button"
-      className="grid size-9 place-items-center rounded-[12px] text-muted"
-      onClick={() => setSoundOn(!soundOn)}
-      aria-label={soundOn ? ui.mute : ui.unmute}
-      data-mute-sounds="1"
-      data-sound-on={soundOn ? "1" : "0"}
-    >
-      {soundOn ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
-    </button>
-  );
-  const shownAnswer = reveal ? (
-    <p className="mt-2 text-center text-sm text-good" data-show-correct="1">
-      {q.kind === "tenframe" ? q.answer : speech}
-    </p>
-  ) : null;
+  const showSpeech = leftover
+    ? status === "wrong" || pose === "oops" || reveal
+    : status === "wrong" || pose === "oops" || reveal;
+  const shownAnswer =
+    reveal && !leftover ? (
+      <p className="mt-2 text-center text-sm text-good" data-show-correct="1">
+        {speech}
+      </p>
+    ) : reveal && leftover ? (
+      <p className="sr-only" data-show-correct="1">
+        {q.answer}
+      </p>
+    ) : null;
+  const hideHeading =
+    q.kind === "fluency" ||
+    q.kind === "word" ||
+    q.kind === "jumps" ||
+    leftover ||
+    (q.kind === "money" && (q.data as { mode?: string }).mode === "make");
   const board = (
     <Board
       key={q.id}
@@ -481,106 +474,53 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     />
   ) : null;
 
-  if (quietWelcome) {
-    return (
-      <div
-        className="mx-auto grid min-h-dvh w-full max-w-none grid-cols-1 place-content-center place-items-stretch gap-4 overflow-x-hidden px-4 py-5"
-        data-welcome-leftover="1"
-        {...(showPanel ? { "data-panel": "1" } : {})}
-      >
-        <div className="flex justify-end">{muteBtn}</div>
-        <div className="flex flex-col items-center">
-          <div className="relative">
-            <Mascot who={who} pose={pose} hop={hop} size="md" />
-            <StarPop show={star} />
-          </div>
-          {showSpeech ? (
-            <p className="mt-2 max-w-[14rem] rounded-[18px] border border-line bg-surface px-3 py-2 text-sm">{speech}</p>
-          ) : null}
-        </div>
-
-        <div className="h-full min-h-0 w-full min-w-0">{board}</div>
-
-        {panel ? (
-          <div className="mx-auto w-full max-w-sm lg:max-w-md">
-            {panel}
-            {shownAnswer}
-          </div>
-        ) : (
-          shownAnswer
-        )}
-      </div>
-    );
-  }
-
   return (
-    <div
-      className="mx-auto flex min-h-dvh max-w-lg flex-col overflow-x-hidden px-4 pt-3 lg:max-w-5xl"
-      data-play-page="1"
-    >
-      <header className="mb-2 flex shrink-0 items-center gap-2">
-        <button type="button" className="text-sm text-muted" onClick={() => navigate({ id: "home" })}>
-          ← {ui.home}
-        </button>
-        <div className="mx-2 h-2 flex-1 overflow-hidden rounded-full bg-surface-2">
-          <div className="h-full bg-teal transition-[width] duration-300" style={{ width: `${(i / pack.items.length) * 100}%` }} />
-        </div>
-        <span className="text-xs tabular-nums text-muted">
-          {i + 1}/{pack.items.length}
-        </span>
-        {muteBtn}
-      </header>
-
-      <div
-        className={
-          showPanel
-            ? "flex min-h-0 flex-1 flex-col lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,22rem)] lg:items-start lg:gap-6"
-            : "flex min-h-0 flex-1 flex-col"
-        }
-      >
-        <div className="min-h-0 flex-1 overflow-y-auto pb-3 lg:overflow-visible">
-          <div className="flex items-end gap-2">
-            <div className="relative">
-              <Mascot who={who} pose={pose} hop={hop} size="sm" />
-              <StarPop show={star} />
-            </div>
-            {showSpeech ? (
-              <p className="mb-3 max-w-[14rem] rounded-[18px] border border-line bg-surface px-3 py-2 text-sm">{speech}</p>
-            ) : null}
-          </div>
-
-          {pill ? (
-            <p className="mb-2 text-center text-[11px] font-medium uppercase tracking-wide text-muted">{pill}</p>
+    <AppScene scene="play" tabs={<AppTabs active="play" />} className="overflow-x-hidden">
+      <div className="flex min-h-0 flex-1 flex-col" data-play-page="1">
+        <AppHeader variant="play" />
+        <div className="flex min-h-0 flex-1 flex-col px-3">
+          {showSpeech ? (
+            <p className="mx-auto mb-1 max-w-[14rem] rounded-[18px] bg-white/80 px-3 py-1.5 text-center text-sm">
+              {speech}
+            </p>
           ) : null}
-
-          {q.sol?.length ? (
-            <p className="mb-1 text-center text-[11px] font-medium uppercase tracking-wide text-faint">{q.sol.join(" · ")}</p>
-          ) : null}
-
-          {q.kind === "fluency" || q.kind === "word" || q.kind === "jumps" || (q.kind === "tenframe" && "equation" in (q.data as object) && (q.data as { equation?: string }).equation === q.prompt) || (q.kind === "money" && (q.data as { mode?: string }).mode === "make") ? null : (
-            <h2 className="mb-3 text-center font-display text-xl leading-tight sm:text-2xl">
+          {!hideHeading ? (
+            <h2 className="mb-2 text-center font-display text-xl leading-tight sm:text-2xl">
               {cardHeading(q, interacted)}
             </h2>
-          )}
-
-          <div className={q.kind === "tenframe" ? "mx-auto w-full max-w-xl" : undefined}>{board}</div>
-
-          {q.kind === "word" || q.prompt.length > 70 ? <div className="mt-3"><ScratchPad /></div> : null}
+          ) : null}
+          <div className={leftover ? "mx-auto flex min-h-0 w-full flex-1 items-center" : "min-h-0 flex-1 overflow-y-auto"}>
+            <div className={leftover ? "w-full" : undefined}>{board}</div>
+            {q.kind === "word" || q.prompt.length > 70 ? (
+              <div className="mt-3">
+                <ScratchPad />
+              </div>
+            ) : null}
+          </div>
         </div>
-
         {showPanel || shownAnswer || showSkip ? (
-          <div className="shrink-0 lg:mt-0" data-play-keys="1">
+          <div className="keypad-dock shrink-0" data-play-keys="1">
+            {showPanel ? (
+              <div className="mascot-dock">
+                <Mascot who={who} pose={pose} hop={hop} size="sm" className="!h-full !w-full" />
+                <StarPop show={star} />
+              </div>
+            ) : null}
             {panel}
             {shownAnswer}
-
             {showSkip ? (
-              <button type="button" className="mt-3 w-full text-center text-xs text-faint" onClick={skip}>
+              <button type="button" className="skip-quiet" onClick={skip}>
                 {ui.skip}
               </button>
             ) : null}
           </div>
-        ) : null}
+        ) : (
+          <div className="relative mx-auto mb-1 h-16 w-16">
+            <Mascot who={who} pose={pose} hop={hop} size="sm" className="!h-16 !w-16" />
+            <StarPop show={star} />
+          </div>
+        )}
       </div>
-    </div>
+    </AppScene>
   );
 }
