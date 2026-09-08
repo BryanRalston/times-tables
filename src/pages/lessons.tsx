@@ -1,101 +1,90 @@
-import { AppHeader, AppScene, AppTabs, useUi } from "@/components/chrome";
-import { ART } from "@/lib/art";
+import { useMemo } from "react";
+import { AppHeader, AppScene, AppTabs, WalkMark, useUi } from "@/components/chrome";
 import { todayIso } from "@/lib/calendar";
-import { QUARTERS, suggestedUnitId, unitsFor } from "@/lib/curriculum";
+import { suggestedUnitId, unitById, unitsFor } from "@/lib/curriculum";
+import { makeDailyWalk } from "@/lib/daily";
 import { parseLocale } from "@/lib/i18n";
 import { activityText, unitText } from "@/lib/labels";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
-import { cn } from "@/lib/utils";
 
 export function LessonsPage() {
   const classUnitId = useProgress((s) => s.classUnitId);
   const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
-  const activities = useProgress((s) => s.activities);
-  const suggested = suggestedUnitId(todayIso(), classUnitId || undefined, pathGrade);
+  const skipWeekend = useProgress((s) => s.skipWeekend);
+  const shaky = useProgress((s) => s.shaky);
+  const facts = useProgress((s) => s.facts);
+  const sessions = useProgress((s) => s.sessions);
+  const learnerId = useProgress((s) => s.learnerId);
+  const attempts = useProgress((s) => s.attempts);
   const locale = parseLocale(useProgress((s) => s.locale));
   const ui = useUi();
-  const qName = [ui.q1, ui.q2, ui.q3, ui.q4];
+  const date = todayIso();
+  const suggested = suggestedUnitId(date, classUnitId || undefined, pathGrade);
+  const unit = unitById(suggested);
+  const nextAttempt = (attempts[`daily:${suggested}`] ?? 0) + 1;
+  const walk = useMemo(
+    () =>
+      makeDailyWalk({
+        date,
+        classUnitId: classUnitId || undefined,
+        skipWeekend,
+        shaky,
+        facts,
+        learnerId,
+        attempt: nextAttempt,
+        locale,
+        grade: pathGrade,
+      }),
+    [date, classUnitId, skipWeekend, shaky, facts, learnerId, nextAttempt, locale, pathGrade],
+  );
+  const done = Boolean(sessions[walk.date]?.completed);
+  const unitShort = unit ? unitText(unit, locale).short : ui.todaysWalk;
+  const others = unitsFor(pathGrade).filter((u) => u.id !== suggested);
 
   return (
     <AppScene scene="hills" tabs={<AppTabs active="lessons" />}>
       <AppHeader variant="shelf" title={ui.lessons} />
-      <div className="flex-1 overflow-y-auto px-4 pb-3">
-      <p className="mb-4 text-center text-sm text-muted">{ui.lessonsIntro}</p>
+      <section className="continue-card" data-continue-card="1" data-lessons-continue="1">
+        <WalkMark />
+        <h2 className="font-display text-[1.65rem] font-semibold leading-tight text-ink">{ui.todaysWalk}</h2>
+        <p className="mt-1 text-sm font-semibold text-muted">
+          {unitShort} · {walk.fresh} {ui.fresh.toLowerCase()}
+        </p>
+        <button type="button" className="start-loud" onClick={() => navigate({ id: "play", kind: "daily" })}>
+          {done ? ui.walkAgain : ui.start}
+        </button>
+      </section>
 
-      {QUARTERS.map((q) => {
-        const units = unitsFor(pathGrade).filter((u) => u.quarter === q.id);
-        return (
-          <section key={q.id} className="mb-6">
-            <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted">
-              {qName[q.id - 1] ?? q.name} · {q.span}
-            </h3>
-            <div className="grid gap-2 lg:grid-cols-2">
-              {units.map((u) => {
-                const now = u.id === suggested;
-                return (
-                  <details key={u.id} open={now} className="frost rounded-[20px] border border-line p-3 shadow-soft">
-                    <summary className="flex cursor-pointer list-none items-center gap-3">
-                      <img src={ART.nodeOpen} alt="" className="h-12 w-12 object-contain" />
-                      <span className="min-w-0 flex-1">
-                        <span className="flex items-center gap-2">
-                          <span className="font-display text-lg leading-tight">{unitText(u, locale).short}</span>
-                          {now ? (
-                            <span className="rounded-full bg-teal-soft px-2 py-0.5 text-[11px] font-medium text-teal">{ui.now}</span>
-                          ) : null}
-                        </span>
-                        <span className="block text-xs text-muted">
-                          Unit {u.number} · {u.sol.join(" · ")}
-                        </span>
-                      </span>
-                    </summary>
-                    <p className="mt-2 text-sm text-muted">{unitText(u, locale).blurb}</p>
-                    <div className="mt-3 space-y-2">
-                      {now ? (
-                        <button
-                          type="button"
-                          className="flex h-12 w-full items-center justify-center rounded-[14px] bg-teal text-sm font-medium text-teal-ink"
-                          onClick={() => navigate({ id: "play", kind: "daily" })}
-                        >
-                          {ui.todaysWalk}
-                        </button>
-                      ) : null}
-                      {u.activities.map((a) => {
-                        const save = activities[a.id];
-                        return (
-                          <button
-                            key={a.id}
-                            type="button"
-                            onClick={() => navigate({ id: "play", kind: "activity", activityId: a.id })}
-                            className={cn(
-                              "flex w-full items-center gap-3 rounded-[14px] border border-line bg-bg-warm px-3 py-2.5 text-left",
-                            )}
-                          >
-                            <span className="min-w-0 flex-1">
-                              <span className="block font-medium leading-tight">{activityText(a, locale).title}</span>
-                              <span className="block text-xs text-muted">{activityText(a, locale).blurb}</span>
-                              <span className="block text-[11px] text-faint">{a.sol.join(" · ")}</span>
-                            </span>
-                            <span className="text-star">{save?.stars ? "★".repeat(save.stars) : ui.play}</span>
-                          </button>
-                        );
-                      })}
-                      <button
-                        type="button"
-                        className="w-full text-center text-xs text-muted"
-                        onClick={() => navigate({ id: "unit", unitId: u.id })}
-                      >
-                        {ui.unitPage}
-                      </button>
-                    </div>
-                  </details>
-                );
-              })}
-            </div>
-          </section>
-        );
-      })}
-      </div>
+      {unit ? (
+        <div className="lesson-acts" data-lesson-acts="1">
+          {unit.activities.map((a) => (
+            <button
+              key={a.id}
+              type="button"
+              className="lesson-act"
+              onClick={() => navigate({ id: "play", kind: "activity", activityId: a.id })}
+            >
+              {activityText(a, locale).title}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      {others.length ? (
+        <div className="lesson-more" data-lesson-more="1">
+          {others.map((u) => (
+            <button
+              key={u.id}
+              type="button"
+              className="lesson-quiet-unit"
+              onClick={() => navigate({ id: "unit", unitId: u.id })}
+            >
+              {unitText(u, locale).short}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </AppScene>
   );
 }
