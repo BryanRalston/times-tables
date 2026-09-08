@@ -893,14 +893,14 @@ details > summary::-webkit-details-marker {
 .candy-scroll {
   flex: 1;
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  display: flex;
+  overflow: hidden;
   padding: 0.15rem 0.45rem 0.2rem;
 }
 .candy-map {
   position: relative;
-  height: 54rem;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   border-radius: 28px;
   border: 4px solid #f3b3c8;
@@ -1278,10 +1278,10 @@ details > summary::-webkit-details-marker {
   margin-top: 0.12rem;
 }
 .candy-star {
-  color: #e8c878;
+  color: #ffd24a;
   font-size: 0.62rem;
   line-height: 1;
-  opacity: 0.45;
+  opacity: 0.55;
 }
 .candy-star-on {
   color: #ffd24a;
@@ -1306,22 +1306,6 @@ details > summary::-webkit-details-marker {
   width: 4.4rem;
   height: 4.4rem;
   animation: candy-hop 1.8s ease-in-out infinite;
-}
-.candy-start {
-  position: absolute;
-  z-index: 6;
-  left: 50%;
-  bottom: 1.1rem;
-  transform: translateX(-50%);
-  height: 2.2rem;
-  padding: 0 1.1rem;
-  border-radius: 9999px;
-  background: var(--color-teal);
-  color: #fff;
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 700;
-  box-shadow: 0 8px 16px -10px rgb(14 138 134 / 0.8);
 }
 .candy-dock {
   display: flex;

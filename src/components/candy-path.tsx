@@ -188,6 +188,7 @@ export function CandyPath({
             data-path-unit={unit.id}
             data-path-status={status}
             data-path-zone={zone}
+            data-path-stars={stars}
             disabled={locked}
             aria-disabled={locked}
             aria-label={`${ui.unitN(unit.number)}. ${short}${status === "now" ? `, ${ui.now}` : ""}${locked ? `, ${ui.pathLocked}` : ""}`}
@@ -199,7 +200,7 @@ export function CandyPath({
             ) : (
               <span className="candy-stars" aria-hidden>
                 {[0, 1, 2].map((s) => (
-                  <span key={s} className={cn("candy-star", s < stars && "candy-star-on")}>
+                  <span key={s} className="candy-star candy-star-on">
                     ★
                   </span>
                 ))}
@@ -217,9 +218,6 @@ export function CandyPath({
         <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
       </div>
 
-      <button type="button" className="candy-start" onClick={onStart}>
-        {ui.start}
-      </button>
     </div>
   );
 }
