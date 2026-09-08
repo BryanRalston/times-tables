@@ -13,7 +13,8 @@ describe("asset URLs", () => {
     expect(asset("/squishees/cat.png")).toBe("/times-tables/squishees/cat.png");
     expect(squisheeSrc("cat")).toBe("/times-tables/squishees/cat.png");
     expect(squisheeSrc("shark")).toMatch(/\/times-tables\/squishees\/shark\.png$/);
-    expect(asset("art/home-peek.png")).toBe("/times-tables/art/home-peek.png");
-    expect(existsSync(join(HERE, "../../public/art/home-peek.png"))).toBe(true);
+    expect(squisheeSrc("peach")).toBe("/times-tables/squishees/peach.png");
+    expect(existsSync(join(HERE, "../../public/squishees/peach.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/art/home-peek.png"))).toBe(false);
   });
 });

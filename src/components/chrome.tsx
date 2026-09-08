@@ -1,9 +1,10 @@
 import { BookOpen, ChevronLeft, Home, Library, Settings2, Volume2, VolumeX } from "lucide-react";
 import type { ReactNode } from "react";
-import { ART } from "@/lib/art";
+import { MagentaImg } from "@/components/magenta-video";
 import { parseLocale, UI } from "@/lib/i18n";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
+import { squisheeSrc } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
 export type SceneKind = "hills" | "play" | "shelf";
@@ -240,8 +241,8 @@ export function ContinueStage({ children, peek = false }: { children: ReactNode;
   return (
     <div className={cn("continue-stage", peek && "continue-stage-peek")}>
       {peek ? (
-        <span className="continue-peek" data-continue-peek="1" aria-hidden>
-          <img src={ART.homePeek} alt="" className="continue-peek-art" draggable={false} />
+        <span className="continue-peek" data-continue-peek="1" data-peek-id="peach" aria-hidden>
+          <MagentaImg src={squisheeSrc("peach")} alt="" className="continue-peek-art" />
         </span>
       ) : null}
       {children}
