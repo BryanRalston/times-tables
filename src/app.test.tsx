@@ -47,20 +47,25 @@ function stubViewport(width: number) {
 
 function expectHomeShell(html: string) {
   expect(html).toContain("Squishee Math");
-  expect(html).toMatch(/Today(?:'|&#x27;)s walk/);
+  expect(html).toContain("Grade 3 Path");
   expect(html).toContain("Start");
-  expect(html).toContain("All units");
+  expect(html).toContain("Ten-Frame Meadow");
+  expect(html).toContain("Coin Cove");
+  expect(html).toContain("Fraction Forest");
   expect(html).toContain("Home, lessons, and shelf");
-  expect(html).toContain("data-continue-card");
-  expect(html).toContain("data-continue-peek");
-  expect(html).toContain('data-peek-id="peach"');
-  expect(html).toContain('data-peek-slot="center"');
-  expect(html).toContain(`data-peek-roster="${SQUISHEE_IDS.length}"`);
-  expect(html).toContain("data-walk-mark");
+  expect(html).toContain("data-grade-path");
+  expect(html).toContain('data-path-hopper="peach"');
+  expect(html).toContain('data-path-unit="u1"');
+  expect(html).toContain('data-path-unit="u13"');
+  expect(html).toContain('data-path-status="now"');
+  expect(html).toContain('data-path-status="locked"');
   expect(html).toContain("data-scene-land");
   expect(html).toContain("peach.png");
   expect(html).not.toContain("home-peek.png");
   expect(html).not.toMatch(/avocado\.png|mushroom\.png/);
+  expect(html).not.toContain("g4-");
+  expect(html).not.toContain("All units");
+  expect(html).not.toContain("data-continue-peek");
   expect(html).toContain("data-app-shell");
   expect(html).toContain("data-app-tabs");
   expect(html).toContain("data-mute-sounds");
@@ -139,7 +144,7 @@ describe("first-visit Home door", () => {
     expect(html).not.toContain("6 + n = 10");
   });
 
-  it("return visits keep Home as one Continue card, not leftover or Score/Streak", () => {
+  it("return visits keep Home as the Grade 3 path, not leftover or Score/Streak", () => {
     expect(doorRoute(true, { id: "home" })).toEqual({ id: "home" });
     expectHomeShell(renderToStaticMarkup(<HomePage />));
   });
@@ -149,7 +154,8 @@ describe("first-visit Home door", () => {
     expect(src).not.toContain("playLeftover");
     expect(src).not.toContain('kind: "welcome"');
     expect(src).toContain("ui.start");
-    expect(src).toContain("allUnits");
+    expect(src).toContain("CandyPath");
+    expect(src).not.toContain("allUnits");
     expect(src).not.toContain("YearPath");
     expect(src).not.toContain("year-beads");
     expect(src).not.toContain("peach");
@@ -210,6 +216,9 @@ describe("first-visit Home door", () => {
     const css = readFileSync(join(HERE, "styles.css"), "utf8");
     expect(css).toContain(".app-scene");
     expect(css).toContain(".scene-hill");
+    expect(css).toContain(".candy-map");
+    expect(css).toContain(".candy-hopper-art");
+    expect(css).toContain("@keyframes candy-hop");
     expect(css).toContain(".walk-spark");
     expect(css).toContain("@keyframes peek-bob");
     expect(css).toContain(".continue-peek-left");

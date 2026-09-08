@@ -141,6 +141,11 @@ export type Ui = {
   mystery: string;
   start: string;
   allUnits: string;
+  grade3Path: string;
+  zoneMeadow: string;
+  zoneCove: string;
+  zoneForest: string;
+  pathLocked: string;
   owned: string;
   commons: string;
   rares: string;
@@ -294,6 +299,11 @@ export const UI: Record<Locale, Ui> = {
     mystery: "???",
     start: "Start",
     allUnits: "All units",
+    grade3Path: "Grade 3 Path",
+    zoneMeadow: "Ten-Frame Meadow",
+    zoneCove: "Coin Cove",
+    zoneForest: "Fraction Forest",
+    pathLocked: "Locked",
     owned: "Owned",
     commons: "Commons",
     rares: "Rares",
@@ -445,6 +455,11 @@ export const UI: Record<Locale, Ui> = {
     mystery: "???",
     start: "Empezar",
     allUnits: "Todas las unidades",
+    grade3Path: "Sendero de 3.º",
+    zoneMeadow: "Prado de decenas",
+    zoneCove: "Cala de monedas",
+    zoneForest: "Bosque de fracciones",
+    pathLocked: "Cerrado",
     owned: "Tuyo",
     commons: "Comunes",
     rares: "Raros",
@@ -596,6 +611,11 @@ export const UI: Record<Locale, Ui> = {
     mystery: "???",
     start: "Começar",
     allUnits: "Todas as unidades",
+    grade3Path: "Trilha do 3.º ano",
+    zoneMeadow: "Prado das dezenas",
+    zoneCove: "Enseada das moedas",
+    zoneForest: "Floresta das frações",
+    pathLocked: "Trancado",
     owned: "Seu",
     commons: "Comuns",
     rares: "Raros",

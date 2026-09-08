@@ -145,6 +145,15 @@ export function squisheeById(id: string): Squishee | undefined {
   return SQUISHEES.find((s) => s.id === id);
 }
 
+/** Last owned shelf toy, else the familiar first peek face. */
+export function pathHopperId(owned: readonly string[]): string {
+  for (let i = owned.length - 1; i >= 0; i--) {
+    const id = owned[i]!;
+    if (squisheeById(id)) return id;
+  }
+  return PEEK_SQUISHEE_IDS[0] ?? SQUISHEE_IDS[0]!;
+}
+
 export function squisheeSrc(id: string): string {
   const s = squisheeById(id) ?? SQUISHEES[0]!;
   return asset(`squishees/${s.file}`);
