@@ -111,7 +111,6 @@ export function Keypad({
   }
 
   if (docked) {
-    const top = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "back"] as const;
     return (
       <div className={cn("space-y-2", className)}>
         {quiet ? (
@@ -123,14 +122,14 @@ export function Keypad({
         ) : (
           <AnswerReadout value={value} prefix={prefix} />
         )}
-        <div className="grid w-full grid-cols-10 gap-1" data-keypad="1">
-          {top.map((k) => keyBtn(k))}
+        <div className="grid w-full grid-cols-5 gap-1.5" data-keypad="1">
+          {(["1", "2", "3", "4", "5", "6", "7", "8", "9", "back"] as const).map((k) => keyBtn(k))}
         </div>
-        <div className="grid w-full grid-cols-10 gap-1">
-          {allowDot && !replace ? keyBtn(".") : null}
-          {keyBtn("0", allowDot && !replace ? "col-span-2" : "col-span-3")}
+        <div className="grid w-full grid-cols-5 gap-1.5">
+          {allowDot && !replace ? keyBtn(".") : keyBtn("0")}
+          {allowDot && !replace ? keyBtn("0") : <span />}
           <Button
-            className="check-loud col-span-7 w-full"
+            className="check-loud col-span-3 w-full"
             size="lg"
             onClick={onCheck}
             disabled={disabled || value.length === 0}
