@@ -912,45 +912,19 @@ details > summary::-webkit-details-marker {
     inset 0 0 0 3px #ffe6f0,
     0 16px 32px -22px rgb(80 30 50 / 0.4);
 }
-.candy-plates {
-  --candy-plate-overlap: 0.34;
-  --candy-plate-fade: 38%;
-  display: flex;
-  flex-direction: column;
+.candy-world {
+  position: relative;
   width: 100%;
+  aspect-ratio: 2 / 5;
 }
-.candy-plate {
+.candy-world-art {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 3 / 2;
+  height: 100%;
   object-fit: cover;
   object-position: center;
-  margin-top: calc(100% * (2 / 3) * var(--candy-plate-overlap) * -1);
-  /* Later plates sit on top; fade only their top so the plate underneath shows through. */
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgb(0 0 0 / 0.12) 16%,
-    rgb(0 0 0 / 0.45) 26%,
-    #000 38%,
-    #000 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgb(0 0 0 / 0.12) 16%,
-    rgb(0 0 0 / 0.45) 26%,
-    #000 38%,
-    #000 100%
-  );
-}
-.candy-plate[data-candy-plate="forest"] {
-  margin-top: 0;
-  -webkit-mask-image: none;
-  mask-image: none;
 }
 .candy-overlay {
   position: absolute;
@@ -965,28 +939,28 @@ details > summary::-webkit-details-marker {
 .candy-sign {
   position: absolute;
   z-index: 8;
-  padding: 0.28rem 0.55rem;
+  padding: 0.22rem 0.5rem;
   border-radius: 8px;
-  background: linear-gradient(#d2a66c, #a67c4e);
-  border: 3px solid #6b4423;
+  background: rgb(210 166 108 / 0.72);
+  border: 2px solid rgb(107 68 35 / 0.55);
   color: #fff8e8;
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   font-weight: 800;
   letter-spacing: 0.01em;
-  box-shadow: 0 4px 0 #5a3818;
+  box-shadow: 0 2px 8px rgb(90 56 24 / 0.18);
   text-wrap: nowrap;
 }
 .candy-sign-meadow {
-  left: 8%;
-  top: 78%;
+  left: 6%;
+  top: 80%;
 }
 .candy-sign-cove {
-  left: 70%;
+  left: 68%;
   top: 48%;
 }
 .candy-sign-forest {
-  left: 7%;
-  top: 10%;
+  left: 6%;
+  top: 12%;
 }
 .candy-node {
   position: absolute;
@@ -1007,11 +981,6 @@ details > summary::-webkit-details-marker {
   z-index: 3;
   opacity: 0.42;
   filter: none;
-}
-.candy-node-step {
-  width: 2.4rem;
-  height: 2.4rem;
-  pointer-events: none;
 }
 .candy-node-disc {
   display: grid;
@@ -1095,36 +1064,34 @@ details > summary::-webkit-details-marker {
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgb(248 244 255 / 0.36) 0%,
-    rgb(232 238 255 / 0.2) 62%,
+    rgb(236 232 246 / 0.42) 0%,
+    rgb(224 230 244 / 0.22) 48%,
+    rgb(248 246 252 / 0.06) 78%,
     rgb(255 255 255 / 0) 100%
   );
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
-  mask-image: linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 58%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 58%, transparent 100%);
 }
 .candy-fog-mist {
   position: absolute;
   border-radius: 50%;
-  background: rgb(255 248 252 / 0.14);
-  filter: blur(38px);
+  background: rgb(232 236 248 / 0.16);
+  filter: blur(52px);
 }
 .candy-fog-mist-a {
-  left: 8%;
-  top: 12%;
-  width: 58%;
-  height: 42%;
+  left: 4%;
+  top: 6%;
+  width: 72%;
+  height: 54%;
 }
 .candy-fog-mist-b {
-  right: 4%;
-  top: 28%;
-  width: 46%;
-  height: 36%;
+  right: 0;
+  top: 22%;
+  width: 58%;
+  height: 46%;
 }
 .candy-sign-fog {
   opacity: 0.72;
-}
-.candy-zone-dim {
-  filter: saturate(0.55);
 }
 .candy-dock {
   display: flex;

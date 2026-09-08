@@ -1,19 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { UNITS } from "./curriculum";
 import {
-  CANDY_ZONE_FILES,
-  CANDY_ZONE_STACK,
+  CANDY_WORLD_ASPECT,
   GRADE3_PATH_NODES,
   GRADE3_PATH_PADS,
-  PLATE_OVERLAP,
-  ZONE_PAD_COUNTS,
+  TALL_MAP_DECORATIVE_PAD,
+  TALL_MAP_FILE,
+  TALL_MAP_SIZE,
   displayUnitStars,
   fogCoverPercent,
   lastClearUnitNumber,
+  mapToViewPos,
   nodeIsFogged,
-  padIsFogged,
-  plateSpan,
-  plateToMapPos,
   zoneForUnitNumber,
   zoneIsFogged,
   zoneLabelIsFogged,
@@ -24,6 +22,7 @@ describe("grade path", () => {
   it("places every Grade 3 unit on the trail and none from Grade 4", () => {
     expect(UNITS).toHaveLength(13);
     expect(GRADE3_PATH_NODES).toHaveLength(UNITS.length);
+    expect(GRADE3_PATH_PADS).toHaveLength(13);
     expect(UNITS.every((u) => !u.id.startsWith("g4-"))).toBe(true);
     expect(zoneForUnitNumber(1)).toBe("meadow");
     expect(zoneForUnitNumber(4)).toBe("meadow");
@@ -33,24 +32,26 @@ describe("grade path", () => {
     expect(zoneForUnitNumber(13)).toBe("forest");
   });
 
-  it("stacks painted plates and sits a node on every cream pad", () => {
-    expect(CANDY_ZONE_STACK).toEqual(["forest", "cove", "meadow"]);
-    expect(CANDY_ZONE_FILES.meadow).toBe("candy-zones/meadow.png");
-    expect(CANDY_ZONE_FILES.cove).toBe("candy-zones/cove.png");
-    expect(CANDY_ZONE_FILES.forest).toBe("candy-zones/forest.png");
-    expect(ZONE_PAD_COUNTS.meadow).toBe(14);
-    expect(ZONE_PAD_COUNTS.cove).toBe(14);
-    expect(ZONE_PAD_COUNTS.forest).toBe(13);
-    expect(GRADE3_PATH_PADS).toHaveLength(41);
-    expect(GRADE3_PATH_PADS.filter((p) => p.zone === "meadow")).toHaveLength(14);
-    expect(GRADE3_PATH_PADS.filter((p) => p.zone === "cove")).toHaveLength(14);
-    expect(GRADE3_PATH_PADS.filter((p) => p.zone === "forest")).toHaveLength(13);
-    expect(GRADE3_PATH_PADS.filter((p) => p.unitNumber !== null)).toHaveLength(13);
-    expect(plateToMapPos("forest", { x: 50, y: 0 })).toEqual({ x: 50, y: 0 });
-    expect(plateToMapPos("meadow", { x: 50, y: 100 }).y).toBeCloseTo(100);
-    expect(plateToMapPos("cove", { x: 50, y: 0 }).y).toBeCloseTo(((1 - PLATE_OVERLAP) / plateSpan()) * 100);
+  it("sits the 13 units on painted cream pads of one tall map", () => {
+    expect(TALL_MAP_FILE).toBe("candy-zones/tall-map.png");
+    expect(TALL_MAP_SIZE).toEqual({ w: 1536, h: 1024 });
+    expect(CANDY_WORLD_ASPECT).toBeCloseTo(2 / 5);
+    expect(GRADE3_PATH_PADS.filter((p) => p.zone === "meadow")).toHaveLength(4);
+    expect(GRADE3_PATH_PADS.filter((p) => p.zone === "cove")).toHaveLength(4);
+    expect(GRADE3_PATH_PADS.filter((p) => p.zone === "forest")).toHaveLength(5);
+    expect(GRADE3_PATH_PADS.map((p) => p.unitNumber)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
     expect(GRADE3_PATH_NODES[0]!.y).toBeGreaterThan(88);
     expect(GRADE3_PATH_NODES[12]!.y).toBeLessThan(8);
+    expect(GRADE3_PATH_NODES.every((n, i, all) => i === 0 || n.y < all[i - 1]!.y)).toBe(true);
+    expect(TALL_MAP_DECORATIVE_PAD.y).toBeGreaterThan(GRADE3_PATH_PADS[8]!.map.y);
+    expect(TALL_MAP_DECORATIVE_PAD.y).toBeLessThan(GRADE3_PATH_PADS[7]!.map.y);
+    const mid = mapToViewPos({ x: 50, y: 50 });
+    expect(mid.x).toBeCloseTo(50);
+    expect(mid.y).toBeCloseTo(50);
+    const left = mapToViewPos({ x: 45.05, y: 92.69 });
+    expect(left.x).toBeGreaterThan(20);
+    expect(left.x).toBeLessThan(45.05);
+    expect(left.y).toBeCloseTo(92.69);
     expect(displayUnitStars(0, 15)).toBe(0);
     expect(displayUnitStars(5, 15)).toBe(1);
     expect(displayUnitStars(15, 15)).toBe(3);
@@ -69,7 +70,6 @@ describe("grade path", () => {
     expect(zoneLabelIsFogged("cove", 1)).toBe(false);
     expect(zoneLabelIsFogged("forest", 1)).toBe(false);
     expect(zoneLabelIsFogged("forest", 9)).toBe(false);
-    expect(padIsFogged({ x: 50, y: 2 }, 1)).toBe(true);
     expect(fogCoverPercent(1)).toBeGreaterThan(40);
     expect(fogCoverPercent(13)).toBe(0);
   });
