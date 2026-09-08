@@ -231,6 +231,7 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-fog");
     expect(css).toContain(".candy-sprinkle");
     expect(css).toContain("height: 96rem");
+    expect(css).toContain(".app-phone:has(.candy-scroll)");
     expect(css).toContain(".walk-spark");
     expect(css).toContain("@keyframes peek-bob");
     expect(css).toContain(".continue-peek-left");

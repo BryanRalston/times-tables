@@ -890,6 +890,11 @@ details > summary::-webkit-details-marker {
   margin: 1rem 1rem 0.4rem;
 }
 
+.app-phone:has(.candy-scroll) {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
 .candy-scroll {
   flex: 1;
   min-height: 0;
