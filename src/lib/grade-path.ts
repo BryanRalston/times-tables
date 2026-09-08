@@ -17,27 +17,27 @@ export function plateToMapPos(zone: PathZone, local: PathNodePos): PathNodePos {
   return { x: local.x, y: (i * 100 + local.y) / CANDY_ZONE_STACK.length };
 }
 
-/** Pads along each plate’s cream path, bottom-to-top, one node per Grade 3 unit. */
+/** Cream pads on the locked vinyl plates, bottom-to-top, one node per Grade 3 unit. */
 const MEADOW_PADS: readonly PathNodePos[] = [
-  { x: 49.9, y: 93.8 },
-  { x: 48.7, y: 66.4 },
-  { x: 64.6, y: 39.5 },
-  { x: 67.8, y: 12.1 },
+  { x: 42.3, y: 90.9 },
+  { x: 58.3, y: 62.8 },
+  { x: 46.6, y: 40 },
+  { x: 44.8, y: 16.4 },
 ];
 
 const COVE_PADS: readonly PathNodePos[] = [
-  { x: 54.2, y: 89.8 },
-  { x: 48.3, y: 63.3 },
-  { x: 57.2, y: 36.7 },
-  { x: 53.7, y: 10.2 },
+  { x: 63, y: 90 },
+  { x: 38.6, y: 59.7 },
+  { x: 45.7, y: 28.1 },
+  { x: 60.6, y: 4.4 },
 ];
 
 const FOREST_PADS: readonly PathNodePos[] = [
-  { x: 53.2, y: 91.8 },
-  { x: 44.3, y: 70.7 },
-  { x: 50.4, y: 50 },
-  { x: 53.5, y: 28.9 },
-  { x: 48.1, y: 8.2 },
+  { x: 47.7, y: 87.4 },
+  { x: 54.3, y: 68.3 },
+  { x: 49.9, y: 45.8 },
+  { x: 49.7, y: 26 },
+  { x: 60.9, y: 2.6 },
 ];
 
 /** Percent coords inside the stacked map; y = 0 is the top so the trail climbs. */
