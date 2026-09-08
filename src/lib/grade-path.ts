@@ -19,7 +19,7 @@ export const CANDY_ZONE_FILES: Record<PathZone, string> = {
 };
 
 /** Shared plate-height fraction used for CSS overlap and map math. */
-export const PLATE_OVERLAP = 0.16;
+export const PLATE_OVERLAP = 0.34;
 
 export function plateSpan(overlap = PLATE_OVERLAP): number {
   return CANDY_ZONE_STACK.length - (CANDY_ZONE_STACK.length - 1) * overlap;

@@ -913,8 +913,8 @@ details > summary::-webkit-details-marker {
     0 16px 32px -22px rgb(80 30 50 / 0.4);
 }
 .candy-plates {
-  --candy-plate-overlap: 0.16;
-  --candy-plate-fade: 16%;
+  --candy-plate-overlap: 0.34;
+  --candy-plate-fade: 38%;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -927,29 +927,30 @@ details > summary::-webkit-details-marker {
   object-fit: cover;
   object-position: center;
   margin-top: calc(100% * (2 / 3) * var(--candy-plate-overlap) * -1);
+  /* Later plates sit on top; fade only their top so the plate underneath shows through. */
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0%,
-    #000 var(--candy-plate-fade),
-    #000 calc(100% - var(--candy-plate-fade)),
-    transparent 100%
+    rgb(0 0 0 / 0.12) 16%,
+    rgb(0 0 0 / 0.45) 26%,
+    #000 38%,
+    #000 100%
   );
   mask-image: linear-gradient(
     to bottom,
     transparent 0%,
-    #000 var(--candy-plate-fade),
-    #000 calc(100% - var(--candy-plate-fade)),
-    transparent 100%
+    rgb(0 0 0 / 0.12) 16%,
+    rgb(0 0 0 / 0.45) 26%,
+    #000 38%,
+    #000 100%
   );
 }
 .candy-plate[data-candy-plate="forest"] {
   margin-top: 0;
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - var(--candy-plate-fade)), transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - var(--candy-plate-fade)), transparent 100%);
-}
-.candy-plate[data-candy-plate="meadow"] {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 var(--candy-plate-fade), #000 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, #000 var(--candy-plate-fade), #000 100%);
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 .candy-overlay {
   position: absolute;
