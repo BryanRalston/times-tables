@@ -9,6 +9,7 @@ import { ScratchPad } from "@/components/scratch";
 import { Button } from "@/components/ui/button";
 import { todayIso } from "@/lib/calendar";
 import { activityById, suggestedUnitId } from "@/lib/curriculum";
+import { pathNowUnitId } from "@/lib/path";
 import { makeDailyWalk, walkLabel } from "@/lib/daily";
 import { parseLocale, UI } from "@/lib/i18n";
 import { cardHeading, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen } from "@/lib/leftover";
@@ -123,14 +124,15 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   const [pack] = useState(() => {
     const st = useProgress.getState();
-    const unitGuess = suggestedUnitId(todayIso(), st.classUnitId || undefined, st.pathGrade);
+    const calendarId = suggestedUnitId(todayIso(), st.classUnitId || undefined, st.pathGrade);
+    const unitGuess = pathNowUnitId(calendarId, st.sessions, st.activities);
     const key = playKey(kind, activityId, unitGuess);
     const attempt = st.beginPlay(key);
     const locale = parseLocale(st.locale);
     return buildPack(
       kind,
       activityId,
-      st.classUnitId,
+      st.classUnitId || unitGuess,
       st.skipWeekend,
       st.shaky,
       st.facts ?? {},

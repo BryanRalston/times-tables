@@ -3,7 +3,7 @@ import { SCHOOL_DAYS, isSchoolDay, prevSchoolDay, weekdayName } from "./calendar
 import { GRADE3_SOLS, UNITS, WELCOME_ACTIVITY, activityById, coversSol, fluencyFactorsForUnit, suggestedUnitId, unitById } from "./curriculum";
 import { makeDailyWalk } from "./daily";
 import { doorRoute, parseHash } from "./nav";
-import { isUnitOpen, unitStatus } from "./path";
+import { farthestClearedUnitNumber, isUnitOpen, lessonsHopFrom, pathNowUnitId, unitStatus } from "./path";
 import { qCopy, UI } from "./i18n";
 import { makeActivityRound, makeQuestion, makeWelcomeRound, placeOnGraph, untieExtreme, welcomeFirst, wordForm } from "./questions";
 import type { GraphData, MeasureData, MoneyData, PlaceValueData } from "./types";
@@ -516,5 +516,19 @@ describe("path", () => {
     expect(unitStatus(UNITS[0]!, "u3")).toBe("open");
     expect(unitStatus(UNITS[2]!, "u3")).toBe("now");
     expect(isUnitOpen(later, "u1")).toBe(true);
+  });
+
+  it("advances Lessons now after unit 1 is finished so Guest can hop to pad 2", () => {
+    const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
+    expect(farthestClearedUnitNumber({}, {})).toBe(0);
+    expect(farthestClearedUnitNumber({}, { "u1-leftover": leftover })).toBe(1);
+    expect(farthestClearedUnitNumber({ "2026-09-08": { date: "2026-09-08", unitId: "u1", schoolDay: 1, correct: 8, total: 10, fresh: 8, review: 2, completed: true } }, {})).toBe(1);
+    expect(pathNowUnitId("u1", {}, {})).toBe("u1");
+    expect(pathNowUnitId("u1", {}, { "u1-leftover": leftover })).toBe("u2");
+    expect(pathNowUnitId("u5", {}, { "u1-leftover": leftover })).toBe("u5");
+    expect(lessonsHopFrom(0, 1, 0)).toBe(1);
+    expect(lessonsHopFrom(0, 2, 1)).toBe(1);
+    expect(lessonsHopFrom(1, 2, 1)).toBe(1);
+    expect(lessonsHopFrom(2, 2, 1)).toBe(2);
   });
 });

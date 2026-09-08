@@ -1,10 +1,19 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { todayIso } from "@/lib/calendar";
 import { pickTrailPeekSpot, trailPeekHash } from "@/lib/grade-path";
+import { resetProgressMemory } from "@/lib/progress";
 import { CandyPath } from "./candy-path";
 
 describe("CandyPath", () => {
+  beforeEach(() => {
+    resetProgressMemory();
+  });
+
+  afterEach(() => {
+    resetProgressMemory();
+  });
+
   it("maps all 13 Grade 3 units on one tall map and locks later nodes", () => {
     const html = renderToStaticMarkup(
       <CandyPath suggestedId="u5" onStart={() => {}} onOpenUnit={() => {}} />,
@@ -79,5 +88,16 @@ describe("CandyPath", () => {
     expect(peek?.zone).toBe("meadow");
     expect(html).toContain(`data-trail-peek="${peek!.id}"`);
     expect((html.match(/data-trail-peek="/g) ?? []).length).toBe(1);
+  });
+
+  it("starts a return-to-map hop from the finished pad to the new now pad", () => {
+    const html = renderToStaticMarkup(
+      <CandyPath suggestedId="u2" standFrom={1} onStart={() => {}} onOpenUnit={() => {}} />,
+    );
+    expect(html).toContain('data-path-hop-from="1"');
+    expect(html).toContain('data-path-hop-to="2"');
+    expect(html).toContain('data-path-travel="1"');
+    expect(html).toMatch(/data-path-unit="u2"[^>]*data-path-status="now"/);
+    expect(html).toMatch(/data-path-unit="u1"[^>]*data-path-status="open"/);
   });
 });

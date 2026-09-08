@@ -120,6 +120,20 @@ describe("first-visit Home door", () => {
     expect(html).not.toMatch(/3\.NS\.\d/);
     expect(html).not.toContain("data-welcome-leftover");
     expect(html).not.toContain("6 + n = 10");
+    expect(html).toContain('data-path-travel="0"');
+  });
+
+  it("Guest who finished unit 1 leftover hops to pad 2 on Lessons", () => {
+    useProgress.setState({
+      activities: { "u1-leftover": { plays: 1, best: 4, last: 4, stars: 3, misses: [] } },
+      pathHopperAt: 0,
+    });
+    stubHash("#/lessons");
+    const html = renderToStaticMarkup(<App />);
+    expect(html).toContain('data-path-hop-from="1"');
+    expect(html).toContain('data-path-travel="1"');
+    expect(html).toMatch(/data-path-unit="u2"[^>]*data-path-status="now"/);
+    expect(html).toMatch(/data-path-unit="u1"[^>]*data-path-status="open"/);
   });
 
   it("empty Guest at #/ on tablet/laptop gets the same Home shell", () => {

@@ -83,6 +83,11 @@ export function readFirstSave(): Partial<SaveState> | null {
   return null;
 }
 
+function clampPathHopperAt(n: unknown): number {
+  if (typeof n !== "number" || !Number.isFinite(n)) return 0;
+  return Math.min(UNITS.length, Math.max(0, Math.round(n)));
+}
+
 export function emptyLearner(name = ""): LearnerSlice {
   return {
     name,
@@ -100,6 +105,7 @@ export function emptyLearner(name = ""): LearnerSlice {
     bests: emptyBests(),
     today: emptyToday(),
     runHonest: emptyRun(),
+    pathHopperAt: 0,
   };
 }
 
@@ -120,6 +126,7 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
     bests: parseBests(s.bests),
     today: parseToday(s.today),
     runHonest: parseRun(s.runHonest),
+    pathHopperAt: clampPathHopperAt(s.pathHopperAt),
   };
 }
 
@@ -158,6 +165,7 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
     bests: parseBests(raw.bests),
     today: parseToday(raw.today),
     runHonest: parseRun(raw.runHonest),
+    pathHopperAt: raw.pathHopperAt ?? 0,
   });
   const learners = { ...(raw.learners ?? {}) };
   if (!learners[learnerId]) learners[learnerId] = fromFlat;
@@ -185,6 +193,7 @@ interface ProgressApi extends SaveState {
   setName: (name: string) => void;
   markWelcome: () => void;
   setClassUnit: (id: string) => void;
+  setPathHopperAt: (n: number) => void;
   setPathGrade: (grade: PathGrade) => void;
   setSkipWeekend: (v: boolean) => void;
   setLocale: (locale: Locale) => void;
@@ -231,6 +240,7 @@ function snapshotSave(s: SaveState): SaveState {
     bests: s.bests,
     today: s.today,
     runHonest: s.runHonest,
+    pathHopperAt: s.pathHopperAt,
     learners: s.learners,
   };
 }
@@ -273,6 +283,7 @@ export const useProgress = create<ProgressApi>()(
       setName: (name) => commit(get, set, { name: name.trim().slice(0, 24) }),
       markWelcome: () => commit(get, set, { seenWelcome: true }),
       setClassUnit: (id) => set({ classUnitId: id }),
+      setPathHopperAt: (n) => commit(get, set, { pathHopperAt: clampPathHopperAt(n) }),
       setPathGrade: (grade) => {
         const pathGrade = parsePathGrade(grade);
         const classUnitId = unitsFor(pathGrade).some((u) => u.id === get().classUnitId) ? get().classUnitId : "";

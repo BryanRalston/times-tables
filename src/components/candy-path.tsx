@@ -1,5 +1,5 @@
 import { Lock } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
 import { asset } from "@/lib/art";
@@ -194,26 +194,35 @@ function nodeTone(status: NodeStatus, zone: PathZone, n: number): string {
   }
 }
 
-export function CandyPath({
-  suggestedId,
-  onStart,
-  onOpenUnit,
-}: {
-  suggestedId: string;
-  onStart: () => void;
-  onOpenUnit: (id: string) => void;
-}) {
+export type CandyPathHandle = {
+  playNow: () => void;
+};
+
+export const CandyPath = forwardRef<
+  CandyPathHandle,
+  {
+    suggestedId: string;
+    standFrom?: number;
+    onStart: () => void;
+    onOpenUnit: (id: string) => void;
+  }
+>(function CandyPath({ suggestedId, standFrom, onStart, onOpenUnit }, ref) {
   const ui = useUi();
   const locale = parseLocale(useProgress((s) => s.locale));
   const owned = useProgress((s) => s.squishees);
+  const setPathHopperAt = useProgress((s) => s.setPathHopperAt);
   const hopperId = pathHopperId(owned);
   const current = UNITS.find((u) => u.id === suggestedId) ?? UNITS[0]!;
-  const restPos = mapToViewPos(GRADE3_PATH_NODES[current.number - 1] ?? GRADE3_PATH_NODES[0]!);
-  const prevNumber = useRef(current.number);
-  const [travelFrom, setTravelFrom] = useState(current.number);
-  const [travel, setTravel] = useState(false);
+  const origin = standFrom && standFrom > 0 ? standFrom : current.number;
+  const originPos = mapToViewPos(GRADE3_PATH_NODES[origin - 1] ?? GRADE3_PATH_NODES[0]!);
+  const settled = useRef(origin);
+  const pending = useRef<(() => void) | null>(null);
+  const [dest, setDest] = useState(current.number);
+  const [travelFrom, setTravelFrom] = useState(origin);
+  const [travel, setTravel] = useState(origin !== current.number);
   const [landing, setLanding] = useState(false);
-  const [pose, setPose] = useState<HopPose>(() => restHopPose(restPos));
+  const [pose, setPose] = useState<HopPose>(() => restHopPose(originPos));
+  const destPos = mapToViewPos(GRADE3_PATH_NODES[dest - 1] ?? GRADE3_PATH_NODES[0]!);
   const fogH = fogCoverPercent(current.number);
 
   useEffect(() => {
@@ -231,22 +240,32 @@ export function CandyPath({
   }, [pose.y, travel]);
 
   useEffect(() => {
-    const from = prevNumber.current;
-    const to = current.number;
-    if (from === to) {
-      setPose(restHopPose(restPos));
+    setDest(current.number);
+  }, [current.number]);
+
+  useEffect(() => {
+    const from = settled.current;
+    const to = dest;
+    const finish = (pad: number) => {
+      settled.current = pad;
+      setPathHopperAt(pad);
+      setTravel(false);
       setLanding(false);
+      setPose(restHopPose(mapToViewPos(GRADE3_PATH_NODES[pad - 1] ?? GRADE3_PATH_NODES[0]!)));
+      const next = pending.current;
+      pending.current = null;
+      next?.();
+    };
+    if (from === to) {
+      finish(to);
       return;
     }
 
     const stops = hopUnitStops(from, to);
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    prevNumber.current = to;
     setTravelFrom(from);
     if (reduce || stops.length < 2) {
-      setPose(restHopPose(restPos));
-      setTravel(false);
-      setLanding(false);
+      finish(to);
       return;
     }
 
@@ -261,9 +280,7 @@ export function CandyPath({
     const tick = (now: number) => {
       const { hopIndex, t, phase, done } = hopProgressAt(now - start, hopCount);
       if (done) {
-        setPose(restHopPose(views[views.length - 1]!));
-        setTravel(false);
-        setLanding(false);
+        finish(to);
         return;
       }
       const isLand = phase === "land";
@@ -287,15 +304,28 @@ export function CandyPath({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [suggestedId, current.number, restPos.x, restPos.y]);
+  }, [dest, destPos.x, destPos.y, setPathHopperAt]);
 
-  const activate = (status: NodeStatus, unitId: string) => {
+  const hopThen = (to: number, then: () => void) => {
+    if (settled.current === to && !travel) {
+      then();
+      return;
+    }
+    pending.current = then;
+    if (dest !== to) setDest(to);
+  };
+
+  useImperativeHandle(ref, () => ({
+    playNow: () => hopThen(current.number, onStart),
+  }));
+
+  const activate = (status: NodeStatus, unitId: string, unitNumber: number) => {
     switch (status) {
       case "now":
-        onStart();
+        hopThen(unitNumber, onStart);
         return;
       case "open":
-        onOpenUnit(unitId);
+        hopThen(unitNumber, () => onOpenUnit(unitId));
         return;
       case "locked":
         return;
@@ -372,7 +402,7 @@ export function CandyPath({
               disabled={locked}
               aria-disabled={locked}
               aria-label={`${ui.unitN(unit.number)}. ${short}${status === "now" ? `, ${ui.now}` : ""}${locked ? `, ${ui.pathLocked}` : ""}`}
-              onClick={() => activate(status, unit.id)}
+              onClick={() => activate(status, unit.id, unit.number)}
             >
               <span className="candy-node-disc">{fogged ? "" : unit.number}</span>
               {fogged || status === "locked" ? (
@@ -411,9 +441,9 @@ export function CandyPath({
           data-path-hopper={hopperId}
           data-path-travel={travel ? "1" : "0"}
           data-path-land={landing ? "1" : "0"}
-          data-path-hop-from={travel ? String(travelFrom) : String(current.number)}
-          data-path-hop-to={String(current.number)}
-          data-path-hop-ms={travel ? String(hopTravelMs(hopUnitStops(travelFrom, current.number))) : "0"}
+          data-path-hop-from={travel ? String(travelFrom) : String(dest)}
+          data-path-hop-to={String(dest)}
+          data-path-hop-ms={travel ? String(hopTravelMs(hopUnitStops(travelFrom, dest))) : "0"}
         >
           <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
         </div>
@@ -430,4 +460,4 @@ export function CandyPath({
       </div>
     </div>
   );
-}
+});
