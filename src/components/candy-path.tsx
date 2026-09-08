@@ -5,16 +5,14 @@ import { MagentaImg } from "@/components/magenta-video";
 import { asset } from "@/lib/art";
 import { UNITS } from "@/lib/curriculum";
 import {
-  CANDY_ZONE_FILES,
-  CANDY_ZONE_STACK,
   GRADE3_PATH_NODES,
   GRADE3_PATH_PADS,
+  TALL_MAP_FILE,
   displayUnitStars,
   fogCoverPercent,
+  mapToViewPos,
   nodeIsFogged,
-  padIsFogged,
   zoneForUnitNumber,
-  zoneIsFogged,
   zoneLabelIsFogged,
   type PathZone,
 } from "@/lib/grade-path";
@@ -88,7 +86,7 @@ export function CandyPath({
   const [travel, setTravel] = useState(false);
 
   const current = UNITS.find((u) => u.id === suggestedId) ?? UNITS[0]!;
-  const currentPos = GRADE3_PATH_NODES[current.number - 1] ?? GRADE3_PATH_NODES[0]!;
+  const currentPos = mapToViewPos(GRADE3_PATH_NODES[current.number - 1] ?? GRADE3_PATH_NODES[0]!);
   const fogH = fogCoverPercent(current.number);
 
   useEffect(() => {
@@ -127,19 +125,15 @@ export function CandyPath({
   };
 
   return (
-    <div className="candy-map" data-grade-path="1" data-path-tall="1">
-      <div className="candy-plates" data-candy-plates-blend="1" aria-hidden>
-        {CANDY_ZONE_STACK.map((zone) => (
-          <img
-            key={zone}
-            className={cn("candy-plate", zoneIsFogged(zone, current.number) && "candy-zone-dim")}
-            src={asset(CANDY_ZONE_FILES[zone])}
-            alt=""
-            decoding="async"
-            data-candy-plate={zone}
-            data-path-zone={zone}
-          />
-        ))}
+    <div className="candy-map" data-grade-path="1" data-path-tall="1" data-candy-world="1">
+      <div className="candy-world" aria-hidden>
+        <img
+          className="candy-world-art"
+          src={asset(TALL_MAP_FILE)}
+          alt=""
+          decoding="async"
+          data-candy-tall-map="1"
+        />
       </div>
 
       <div className="candy-overlay">
@@ -154,21 +148,9 @@ export function CandyPath({
         </p>
 
         {GRADE3_PATH_PADS.map((pad) => {
-          const unit = pad.unitNumber ? UNITS[pad.unitNumber - 1] : undefined;
-          if (!unit) {
-            const fogged = padIsFogged(pad.map, current.number);
-            return (
-              <span
-                key={`${pad.zone}-${pad.local.x}-${pad.local.y}`}
-                className="candy-node candy-node-step"
-                style={{ left: `${pad.map.x}%`, top: `${pad.map.y}%` }}
-                data-path-pad="1"
-                data-path-zone={pad.zone}
-                data-path-fog={fogged ? "1" : "0"}
-                aria-hidden
-              />
-            );
-          }
+          const unit = UNITS[pad.unitNumber - 1];
+          if (!unit) return null;
+          const view = mapToViewPos(pad.map);
           const status = unitStatus(unit, suggestedId);
           const zone = zoneForUnitNumber(unit.number);
           const stars = displayUnitStars(unitStars(unit.id), unitMaxStars(unit.id));
@@ -180,7 +162,7 @@ export function CandyPath({
               key={unit.id}
               type="button"
               className={cn("candy-node candy-node-bare", nodeTone(status, zone, unit.number))}
-              style={{ left: `${pad.map.x}%`, top: `${pad.map.y}%` }}
+              style={{ left: `${view.x}%`, top: `${view.y}%` }}
               data-path-unit={unit.id}
               data-path-pad="1"
               data-path-status={status}

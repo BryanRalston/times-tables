@@ -4,128 +4,63 @@ export type PathNodePos = { x: number; y: number };
 
 export type PathPad = {
   zone: PathZone;
-  local: PathNodePos;
   map: PathNodePos;
-  unitNumber: number | null;
+  unitNumber: number;
 };
 
-/** Painted plates, top of the scroll to bottom. Each file is 1536×1024 (3:2). */
-export const CANDY_ZONE_STACK: readonly PathZone[] = ["forest", "cove", "meadow"];
+/** Locked quiet world: terrain + path + cream pads only. 1536×1024. */
+export const TALL_MAP_FILE = "candy-zones/tall-map.png";
 
-export const CANDY_ZONE_FILES: Record<PathZone, string> = {
-  forest: "candy-zones/forest.png",
-  cove: "candy-zones/cove.png",
-  meadow: "candy-zones/meadow.png",
-};
-
-/** Shared plate-height fraction used for CSS overlap and map math. */
-export const PLATE_OVERLAP = 0.34;
-
-export function plateSpan(overlap = PLATE_OVERLAP): number {
-  return CANDY_ZONE_STACK.length - (CANDY_ZONE_STACK.length - 1) * overlap;
-}
-
-/** Local percent coords on one plate; y = 0 is the top of that plate. */
-export function plateToMapPos(zone: PathZone, local: PathNodePos, overlap = PLATE_OVERLAP): PathNodePos {
-  const i = CANDY_ZONE_STACK.indexOf(zone);
-  const start = i * (1 - overlap);
-  return { x: local.x, y: ((start + local.y / 100) / plateSpan(overlap)) * 100 };
-}
+export const TALL_MAP_SIZE = { w: 1536, h: 1024 } as const;
 
 /**
- * Cream discs painted on the locked vinyl plates, bottom-to-top along the path.
- * Meadow drops the off-path flower; cove keeps the recovered mid-curve stones;
- * forest includes the entrance pad at the bottom of the plate.
+ * CSS `aspect-ratio` width/height for the Lessons world.
+ * Taller than the 3:2 PNG so painted pads are large enough for hopper/numbers
+ * and the trail scrolls. object-fit cover crops only the far sides.
  */
-const MEADOW_PADS: readonly PathNodePos[] = [
-  { x: 38.7, y: 93.2 },
-  { x: 43.5, y: 81.7 },
-  { x: 55.8, y: 75.4 },
-  { x: 55.1, y: 64.4 },
-  { x: 46.9, y: 57.3 },
-  { x: 42.3, y: 49.1 },
-  { x: 46.5, y: 40.1 },
-  { x: 55.6, y: 35.8 },
-  { x: 58.5, y: 27.3 },
-  { x: 50.5, y: 22.7 },
-  { x: 44.6, y: 17.0 },
-  { x: 47.2, y: 9.8 },
-  { x: 54.6, y: 5.9 },
-  { x: 62.7, y: 2.0 },
+export const CANDY_WORLD_ASPECT = 2 / 5;
+
+/**
+ * Painted cream pads on tall-map.png, percent of the PNG (y = 0 is the top).
+ * Art has 14 discs; the cove→forest shoreline stone is decorative.
+ */
+const TALL_MAP_UNIT_PADS: readonly PathPad[] = [
+  { zone: "meadow", map: { x: 45.05, y: 92.69 }, unitNumber: 1 },
+  { zone: "meadow", map: { x: 51.04, y: 83.31 }, unitNumber: 2 },
+  { zone: "meadow", map: { x: 48.89, y: 74.64 }, unitNumber: 3 },
+  { zone: "meadow", map: { x: 46.06, y: 65.81 }, unitNumber: 4 },
+  { zone: "cove", map: { x: 50.64, y: 59.03 }, unitNumber: 5 },
+  { zone: "cove", map: { x: 49.56, y: 51.11 }, unitNumber: 6 },
+  { zone: "cove", map: { x: 53.67, y: 44.87 }, unitNumber: 7 },
+  { zone: "cove", map: { x: 49.87, y: 38.13 }, unitNumber: 8 },
+  { zone: "forest", map: { x: 49.44, y: 27.4 }, unitNumber: 9 },
+  { zone: "forest", map: { x: 54.47, y: 21.22 }, unitNumber: 10 },
+  { zone: "forest", map: { x: 49.3, y: 17.14 }, unitNumber: 11 },
+  { zone: "forest", map: { x: 46.06, y: 11.46 }, unitNumber: 12 },
+  { zone: "forest", map: { x: 51.27, y: 6.52 }, unitNumber: 13 },
 ];
 
-const COVE_PADS: readonly PathNodePos[] = [
-  { x: 59.6, y: 92.0 },
-  { x: 51.2, y: 85.3 },
-  { x: 42.9, y: 79.4 },
-  { x: 37.4, y: 72.8 },
-  { x: 35.5, y: 61.6 },
-  { x: 48.9, y: 54.6 },
-  { x: 58.4, y: 49.2 },
-  { x: 63.5, y: 39.9 },
-  { x: 54.7, y: 30.9 },
-  { x: 44.7, y: 28.7 },
-  { x: 37.9, y: 22.7 },
-  { x: 44.2, y: 14.8 },
-  { x: 52.5, y: 8.8 },
-  { x: 60.6, y: 4.5 },
-];
+/** Shoreline stone between cove and forest — painted, not a unit. */
+export const TALL_MAP_DECORATIVE_PAD: PathNodePos = { x: 45.51, y: 32.55 };
 
-const FOREST_PADS: readonly PathNodePos[] = [
-  { x: 47.7, y: 87.4 },
-  { x: 52.1, y: 80.7 },
-  { x: 54.0, y: 70.4 },
-  { x: 45.9, y: 62.8 },
-  { x: 42.3, y: 53.6 },
-  { x: 49.9, y: 45.8 },
-  { x: 56.3, y: 40.4 },
-  { x: 56.9, y: 30.8 },
-  { x: 49.7, y: 26.1 },
-  { x: 46.5, y: 19.6 },
-  { x: 47.7, y: 12.9 },
-  { x: 55.3, y: 8.6 },
-  { x: 60.9, y: 3.4 },
-];
+export const GRADE3_PATH_PADS: readonly PathPad[] = TALL_MAP_UNIT_PADS;
 
-export const ZONE_PAD_COUNTS = {
-  meadow: MEADOW_PADS.length,
-  cove: COVE_PADS.length,
-  forest: FOREST_PADS.length,
-} as const;
+/** Percent coords for the 13 Grade 3 units in PNG space; y = 0 is the top. */
+export const GRADE3_PATH_NODES: readonly PathNodePos[] = GRADE3_PATH_PADS.map((p) => p.map);
 
-/** Grade 3 units stay 4 / 4 / 5 across the three zones. */
-const MEADOW_UNIT_INDEXES = [0, 4, 9, 13] as const;
-const COVE_UNIT_INDEXES = [0, 4, 9, 13] as const;
-const FOREST_UNIT_INDEXES = [0, 3, 6, 9, 12] as const;
-
-function padsForZone(
-  zone: PathZone,
-  locals: readonly PathNodePos[],
-  unitIndexes: readonly number[],
-  firstUnit: number,
-): PathPad[] {
-  return locals.map((local, i) => {
-    const unitSlot = unitIndexes.indexOf(i);
-    return {
-      zone,
-      local,
-      map: plateToMapPos(zone, local),
-      unitNumber: unitSlot >= 0 ? firstUnit + unitSlot : null,
-    };
-  });
+/**
+ * Map a PNG-percent point onto the cover-cropped world box.
+ * The world is taller than the art, so only the x axis is cropped.
+ */
+export function mapToViewPos(pos: PathNodePos, worldAspect = CANDY_WORLD_ASPECT): PathNodePos {
+  const imageAspect = TALL_MAP_SIZE.w / TALL_MAP_SIZE.h;
+  if (worldAspect >= imageAspect) {
+    const scale = worldAspect / imageAspect;
+    return { x: pos.x, y: (pos.y - 50) * scale + 50 };
+  }
+  const scale = imageAspect / worldAspect;
+  return { x: (pos.x - 50) * scale + 50, y: pos.y };
 }
-
-/** Every painted cream pad, bottom of meadow to top of forest. */
-export const GRADE3_PATH_PADS: readonly PathPad[] = [
-  ...padsForZone("meadow", MEADOW_PADS, MEADOW_UNIT_INDEXES, 1),
-  ...padsForZone("cove", COVE_PADS, COVE_UNIT_INDEXES, 5),
-  ...padsForZone("forest", FOREST_PADS, FOREST_UNIT_INDEXES, 9),
-];
-
-/** Percent coords for the 13 Grade 3 units; y = 0 is the top so the trail climbs. */
-export const GRADE3_PATH_NODES: readonly PathNodePos[] = GRADE3_PATH_PADS.filter((p) => p.unitNumber !== null).map(
-  (p) => p.map,
-);
 
 export function zoneForUnitNumber(n: number): PathZone {
   if (n <= 4) return "meadow";
@@ -148,14 +83,6 @@ export function lastClearUnitNumber(nowNumber: number, total = GRADE3_PATH_NODES
 
 export function nodeIsFogged(unitNumber: number, nowNumber: number): boolean {
   return unitNumber > lastClearUnitNumber(nowNumber);
-}
-
-export function padIsFogged(pos: PathNodePos, nowNumber: number, nodes: readonly PathNodePos[] = GRADE3_PATH_NODES): boolean {
-  const last = lastClearUnitNumber(nowNumber, nodes.length);
-  if (last >= nodes.length) return false;
-  const lastVisible = nodes[last - 1];
-  if (!lastVisible) return false;
-  return pos.y < lastVisible.y - 3;
 }
 
 export function zoneIsFogged(zone: PathZone, nowNumber: number): boolean {
