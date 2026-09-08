@@ -361,6 +361,7 @@ describe("answer audit", () => {
         if (d.ask === "greatest") {
           const m = Math.max(...Object.values(counts));
           expect(counts[q.answer]).toBe(m);
+          expect(Object.values(counts).filter((c) => c === m)).toHaveLength(1);
           expect(d.rows.filter((r) => (counts[r.label] ?? 0) === m)).toHaveLength(1);
         }
         if (d.ask === "least") {

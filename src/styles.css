@@ -749,6 +749,7 @@ details > summary::-webkit-details-marker {
   font-size: 1.2rem;
   font-weight: 650;
   box-shadow: 0 6px 12px -10px rgb(80 30 50 / 0.45);
+  touch-action: manipulation;
 }
 .keypad-dock .key-back {
   background: #5d5a61;
@@ -762,6 +763,7 @@ details > summary::-webkit-details-marker {
   color: #fff;
   font-family: var(--font-display);
   font-weight: 650;
+  touch-action: manipulation;
 }
 .mascot-dock {
   position: absolute;

@@ -765,13 +765,39 @@ export function placeOnGraph(
   counts: Record<string, number>,
   tokenId: string,
   category: string,
-): { tray: { id: string; label: string; symbol?: string }[]; counts: Record<string, number> } {
+  increment = 1,
+): {
+  ok: boolean;
+  tray: { id: string; label: string; symbol?: string }[];
+  counts: Record<string, number>;
+} {
   const item = tray.find((x) => x.id === tokenId);
-  if (!item) return { tray, counts };
+  if (!item) return { ok: false, tray, counts };
+  if (item.label !== category) return { ok: false, tray, counts };
   return {
+    ok: true,
     tray: tray.filter((x) => x.id !== tokenId),
-    counts: { ...counts, [category]: (counts[category] ?? 0) + 1 },
+    counts: { ...counts, [category]: (counts[category] ?? 0) + increment },
   };
+}
+
+/** Bump one tied extreme so Grade 3 "most" / "least" has a single winner. */
+export function untieExtreme(values: number[], want: "max" | "min"): number[] {
+  const ext = want === "max" ? Math.max(...values) : Math.min(...values);
+  const tied = values.map((v, i) => (v === ext ? i : -1)).filter((i) => i >= 0);
+  if (tied.length <= 1) return values;
+  const next = [...values];
+  const keep = tied[0]!;
+  if (want === "max") {
+    next[keep] += 1;
+    return next;
+  }
+  if (next[keep]! > 0) {
+    next[keep] -= 1;
+    return next;
+  }
+  next[tied[1]!] += 1;
+  return next;
 }
 
 function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
@@ -787,7 +813,7 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   if (params.collect) {
     const ask = rng.pick(["value", "greatest", "least"] as const);
     const parts =
-      ask === "greatest" || ask === "least" ? rng.shuffle([3, 2, 2, 1]) : null;
+      ask === "greatest" || ask === "least" ? rng.shuffle(untieExtreme(untieExtreme([3, 2, 2, 1], "max"), "min")) : null;
     const bag = parts
       ? pack.flatMap((p, i) => Array.from({ length: parts[i]! }, () => p))
       : (() => {
@@ -847,7 +873,10 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       } satisfies GraphData,
     });
   }
-  const units = rng.shuffle([1, 2, 3, 4, 5, 6, 7, 8]).slice(0, 4);
+  const units = untieExtreme(
+    untieExtreme(rng.shuffle([1, 2, 3, 4, 5, 6, 7, 8]).slice(0, 4), "max"),
+    "min",
+  );
   const rows = pack.map((p, i) => ({ label: p.label, value: units[i]! * key, symbol: p.id }));
   const ask = rng.pick(["greatest", "least", "value", "more", "total"] as const);
   const byLabel = Object.fromEntries(rows.map((r) => [r.label, r.value]));

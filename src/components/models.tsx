@@ -5,7 +5,8 @@ import { G4Q, parseLocale, PLACE, UI } from "@/lib/i18n";
 import { leftoverWhyMoveMs, splitCounted } from "@/lib/leftover";
 import { useProgress } from "@/lib/progress";
 import { asset } from "@/lib/art";
-import { playTap } from "@/lib/sound";
+import { placeOnGraph } from "@/lib/questions";
+import { playTap, playWrong } from "@/lib/sound";
 import { squisheeSrc } from "@/lib/squishees";
 import type {
   AreaData,
@@ -1103,6 +1104,8 @@ function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
     Object.fromEntries(data.rows.map((r) => [r.label, data.collect ? 0 : r.value])),
   );
   const [picked, setPicked] = useState<string | null>(null);
+  const [sortShake, setSortShake] = useState(0);
+  const [sortMiss, setSortMiss] = useState(false);
   const rows = data.rows.map((r) => ({ ...r, value: counts[r.label] ?? 0 }));
   const max = Math.max(...rows.map((r) => r.value), 1);
   const count = (v: number) => Math.max(0, Math.round(v / Math.max(1, data.key)));
@@ -1114,22 +1117,27 @@ function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
       return;
     }
     if (!picked) return;
-    const item = tray.find((t) => t.id === picked);
-    if (!item) return;
-    const nextTray = tray.filter((x) => x.id !== picked);
-    setTray(nextTray);
-    setCounts((c) => ({ ...c, [label]: (c[label] ?? 0) + Math.max(1, data.key) }));
+    const next = placeOnGraph(tray, counts, picked, label, Math.max(1, data.key));
+    if (!next.ok) {
+      setSortShake((n) => n + 1);
+      setSortMiss(true);
+      playWrong();
+      return;
+    }
+    setTray(next.tray);
+    setCounts(next.counts);
     setPicked(null);
+    setSortMiss(false);
     playTap();
-    if (nextTray.length === 0) onInteract();
+    if (next.tray.length === 0) onInteract();
   }
 
   return (
-    <Frame shake={shake} status={status}>
+    <Frame shake={shake + sortShake} status={sortMiss && status === "idle" ? "wrong" : status}>
       <p className="mb-2 text-center text-sm font-medium">{data.title}</p>
       {data.collect && tray.length ? (
         <div className="mb-3 rounded-[12px] border border-dashed border-line bg-bg-warm p-2">
-          <p className="mb-1 text-xs text-muted">{ui.tapPicture}</p>
+          <p className="mb-1 text-xs text-muted">{sortMiss ? ui.sortWrong : ui.tapPicture}</p>
           <div className="flex flex-wrap gap-1">
             {tray.map((t) => (
               <button

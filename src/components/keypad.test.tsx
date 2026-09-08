@@ -42,6 +42,11 @@ describe("leftover keypad", () => {
     expect(applyKeypadKey("12.5", "0")).toBe("12.50");
   });
 
+  it("an emptied field after a miss takes the next digit as a fresh entry", () => {
+    expect(applyKeypadKey("", "7")).toBe("7");
+    expect(applyKeypadKey("", "6")).toBe("6");
+  });
+
   it("omits the decimal on leftover replace-mode keys", () => {
     const html = renderToStaticMarkup(
       <Keypad value="" onChange={() => undefined} onCheck={() => undefined} replace allowDot={false} quiet />,
