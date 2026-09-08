@@ -472,6 +472,13 @@ async function checkActivity(page, id, kind, viewport) {
         await shotFail(page, `${viewport}-${id}`);
         return row;
       }
+      const box = await check.first().boundingBox();
+      if (!box || box.y > 820 || box.y + box.height < 0) {
+        row.ui = "fail";
+        row.note = `leftover Check off-screen after why-move y=${box?.y}`;
+        await shotFail(page, `${viewport}-${id}`);
+        return row;
+      }
     }
     if (hook.needsInteract && (id === "u1-tally" || id === "u6-picto" || id === "u7-bar")) {
       if (!hook.checkDisabled) {

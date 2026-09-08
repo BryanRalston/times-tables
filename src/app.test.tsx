@@ -263,6 +263,8 @@ describe("first-visit Home door", () => {
     expect(css).not.toContain("--candy-plate-overlap");
     expect(css).not.toContain(".candy-fog-cloud");
     expect(css).toContain(".app-phone:has(.candy-scroll)");
+    expect(css).toContain(".app-phone:has([data-play-page])");
+    expect(css).toContain('[data-leftover-board][data-leftover-rows="4"] .leftover-dot');
     expect(css).not.toContain(".tf-bed");
     expect(css).not.toContain(".pie-tree");
     expect(css).not.toContain(".sailboat");

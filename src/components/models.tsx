@@ -105,12 +105,14 @@ function Frame({
   shake,
   status,
   leftover,
+  leftoverRows,
   onMiss,
 }: {
   children: ReactNode;
   shake: number;
   status: BoardProps["status"];
   leftover?: boolean;
+  leftoverRows?: number;
   onMiss?: (e: { target: EventTarget | null }) => void;
 }) {
   return (
@@ -126,7 +128,13 @@ function Frame({
         !leftover && status === "wrong" && "border-bad",
         !leftover && status === "idle" && "border-line",
       )}
-      {...(leftover ? { "data-leftover-board": "" } : {})}
+      {...(leftover
+        ? {
+            "data-leftover-board": "",
+            "data-leftover-rows": leftoverRows ?? 0,
+          }
+        : {})}
+      {...(leftover && status !== "correct" ? { "data-why-take": "" } : {})}
       onClick={onMiss}
     >
       {children}
@@ -184,7 +192,6 @@ function Dot({
 function TenFrame({ question, onInteract, status, shake }: BoardProps) {
   const data = question.data as TenFrameData;
   const [taken, setTaken] = useState(false);
-  const [nudge, setNudge] = useState(0);
   const taking = useRef(false);
   const whyRef = useRef(0);
   const cells = Math.min(20, Math.max(data.total, data.shown));
@@ -233,15 +240,14 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
     window.addEventListener("pointercancel", drop);
   }
 
-  function missTake(e: { target: EventTarget | null }) {
-    if (taking.current || knownGone) return;
-    const el = e.target as HTMLElement | null;
-    if (el?.closest("[data-known-group]")) return;
-    setNudge((n) => n + 1);
+  function missTake() {
+    // `display: contents` on the known group can drop closest() on phone taps.
+    // Any leftover-board tap is the why-move so the keypad can open.
+    takeGroup();
   }
 
   return (
-    <Frame shake={shake} status={status} leftover onMiss={missTake}>
+    <Frame shake={shake} status={status} leftover leftoverRows={rows} onMiss={missTake}>
       <p className="leftover-eq mb-4 text-center text-ink">{data.equation}</p>
       <div className="flex flex-col items-center justify-center gap-1.5">
         {Array.from({ length: rows }, (_, r) => {
@@ -262,12 +268,7 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
                   data-known-group=""
                   role="group"
                   aria-label="known group"
-                  className={cn(
-                    "contents",
-                    !knownGone && "known-idle",
-                    nudge ? "known-bounce" : null,
-                  )}
-                  key={nudge}
+                  className={cn("contents", !knownGone && "known-idle")}
                   onPointerDown={bindTake}
                   onClick={takeGroup}
                 >

@@ -26,6 +26,21 @@ export function leftoverPanelOpen(args: {
   return true;
 }
 
+/** Take-what-you-see hint while the keypad is gated; never a silent leftover board. */
+export function leftoverSpeechOpen(args: {
+  kind: string;
+  interacted: boolean;
+  status: "idle" | "correct" | "wrong";
+  reveal?: boolean;
+}): boolean {
+  if (!isLeftoverFrame(args.kind)) {
+    return args.status === "wrong" || Boolean(args.reveal);
+  }
+  if (args.status === "correct") return false;
+  if (args.status === "wrong" || args.reveal) return true;
+  return !args.interacted;
+}
+
 export function leftoverSkipOpen(args: {
   kind: string;
   needsInteract?: boolean;

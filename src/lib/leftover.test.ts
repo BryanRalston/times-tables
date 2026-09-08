@@ -1,9 +1,10 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { activityById } from "./curriculum";
 import { makeQuestion } from "./questions";
 import { rngFromSeed } from "./rng";
 import type { GraphData } from "./types";
-import { cardHeading, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen, leftoverWhyMoveMs, splitCounted } from "./leftover";
+import { cardHeading, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen, leftoverSpeechOpen, leftoverWhyMoveMs, splitCounted } from "./leftover";
 
 describe("leftover why-move gates", () => {
   it("hides keypad, Check, and Skip until the known group is taken", () => {
@@ -22,6 +23,23 @@ describe("leftover why-move gates", () => {
     const miss = { ...ready, status: "wrong" as const };
     expect(leftoverPanelOpen(miss)).toBe(true);
     expect(leftoverSkipOpen(miss)).toBe(false);
+  });
+
+  it("18 − n = 10 still gates Check until take, and never stays a silent board", () => {
+    const waiting = { kind: "tenframe", needsInteract: true, interacted: false, status: "idle" as const };
+    expect(leftoverPanelOpen(waiting)).toBe(false);
+    expect(leftoverSpeechOpen(waiting)).toBe(true);
+    const ready = { ...waiting, interacted: true };
+    expect(leftoverPanelOpen(ready)).toBe(true);
+    expect(leftoverSpeechOpen(ready)).toBe(false);
+    expect(leftoverPanelOpen({ ...ready, status: "correct" as const })).toBe(false);
+  });
+
+  it("play leftover keeps the take hint until why-move, then docks the keypad", () => {
+    const play = readFileSync(new URL("../pages/play.tsx", import.meta.url), "utf8");
+    expect(play).toContain("leftoverSpeechOpen");
+    expect(play).toContain("overflow-y-auto");
+    expect(play).toContain("leftoverPanelOpen");
   });
 
   it("holds leftover about two seconds", () => {
