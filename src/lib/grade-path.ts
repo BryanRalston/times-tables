@@ -151,11 +151,74 @@ export const TALL_MAP_OVERLAYS: readonly PathOverlay[] = [
   { id: "fraction-pie", file: "fraction-pie.png", zone: "forest", map: { x: 39.55, y: 14.35 }, width: 13, motion: "sway" },
 ];
 
-export const TRAIL_PEEK_SPOTS: readonly { id: string; zone: PathZone; map: PathNodePos }[] = [
-  { id: "meadow", zone: "meadow", map: { x: 58.85, y: 91.15 } },
-  { id: "cove", zone: "cove", map: { x: 39.75, y: 46.55 } },
-  { id: "forest", zone: "forest", map: { x: 59.95, y: 18.85 } },
+export type TrailPeekSpot = {
+  id: string;
+  zone: PathZone;
+  map: PathNodePos;
+};
+
+/**
+ * Hide holes beside the trail — PNG gutters, not on pads.
+ * Only one fires per Lessons visit; extras exist so the current stretch always has a nearby pop.
+ */
+export const TRAIL_PEEK_SPOTS: readonly TrailPeekSpot[] = [
+  { id: "meadow-bush", zone: "meadow", map: { x: 58.85, y: 91.15 } },
+  { id: "meadow-rock", zone: "meadow", map: { x: 39.45, y: 82.25 } },
+  { id: "meadow-clear", zone: "meadow", map: { x: 59.35, y: 71.85 } },
+  { id: "cove-palm", zone: "cove", map: { x: 60.85, y: 57.55 } },
+  { id: "cove-fall", zone: "cove", map: { x: 39.75, y: 46.55 } },
+  { id: "cove-coin", zone: "cove", map: { x: 60.55, y: 40.15 } },
+  { id: "forest-shade", zone: "forest", map: { x: 39.65, y: 26.85 } },
+  { id: "forest-pie", zone: "forest", map: { x: 61.5, y: 16.4 } },
+  { id: "forest-canopy", zone: "forest", map: { x: 38.95, y: 7.25 } },
 ];
+
+/** Map-Y window around the current pad that stays on-screen after hopper-centering. */
+export const TRAIL_PEEK_NEARBY_Y = 16;
+
+/** Minimum PNG-space distance from a painted pad so the pop never covers a disc. */
+export const TRAIL_PEEK_MIN_PAD_DIST = 8;
+
+/** Once the hide spot is on-screen, wait this long (plus spread) before the pop. */
+export const TRAIL_PEEK_ARM_MS = 880;
+export const TRAIL_PEEK_ARM_SPREAD_MS = 640;
+
+export function trailPeekHash(iso: string, nowNumber: number): number {
+  let h = 2166136261;
+  for (let i = 0; i < iso.length; i++) h = Math.imul(h ^ iso.charCodeAt(i), 16777619);
+  return (h + nowNumber * 131) >>> 0;
+}
+
+export function trailPeekSpotClear(spot: TrailPeekSpot, nowNumber: number): boolean {
+  return !zoneIsFogged(spot.zone, nowNumber) && !overlayIsVeiled(spot.map.y, nowNumber);
+}
+
+export function nearbyTrailPeekSpots(nowNumber: number): TrailPeekSpot[] {
+  const nowY = GRADE3_PATH_NODES[nowNumber - 1]?.y;
+  if (nowY == null) return [];
+  return TRAIL_PEEK_SPOTS.filter(
+    (s) => trailPeekSpotClear(s, nowNumber) && Math.abs(s.map.y - nowY) <= TRAIL_PEEK_NEARBY_Y,
+  );
+}
+
+export function pickTrailPeekSpot(nowNumber: number, hash: number): TrailPeekSpot | undefined {
+  const nearby = nearbyTrailPeekSpots(nowNumber);
+  if (nearby.length) return nearby[hash % nearby.length];
+  const nowY = GRADE3_PATH_NODES[nowNumber - 1]?.y;
+  if (nowY == null) return undefined;
+  const clear = TRAIL_PEEK_SPOTS.filter((s) => trailPeekSpotClear(s, nowNumber));
+  if (!clear.length) return undefined;
+  let best = clear[0]!;
+  let bestD = Math.abs(best.map.y - nowY);
+  for (const s of clear.slice(1)) {
+    const d = Math.abs(s.map.y - nowY);
+    if (d < bestD) {
+      best = s;
+      bestD = d;
+    }
+  }
+  return best;
+}
 
 export function overlayIsVeiled(mapY: number, nowNumber: number): boolean {
   const fog = fogCoverPercent(nowNumber);

@@ -12,7 +12,10 @@ import {
   TALL_MAP_FILE,
   TALL_MAP_OVERLAY_DIR,
   TALL_MAP_OVERLAYS,
-  TRAIL_PEEK_SPOTS,
+  TRAIL_PEEK_ARM_MS,
+  TRAIL_PEEK_ARM_SPREAD_MS,
+  pickTrailPeekSpot,
+  trailPeekHash,
   displayUnitStars,
   fogCoverPercent,
   mapToViewPos,
@@ -20,7 +23,6 @@ import {
   overlayIsVeiled,
   overlayMotionClass,
   zoneForUnitNumber,
-  zoneIsFogged,
   zoneLabelIsFogged,
   type PathZone,
 } from "@/lib/grade-path";
@@ -28,7 +30,7 @@ import { parseLocale } from "@/lib/i18n";
 import { unitText } from "@/lib/labels";
 import { unitStatus, type NodeStatus } from "@/lib/path";
 import { unitMaxStars, unitStars, useProgress } from "@/lib/progress";
-import { peekTurn, pathHopperId, squisheeSrc } from "@/lib/squishees";
+import { pathHopperId, squisheeSrc, trailPeekFace } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
 function zoneLabel(zone: PathZone, ui: ReturnType<typeof useUi>): string {
@@ -74,38 +76,79 @@ function usePrefersReducedMotion(): boolean {
   return reduce;
 }
 
-function trailPeekHash(iso: string, nowNumber: number): number {
-  let h = 2166136261;
-  for (let i = 0; i < iso.length; i++) h = Math.imul(h ^ iso.charCodeAt(i), 16777619);
-  return (h + nowNumber * 131) >>> 0;
+function trailPeekInScroller(el: HTMLElement, root: HTMLElement): boolean {
+  const er = el.getBoundingClientRect();
+  const sr = root.getBoundingClientRect();
+  return er.bottom > sr.top + 4 && er.top < sr.bottom - 4 && er.width > 0 && er.height > 0;
 }
 
-function TrailPeek({ nowNumber }: { nowNumber: number }) {
+function TrailPeek({ nowNumber, hopperId }: { nowNumber: number; hopperId: string }) {
   const reduce = usePrefersReducedMotion();
+  const nodeRef = useRef<HTMLSpanElement>(null);
+  const played = useRef(false);
   const [armed, setArmed] = useState(false);
   const iso = todayIso();
   const hash = trailPeekHash(iso, nowNumber);
-  const clear = TRAIL_PEEK_SPOTS.filter((s) => !zoneIsFogged(s.zone, nowNumber));
-  const spot = clear.length ? clear[hash % clear.length] : undefined;
+  const spot = pickTrailPeekSpot(nowNumber, hash);
 
   useEffect(() => {
+    if (played.current) return;
     if (reduce || !spot) {
       setArmed(false);
       return;
     }
-    const t = window.setTimeout(() => setArmed(true), 3000 + (hash % 2600));
-    return () => window.clearTimeout(t);
+    const el = nodeRef.current;
+    const root = el?.closest(".candy-scroll");
+    if (!el || !(root instanceof HTMLElement)) return;
+
+    let timer = 0;
+    let arming = false;
+    const delay = TRAIL_PEEK_ARM_MS + (hash % TRAIL_PEEK_ARM_SPREAD_MS);
+
+    const schedule = () => {
+      if (played.current || arming || !trailPeekInScroller(el, root)) return;
+      arming = true;
+      timer = window.setTimeout(() => {
+        if (played.current) return;
+        played.current = true;
+        setArmed(true);
+      }, delay);
+    };
+
+    let io: IntersectionObserver | undefined;
+    if (typeof IntersectionObserver === "function") {
+      io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) schedule();
+        },
+        { root, threshold: 0.12, rootMargin: "12% 0px" },
+      );
+      io.observe(el);
+    }
+
+    const raf = requestAnimationFrame(schedule);
+    const poll = window.setTimeout(schedule, 480);
+    root.addEventListener("scroll", schedule, { passive: true });
+    return () => {
+      io?.disconnect();
+      root.removeEventListener("scroll", schedule);
+      cancelAnimationFrame(raf);
+      window.clearTimeout(poll);
+      window.clearTimeout(timer);
+    };
   }, [hash, reduce, spot]);
 
-  if (reduce || !armed || !spot) return null;
+  if (reduce || !spot) return null;
   const view = mapToViewPos(spot.map);
-  const turn = peekTurn(hash % 19);
+  const turn = trailPeekFace(hash, hopperId);
   return (
     <span
+      ref={nodeRef}
       className="candy-trail-peek"
       style={{ left: `${view.x}%`, top: `${view.y}%` }}
       data-trail-peek={spot.id}
       data-peek-id={turn.id}
+      data-peek-armed={armed ? "1" : "0"}
       aria-hidden
       onAnimationEnd={(e) => {
         if (!(e.target instanceof HTMLElement)) return;
@@ -113,7 +156,7 @@ function TrailPeek({ nowNumber }: { nowNumber: number }) {
         setArmed(false);
       }}
     >
-      <MagentaImg src={squisheeSrc(turn.id)} alt="" className="candy-trail-peek-art" />
+      {armed ? <MagentaImg src={squisheeSrc(turn.id)} alt="" className="candy-trail-peek-art" /> : null}
     </span>
   );
 }
@@ -323,7 +366,7 @@ export function CandyPath({
           <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
         </div>
 
-        <TrailPeek nowNumber={current.number} />
+        <TrailPeek nowNumber={current.number} hopperId={hopperId} />
 
         {fogH > 0 ? (
           <div className="candy-fog" data-candy-fog="1" data-candy-mist="1" style={{ height: `${fogH}%` }} aria-hidden>

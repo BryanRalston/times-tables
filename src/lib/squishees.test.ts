@@ -7,6 +7,7 @@ import {
   parsePokeStripJson,
   PEEK_SQUISHEE_IDS,
   peekTurn,
+  trailPeekFace,
   pokeStripFile,
   pokeStripJsonFile,
   pokeStripSrc,
@@ -112,6 +113,14 @@ describe("home peek roster", () => {
     expect(seen.size).toBe(SQUISHEE_IDS.length);
     expect([...slots].sort()).toEqual(["center", "left", "right"]);
     expect(peekTurn(PEEK_SQUISHEE_IDS.length).id).toBe("peach");
+  });
+
+  it("picks a trail peek face that is not the hopper", () => {
+    const hopper = "peach";
+    const face = trailPeekFace(0, hopper);
+    expect(face.id).not.toBe(hopper);
+    expect(PEEK_SQUISHEE_IDS).toContain(face.id);
+    expect(trailPeekFace(1, PEEK_SQUISHEE_IDS[1]!).id).not.toBe(PEEK_SQUISHEE_IDS[1]);
   });
 });
 
