@@ -362,6 +362,8 @@ details > summary::-webkit-details-marker {
   width: 100%;
   display: flex;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
 .app-phone {
   width: 100%;
@@ -370,24 +372,11 @@ details > summary::-webkit-details-marker {
   display: flex;
   flex-direction: column;
   position: relative;
+  z-index: 1;
 }
-.scene-hills {
-  background:
-    radial-gradient(ellipse 90px 36px at 18% 9%, rgb(255 255 255 / 0.72), transparent 70%),
-    radial-gradient(ellipse 120px 42px at 78% 7%, rgb(255 255 255 / 0.55), transparent 72%),
-    radial-gradient(ellipse 70px 28px at 52% 12%, rgb(255 255 255 / 0.4), transparent 70%),
-    radial-gradient(120% 46% at 50% 108%, #e89abc 0%, #efadc8 42%, transparent 43%),
-    radial-gradient(90% 38% at 0% 100%, #e38eaf 0%, transparent 54%),
-    radial-gradient(90% 38% at 100% 100%, #e899b8 0%, transparent 54%),
-    linear-gradient(180deg, #f8c9dc 0%, #f4b8d0 48%, #eea4c4 100%);
-}
+.scene-hills,
 .scene-play {
-  background-color: #f4b8d0;
-  background-image:
-    radial-gradient(circle at 12% 18%, rgb(255 255 255 / 0.14) 0 1px, transparent 2px),
-    radial-gradient(circle at 72% 36%, rgb(255 255 255 / 0.1) 0 1px, transparent 2px),
-    linear-gradient(180deg, #f7c4d8 0%, #f4b8d0 55%, #f0adc8 100%);
-  background-size: 120px 120px, 160px 160px, auto;
+  background: linear-gradient(180deg, #fde8f0 0%, #f7c8dc 46%, #f4b8d0 100%);
 }
 .scene-shelf {
   background-color: #f6cfe0;
@@ -396,6 +385,56 @@ details > summary::-webkit-details-marker {
     radial-gradient(circle at 78% 28%, rgb(196 92 160 / 0.12) 0 1px, transparent 2px),
     repeating-linear-gradient(180deg, transparent 0 86px, rgb(232 150 180 / 0.28) 86px 90px),
     linear-gradient(180deg, #f8d6e6 0%, #f3c2d8 100%);
+}
+.scene-land {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.scene-cloud {
+  position: absolute;
+  background: rgb(255 255 255 / 0.92);
+  border-radius: 9999px;
+  box-shadow:
+    22px 8px 0 -6px rgb(255 255 255 / 0.78),
+    -20px 10px 0 -8px rgb(255 255 255 / 0.7);
+}
+.scene-cloud-a {
+  top: 6.5%;
+  left: 7%;
+  width: 108px;
+  height: 38px;
+}
+.scene-cloud-b {
+  top: 4.5%;
+  right: 8%;
+  width: 132px;
+  height: 44px;
+}
+.scene-hill {
+  position: absolute;
+  bottom: 0;
+  border-radius: 50% 50% 0 0;
+}
+.scene-hill-back {
+  left: -22%;
+  right: -18%;
+  height: 48%;
+  background: #f0b4cc;
+}
+.scene-hill-mid {
+  left: -32%;
+  width: 84%;
+  height: 38%;
+  background: #e89abc;
+}
+.scene-hill-front {
+  right: -28%;
+  width: 76%;
+  height: 30%;
+  background: #e087af;
 }
 
 .scene-head,
@@ -466,6 +505,38 @@ details > summary::-webkit-details-marker {
   background: rgb(13 138 134 / 0.08);
 }
 
+.continue-stage {
+  position: relative;
+  margin: 1.4rem 1rem 0;
+  z-index: 1;
+}
+.continue-stage-peek {
+  margin-top: 2.7rem;
+}
+.continue-stage .continue-card {
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+.continue-peek {
+  position: absolute;
+  left: 50%;
+  top: -3.55rem;
+  z-index: 0;
+  width: 7.4rem;
+  height: 4.4rem;
+  transform: translateX(-50%);
+  overflow: hidden;
+  pointer-events: none;
+}
+.continue-peek-art {
+  display: block;
+  width: 8.6rem;
+  height: 8.6rem;
+  margin: 0 auto;
+  object-fit: contain;
+  transform: translateY(1.15rem);
+}
 .continue-card {
   margin: 1.4rem 1rem 0;
   padding: 1.35rem 1.25rem 1.15rem;
@@ -475,32 +546,78 @@ details > summary::-webkit-details-marker {
   text-align: center;
 }
 .walk-mark {
+  position: relative;
   display: grid;
   place-items: end center;
   grid-auto-flow: column;
-  gap: 0.28rem;
-  width: 4.5rem;
-  height: 4.5rem;
-  margin: 0 auto 0.85rem;
+  align-content: end;
+  gap: 0.38rem;
+  width: 5.5rem;
+  height: 5.5rem;
+  margin: 0 auto 0.9rem;
+  padding: 1.05rem 0.85rem 0.95rem;
   border-radius: 9999px;
-  background: #d7f3f1;
-  padding-bottom: 0.95rem;
+  background:
+    radial-gradient(circle at 32% 28%, #ffffff, transparent 42%),
+    radial-gradient(circle at 50% 46%, #dff8f5 0%, #b6eee8 58%, #8fded6 100%);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.75),
+    inset 0 -6px 10px rgb(14 138 134 / 0.12),
+    0 10px 18px -12px rgb(14 138 134 / 0.55);
 }
 .walk-bar {
-  width: 0.62rem;
+  position: relative;
+  width: 0.82rem;
   border-radius: 9999px;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.55),
+    0 5px 8px -3px rgb(40 20 50 / 0.35);
+}
+.walk-bar::before {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 28%;
+  top: 10%;
+  height: 34%;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.75), rgb(255 255 255 / 0.05));
 }
 .walk-bar-a {
-  height: 1.15rem;
-  background: #8b6ad9;
+  height: 1.45rem;
+  background: linear-gradient(180deg, #d4c2ff 0%, #9b74e8 46%, #6f4cc4 100%);
 }
 .walk-bar-b {
-  height: 1.7rem;
-  background: #f2a24b;
+  height: 2.05rem;
+  background: linear-gradient(180deg, #ffd88a 0%, #f2a24b 48%, #d67d1c 100%);
 }
 .walk-bar-c {
-  height: 2.15rem;
-  background: #0e8a86;
+  height: 2.55rem;
+  background: linear-gradient(180deg, #5ee0d4 0%, #14a39c 52%, #0b6f6b 100%);
+}
+.walk-spark {
+  position: absolute;
+  width: 0.42rem;
+  height: 0.42rem;
+  background: #fff;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  filter: drop-shadow(0 0 3px rgb(255 255 255 / 0.9));
+}
+.walk-spark-a {
+  top: 0.55rem;
+  right: 0.72rem;
+}
+.walk-spark-b {
+  top: 1.05rem;
+  left: 0.62rem;
+  width: 0.3rem;
+  height: 0.3rem;
+}
+.walk-spark-c {
+  top: 0.28rem;
+  left: 2.35rem;
+  width: 0.24rem;
+  height: 0.24rem;
 }
 .start-loud {
   display: flex;

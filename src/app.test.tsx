@@ -51,6 +51,10 @@ function expectHomeShell(html: string) {
   expect(html).toContain("All units");
   expect(html).toContain("Home, lessons, and shelf");
   expect(html).toContain("data-continue-card");
+  expect(html).toContain("data-continue-peek");
+  expect(html).toContain("data-walk-mark");
+  expect(html).toContain("data-scene-land");
+  expect(html).toContain("peach.png");
   expect(html).toContain("data-app-shell");
   expect(html).toContain("data-app-tabs");
   expect(html).toContain("data-mute-sounds");
@@ -159,6 +163,9 @@ describe("first-visit Home door", () => {
     expect(chrome).toContain("data-app-shell");
     expect(chrome).toContain("app-phone");
     expect(chrome).toContain("CoinChip");
+    expect(chrome).toContain("data-scene-land");
+    expect(chrome).toContain("walk-spark");
+    expect(chrome).toContain("continue-peek");
     expect(chrome).not.toContain("max-w-6xl");
     expect(chrome).not.toMatch(/Score\s*\/\s*Streak/);
     expect(chrome).not.toMatch(/\bstars\b/);
@@ -175,6 +182,8 @@ describe("first-visit Home door", () => {
     expect(shelf).not.toContain("Squishee shop");
     const css = readFileSync(join(HERE, "styles.css"), "utf8");
     expect(css).toContain(".app-scene");
+    expect(css).toContain(".scene-hill");
+    expect(css).toContain(".walk-spark");
     expect(css).toContain(".keypad-dock");
     expect(css).toContain(".squishee-silhouette");
     expect(css).toContain("[data-leftover-board] .leftover-dot");

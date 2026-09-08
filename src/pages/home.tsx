@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { AppHeader, AppScene, AppTabs, WalkMark, useUi } from "@/components/chrome";
+import { AppHeader, AppScene, AppTabs, ContinueStage, WalkMark, useUi } from "@/components/chrome";
 import { todayIso } from "@/lib/calendar";
 import { remainingSchoolDaysInUnit, suggestedUnitId, unitById } from "@/lib/curriculum";
 import { makeDailyWalk } from "@/lib/daily";
@@ -54,21 +54,23 @@ export function HomePage() {
   return (
     <AppScene scene="hills" tabs={<AppTabs active="home" />}>
       <AppHeader />
-      <section className="continue-card" data-continue-card="1">
-        <WalkMark />
-        <h2 className="font-display text-[1.65rem] font-semibold leading-tight text-ink">{ui.todaysWalk}</h2>
-        <p className="mt-1 text-sm font-semibold text-muted">
-          {unitShort} · {walk.fresh} {ui.fresh.toLowerCase()}
-        </p>
-        <p className="sr-only">{ui.newReview(walk.fresh, walk.review, remain)}</p>
-        <button
-          type="button"
-          className="start-loud"
-          onClick={() => navigate({ id: "play", kind: "daily" })}
-        >
-          {done ? ui.walkAgain : ui.start}
-        </button>
-      </section>
+      <ContinueStage peek>
+        <section className="continue-card" data-continue-card="1">
+          <WalkMark />
+          <h2 className="font-display text-[1.65rem] font-semibold leading-tight text-ink">{ui.todaysWalk}</h2>
+          <p className="mt-1 text-sm font-semibold text-muted">
+            {unitShort} · {walk.fresh} {ui.fresh.toLowerCase()}
+          </p>
+          <p className="sr-only">{ui.newReview(walk.fresh, walk.review, remain)}</p>
+          <button
+            type="button"
+            className="start-loud"
+            onClick={() => navigate({ id: "play", kind: "daily" })}
+          >
+            {done ? ui.walkAgain : ui.start}
+          </button>
+        </section>
+      </ContinueStage>
 
       {leftoverDone ? (
         <button
