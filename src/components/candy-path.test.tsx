@@ -1,10 +1,19 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { todayIso } from "@/lib/calendar";
 import { pickTrailPeekSpot, trailPeekHash } from "@/lib/grade-path";
+import { resetProgressMemory } from "@/lib/progress";
 import { CandyPath } from "./candy-path";
 
 describe("CandyPath", () => {
+  beforeEach(() => {
+    resetProgressMemory();
+  });
+
+  afterEach(() => {
+    resetProgressMemory();
+  });
+
   it("maps all 13 Grade 3 units on one tall map and locks later nodes", () => {
     const html = renderToStaticMarkup(
       <CandyPath suggestedId="u5" onStart={() => {}} onOpenUnit={() => {}} />,
@@ -25,6 +34,9 @@ describe("CandyPath", () => {
     expect(html).toContain('data-path-hopper="peach"');
     expect(html).toContain('data-path-hop-to="5"');
     expect(html).toContain('data-path-travel="0"');
+    expect(html).toContain('data-path-land="0"');
+    expect(html).toContain("candy-hopper-shadow");
+    expect(html).toContain('data-path-shadow="0"');
     expect(html).toContain("peach.png");
     expect(html).toContain("data-candy-fog");
     expect(html).toContain("data-candy-mist");
@@ -57,6 +69,8 @@ describe("CandyPath", () => {
     expect(html).toContain(`data-trail-peek="${peek!.id}"`);
     expect((html.match(/data-trail-peek="/g) ?? []).length).toBe(1);
     expect(html).toContain('data-peek-armed="0"');
+    expect(html).toContain('data-peek-exited="0"');
+    expect(html).toMatch(/data-peek-side="(left|right)"/);
     expect(html).not.toContain("data-squishee-shop");
     expect(html).not.toContain("data-trail-collect");
   });
@@ -74,5 +88,16 @@ describe("CandyPath", () => {
     expect(peek?.zone).toBe("meadow");
     expect(html).toContain(`data-trail-peek="${peek!.id}"`);
     expect((html.match(/data-trail-peek="/g) ?? []).length).toBe(1);
+  });
+
+  it("starts a return-to-map hop from the finished pad to the new now pad", () => {
+    const html = renderToStaticMarkup(
+      <CandyPath suggestedId="u2" standFrom={1} onStart={() => {}} onOpenUnit={() => {}} />,
+    );
+    expect(html).toContain('data-path-hop-from="1"');
+    expect(html).toContain('data-path-hop-to="2"');
+    expect(html).toContain('data-path-travel="1"');
+    expect(html).toMatch(/data-path-unit="u2"[^>]*data-path-status="now"/);
+    expect(html).toMatch(/data-path-unit="u1"[^>]*data-path-status="open"/);
   });
 });

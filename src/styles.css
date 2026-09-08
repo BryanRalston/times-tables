@@ -978,7 +978,7 @@ details > summary::-webkit-details-marker {
   cursor: default;
 }
 .candy-node[data-path-fog="1"] {
-  z-index: 3;
+  z-index: 4;
   opacity: 0.42;
   filter: none;
 }
@@ -1049,46 +1049,52 @@ details > summary::-webkit-details-marker {
   opacity: 0.78;
 }
 .candy-prop-bob {
-  animation: candy-prop-bob 3.8s ease-in-out infinite;
+  animation: candy-prop-bob 2.8s ease-in-out infinite;
 }
 .candy-prop-sway {
-  animation: candy-prop-sway 4.6s ease-in-out infinite;
+  animation: candy-prop-sway 3.2s ease-in-out infinite;
 }
 .candy-prop-shimmer {
-  animation: candy-prop-shimmer 2.8s ease-in-out infinite;
+  animation: candy-prop-shimmer 2.4s ease-in-out infinite;
 }
 .candy-prop-fall {
-  animation: candy-prop-fall 2.4s ease-in-out infinite;
+  animation: candy-prop-fall 1.15s linear infinite;
 }
 .candy-prop-fall::after {
   content: "";
   position: absolute;
   left: 28%;
   right: 28%;
-  top: 10%;
-  bottom: 30%;
-  background: linear-gradient(180deg, transparent 0%, rgb(255 255 255 / 0.28) 46%, transparent 100%);
+  top: 8%;
+  bottom: 28%;
+  background: linear-gradient(180deg, transparent 0%, rgb(255 255 255 / 0.32) 42%, transparent 100%);
   mix-blend-mode: soft-light;
-  animation: candy-fall-sheen 1.7s linear infinite;
+  animation: candy-fall-sheen 0.95s linear infinite;
   pointer-events: none;
 }
 .candy-trail-peek {
   position: absolute;
   z-index: 3;
-  width: 2.7rem;
-  height: 2.15rem;
-  transform: translate(-50%, -10%);
+  width: 2.35rem;
+  height: 1.95rem;
+  transform: translate(-50%, -8%);
   overflow: hidden;
   pointer-events: none;
 }
+.candy-trail-peek[data-peek-side="left"] {
+  transform: translate(-58%, -8%);
+}
+.candy-trail-peek[data-peek-side="right"] {
+  transform: translate(-42%, -8%);
+}
 .candy-trail-peek-art {
   display: block;
-  width: 2.55rem;
-  height: 2.55rem;
+  width: 2.2rem;
+  height: 2.2rem;
   margin: 0 auto;
   object-fit: contain;
-  transform: translateY(2.2rem);
-  animation: candy-trail-peek 6.2s 1;
+  transform: translateY(2.15rem);
+  animation: candy-trail-peek 4.6s 1 forwards;
 }
 @keyframes candy-prop-bob {
   0%,
@@ -1096,16 +1102,16 @@ details > summary::-webkit-details-marker {
     transform: translate(-50%, -50%);
   }
   50% {
-    transform: translate(-50%, calc(-50% - 0.2rem));
+    transform: translate(-50%, calc(-50% - 0.07rem));
   }
 }
 @keyframes candy-prop-sway {
   0%,
   100% {
-    transform: translate(-50%, -50%) rotate(-2.1deg);
+    transform: translate(-50%, -50%) rotate(-1.05deg);
   }
   50% {
-    transform: translate(-50%, -50%) rotate(2.3deg);
+    transform: translate(-50%, -50%) rotate(1.15deg);
   }
 }
 @keyframes candy-prop-shimmer {
@@ -1115,50 +1121,62 @@ details > summary::-webkit-details-marker {
     filter: brightness(1);
   }
   50% {
-    transform: translate(-50%, calc(-50% - 0.14rem));
-    filter: brightness(1.08);
+    transform: translate(-50%, calc(-50% - 0.05rem));
+    filter: brightness(1.06);
   }
 }
 @keyframes candy-prop-fall {
-  0%,
-  100% {
-    transform: translate(-50%, -50%);
+  0% {
+    transform: translate(-50%, -50%) scaleY(1);
   }
   50% {
-    transform: translate(-50%, calc(-50% + 0.12rem));
+    transform: translate(-50%, -50%) scaleY(1.018);
+  }
+  100% {
+    transform: translate(-50%, -50%) scaleY(1);
   }
 }
 @keyframes candy-fall-sheen {
   0% {
-    transform: translateY(-18%);
-    opacity: 0.2;
+    transform: translateY(-12%);
+    opacity: 0.12;
   }
-  50% {
-    opacity: 0.55;
+  40% {
+    opacity: 0.5;
   }
   100% {
-    transform: translateY(22%);
-    opacity: 0.15;
+    transform: translateY(18%);
+    opacity: 0.1;
   }
 }
 @keyframes candy-trail-peek {
   0% {
-    transform: translateY(2.2rem);
-    animation-timing-function: cubic-bezier(0.34, 1.4, 0.64, 1);
+    transform: translateY(2.15rem);
+    animation-timing-function: cubic-bezier(0.22, 1.15, 0.36, 1);
   }
-  12% {
-    transform: translateY(0.1rem);
+  16% {
+    transform: translateY(0.08rem);
     animation-timing-function: ease-out;
   }
-  18%,
-  52% {
-    transform: translateY(0.32rem);
-    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  22%,
+  46% {
+    transform: translateY(0.22rem);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
   }
-  68%,
+  62%,
   100% {
-    transform: translateY(2.2rem);
+    transform: translateY(2.15rem);
   }
+}
+.candy-hopper-shadow {
+  position: absolute;
+  z-index: 3;
+  width: 1.45rem;
+  height: 0.36rem;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgb(46 30 22 / 0.34) 0%, rgb(46 30 22 / 0) 72%);
+  pointer-events: none;
+  will-change: left, top, transform, opacity;
 }
 .candy-hopper {
   position: absolute;

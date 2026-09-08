@@ -120,6 +120,20 @@ describe("first-visit Home door", () => {
     expect(html).not.toMatch(/3\.NS\.\d/);
     expect(html).not.toContain("data-welcome-leftover");
     expect(html).not.toContain("6 + n = 10");
+    expect(html).toContain('data-path-travel="0"');
+  });
+
+  it("Guest who finished unit 1 leftover hops to pad 2 on Lessons", () => {
+    useProgress.setState({
+      activities: { "u1-leftover": { plays: 1, best: 4, last: 4, stars: 3, misses: [] } },
+      pathHopperAt: 0,
+    });
+    stubHash("#/lessons");
+    const html = renderToStaticMarkup(<App />);
+    expect(html).toContain('data-path-hop-from="1"');
+    expect(html).toContain('data-path-travel="1"');
+    expect(html).toMatch(/data-path-unit="u2"[^>]*data-path-status="now"/);
+    expect(html).toMatch(/data-path-unit="u1"[^>]*data-path-status="open"/);
   });
 
   it("empty Guest at #/ on tablet/laptop gets the same Home shell", () => {
@@ -229,9 +243,14 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-world-art");
     expect(css).toContain(".candy-overlay");
     expect(css).toContain(".candy-hopper-art");
+    expect(css).toContain(".candy-hopper-shadow");
     expect(css).toContain("@keyframes candy-hop");
     expect(css).toContain("@keyframes candy-prop-sway");
     expect(css).toContain("@keyframes candy-trail-peek");
+    expect(css).toContain("animation: candy-prop-bob 2.8s ease-in-out infinite");
+    expect(css).toContain("animation: candy-prop-sway 3.2s ease-in-out infinite");
+    expect(css).toContain("animation: candy-prop-fall 1.15s linear infinite");
+    expect(css).toContain("animation: candy-trail-peek 4.6s 1 forwards");
     expect(css).toContain("transform-origin: 50% 82%");
     expect(css).not.toContain("left 0.72s");
     expect(css).toContain(".candy-fog");

@@ -335,6 +335,8 @@ export interface LearnerSlice {
   bests: PersonalBests;
   today: TodayPractice;
   runHonest: HonestRun;
+  /** Last pad the Lessons hopper settled on. 0 = never stood on the map. */
+  pathHopperAt: number;
 }
 
 export interface SaveState extends LearnerSlice {

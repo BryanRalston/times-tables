@@ -1,17 +1,26 @@
 import { GRADE3_PATH_NODES, type PathNodePos } from "./grade-path";
 
+export type HopPhase = "air" | "land";
+
 export type HopPose = {
   x: number;
   y: number;
   squashX: number;
   squashY: number;
+  shadowX: number;
+  shadowY: number;
+  shadowScale: number;
+  shadowOpacity: number;
 };
 
 /** One pad-to-pad hop. */
 export const HOP_MS = 520;
 
-/** Brief settle on a pad before the next hop. */
-export const LAND_MS = 72;
+/** Squash and settle on a pad, including after the last hop. */
+export const LAND_MS = 160;
+
+const REST_SHADOW_SCALE = 1;
+const REST_SHADOW_OPACITY = 0.14;
 
 export function clamp01(t: number): number {
   if (t <= 0) return 0;
@@ -39,21 +48,26 @@ export function hopUnitStops(fromNumber: number, toNumber: number, total = GRADE
 export function hopTravelMs(stops: readonly number[]): number {
   const hops = Math.max(0, stops.length - 1);
   if (hops === 0) return 0;
-  return hops * HOP_MS + (hops - 1) * LAND_MS;
+  return hops * (HOP_MS + LAND_MS);
 }
 
-export function hopProgressAt(elapsedMs: number, hopCount: number): {
+export function hopProgressAt(
+  elapsedMs: number,
+  hopCount: number,
+): {
   hopIndex: number;
   t: number;
+  phase: HopPhase;
   done: boolean;
 } {
-  if (hopCount <= 0) return { hopIndex: 0, t: 1, done: true };
+  if (hopCount <= 0) return { hopIndex: 0, t: 1, phase: "land", done: true };
   const cycle = HOP_MS + LAND_MS;
-  const total = hopCount * HOP_MS + (hopCount - 1) * LAND_MS;
-  if (elapsedMs >= total) return { hopIndex: hopCount - 1, t: 1, done: true };
+  const total = hopCount * cycle;
+  if (elapsedMs >= total) return { hopIndex: hopCount - 1, t: 1, phase: "land", done: true };
   const hopIndex = Math.min(hopCount - 1, Math.max(0, Math.floor(elapsedMs / cycle)));
   const local = elapsedMs - hopIndex * cycle;
-  return { hopIndex, t: clamp01(local / HOP_MS), done: false };
+  if (local < HOP_MS) return { hopIndex, t: clamp01(local / HOP_MS), phase: "air", done: false };
+  return { hopIndex, t: clamp01((local - HOP_MS) / LAND_MS), phase: "land", done: false };
 }
 
 export function hopSquash(t: number): { x: number; y: number } {
@@ -70,23 +84,62 @@ export function hopSquash(t: number): { x: number; y: number } {
   return { x: 1 - 0.05 * lift, y: 1 + 0.08 * lift };
 }
 
+/** Impact squash, then ease back to rest on the same pad. */
+export function hopLandSquash(t: number): { x: number; y: number } {
+  const u = clamp01(t);
+  const land = hopSquash(1);
+  if (u < 0.38) {
+    const s = easeHopTravel(u / 0.38);
+    return { x: land.x + 0.07 * s, y: land.y - 0.06 * s };
+  }
+  const s = 1 - (1 - (u - 0.38) / 0.62) ** 2;
+  const peakX = land.x + 0.07;
+  const peakY = land.y - 0.06;
+  return { x: peakX + (1 - peakX) * s, y: peakY + (1 - peakY) * s };
+}
+
 export function hopLiftPercent(from: PathNodePos, to: PathNodePos): number {
   const dist = Math.hypot(to.x - from.x, to.y - from.y);
   return Math.min(6.4, 3.3 + dist * 0.26);
 }
 
-export function hopAlong(from: PathNodePos, to: PathNodePos, t: number): HopPose {
-  const u = easeHopTravel(t);
-  const lift = hopLiftPercent(from, to) * Math.sin(Math.PI * clamp01(t));
-  const squash = hopSquash(t);
+function withShadow(pos: PathNodePos, scale: number, opacity: number, squash: { x: number; y: number }): HopPose {
   return {
-    x: from.x + (to.x - from.x) * u,
-    y: from.y + (to.y - from.y) * u - lift,
+    x: pos.x,
+    y: pos.y,
     squashX: squash.x,
     squashY: squash.y,
+    shadowX: pos.x,
+    shadowY: pos.y,
+    shadowScale: scale,
+    shadowOpacity: opacity,
   };
 }
 
+export function hopAlong(from: PathNodePos, to: PathNodePos, t: number): HopPose {
+  const u = easeHopTravel(t);
+  const liftAmt = Math.sin(Math.PI * clamp01(t));
+  const lift = hopLiftPercent(from, to) * liftAmt;
+  const squash = hopSquash(t);
+  const ground = { x: from.x + (to.x - from.x) * u, y: from.y + (to.y - from.y) * u };
+  return {
+    x: ground.x,
+    y: ground.y - lift,
+    squashX: squash.x,
+    squashY: squash.y,
+    shadowX: ground.x,
+    shadowY: ground.y,
+    shadowScale: 1 + 0.42 * liftAmt,
+    shadowOpacity: 0.22 - 0.1 * liftAmt,
+  };
+}
+
+export function hopLandSettle(pos: PathNodePos, t: number): HopPose {
+  const u = clamp01(t);
+  const squash = hopLandSquash(u);
+  return withShadow(pos, REST_SHADOW_SCALE, 0.22 - 0.08 * u, squash);
+}
+
 export function restHopPose(pos: PathNodePos): HopPose {
-  return { x: pos.x, y: pos.y, squashX: 1, squashY: 1 };
+  return withShadow(pos, REST_SHADOW_SCALE, REST_SHADOW_OPACITY, { x: 1, y: 1 });
 }

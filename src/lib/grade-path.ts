@@ -179,6 +179,9 @@ export const TRAIL_PEEK_NEARBY_Y = 16;
 /** Minimum PNG-space distance from a painted pad so the pop never covers a disc. */
 export const TRAIL_PEEK_MIN_PAD_DIST = 8;
 
+/** Extra clearance from the hopper's current pad so the face never sits on the numbers. */
+export const TRAIL_PEEK_MIN_HOPPER_DIST = 10;
+
 /** Once the hide spot is on-screen, wait this long (plus spread) before the pop. */
 export const TRAIL_PEEK_ARM_MS = 880;
 export const TRAIL_PEEK_ARM_SPREAD_MS = 640;
@@ -193,11 +196,29 @@ export function trailPeekSpotClear(spot: TrailPeekSpot, nowNumber: number): bool
   return !zoneIsFogged(spot.zone, nowNumber) && !overlayIsVeiled(spot.map.y, nowNumber);
 }
 
+export function trailPeekPadDistance(spot: TrailPeekSpot, pad: PathNodePos): number {
+  return Math.hypot(pad.x - spot.map.x, pad.y - spot.map.y);
+}
+
+export function trailPeekClearsPads(spot: TrailPeekSpot): boolean {
+  return GRADE3_PATH_PADS.every((pad) => trailPeekPadDistance(spot, pad.map) >= TRAIL_PEEK_MIN_PAD_DIST);
+}
+
+export function trailPeekClearsHopper(spot: TrailPeekSpot, nowNumber: number): boolean {
+  const hopper = GRADE3_PATH_NODES[nowNumber - 1];
+  if (!hopper) return true;
+  return trailPeekPadDistance(spot, hopper) >= TRAIL_PEEK_MIN_HOPPER_DIST;
+}
+
 export function nearbyTrailPeekSpots(nowNumber: number): TrailPeekSpot[] {
   const nowY = GRADE3_PATH_NODES[nowNumber - 1]?.y;
   if (nowY == null) return [];
   return TRAIL_PEEK_SPOTS.filter(
-    (s) => trailPeekSpotClear(s, nowNumber) && Math.abs(s.map.y - nowY) <= TRAIL_PEEK_NEARBY_Y,
+    (s) =>
+      trailPeekSpotClear(s, nowNumber) &&
+      trailPeekClearsPads(s) &&
+      trailPeekClearsHopper(s, nowNumber) &&
+      Math.abs(s.map.y - nowY) <= TRAIL_PEEK_NEARBY_Y,
   );
 }
 
@@ -206,7 +227,9 @@ export function pickTrailPeekSpot(nowNumber: number, hash: number): TrailPeekSpo
   if (nearby.length) return nearby[hash % nearby.length];
   const nowY = GRADE3_PATH_NODES[nowNumber - 1]?.y;
   if (nowY == null) return undefined;
-  const clear = TRAIL_PEEK_SPOTS.filter((s) => trailPeekSpotClear(s, nowNumber));
+  const clear = TRAIL_PEEK_SPOTS.filter(
+    (s) => trailPeekSpotClear(s, nowNumber) && trailPeekClearsPads(s) && trailPeekClearsHopper(s, nowNumber),
+  );
   if (!clear.length) return undefined;
   let best = clear[0]!;
   let bestD = Math.abs(best.map.y - nowY);
