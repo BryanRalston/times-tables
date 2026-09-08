@@ -1,10 +1,10 @@
 import { BookOpen, ChevronLeft, Home, Library, Settings2, Volume2, VolumeX } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { MagentaImg } from "@/components/magenta-video";
 import { parseLocale, UI } from "@/lib/i18n";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
-import { squisheeSrc } from "@/lib/squishees";
+import { PEEK_SQUISHEE_IDS, peekTurn, squisheeSrc } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
 export type SceneKind = "hills" | "play" | "shelf";
@@ -237,14 +237,62 @@ export function WalkMark() {
   );
 }
 
+function usePrefersReducedMotion(): boolean {
+  const [reduce, setReduce] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReduce(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+  return reduce;
+}
+
+function ContinuePeek() {
+  const reduce = usePrefersReducedMotion();
+  const [index, setIndex] = useState(0);
+  const turn = reduce ? peekTurn(0) : peekTurn(index);
+
+  useEffect(() => {
+    if (reduce) return;
+    const next = peekTurn(index + 1);
+    const img = new Image();
+    img.src = squisheeSrc(next.id);
+  }, [index, reduce]);
+
+  return (
+    <span
+      className={cn("continue-peek", `continue-peek-${turn.slot}`)}
+      data-continue-peek="1"
+      data-peek-id={turn.id}
+      data-peek-slot={turn.slot}
+      data-peek-roster={PEEK_SQUISHEE_IDS.length}
+      aria-hidden
+      onAnimationEnd={
+        reduce
+          ? undefined
+          : (e) => {
+              if (!(e.target instanceof HTMLElement)) return;
+              if (!e.target.classList.contains("continue-peek-art")) return;
+              setIndex((i) => i + 1);
+            }
+      }
+    >
+      <MagentaImg
+        key={reduce ? turn.id : `${turn.id}-${index}`}
+        src={squisheeSrc(turn.id)}
+        alt=""
+        className="continue-peek-art"
+      />
+    </span>
+  );
+}
+
 export function ContinueStage({ children, peek = false }: { children: ReactNode; peek?: boolean }) {
   return (
     <div className={cn("continue-stage", peek && "continue-stage-peek")}>
-      {peek ? (
-        <span className="continue-peek" data-continue-peek="1" data-peek-id="peach" aria-hidden>
-          <MagentaImg src={squisheeSrc("peach")} alt="" className="continue-peek-art" />
-        </span>
-      ) : null}
+      {peek ? <ContinuePeek /> : null}
       {children}
     </div>
   );

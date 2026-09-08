@@ -124,6 +124,23 @@ export const COMMON_SQUISHEES = COMMON;
 export const RARE_SQUISHEES = RARE;
 export const SQUISHEE_IDS = SQUISHEES.map((s) => s.id);
 
+/** Peek rotation: same catalog Shelf uses, starting at Peach so the first face stays familiar. */
+export const PEEK_SLOTS = ["center", "left", "right"] as const;
+export type PeekSlot = (typeof PEEK_SLOTS)[number];
+
+export const PEEK_SQUISHEE_IDS: readonly string[] = (() => {
+  const i = SQUISHEE_IDS.indexOf("peach");
+  if (i <= 0) return SQUISHEE_IDS;
+  return [...SQUISHEE_IDS.slice(i), ...SQUISHEE_IDS.slice(0, i)];
+})();
+
+export function peekTurn(index: number): { id: string; slot: PeekSlot } {
+  const n = PEEK_SQUISHEE_IDS.length;
+  const id = PEEK_SQUISHEE_IDS[((index % n) + n) % n]!;
+  const slot = PEEK_SLOTS[((index % PEEK_SLOTS.length) + PEEK_SLOTS.length) % PEEK_SLOTS.length]!;
+  return { id, slot };
+}
+
 export function squisheeById(id: string): Squishee | undefined {
   return SQUISHEES.find((s) => s.id === id);
 }
