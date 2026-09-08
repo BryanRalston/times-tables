@@ -1,10 +1,11 @@
 import { useMemo } from "react";
+import { CandyPath } from "@/components/candy-path";
 import { AppHeader, AppScene, AppTabs, ContinueStage, WalkMark, useUi } from "@/components/chrome";
 import { todayIso } from "@/lib/calendar";
-import { suggestedUnitId, unitById, unitsFor } from "@/lib/curriculum";
+import { UNITS, suggestedUnitId, unitById } from "@/lib/curriculum";
 import { makeDailyWalk } from "@/lib/daily";
 import { parseLocale } from "@/lib/i18n";
-import { activityText, unitText } from "@/lib/labels";
+import { unitText } from "@/lib/labels";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 
@@ -21,6 +22,8 @@ export function LessonsPage() {
   const ui = useUi();
   const date = todayIso();
   const suggested = suggestedUnitId(date, classUnitId || undefined, pathGrade);
+  const g3Class = UNITS.some((u) => u.id === classUnitId) ? classUnitId : undefined;
+  const pathSuggested = suggestedUnitId(date, g3Class, 3);
   const unit = unitById(suggested);
   const nextAttempt = (attempts[`daily:${suggested}`] ?? 0) + 1;
   const walk = useMemo(
@@ -40,7 +43,6 @@ export function LessonsPage() {
   );
   const done = Boolean(sessions[walk.date]?.completed);
   const unitShort = unit ? unitText(unit, locale).short : ui.todaysWalk;
-  const others = unitsFor(pathGrade).filter((u) => u.id !== suggested);
 
   return (
     <AppScene scene="hills" tabs={<AppTabs active="lessons" />}>
@@ -58,35 +60,18 @@ export function LessonsPage() {
         </section>
       </ContinueStage>
 
-      {unit ? (
-        <div className="lesson-acts" data-lesson-acts="1">
-          {unit.activities.map((a) => (
-            <button
-              key={a.id}
-              type="button"
-              className="lesson-act"
-              onClick={() => navigate({ id: "play", kind: "activity", activityId: a.id })}
-            >
-              {activityText(a, locale).title}
-            </button>
-          ))}
-        </div>
-      ) : null}
-
-      {others.length ? (
-        <div className="lesson-more" data-lesson-more="1">
-          {others.map((u) => (
-            <button
-              key={u.id}
-              type="button"
-              className="lesson-quiet-unit"
-              onClick={() => navigate({ id: "unit", unitId: u.id })}
-            >
-              {unitText(u, locale).short}
-            </button>
-          ))}
-        </div>
-      ) : null}
+      <div className="candy-scroll">
+        <CandyPath
+          suggestedId={pathSuggested}
+          onStart={() => navigate({ id: "play", kind: "daily" })}
+          onOpenUnit={(id) => navigate({ id: "unit", unitId: id })}
+        />
+      </div>
+      <p className="candy-caption">
+        <span aria-hidden>★</span>
+        {ui.grade3Path}
+        <span aria-hidden>★</span>
+      </p>
     </AppScene>
   );
 }

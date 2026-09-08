@@ -483,7 +483,7 @@ details > summary::-webkit-details-marker {
   gap: 0.25rem;
   margin-top: auto;
   padding: 0.45rem 0.7rem max(0.55rem, env(safe-area-inset-bottom));
-  background: #f4a4c0;
+  background: rgb(255 255 255 / 0.94);
   border-top-left-radius: 22px;
   border-top-right-radius: 22px;
   box-shadow: 0 -10px 24px -18px rgb(80 30 50 / 0.35);
@@ -496,13 +496,13 @@ details > summary::-webkit-details-marker {
   gap: 0.15rem;
   min-height: 3.35rem;
   border-radius: 16px;
-  color: #fff8fb;
+  color: #7a6572;
   font-size: 0.72rem;
   font-weight: 700;
 }
 .app-tab-on {
-  color: #fff;
-  background: rgb(255 255 255 / 0.28);
+  color: var(--color-teal);
+  background: rgb(13 138 134 / 0.08);
 }
 
 .continue-stage {
