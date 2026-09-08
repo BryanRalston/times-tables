@@ -60,6 +60,7 @@ function expectHomeShell(html: string) {
   expect(html).not.toContain("The year map.");
   expect(html).not.toContain(">Score<");
   expect(html).not.toMatch(/Score\s*\/\s*Streak/);
+  expect(html).not.toContain("School-day streak");
   expect(html).not.toContain("1/20");
 }
 
@@ -82,8 +83,12 @@ describe("first-visit Home door", () => {
   it("empty Guest at a phone catalog hash opens that page, not leftover", () => {
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
-    expect(html).toContain("Every unit, every activity");
+    expect(html).toContain("data-lessons-continue");
+    expect(html).toMatch(/Today(?:'|&#x27;)s walk/);
+    expect(html).toContain("Start");
     expect(html).toContain("Home, lessons, and shelf");
+    expect(html).not.toContain("Every unit, every activity");
+    expect(html).not.toMatch(/3\.NS\.\d/);
     expect(html).not.toContain("data-welcome-leftover");
     expect(html).not.toContain("6 + n = 10");
   });
@@ -100,8 +105,11 @@ describe("first-visit Home door", () => {
     stubViewport(1280);
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
-    expect(html).toContain("Every unit, every activity");
+    expect(html).toContain("data-lessons-continue");
+    expect(html).toMatch(/Today(?:'|&#x27;)s walk/);
     expect(html).toContain("Home, lessons, and shelf");
+    expect(html).not.toContain("Every unit, every activity");
+    expect(html).not.toMatch(/3\.NS\.\d/);
     expect(html).not.toContain("data-welcome-leftover");
     expect(html).not.toContain("6 + n = 10");
   });
@@ -150,8 +158,21 @@ describe("first-visit Home door", () => {
     expect(chrome).toContain("data-mute-sounds");
     expect(chrome).toContain("data-app-shell");
     expect(chrome).toContain("app-phone");
+    expect(chrome).toContain("CoinChip");
     expect(chrome).not.toContain("max-w-6xl");
     expect(chrome).not.toMatch(/Score\s*\/\s*Streak/);
+    expect(chrome).not.toMatch(/\bstars\b/);
+    expect(chrome).not.toMatch(/\bstreak\b/);
+    const lessons = readFileSync(join(HERE, "pages/lessons.tsx"), "utf8");
+    expect(lessons).toContain("data-lessons-continue");
+    expect(lessons).toContain("start-loud");
+    expect(lessons).not.toContain("lessonsIntro");
+    expect(lessons).not.toContain(".sol");
+    const shelf = readFileSync(join(HERE, "pages/shelf.tsx"), "utf8");
+    expect(shelf).toContain("data-shelf-plank");
+    expect(shelf).toContain("data-shelf-empty");
+    expect(shelf).not.toContain("grid-cols-3");
+    expect(shelf).not.toContain("Squishee shop");
     const css = readFileSync(join(HERE, "styles.css"), "utf8");
     expect(css).toContain(".app-scene");
     expect(css).toContain(".keypad-dock");

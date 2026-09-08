@@ -20,7 +20,12 @@ describe("shop tiles", () => {
     expect(html).toContain("squishee-silhouette");
     expect(html).toContain("???");
     expect(html).toContain("frog.png");
+    expect(html).toContain("data-shelf-plank");
+    expect(html).toContain("data-shelf-empty");
     expect(html).not.toContain("Poke Bear");
+    expect(html).not.toContain("Squishee shop");
+    expect(html).not.toMatch(/Buy\s*·/);
+    expect(html).not.toContain("Spend coins on a toy");
   });
 
   it("owned avocado tile is a poke button with squash machinery", () => {
