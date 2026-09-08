@@ -18,4 +18,10 @@ Magenta key `#FF00FF`. Use `*.png` in the UI (transparent). JPGs are the Imagine
 - `node-open.png` — playable
 - `node-locked.png` — not yet
 
+## Lessons zone plates (`public/candy-zones/`)
+Painted Candy-Crush backgrounds. Stack forest → cove → meadow. Keep hop, nodes, and fog as overlays — do not bake them into the plates.
+- `forest.png` — Fraction Forest (top)
+- `cove.png` — Coin Cove (middle)
+- `meadow.png` — Ten-Frame Meadow (bottom)
+
 Do not put letters on new art. Chroma the magentas; do not leave hot pink boxes in the layout.

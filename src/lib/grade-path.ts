@@ -2,21 +2,49 @@ export type PathZone = "meadow" | "cove" | "forest";
 
 export type PathNodePos = { x: number; y: number };
 
-/** Percent coords inside the map; y = 0 is the top so the trail climbs. */
+/** Painted plates, top of the scroll to bottom. Each file is 1536×1024 (3:2). */
+export const CANDY_ZONE_STACK: readonly PathZone[] = ["forest", "cove", "meadow"];
+
+export const CANDY_ZONE_FILES: Record<PathZone, string> = {
+  forest: "candy-zones/forest.png",
+  cove: "candy-zones/cove.png",
+  meadow: "candy-zones/meadow.png",
+};
+
+/** Local percent coords on one plate; y = 0 is the top of that plate. */
+export function plateToMapPos(zone: PathZone, local: PathNodePos): PathNodePos {
+  const i = CANDY_ZONE_STACK.indexOf(zone);
+  return { x: local.x, y: (i * 100 + local.y) / CANDY_ZONE_STACK.length };
+}
+
+/** Pads along each plate’s cream path, bottom-to-top, one node per Grade 3 unit. */
+const MEADOW_PADS: readonly PathNodePos[] = [
+  { x: 49.9, y: 93.8 },
+  { x: 48.7, y: 66.4 },
+  { x: 64.6, y: 39.5 },
+  { x: 67.8, y: 12.1 },
+];
+
+const COVE_PADS: readonly PathNodePos[] = [
+  { x: 54.2, y: 89.8 },
+  { x: 48.3, y: 63.3 },
+  { x: 57.2, y: 36.7 },
+  { x: 53.7, y: 10.2 },
+];
+
+const FOREST_PADS: readonly PathNodePos[] = [
+  { x: 53.2, y: 91.8 },
+  { x: 44.3, y: 70.7 },
+  { x: 50.4, y: 50 },
+  { x: 53.5, y: 28.9 },
+  { x: 48.1, y: 8.2 },
+];
+
+/** Percent coords inside the stacked map; y = 0 is the top so the trail climbs. */
 export const GRADE3_PATH_NODES: readonly PathNodePos[] = [
-  { x: 20, y: 91 },
-  { x: 46, y: 84 },
-  { x: 74, y: 77 },
-  { x: 40, y: 69 },
-  { x: 18, y: 61 },
-  { x: 50, y: 54 },
-  { x: 78, y: 47 },
-  { x: 48, y: 40 },
-  { x: 24, y: 33 },
-  { x: 52, y: 26 },
-  { x: 76, y: 19 },
-  { x: 46, y: 12 },
-  { x: 62, y: 5.5 },
+  ...MEADOW_PADS.map((p) => plateToMapPos("meadow", p)),
+  ...COVE_PADS.map((p) => plateToMapPos("cove", p)),
+  ...FOREST_PADS.map((p) => plateToMapPos("forest", p)),
 ];
 
 export function zoneForUnitNumber(n: number): PathZone {
@@ -64,43 +92,4 @@ export function fogCoverPercent(nowNumber: number, nodes: readonly PathNodePos[]
   const lastVisible = nodes[last - 1];
   if (!lastVisible) return 0;
   return Math.max(8, lastVisible.y - 10);
-}
-
-export type Sprinkle = { x: number; y: number; hue: number; r: number };
-
-export function pathSprinkles(nodes: readonly PathNodePos[] = GRADE3_PATH_NODES, count = 56): Sprinkle[] {
-  if (nodes.length < 2 || count <= 0) return [];
-  const hues = [0, 28, 200, 140, 330];
-  const out: Sprinkle[] = [];
-  for (let i = 0; i < count; i++) {
-    const t = (i + 0.5) / count;
-    const scaled = t * (nodes.length - 1);
-    const a = Math.floor(scaled);
-    const b = Math.min(nodes.length - 1, a + 1);
-    const f = scaled - a;
-    const p = nodes[a]!;
-    const q = nodes[b]!;
-    const side = i % 2 === 0 ? -1 : 1;
-    out.push({
-      x: p.x + (q.x - p.x) * f + side * (1.1 + (i % 3) * 0.35),
-      y: p.y + (q.y - p.y) * f + (i % 5 === 0 ? -0.6 : 0.4),
-      hue: hues[i % hues.length]!,
-      r: 0.55 + (i % 3) * 0.18,
-    });
-  }
-  return out;
-}
-
-export function pathSvgD(nodes: readonly PathNodePos[] = GRADE3_PATH_NODES): string {
-  const first = nodes[0];
-  if (!first) return "";
-  let d = `M ${first.x} ${first.y}`;
-  for (let i = 1; i < nodes.length; i++) {
-    const prev = nodes[i - 1]!;
-    const cur = nodes[i]!;
-    const cpx = (prev.x + cur.x) / 2;
-    const cpy = (prev.y + cur.y) / 2 + (i % 2 === 0 ? -3 : 3);
-    d += ` Q ${cpx} ${cpy} ${cur.x} ${cur.y}`;
-  }
-  return d;
 }
