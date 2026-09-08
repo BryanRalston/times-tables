@@ -45,7 +45,7 @@ export function LessonsPage() {
   return (
     <AppScene scene="hills" tabs={<AppTabs active="lessons" />}>
       <AppHeader variant="shelf" title={ui.lessons} />
-      <ContinueStage>
+      <ContinueStage peek>
         <section className="continue-card" data-continue-card="1" data-lessons-continue="1">
           <WalkMark />
           <h2 className="font-display text-[1.65rem] font-semibold leading-tight text-ink">{ui.todaysWalk}</h2>

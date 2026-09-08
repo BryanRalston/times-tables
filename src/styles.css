@@ -421,20 +421,20 @@ details > summary::-webkit-details-marker {
 .scene-hill-back {
   left: -22%;
   right: -18%;
-  height: 48%;
-  background: #f0b4cc;
+  height: 58%;
+  background: #f3c0d4;
 }
 .scene-hill-mid {
   left: -32%;
   width: 84%;
-  height: 38%;
-  background: #e89abc;
+  height: 46%;
+  background: #ebb0c8;
 }
 .scene-hill-front {
   right: -28%;
   width: 76%;
-  height: 30%;
-  background: #e087af;
+  height: 36%;
+  background: #e39ab8;
 }
 
 .scene-head,
@@ -521,21 +521,21 @@ details > summary::-webkit-details-marker {
 .continue-peek {
   position: absolute;
   left: 50%;
-  top: -4.85rem;
+  top: -4.35rem;
   z-index: 0;
-  width: 8.2rem;
-  height: 5.7rem;
+  width: 7.6rem;
+  height: 5.15rem;
   transform: translateX(-50%);
   overflow: hidden;
   pointer-events: none;
 }
 .continue-peek-art {
   display: block;
-  width: 8rem;
-  height: 8rem;
+  width: 7.5rem;
+  height: 7.5rem;
   margin: 0 auto;
   object-fit: contain;
-  transform: translateY(0.15rem);
+  transform: translateY(0.45rem);
 }
 .continue-card {
   margin: 1.4rem 1rem 0;
@@ -618,6 +618,12 @@ details > summary::-webkit-details-marker {
   left: 2.35rem;
   width: 0.24rem;
   height: 0.24rem;
+}
+.walk-spark-d {
+  top: 1.55rem;
+  right: 0.55rem;
+  width: 0.22rem;
+  height: 0.22rem;
 }
 .start-loud {
   display: flex;

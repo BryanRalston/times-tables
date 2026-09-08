@@ -54,7 +54,10 @@ function expectHomeShell(html: string) {
   expect(html).toContain("data-continue-peek");
   expect(html).toContain("data-walk-mark");
   expect(html).toContain("data-scene-land");
-  expect(html).toContain("peach.png");
+  expect(html).toContain("home-peek.png");
+  expect(html).not.toContain("peach.png");
+  expect(html).not.toContain("avocado.png");
+  expect(html).not.toContain("mushroom.png");
   expect(html).toContain("data-app-shell");
   expect(html).toContain("data-app-tabs");
   expect(html).toContain("data-mute-sounds");
@@ -138,6 +141,10 @@ describe("first-visit Home door", () => {
     expect(src).toContain("ui.start");
     expect(src).toContain("allUnits");
     expect(src).not.toContain("YearPath");
+    expect(src).not.toContain("year-beads");
+    expect(src).not.toContain("peach");
+    expect(src).not.toContain("avocado");
+    expect(src).not.toContain("mushroom");
     const app = readFileSync(join(HERE, "app.tsx"), "utf8");
     expect(app).not.toContain("doorRoute");
     expect(app).not.toContain("usePhoneDoor");
@@ -166,6 +173,9 @@ describe("first-visit Home door", () => {
     expect(chrome).toContain("data-scene-land");
     expect(chrome).toContain("walk-spark");
     expect(chrome).toContain("continue-peek");
+    expect(chrome).toContain("ART.homePeek");
+    expect(chrome).not.toContain("squisheeSrc");
+    expect(chrome).not.toContain("peach");
     expect(chrome).not.toContain("max-w-6xl");
     expect(chrome).not.toMatch(/Score\s*\/\s*Streak/);
     expect(chrome).not.toMatch(/\bstars\b/);
