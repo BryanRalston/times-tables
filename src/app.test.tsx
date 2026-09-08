@@ -61,6 +61,8 @@ function expectHomeShell(html: string) {
   expect(html).toContain("peach.png");
   expect(html).not.toContain("home-peek.png");
   expect(html).not.toMatch(/avocado\.png|mushroom\.png/);
+  expect(html).not.toContain("data-grade-path");
+  expect(html).not.toContain("Ten-Frame Meadow");
   expect(html).toContain("data-app-shell");
   expect(html).toContain("data-app-tabs");
   expect(html).toContain("data-mute-sounds");
@@ -72,6 +74,21 @@ function expectHomeShell(html: string) {
   expect(html).not.toMatch(/Score\s*\/\s*Streak/);
   expect(html).not.toContain("School-day streak");
   expect(html).not.toContain("1/20");
+}
+
+function expectLessonsPath(html: string) {
+  expect(html).toContain("data-lessons-path");
+  expect(html).toContain("data-grade-path");
+  expect(html).toContain("Grade 3 Path");
+  expect(html).toContain("Ten-Frame Meadow");
+  expect(html).toContain("Coin Cove");
+  expect(html).toContain("Fraction Forest");
+  expect(html).toContain('data-path-hopper="peach"');
+  expect(html).toContain('data-path-unit="u1"');
+  expect(html).toContain('data-path-unit="u13"');
+  expect(html).toContain("Start");
+  expect(html).not.toContain("g4-");
+  expect(html).not.toContain("data-lessons-continue");
 }
 
 describe("first-visit Home door", () => {
@@ -93,14 +110,9 @@ describe("first-visit Home door", () => {
   it("empty Guest at a phone catalog hash opens that page, not leftover", () => {
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
-    expect(html).toContain("data-lessons-continue");
-    expect(html).toContain("data-continue-peek");
-    expect(html).toContain('data-peek-id="peach"');
-    expect(html).toContain(`data-peek-roster="${SQUISHEE_IDS.length}"`);
+    expectLessonsPath(html);
     expect(html).toContain("peach.png");
     expect(html).not.toContain("home-peek.png");
-    expect(html).toMatch(/Today(?:'|&#x27;)s walk/);
-    expect(html).toContain("Start");
     expect(html).toContain("Home, lessons, and shelf");
     expect(html).not.toContain("Every unit, every activity");
     expect(html).not.toMatch(/3\.NS\.\d/);
@@ -120,10 +132,8 @@ describe("first-visit Home door", () => {
     stubViewport(1280);
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
-    expect(html).toContain("data-lessons-continue");
-    expect(html).toContain("data-continue-peek");
+    expectLessonsPath(html);
     expect(html).toContain("peach.png");
-    expect(html).toMatch(/Today(?:'|&#x27;)s walk/);
     expect(html).toContain("Home, lessons, and shelf");
     expect(html).not.toContain("Every unit, every activity");
     expect(html).not.toMatch(/3\.NS\.\d/);
@@ -150,6 +160,7 @@ describe("first-visit Home door", () => {
     expect(src).not.toContain('kind: "welcome"');
     expect(src).toContain("ui.start");
     expect(src).toContain("allUnits");
+    expect(src).not.toContain("CandyPath");
     expect(src).not.toContain("YearPath");
     expect(src).not.toContain("year-beads");
     expect(src).not.toContain("peach");
@@ -198,8 +209,9 @@ describe("first-visit Home door", () => {
     expect(chrome).not.toMatch(/\bstars\b/);
     expect(chrome).not.toMatch(/\bstreak\b/);
     const lessons = readFileSync(join(HERE, "pages/lessons.tsx"), "utf8");
-    expect(lessons).toContain("data-lessons-continue");
-    expect(lessons).toContain("start-loud");
+    expect(lessons).toContain("data-lessons-path");
+    expect(lessons).toContain("CandyPath");
+    expect(lessons).toContain("ui.start");
     expect(lessons).not.toContain("lessonsIntro");
     expect(lessons).not.toContain(".sol");
     const shelf = readFileSync(join(HERE, "pages/shelf.tsx"), "utf8");
@@ -210,6 +222,9 @@ describe("first-visit Home door", () => {
     const css = readFileSync(join(HERE, "styles.css"), "utf8");
     expect(css).toContain(".app-scene");
     expect(css).toContain(".scene-hill");
+    expect(css).toContain(".candy-map");
+    expect(css).toContain(".candy-hopper-art");
+    expect(css).toContain("@keyframes candy-hop");
     expect(css).toContain(".walk-spark");
     expect(css).toContain("@keyframes peek-bob");
     expect(css).toContain(".continue-peek-left");

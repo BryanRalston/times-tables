@@ -427,6 +427,9 @@ describe("locale", () => {
     expect(UI.en.grownupPoints.length).toBeGreaterThanOrEqual(5);
     expect(UI.en.grownupBlurb).toMatch(/Grade 4/);
     expect(UI.en.grownupBlurb).toMatch(/Nothing leaves/i);
+    expect(UI.en.grade3Path).toBe("Grade 3 Path");
+    expect(UI.es.zoneMeadow).toBe("Prado de decenas");
+    expect(UI["pt-BR"].zoneForest).toBe("Floresta das frações");
     expect(UI.en.pathGrade4).toBe("Advanced (Grade 4) — preview");
     expect(UI.es.pathGrade4).toBe("Avanzado (4.º) — vista previa");
     expect(UI["pt-BR"].pathGrade4).toBe("Avançado (4.º) — prévia");
@@ -506,10 +509,12 @@ describe("shuffle", () => {
 });
 
 describe("path", () => {
-  it("never locks a unit — calendar only marks now", () => {
+  it("locks later units on the map; Lessons stay open", () => {
     const later = UNITS.find((u) => u.id === "u11")!;
-    expect(unitStatus(later, "u1")).toBe("open");
+    expect(unitStatus(later, "u1")).toBe("locked");
     expect(unitStatus(UNITS[0]!, "u1")).toBe("now");
+    expect(unitStatus(UNITS[0]!, "u3")).toBe("open");
+    expect(unitStatus(UNITS[2]!, "u3")).toBe("now");
     expect(isUnitOpen(later, "u1")).toBe(true);
   });
 });
