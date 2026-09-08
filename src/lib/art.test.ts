@@ -16,6 +16,11 @@ describe("asset URLs", () => {
     expect(squisheeSrc("peach")).toBe("/times-tables/squishees/peach.png");
     expect(existsSync(join(HERE, "../../public/squishees/peach.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/tall-map.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/waterfall.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/tenframe.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/coins.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/palm.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/fraction-pie.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/art/home-peek.png"))).toBe(false);
   });
 });
