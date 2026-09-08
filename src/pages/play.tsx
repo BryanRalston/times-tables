@@ -12,7 +12,7 @@ import { activityById, suggestedUnitId } from "@/lib/curriculum";
 import { pathNowUnitId } from "@/lib/path";
 import { makeDailyWalk, walkLabel } from "@/lib/daily";
 import { parseLocale, UI } from "@/lib/i18n";
-import { cardHeading, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen } from "@/lib/leftover";
+import { cardHeading, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen, leftoverSpeechOpen } from "@/lib/leftover";
 import { aliasActivityId, navigate } from "@/lib/nav";
 import { holdMsFor, REVEAL_AFTER_MISSES, WRONG_REVEAL_MS, WRONG_RETRY_MS, type FactStat } from "@/lib/practice";
 import { useProgress } from "@/lib/progress";
@@ -437,7 +437,12 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       : correctSpeech(q, locale)
     : pandaLine(q, locale, pose === "oops" ? "wrong" : status, interacted);
   const showSpeech = leftover
-    ? status === "wrong" || pose === "oops" || reveal
+    ? leftoverSpeechOpen({
+        kind: q.kind,
+        interacted,
+        status: pose === "oops" ? "wrong" : status,
+        reveal,
+      })
     : status === "wrong" || pose === "oops" || reveal;
   const shownAnswer =
     reveal && !leftover ? (
@@ -492,7 +497,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
               {cardHeading(q, interacted)}
             </h2>
           ) : null}
-          <div className={leftover ? "mx-auto flex min-h-0 w-full flex-1 items-center" : "min-h-0 flex-1 overflow-y-auto"}>
+          <div className={leftover ? "mx-auto flex min-h-0 w-full flex-1 items-center overflow-y-auto" : "min-h-0 flex-1 overflow-y-auto"}>
             <div className={leftover ? "w-full" : undefined}>{board}</div>
             {q.kind === "word" || q.prompt.length > 70 ? (
               <div className="mt-3">

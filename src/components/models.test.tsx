@@ -195,11 +195,36 @@ describe("boards", () => {
     expect(src).toContain("pointerup");
     expect(src).toContain("bindTake");
     expect(src).toContain("missTake");
+    expect(src).toMatch(/function missTake[\s\S]*takeGroup\(/);
+    expect(src).toContain("data-why-take");
+    expect(src).toContain("leftoverRows");
     expect(src).toContain("size-11");
     expect(src).toContain("leftover-dot");
     expect(src).toContain("leftover-eq");
     expect(src).toContain("onClick={takeGroup}");
     expect(src).toContain("grid-cols-5");
+  });
+
+  it("18 − n = 10 still has a takeable known group and four leftover rows", () => {
+    const q: Question = {
+      id: "q-18n10",
+      kind: "tenframe",
+      input: "keypad",
+      prompt: "18 − n = 10",
+      hint: "Take the dots you can see. Then name n.",
+      answer: "8",
+      needsInteract: true,
+      data: { total: 18, shown: 10, equation: "18 − n = 10" },
+    };
+    const html = renderToStaticMarkup(<Board {...stub(q)} status="idle" />);
+    expect(html).toContain("18 − n = 10");
+    expect(html).toContain("data-leftover-board");
+    expect(html).toContain('data-leftover-rows="4"');
+    expect(html).toContain("data-why-take");
+    expect(html).toContain("data-known-group");
+    expect(html).toContain("known-glow");
+    expect((html.match(/aria-label="dot"/g) ?? []).length).toBe(10);
+    expect(html).not.toContain(`n is ${q.answer}`);
   });
 
   it("after a correct leftover Check the board isolates n without an n is overlay", () => {
