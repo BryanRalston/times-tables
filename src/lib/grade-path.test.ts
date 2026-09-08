@@ -1,6 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { UNITS } from "./curriculum";
-import { GRADE3_PATH_NODES, displayUnitStars, pathSvgD, zoneForUnitNumber } from "./grade-path";
+import {
+  GRADE3_PATH_NODES,
+  displayUnitStars,
+  fogCoverPercent,
+  lastClearUnitNumber,
+  nodeIsFogged,
+  pathSprinkles,
+  pathSvgD,
+  zoneForUnitNumber,
+  zoneIsFogged,
+} from "./grade-path";
 import { pathHopperId } from "./squishees";
 
 describe("grade path", () => {
@@ -23,6 +33,21 @@ describe("grade path", () => {
     expect(displayUnitStars(0, 15)).toBe(0);
     expect(displayUnitStars(5, 15)).toBe(1);
     expect(displayUnitStars(15, 15)).toBe(3);
+  });
+
+  it("hides the far trail under fog and keeps a short lookahead", () => {
+    expect(lastClearUnitNumber(1)).toBe(3);
+    expect(nodeIsFogged(1, 1)).toBe(false);
+    expect(nodeIsFogged(3, 1)).toBe(false);
+    expect(nodeIsFogged(4, 1)).toBe(true);
+    expect(nodeIsFogged(13, 1)).toBe(true);
+    expect(zoneIsFogged("meadow", 1)).toBe(false);
+    expect(zoneIsFogged("cove", 1)).toBe(true);
+    expect(zoneIsFogged("forest", 1)).toBe(true);
+    expect(zoneIsFogged("forest", 8)).toBe(false);
+    expect(fogCoverPercent(1)).toBeGreaterThan(50);
+    expect(fogCoverPercent(13)).toBe(0);
+    expect(pathSprinkles().length).toBeGreaterThan(20);
   });
 
   it("hops the last owned squishee, else the familiar first peek face", () => {

@@ -21,6 +21,21 @@ describe("CandyPath", () => {
     expect(html).toMatch(/data-path-unit="u13"[^>]*data-path-status="locked"/);
     expect(html).toContain('data-path-hopper="peach"');
     expect(html).toContain("peach.png");
+    expect(html).toContain("data-candy-fog");
+    expect(html).toContain('data-path-fog="1"');
+    expect(html).toContain("candy-sprinkle");
+    expect(html).toContain("data-path-tall");
     expect(html).not.toContain("g4-");
+  });
+
+  it("keeps nearby nodes clear and fogs the far forest on unit 1", () => {
+    const html = renderToStaticMarkup(
+      <CandyPath suggestedId="u1" onStart={() => {}} onOpenUnit={() => {}} />,
+    );
+    expect(html).toMatch(/data-path-unit="u1"[^>]*data-path-fog="0"/);
+    expect(html).toMatch(/data-path-unit="u3"[^>]*data-path-fog="0"/);
+    expect(html).toMatch(/data-path-unit="u4"[^>]*data-path-fog="1"/);
+    expect(html).toMatch(/data-path-unit="u13"[^>]*data-path-fog="1"/);
+    expect(html).toContain("Mist hides the path ahead");
   });
 });

@@ -146,6 +146,7 @@ export type Ui = {
   zoneCove: string;
   zoneForest: string;
   pathLocked: string;
+  pathFogAhead: string;
   owned: string;
   commons: string;
   rares: string;
@@ -304,6 +305,7 @@ export const UI: Record<Locale, Ui> = {
     zoneCove: "Coin Cove",
     zoneForest: "Fraction Forest",
     pathLocked: "Locked",
+    pathFogAhead: "Mist hides the path ahead. Finish today’s walk to see more.",
     owned: "Owned",
     commons: "Commons",
     rares: "Rares",
@@ -460,6 +462,7 @@ export const UI: Record<Locale, Ui> = {
     zoneCove: "Cala de monedas",
     zoneForest: "Bosque de fracciones",
     pathLocked: "Cerrado",
+    pathFogAhead: "La niebla esconde el sendero. Termina el paseo de hoy para ver más.",
     owned: "Tuyo",
     commons: "Comunes",
     rares: "Raros",
@@ -616,6 +619,7 @@ export const UI: Record<Locale, Ui> = {
     zoneCove: "Enseada das moedas",
     zoneForest: "Floresta das frações",
     pathLocked: "Trancado",
+    pathFogAhead: "A névoa esconde a trilha. Termine o passeio de hoje para ver mais.",
     owned: "Seu",
     commons: "Comuns",
     rares: "Raros",
