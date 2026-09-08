@@ -5,6 +5,8 @@ import {
   cheerStripFile,
   cheerStripJsonFile,
   parsePokeStripJson,
+  PEEK_SQUISHEE_IDS,
+  peekTurn,
   pokeStripFile,
   pokeStripJsonFile,
   pokeStripSrc,
@@ -89,6 +91,27 @@ describe("cheer clips", () => {
       cell: 384,
       src: "/times-tables/squishees/panda-cheer-strip.png",
     });
+  });
+});
+
+describe("home peek roster", () => {
+  it("rotates every catalog squishee, starting at Peach, through left/center/right", () => {
+    expect(PEEK_SQUISHEE_IDS[0]).toBe("peach");
+    expect([...PEEK_SQUISHEE_IDS].sort()).toEqual([...SQUISHEE_IDS].sort());
+    expect(PEEK_SQUISHEE_IDS).toEqual(expect.arrayContaining(["peach", "avocado", "mushroom", "golden-dragon", "blush-cloud"]));
+    expect(peekTurn(0)).toEqual({ id: "peach", slot: "center" });
+    expect(peekTurn(1)).toEqual({ id: PEEK_SQUISHEE_IDS[1], slot: "left" });
+    expect(peekTurn(2)).toEqual({ id: PEEK_SQUISHEE_IDS[2], slot: "right" });
+    const seen = new Set<string>();
+    const slots = new Set<string>();
+    for (let i = 0; i < PEEK_SQUISHEE_IDS.length; i++) {
+      const turn = peekTurn(i);
+      seen.add(turn.id);
+      slots.add(turn.slot);
+    }
+    expect(seen.size).toBe(SQUISHEE_IDS.length);
+    expect([...slots].sort()).toEqual(["center", "left", "right"]);
+    expect(peekTurn(PEEK_SQUISHEE_IDS.length).id).toBe("peach");
   });
 });
 
