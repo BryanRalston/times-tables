@@ -231,7 +231,11 @@ describe("first-visit Home door", () => {
     expect(css).toContain("@keyframes candy-hop");
     expect(css).toContain("@keyframes candy-travel-hop");
     expect(css).toContain(".candy-fog");
+    expect(css).toContain(".candy-fog-mist");
+    expect(css).toContain("--candy-plate-overlap");
+    expect(css).toContain("mask-image");
     expect(css).toContain("aspect-ratio: 3 / 2");
+    expect(css).not.toContain(".candy-fog-cloud");
     expect(css).toContain(".app-phone:has(.candy-scroll)");
     expect(css).not.toContain(".tf-bed");
     expect(css).not.toContain(".pie-tree");

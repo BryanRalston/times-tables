@@ -4,13 +4,19 @@ import {
   CANDY_ZONE_FILES,
   CANDY_ZONE_STACK,
   GRADE3_PATH_NODES,
+  GRADE3_PATH_PADS,
+  PLATE_OVERLAP,
+  ZONE_PAD_COUNTS,
   displayUnitStars,
   fogCoverPercent,
   lastClearUnitNumber,
   nodeIsFogged,
+  padIsFogged,
+  plateSpan,
   plateToMapPos,
   zoneForUnitNumber,
   zoneIsFogged,
+  zoneLabelIsFogged,
 } from "./grade-path";
 import { pathHopperId } from "./squishees";
 
@@ -27,22 +33,24 @@ describe("grade path", () => {
     expect(zoneForUnitNumber(13)).toBe("forest");
   });
 
-  it("stacks painted plates and sits nodes on each zone’s cream path", () => {
+  it("stacks painted plates and sits a node on every cream pad", () => {
     expect(CANDY_ZONE_STACK).toEqual(["forest", "cove", "meadow"]);
     expect(CANDY_ZONE_FILES.meadow).toBe("candy-zones/meadow.png");
     expect(CANDY_ZONE_FILES.cove).toBe("candy-zones/cove.png");
     expect(CANDY_ZONE_FILES.forest).toBe("candy-zones/forest.png");
+    expect(ZONE_PAD_COUNTS.meadow).toBe(14);
+    expect(ZONE_PAD_COUNTS.cove).toBe(14);
+    expect(ZONE_PAD_COUNTS.forest).toBe(13);
+    expect(GRADE3_PATH_PADS).toHaveLength(41);
+    expect(GRADE3_PATH_PADS.filter((p) => p.zone === "meadow")).toHaveLength(14);
+    expect(GRADE3_PATH_PADS.filter((p) => p.zone === "cove")).toHaveLength(14);
+    expect(GRADE3_PATH_PADS.filter((p) => p.zone === "forest")).toHaveLength(13);
+    expect(GRADE3_PATH_PADS.filter((p) => p.unitNumber !== null)).toHaveLength(13);
     expect(plateToMapPos("forest", { x: 50, y: 0 })).toEqual({ x: 50, y: 0 });
-    expect(plateToMapPos("cove", { x: 50, y: 0 }).y).toBeCloseTo(100 / 3);
-    expect(plateToMapPos("meadow", { x: 50, y: 100 }).y).toBe(100);
-    expect(GRADE3_PATH_NODES[0]!.y).toBeGreaterThan(90);
+    expect(plateToMapPos("meadow", { x: 50, y: 100 }).y).toBeCloseTo(100);
+    expect(plateToMapPos("cove", { x: 50, y: 0 }).y).toBeCloseTo(((1 - PLATE_OVERLAP) / plateSpan()) * 100);
+    expect(GRADE3_PATH_NODES[0]!.y).toBeGreaterThan(88);
     expect(GRADE3_PATH_NODES[12]!.y).toBeLessThan(8);
-    for (let i = 0; i < 4; i++) expect(GRADE3_PATH_NODES[i]!.y).toBeGreaterThan(66);
-    for (let i = 4; i < 8; i++) {
-      expect(GRADE3_PATH_NODES[i]!.y).toBeGreaterThan(33);
-      expect(GRADE3_PATH_NODES[i]!.y).toBeLessThan(67);
-    }
-    for (let i = 8; i < 13; i++) expect(GRADE3_PATH_NODES[i]!.y).toBeLessThan(34);
     expect(displayUnitStars(0, 15)).toBe(0);
     expect(displayUnitStars(5, 15)).toBe(1);
     expect(displayUnitStars(15, 15)).toBe(3);
@@ -58,7 +66,11 @@ describe("grade path", () => {
     expect(zoneIsFogged("cove", 1)).toBe(true);
     expect(zoneIsFogged("forest", 1)).toBe(true);
     expect(zoneIsFogged("forest", 8)).toBe(false);
-    expect(fogCoverPercent(1)).toBeGreaterThan(50);
+    expect(zoneLabelIsFogged("cove", 1)).toBe(false);
+    expect(zoneLabelIsFogged("forest", 1)).toBe(false);
+    expect(zoneLabelIsFogged("forest", 9)).toBe(false);
+    expect(padIsFogged({ x: 50, y: 2 }, 1)).toBe(true);
+    expect(fogCoverPercent(1)).toBeGreaterThan(40);
     expect(fogCoverPercent(13)).toBe(0);
   });
 

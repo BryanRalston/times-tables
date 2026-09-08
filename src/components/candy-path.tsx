@@ -8,11 +8,14 @@ import {
   CANDY_ZONE_FILES,
   CANDY_ZONE_STACK,
   GRADE3_PATH_NODES,
+  GRADE3_PATH_PADS,
   displayUnitStars,
   fogCoverPercent,
   nodeIsFogged,
+  padIsFogged,
   zoneForUnitNumber,
   zoneIsFogged,
+  zoneLabelIsFogged,
   type PathZone,
 } from "@/lib/grade-path";
 import { parseLocale } from "@/lib/i18n";
@@ -125,7 +128,7 @@ export function CandyPath({
 
   return (
     <div className="candy-map" data-grade-path="1" data-path-tall="1">
-      <div className="candy-plates" aria-hidden>
+      <div className="candy-plates" data-candy-plates-blend="1" aria-hidden>
         {CANDY_ZONE_STACK.map((zone) => (
           <img
             key={zone}
@@ -140,18 +143,32 @@ export function CandyPath({
       </div>
 
       <div className="candy-overlay">
-        <p className={cn("candy-sign candy-sign-meadow", zoneIsFogged("meadow", current.number) && "candy-sign-fog")}>
+        <p className={cn("candy-sign candy-sign-meadow", zoneLabelIsFogged("meadow", current.number) && "candy-sign-fog")}>
           {zoneLabel("meadow", ui)}
         </p>
-        <p className={cn("candy-sign candy-sign-cove", zoneIsFogged("cove", current.number) && "candy-sign-fog")}>
+        <p className={cn("candy-sign candy-sign-cove", zoneLabelIsFogged("cove", current.number) && "candy-sign-fog")}>
           {zoneLabel("cove", ui)}
         </p>
-        <p className={cn("candy-sign candy-sign-forest", zoneIsFogged("forest", current.number) && "candy-sign-fog")}>
+        <p className={cn("candy-sign candy-sign-forest", zoneLabelIsFogged("forest", current.number) && "candy-sign-fog")}>
           {zoneLabel("forest", ui)}
         </p>
 
-        {UNITS.map((unit, i) => {
-          const pos = GRADE3_PATH_NODES[i]!;
+        {GRADE3_PATH_PADS.map((pad) => {
+          const unit = pad.unitNumber ? UNITS[pad.unitNumber - 1] : undefined;
+          if (!unit) {
+            const fogged = padIsFogged(pad.map, current.number);
+            return (
+              <span
+                key={`${pad.zone}-${pad.local.x}-${pad.local.y}`}
+                className="candy-node candy-node-step"
+                style={{ left: `${pad.map.x}%`, top: `${pad.map.y}%` }}
+                data-path-pad="1"
+                data-path-zone={pad.zone}
+                data-path-fog={fogged ? "1" : "0"}
+                aria-hidden
+              />
+            );
+          }
           const status = unitStatus(unit, suggestedId);
           const zone = zoneForUnitNumber(unit.number);
           const stars = displayUnitStars(unitStars(unit.id), unitMaxStars(unit.id));
@@ -162,9 +179,10 @@ export function CandyPath({
             <button
               key={unit.id}
               type="button"
-              className={cn("candy-node", nodeTone(status, zone, unit.number))}
-              style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+              className={cn("candy-node candy-node-bare", nodeTone(status, zone, unit.number))}
+              style={{ left: `${pad.map.x}%`, top: `${pad.map.y}%` }}
               data-path-unit={unit.id}
+              data-path-pad="1"
               data-path-status={status}
               data-path-zone={zone}
               data-path-stars={stars}
@@ -200,10 +218,9 @@ export function CandyPath({
         </div>
 
         {fogH > 0 ? (
-          <div className="candy-fog" data-candy-fog="1" style={{ height: `${fogH}%` }} aria-hidden>
-            <span className="candy-fog-cloud candy-fog-cloud-a" />
-            <span className="candy-fog-cloud candy-fog-cloud-b" />
-            <span className="candy-fog-cloud candy-fog-cloud-c" />
+          <div className="candy-fog" data-candy-fog="1" data-candy-mist="1" style={{ height: `${fogH}%` }} aria-hidden>
+            <span className="candy-fog-mist candy-fog-mist-a" />
+            <span className="candy-fog-mist candy-fog-mist-b" />
           </div>
         ) : null}
         {fogH > 0 ? <p className="sr-only">{ui.pathFogAhead}</p> : null}
