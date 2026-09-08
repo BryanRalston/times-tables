@@ -23,8 +23,17 @@ describe("CandyPath", () => {
     expect(html).toContain("peach.png");
     expect(html).toContain("data-candy-fog");
     expect(html).toContain('data-path-fog="1"');
-    expect(html).toContain("candy-sprinkle");
+    expect(html).toContain('data-candy-plate="meadow"');
+    expect(html).toContain('data-candy-plate="cove"');
+    expect(html).toContain('data-candy-plate="forest"');
+    expect(html).toContain("candy-zones/meadow.png");
+    expect(html).toContain("candy-zones/cove.png");
+    expect(html).toContain("candy-zones/forest.png");
     expect(html).toContain("data-path-tall");
+    expect(html).not.toContain("tf-bed");
+    expect(html).not.toContain("pie-tree");
+    expect(html).not.toContain("sailboat");
+    expect(html).not.toContain("candy-sprinkle");
     expect(html).not.toContain("g4-");
   });
 
