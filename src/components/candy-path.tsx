@@ -3,7 +3,15 @@ import { useEffect, useRef, useState } from "react";
 import { useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
 import { asset } from "@/lib/art";
-import { hopAlong, hopProgressAt, hopTravelMs, hopUnitStops, restHopPose, type HopPose } from "@/lib/candy-hop";
+import {
+  hopAlong,
+  hopLandSettle,
+  hopProgressAt,
+  hopTravelMs,
+  hopUnitStops,
+  restHopPose,
+  type HopPose,
+} from "@/lib/candy-hop";
 import { todayIso } from "@/lib/calendar";
 import { UNITS } from "@/lib/curriculum";
 import {
@@ -82,7 +90,15 @@ function trailPeekInScroller(el: HTMLElement, root: HTMLElement): boolean {
   return er.bottom > sr.top + 4 && er.top < sr.bottom - 4 && er.width > 0 && er.height > 0;
 }
 
-function TrailPeek({ nowNumber, hopperId }: { nowNumber: number; hopperId: string }) {
+function TrailPeek({
+  nowNumber,
+  hopperId,
+  hold,
+}: {
+  nowNumber: number;
+  hopperId: string;
+  hold: boolean;
+}) {
   const reduce = usePrefersReducedMotion();
   const nodeRef = useRef<HTMLSpanElement>(null);
   const played = useRef(false);
@@ -93,8 +109,8 @@ function TrailPeek({ nowNumber, hopperId }: { nowNumber: number; hopperId: strin
 
   useEffect(() => {
     if (played.current) return;
-    if (reduce || !spot) {
-      setArmed(false);
+    if (reduce || !spot || hold) {
+      if (!played.current) setArmed(false);
       return;
     }
     const el = nodeRef.current;
@@ -136,7 +152,7 @@ function TrailPeek({ nowNumber, hopperId }: { nowNumber: number; hopperId: strin
       window.clearTimeout(poll);
       window.clearTimeout(timer);
     };
-  }, [hash, reduce, spot]);
+  }, [hash, hold, reduce, spot]);
 
   if (reduce || !spot) return null;
   const view = mapToViewPos(spot.map);
@@ -149,6 +165,8 @@ function TrailPeek({ nowNumber, hopperId }: { nowNumber: number; hopperId: strin
       data-trail-peek={spot.id}
       data-peek-id={turn.id}
       data-peek-armed={armed ? "1" : "0"}
+      data-peek-exited={played.current && !armed ? "1" : "0"}
+      data-peek-side={spot.map.x < 50 ? "left" : "right"}
       aria-hidden
       onAnimationEnd={(e) => {
         if (!(e.target instanceof HTMLElement)) return;
@@ -194,6 +212,7 @@ export function CandyPath({
   const prevNumber = useRef(current.number);
   const [travelFrom, setTravelFrom] = useState(current.number);
   const [travel, setTravel] = useState(false);
+  const [landing, setLanding] = useState(false);
   const [pose, setPose] = useState<HopPose>(() => restHopPose(restPos));
   const fogH = fogCoverPercent(current.number);
 
@@ -216,6 +235,7 @@ export function CandyPath({
     const to = current.number;
     if (from === to) {
       setPose(restHopPose(restPos));
+      setLanding(false);
       return;
     }
 
@@ -226,23 +246,43 @@ export function CandyPath({
     if (reduce || stops.length < 2) {
       setPose(restHopPose(restPos));
       setTravel(false);
+      setLanding(false);
       return;
     }
 
     const views = stops.map((n) => mapToViewPos(GRADE3_PATH_NODES[n - 1]!));
     const hopCount = views.length - 1;
     setTravel(true);
+    setLanding(false);
     setPose(restHopPose(views[0]!));
     let raf = 0;
+    let wasLand = false;
     const start = performance.now();
     const tick = (now: number) => {
-      const { hopIndex, t, done } = hopProgressAt(now - start, hopCount);
+      const { hopIndex, t, phase, done } = hopProgressAt(now - start, hopCount);
       if (done) {
         setPose(restHopPose(views[views.length - 1]!));
         setTravel(false);
+        setLanding(false);
         return;
       }
-      setPose(hopAlong(views[hopIndex]!, views[hopIndex + 1]!, t));
+      const isLand = phase === "land";
+      if (isLand !== wasLand) {
+        wasLand = isLand;
+        setLanding(isLand);
+      }
+      switch (phase) {
+        case "land":
+          setPose(hopLandSettle(views[hopIndex + 1]!, t));
+          break;
+        case "air":
+          setPose(hopAlong(views[hopIndex]!, views[hopIndex + 1]!, t));
+          break;
+        default: {
+          const _never: never = phase;
+          return _never;
+        }
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -350,6 +390,17 @@ export function CandyPath({
           );
         })}
 
+        <span
+          className="candy-hopper-shadow"
+          style={{
+            left: `${pose.shadowX}%`,
+            top: `${pose.shadowY}%`,
+            opacity: pose.shadowOpacity,
+            transform: `translate(-50%, 22%) scale(${pose.shadowScale}, ${0.62 + pose.shadowScale * 0.18})`,
+          }}
+          data-path-shadow={travel ? "1" : "0"}
+          aria-hidden
+        />
         <div
           className={cn("candy-hopper", travel && "candy-hopper-travel")}
           style={{
@@ -359,6 +410,7 @@ export function CandyPath({
           }}
           data-path-hopper={hopperId}
           data-path-travel={travel ? "1" : "0"}
+          data-path-land={landing ? "1" : "0"}
           data-path-hop-from={travel ? String(travelFrom) : String(current.number)}
           data-path-hop-to={String(current.number)}
           data-path-hop-ms={travel ? String(hopTravelMs(hopUnitStops(travelFrom, current.number))) : "0"}
@@ -366,7 +418,7 @@ export function CandyPath({
           <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
         </div>
 
-        <TrailPeek nowNumber={current.number} hopperId={hopperId} />
+        <TrailPeek nowNumber={current.number} hopperId={hopperId} hold={travel} />
 
         {fogH > 0 ? (
           <div className="candy-fog" data-candy-fog="1" data-candy-mist="1" style={{ height: `${fogH}%` }} aria-hidden>

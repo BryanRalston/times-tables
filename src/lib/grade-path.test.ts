@@ -10,6 +10,7 @@ import {
   TALL_MAP_SIZE,
   TRAIL_PEEK_ARM_MS,
   TRAIL_PEEK_ARM_SPREAD_MS,
+  TRAIL_PEEK_MIN_HOPPER_DIST,
   TRAIL_PEEK_MIN_PAD_DIST,
   TRAIL_PEEK_NEARBY_Y,
   TRAIL_PEEK_SPOTS,
@@ -20,6 +21,8 @@ import {
   nearbyTrailPeekSpots,
   nodeIsFogged,
   pickTrailPeekSpot,
+  trailPeekClearsHopper,
+  trailPeekClearsPads,
   trailPeekHash,
   zoneForUnitNumber,
   zoneIsFogged,
@@ -75,6 +78,8 @@ describe("grade path", () => {
     expect(TALL_MAP_OVERLAYS.every((p) => p.map.x > 38 && p.map.x < 62)).toBe(true);
     expect(TRAIL_PEEK_SPOTS).toHaveLength(9);
     expect(TRAIL_PEEK_SPOTS.every((p) => p.map.x > 38 && p.map.x < 62)).toBe(true);
+    expect(TRAIL_PEEK_MIN_HOPPER_DIST).toBeGreaterThan(TRAIL_PEEK_MIN_PAD_DIST);
+    expect(TRAIL_PEEK_SPOTS.every((p) => trailPeekClearsPads(p))).toBe(true);
     expect(TRAIL_PEEK_SPOTS.every((p) => GRADE3_PATH_PADS.every((pad) => Math.hypot(pad.map.x - p.map.x, pad.map.y - p.map.y) >= TRAIL_PEEK_MIN_PAD_DIST))).toBe(true);
     expect(TRAIL_PEEK_ARM_MS + TRAIL_PEEK_ARM_SPREAD_MS).toBeLessThan(2000);
   });
@@ -88,6 +93,8 @@ describe("grade path", () => {
       const picked = pickTrailPeekSpot(n, trailPeekHash("2026-09-08", n));
       expect(picked).toBeDefined();
       expect(nearby).toContainEqual(picked);
+      expect(trailPeekClearsHopper(picked!, n)).toBe(true);
+      expect(trailPeekClearsPads(picked!)).toBe(true);
     }
     const early = pickTrailPeekSpot(1, 0);
     expect(early?.zone).toBe("meadow");

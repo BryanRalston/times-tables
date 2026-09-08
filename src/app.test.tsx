@@ -229,9 +229,14 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-world-art");
     expect(css).toContain(".candy-overlay");
     expect(css).toContain(".candy-hopper-art");
+    expect(css).toContain(".candy-hopper-shadow");
     expect(css).toContain("@keyframes candy-hop");
     expect(css).toContain("@keyframes candy-prop-sway");
     expect(css).toContain("@keyframes candy-trail-peek");
+    expect(css).toContain("animation: candy-prop-bob 2.8s ease-in-out infinite");
+    expect(css).toContain("animation: candy-prop-sway 3.2s ease-in-out infinite");
+    expect(css).toContain("animation: candy-prop-fall 1.15s linear infinite");
+    expect(css).toContain("animation: candy-trail-peek 4.6s 1 forwards");
     expect(css).toContain("transform-origin: 50% 82%");
     expect(css).not.toContain("left 0.72s");
     expect(css).toContain(".candy-fog");

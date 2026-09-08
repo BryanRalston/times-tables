@@ -25,6 +25,9 @@ describe("CandyPath", () => {
     expect(html).toContain('data-path-hopper="peach"');
     expect(html).toContain('data-path-hop-to="5"');
     expect(html).toContain('data-path-travel="0"');
+    expect(html).toContain('data-path-land="0"');
+    expect(html).toContain("candy-hopper-shadow");
+    expect(html).toContain('data-path-shadow="0"');
     expect(html).toContain("peach.png");
     expect(html).toContain("data-candy-fog");
     expect(html).toContain("data-candy-mist");
@@ -57,6 +60,8 @@ describe("CandyPath", () => {
     expect(html).toContain(`data-trail-peek="${peek!.id}"`);
     expect((html.match(/data-trail-peek="/g) ?? []).length).toBe(1);
     expect(html).toContain('data-peek-armed="0"');
+    expect(html).toContain('data-peek-exited="0"');
+    expect(html).toMatch(/data-peek-side="(left|right)"/);
     expect(html).not.toContain("data-squishee-shop");
     expect(html).not.toContain("data-trail-collect");
   });
