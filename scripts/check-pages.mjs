@@ -17,14 +17,8 @@ if (!/\/times-tables\/assets\/[^"']+\.js/.test(html)) {
 }
 if (/src\/main\.tsx/.test(html)) fail("dist/index.html still points at src/main.tsx");
 if (html.includes("%BASE_URL%")) fail("dist/index.html still has unsubstituted %BASE_URL%");
-if (!html.includes("#/play/welcome") || !html.includes("g3-path-v2") || !html.includes("seenWelcome") || !html.includes("history.replaceState")) {
-  fail("dist/index.html missing first-visit leftover boot script");
-}
-if (!html.includes("max-width: 767px") || !html.includes("matchMedia")) {
-  fail("leftover boot must skip replaceState to #/play/welcome at 768px and up");
-}
-if (!/<script(?![^>]*type=["']module["'])[^>]*>[\s\S]*?#\/play\/welcome/.test(html)) {
-  fail("leftover boot must be a classic (non-module) script so it runs before React");
+if (html.includes("#/play/welcome") && html.includes("history.replaceState")) {
+  fail("dist/index.html must not rewrite first visit onto leftover");
 }
 if (!existsSync(nojekyll)) fail("dist/.nojekyll missing");
 const catPng = resolve("dist/squishees/cat.png");

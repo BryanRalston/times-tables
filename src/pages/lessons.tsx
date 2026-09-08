@@ -1,4 +1,4 @@
-import { AppHeader, AppShell, AppTabs, useUi } from "@/components/chrome";
+import { AppHeader, AppScene, AppTabs, useUi } from "@/components/chrome";
 import { ART } from "@/lib/art";
 import { todayIso } from "@/lib/calendar";
 import { QUARTERS, suggestedUnitId, unitsFor } from "@/lib/curriculum";
@@ -18,11 +18,10 @@ export function LessonsPage() {
   const qName = [ui.q1, ui.q2, ui.q3, ui.q4];
 
   return (
-    <AppShell>
-      <AppHeader />
-      <AppTabs active="lessons" />
-      <h2 className="font-display text-2xl">{ui.lessons}</h2>
-      <p className="frost mb-4 rounded-[16px] border border-line p-3 text-sm text-muted">{ui.lessonsIntro}</p>
+    <AppScene scene="hills" tabs={<AppTabs active="lessons" />}>
+      <AppHeader variant="shelf" title={ui.lessons} />
+      <div className="flex-1 overflow-y-auto px-4 pb-3">
+      <p className="mb-4 text-center text-sm text-muted">{ui.lessonsIntro}</p>
 
       {QUARTERS.map((q) => {
         const units = unitsFor(pathGrade).filter((u) => u.quarter === q.id);
@@ -96,6 +95,7 @@ export function LessonsPage() {
           </section>
         );
       })}
-    </AppShell>
+      </div>
+    </AppScene>
   );
 }

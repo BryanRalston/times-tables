@@ -72,6 +72,7 @@ export function Keypad({
   replace,
   allowDot = true,
   quiet,
+  docked,
   prefix,
   className,
 }: {
@@ -82,6 +83,7 @@ export function Keypad({
   replace?: boolean;
   allowDot?: boolean;
   quiet?: boolean;
+  docked?: boolean;
   prefix?: string;
   className?: string;
 }) {
@@ -90,6 +92,54 @@ export function Keypad({
   function press(k: string) {
     if (disabled) return;
     onChange(applyKeypadKey(value, k, { replace, allowDot: allowDot && !replace }));
+  }
+
+  function keyBtn(k: string, extra?: string) {
+    return (
+      <Button
+        key={k}
+        variant="secondary"
+        size="key"
+        className={cn("key-num min-w-0 w-full", k === "back" && "key-back", extra)}
+        aria-label={k === "back" ? "Backspace" : k}
+        onClick={() => press(k)}
+        disabled={disabled}
+      >
+        {k === "back" ? <Delete className="size-5" /> : k}
+      </Button>
+    );
+  }
+
+  if (docked) {
+    const top = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "back"] as const;
+    return (
+      <div className={cn("space-y-2", className)}>
+        {quiet ? (
+          value ? (
+            <p className="text-center font-display text-2xl leading-none tabular-nums" aria-live="polite">
+              {value}
+            </p>
+          ) : null
+        ) : (
+          <AnswerReadout value={value} prefix={prefix} />
+        )}
+        <div className="grid w-full grid-cols-10 gap-1" data-keypad="1">
+          {top.map((k) => keyBtn(k))}
+        </div>
+        <div className="grid w-full grid-cols-10 gap-1">
+          {allowDot && !replace ? keyBtn(".") : null}
+          {keyBtn("0", allowDot && !replace ? "col-span-2" : "col-span-3")}
+          <Button
+            className="check-loud col-span-7 w-full"
+            size="lg"
+            onClick={onCheck}
+            disabled={disabled || value.length === 0}
+          >
+            {ui.check}
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (

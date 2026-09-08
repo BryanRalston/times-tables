@@ -138,6 +138,13 @@ export type Ui = {
   unmute: string;
   sounds: string;
   mystery: string;
+  start: string;
+  allUnits: string;
+  owned: string;
+  commons: string;
+  rares: string;
+  missingSubtrahend: string;
+  timesFacts: string;
   practiceToday: string;
   questionsN: (n: number) => string;
   correctPct: (n: number) => string;
@@ -283,6 +290,13 @@ export const UI: Record<Locale, Ui> = {
     unmute: "Unmute sounds",
     sounds: "Sounds",
     mystery: "???",
+    start: "Start",
+    allUnits: "All units",
+    owned: "Owned",
+    commons: "Commons",
+    rares: "Rares",
+    missingSubtrahend: "Missing subtrahend",
+    timesFacts: "Times tables facts",
     practiceToday: "Today",
     questionsN: (n) => `${n} questions`,
     correctPct: (n) => `${n}% correct`,
@@ -426,6 +440,13 @@ export const UI: Record<Locale, Ui> = {
     unmute: "Activar sonidos",
     sounds: "Sonidos",
     mystery: "???",
+    start: "Empezar",
+    allUnits: "Todas las unidades",
+    owned: "Tuyo",
+    commons: "Comunes",
+    rares: "Raros",
+    missingSubtrahend: "Sustraendo que falta",
+    timesFacts: "Tablas de multiplicar",
     practiceToday: "Hoy",
     questionsN: (n) => `${n} preguntas`,
     correctPct: (n) => `${n}% correctas`,
@@ -569,6 +590,13 @@ export const UI: Record<Locale, Ui> = {
     unmute: "Ativar sons",
     sounds: "Sons",
     mystery: "???",
+    start: "Começar",
+    allUnits: "Todas as unidades",
+    owned: "Seu",
+    commons: "Comuns",
+    rares: "Raros",
+    missingSubtrahend: "Subtraendo que falta",
+    timesFacts: "Tabuada",
     practiceToday: "Hoje",
     questionsN: (n) => `${n} perguntas`,
     correctPct: (n) => `${n}% corretas`,

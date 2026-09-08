@@ -1,4 +1,4 @@
-import { HomeLink, useUi } from "@/components/chrome";
+import { AppHeader, AppScene, AppTabs, useUi } from "@/components/chrome";
 import { Button } from "@/components/ui/button";
 import { ART } from "@/lib/art";
 import { remainingSchoolDaysInUnit, suggestedUnitId, unitById, unitSpanDays, unitWindowLabel } from "@/lib/curriculum";
@@ -17,9 +17,9 @@ export function UnitPage({ unitId }: { unitId: string }) {
 
   if (!unit) {
     return (
-      <div className="p-6">
-        <HomeLink />
-      </div>
+      <AppScene scene="hills" tabs={<AppTabs active="lessons" />}>
+        <AppHeader variant="play" />
+      </AppScene>
     );
   }
 
@@ -32,13 +32,9 @@ export function UnitPage({ unitId }: { unitId: string }) {
   const copy = unitText(unit, locale);
 
   return (
-    <div className="mx-auto min-h-dvh max-w-3xl px-4 py-6 lg:max-w-5xl">
-      <div className="mb-4 flex items-center justify-between">
-        <HomeLink />
-        <button type="button" className="text-sm text-teal" onClick={() => navigate({ id: "lessons" })}>
-          {ui.lessons}
-        </button>
-      </div>
+    <AppScene scene="hills" tabs={<AppTabs active="lessons" />}>
+      <AppHeader variant="play" />
+      <div className="flex-1 overflow-y-auto px-4 pb-4">
       <div className="flex items-start gap-3">
         <img src={ART.nodeOpen} alt="" className="h-20 w-20 object-contain" />
         <div>
@@ -82,6 +78,7 @@ export function UnitPage({ unitId }: { unitId: string }) {
           );
         })}
       </div>
-    </div>
+      </div>
+    </AppScene>
   );
 }

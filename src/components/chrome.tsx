@@ -1,109 +1,162 @@
-import { BookOpen, Coins, Flame, Home, Settings2, Sparkles, Star, Volume2, VolumeX } from "lucide-react";
+import { BookOpen, ChevronLeft, Home, Library, Settings2, Volume2, VolumeX } from "lucide-react";
 import type { ReactNode } from "react";
-import { PokeToy } from "@/components/poke-toy";
-import { todayIso, YEAR_LABEL } from "@/lib/calendar";
 import { parseLocale, UI } from "@/lib/i18n";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
-import { schoolStreak } from "@/lib/streak";
 import { cn } from "@/lib/utils";
+
+export type SceneKind = "hills" | "play" | "shelf";
+export type TabId = "home" | "lessons" | "shelf";
 
 export function useUi() {
   const locale = parseLocale(useProgress((s) => s.locale));
   return UI[locale];
 }
 
-export function AppHeader() {
-  const name = useProgress((s) => s.name);
-  const stars = useProgress((s) => s.stars);
+export function CoinChip({ className }: { className?: string }) {
   const coins = useProgress((s) => s.coins);
-  const sessions = useProgress((s) => s.sessions);
-  const hydrated = useProgress((s) => s.hydrated);
-  const streak = schoolStreak(sessions, todayIso());
   const ui = useUi();
-  const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
+  return (
+    <button
+      type="button"
+      className={cn("coin-chip", className)}
+      onClick={() => navigate({ id: "shelf" })}
+      aria-label={ui.coins}
+    >
+      <span className="coin-face" aria-hidden />
+      <span className="tabular-nums">{coins}</span>
+    </button>
+  );
+}
+
+export function MuteButton({ className }: { className?: string }) {
+  const ui = useUi();
   const soundOn = useProgress((s) => s.soundOn !== false);
   const setSoundOn = useProgress((s) => s.setSoundOn);
+  return (
+    <button
+      type="button"
+      className={cn("grid size-9 place-items-center rounded-full text-muted", className)}
+      onClick={() => setSoundOn(!soundOn)}
+      aria-label={soundOn ? ui.mute : ui.unmute}
+      data-mute-sounds="1"
+      data-sound-on={soundOn ? "1" : "0"}
+    >
+      {soundOn ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
+    </button>
+  );
+}
+
+export function Wordmark({ compact }: { compact?: boolean }) {
+  const ui = useUi();
+  const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
+  const hydrated = useProgress((s) => s.hydrated);
+  return (
+    <div className="min-w-0">
+      <p className={cn("font-display font-semibold leading-none text-teal", compact ? "text-lg" : "text-[1.35rem]")}>
+        {ui.path}
+      </p>
+      <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-muted">
+        {pathGrade === 4 ? ui.grade4 : ui.grade3}
+      </p>
+      {hydrated ? (
+        <p className="sr-only" data-saved="1">
+          {ui.saved}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+export function AppHeader({
+  variant = "home",
+  title,
+}: {
+  variant?: "home" | "play" | "shelf";
+  title?: string;
+}) {
+  const ui = useUi();
+
+  if (variant === "play") {
+    return (
+      <header className="play-head">
+        <button
+          type="button"
+          className="grid size-10 place-items-center rounded-full text-ink"
+          onClick={() => navigate({ id: "home" })}
+          aria-label={ui.home}
+        >
+          <ChevronLeft className="size-6" strokeWidth={2.25} />
+        </button>
+        <div className="flex items-center gap-1">
+          <MuteButton />
+          <CoinChip />
+        </div>
+      </header>
+    );
+  }
 
   return (
-    <header className="mb-3 flex items-center gap-3">
-      <PokeToy id="frog" size="sm" bob className="h-14 w-14" />
-      <div className="min-w-0 flex-1">
-        <p className="flex flex-wrap items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted">
-          {pathGrade === 4 ? ui.grade4 : ui.grade3} · {YEAR_LABEL}
-          {pathGrade === 4 ? (
-            <span className="rounded-full bg-star-soft px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-star">{ui.preview}</span>
-          ) : null}
-        </p>
-        <h1 className="font-display text-xl leading-tight sm:text-2xl">{name ? ui.namedPath(name) : pathGrade === 4 ? ui.pathGrade4 : ui.path}</h1>
-        {hydrated ? (
-          <p className="text-[11px] font-medium text-teal" data-saved="1">
-            {ui.saved}
-          </p>
-        ) : null}
-      </div>
-      <div className="flex items-center gap-2 text-sm">
+    <header className="scene-head">
+      {title ? (
+        <div className="min-w-0">
+          <Wordmark compact />
+          <h1 className="mt-1 font-display text-2xl font-semibold text-ink">{title}</h1>
+        </div>
+      ) : (
+        <Wordmark />
+      )}
+      <div className="flex items-center gap-1">
+        <MuteButton />
         <button
           type="button"
-          className="inline-flex items-center gap-1 rounded-full bg-teal/15 px-2 py-1 text-teal"
-          onClick={() => navigate({ id: "shelf" })}
-          aria-label={ui.coins}
-        >
-          <Coins className="size-4" />
-          {coins}
-        </button>
-        <span className="inline-flex items-center gap-1 rounded-full bg-star-soft px-2 py-1 text-star">
-          <Star className="size-4 fill-current" />
-          {stars}
-        </span>
-        <span className="inline-flex items-center gap-1 rounded-full bg-star-soft px-2 py-1 text-star">
-          <Flame className="size-4" />
-          {streak}
-        </span>
-        <button
-          type="button"
-          className="grid size-10 place-items-center rounded-[12px] text-muted"
-          onClick={() => setSoundOn(!soundOn)}
-          aria-label={soundOn ? ui.mute : ui.unmute}
-          data-mute-sounds="1"
-          data-sound-on={soundOn ? "1" : "0"}
-        >
-          {soundOn ? <Volume2 className="size-5" /> : <VolumeX className="size-5" />}
-        </button>
-        <button
-          type="button"
-          className="grid size-10 place-items-center rounded-[12px] text-muted"
+          className="grid size-8 place-items-center rounded-full text-faint"
           onClick={() => navigate({ id: "grownup" })}
           aria-label={ui.grownups}
         >
-          <Settings2 className="size-5" />
+          <Settings2 className="size-4" />
         </button>
+        <CoinChip />
       </div>
     </header>
   );
 }
 
-export function AppTabs({ active }: { active: "home" | "lessons" | "shelf" }) {
-  const ui = useUi();
-  const tab = (id: "home" | "lessons" | "shelf", label: string, icon: ReactNode) => (
-    <button
-      type="button"
-      className={cn(
-        "inline-flex h-11 items-center justify-center gap-1.5 rounded-[12px] text-sm font-medium",
-        active === id ? "bg-surface text-ink shadow-soft" : "text-muted",
-      )}
-      aria-current={active === id ? "page" : undefined}
-      onClick={() => navigate({ id })}
-    >
-      {icon}
-      {label}
-    </button>
-  );
+function HouseIcon({ active }: { active: boolean }) {
   return (
-    <nav className="frost mb-5 grid grid-cols-3 gap-1 rounded-[16px] p-1" aria-label={ui.tabsAria}>
-      {tab("home", ui.home, <Home className="size-4" />)}
-      {tab("lessons", ui.lessons, <BookOpen className="size-4" />)}
-      {tab("shelf", ui.shelf, <Sparkles className="size-4" />)}
+    <span className="relative grid size-6 place-items-center">
+      <Home className="size-6" strokeWidth={active ? 2.4 : 2} />
+      {active ? (
+        <span className="pointer-events-none absolute top-[11px] flex gap-0.5" aria-hidden>
+          <span className="size-[3px] rounded-full bg-current" />
+          <span className="size-[3px] rounded-full bg-current" />
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
+export function AppTabs({ active }: { active?: TabId | "play" }) {
+  const ui = useUi();
+  const tab = (id: TabId, label: string, icon: ReactNode) => {
+    const on = active === id;
+    return (
+      <button
+        type="button"
+        className={cn("app-tab", on && "app-tab-on")}
+        aria-current={on ? "page" : undefined}
+        onClick={() => navigate({ id })}
+      >
+        {icon}
+        <span>{label}</span>
+      </button>
+    );
+  };
+  return (
+    <nav className="app-tabs" aria-label={ui.tabsAria} data-app-tabs="1">
+      {tab("home", ui.home, <HouseIcon active={active === "home"} />)}
+      {tab("lessons", ui.lessons, <BookOpen className="size-6" strokeWidth={active === "lessons" ? 2.4 : 2} />)}
+      {tab("shelf", ui.shelf, <Library className="size-6" strokeWidth={active === "shelf" ? 2.4 : 2} />)}
     </nav>
   );
 }
@@ -111,18 +164,52 @@ export function AppTabs({ active }: { active: "home" | "lessons" | "shelf" }) {
 export function HomeLink({ className }: { className?: string }) {
   const ui = useUi();
   return (
-    <button type="button" className={cn("text-sm text-muted", className)} onClick={() => navigate({ id: "home" })}>
-      ← {ui.home}
+    <button
+      type="button"
+      className={cn("grid size-10 place-items-center rounded-full text-ink", className)}
+      onClick={() => navigate({ id: "home" })}
+      aria-label={ui.home}
+    >
+      <ChevronLeft className="size-6" strokeWidth={2.25} />
     </button>
   );
 }
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppScene({
+  scene,
+  children,
+  tabs,
+  className,
+}: {
+  scene: SceneKind;
+  children: ReactNode;
+  tabs?: ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="min-h-dvh w-full lg:px-6 lg:py-5" data-app-shell="1">
-      <div className="mx-auto min-h-dvh w-full max-w-6xl px-4 pb-16 pt-4 lg:min-h-[calc(100dvh-2.5rem)] lg:rounded-[28px] lg:border lg:border-line lg:bg-surface lg:px-8 lg:py-6 lg:shadow-soft">
+    <div className={cn("app-scene", `scene-${scene}`)} data-app-shell="1" data-scene={scene}>
+      <div className={cn("app-phone", className)}>
         {children}
+        {tabs}
       </div>
     </div>
+  );
+}
+
+export function AppShell({ children, scene = "hills" }: { children: ReactNode; scene?: SceneKind }) {
+  return (
+    <AppScene scene={scene}>
+      {children}
+    </AppScene>
+  );
+}
+
+export function WalkMark() {
+  return (
+    <span className="walk-mark" aria-hidden>
+      <span className="walk-bar walk-bar-a" />
+      <span className="walk-bar walk-bar-b" />
+      <span className="walk-bar walk-bar-c" />
+    </span>
   );
 }

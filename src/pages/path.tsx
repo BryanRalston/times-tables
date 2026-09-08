@@ -1,6 +1,4 @@
-import { useUi } from "@/components/chrome";
-import { PokeToy } from "@/components/poke-toy";
-import { Button } from "@/components/ui/button";
+import { AppHeader, AppScene, AppTabs, WalkMark, useUi } from "@/components/chrome";
 import { MISSING_ADDEND_PRICE } from "@/lib/coins";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
@@ -12,41 +10,34 @@ export function PathPage() {
   const loud = coins >= MISSING_ADDEND_PRICE;
 
   return (
-    <div className="mx-auto min-h-dvh max-w-lg px-4 py-8" data-leftover-path="1">
-      <p className="text-center text-xs font-medium uppercase tracking-wide text-muted">{ui.grade3}</p>
-      <h1 className="text-center font-display text-3xl">{ui.path}</h1>
-      <p className="mt-6 text-center text-sm text-muted">
-        {ui.coins}: {coins}
-      </p>
-
-      <button
-        type="button"
-        className="mt-8 w-full rounded-[20px] border border-line px-4 py-3 text-left text-muted"
-        onClick={() => navigate({ id: "play", kind: "activity", activityId: "u1-leftover" })}
-      >
-        <span className="block text-xs font-medium uppercase tracking-wide">{ui.replay}</span>
-        <span className="font-display text-xl text-ink">{ui.numberSense}</span>
-      </button>
-
-      <Button
-        className={cn("mt-4 w-full", !loud && "opacity-90")}
-        size="lg"
-        onClick={() => navigate({ id: "play", kind: "activity", activityId: "u1-friends" })}
-      >
-        <span className="flex w-full items-center justify-between gap-3">
-          <span className="flex items-center gap-3">
-            <PokeToy id="cat" size="sm" className="h-14 w-14" />
-            <span className="font-display text-2xl">{ui.missingAddend}</span>
-          </span>
-          <span className="font-display text-4xl tabular-nums">{MISSING_ADDEND_PRICE}</span>
-        </span>
-      </Button>
-
-      <p className="mt-10 text-center text-xs text-faint">
-        <button type="button" className="text-muted" onClick={() => navigate({ id: "home" })}>
-          {ui.home}
+    <AppScene scene="hills" tabs={<AppTabs active="home" />}>
+      <AppHeader />
+      <div className="px-4 pt-2" data-leftover-path="1">
+        <button
+          type="button"
+          className="ghost-replay"
+          onClick={() => navigate({ id: "play", kind: "activity", activityId: "u1-leftover" })}
+        >
+          {ui.replay} · {ui.numberSense}
         </button>
-      </p>
-    </div>
+      </div>
+      <section className="continue-card">
+        <WalkMark />
+        <h2 className="font-display text-[1.65rem] font-semibold leading-tight text-ink">{ui.missingAddend}</h2>
+        <p className="mt-1 text-sm font-semibold text-muted">
+          {ui.coins} · {MISSING_ADDEND_PRICE}
+        </p>
+        <button
+          type="button"
+          className={cn("start-loud", !loud && "opacity-90")}
+          onClick={() => navigate({ id: "play", kind: "activity", activityId: "u1-friends" })}
+        >
+          {ui.start}
+        </button>
+      </section>
+      <button type="button" className="all-units" onClick={() => navigate({ id: "lessons" })}>
+        {ui.allUnits}
+      </button>
+    </AppScene>
   );
 }

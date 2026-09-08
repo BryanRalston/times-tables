@@ -1,8 +1,8 @@
+import { Check } from "lucide-react";
 import { useState } from "react";
-import { AppHeader, AppShell, AppTabs, useUi } from "@/components/chrome";
+import { AppHeader, AppScene, AppTabs, useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
 import { PokeToy } from "@/components/poke-toy";
-import { Button } from "@/components/ui/button";
 import { squisheePrice } from "@/lib/coins";
 import { COMMON_SQUISHEES, RARE_SQUISHEES, squisheeSrc, type Squishee } from "@/lib/squishees";
 import { playTap } from "@/lib/sound";
@@ -14,8 +14,8 @@ export function ShelfPage() {
   const coins = useProgress((s) => s.coins);
   const buySquishee = useProgress((s) => s.buySquishee);
   const ui = useUi();
-  const haveCommon = COMMON_SQUISHEES.filter((s) => earned.includes(s.id)).length;
-  const haveRare = RARE_SQUISHEES.filter((s) => earned.includes(s.id)).length;
+  const recent = earned.length ? earned[earned.length - 1] : null;
+  const recentToy = [...COMMON_SQUISHEES, ...RARE_SQUISHEES].find((s) => s.id === recent);
 
   function buy(id: string) {
     const r = buySquishee(id);
@@ -24,30 +24,32 @@ export function ShelfPage() {
   }
 
   return (
-    <AppShell>
-      <AppHeader />
-      <AppTabs active="shelf" />
-      <p className="mb-3 text-center text-sm font-medium text-teal">
-        {ui.coins}: {coins}
-      </p>
-      <h2 className="font-display text-2xl">{ui.squisheeShelf}</h2>
-      <p className="mb-4 text-sm text-muted">{ui.shelfBlurb(haveCommon, COMMON_SQUISHEES.length)}</p>
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-        {COMMON_SQUISHEES.map((s) => (
-          <ShopCard key={s.id} s={s} got={earned.includes(s.id)} coins={coins} onBuy={buy} />
-        ))}
+    <AppScene scene="shelf" tabs={<AppTabs active="shelf" />}>
+      <AppHeader variant="shelf" title={ui.shelf} />
+      <div className="flex-1 overflow-y-auto px-4 pb-3">
+        {recentToy ? (
+          <div className="mb-2 flex justify-center">
+            <ShopCard s={recentToy} got coins={coins} onBuy={buy} featured />
+          </div>
+        ) : null}
+        <h2 className="shelf-section">
+          <span aria-hidden>★</span> {ui.commons}
+        </h2>
+        <div className="grid grid-cols-3 gap-2.5">
+          {COMMON_SQUISHEES.map((s) => (
+            <ShopCard key={s.id} s={s} got={earned.includes(s.id)} coins={coins} onBuy={buy} />
+          ))}
+        </div>
+        <h2 className="shelf-section">
+          <span aria-hidden>◇</span> {ui.rares}
+        </h2>
+        <div className="grid grid-cols-3 gap-2.5">
+          {RARE_SQUISHEES.map((s) => (
+            <ShopCard key={s.id} s={s} got={earned.includes(s.id)} coins={coins} onBuy={buy} />
+          ))}
+        </div>
       </div>
-
-      <h2 className="mt-8 font-display text-2xl">{ui.rareShelf}</h2>
-      <p className="mb-4 text-sm text-muted">
-        {ui.rareBlurb} {haveRare} / {RARE_SQUISHEES.length}
-      </p>
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-        {RARE_SQUISHEES.map((s) => (
-          <ShopCard key={s.id} s={s} got={earned.includes(s.id)} coins={coins} onBuy={buy} />
-        ))}
-      </div>
-    </AppShell>
+    </AppScene>
   );
 }
 
@@ -57,12 +59,14 @@ export function ShopCard({
   coins,
   onBuy,
   cheer = false,
+  featured = false,
 }: {
   s: Squishee;
   got: boolean;
   coins: number;
   onBuy: (id: string) => boolean | void;
   cheer?: boolean;
+  featured?: boolean;
 }) {
   const ui = useUi();
   const [justBought, setJustBought] = useState(cheer);
@@ -70,13 +74,7 @@ export function ShopCard({
   const canBuy = !got && coins >= price;
   const playCheer = justBought;
   return (
-    <div
-      className={cn(
-        "frost flex flex-col items-center overflow-visible rounded-[20px] border p-2",
-        got && s.rarity === "rare" ? "border-star shadow-soft" : "border-line",
-        got && "shadow-soft",
-      )}
-    >
+    <div className={cn("shelf-card", featured && "w-40", got && s.rarity === "rare" && "rare-glow")}>
       {got ? (
         <PokeToy
           id={s.id}
@@ -90,12 +88,16 @@ export function ShopCard({
           <MagentaImg src={squisheeSrc(s.id)} alt="" className="squishee-silhouette pointer-events-none h-20 w-20" />
         </span>
       )}
-      <span className="mt-1 text-center text-xs font-medium">{got ? s.name : ui.mystery}</span>
-      {got && s.rarity === "rare" ? <span className="text-[10px] font-medium text-star">{ui.rareBadge}</span> : null}
-      {got ? null : (
-        <Button
-          size="sm"
-          className="mt-2 h-9 w-full px-1 text-xs"
+      <span className="mt-1 text-center text-xs font-bold text-plum">{got ? s.name : ui.mystery}</span>
+      {got ? (
+        <span className="owned-pill">
+          <Check className="size-3.5" strokeWidth={3} />
+          {ui.owned}
+        </span>
+      ) : (
+        <button
+          type="button"
+          className="shelf-price"
           disabled={!canBuy}
           title={canBuy ? undefined : ui.notEnough}
           onClick={() => {
@@ -103,8 +105,9 @@ export function ShopCard({
           }}
           aria-label={`${ui.buy}, ${price} ${ui.coins}`}
         >
-          {ui.buy} · {price}
-        </Button>
+          <span className="coin-face !h-4 !w-4 text-[0.55rem]" aria-hidden />
+          {price}
+        </button>
       )}
     </div>
   );

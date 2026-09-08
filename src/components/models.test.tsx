@@ -193,7 +193,7 @@ describe("boards", () => {
     expect(src).toContain("pointerup");
     expect(src).toContain("bindTake");
     expect(src).toContain("missTake");
-    expect(src).toContain("lg:size-12");
+    expect(src).toContain("size-11");
     expect(src).toContain("leftover-dot");
     expect(src).toContain("leftover-eq");
     expect(src).toContain("onClick={takeGroup}");
@@ -204,7 +204,7 @@ describe("boards", () => {
     const q = welcomeFirst(rngFromSeed(1));
     const html = renderToStaticMarkup(<Board {...stub(q)} status="correct" interacted />);
     expect(html).toContain("data-n-isolate");
-    expect(html).toContain(`n = ${q.answer}`);
+    expect(html).not.toContain(`n = ${q.answer}`);
     expect(html).toContain('aria-label="leftover"');
     expect(html).not.toContain(`n is ${q.answer}`);
     expect(html).not.toMatch(/<p[^>]*>n<\/p>/);
