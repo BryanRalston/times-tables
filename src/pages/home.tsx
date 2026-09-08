@@ -8,13 +8,6 @@ import { unitText } from "@/lib/labels";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 
-const FAMILIES = [
-  { id: "u1-leftover", label: "numberSense" as const },
-  { id: "u1-friends", label: "missingAddend" as const },
-  { id: "u7-take", label: "missingSubtrahend" as const },
-  { id: "u6-facts", label: "timesFacts" as const },
-];
-
 export function HomePage() {
   const classUnitId = useProgress((s) => s.classUnitId);
   const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
@@ -85,26 +78,6 @@ export function HomePage() {
       <button type="button" className="all-units" onClick={() => navigate({ id: "lessons" })}>
         {ui.allUnits}
       </button>
-
-      <div className="year-beads" data-year-beads="1">
-        {FAMILIES.map((f, i) => {
-          const played = Boolean(activities[f.id]?.plays);
-          const now = !played && (i === 0 || Boolean(activities[FAMILIES[i - 1].id]?.plays));
-          return (
-            <button
-              key={f.id}
-              type="button"
-              className="year-bead"
-              data-now={now ? "1" : "0"}
-              data-done={played ? "1" : "0"}
-              onClick={() => navigate({ id: "play", kind: "activity", activityId: f.id })}
-            >
-              <i />
-              {ui[f.label]}
-            </button>
-          );
-        })}
-      </div>
       <p className="mt-auto pb-2 text-center text-[11px] text-faint">{ui.nothingLeaves}</p>
     </AppScene>
   );

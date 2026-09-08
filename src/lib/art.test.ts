@@ -1,6 +1,11 @@
+import { existsSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { asset } from "./art";
 import { squisheeSrc } from "./squishees";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
 
 describe("asset URLs", () => {
   it("prefixes BASE_URL so public squishees resolve under /times-tables/", () => {
@@ -8,5 +13,7 @@ describe("asset URLs", () => {
     expect(asset("/squishees/cat.png")).toBe("/times-tables/squishees/cat.png");
     expect(squisheeSrc("cat")).toBe("/times-tables/squishees/cat.png");
     expect(squisheeSrc("shark")).toMatch(/\/times-tables\/squishees\/shark\.png$/);
+    expect(asset("art/home-peek.png")).toBe("/times-tables/art/home-peek.png");
+    expect(existsSync(join(HERE, "../../public/art/home-peek.png"))).toBe(true);
   });
 });

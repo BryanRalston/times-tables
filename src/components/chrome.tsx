@@ -1,10 +1,9 @@
 import { BookOpen, ChevronLeft, Home, Library, Settings2, Volume2, VolumeX } from "lucide-react";
 import type { ReactNode } from "react";
-import { MagentaImg } from "@/components/magenta-video";
+import { ART } from "@/lib/art";
 import { parseLocale, UI } from "@/lib/i18n";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
-import { squisheeSrc } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
 export type SceneKind = "hills" | "play" | "shelf";
@@ -229,6 +228,7 @@ export function WalkMark() {
       <span className="walk-spark walk-spark-a" />
       <span className="walk-spark walk-spark-b" />
       <span className="walk-spark walk-spark-c" />
+      <span className="walk-spark walk-spark-d" />
       <span className="walk-bar walk-bar-a" />
       <span className="walk-bar walk-bar-b" />
       <span className="walk-bar walk-bar-c" />
@@ -237,13 +237,11 @@ export function WalkMark() {
 }
 
 export function ContinueStage({ children, peek = false }: { children: ReactNode; peek?: boolean }) {
-  const owned = useProgress((s) => s.squishees);
-  const id = owned.length ? owned[owned.length - 1] : "peach";
   return (
     <div className={cn("continue-stage", peek && "continue-stage-peek")}>
       {peek ? (
         <span className="continue-peek" data-continue-peek="1" aria-hidden>
-          <MagentaImg src={squisheeSrc(id)} alt="" className="continue-peek-art" />
+          <img src={ART.homePeek} alt="" className="continue-peek-art" draggable={false} />
         </span>
       ) : null}
       {children}
