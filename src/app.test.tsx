@@ -85,10 +85,12 @@ function expectLessonsPath(html: string) {
   expect(html).toContain("Fraction Forest");
   expect(html).toContain('data-path-hopper="peach"');
   expect(html).toContain('data-path-unit="u1"');
-  expect(html).toContain('data-path-unit="u13"');
-  expect(html).toContain("Start");
-  expect(html).not.toContain("g4-");
-  expect(html).not.toContain("data-lessons-continue");
+    expect(html).toContain('data-path-unit="u13"');
+    expect(html).toContain("Start");
+    expect(html).toContain("data-candy-fog");
+    expect(html).toContain('data-path-fog="1"');
+    expect(html).not.toContain("g4-");
+    expect(html).not.toContain("data-lessons-continue");
 }
 
 describe("first-visit Home door", () => {
@@ -225,6 +227,10 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-map");
     expect(css).toContain(".candy-hopper-art");
     expect(css).toContain("@keyframes candy-hop");
+    expect(css).toContain("@keyframes candy-travel-hop");
+    expect(css).toContain(".candy-fog");
+    expect(css).toContain(".candy-sprinkle");
+    expect(css).toContain("height: 96rem");
     expect(css).toContain(".walk-spark");
     expect(css).toContain("@keyframes peek-bob");
     expect(css).toContain(".continue-peek-left");
