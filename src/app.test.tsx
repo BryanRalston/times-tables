@@ -52,10 +52,11 @@ function expectHomeShell(html: string) {
   expect(html).toContain("Home, lessons, and shelf");
   expect(html).toContain("data-continue-card");
   expect(html).toContain("data-continue-peek");
+  expect(html).toContain('data-peek-id="peach"');
   expect(html).toContain("data-walk-mark");
   expect(html).toContain("data-scene-land");
-  expect(html).toContain("home-peek.png");
-  expect(html).not.toContain("peach.png");
+  expect(html).toContain("peach.png");
+  expect(html).not.toContain("home-peek.png");
   expect(html).not.toContain("avocado.png");
   expect(html).not.toContain("mushroom.png");
   expect(html).toContain("data-app-shell");
@@ -91,6 +92,10 @@ describe("first-visit Home door", () => {
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
     expect(html).toContain("data-lessons-continue");
+    expect(html).toContain("data-continue-peek");
+    expect(html).toContain('data-peek-id="peach"');
+    expect(html).toContain("peach.png");
+    expect(html).not.toContain("home-peek.png");
     expect(html).toMatch(/Today(?:'|&#x27;)s walk/);
     expect(html).toContain("Start");
     expect(html).toContain("Home, lessons, and shelf");
@@ -113,6 +118,8 @@ describe("first-visit Home door", () => {
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
     expect(html).toContain("data-lessons-continue");
+    expect(html).toContain("data-continue-peek");
+    expect(html).toContain("peach.png");
     expect(html).toMatch(/Today(?:'|&#x27;)s walk/);
     expect(html).toContain("Home, lessons, and shelf");
     expect(html).not.toContain("Every unit, every activity");
@@ -173,9 +180,12 @@ describe("first-visit Home door", () => {
     expect(chrome).toContain("data-scene-land");
     expect(chrome).toContain("walk-spark");
     expect(chrome).toContain("continue-peek");
-    expect(chrome).toContain("ART.homePeek");
-    expect(chrome).not.toContain("squisheeSrc");
-    expect(chrome).not.toContain("peach");
+    expect(chrome).toContain('squisheeSrc("peach")');
+    expect(chrome).not.toContain("ART.homePeek");
+    expect(chrome).not.toContain("home-peek");
+    expect(chrome).not.toContain("lastOwned");
+    expect(chrome).not.toContain("avocado");
+    expect(chrome).not.toContain("mushroom");
     expect(chrome).not.toContain("max-w-6xl");
     expect(chrome).not.toMatch(/Score\s*\/\s*Streak/);
     expect(chrome).not.toMatch(/\bstars\b/);
@@ -194,6 +204,8 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".app-scene");
     expect(css).toContain(".scene-hill");
     expect(css).toContain(".walk-spark");
+    expect(css).toContain("@keyframes peek-bob");
+    expect(css).toContain("animation: none !important");
     expect(css).toContain(".keypad-dock");
     expect(css).toContain(".squishee-silhouette");
     expect(css).toContain("[data-leftover-board] .leftover-dot");
