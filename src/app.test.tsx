@@ -230,6 +230,8 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-overlay");
     expect(css).toContain(".candy-hopper-art");
     expect(css).toContain("@keyframes candy-hop");
+    expect(css).toContain("@keyframes candy-prop-sway");
+    expect(css).toContain("@keyframes candy-trail-peek");
     expect(css).toContain("transform-origin: 50% 82%");
     expect(css).not.toContain("left 0.72s");
     expect(css).toContain(".candy-fog");

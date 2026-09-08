@@ -30,6 +30,13 @@ describe("CandyPath", () => {
     expect(html).toContain("candy-zones/tall-map.png");
     expect(html).toContain('data-path-fog="1"');
     expect(html).toContain("data-path-tall");
+    expect(html).toContain('data-candy-prop="waterfall"');
+    expect(html).toContain('data-candy-prop="tenframe-a"');
+    expect(html).toContain('data-candy-prop="tenframe-b"');
+    expect(html).toContain('data-candy-prop="palm"');
+    expect(html).toContain('data-candy-prop="coins"');
+    expect(html).toContain('data-candy-prop="fraction-pie"');
+    expect(html).toContain("candy-zones/overlays/waterfall.png");
     expect((html.match(/data-path-pad="1"/g) ?? []).length).toBe(13);
     expect((html.match(/data-path-unit="/g) ?? []).length).toBe(13);
     expect(html).not.toContain("data-candy-plates-blend");

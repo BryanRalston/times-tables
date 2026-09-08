@@ -4,16 +4,23 @@ import { useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
 import { asset } from "@/lib/art";
 import { hopAlong, hopProgressAt, hopTravelMs, hopUnitStops, restHopPose, type HopPose } from "@/lib/candy-hop";
+import { todayIso } from "@/lib/calendar";
 import { UNITS } from "@/lib/curriculum";
 import {
   GRADE3_PATH_NODES,
   GRADE3_PATH_PADS,
   TALL_MAP_FILE,
+  TALL_MAP_OVERLAY_DIR,
+  TALL_MAP_OVERLAYS,
+  TRAIL_PEEK_SPOTS,
   displayUnitStars,
   fogCoverPercent,
   mapToViewPos,
   nodeIsFogged,
+  overlayIsVeiled,
+  overlayMotionClass,
   zoneForUnitNumber,
+  zoneIsFogged,
   zoneLabelIsFogged,
   type PathZone,
 } from "@/lib/grade-path";
@@ -21,7 +28,7 @@ import { parseLocale } from "@/lib/i18n";
 import { unitText } from "@/lib/labels";
 import { unitStatus, type NodeStatus } from "@/lib/path";
 import { unitMaxStars, unitStars, useProgress } from "@/lib/progress";
-import { pathHopperId, squisheeSrc } from "@/lib/squishees";
+import { peekTurn, pathHopperId, squisheeSrc } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
 function zoneLabel(zone: PathZone, ui: ReturnType<typeof useUi>): string {
@@ -53,6 +60,62 @@ function openTone(zone: PathZone, n: number): string {
       return _never;
     }
   }
+}
+
+function usePrefersReducedMotion(): boolean {
+  const [reduce, setReduce] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReduce(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+  return reduce;
+}
+
+function trailPeekHash(iso: string, nowNumber: number): number {
+  let h = 2166136261;
+  for (let i = 0; i < iso.length; i++) h = Math.imul(h ^ iso.charCodeAt(i), 16777619);
+  return (h + nowNumber * 131) >>> 0;
+}
+
+function TrailPeek({ nowNumber }: { nowNumber: number }) {
+  const reduce = usePrefersReducedMotion();
+  const [armed, setArmed] = useState(false);
+  const iso = todayIso();
+  const hash = trailPeekHash(iso, nowNumber);
+  const clear = TRAIL_PEEK_SPOTS.filter((s) => !zoneIsFogged(s.zone, nowNumber));
+  const spot = clear.length ? clear[hash % clear.length] : undefined;
+
+  useEffect(() => {
+    if (reduce || !spot) {
+      setArmed(false);
+      return;
+    }
+    const t = window.setTimeout(() => setArmed(true), 3000 + (hash % 2600));
+    return () => window.clearTimeout(t);
+  }, [hash, reduce, spot]);
+
+  if (reduce || !armed || !spot) return null;
+  const view = mapToViewPos(spot.map);
+  const turn = peekTurn(hash % 19);
+  return (
+    <span
+      className="candy-trail-peek"
+      style={{ left: `${view.x}%`, top: `${view.y}%` }}
+      data-trail-peek={spot.id}
+      data-peek-id={turn.id}
+      aria-hidden
+      onAnimationEnd={(e) => {
+        if (!(e.target instanceof HTMLElement)) return;
+        if (!e.target.classList.contains("candy-trail-peek-art")) return;
+        setArmed(false);
+      }}
+    >
+      <MagentaImg src={squisheeSrc(turn.id)} alt="" className="candy-trail-peek-art" />
+    </span>
+  );
 }
 
 function nodeTone(status: NodeStatus, zone: PathZone, n: number): string {
@@ -92,17 +155,20 @@ export function CandyPath({
   const fogH = fogCoverPercent(current.number);
 
   useEffect(() => {
-    const node = document.querySelector<HTMLElement>("[data-path-status='now']");
-    const scroller = node?.closest(".candy-scroll");
-    if (node && scroller instanceof HTMLElement) {
-      const nr = node.getBoundingClientRect();
+    const hopper = document.querySelector<HTMLElement>("[data-path-hopper]");
+    const scroller = hopper?.closest(".candy-scroll");
+    if (hopper && scroller instanceof HTMLElement) {
+      const hr = hopper.getBoundingClientRect();
       const sr = scroller.getBoundingClientRect();
-      scroller.scrollTo({
-        top: scroller.scrollTop + (nr.top - sr.top) - sr.height * 0.42,
-        behavior: prevNumber.current === current.number ? "auto" : "smooth",
-      });
+      const delta = hr.top - (sr.top + sr.height * 0.46);
+      if (Math.abs(delta) >= 5) {
+        if (travel) scroller.scrollTop += delta * 0.28;
+        else scroller.scrollTop += delta;
+      }
     }
+  }, [pose.y, travel]);
 
+  useEffect(() => {
     const from = prevNumber.current;
     const to = current.number;
     if (from === to) {
@@ -180,6 +246,24 @@ export function CandyPath({
           {zoneLabel("forest", ui)}
         </p>
 
+        {TALL_MAP_OVERLAYS.map((prop) => {
+          const view = mapToViewPos(prop.map);
+          const veiled = overlayIsVeiled(prop.map.y, current.number);
+          return (
+            <span
+              key={prop.id}
+              className={cn("candy-prop", overlayMotionClass(prop.motion), veiled && "candy-prop-veil")}
+              style={{ left: `${view.x}%`, top: `${view.y}%`, width: `${prop.width}%` }}
+              data-candy-prop={prop.id}
+              data-candy-prop-zone={prop.zone}
+              data-candy-prop-veil={veiled ? "1" : "0"}
+              aria-hidden
+            >
+              <img src={asset(`${TALL_MAP_OVERLAY_DIR}/${prop.file}`)} alt="" draggable={false} decoding="async" />
+            </span>
+          );
+        })}
+
         {GRADE3_PATH_PADS.map((pad) => {
           const unit = UNITS[pad.unitNumber - 1];
           if (!unit) return null;
@@ -238,6 +322,8 @@ export function CandyPath({
         >
           <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
         </div>
+
+        <TrailPeek nowNumber={current.number} />
 
         {fogH > 0 ? (
           <div className="candy-fog" data-candy-fog="1" data-candy-mist="1" style={{ height: `${fogH}%` }} aria-hidden>

@@ -1033,6 +1033,133 @@ details > summary::-webkit-details-marker {
   margin-top: 0.12rem;
   color: #7a7a84;
 }
+.candy-prop {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  transform-origin: 50% 88%;
+  pointer-events: none;
+}
+.candy-prop img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.candy-prop-veil {
+  opacity: 0.78;
+}
+.candy-prop-bob {
+  animation: candy-prop-bob 3.8s ease-in-out infinite;
+}
+.candy-prop-sway {
+  animation: candy-prop-sway 4.6s ease-in-out infinite;
+}
+.candy-prop-shimmer {
+  animation: candy-prop-shimmer 2.8s ease-in-out infinite;
+}
+.candy-prop-fall {
+  animation: candy-prop-fall 2.4s ease-in-out infinite;
+}
+.candy-prop-fall::after {
+  content: "";
+  position: absolute;
+  left: 28%;
+  right: 28%;
+  top: 10%;
+  bottom: 30%;
+  background: linear-gradient(180deg, transparent 0%, rgb(255 255 255 / 0.28) 46%, transparent 100%);
+  mix-blend-mode: soft-light;
+  animation: candy-fall-sheen 1.7s linear infinite;
+  pointer-events: none;
+}
+.candy-trail-peek {
+  position: absolute;
+  z-index: 3;
+  width: 2.7rem;
+  height: 2.15rem;
+  transform: translate(-50%, -10%);
+  overflow: hidden;
+  pointer-events: none;
+}
+.candy-trail-peek-art {
+  display: block;
+  width: 2.55rem;
+  height: 2.55rem;
+  margin: 0 auto;
+  object-fit: contain;
+  transform: translateY(2.2rem);
+  animation: candy-trail-peek 6.2s 1;
+}
+@keyframes candy-prop-bob {
+  0%,
+  100% {
+    transform: translate(-50%, -50%);
+  }
+  50% {
+    transform: translate(-50%, calc(-50% - 0.2rem));
+  }
+}
+@keyframes candy-prop-sway {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) rotate(-2.1deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(2.3deg);
+  }
+}
+@keyframes candy-prop-shimmer {
+  0%,
+  100% {
+    transform: translate(-50%, -50%);
+    filter: brightness(1);
+  }
+  50% {
+    transform: translate(-50%, calc(-50% - 0.14rem));
+    filter: brightness(1.08);
+  }
+}
+@keyframes candy-prop-fall {
+  0%,
+  100% {
+    transform: translate(-50%, -50%);
+  }
+  50% {
+    transform: translate(-50%, calc(-50% + 0.12rem));
+  }
+}
+@keyframes candy-fall-sheen {
+  0% {
+    transform: translateY(-18%);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(22%);
+    opacity: 0.15;
+  }
+}
+@keyframes candy-trail-peek {
+  0% {
+    transform: translateY(2.2rem);
+    animation-timing-function: cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+  16% {
+    transform: translateY(0.12rem);
+    animation-timing-function: ease-out;
+  }
+  20%,
+  40% {
+    transform: translateY(0.34rem);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  56%,
+  100% {
+    transform: translateY(2.2rem);
+  }
+}
 .candy-hopper {
   position: absolute;
   z-index: 5;
@@ -1134,6 +1261,14 @@ details > summary::-webkit-details-marker {
   }
   .candy-hopper {
     transition: none !important;
+  }
+  .candy-prop-bob,
+  .candy-prop-sway,
+  .candy-prop-shimmer,
+  .candy-prop-fall,
+  .candy-prop-fall::after,
+  .candy-trail-peek-art {
+    animation: none !important;
   }
 }
 

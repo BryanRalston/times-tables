@@ -6,7 +6,9 @@ import {
   GRADE3_PATH_PADS,
   TALL_MAP_DECORATIVE_PAD,
   TALL_MAP_FILE,
+  TALL_MAP_OVERLAYS,
   TALL_MAP_SIZE,
+  TRAIL_PEEK_SPOTS,
   displayUnitStars,
   fogCoverPercent,
   lastClearUnitNumber,
@@ -55,6 +57,17 @@ describe("grade path", () => {
     expect(displayUnitStars(0, 15)).toBe(0);
     expect(displayUnitStars(5, 15)).toBe(1);
     expect(displayUnitStars(15, 15)).toBe(3);
+    expect(TALL_MAP_OVERLAYS.map((p) => p.id)).toEqual([
+      "tenframe-a",
+      "tenframe-b",
+      "waterfall",
+      "palm",
+      "coins",
+      "fraction-pie",
+    ]);
+    expect(TALL_MAP_OVERLAYS.every((p) => p.map.x > 38 && p.map.x < 62)).toBe(true);
+    expect(TRAIL_PEEK_SPOTS).toHaveLength(3);
+    expect(TRAIL_PEEK_SPOTS.every((p) => p.map.x > 38 && p.map.x < 62)).toBe(true);
   });
 
   it("hides the far trail under fog and keeps a short lookahead", () => {

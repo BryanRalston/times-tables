@@ -124,3 +124,57 @@ export function fogCoverPercent(nowNumber: number, nodes: readonly PathNodePos[]
   if (!lastVisible) return 0;
   return Math.max(6, lastVisible.y - 6);
 }
+
+export type OverlayMotion = "bob" | "sway" | "shimmer" | "fall";
+
+export type PathOverlay = {
+  id: string;
+  file: string;
+  zone: PathZone;
+  map: PathNodePos;
+  width: number;
+  motion: OverlayMotion;
+};
+
+export const TALL_MAP_OVERLAY_DIR = "candy-zones/overlays";
+
+/**
+ * PNG-space props in the cover-crop gutters, beside the trail.
+ * Visible x is roughly 36.7–63.3 of the 1536px art.
+ */
+export const TALL_MAP_OVERLAYS: readonly PathOverlay[] = [
+  { id: "tenframe-a", file: "tenframe.png", zone: "meadow", map: { x: 40.15, y: 88.35 }, width: 20, motion: "bob" },
+  { id: "tenframe-b", file: "tenframe.png", zone: "meadow", map: { x: 59.55, y: 77.85 }, width: 16, motion: "bob" },
+  { id: "waterfall", file: "waterfall.png", zone: "cove", map: { x: 39.2, y: 51.15 }, width: 20, motion: "fall" },
+  { id: "palm", file: "palm.png", zone: "cove", map: { x: 60.45, y: 56.85 }, width: 15, motion: "sway" },
+  { id: "coins", file: "coins.png", zone: "cove", map: { x: 60.15, y: 42.55 }, width: 13, motion: "shimmer" },
+  { id: "fraction-pie", file: "fraction-pie.png", zone: "forest", map: { x: 39.55, y: 14.35 }, width: 13, motion: "sway" },
+];
+
+export const TRAIL_PEEK_SPOTS: readonly { id: string; zone: PathZone; map: PathNodePos }[] = [
+  { id: "meadow", zone: "meadow", map: { x: 58.85, y: 91.15 } },
+  { id: "cove", zone: "cove", map: { x: 39.75, y: 46.55 } },
+  { id: "forest", zone: "forest", map: { x: 59.95, y: 18.85 } },
+];
+
+export function overlayIsVeiled(mapY: number, nowNumber: number): boolean {
+  const fog = fogCoverPercent(nowNumber);
+  return fog > 0 && mapY < fog - 2;
+}
+
+export function overlayMotionClass(motion: OverlayMotion): string {
+  switch (motion) {
+    case "bob":
+      return "candy-prop-bob";
+    case "sway":
+      return "candy-prop-sway";
+    case "shimmer":
+      return "candy-prop-shimmer";
+    case "fall":
+      return "candy-prop-fall";
+    default: {
+      const _never: never = motion;
+      return _never;
+    }
+  }
+}
