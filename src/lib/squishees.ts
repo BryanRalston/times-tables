@@ -141,6 +141,15 @@ export function peekTurn(index: number): { id: string; slot: PeekSlot } {
   return { id, slot };
 }
 
+/** Lessons trail pop: rotate faces, but never clone the hopper sitting on the pad. */
+export function trailPeekFace(hash: number, hopperId: string): { id: string; slot: PeekSlot } {
+  const n = PEEK_SQUISHEE_IDS.length;
+  if (n === 0) return peekTurn(0);
+  let idx = ((hash % n) + n) % n;
+  if (PEEK_SQUISHEE_IDS[idx] === hopperId && n > 1) idx = (idx + 1) % n;
+  return peekTurn(idx);
+}
+
 export function squisheeById(id: string): Squishee | undefined {
   return SQUISHEES.find((s) => s.id === id);
 }

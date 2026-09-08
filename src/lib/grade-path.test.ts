@@ -8,12 +8,19 @@ import {
   TALL_MAP_FILE,
   TALL_MAP_OVERLAYS,
   TALL_MAP_SIZE,
+  TRAIL_PEEK_ARM_MS,
+  TRAIL_PEEK_ARM_SPREAD_MS,
+  TRAIL_PEEK_MIN_PAD_DIST,
+  TRAIL_PEEK_NEARBY_Y,
   TRAIL_PEEK_SPOTS,
   displayUnitStars,
   fogCoverPercent,
   lastClearUnitNumber,
   mapToViewPos,
+  nearbyTrailPeekSpots,
   nodeIsFogged,
+  pickTrailPeekSpot,
+  trailPeekHash,
   zoneForUnitNumber,
   zoneIsFogged,
   zoneLabelIsFogged,
@@ -66,8 +73,28 @@ describe("grade path", () => {
       "fraction-pie",
     ]);
     expect(TALL_MAP_OVERLAYS.every((p) => p.map.x > 38 && p.map.x < 62)).toBe(true);
-    expect(TRAIL_PEEK_SPOTS).toHaveLength(3);
+    expect(TRAIL_PEEK_SPOTS).toHaveLength(9);
     expect(TRAIL_PEEK_SPOTS.every((p) => p.map.x > 38 && p.map.x < 62)).toBe(true);
+    expect(TRAIL_PEEK_SPOTS.every((p) => GRADE3_PATH_PADS.every((pad) => Math.hypot(pad.map.x - p.map.x, pad.map.y - p.map.y) >= TRAIL_PEEK_MIN_PAD_DIST))).toBe(true);
+    expect(TRAIL_PEEK_ARM_MS + TRAIL_PEEK_ARM_SPREAD_MS).toBeLessThan(2000);
+  });
+
+  it("picks exactly one nearby hide spot on the clear stretch for every unit", () => {
+    for (let n = 1; n <= GRADE3_PATH_NODES.length; n++) {
+      const nowY = GRADE3_PATH_NODES[n - 1]!.y;
+      const nearby = nearbyTrailPeekSpots(n);
+      expect(nearby.length).toBeGreaterThan(0);
+      expect(nearby.every((s) => Math.abs(s.map.y - nowY) <= TRAIL_PEEK_NEARBY_Y)).toBe(true);
+      const picked = pickTrailPeekSpot(n, trailPeekHash("2026-09-08", n));
+      expect(picked).toBeDefined();
+      expect(nearby).toContainEqual(picked);
+    }
+    const early = pickTrailPeekSpot(1, 0);
+    expect(early?.zone).toBe("meadow");
+    const midIds = new Set(
+      [0, 1, 2, 3, 4, 5].map((h) => pickTrailPeekSpot(5, h)?.id).filter(Boolean),
+    );
+    expect(midIds.size).toBeGreaterThan(1);
   });
 
   it("hides the far trail under fog and keeps a short lookahead", () => {

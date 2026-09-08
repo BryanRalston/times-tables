@@ -1,5 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { todayIso } from "@/lib/calendar";
+import { pickTrailPeekSpot, trailPeekHash } from "@/lib/grade-path";
 import { CandyPath } from "./candy-path";
 
 describe("CandyPath", () => {
@@ -50,6 +52,13 @@ describe("CandyPath", () => {
     expect(html).not.toContain("sailboat");
     expect(html).not.toContain("candy-sprinkle");
     expect(html).not.toContain("g4-");
+    const peek = pickTrailPeekSpot(5, trailPeekHash(todayIso(), 5));
+    expect(peek).toBeDefined();
+    expect(html).toContain(`data-trail-peek="${peek!.id}"`);
+    expect((html.match(/data-trail-peek="/g) ?? []).length).toBe(1);
+    expect(html).toContain('data-peek-armed="0"');
+    expect(html).not.toContain("data-squishee-shop");
+    expect(html).not.toContain("data-trail-collect");
   });
 
   it("keeps nearby nodes clear and fogs the far forest on unit 1", () => {
@@ -61,5 +70,9 @@ describe("CandyPath", () => {
     expect(html).toMatch(/data-path-unit="u4"[^>]*data-path-fog="1"/);
     expect(html).toMatch(/data-path-unit="u13"[^>]*data-path-fog="1"/);
     expect(html).toContain("Mist hides the path ahead");
+    const peek = pickTrailPeekSpot(1, trailPeekHash(todayIso(), 1));
+    expect(peek?.zone).toBe("meadow");
+    expect(html).toContain(`data-trail-peek="${peek!.id}"`);
+    expect((html.match(/data-trail-peek="/g) ?? []).length).toBe(1);
   });
 });
