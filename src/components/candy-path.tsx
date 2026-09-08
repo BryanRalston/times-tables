@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
 import { asset } from "@/lib/art";
+import { hopAlong, hopProgressAt, hopTravelMs, hopUnitStops, restHopPose, type HopPose } from "@/lib/candy-hop";
 import { UNITS } from "@/lib/curriculum";
 import {
   GRADE3_PATH_NODES,
@@ -82,11 +83,12 @@ export function CandyPath({
   const locale = parseLocale(useProgress((s) => s.locale));
   const owned = useProgress((s) => s.squishees);
   const hopperId = pathHopperId(owned);
-  const prevSuggested = useRef(suggestedId);
-  const [travel, setTravel] = useState(false);
-
   const current = UNITS.find((u) => u.id === suggestedId) ?? UNITS[0]!;
-  const currentPos = mapToViewPos(GRADE3_PATH_NODES[current.number - 1] ?? GRADE3_PATH_NODES[0]!);
+  const restPos = mapToViewPos(GRADE3_PATH_NODES[current.number - 1] ?? GRADE3_PATH_NODES[0]!);
+  const prevNumber = useRef(current.number);
+  const [travelFrom, setTravelFrom] = useState(current.number);
+  const [travel, setTravel] = useState(false);
+  const [pose, setPose] = useState<HopPose>(() => restHopPose(restPos));
   const fogH = fogCoverPercent(current.number);
 
   useEffect(() => {
@@ -97,15 +99,46 @@ export function CandyPath({
       const sr = scroller.getBoundingClientRect();
       scroller.scrollTo({
         top: scroller.scrollTop + (nr.top - sr.top) - sr.height * 0.42,
-        behavior: "auto",
+        behavior: prevNumber.current === current.number ? "auto" : "smooth",
       });
     }
-    if (prevSuggested.current === suggestedId) return;
-    prevSuggested.current = suggestedId;
+
+    const from = prevNumber.current;
+    const to = current.number;
+    if (from === to) {
+      setPose(restHopPose(restPos));
+      return;
+    }
+
+    const stops = hopUnitStops(from, to);
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    prevNumber.current = to;
+    setTravelFrom(from);
+    if (reduce || stops.length < 2) {
+      setPose(restHopPose(restPos));
+      setTravel(false);
+      return;
+    }
+
+    const views = stops.map((n) => mapToViewPos(GRADE3_PATH_NODES[n - 1]!));
+    const hopCount = views.length - 1;
     setTravel(true);
-    const t = window.setTimeout(() => setTravel(false), 780);
-    return () => window.clearTimeout(t);
-  }, [suggestedId]);
+    setPose(restHopPose(views[0]!));
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const { hopIndex, t, done } = hopProgressAt(now - start, hopCount);
+      if (done) {
+        setPose(restHopPose(views[views.length - 1]!));
+        setTravel(false);
+        return;
+      }
+      setPose(hopAlong(views[hopIndex]!, views[hopIndex + 1]!, t));
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [suggestedId, current.number, restPos.x, restPos.y]);
 
   const activate = (status: NodeStatus, unitId: string) => {
     switch (status) {
@@ -192,9 +225,16 @@ export function CandyPath({
 
         <div
           className={cn("candy-hopper", travel && "candy-hopper-travel")}
-          style={{ left: `${currentPos.x}%`, top: `${currentPos.y}%` }}
+          style={{
+            left: `${pose.x}%`,
+            top: `${pose.y}%`,
+            transform: `translate(-50%, -62%) scale(${pose.squashX}, ${pose.squashY})`,
+          }}
           data-path-hopper={hopperId}
           data-path-travel={travel ? "1" : "0"}
+          data-path-hop-from={travel ? String(travelFrom) : String(current.number)}
+          data-path-hop-to={String(current.number)}
+          data-path-hop-ms={travel ? String(hopTravelMs(hopUnitStops(travelFrom, current.number))) : "0"}
         >
           <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
         </div>

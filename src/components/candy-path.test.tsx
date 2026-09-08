@@ -21,6 +21,8 @@ describe("CandyPath", () => {
     expect(html).toMatch(/data-path-unit="u4"[^>]*data-path-status="open"/);
     expect(html).toMatch(/data-path-unit="u13"[^>]*data-path-status="locked"/);
     expect(html).toContain('data-path-hopper="peach"');
+    expect(html).toContain('data-path-hop-to="5"');
+    expect(html).toContain('data-path-travel="0"');
     expect(html).toContain("peach.png");
     expect(html).toContain("data-candy-fog");
     expect(html).toContain("data-candy-mist");

@@ -1036,21 +1036,20 @@ details > summary::-webkit-details-marker {
 .candy-hopper {
   position: absolute;
   z-index: 5;
-  width: 3.2rem;
-  height: 3.2rem;
-  transform: translate(-50%, -108%);
+  width: 2.85rem;
+  height: 2.85rem;
+  transform: translate(-50%, -62%);
+  transform-origin: 50% 82%;
   pointer-events: none;
-  transition:
-    left 0.72s cubic-bezier(0.34, 1.2, 0.64, 1),
-    top 0.72s cubic-bezier(0.34, 1.2, 0.64, 1);
+  will-change: left, top, transform;
 }
 .candy-hopper-art {
-  width: 3.2rem;
-  height: 3.2rem;
-  animation: candy-hop 1.8s ease-in-out infinite;
+  width: 2.85rem;
+  height: 2.85rem;
+  animation: candy-hop 1.9s ease-in-out infinite;
 }
 .candy-hopper-travel .candy-hopper-art {
-  animation: candy-travel-hop 0.72s ease-in-out 1;
+  animation: none;
 }
 .candy-fog {
   position: absolute;
@@ -1126,16 +1125,7 @@ details > summary::-webkit-details-marker {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-0.55rem);
-  }
-}
-@keyframes candy-travel-hop {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-  40% {
-    transform: translateY(-1.15rem) scale(1.06);
+    transform: translateY(-0.28rem);
   }
 }
 @media (prefers-reduced-motion: reduce) {
