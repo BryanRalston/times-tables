@@ -913,6 +913,8 @@ details > summary::-webkit-details-marker {
     0 16px 32px -22px rgb(80 30 50 / 0.4);
 }
 .candy-plates {
+  --candy-plate-overlap: 0.34;
+  --candy-plate-fade: 38%;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -924,6 +926,31 @@ details > summary::-webkit-details-marker {
   aspect-ratio: 3 / 2;
   object-fit: cover;
   object-position: center;
+  margin-top: calc(100% * (2 / 3) * var(--candy-plate-overlap) * -1);
+  /* Later plates sit on top; fade only their top so the plate underneath shows through. */
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(0 0 0 / 0.12) 16%,
+    rgb(0 0 0 / 0.45) 26%,
+    #000 38%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(0 0 0 / 0.12) 16%,
+    rgb(0 0 0 / 0.45) 26%,
+    #000 38%,
+    #000 100%
+  );
+}
+.candy-plate[data-candy-plate="forest"] {
+  margin-top: 0;
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 .candy-overlay {
   position: absolute;
@@ -937,7 +964,7 @@ details > summary::-webkit-details-marker {
 }
 .candy-sign {
   position: absolute;
-  z-index: 3;
+  z-index: 8;
   padding: 0.28rem 0.55rem;
   border-radius: 8px;
   background: linear-gradient(#d2a66c, #a67c4e);
@@ -978,8 +1005,13 @@ details > summary::-webkit-details-marker {
 }
 .candy-node[data-path-fog="1"] {
   z-index: 3;
-  opacity: 0.22;
-  filter: saturate(0.2);
+  opacity: 0.42;
+  filter: none;
+}
+.candy-node-step {
+  width: 2.4rem;
+  height: 2.4rem;
+  pointer-events: none;
 }
 .candy-node-disc {
   display: grid;
@@ -989,37 +1021,29 @@ details > summary::-webkit-details-marker {
   border-radius: 9999px;
   color: #3b2a20;
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   font-weight: 800;
-  box-shadow:
-    inset 0 4px 0 rgb(255 255 255 / 0.78),
-    inset 0 -6px 10px rgb(80 40 20 / 0.14),
-    0 7px 0 rgb(80 40 20 / 0.14);
+  background: transparent;
+  box-shadow: none;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.82);
 }
-.candy-node-green .candy-node-disc {
-  background: linear-gradient(180deg, #e8ffb4, #b6e06a 55%, #8fc84a);
-}
-.candy-node-orange .candy-node-disc {
-  background: linear-gradient(180deg, #ffe7b8, #ffc46a 55%, #f0a03a);
-}
-.candy-node-yellow .candy-node-disc {
-  background: linear-gradient(180deg, #fff6b8, #ffe27a 55%, #f0c03a);
-}
-.candy-node-lilac .candy-node-disc {
-  background: linear-gradient(180deg, #f3e0ff, #d4b0f5 55%, #c090e8);
+.candy-node-green .candy-node-disc,
+.candy-node-orange .candy-node-disc,
+.candy-node-yellow .candy-node-disc,
+.candy-node-lilac .candy-node-disc,
+.candy-node-locked .candy-node-disc {
+  background: transparent;
+  box-shadow: none;
 }
 .candy-node-now .candy-node-disc {
-  background: linear-gradient(180deg, #e8fff8, #9af0ff 48%, #5ad4f0);
+  background: transparent;
   box-shadow:
-    inset 0 4px 0 rgb(255 255 255 / 0.85),
-    0 0 0 8px rgb(255 255 255 / 0.55),
-    0 0 0 14px rgb(80 220 255 / 0.4),
-    0 0 28px 10px rgb(60 210 255 / 0.55);
+    0 0 0 5px rgb(255 255 255 / 0.42),
+    0 0 0 10px rgb(80 220 255 / 0.28),
+    0 0 18px 6px rgb(60 210 255 / 0.32);
 }
 .candy-node-locked .candy-node-disc {
-  background: linear-gradient(180deg, #e6e6ea, #c8c8d0 60%, #b0b0ba);
   color: #6a6a74;
-  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.45);
 }
 .candy-stars {
   display: flex;
@@ -1069,37 +1093,35 @@ details > summary::-webkit-details-marker {
   top: 0;
   z-index: 6;
   pointer-events: none;
-  background:
-    linear-gradient(180deg, rgb(255 250 252 / 0.94) 0%, rgb(232 242 255 / 0.82) 62%, rgb(255 255 255 / 0.08) 100%);
+  background: linear-gradient(
+    180deg,
+    rgb(248 244 255 / 0.36) 0%,
+    rgb(232 238 255 / 0.2) 62%,
+    rgb(255 255 255 / 0) 100%
+  );
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
 }
-.candy-fog-cloud {
+.candy-fog-mist {
   position: absolute;
-  background: rgb(255 255 255 / 0.88);
-  border-radius: 9999px;
-  box-shadow:
-    28px 10px 0 -8px rgb(255 255 255 / 0.75),
-    -24px 12px 0 -10px rgb(255 255 255 / 0.7);
+  border-radius: 50%;
+  background: rgb(255 248 252 / 0.14);
+  filter: blur(38px);
 }
-.candy-fog-cloud-a {
-  left: 12%;
-  bottom: 18%;
-  width: 7.5rem;
-  height: 2.4rem;
+.candy-fog-mist-a {
+  left: 8%;
+  top: 12%;
+  width: 58%;
+  height: 42%;
 }
-.candy-fog-cloud-b {
-  right: 8%;
-  bottom: 34%;
-  width: 8.2rem;
-  height: 2.6rem;
-}
-.candy-fog-cloud-c {
-  left: 38%;
-  bottom: 8%;
-  width: 6.4rem;
-  height: 2rem;
+.candy-fog-mist-b {
+  right: 4%;
+  top: 28%;
+  width: 46%;
+  height: 36%;
 }
 .candy-sign-fog {
-  opacity: 0.28;
+  opacity: 0.72;
 }
 .candy-zone-dim {
   filter: saturate(0.55);
