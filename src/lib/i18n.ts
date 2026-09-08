@@ -61,6 +61,7 @@ export type Ui = {
   nearestHundred: string;
   nearestThousand: string;
   tapPicture: string;
+  sortWrong: string;
   nowReadGraph: string;
   countedTray: string;
   tapCoinsIn: string;
@@ -205,6 +206,7 @@ export const UI: Record<Locale, Ui> = {
     nearestHundred: "Nearest hundred",
     nearestThousand: "Nearest thousand",
     tapPicture: "Tap a picture, then its category.",
+    sortWrong: "That picture belongs in a different group.",
     nowReadGraph: "Now read the graph.",
     countedTray: "Counted",
     tapCoinsIn: "Tap each coin into the tray, then type the cents.",
@@ -355,6 +357,7 @@ export const UI: Record<Locale, Ui> = {
     nearestHundred: "Centena más cercana",
     nearestThousand: "Millar más cercano",
     tapPicture: "Toca una foto, luego su categoría.",
+    sortWrong: "Esa foto va en otro grupo.",
     nowReadGraph: "Ahora lee la gráfica.",
     countedTray: "Contadas",
     tapCoinsIn: "Toca cada moneda y ponla en la bandeja, luego escribe los centavos.",
@@ -505,6 +508,7 @@ export const UI: Record<Locale, Ui> = {
     nearestHundred: "Centena mais próxima",
     nearestThousand: "Milhar mais próximo",
     tapPicture: "Toque numa figura, depois na categoria.",
+    sortWrong: "Essa figura pertence a outro grupo.",
     nowReadGraph: "Agora leia o gráfico.",
     countedTray: "Contadas",
     tapCoinsIn: "Toque cada moeda para a bandeja, depois escreva os centavos.",

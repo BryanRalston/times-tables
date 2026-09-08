@@ -131,6 +131,11 @@ export function Keypad({
           <Button
             className="check-loud col-span-3 w-full"
             size="lg"
+            onPointerDown={(e) => {
+              if (e.button !== 0) return;
+              if (disabled || value.length === 0) return;
+              onCheck();
+            }}
             onClick={onCheck}
             disabled={disabled || value.length === 0}
           >
@@ -166,7 +171,17 @@ export function Keypad({
             {k === "back" ? <Delete className="size-5" /> : k}
           </Button>
         ))}
-        <Button className="col-span-3" size="lg" onClick={onCheck} disabled={disabled || value.length === 0}>
+        <Button
+          className="col-span-3"
+          size="lg"
+          onPointerDown={(e) => {
+            if (e.button !== 0) return;
+            if (disabled || value.length === 0) return;
+            onCheck();
+          }}
+          onClick={onCheck}
+          disabled={disabled || value.length === 0}
+        >
           {ui.check}
         </Button>
       </div>

@@ -170,6 +170,8 @@ describe("first-visit Home door", () => {
     expect(play).toContain("AppTabs");
     expect(play).toContain("REVEAL_AFTER_MISSES");
     expect(play).toContain("holdMsFor");
+    expect(play).toMatch(/setValue\(""\);\s*holdRef[\s\S]*WRONG_RETRY_MS/);
+    expect(play).toContain("needsInteract");
     expect(play).not.toMatch(/Score\s*\/\s*Streak/);
     expect(play).not.toContain(">Score<");
     const chrome = readFileSync(join(HERE, "components/chrome.tsx"), "utf8");

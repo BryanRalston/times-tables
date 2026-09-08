@@ -10,6 +10,8 @@ import type { ChoiceData, ClockData, DecimalData, GraphData, MeasureData, MoneyD
 import { moneyFmt } from "@/lib/utils";
 import { BEAKER_FACE, Board, beakerMeniscusY, moneyBox, rulerPointerX, scaleNeedleDeg, type BoardProps } from "./models";
 
+const HERE = dirname(fileURLToPath(import.meta.url));
+
 function stub(q: Question): BoardProps {
   return {
     question: q,
@@ -238,6 +240,10 @@ describe("boards", () => {
     expect(html).toContain(`squishees/${d.symbol}.png`);
     expect(html).not.toMatch(/src=""/);
     expect(html).not.toMatch(/src="undefined"/);
+    const src = readFileSync(join(HERE, "models.tsx"), "utf8");
+    expect(src).toContain("placeOnGraph");
+    expect(src).toContain("sortWrong");
+    expect(src).toContain("playWrong");
   });
 
   it("pictograph img count equals sum of count(value)", () => {

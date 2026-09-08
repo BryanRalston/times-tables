@@ -339,6 +339,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         setValue(q.answer);
         holdRef.current = window.setTimeout(() => goNext(correct, nextMisses), reduce ? 280 : WRONG_REVEAL_MS);
       } else {
+        setValue("");
         holdRef.current = window.setTimeout(() => {
           setStatus("idle");
           setPose("think");
