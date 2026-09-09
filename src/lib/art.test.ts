@@ -23,7 +23,12 @@ describe("asset URLs", () => {
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/palm.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/fraction-pie.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/daisies.png"))).toBe(true);
-    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/candy-cane.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/candy-cane.png"))).toBe(false);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/lollipop.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/peppermint.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/shell.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/pie-tart.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/numbered-sweet.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/sailboat.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/gumdrop.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/cove-water-mask.png"))).toBe(true);
