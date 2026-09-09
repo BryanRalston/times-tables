@@ -20,6 +20,7 @@ describe("asset URLs", () => {
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/tenframe.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/tenframe-mound.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/coins.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/coin-stack.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/coin-spin.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/palm.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/dock.png"))).toBe(true);

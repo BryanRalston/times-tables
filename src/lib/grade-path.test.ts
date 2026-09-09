@@ -12,6 +12,7 @@ import {
   overlayInOpenCoveWater,
   overlayOnCoveShoreLip,
   overlayOnDryCoveBank,
+  overlaysHaveBreathingRoom,
   overlaySeatClass,
   padChromeStars,
   TRAIL_PEEK_ARM_MS,
@@ -83,12 +84,7 @@ describe("grade path", () => {
       "tenframe-c",
       "tenframe-d",
       "tenframe-e",
-      "tenframe-f",
-      "tenframe-g",
-      "tenframe-h",
       "flowers",
-      "flowers-b",
-      "flowers-c",
       "daisies",
       "waterfall",
       "palm",
@@ -98,35 +94,28 @@ describe("grade path", () => {
       "coins",
       "coins-b",
       "coins-c",
-      "coins-d",
-      "coins-e",
-      "coins-f",
-      "coin-spin",
-      "coin-spin-b",
       "fraction-tree",
       "fraction-tree-b",
       "fraction-tree-c",
       "fraction-tree-d",
       "fraction-tree-e",
-      "fraction-tree-f",
-      "fraction-tree-g",
-      "fraction-tree-h",
-      "fraction-tree-i",
-      "fraction-tree-j",
     ]);
     expect(TALL_MAP_OVERLAYS.some((p) => p.id === "candy-cane" || p.file === "candy-cane.png")).toBe(false);
-    expect(TALL_MAP_OVERLAYS.filter((p) => p.file === "tenframe-mound.png")).toHaveLength(8);
+    expect(TALL_MAP_OVERLAYS.filter((p) => p.file === "tenframe-mound.png")).toHaveLength(5);
     expect(TALL_MAP_OVERLAYS.filter((p) => p.file === "sailboat.png")).toHaveLength(2);
-    expect(TALL_MAP_OVERLAYS.filter((p) => p.file === "coins.png")).toHaveLength(6);
-    expect(TALL_MAP_OVERLAYS.filter((p) => p.file === "fraction-tree.png")).toHaveLength(10);
-    expect(TALL_MAP_OVERLAYS.filter((p) => p.zone === "meadow").length).toBe(12);
-    expect(TALL_MAP_OVERLAYS.filter((p) => p.zone === "cove").length).toBe(13);
-    expect(TALL_MAP_OVERLAYS.filter((p) => p.zone === "forest").length).toBe(10);
+    expect(TALL_MAP_OVERLAYS.filter((p) => p.file === "coin-stack.png")).toHaveLength(3);
+    expect(TALL_MAP_OVERLAYS.filter((p) => p.file === "fraction-tree.png")).toHaveLength(5);
+    expect(TALL_MAP_OVERLAYS.filter((p) => p.zone === "meadow").length).toBe(7);
+    expect(TALL_MAP_OVERLAYS.filter((p) => p.zone === "cove").length).toBe(8);
+    expect(TALL_MAP_OVERLAYS.filter((p) => p.zone === "forest").length).toBe(5);
     expect(
       TALL_MAP_OVERLAYS.filter((p) => p.file === "tenframe-mound.png" && p.id !== "tenframe-a").every((p) => p.map.y < 88),
     ).toBe(true);
     expect(TALL_MAP_OVERLAYS.every((p) => p.map.x > 38 && p.map.x < 62)).toBe(true);
     expect(TALL_MAP_OVERLAYS.every((p) => overlayClearsPads(p))).toBe(true);
+    expect(overlaysHaveBreathingRoom(TALL_MAP_OVERLAYS, "tenframe-mound.png")).toBe(true);
+    expect(overlaysHaveBreathingRoom(TALL_MAP_OVERLAYS, "coin-stack.png")).toBe(true);
+    expect(overlaysHaveBreathingRoom(TALL_MAP_OVERLAYS, "fraction-tree.png")).toBe(true);
     expect(new Set(TALL_MAP_OVERLAYS.map((p) => p.file))).toEqual(
       new Set([
         "tenframe-mound.png",
@@ -136,8 +125,7 @@ describe("grade path", () => {
         "palm.png",
         "dock.png",
         "sailboat.png",
-        "coins.png",
-        "coin-spin.png",
+        "coin-stack.png",
         "fraction-tree.png",
       ]),
     );
@@ -160,7 +148,8 @@ describe("grade path", () => {
     expect(TALL_MAP_OVERLAYS.find((p) => p.id === "sailboat")?.motion).toBe("bob");
     expect(TALL_MAP_OVERLAYS.find((p) => p.id === "dock")?.file).toBe("dock.png");
     expect(TALL_MAP_OVERLAYS.find((p) => p.id === "coins")?.motion).toBe("bob");
-    expect(TALL_MAP_OVERLAYS.find((p) => p.id === "coin-spin")?.motion).toBe("spin");
+    expect(TALL_MAP_OVERLAYS.find((p) => p.id === "coins")?.file).toBe("coin-stack.png");
+    expect(TALL_MAP_OVERLAYS.some((p) => p.file === "coin-spin.png")).toBe(false);
     expect(TALL_MAP_OVERLAYS.find((p) => p.id === "flowers")?.file).toBe("meadow-flowers.png");
     expect(TALL_MAP_OVERLAYS.find((p) => p.id === "fraction-tree")?.file).toBe("fraction-tree.png");
     expect(TALL_MAP_OVERLAYS.find((p) => p.id === "palm")?.motion).toBe("sway");
