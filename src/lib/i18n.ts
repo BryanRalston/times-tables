@@ -162,6 +162,13 @@ export type Ui = {
   bestStreak: (n: number) => string;
   bestAccuracy: (n: number) => string;
   fastestAvg: (s: string) => string;
+  lessThan: string;
+  equalTo: string;
+  greaterThan: string;
+  compareLeft: string;
+  compareRight: string;
+  tensYouSee: string;
+  nOnesHiding: string;
 };
 
 export const UI: Record<Locale, Ui> = {
@@ -321,6 +328,13 @@ export const UI: Record<Locale, Ui> = {
     bestStreak: (n) => `Best school-day streak ${n}`,
     bestAccuracy: (n) => `Best accuracy ${n}%`,
     fastestAvg: (s) => `Fastest honest average ${s}s`,
+    lessThan: "less than",
+    equalTo: "equal to",
+    greaterThan: "greater than",
+    compareLeft: "left",
+    compareRight: "right",
+    tensYouSee: "tens you can see",
+    nOnesHiding: "n ones hiding",
   },
   es: {
     language: "Idioma",
@@ -478,6 +492,13 @@ export const UI: Record<Locale, Ui> = {
     bestStreak: (n) => `Mejor racha de días escolares ${n}`,
     bestAccuracy: (n) => `Mejor precisión ${n}%`,
     fastestAvg: (s) => `Promedio honesto más rápido ${s}s`,
+    lessThan: "menor que",
+    equalTo: "igual a",
+    greaterThan: "mayor que",
+    compareLeft: "izquierda",
+    compareRight: "derecha",
+    tensYouSee: "decenas que ves",
+    nOnesHiding: "n unidades que se esconden",
   },
   "pt-BR": {
     language: "Idioma",
@@ -635,6 +656,13 @@ export const UI: Record<Locale, Ui> = {
     bestStreak: (n) => `Melhor sequência de dias letivos ${n}`,
     bestAccuracy: (n) => `Melhor precisão ${n}%`,
     fastestAvg: (s) => `Média honesta mais rápida ${s}s`,
+    lessThan: "menor que",
+    equalTo: "igual a",
+    greaterThan: "maior que",
+    compareLeft: "esquerda",
+    compareRight: "direita",
+    tensYouSee: "dezenas que você vê",
+    nOnesHiding: "n unidades escondidas",
   },
 };
 
@@ -931,6 +959,8 @@ export type QCopy = {
   buildPlacesHint: string;
   leastToGreatest: string;
   greatestToLeast: string;
+  compareNumbers: string;
+  compareFractions: string;
   familyFact: (a: number, b: number) => string;
   howManySides: string;
   howManyVertices: string;
@@ -951,7 +981,8 @@ export type QCopy = {
   dataNo: string[];
   fractionLine: string;
   fractionOnLine: string;
-  unitFraction: (den: number) => string;
+  unitFraction: string;
+  shadedSet: string;
   mixedName: string;
   closerTo: (frac: string) => string;
   equivN: (num: number, den: number, den2: number) => string;
@@ -1005,7 +1036,7 @@ function measureEn(): QCopy["measureUnits"] {
     { prompt: "Best unit for the length of a classroom?", answer: "meter", choices: ["centimeter", "meter", "mile", "gram"] },
     { prompt: "Best unit for a watermelon?", answer: "pound", choices: ["ounce", "pound", "inch", "cup"] },
     { prompt: "Best unit for a spoon of water?", answer: "milliliter", choices: ["liter", "milliliter", "yard", "kilogram"] },
-    { prompt: "Do you need an estimate or an exact measure to fill a prescription?", answer: "exact", choices: ["estimate", "exact"] },
+    { prompt: "Do you need an estimate or an exact measure to measure medicine?", answer: "exact", choices: ["estimate", "exact"] },
     { prompt: "Best unit for the mass of a grape?", answer: "gram", choices: ["gram", "kilogram", "liter", "mile"] },
     { prompt: "Best unit for a bottle of milk?", answer: "liter", choices: ["liter", "milliliter", "inch", "ton"] },
     { prompt: "Best unit for a paper clip?", answer: "centimeter", choices: ["centimeter", "kilometer", "gallon", "ton"] },
@@ -1038,8 +1069,10 @@ export function qCopy(locale: Locale): QCopy {
       whatValue: (n, digit, place) => `En ${n}, ¿cuál es el valor del ${digit} en ${place}?`,
       buildHundreds: (target) => `Arma ${target}. ¿Cuántas centenas?`,
       buildPlacesHint: "Miles, centenas, decenas, unidades.",
-      leastToGreatest: "De menor a mayor.",
-      greatestToLeast: "De mayor a menor.",
+      leastToGreatest: "Pon estos de menor a mayor.",
+      greatestToLeast: "Pon estos de mayor a menor.",
+      compareNumbers: "¿El primer número es menor que, igual a, o mayor que el segundo?",
+      compareFractions: "¿La primera fracción es menor que, igual a, o mayor que la segunda?",
       familyFact: (a, b) => `¿Qué hecho va con ${a} grupos de ${b}?`,
       howManySides: "¿Cuántos lados?",
       howManyVertices: "¿Cuántos vértices?",
@@ -1072,7 +1105,8 @@ export function qCopy(locale: Locale): QCopy {
       ],
       fractionLine: "en la recta numérica",
       fractionOnLine: "¿Qué fracción está marcada en la recta?",
-      unitFraction: (den) => `Una pieza de ${den}. Nombra la fracción unitaria.`,
+      unitFraction: "¿Qué fracción unitaria está sombreada?",
+      shadedSet: "¿Qué fracción del grupo está sombreada?",
       mixedName: "Nombra el número mixto.",
       closerTo: (frac) => `¿${frac} está más cerca de 0, 1/2 o 1?`,
       equivN: (num, den, den2) => `${num}/${den} = n/${den2}. ¿Cuánto es n?`,
@@ -1087,7 +1121,7 @@ export function qCopy(locale: Locale): QCopy {
       tapCoinsIn: "Toca cada moneda y ponla en la bandeja, luego escribe los centavos.",
       tapMoneyIn: "Toca cada billete y moneda y ponlos en la bandeja, luego escribe dólares y centavos.",
       howMuchMoney: "¿Cuánto dinero?",
-      compareMoney: "Compara los dos conjuntos.",
+      compareMoney: "¿El dinero de la izquierda es menor que, igual a, o mayor que el de la derecha?",
       unitSquares: "¿Cuántos cuadrados unitarios?",
       squaresHide: (shown) => `${shown} cuadrados se ven. n se esconden. ¿Área?`,
       periName: (name) => `¿Perímetro de este ${name}?`,
@@ -1125,7 +1159,7 @@ export function qCopy(locale: Locale): QCopy {
         { prompt: "¿Mejor unidad para el largo de un salón?", answer: "meter", choices: ["centimeter", "meter", "mile", "gram"] },
         { prompt: "¿Mejor unidad para una sandía?", answer: "pound", choices: ["ounce", "pound", "inch", "cup"] },
         { prompt: "¿Mejor unidad para una cuchara de agua?", answer: "milliliter", choices: ["liter", "milliliter", "yard", "kilogram"] },
-        { prompt: "¿Necesitas una estimación o una medida exacta para una receta médica?", answer: "exact", choices: ["estimate", "exact"] },
+        { prompt: "¿Necesitas una estimación o una medida exacta para medir una medicina?", answer: "exact", choices: ["estimate", "exact"] },
         { prompt: "¿Mejor unidad para la masa de una uva?", answer: "gram", choices: ["gram", "kilogram", "liter", "mile"] },
         { prompt: "¿Mejor unidad para una botella de leche?", answer: "liter", choices: ["liter", "milliliter", "inch", "ton"] },
         { prompt: "¿Mejor unidad para un clip?", answer: "centimeter", choices: ["centimeter", "kilometer", "gallon", "ton"] },
@@ -1157,8 +1191,10 @@ export function qCopy(locale: Locale): QCopy {
       whatValue: (n, digit, place) => `Em ${n}, qual é o valor do ${digit} em ${place}?`,
       buildHundreds: (target) => `Monte ${target}. Quantas centenas?`,
       buildPlacesHint: "Milhares, centenas, dezenas, unidades.",
-      leastToGreatest: "Do menor para o maior.",
-      greatestToLeast: "Do maior para o menor.",
+      leastToGreatest: "Coloque estes do menor para o maior.",
+      greatestToLeast: "Coloque estes do maior para o menor.",
+      compareNumbers: "O primeiro número é menor que, igual a, ou maior que o segundo?",
+      compareFractions: "A primeira fração é menor que, igual a, ou maior que a segunda?",
       familyFact: (a, b) => `Qual fato combina com ${a} grupos de ${b}?`,
       howManySides: "Quantos lados?",
       howManyVertices: "Quantos vértices?",
@@ -1191,7 +1227,8 @@ export function qCopy(locale: Locale): QCopy {
       ],
       fractionLine: "na reta numérica",
       fractionOnLine: "Que fração está marcada na reta?",
-      unitFraction: (den) => `Um pedaço de ${den}. Nomeie a fração unitária.`,
+      unitFraction: "Que fração unitária está pintada?",
+      shadedSet: "Que fração do grupo está pintada?",
       mixedName: "Nomeie o número misto.",
       closerTo: (frac) => `${frac} está mais perto de 0, 1/2 ou 1?`,
       equivN: (num, den, den2) => `${num}/${den} = n/${den2}. Quanto é n?`,
@@ -1206,7 +1243,7 @@ export function qCopy(locale: Locale): QCopy {
       tapCoinsIn: "Toque cada moeda para a bandeja, depois escreva os centavos.",
       tapMoneyIn: "Toque cada nota e moeda para a bandeja, depois escreva dólares e centavos.",
       howMuchMoney: "Quanto dinheiro?",
-      compareMoney: "Compare os dois conjuntos.",
+      compareMoney: "O dinheiro da esquerda é menor que, igual a, ou maior que o da direita?",
       unitSquares: "Quantos quadrados unitários?",
       squaresHide: (shown) => `${shown} quadrados aparecem. n se escondem. Área?`,
       periName: (name) => `Perímetro deste ${name}?`,
@@ -1244,7 +1281,7 @@ export function qCopy(locale: Locale): QCopy {
         { prompt: "Melhor unidade para o comprimento de uma sala?", answer: "meter", choices: ["centimeter", "meter", "mile", "gram"] },
         { prompt: "Melhor unidade para uma melancia?", answer: "pound", choices: ["ounce", "pound", "inch", "cup"] },
         { prompt: "Melhor unidade para uma colher de água?", answer: "milliliter", choices: ["liter", "milliliter", "yard", "kilogram"] },
-        { prompt: "Você precisa de uma estimativa ou de uma medida exata para um remédio?", answer: "exact", choices: ["estimate", "exact"] },
+        { prompt: "Você precisa de uma estimativa ou de uma medida exata para medir um remédio?", answer: "exact", choices: ["estimate", "exact"] },
         { prompt: "Melhor unidade para a massa de uma uva?", answer: "gram", choices: ["gram", "kilogram", "liter", "mile"] },
         { prompt: "Melhor unidade para uma garrafa de leite?", answer: "liter", choices: ["liter", "milliliter", "inch", "ton"] },
         { prompt: "Melhor unidade para um clipe?", answer: "centimeter", choices: ["centimeter", "kilometer", "gallon", "ton"] },
@@ -1275,8 +1312,10 @@ export function qCopy(locale: Locale): QCopy {
     whatValue: (n, digit, place) => `In ${n}, what is the value of the ${digit} in the ${place}?`,
     buildHundreds: (target) => `Build ${target}. How many hundreds?`,
     buildPlacesHint: "Thousands, hundreds, tens, ones.",
-    leastToGreatest: "Least to greatest.",
-    greatestToLeast: "Greatest to least.",
+    leastToGreatest: "Put these least to greatest.",
+    greatestToLeast: "Put these greatest to least.",
+    compareNumbers: "Is the first number less than, equal to, or greater than the second?",
+    compareFractions: "Is the first fraction less than, equal to, or greater than the second?",
     familyFact: (a, b) => `Which fact belongs with ${a} groups of ${b}?`,
     howManySides: "How many sides?",
     howManyVertices: "How many vertices?",
@@ -1309,7 +1348,8 @@ export function qCopy(locale: Locale): QCopy {
     ],
     fractionLine: "on the number line",
     fractionOnLine: "What fraction is marked on the number line?",
-    unitFraction: (den) => `One piece of ${den}. Name the unit fraction.`,
+    unitFraction: "What unit fraction is shaded?",
+    shadedSet: "What fraction of the group is shaded?",
     mixedName: "Name the mixed number.",
     closerTo: (frac) => `Is ${frac} closer to 0, 1/2, or 1?`,
     equivN: (num, den, den2) => `${num}/${den} = n/${den2}. What is n?`,
@@ -1324,7 +1364,7 @@ export function qCopy(locale: Locale): QCopy {
     tapCoinsIn: "Tap each coin into the tray, then type the cents.",
     tapMoneyIn: "Tap each bill and coin into the tray, then type dollars and cents.",
     howMuchMoney: "How much money?",
-    compareMoney: "Compare the two sets.",
+    compareMoney: "Is the left money less than, equal to, or greater than the right money?",
     unitSquares: "How many unit squares?",
     squaresHide: (shown) => `${shown} squares showing. n hide. Area?`,
     periName: (name) => `Perimeter of this ${name}?`,

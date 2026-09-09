@@ -2149,7 +2149,7 @@
   ],
   "u2-compare": [
     {
-      "prompt": "9597 ○ 5994",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -2158,7 +2158,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "3024 ○ 7014",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -2167,7 +2167,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "5177 ○ 3736",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -2176,7 +2176,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "1051 ○ 6240",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -2185,7 +2185,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "601 ○ 3436",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -2194,7 +2194,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "5896 ○ 6321",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -2203,7 +2203,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "7358 ○ 2875",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -2212,7 +2212,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "412 ○ 5841",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -2221,7 +2221,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "5663 ○ 815",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -2230,7 +2230,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "376 ○ 1717",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -2239,7 +2239,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "4016 ○ 4016",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": "=",
       "alts": null,
       "choices": null,
@@ -2248,7 +2248,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "9595 ○ 567",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -2257,7 +2257,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "3280 ○ 9239",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -2266,7 +2266,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "998 ○ 7923",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -2275,7 +2275,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "6311 ○ 2067",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -2284,7 +2284,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "1526 ○ 4899",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -2293,7 +2293,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "8497 ○ 8125",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -2302,7 +2302,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "7011 ○ 2305",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -2311,7 +2311,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "9487 ○ 4803",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -2320,7 +2320,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "6342 ○ 3512",
+      "prompt": "Is the first number less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -2331,7 +2331,7 @@
   ],
   "u2-order": [
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "7346 4239 1501",
       "alts": null,
       "choices": [
@@ -2344,7 +2344,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "208 6962 8304",
       "alts": null,
       "choices": [
@@ -2357,7 +2357,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "5546 4970 671",
       "alts": null,
       "choices": [
@@ -2370,7 +2370,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "4556 2814 236",
       "alts": null,
       "choices": [
@@ -2383,7 +2383,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "8385 7819 7182",
       "alts": null,
       "choices": [
@@ -2396,7 +2396,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "576 3152 8719",
       "alts": null,
       "choices": [
@@ -2409,7 +2409,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "924 4734 5717",
       "alts": null,
       "choices": [
@@ -2422,7 +2422,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "1189 5607 6492",
       "alts": null,
       "choices": [
@@ -2435,7 +2435,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "6324 7788 8345",
       "alts": null,
       "choices": [
@@ -2448,7 +2448,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "151 5690 6834",
       "alts": null,
       "choices": [
@@ -2461,7 +2461,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "431 1129 1231",
       "alts": null,
       "choices": [
@@ -2474,7 +2474,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "216 5388 8396",
       "alts": null,
       "choices": [
@@ -2487,7 +2487,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "1520 3496 8714",
       "alts": null,
       "choices": [
@@ -2500,7 +2500,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "7918 4399 1217",
       "alts": null,
       "choices": [
@@ -2513,7 +2513,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "3720 5454 8959",
       "alts": null,
       "choices": [
@@ -2526,7 +2526,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "523 2991 4972",
       "alts": null,
       "choices": [
@@ -2539,7 +2539,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "8649 2061 1176",
       "alts": null,
       "choices": [
@@ -2552,7 +2552,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "4797 1950 1835",
       "alts": null,
       "choices": [
@@ -2565,7 +2565,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "6283 6974 8717",
       "alts": null,
       "choices": [
@@ -2578,7 +2578,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "8000 7623 390",
       "alts": null,
       "choices": [
@@ -5908,7 +5908,7 @@
   ],
   "u5-unit": [
     {
-      "prompt": "One piece of 10. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/10",
       "alts": null,
       "choices": null,
@@ -5917,7 +5917,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 2. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/2",
       "alts": null,
       "choices": null,
@@ -5926,7 +5926,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 4. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/4",
       "alts": null,
       "choices": null,
@@ -5935,7 +5935,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 4. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/4",
       "alts": null,
       "choices": null,
@@ -5944,7 +5944,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 6. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/6",
       "alts": null,
       "choices": null,
@@ -5953,7 +5953,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 5. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/5",
       "alts": null,
       "choices": null,
@@ -5962,7 +5962,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 10. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/10",
       "alts": null,
       "choices": null,
@@ -5971,7 +5971,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 5. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/5",
       "alts": null,
       "choices": null,
@@ -5980,7 +5980,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 8. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/8",
       "alts": null,
       "choices": null,
@@ -5989,7 +5989,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 3. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/3",
       "alts": null,
       "choices": null,
@@ -5998,7 +5998,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 5. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/5",
       "alts": null,
       "choices": null,
@@ -6007,7 +6007,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 3. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/3",
       "alts": null,
       "choices": null,
@@ -6016,7 +6016,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 6. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/6",
       "alts": null,
       "choices": null,
@@ -6025,7 +6025,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 6. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/6",
       "alts": null,
       "choices": null,
@@ -6034,7 +6034,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 2. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/2",
       "alts": null,
       "choices": null,
@@ -6043,7 +6043,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 6. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/6",
       "alts": null,
       "choices": null,
@@ -6052,7 +6052,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 5. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/5",
       "alts": null,
       "choices": null,
@@ -6061,7 +6061,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 6. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/6",
       "alts": null,
       "choices": null,
@@ -6070,7 +6070,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 5. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/5",
       "alts": null,
       "choices": null,
@@ -6079,7 +6079,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "One piece of 4. Name the unit fraction.",
+      "prompt": "What unit fraction is shaded?",
       "answer": "1/4",
       "alts": null,
       "choices": null,
@@ -6494,7 +6494,7 @@
   ],
   "u5-set": [
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "2/10",
       "alts": null,
       "choices": null,
@@ -6503,7 +6503,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "3/3",
       "alts": null,
       "choices": null,
@@ -6512,7 +6512,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "3/5",
       "alts": null,
       "choices": null,
@@ -6521,7 +6521,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "2/5",
       "alts": null,
       "choices": null,
@@ -6530,7 +6530,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "2/10",
       "alts": null,
       "choices": null,
@@ -6539,7 +6539,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "6/8",
       "alts": null,
       "choices": null,
@@ -6548,7 +6548,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "5/10",
       "alts": null,
       "choices": null,
@@ -6557,7 +6557,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "2/10",
       "alts": null,
       "choices": null,
@@ -6566,7 +6566,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "2/3",
       "alts": null,
       "choices": null,
@@ -6575,7 +6575,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "4/8",
       "alts": null,
       "choices": null,
@@ -6584,7 +6584,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "5/10",
       "alts": null,
       "choices": null,
@@ -6593,7 +6593,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "1/5",
       "alts": null,
       "choices": null,
@@ -6602,7 +6602,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "2/4",
       "alts": null,
       "choices": null,
@@ -6611,7 +6611,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "2/4",
       "alts": null,
       "choices": null,
@@ -6620,7 +6620,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "6/6",
       "alts": null,
       "choices": null,
@@ -6629,7 +6629,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "2/10",
       "alts": null,
       "choices": null,
@@ -6638,7 +6638,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "1/2",
       "alts": null,
       "choices": null,
@@ -6647,7 +6647,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "5/10",
       "alts": null,
       "choices": null,
@@ -6656,7 +6656,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "5/10",
       "alts": null,
       "choices": null,
@@ -6665,7 +6665,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What fraction is shaded?",
+      "prompt": "What fraction of the group is shaded?",
       "answer": "1/6",
       "alts": null,
       "choices": null,
@@ -9753,7 +9753,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Do you need an estimate or an exact measure to fill a prescription?",
+      "prompt": "Do you need an estimate or an exact measure to measure medicine?",
       "answer": "exact",
       "alts": null,
       "choices": [
@@ -11659,7 +11659,7 @@
   ],
   "u10-compare": [
     {
-      "prompt": "1/3 ○ 7/10",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -11668,7 +11668,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "5/10 ○ 2/3",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -11677,7 +11677,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "4/5 ○ 8/10",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "=",
       "alts": null,
       "choices": null,
@@ -11686,7 +11686,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "6/8 ○ 4/5",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -11695,7 +11695,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "2/3 ○ 2/6",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -11704,7 +11704,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "1/2 ○ 3/4",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -11713,7 +11713,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "4/8 ○ 2/6",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -11722,7 +11722,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "4/10 ○ 1/4",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -11731,7 +11731,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "1/3 ○ 6/10",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -11740,7 +11740,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "2/4 ○ 1/2",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "=",
       "alts": null,
       "choices": null,
@@ -11749,7 +11749,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "2/3 ○ 3/8",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -11758,7 +11758,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "1/2 ○ 2/5",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -11767,7 +11767,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "2/5 ○ 1/2",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -11776,7 +11776,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "1/2 ○ 4/10",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -11785,7 +11785,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "1/5 ○ 1/2",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -11794,7 +11794,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "9/10 ○ 2/4",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -11803,7 +11803,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "1/2 ○ 5/6",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -11812,7 +11812,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "1/6 ○ 2/5",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -11821,7 +11821,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "4/8 ○ 5/6",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -11830,7 +11830,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "1/3 ○ 1/10",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -12109,7 +12109,7 @@
   ],
   "u10-order": [
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "4/5 3/5 1/5",
       "alts": null,
       "choices": [
@@ -12122,7 +12122,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "1/4 2/4 3/4",
       "alts": null,
       "choices": [
@@ -12135,7 +12135,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "2/5 3/5 4/5",
       "alts": null,
       "choices": [
@@ -12148,7 +12148,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "1/6 2/6 5/6",
       "alts": null,
       "choices": [
@@ -12161,7 +12161,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "1/10 3/10 9/10",
       "alts": null,
       "choices": [
@@ -12174,7 +12174,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "1/10 3/10 9/10",
       "alts": null,
       "choices": [
@@ -12187,7 +12187,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "5/6 2/6 1/6",
       "alts": null,
       "choices": [
@@ -12200,7 +12200,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "1/5 2/5 3/5",
       "alts": null,
       "choices": [
@@ -12213,7 +12213,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "1/10 2/10 9/10",
       "alts": null,
       "choices": [
@@ -12226,7 +12226,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "1/10 2/10 9/10",
       "alts": null,
       "choices": [
@@ -12239,7 +12239,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "3/10 2/10 1/10",
       "alts": null,
       "choices": [
@@ -12252,7 +12252,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "1/10 3/10 9/10",
       "alts": null,
       "choices": [
@@ -12265,7 +12265,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "1/8 2/8 7/8",
       "alts": null,
       "choices": [
@@ -12278,7 +12278,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "3/4 2/4 1/4",
       "alts": null,
       "choices": [
@@ -12291,7 +12291,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "1/10 2/10 3/10",
       "alts": null,
       "choices": [
@@ -12304,7 +12304,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Least to greatest.",
+      "prompt": "Put these least to greatest.",
       "answer": "1/4 2/4 3/4",
       "alts": null,
       "choices": [
@@ -12317,7 +12317,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "4/5 3/5 2/5",
       "alts": null,
       "choices": [
@@ -12330,7 +12330,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "9/10 3/10 2/10",
       "alts": null,
       "choices": [
@@ -12343,7 +12343,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "4/5 3/5 1/5",
       "alts": null,
       "choices": [
@@ -12356,7 +12356,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Greatest to least.",
+      "prompt": "Put these greatest to least.",
       "answer": "7/8 3/8 2/8",
       "alts": null,
       "choices": [
@@ -12371,7 +12371,7 @@
   ],
   "u10-line": [
     {
-      "prompt": "1/4 ○ 2/4 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -12380,7 +12380,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "2/3 ○ 3/3 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -12389,7 +12389,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "2/10 ○ 4/10 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -12398,7 +12398,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "7/8 ○ 2/8 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -12407,7 +12407,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "5/6 ○ 6/6 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -12416,7 +12416,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "2/8 ○ 1/8 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -12425,7 +12425,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "2/2 ○ 1/2 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -12434,7 +12434,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "1/2 ○ 1/2 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "=",
       "alts": null,
       "choices": null,
@@ -12443,7 +12443,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "5/6 ○ 2/6 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -12452,7 +12452,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "1/2 ○ 2/2 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -12461,7 +12461,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "4/8 ○ 4/8 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "=",
       "alts": null,
       "choices": null,
@@ -12470,7 +12470,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "6/6 ○ 4/6 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -12479,7 +12479,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "3/8 ○ 3/8 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "=",
       "alts": null,
       "choices": null,
@@ -12488,7 +12488,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "2/8 ○ 2/8 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "=",
       "alts": null,
       "choices": null,
@@ -12497,7 +12497,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "1/2 ○ 2/2 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -12506,7 +12506,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "8/8 ○ 6/8 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -12515,7 +12515,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "2/5 ○ 1/5 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -12524,7 +12524,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "3/5 ○ 2/5 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -12533,7 +12533,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "2/2 ○ 1/2 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -12542,7 +12542,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "5/10 ○ 8/10 on the number line",
+      "prompt": "Is the first fraction less than, equal to, or greater than the second?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -13381,7 +13381,7 @@
   ],
   "u11-compare": [
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -13390,7 +13390,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -13399,7 +13399,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -13408,7 +13408,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -13417,7 +13417,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -13426,7 +13426,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -13435,7 +13435,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -13444,7 +13444,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -13453,7 +13453,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -13462,7 +13462,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -13471,7 +13471,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -13480,7 +13480,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -13489,7 +13489,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -13498,7 +13498,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -13507,7 +13507,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -13516,7 +13516,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -13525,7 +13525,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -13534,7 +13534,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": "<",
       "alts": null,
       "choices": null,
@@ -13543,7 +13543,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": ">",
       "alts": null,
       "choices": null,
@@ -13552,7 +13552,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Compare the two sets.",
+      "prompt": "Is the left money less than, equal to, or greater than the right money?",
       "answer": "<",
       "alts": null,
       "choices": null,

@@ -396,6 +396,7 @@ function PlaceValue({ question, status, shake }: BoardProps) {
     );
   }
   if (data.mode === "expanded") {
+    const ui = UI[locale];
     const tens = Math.floor(data.number / 10) * 10;
     const ones = data.digit;
     return (
@@ -408,7 +409,7 @@ function PlaceValue({ question, status, shake }: BoardProps) {
                 <span key={i} className="h-12 w-2.5 rounded-sm bg-teal" />
               ))}
             </div>
-            tens you can see
+            {ui.tensYouSee}
           </div>
           <div>
             <div className="flex flex-wrap gap-0.5">
@@ -416,7 +417,7 @@ function PlaceValue({ question, status, shake }: BoardProps) {
                 <span key={i} className="size-3 rounded-[2px] border border-dashed border-star bg-star-soft" />
               ))}
             </div>
-            n ones hiding
+            {ui.nOnesHiding}
           </div>
         </div>
       </Frame>
@@ -453,7 +454,7 @@ function PlaceValue({ question, status, shake }: BoardProps) {
             )}
           >
             <p className="font-display text-lg text-ink tabular-nums">{col.ch}</p>
-            {col.label}
+            {found || data.mode !== "place" ? col.label : "\u00a0"}
           </div>
         ))}
       </div>
@@ -463,20 +464,35 @@ function PlaceValue({ question, status, shake }: BoardProps) {
 
 function BuildNumber({ question, status, shake }: BoardProps) {
   const data = question.data as BuildData;
+  const locale = parseLocale(useProgress((st) => st.locale));
   const parts = tensOnes(data.target);
+  const cols = [
+    { n: parts.thousands, label: PLACE[locale][3] ?? "thousands", kind: "thousands" as const },
+    { n: parts.hundreds, label: PLACE[locale][2] ?? "hundreds", kind: "hundreds" as const },
+    { n: parts.tens, label: PLACE[locale][1] ?? "tens", kind: "tens" as const },
+    { n: parts.ones, label: PLACE[locale][0] ?? "ones", kind: "ones" as const },
+  ];
   return (
     <Frame shake={shake} status={status}>
-      <p className="mb-3 text-center font-display text-3xl tabular-nums">{data.target}</p>
+      <p className="mb-3 text-center font-display text-3xl tabular-nums">{data.target.toLocaleString("en-US")}</p>
       <div className="grid grid-cols-4 gap-2 text-center text-xs text-muted">
-        {[
-          ["Th", parts.thousands],
-          ["H", parts.hundreds],
-          ["T", parts.tens],
-          ["O", parts.ones],
-        ].map(([label, n]) => (
-          <div key={String(label)} className="rounded-[12px] border border-line bg-bg-warm p-2">
-            <p className="font-display text-xl text-ink">{n}</p>
-            {label}
+        {cols.map((col) => (
+          <div key={col.kind} className="rounded-[12px] border border-line bg-bg-warm p-2" data-build-place={col.kind}>
+            <div className="flex min-h-10 flex-wrap items-end justify-center gap-0.5">
+              {Array.from({ length: col.n }, (_, i) => (
+                <span
+                  key={i}
+                  data-build-block={col.kind}
+                  className={cn(
+                    col.kind === "ones" && "size-2 rounded-[2px] bg-star",
+                    col.kind === "tens" && "h-8 w-1.5 rounded-sm bg-teal",
+                    col.kind === "hundreds" && "size-4 rounded-[3px] bg-q2",
+                    col.kind === "thousands" && "size-5 rounded-[3px] bg-ink/40",
+                  )}
+                />
+              ))}
+            </div>
+            {col.label}
           </div>
         ))}
       </div>
@@ -486,21 +502,32 @@ function BuildNumber({ question, status, shake }: BoardProps) {
 
 function CompareNums({ question, status, shake }: BoardProps) {
   const data = question.data as CompareData;
+  const ui = UI[parseLocale(useProgress((st) => st.locale))];
+  const showBars = data.visual === "bars";
   const max = Math.max(data.a, data.b, 1);
   return (
     <Frame shake={shake} status={status}>
-      <div className="flex items-end justify-center gap-8">
+      <div className={cn("flex justify-center gap-8", showBars ? "items-end" : "items-start")}>
         {[data.a, data.b].map((n, i) => (
           <div key={i} className="flex flex-col items-center gap-2">
-            <div
-              className={cn("w-10 rounded-t-md", i === 0 ? "bg-teal" : "bg-star")}
-              style={{ height: `${Math.max(12, (n / max) * 96)}px` }}
-            />
+            {showBars ? (
+              <div
+                className={cn("w-10 rounded-t-md", i === 0 ? "bg-teal" : "bg-star")}
+                style={{ height: `${Math.max(12, (n / max) * 96)}px` }}
+              />
+            ) : null}
+            {question.input === "compare" ? (
+              <p className="text-[11px] text-muted">{i === 0 ? ui.compareLeft : ui.compareRight}</p>
+            ) : null}
             <span className="font-display text-2xl tabular-nums sm:text-3xl">{n}</span>
           </div>
         ))}
       </div>
-      {question.input === "compare" ? <p className="mt-3 text-center text-faint">○</p> : null}
+      {question.input === "compare" ? (
+        <p className="mt-3 text-center font-display text-2xl tabular-nums">
+          {data.a} ○ {data.b}
+        </p>
+      ) : null}
     </Frame>
   );
 }
@@ -701,9 +728,31 @@ function FractionBar({ question, onInteract, status, shake }: BoardProps) {
           <circle cx={x(data.num, den)} cy="20" r="3" fill="#0d7377" />
           {data.num2 != null && data.den2 ? <circle cx={x(data.num2, data.den2)} cy="20" r="3" fill="#c45c26" /> : null}
         </svg>
-        <p className="text-center text-xs text-muted">
-          {data.num2 != null ? `${data.num}/${data.den} and ${data.num2}/${data.den2}` : `${data.num} jump${data.num === 1 ? "" : "s"} of 1/${den}`}
-        </p>
+        {data.num2 != null ? (
+          <p className="text-center font-display text-xl">
+            {data.num}/{data.den} ○ {data.num2}/{data.den2}
+          </p>
+        ) : null}
+      </Frame>
+    );
+  }
+
+  if (data.set) {
+    const filled = data.shaded ?? data.num;
+    return (
+      <Frame shake={shake} status={status}>
+        <div className="flex flex-wrap justify-center gap-2">
+          {Array.from({ length: den }, (_, i) => (
+            <span
+              key={i}
+              data-set-piece={i < filled ? "shaded" : "plain"}
+              className={cn(
+                "size-8 rounded-full border sm:size-9",
+                i < filled ? "border-teal bg-teal" : "border-line bg-surface",
+              )}
+            />
+          ))}
+        </div>
       </Frame>
     );
   }
@@ -866,18 +915,24 @@ function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProp
     return (
       <Frame shake={shake} status={status}>
         <div className="grid grid-cols-2 gap-3">
-          <div className="flex flex-wrap justify-center gap-1 rounded-[16px] border border-line p-2">
-            {left.map((id, i) => (
-              <MoneyPic key={`l-${i}`} id={id} />
-            ))}
+          <div className="rounded-[16px] border border-line p-2">
+            <p className="mb-1 text-center text-[11px] text-muted">{ui.compareLeft}</p>
+            <div className="flex flex-wrap justify-center gap-1">
+              {left.map((id, i) => (
+                <MoneyPic key={`l-${i}`} id={id} />
+              ))}
+            </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-1 rounded-[16px] border border-line p-2">
-            {right.map((id, i) => (
-              <MoneyPic key={`r-${i}`} id={id} />
-            ))}
+          <div className="rounded-[16px] border border-line p-2">
+            <p className="mb-1 text-center text-[11px] text-muted">{ui.compareRight}</p>
+            <div className="flex flex-wrap justify-center gap-1">
+              {right.map((id, i) => (
+                <MoneyPic key={`r-${i}`} id={id} />
+              ))}
+            </div>
           </div>
         </div>
-        <p className="mt-3 text-center text-sm text-muted">{question.prompt}</p>
+        <p className="mt-3 text-center font-display text-xl">○</p>
       </Frame>
     );
   }
@@ -1236,6 +1291,24 @@ function hundredsParts(n: number) {
   };
 }
 
+export function jumpTickLabel(data: JumpsData, i: number): string {
+  const n = i * data.size;
+  switch (data.hide) {
+    case "product":
+      return i === data.jumps ? "n" : String(n);
+    case "size":
+      if (i === 0) return "0";
+      if (i === data.jumps) return String(n);
+      return "";
+    case "jumps":
+      return String(n);
+    default: {
+      const _never: never = data.hide;
+      return _never;
+    }
+  }
+}
+
 function NumberLine({ question, status, shake }: BoardProps) {
   const data = question.data as JumpsData;
   const product = data.size * data.jumps;
@@ -1248,11 +1321,12 @@ function NumberLine({ question, status, shake }: BoardProps) {
         <line x1="8" y1="24" x2="92" y2="24" stroke="#1f1a14" strokeWidth="1.5" />
         {Array.from({ length: data.jumps + 1 }, (_, i) => {
           const n = i * data.size;
+          const label = jumpTickLabel(data, i);
           return (
             <g key={i}>
               <line x1={x(n)} y1="18" x2={x(n)} y2="30" stroke="#1f1a14" strokeWidth="1.2" />
               <text x={x(n)} y="38" textAnchor="middle" fontSize="5" fill="#6b6358">
-                {n}
+                {label}
               </text>
               {i < data.jumps ? (
                 <path

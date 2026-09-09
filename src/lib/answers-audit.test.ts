@@ -459,11 +459,60 @@ describe("answer audit", () => {
     expect(models).not.toContain("Read the hands.");
     expect(models).not.toContain("Nearest hundred");
     expect(models).not.toContain("Nearest thousand");
+    expect(models).not.toContain("tens you can see");
+    expect(models).not.toContain("n ones hiding");
     expect(models).not.toMatch(/Key:\s*</);
     const gens = readFileSync(join(HERE, "questions.ts"), "utf8");
     expect(gens).not.toContain("Thousands, hundreds, tens, ones.");
     expect(gens).not.toContain("Take the pieces you can see.");
     expect(gens).not.toMatch(/What is n\?`/);
+  });
+
+  it("Grade 3 compare prompts name both sides and < = >", () => {
+    const ids = ["u2-compare", "u10-compare", "u10-line", "u11-compare"] as const;
+    for (const locale of ["en", "es", "pt-BR"] as const) {
+      for (const id of ids) {
+        for (let i = 0; i < 16; i++) {
+          const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`cmp:${locale}:${id}:${i}`), locale);
+          expect(q.input, `${id} ${locale}`).toBe("compare");
+          expect(q.prompt, `${id} ${locale}`).toMatch(/less than|menor que/);
+          expect(q.prompt, `${id} ${locale}`).toMatch(/equal to|igual a/);
+          expect(q.prompt, `${id} ${locale}`).toMatch(/greater than|mayor que|maior que/);
+          expect(q.prompt, `${id} ${locale}`).not.toMatch(/^\s*\d[\d,]*\s*○\s*\d/);
+          expect(q.prompt, `${id} ${locale}`).not.toMatch(/\d+\/\d+\s*○/);
+          expect(q.prompt, `${id} ${locale}`).not.toContain(q.answer);
+          if (id === "u2-compare") {
+            const d = q.data as CompareData;
+            expect(q.prompt).not.toContain(String(d.a));
+            expect(q.prompt).not.toContain(String(d.b));
+          }
+        }
+      }
+    }
+  });
+
+  it("unit fraction prompt does not name 1/den", () => {
+    for (const locale of ["en", "es", "pt-BR"] as const) {
+      for (let i = 0; i < 20; i++) {
+        const q = makeQuestion(activityById("u5-unit")!.activity, rngFromSeed(`uf:${locale}:${i}`), locale);
+        const d = q.data as FractionData;
+        expect(q.answer).toBe(`1/${d.den}`);
+        expect(q.prompt).not.toMatch(/one piece of|una pieza de|um pedaço de/i);
+        expect(q.prompt).not.toContain(q.answer);
+        expect(q.prompt).not.toContain(String(d.den));
+      }
+    }
+  });
+
+  it("of-a-set uses a set prompt, not the region-bar prompt", () => {
+    for (let i = 0; i < 12; i++) {
+      const setQ = makeQuestion(activityById("u5-set")!.activity, rngFromSeed(`set:${i}`));
+      const barQ = makeQuestion(activityById("u5-name")!.activity, rngFromSeed(`bar:${i}`));
+      expect((setQ.data as FractionData).set).toBe(true);
+      expect((barQ.data as FractionData).set).toBeFalsy();
+      expect(setQ.prompt).toMatch(/group/i);
+      expect(barQ.prompt).not.toMatch(/group/i);
+    }
   });
 });
 

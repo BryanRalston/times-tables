@@ -4,7 +4,7 @@ import { activityById } from "@/lib/curriculum";
 import { makeQuestion, welcomeFirst } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
 import { AnswerPanel } from "./answer-panel";
-import { AnswerReadout, ClockKeys, Keypad, applyKeypadKey } from "./keypad";
+import { AnswerReadout, ClockKeys, CompareKeys, Keypad, applyKeypadKey } from "./keypad";
 
 describe("answer readout", () => {
   it("shows typed digits in a Your answer box", () => {
@@ -74,6 +74,19 @@ describe("clock keys", () => {
     expect(html).not.toContain("+5 min");
     expect(html).toContain("Check");
     expect(html).not.toMatch(/ disabled(=""|>)/);
+  });
+});
+
+describe("compare keys", () => {
+  it("labels less than, equal to, and greater than", () => {
+    const html = renderToStaticMarkup(<CompareKeys onPick={() => undefined} />);
+    expect(html).toContain("less than");
+    expect(html).toContain("equal to");
+    expect(html).toContain("greater than");
+    expect(html).toContain("&lt;");
+    expect(html).toContain("=");
+    expect(html).toContain("&gt;");
+    expect(html).toContain('aria-label="less than"');
   });
 });
 

@@ -124,6 +124,7 @@ export interface FractionData {
   den2?: number;
   mode: "name" | "unit" | "mixed" | "compare" | "benchmark" | "equiv" | "leftover" | "line";
   shaded?: number;
+  set?: boolean;
 }
 
 export interface ClockData {

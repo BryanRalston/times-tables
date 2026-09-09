@@ -159,7 +159,7 @@ export const UNITS: UnitDef[] = [
       A("u6-array", "Easy arrays", "Rows of 2, 5, or 10.", ["3.CE.2.d"], "array", { factors: [2, 5, 10] }),
       A("u6-factor", "Missing factor", "5 × n = 30. Isolate one group.", ["3.CE.2.d"], "groups", { hide: "groups", factors: [2, 5, 10] }),
       A("u6-skip", "Skip count", "The pattern is hiding a number.", ["3.CE.2.d"], "pattern", { steps: [2, 5, 10], dir: "up" }),
-      A("u6-picto", "Tally with a key", "Sort pictures. Each picture can stand for 1. Then read.", ["3.PS.1.c", "3.PS.1.e"], "graph", { kind: "picto", collect: true, key: 2 }),
+      A("u6-picto", "Tally with a key", "Sort pictures. Each picture stands for 2. Then read.", ["3.PS.1.c", "3.PS.1.e"], "graph", { kind: "picto", collect: true, key: 2 }),
     ],
   },
   {

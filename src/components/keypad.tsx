@@ -198,12 +198,33 @@ export function CompareKeys({
   disabled?: boolean;
   includeNeq?: boolean;
 }) {
-  const keys = includeNeq ? ["<", "=", ">", "≠"] : ["<", "=", ">"];
+  const ui = useChrome();
+  const keys = includeNeq
+    ? [
+        { sym: "<", words: ui.lessThan },
+        { sym: "=", words: ui.equalTo },
+        { sym: ">", words: ui.greaterThan },
+        { sym: "≠", words: ui.lessThan },
+      ]
+    : [
+        { sym: "<", words: ui.lessThan },
+        { sym: "=", words: ui.equalTo },
+        { sym: ">", words: ui.greaterThan },
+      ];
   return (
     <div className={cn("grid gap-2", includeNeq ? "grid-cols-4" : "grid-cols-3")}>
       {keys.map((k) => (
-        <Button key={k} variant="secondary" size="lg" className="text-2xl" disabled={disabled} onClick={() => onPick(k)}>
-          {k}
+        <Button
+          key={k.sym}
+          variant="secondary"
+          size="lg"
+          className="flex h-auto flex-col gap-0.5 py-2 text-2xl"
+          disabled={disabled}
+          onClick={() => onPick(k.sym)}
+          aria-label={k.words}
+        >
+          <span>{k.sym}</span>
+          {k.sym !== "≠" ? <span className="text-[10px] font-sans font-medium leading-tight text-muted">{k.words}</span> : null}
         </Button>
       ))}
     </div>
