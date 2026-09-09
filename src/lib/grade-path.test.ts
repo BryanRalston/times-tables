@@ -85,9 +85,9 @@ describe("grade path", () => {
     expect(TALL_MAP_OVERLAYS.every((p) => p.map.x > 38 && p.map.x < 62)).toBe(true);
     expect(TALL_MAP_OVERLAYS.every((p) => overlayClearsPads(p))).toBe(true);
     const fall = TALL_MAP_OVERLAYS.find((p) => p.id === "waterfall")!;
-    expect(fall.map).toEqual({ x: 42.05, y: 31.15 });
-    expect(fall.map.y).toBeGreaterThan(26);
-    expect(fall.map.y).toBeLessThan(32);
+    expect(fall.map).toEqual({ x: 40.2, y: 25.55 });
+    expect(fall.map.y).toBeGreaterThan(24);
+    expect(fall.map.y).toBeLessThan(28);
     expect(overlayInOpenCoveWater(fall)).toBe(false);
     expect(TALL_MAP_OVERLAYS.find((p) => p.id === "sailboat")?.motion).toBe("bob");
     expect(TALL_MAP_OVERLAYS.find((p) => p.id === "coins")?.motion).toBe("bob");

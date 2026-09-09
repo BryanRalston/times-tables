@@ -150,7 +150,7 @@ export const TALL_MAP_OVERLAYS: readonly PathOverlay[] = [
   { id: "tenframe-b", file: "tenframe.png", zone: "meadow", map: { x: 59.55, y: 77.85 }, width: 16, motion: "bob" },
   { id: "daisies", file: "daisies.png", zone: "meadow", map: { x: 39.85, y: 80.15 }, width: 11, motion: "bob" },
   { id: "gumdrop", file: "gumdrop.png", zone: "meadow", map: { x: 59.25, y: 69.45 }, width: 12, motion: "sway" },
-  { id: "waterfall", file: "waterfall.png", zone: "cove", map: { x: 42.05, y: 31.15 }, width: 15, motion: "fall" },
+  { id: "waterfall", file: "waterfall.png", zone: "cove", map: { x: 40.2, y: 25.55 }, width: 14, motion: "fall" },
   { id: "palm", file: "palm.png", zone: "cove", map: { x: 60.45, y: 56.85 }, width: 15, motion: "sway" },
   { id: "sailboat", file: "sailboat.png", zone: "cove", map: { x: 59.4, y: 49.6 }, width: 12, motion: "bob" },
   { id: "coins", file: "coins.png", zone: "cove", map: { x: 60.15, y: 42.55 }, width: 13, motion: "bob" },
