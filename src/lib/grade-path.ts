@@ -142,7 +142,7 @@ export const TALL_MAP_OVERLAY_DIR = "candy-zones/overlays";
  * PNG-space props in the cover-crop gutters, beside the trail.
  * Visible x is roughly 36.7–63.3 of the 1536px art.
  *
- * Waterfall sits on the cove's upper-left rocky shore (forest→water),
+ * Waterfall sits on the cove's upper-left rocky/pink shore (forest→water),
  * not the open-water band around y ≈ 42–54. Splash is toward larger y.
  */
 export const TALL_MAP_OVERLAYS: readonly PathOverlay[] = [
@@ -150,7 +150,7 @@ export const TALL_MAP_OVERLAYS: readonly PathOverlay[] = [
   { id: "tenframe-b", file: "tenframe.png", zone: "meadow", map: { x: 59.55, y: 77.85 }, width: 16, motion: "bob" },
   { id: "daisies", file: "daisies.png", zone: "meadow", map: { x: 39.85, y: 80.15 }, width: 11, motion: "bob" },
   { id: "gumdrop", file: "gumdrop.png", zone: "meadow", map: { x: 59.25, y: 69.45 }, width: 12, motion: "sway" },
-  { id: "waterfall", file: "waterfall.png", zone: "cove", map: { x: 39.65, y: 32.85 }, width: 17, motion: "fall" },
+  { id: "waterfall", file: "waterfall.png", zone: "cove", map: { x: 38.35, y: 29.15 }, width: 15, motion: "fall" },
   { id: "palm", file: "palm.png", zone: "cove", map: { x: 60.45, y: 56.85 }, width: 15, motion: "sway" },
   { id: "sailboat", file: "sailboat.png", zone: "cove", map: { x: 59.4, y: 49.6 }, width: 12, motion: "bob" },
   { id: "coins", file: "coins.png", zone: "cove", map: { x: 60.15, y: 42.55 }, width: 13, motion: "bob" },
