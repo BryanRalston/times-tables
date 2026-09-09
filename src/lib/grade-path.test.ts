@@ -68,10 +68,10 @@ describe("grade path", () => {
     expect(PATH_OBSTACLE.map).toEqual(TALL_MAP_DECORATIVE_PAD);
     expect(PATH_OBSTACLE.id).toBe("cove-boulder");
     expect(PATH_OBSTACLE.file).toBe("cove-boulder.png");
-    expect(PATH_OBSTACLE.map).toEqual({ x: 45.51, y: 32.55 });
-    expect(PATH_OBSTACLE.width).toBe(24);
-    expect(PATH_OBSTACLE.width).toBeGreaterThan(20);
-    expect(PATH_OBSTACLE.width).toBeLessThan(30);
+    expect(PATH_OBSTACLE.map).toEqual({ x: 46.7, y: 32.7 });
+    expect(PATH_OBSTACLE.width).toBe(20);
+    expect(PATH_OBSTACLE.width).toBeGreaterThan(16);
+    expect(PATH_OBSTACLE.width).toBeLessThan(26);
     expect(TALL_MAP_OVERLAYS.some((p) => p.id === PATH_OBSTACLE.id)).toBe(false);
     expect(GRADE3_PATH_PADS.some((p) => p.map.x === PATH_OBSTACLE.map.x && p.map.y === PATH_OBSTACLE.map.y)).toBe(false);
     const mid = mapToViewPos({ x: 50, y: 50 });

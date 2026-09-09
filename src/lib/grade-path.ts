@@ -41,10 +41,11 @@ const TALL_MAP_UNIT_PADS: readonly PathPad[] = [
 ];
 
 /**
- * Measured center of the old blank disc between units 8 and 9 (PNG %).
- * Tall-map paints that circle to path wood; the boulder overlay sits here.
+ * Boulder on the left shoulder of the 8↔9 bend (PNG %).
+ * Cover-crop pulls x left; 46.7 sits on the path edge over the old disc
+ * without covering pads 8 or 9. Tall-map has no cream circle there.
  */
-export const TALL_MAP_DECORATIVE_PAD: PathNodePos = { x: 45.51, y: 32.55 };
+export const TALL_MAP_DECORATIVE_PAD: PathNodePos = { x: 46.7, y: 32.7 };
 
 export const GRADE3_PATH_PADS: readonly PathPad[] = TALL_MAP_UNIT_PADS;
 
@@ -156,7 +157,7 @@ export const PATH_OBSTACLE: PathObstacle = {
   file: "cove-boulder.png",
   zone: "cove",
   map: TALL_MAP_DECORATIVE_PAD,
-  width: 24,
+  width: 20,
   seat: "land",
 };
 
