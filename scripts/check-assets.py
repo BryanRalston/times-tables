@@ -298,6 +298,25 @@ def main() -> int:
         if mag > 8:
             fails.append(f"money/{name}: leftover magenta {mag}px")
 
+    tall = PUBLIC / "candy-zones" / "tall-map.png"
+    if not tall.exists():
+        fails.append("missing candy-zones/tall-map.png")
+    else:
+        im = Image.open(tall).convert("RGB")
+        w, h = im.size
+        px = im.load()
+        cx, cy = int(round(0.4551 * w)), int(round(0.3255 * h))
+        cream = 0
+        for y in range(max(0, cy - 28), min(h, cy + 29)):
+            for x in range(max(0, cx - 28), min(w, cx + 29)):
+                if (x - cx) ** 2 + (y - cy) ** 2 > 28 * 28:
+                    continue
+                r, g, b = px[x, y]
+                if r > 240 and g > 210 and 150 < b < 200 and (r - b) > 50:
+                    cream += 1
+        if cream > 8:
+            fails.append(f"tall-map.png: cream disc still at 8↔9 boulder seat ({cream}px)")
+
     if fails:
         print("check-assets FAIL")
         for f in fails:
