@@ -920,6 +920,7 @@ details > summary::-webkit-details-marker {
 .candy-map {
   position: relative;
   overflow: hidden;
+  width: max(100%, 68rem);
   border-radius: 28px;
   border: 4px solid #f3b3c8;
   box-shadow:
@@ -928,7 +929,7 @@ details > summary::-webkit-details-marker {
 }
 .candy-world {
   position: relative;
-  width: max(100%, 68rem);
+  width: 100%;
   aspect-ratio: 16 / 9;
 }
 .candy-world-art {
