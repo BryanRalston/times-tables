@@ -8,44 +8,44 @@ export type PathPad = {
   unitNumber: number;
 };
 
-/** Locked quiet world: terrain + path + cream pads only. 1536×1024. */
+/** Locked quiet world: landscape winding boardwalk + 13 cream pads. 1920×1080. */
 export const TALL_MAP_FILE = "candy-zones/tall-map.png";
 
-export const TALL_MAP_SIZE = { w: 1536, h: 1024 } as const;
+export const TALL_MAP_SIZE = { w: 1920, h: 1080 } as const;
 
 /**
  * CSS `aspect-ratio` width/height for the Lessons world.
- * Taller than the 3:2 PNG so painted pads are large enough for hopper/numbers
- * and the trail scrolls. object-fit cover crops only the far sides.
+ * Matches the landscape PNG so the full meadow↔cove↔forest loop stays on-art.
+ * The long axis is horizontal — Lessons scrolls sideways to follow the S.
  */
-export const CANDY_WORLD_ASPECT = 2 / 5;
+export const CANDY_WORLD_ASPECT = 16 / 9;
 
 /**
  * Painted cream pads on tall-map.png, percent of the PNG (y = 0 is the top).
- * Art has 13 numbered discs. The cove shoreline stone is a hop-over obstacle.
+ * 13 discs in boardwalk order: meadow (green, right→left) → cove (water S)
+ * → forest (pink, hook→left). First/last path ends are cropped off-canvas.
  */
 const TALL_MAP_UNIT_PADS: readonly PathPad[] = [
-  { zone: "meadow", map: { x: 45.05, y: 92.69 }, unitNumber: 1 },
-  { zone: "meadow", map: { x: 51.04, y: 83.31 }, unitNumber: 2 },
-  { zone: "meadow", map: { x: 48.89, y: 74.64 }, unitNumber: 3 },
-  { zone: "meadow", map: { x: 46.06, y: 65.81 }, unitNumber: 4 },
-  { zone: "cove", map: { x: 50.64, y: 59.03 }, unitNumber: 5 },
-  { zone: "cove", map: { x: 49.56, y: 51.11 }, unitNumber: 6 },
-  { zone: "cove", map: { x: 53.67, y: 44.87 }, unitNumber: 7 },
-  { zone: "cove", map: { x: 49.87, y: 38.13 }, unitNumber: 8 },
-  { zone: "forest", map: { x: 49.44, y: 27.4 }, unitNumber: 9 },
-  { zone: "forest", map: { x: 54.47, y: 21.22 }, unitNumber: 10 },
-  { zone: "forest", map: { x: 49.3, y: 17.14 }, unitNumber: 11 },
-  { zone: "forest", map: { x: 46.06, y: 11.46 }, unitNumber: 12 },
-  { zone: "forest", map: { x: 51.27, y: 6.52 }, unitNumber: 13 },
+  { zone: "meadow", map: { x: 94.49, y: 77.53 }, unitNumber: 1 },
+  { zone: "meadow", map: { x: 70.38, y: 86.33 }, unitNumber: 2 },
+  { zone: "meadow", map: { x: 50.42, y: 75.69 }, unitNumber: 3 },
+  { zone: "meadow", map: { x: 30.59, y: 77.57 }, unitNumber: 4 },
+  { zone: "cove", map: { x: 31.68, y: 53.48 }, unitNumber: 5 },
+  { zone: "cove", map: { x: 43.19, y: 49.96 }, unitNumber: 6 },
+  { zone: "cove", map: { x: 55.73, y: 49.55 }, unitNumber: 7 },
+  { zone: "cove", map: { x: 66.87, y: 43.17 }, unitNumber: 8 },
+  { zone: "forest", map: { x: 70.53, y: 29.79 }, unitNumber: 9 },
+  { zone: "forest", map: { x: 53.1, y: 17.49 }, unitNumber: 10 },
+  { zone: "forest", map: { x: 41.4, y: 23.56 }, unitNumber: 11 },
+  { zone: "forest", map: { x: 18.3, y: 15.42 }, unitNumber: 12 },
+  { zone: "forest", map: { x: 1.51, y: 17.63 }, unitNumber: 13 },
 ];
 
 /**
- * Boulder on the left shoulder of the 8↔9 bend (PNG %).
- * Cover-crop pulls x left; 46.7 sits on the path edge over the old disc
- * without covering pads 8 or 9. Tall-map has no cream circle there.
+ * Vinyl boulder on the left shoulder of the 4↔5 water rise (PNG %).
+ * Between consecutive pads, not on a numbered disc.
  */
-export const TALL_MAP_DECORATIVE_PAD: PathNodePos = { x: 46.7, y: 32.7 };
+export const TALL_MAP_DECORATIVE_PAD: PathNodePos = { x: 24.6, y: 64.8 };
 
 export const GRADE3_PATH_PADS: readonly PathPad[] = TALL_MAP_UNIT_PADS;
 
@@ -53,8 +53,8 @@ export const GRADE3_PATH_PADS: readonly PathPad[] = TALL_MAP_UNIT_PADS;
 export const GRADE3_PATH_NODES: readonly PathNodePos[] = GRADE3_PATH_PADS.map((p) => p.map);
 
 /**
- * Map a PNG-percent point onto the cover-cropped world box.
- * The world is taller than the art, so only the x axis is cropped.
+ * Map a PNG-percent point onto the world box.
+ * When the world aspect matches the art, this is identity — the full loop stays visible.
  */
 export function mapToViewPos(pos: PathNodePos, worldAspect = CANDY_WORLD_ASPECT): PathNodePos {
   const imageAspect = TALL_MAP_SIZE.w / TALL_MAP_SIZE.h;
@@ -151,13 +151,13 @@ export type PathObstacle = {
   seat: OverlaySeat;
 };
 
-/** Vinyl candy boulder centered on the old 8↔9 disc. Not tappable. */
+/** Vinyl candy boulder on the 4↔5 water-rise shoulder. Not tappable. */
 export const PATH_OBSTACLE: PathObstacle = {
   id: "cove-boulder",
   file: "cove-boulder.png",
   zone: "cove",
   map: TALL_MAP_DECORATIVE_PAD,
-  width: 20,
+  width: 8,
   seat: "land",
 };
 
@@ -174,36 +174,31 @@ export type PathOverlay = {
 export const TALL_MAP_OVERLAY_DIR = "candy-zones/overlays";
 
 /**
- * PNG-space props in the cover-crop gutters, beside the trail.
- * Visible x is roughly 36.7–63.3 of the 1536px art.
- *
- * Landmarks are Imagine props seated only on empty tall-map pixels — not on
- * painted bushes, rocks, trees, or islands. Fewer well-spaced copies beat a
- * clutter wall: ~5 meadow mounds, ~3 cove coin stacks, ~5 forest trees.
- * Waterfall stays extra to the Candyland mock — splash seat (−84%) on the
- * left-gutter pink→beige lip (y ≈ 26.5–27.9 at x ≈ 40–42).
+ * PNG-space props in empty frosting / sand / water gutters beside the loop.
+ * Full landscape is on-screen (no side crop), so landmarks sit in the wide
+ * gutters — never on cream discs.
  */
 export const TALL_MAP_OVERLAYS: readonly PathOverlay[] = [
-  { id: "tenframe-a", file: "tenframe-mound.png", zone: "meadow", map: { x: 39.85, y: 88.05 }, width: 15, motion: "bob", seat: "land" },
-  { id: "tenframe-b", file: "tenframe-mound.png", zone: "meadow", map: { x: 60.45, y: 87.85 }, width: 14, motion: "bob", seat: "land" },
-  { id: "tenframe-c", file: "tenframe-mound.png", zone: "meadow", map: { x: 39.75, y: 72.35 }, width: 14, motion: "bob", seat: "land" },
-  { id: "tenframe-d", file: "tenframe-mound.png", zone: "meadow", map: { x: 60.15, y: 70.25 }, width: 13, motion: "bob", seat: "land" },
-  { id: "tenframe-e", file: "tenframe-mound.png", zone: "meadow", map: { x: 39.85, y: 62.45 }, width: 13, motion: "bob", seat: "land" },
-  { id: "flowers", file: "meadow-flowers.png", zone: "meadow", map: { x: 59.15, y: 93.55 }, width: 8, motion: "bob", seat: "land" },
-  { id: "daisies", file: "daisies.png", zone: "meadow", map: { x: 59.55, y: 76.85 }, width: 8, motion: "bob", seat: "land" },
-  { id: "waterfall", file: "waterfall.png", zone: "cove", map: { x: 40.9, y: 28.5 }, width: 14, motion: "fall", seat: "shore" },
-  { id: "palm", file: "palm.png", zone: "cove", map: { x: 60.45, y: 56.85 }, width: 13, motion: "sway", seat: "land" },
-  { id: "dock", file: "dock.png", zone: "cove", map: { x: 59.55, y: 52.85 }, width: 12, motion: "bob", seat: "water" },
-  { id: "sailboat", file: "sailboat.png", zone: "cove", map: { x: 58.35, y: 50.15 }, width: 9, motion: "bob", seat: "water" },
-  { id: "sailboat-b", file: "sailboat.png", zone: "cove", map: { x: 61.05, y: 48.45 }, width: 8, motion: "bob", seat: "water" },
-  { id: "coins", file: "coin-stack.png", zone: "cove", map: { x: 39.85, y: 45.55 }, width: 9, motion: "bob", seat: "water" },
-  { id: "coins-b", file: "coin-stack.png", zone: "cove", map: { x: 40.15, y: 51.85 }, width: 8, motion: "bob", seat: "water" },
-  { id: "coins-c", file: "coin-stack.png", zone: "cove", map: { x: 60.7, y: 41.55 }, width: 9, motion: "bob", seat: "water" },
-  { id: "fraction-tree", file: "fraction-tree.png", zone: "forest", map: { x: 41.2, y: 23.4 }, width: 11, motion: "sway", seat: "land" },
-  { id: "fraction-tree-b", file: "fraction-tree.png", zone: "forest", map: { x: 59.55, y: 8.15 }, width: 10, motion: "sway", seat: "land" },
-  { id: "fraction-tree-c", file: "fraction-tree.png", zone: "forest", map: { x: 40.9, y: 16.6 }, width: 10, motion: "sway", seat: "land" },
-  { id: "fraction-tree-d", file: "fraction-tree.png", zone: "forest", map: { x: 57.25, y: 14.55 }, width: 10, motion: "sway", seat: "land" },
-  { id: "fraction-tree-e", file: "fraction-tree.png", zone: "forest", map: { x: 61.15, y: 19.85 }, width: 10, motion: "sway", seat: "land" },
+  { id: "tenframe-a", file: "tenframe-mound.png", zone: "meadow", map: { x: 12.2, y: 90.4 }, width: 10, motion: "bob", seat: "land" },
+  { id: "tenframe-b", file: "tenframe-mound.png", zone: "meadow", map: { x: 46.8, y: 93.2 }, width: 9, motion: "bob", seat: "land" },
+  { id: "tenframe-c", file: "tenframe-mound.png", zone: "meadow", map: { x: 64.2, y: 94.0 }, width: 9, motion: "bob", seat: "land" },
+  { id: "tenframe-d", file: "tenframe-mound.png", zone: "meadow", map: { x: 84.6, y: 91.5 }, width: 9, motion: "bob", seat: "land" },
+  { id: "tenframe-e", file: "tenframe-mound.png", zone: "meadow", map: { x: 18.8, y: 70.2 }, width: 9, motion: "bob", seat: "land" },
+  { id: "flowers", file: "meadow-flowers.png", zone: "meadow", map: { x: 55.5, y: 96.2 }, width: 7, motion: "bob", seat: "land" },
+  { id: "daisies", file: "daisies.png", zone: "meadow", map: { x: 8.4, y: 82.6 }, width: 7, motion: "bob", seat: "land" },
+  { id: "waterfall", file: "waterfall.png", zone: "cove", map: { x: 11.4, y: 33.8 }, width: 10, motion: "fall", seat: "shore" },
+  { id: "palm", file: "palm.png", zone: "cove", map: { x: 90.8, y: 58.6 }, width: 9, motion: "sway", seat: "land" },
+  { id: "dock", file: "dock.png", zone: "cove", map: { x: 86.4, y: 51.2 }, width: 9, motion: "bob", seat: "water" },
+  { id: "sailboat", file: "sailboat.png", zone: "cove", map: { x: 82.2, y: 46.4 }, width: 7, motion: "bob", seat: "water" },
+  { id: "sailboat-b", file: "sailboat.png", zone: "cove", map: { x: 91.0, y: 43.8 }, width: 6, motion: "bob", seat: "water" },
+  { id: "coins", file: "coin-stack.png", zone: "cove", map: { x: 9.6, y: 46.8 }, width: 7, motion: "bob", seat: "water" },
+  { id: "coins-b", file: "coin-stack.png", zone: "cove", map: { x: 14.2, y: 55.6 }, width: 6, motion: "bob", seat: "water" },
+  { id: "coins-c", file: "coin-stack.png", zone: "cove", map: { x: 91.4, y: 38.6 }, width: 7, motion: "bob", seat: "water" },
+  { id: "fraction-tree", file: "fraction-tree.png", zone: "forest", map: { x: 86.2, y: 10.4 }, width: 8, motion: "sway", seat: "land" },
+  { id: "fraction-tree-b", file: "fraction-tree.png", zone: "forest", map: { x: 58.8, y: 6.2 }, width: 8, motion: "sway", seat: "land" },
+  { id: "fraction-tree-c", file: "fraction-tree.png", zone: "forest", map: { x: 32.4, y: 7.8 }, width: 8, motion: "sway", seat: "land" },
+  { id: "fraction-tree-d", file: "fraction-tree.png", zone: "forest", map: { x: 72.6, y: 8.6 }, width: 8, motion: "sway", seat: "land" },
+  { id: "fraction-tree-e", file: "fraction-tree.png", zone: "forest", map: { x: 10.8, y: 7.4 }, width: 8, motion: "sway", seat: "land" },
 ];
 
 /** Same-file landmarks stay this far apart so gutters do not become a clutter wall. */
@@ -238,29 +233,28 @@ export function overlaysHaveBreathingRoom(
   return true;
 }
 
-/** Open water on the left gutter — the old mid-cove float. */
+/** Open water on the left cove, beside the boardwalk S. */
 export function overlayInOpenCoveWater(prop: PathOverlay): boolean {
-  return prop.zone === "cove" && prop.map.x < 45 && prop.map.y > 42 && prop.map.y < 54;
+  return prop.zone === "cove" && prop.map.x < 22 && prop.map.y > 40 && prop.map.y < 58;
 }
 
-/** Dry pink forest above the cove lip — the shipped on-land seat. */
+/** Dry pink forest above the cove lip. */
 export function overlayOnDryCoveBank(prop: PathOverlay): boolean {
-  return prop.zone === "cove" && prop.map.x < 46 && prop.map.y < 27.5;
+  return prop.zone === "cove" && prop.map.x < 20 && prop.map.y < 28;
 }
 
 /**
- * Splash-anchor on the forest→cove lip in the left gutter.
- * Rocks sit on the beige/pink ledge; splash is in turquoise (larger y).
+ * Splash-anchor on the left pink→sand lip. Path is on the right at this y.
  */
 export function overlayOnCoveShoreLip(prop: PathOverlay): boolean {
   return (
     prop.id === "waterfall" &&
     prop.zone === "cove" &&
     prop.seat === "shore" &&
-    prop.map.x > 40 &&
-    prop.map.x < 42.5 &&
-    prop.map.y > 27.8 &&
-    prop.map.y < 30 &&
+    prop.map.x > 8 &&
+    prop.map.x < 16 &&
+    prop.map.y > 31 &&
+    prop.map.y < 36 &&
     !overlayInOpenCoveWater(prop) &&
     !overlayOnDryCoveBank(prop)
   );
@@ -277,15 +271,15 @@ export type TrailPeekSpot = {
  * Only one fires per Lessons visit; extras exist so the current stretch always has a nearby pop.
  */
 export const TRAIL_PEEK_SPOTS: readonly TrailPeekSpot[] = [
-  { id: "meadow-bush", zone: "meadow", map: { x: 58.85, y: 91.15 } },
-  { id: "meadow-rock", zone: "meadow", map: { x: 39.45, y: 82.25 } },
-  { id: "meadow-clear", zone: "meadow", map: { x: 59.35, y: 71.85 } },
-  { id: "cove-palm", zone: "cove", map: { x: 60.85, y: 57.55 } },
-  { id: "cove-fall", zone: "cove", map: { x: 39.75, y: 46.55 } },
-  { id: "cove-coin", zone: "cove", map: { x: 60.55, y: 40.15 } },
-  { id: "forest-shade", zone: "forest", map: { x: 39.65, y: 26.85 } },
-  { id: "forest-pie", zone: "forest", map: { x: 61.5, y: 16.4 } },
-  { id: "forest-canopy", zone: "forest", map: { x: 38.95, y: 7.25 } },
+  { id: "meadow-bush", zone: "meadow", map: { x: 88.2, y: 90.6 } },
+  { id: "meadow-rock", zone: "meadow", map: { x: 22.4, y: 88.8 } },
+  { id: "meadow-clear", zone: "meadow", map: { x: 58.6, y: 92.4 } },
+  { id: "cove-palm", zone: "cove", map: { x: 90.2, y: 56.8 } },
+  { id: "cove-fall", zone: "cove", map: { x: 10.8, y: 52.4 } },
+  { id: "cove-coin", zone: "cove", map: { x: 90.6, y: 40.2 } },
+  { id: "forest-shade", zone: "forest", map: { x: 84.4, y: 14.6 } },
+  { id: "forest-pie", zone: "forest", map: { x: 62.2, y: 9.2 } },
+  { id: "forest-canopy", zone: "forest", map: { x: 8.6, y: 9.0 } },
 ];
 
 /** Map-Y window around the current pad that stays on-screen after hopper-centering. */

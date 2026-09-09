@@ -54,33 +54,44 @@ describe("grade path", () => {
 
   it("sits the 13 units on painted cream pads of one tall map", () => {
     expect(TALL_MAP_FILE).toBe("candy-zones/tall-map.png");
-    expect(TALL_MAP_SIZE).toEqual({ w: 1536, h: 1024 });
-    expect(CANDY_WORLD_ASPECT).toBeCloseTo(2 / 5);
+    expect(TALL_MAP_SIZE).toEqual({ w: 1920, h: 1080 });
+    expect(CANDY_WORLD_ASPECT).toBeCloseTo(16 / 9);
     expect(GRADE3_PATH_PADS.filter((p) => p.zone === "meadow")).toHaveLength(4);
     expect(GRADE3_PATH_PADS.filter((p) => p.zone === "cove")).toHaveLength(4);
     expect(GRADE3_PATH_PADS.filter((p) => p.zone === "forest")).toHaveLength(5);
     expect(GRADE3_PATH_PADS.map((p) => p.unitNumber)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
-    expect(GRADE3_PATH_NODES[0]!.y).toBeGreaterThan(88);
-    expect(GRADE3_PATH_NODES[12]!.y).toBeLessThan(8);
-    expect(GRADE3_PATH_NODES.every((n, i, all) => i === 0 || n.y < all[i - 1]!.y)).toBe(true);
-    expect(TALL_MAP_DECORATIVE_PAD.y).toBeGreaterThan(GRADE3_PATH_PADS[8]!.map.y);
-    expect(TALL_MAP_DECORATIVE_PAD.y).toBeLessThan(GRADE3_PATH_PADS[7]!.map.y);
+    expect(GRADE3_PATH_PADS[0]!.map.x).toBeGreaterThan(90);
+    expect(GRADE3_PATH_PADS[0]!.map.y).toBeGreaterThan(70);
+    expect(GRADE3_PATH_PADS[12]!.map.x).toBeLessThan(5);
+    expect(GRADE3_PATH_PADS[12]!.map.y).toBeLessThan(25);
+    expect(GRADE3_PATH_PADS[3]!.zone).toBe("meadow");
+    expect(GRADE3_PATH_PADS[4]!.zone).toBe("cove");
+    expect(GRADE3_PATH_PADS[8]!.zone).toBe("forest");
+    for (let i = 1; i < GRADE3_PATH_NODES.length; i++) {
+      const step = Math.hypot(
+        GRADE3_PATH_NODES[i]!.x - GRADE3_PATH_NODES[i - 1]!.x,
+        GRADE3_PATH_NODES[i]!.y - GRADE3_PATH_NODES[i - 1]!.y,
+      );
+      expect(step).toBeGreaterThan(8);
+      expect(step).toBeLessThan(32);
+    }
+    expect(TALL_MAP_DECORATIVE_PAD.y).toBeLessThan(GRADE3_PATH_PADS[3]!.map.y);
+    expect(TALL_MAP_DECORATIVE_PAD.y).toBeGreaterThan(GRADE3_PATH_PADS[4]!.map.y);
     expect(PATH_OBSTACLE.map).toEqual(TALL_MAP_DECORATIVE_PAD);
     expect(PATH_OBSTACLE.id).toBe("cove-boulder");
     expect(PATH_OBSTACLE.file).toBe("cove-boulder.png");
-    expect(PATH_OBSTACLE.map).toEqual({ x: 46.7, y: 32.7 });
-    expect(PATH_OBSTACLE.width).toBe(20);
-    expect(PATH_OBSTACLE.width).toBeGreaterThan(16);
-    expect(PATH_OBSTACLE.width).toBeLessThan(26);
+    expect(PATH_OBSTACLE.map).toEqual({ x: 24.6, y: 64.8 });
+    expect(PATH_OBSTACLE.width).toBe(8);
+    expect(PATH_OBSTACLE.width).toBeGreaterThan(6);
+    expect(PATH_OBSTACLE.width).toBeLessThan(12);
     expect(TALL_MAP_OVERLAYS.some((p) => p.id === PATH_OBSTACLE.id)).toBe(false);
     expect(GRADE3_PATH_PADS.some((p) => p.map.x === PATH_OBSTACLE.map.x && p.map.y === PATH_OBSTACLE.map.y)).toBe(false);
     const mid = mapToViewPos({ x: 50, y: 50 });
     expect(mid.x).toBeCloseTo(50);
     expect(mid.y).toBeCloseTo(50);
-    const left = mapToViewPos({ x: 45.05, y: 92.69 });
-    expect(left.x).toBeGreaterThan(20);
-    expect(left.x).toBeLessThan(45.05);
-    expect(left.y).toBeCloseTo(92.69);
+    const start = mapToViewPos({ x: 94.49, y: 77.53 });
+    expect(start.x).toBeCloseTo(94.49);
+    expect(start.y).toBeCloseTo(77.53);
     expect(displayUnitStars(0, 15)).toBe(0);
     expect(displayUnitStars(5, 15)).toBe(1);
     expect(displayUnitStars(15, 15)).toBe(3);
@@ -118,10 +129,8 @@ describe("grade path", () => {
     expect(TALL_MAP_OVERLAYS.filter((p) => p.zone === "meadow").length).toBe(7);
     expect(TALL_MAP_OVERLAYS.filter((p) => p.zone === "cove").length).toBe(8);
     expect(TALL_MAP_OVERLAYS.filter((p) => p.zone === "forest").length).toBe(5);
-    expect(
-      TALL_MAP_OVERLAYS.filter((p) => p.file === "tenframe-mound.png" && p.id !== "tenframe-a").every((p) => p.map.y < 88),
-    ).toBe(true);
-    expect(TALL_MAP_OVERLAYS.every((p) => p.map.x > 38 && p.map.x < 62)).toBe(true);
+    expect(TALL_MAP_OVERLAYS.filter((p) => p.file === "tenframe-mound.png").every((p) => p.zone === "meadow")).toBe(true);
+    expect(TALL_MAP_OVERLAYS.every((p) => p.map.x > 6 && p.map.x < 96)).toBe(true);
     expect(TALL_MAP_OVERLAYS.every((p) => overlayClearsPads(p))).toBe(true);
     expect(overlaysHaveBreathingRoom(TALL_MAP_OVERLAYS, "tenframe-mound.png")).toBe(true);
     expect(overlaysHaveBreathingRoom(TALL_MAP_OVERLAYS, "coin-stack.png")).toBe(true);
@@ -144,17 +153,17 @@ describe("grade path", () => {
     expect(overlaySeatClass("water")).toBe("candy-prop-water");
     expect(overlaySeatClass("shore")).toBe("candy-prop-shore");
     const fall = TALL_MAP_OVERLAYS.find((p) => p.id === "waterfall")!;
-    expect(fall.map).toEqual({ x: 40.9, y: 28.5 });
-    expect(fall.width).toBe(14);
+    expect(fall.map).toEqual({ x: 11.4, y: 33.8 });
+    expect(fall.width).toBe(10);
     expect(fall.seat).toBe("shore");
-    expect(fall.map.y).toBeGreaterThan(27.8);
-    expect(fall.map.y).toBeLessThan(30);
+    expect(fall.map.y).toBeGreaterThan(31);
+    expect(fall.map.y).toBeLessThan(36);
     expect(overlayOnCoveShoreLip(fall)).toBe(true);
     expect(overlayOnDryCoveBank(fall)).toBe(false);
     expect(overlayInOpenCoveWater(fall)).toBe(false);
-    expect(overlayOnDryCoveBank({ ...fall, map: { x: 40.2, y: 25.55 } })).toBe(true);
-    expect(overlayOnCoveShoreLip({ ...fall, map: { x: 40.2, y: 25.55 } })).toBe(false);
-    expect(overlayInOpenCoveWater({ ...fall, map: { x: 39.2, y: 51.15 } })).toBe(true);
+    expect(overlayOnDryCoveBank({ ...fall, map: { x: 12, y: 25.55 } })).toBe(true);
+    expect(overlayOnCoveShoreLip({ ...fall, map: { x: 12, y: 25.55 } })).toBe(false);
+    expect(overlayInOpenCoveWater({ ...fall, map: { x: 14.2, y: 51.15 } })).toBe(true);
     expect(TALL_MAP_OVERLAYS.find((p) => p.id === "sailboat")?.motion).toBe("bob");
     expect(TALL_MAP_OVERLAYS.find((p) => p.id === "dock")?.file).toBe("dock.png");
     expect(TALL_MAP_OVERLAYS.find((p) => p.id === "coins")?.motion).toBe("bob");
@@ -165,7 +174,7 @@ describe("grade path", () => {
     expect(TALL_MAP_OVERLAYS.find((p) => p.id === "palm")?.motion).toBe("sway");
     expect(TALL_MAP_OVERLAYS.find((p) => p.id === "daisies")?.motion).toBe("bob");
     expect(TRAIL_PEEK_SPOTS).toHaveLength(9);
-    expect(TRAIL_PEEK_SPOTS.every((p) => p.map.x > 38 && p.map.x < 62)).toBe(true);
+    expect(TRAIL_PEEK_SPOTS.every((p) => p.map.x > 6 && p.map.x < 96)).toBe(true);
     expect(TRAIL_PEEK_MIN_HOPPER_DIST).toBeGreaterThan(TRAIL_PEEK_MIN_PAD_DIST);
     expect(TRAIL_PEEK_SPOTS.every((p) => trailPeekClearsPads(p))).toBe(true);
     expect(TRAIL_PEEK_SPOTS.every((p) => GRADE3_PATH_PADS.every((pad) => Math.hypot(pad.map.x - p.map.x, pad.map.y - p.map.y) >= TRAIL_PEEK_MIN_PAD_DIST))).toBe(true);

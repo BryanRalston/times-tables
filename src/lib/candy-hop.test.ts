@@ -144,16 +144,18 @@ describe("candy hop", () => {
     expect(pathHopSfxKind(null, hopProgressAt(0, 0))).toBeNull();
   });
 
-  it("vaults higher and longer over the cove boulder between pads 8 and 9", () => {
+  it("vaults higher and longer over water crossings on the loop", () => {
+    expect(hopSpanIsObstacle(4, 5)).toBe(true);
+    expect(hopSpanIsObstacle(5, 4)).toBe(true);
     expect(hopSpanIsObstacle(8, 9)).toBe(true);
-    expect(hopSpanIsObstacle(9, 8)).toBe(true);
     expect(hopSpanIsObstacle(7, 8)).toBe(false);
-    expect(hopSpanMs(8, 9)).toBe(OBSTACLE_HOP_MS);
+    expect(hopSpanMs(4, 5)).toBe(OBSTACLE_HOP_MS);
     expect(hopSpanMs(1, 2)).toBe(HOP_MS);
-    expect(hopTravelMs([8, 9])).toBe(OBSTACLE_HOP_MS + LAND_MS);
-    expect(hopTravelMs([8, 9])).toBeGreaterThan(hopTravelMs([1, 2]));
-    const a = mapToViewPos(GRADE3_PATH_NODES[7]!);
-    const b = mapToViewPos(GRADE3_PATH_NODES[8]!);
+    expect(hopTravelMs([4, 5])).toBe(OBSTACLE_HOP_MS + LAND_MS);
+    expect(hopTravelMs([4, 5])).toBeGreaterThan(hopTravelMs([1, 2]));
+    expect(hopUnitStops(1, 13)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+    const a = mapToViewPos(GRADE3_PATH_NODES[3]!);
+    const b = mapToViewPos(GRADE3_PATH_NODES[4]!);
     const obs = mapToViewPos(TALL_MAP_DECORATIVE_PAD);
     const mid = hopAlong(a, b, 0.5, true);
     const low = hopAlong(a, b, 0.5, false);

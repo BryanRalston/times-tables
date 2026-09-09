@@ -912,7 +912,7 @@ details > summary::-webkit-details-marker {
 .candy-scroll {
   flex: 1;
   min-height: 0;
-  overflow-x: hidden;
+  overflow-x: auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 0.15rem 0.45rem 0.2rem;
@@ -928,8 +928,8 @@ details > summary::-webkit-details-marker {
 }
 .candy-world {
   position: relative;
-  width: 100%;
-  aspect-ratio: 2 / 5;
+  width: max(100%, 68rem);
+  aspect-ratio: 16 / 9;
 }
 .candy-world-art {
   position: absolute;
@@ -1032,18 +1032,18 @@ details > summary::-webkit-details-marker {
   z-index: -2;
 }
 .candy-sign-meadow {
-  left: 7%;
-  top: 79%;
+  left: 78%;
+  top: 92%;
   transform: rotate(-3deg);
 }
 .candy-sign-cove {
-  left: 66%;
-  top: 49%;
+  left: 78%;
+  top: 58%;
   transform: rotate(2.4deg);
 }
 .candy-sign-forest {
-  left: 7%;
-  top: 13%;
+  left: 78%;
+  top: 8%;
   transform: rotate(-2.2deg);
 }
 .candy-node {

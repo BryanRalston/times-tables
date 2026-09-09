@@ -56,7 +56,8 @@ describe("CandyPath", () => {
     expect(html).toContain('data-path-obstacle="cove-boulder"');
     expect(html).toContain("candy-zones/overlays/cove-boulder.png");
     expect(html).toContain("candy-prop-obstacle");
-    expect(html).toContain("width:20%");
+    expect(html).toContain("width:8%");
+    expect(html).toContain("data-path-wide");
     expect(html).not.toMatch(/<button[^>]*data-path-obstacle/);
     expect(html).toContain('data-candy-prop="waterfall"');
     expect(html).toContain('data-candy-prop="tenframe-a"');
@@ -150,14 +151,25 @@ describe("CandyPath", () => {
     expect((html.match(/data-path-pad="1"/g) ?? []).length).toBe(13);
   });
 
-  it("marks the 8 to 9 hop as a boulder vault", () => {
+  it("marks the 4 to 5 water-rise hop as a vault", () => {
     const html = renderToStaticMarkup(
-      <CandyPath suggestedId="u9" standFrom={8} standTo={9} onStart={() => {}} onOpenUnit={() => {}} />,
+      <CandyPath suggestedId="u5" standFrom={4} standTo={5} onStart={() => {}} onOpenUnit={() => {}} />,
     );
     expect(html).toContain('data-path-travel="1"');
-    expect(html).toContain('data-path-hop-from="8"');
-    expect(html).toContain('data-path-hop-to="9"');
+    expect(html).toContain('data-path-hop-from="4"');
+    expect(html).toContain('data-path-hop-to="5"');
     expect(html).toContain('data-path-clear-obstacle="1"');
     expect(html).toContain('data-path-obstacle="cove-boulder"');
+  });
+
+  it("hops every consecutive pad along the full loop", () => {
+    const html = renderToStaticMarkup(
+      <CandyPath suggestedId="u13" standFrom={1} standTo={13} onStart={() => {}} onOpenUnit={() => {}} />,
+    );
+    expect(html).toContain('data-path-hop-from="1"');
+    expect(html).toContain('data-path-hop-to="13"');
+    expect(html).toContain('data-path-travel="1"');
+    expect(html).toContain('data-path-clear-obstacle="1"');
+    expect((html.match(/data-path-pad="1"/g) ?? []).length).toBe(13);
   });
 });

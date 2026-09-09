@@ -18,15 +18,21 @@ export type HopPose = {
 /** One pad-to-pad hop. */
 export const HOP_MS = 520;
 
-/** Longer air time so the 8↔9 vault over the cove boulder reads as a hop. */
+/** Longer air time so water-crossing vaults read as a hop. */
 export const OBSTACLE_HOP_MS = 740;
 
-/** Extra lift (map %) so that span clears the boulder. */
+/** Extra lift (map %) so water spans clear the shoulder boulder / cove. */
 export const OBSTACLE_LIFT_PERCENT = 8.1;
 
-/** Grade 3 pads the cove boulder sits between. */
-export const OBSTACLE_HOP_FROM = 8;
-export const OBSTACLE_HOP_TO = 9;
+/** Consecutive pads with a water-crossing vault (rise onto cove, lift to forest). */
+export const OBSTACLE_HOP_SPANS: readonly (readonly [number, number])[] = [
+  [4, 5],
+  [8, 9],
+];
+
+/** Primary water-rise vault (meadow → cove). */
+export const OBSTACLE_HOP_FROM = 4;
+export const OBSTACLE_HOP_TO = 5;
 
 /** Squash and settle on a pad, including after the last hop. */
 export const LAND_MS = 160;
@@ -60,7 +66,7 @@ export function hopUnitStops(fromNumber: number, toNumber: number, total = GRADE
 export function hopSpanIsObstacle(fromNumber: number, toNumber: number): boolean {
   const a = Math.min(fromNumber, toNumber);
   const b = Math.max(fromNumber, toNumber);
-  return a === OBSTACLE_HOP_FROM && b === OBSTACLE_HOP_TO;
+  return OBSTACLE_HOP_SPANS.some(([from, to]) => a === from && b === to);
 }
 
 export function hopSpanMs(fromNumber: number, toNumber: number): number {

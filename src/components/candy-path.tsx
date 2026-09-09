@@ -245,10 +245,16 @@ export const CandyPath = forwardRef<
     if (hopper && scroller instanceof HTMLElement) {
       const hr = hopper.getBoundingClientRect();
       const sr = scroller.getBoundingClientRect();
-      const delta = hr.top - (sr.top + sr.height * 0.46);
-      if (Math.abs(delta) >= 5) {
-        if (travel) scroller.scrollTop += delta * 0.28;
-        else scroller.scrollTop += delta;
+      const deltaY = hr.top - (sr.top + sr.height * 0.46);
+      const deltaX = hr.left - (sr.left + sr.width * 0.46);
+      if (Math.abs(deltaY) >= 5 || Math.abs(deltaX) >= 5) {
+        if (travel) {
+          scroller.scrollTop += deltaY * 0.28;
+          scroller.scrollLeft += deltaX * 0.28;
+        } else {
+          scroller.scrollTop += deltaY;
+          scroller.scrollLeft += deltaX;
+        }
       }
     }
   }, [pose.y, travel]);
@@ -377,7 +383,7 @@ export const CandyPath = forwardRef<
   };
 
   return (
-    <div className="candy-map" data-grade-path="1" data-path-tall="1" data-candy-world="1">
+    <div className="candy-map" data-grade-path="1" data-path-tall="1" data-path-wide="1" data-candy-world="1">
       <div className="candy-world" aria-hidden>
         <img
           className="candy-world-art"

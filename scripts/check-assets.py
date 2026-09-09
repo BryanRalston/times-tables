@@ -304,9 +304,12 @@ def main() -> int:
     else:
         im = Image.open(tall).convert("RGB")
         w, h = im.size
+        if abs(w / h - 16 / 9) > 0.04:
+            fails.append(f"tall-map.png: expected landscape 16:9, got {w}x{h}")
         px = im.load()
-        seats = ((0.4551, 0.3255, 28), (0.4915, 0.328, 22))
-        for fx, fy, rad in seats:
+        # Painted-out extras from the winding plate — must not read as blank pads.
+        extras = ((0.8010, 0.7623, 22), (0.5928, 0.8457, 22), (0.4070, 0.7744, 22), (0.6448, 0.1790, 22), (0.2946, 0.1977, 22))
+        for fx, fy, rad in extras:
             cx, cy = int(round(fx * w)), int(round(fy * h))
             cream = 0
             for y in range(max(0, cy - rad), min(h, cy + rad + 1)):
@@ -317,7 +320,7 @@ def main() -> int:
                     if r > 240 and g > 210 and 150 < b < 200 and (r - b) > 50:
                         cream += 1
             if cream > 8:
-                fails.append(f"tall-map.png: cream disc still at 8↔9 seat {fx:.4f},{fy:.4f} ({cream}px)")
+                fails.append(f"tall-map.png: extra cream disc still at {fx:.4f},{fy:.4f} ({cream}px)")
 
     if fails:
         print("check-assets FAIL")
