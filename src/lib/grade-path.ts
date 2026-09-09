@@ -73,6 +73,15 @@ export function displayUnitStars(earned: number, max: number): number {
   return Math.min(3, Math.max(0, Math.ceil((earned / max) * 3)));
 }
 
+/** Stars under a pad: earned only. Hide on now (hopper sits there) and locked/fog. */
+export function padChromeStars(
+  earned: number,
+  opts: { now: boolean; locked: boolean },
+): number {
+  if (opts.now || opts.locked) return 0;
+  return Math.min(3, Math.max(0, earned));
+}
+
 /** Completed + current + this many nodes ahead stay readable. */
 export const PATH_LOOKAHEAD = 2;
 
@@ -127,6 +136,8 @@ export function fogCoverPercent(nowNumber: number, nodes: readonly PathNodePos[]
 
 export type OverlayMotion = "bob" | "sway" | "shimmer" | "fall" | "spin";
 
+export type OverlaySeat = "land" | "water" | "shore";
+
 export type PathOverlay = {
   id: string;
   file: string;
@@ -134,6 +145,7 @@ export type PathOverlay = {
   map: PathNodePos;
   width: number;
   motion: OverlayMotion;
+  seat: OverlaySeat;
 };
 
 export const TALL_MAP_OVERLAY_DIR = "candy-zones/overlays";
@@ -146,17 +158,17 @@ export const TALL_MAP_OVERLAY_DIR = "candy-zones/overlays";
  * not the open-water band around y ≈ 42–54. Splash is toward larger y.
  */
 export const TALL_MAP_OVERLAYS: readonly PathOverlay[] = [
-  { id: "tenframe-a", file: "tenframe.png", zone: "meadow", map: { x: 40.15, y: 88.35 }, width: 20, motion: "bob" },
-  { id: "tenframe-b", file: "tenframe.png", zone: "meadow", map: { x: 59.55, y: 77.85 }, width: 16, motion: "bob" },
-  { id: "daisies", file: "daisies.png", zone: "meadow", map: { x: 39.85, y: 80.15 }, width: 11, motion: "bob" },
-  { id: "gumdrop", file: "gumdrop.png", zone: "meadow", map: { x: 59.25, y: 69.45 }, width: 12, motion: "sway" },
-  { id: "waterfall", file: "waterfall.png", zone: "cove", map: { x: 40.2, y: 25.55 }, width: 14, motion: "fall" },
-  { id: "palm", file: "palm.png", zone: "cove", map: { x: 60.45, y: 56.85 }, width: 15, motion: "sway" },
-  { id: "sailboat", file: "sailboat.png", zone: "cove", map: { x: 59.4, y: 49.6 }, width: 12, motion: "bob" },
-  { id: "coins", file: "coins.png", zone: "cove", map: { x: 60.15, y: 42.55 }, width: 13, motion: "bob" },
-  { id: "coin-spin", file: "coin-spin.png", zone: "cove", map: { x: 61.25, y: 40.75 }, width: 5.5, motion: "spin" },
-  { id: "candy-cane", file: "candy-cane.png", zone: "forest", map: { x: 59.85, y: 28.15 }, width: 10, motion: "sway" },
-  { id: "fraction-pie", file: "fraction-pie.png", zone: "forest", map: { x: 39.55, y: 14.35 }, width: 13, motion: "sway" },
+  { id: "tenframe-a", file: "tenframe.png", zone: "meadow", map: { x: 40.15, y: 88.35 }, width: 15, motion: "bob", seat: "land" },
+  { id: "tenframe-b", file: "tenframe.png", zone: "meadow", map: { x: 59.55, y: 77.85 }, width: 12, motion: "bob", seat: "land" },
+  { id: "daisies", file: "daisies.png", zone: "meadow", map: { x: 39.85, y: 80.15 }, width: 10, motion: "bob", seat: "land" },
+  { id: "gumdrop", file: "gumdrop.png", zone: "meadow", map: { x: 59.25, y: 69.45 }, width: 10, motion: "sway", seat: "land" },
+  { id: "waterfall", file: "waterfall.png", zone: "cove", map: { x: 40.2, y: 25.55 }, width: 12, motion: "fall", seat: "shore" },
+  { id: "palm", file: "palm.png", zone: "cove", map: { x: 60.45, y: 56.85 }, width: 13, motion: "sway", seat: "land" },
+  { id: "sailboat", file: "sailboat.png", zone: "cove", map: { x: 59.4, y: 49.6 }, width: 10, motion: "bob", seat: "water" },
+  { id: "coins", file: "coins.png", zone: "cove", map: { x: 60.15, y: 42.55 }, width: 11, motion: "bob", seat: "land" },
+  { id: "coin-spin", file: "coin-spin.png", zone: "cove", map: { x: 61.25, y: 40.75 }, width: 5, motion: "spin", seat: "water" },
+  { id: "candy-cane", file: "candy-cane.png", zone: "forest", map: { x: 59.85, y: 28.15 }, width: 9, motion: "sway", seat: "land" },
+  { id: "fraction-pie", file: "fraction-pie.png", zone: "forest", map: { x: 39.55, y: 14.35 }, width: 11, motion: "sway", seat: "land" },
 ];
 
 /** Keep scenery off cream discs / numbers. Existing tenframes sit ~6.5 away. */
@@ -286,6 +298,21 @@ export function overlayMotionClass(motion: OverlayMotion): string {
       return "candy-prop-spin";
     default: {
       const _never: never = motion;
+      return _never;
+    }
+  }
+}
+
+export function overlaySeatClass(seat: OverlaySeat): string {
+  switch (seat) {
+    case "land":
+      return "candy-prop-land";
+    case "water":
+      return "candy-prop-water";
+    case "shore":
+      return "candy-prop-shore";
+    default: {
+      const _never: never = seat;
       return _never;
     }
   }

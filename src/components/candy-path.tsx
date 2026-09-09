@@ -32,6 +32,8 @@ import {
   nodeIsFogged,
   overlayIsVeiled,
   overlayMotionClass,
+  overlaySeatClass,
+  padChromeStars,
   zoneForUnitNumber,
   zoneLabelIsFogged,
   type PathZone,
@@ -381,13 +383,22 @@ export const CandyPath = forwardRef<
       </div>
 
       <div className="candy-overlay">
-        <p className={cn("candy-sign candy-sign-meadow", zoneLabelIsFogged("meadow", current.number) && "candy-sign-fog")}>
+        <p
+          className={cn("candy-sign candy-sign-meadow", zoneLabelIsFogged("meadow", current.number) && "candy-sign-fog")}
+          data-candy-sign="meadow"
+        >
           {zoneLabel("meadow", ui)}
         </p>
-        <p className={cn("candy-sign candy-sign-cove", zoneLabelIsFogged("cove", current.number) && "candy-sign-fog")}>
+        <p
+          className={cn("candy-sign candy-sign-cove", zoneLabelIsFogged("cove", current.number) && "candy-sign-fog")}
+          data-candy-sign="cove"
+        >
           {zoneLabel("cove", ui)}
         </p>
-        <p className={cn("candy-sign candy-sign-forest", zoneLabelIsFogged("forest", current.number) && "candy-sign-fog")}>
+        <p
+          className={cn("candy-sign candy-sign-forest", zoneLabelIsFogged("forest", current.number) && "candy-sign-fog")}
+          data-candy-sign="forest"
+        >
           {zoneLabel("forest", ui)}
         </p>
 
@@ -397,14 +408,17 @@ export const CandyPath = forwardRef<
           return (
             <span
               key={prop.id}
-              className={cn("candy-prop", overlayMotionClass(prop.motion), veiled && "candy-prop-veil")}
+              className={cn("candy-prop", overlaySeatClass(prop.seat), veiled && "candy-prop-veil")}
               style={{ left: `${view.x}%`, top: `${view.y}%`, width: `${prop.width}%` }}
               data-candy-prop={prop.id}
               data-candy-prop-zone={prop.zone}
+              data-candy-prop-seat={prop.seat}
               data-candy-prop-veil={veiled ? "1" : "0"}
               aria-hidden
             >
-              <img src={asset(`${TALL_MAP_OVERLAY_DIR}/${prop.file}`)} alt="" draggable={false} decoding="async" />
+              <span className={cn("candy-prop-art", overlayMotionClass(prop.motion))}>
+                <img src={asset(`${TALL_MAP_OVERLAY_DIR}/${prop.file}`)} alt="" draggable={false} decoding="async" />
+              </span>
             </span>
           );
         })}
@@ -415,10 +429,11 @@ export const CandyPath = forwardRef<
           const view = mapToViewPos(pad.map);
           const status = unitStatus(unit, suggestedId);
           const zone = zoneForUnitNumber(unit.number);
-          const stars = displayUnitStars(unitStars(unit.id), unitMaxStars(unit.id));
-          const short = unitText(unit, locale).short;
+          const earned = displayUnitStars(unitStars(unit.id), unitMaxStars(unit.id));
           const fogged = nodeIsFogged(unit.number, current.number);
           const locked = status === "locked" || fogged;
+          const stars = padChromeStars(earned, { now: status === "now", locked });
+          const short = unitText(unit, locale).short;
           return (
             <button
               key={unit.id}
@@ -439,15 +454,15 @@ export const CandyPath = forwardRef<
               <span className="candy-node-disc">{fogged ? "" : unit.number}</span>
               {fogged || status === "locked" ? (
                 <Lock className="candy-lock" aria-hidden />
-              ) : (
+              ) : stars > 0 ? (
                 <span className="candy-stars" aria-hidden>
-                  {[0, 1, 2].map((s) => (
+                  {Array.from({ length: stars }, (_, s) => (
                     <span key={s} className="candy-star candy-star-on">
                       ★
                     </span>
                   ))}
                 </span>
-              )}
+              ) : null}
             </button>
           );
         })}
@@ -468,7 +483,7 @@ export const CandyPath = forwardRef<
           style={{
             left: `${pose.x}%`,
             top: `${pose.y}%`,
-            transform: `translate(-50%, -62%) scale(${pose.squashX}, ${pose.squashY})`,
+            transform: `translate(-50%, -108%) scale(${pose.squashX}, ${pose.squashY})`,
           }}
           data-path-hopper={hopperId}
           data-path-travel={travel ? "1" : "0"}

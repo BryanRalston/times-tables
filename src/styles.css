@@ -949,6 +949,8 @@ details > summary::-webkit-details-marker {
   mask-position: center;
   -webkit-mask-size: cover;
   -webkit-mask-position: center;
+  opacity: 0.78;
+  filter: saturate(1.04) contrast(0.96);
 }
 .candy-water-flow,
 .candy-water-glint {
@@ -991,28 +993,58 @@ details > summary::-webkit-details-marker {
 .candy-sign {
   position: absolute;
   z-index: 8;
-  padding: 0.22rem 0.5rem;
-  border-radius: 8px;
-  background: rgb(210 166 108 / 0.72);
-  border: 2px solid rgb(107 68 35 / 0.55);
-  color: #fff8e8;
-  font-size: 0.58rem;
+  margin: 0;
+  padding: 0.2rem 0.4rem 0.18rem;
+  border-radius: 3px 3px 5px 5px;
+  background: linear-gradient(180deg, #f4d7a4 0%, #e2bc74 58%, #c99652 100%);
+  border: 3px solid #7a4e2a;
+  color: #5a3820;
+  font-size: 0.5rem;
   font-weight: 800;
   letter-spacing: 0.01em;
-  box-shadow: 0 2px 8px rgb(90 56 24 / 0.18);
+  box-shadow:
+    inset 0 1px 0 #fff3d2,
+    0 3px 0 #6a4220,
+    0 7px 8px rgb(60 36 16 / 0.16);
   text-wrap: nowrap;
+  text-shadow: 0 1px 0 rgb(255 244 214 / 0.65);
+}
+.candy-sign::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.48rem;
+  width: 0.2rem;
+  height: 0.48rem;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #c9a06a, #7a4e2a);
+  border-radius: 1px;
+  z-index: -1;
+}
+.candy-sign::after {
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: -0.62rem;
+  height: 0.26rem;
+  background: radial-gradient(ellipse, rgb(50 30 18 / 0.22), transparent 72%);
+  z-index: -2;
 }
 .candy-sign-meadow {
-  left: 6%;
-  top: 80%;
+  left: 7%;
+  top: 79%;
+  transform: rotate(-3deg);
 }
 .candy-sign-cove {
-  left: 68%;
-  top: 48%;
+  left: 66%;
+  top: 49%;
+  transform: rotate(2.4deg);
 }
 .candy-sign-forest {
-  left: 6%;
-  top: 12%;
+  left: 7%;
+  top: 13%;
+  transform: rotate(-2.2deg);
 }
 .candy-node {
   position: absolute;
@@ -1088,14 +1120,46 @@ details > summary::-webkit-details-marker {
 .candy-prop {
   position: absolute;
   z-index: 2;
-  transform: translate(-50%, -50%);
-  transform-origin: 50% 88%;
+  transform: translate(-50%, -78%);
+  transform-origin: 50% 92%;
   pointer-events: none;
+}
+.candy-prop-land {
+  transform: translate(-50%, -78%);
+}
+.candy-prop-water {
+  transform: translate(-50%, -58%);
+}
+.candy-prop-shore {
+  transform: translate(-50%, -84%);
+}
+.candy-prop::after {
+  content: "";
+  position: absolute;
+  left: 16%;
+  right: 16%;
+  bottom: 2%;
+  height: 16%;
+  background: radial-gradient(ellipse, rgb(46 30 22 / 0.26), transparent 72%);
+  filter: blur(2.5px);
+  z-index: -1;
+  pointer-events: none;
+}
+.candy-prop-water::after {
+  bottom: 10%;
+  height: 14%;
+  background: radial-gradient(ellipse, rgb(18 62 86 / 0.18), transparent 74%);
+}
+.candy-prop-art {
+  display: block;
+  width: 100%;
+  transform-origin: 50% 92%;
 }
 .candy-prop img {
   display: block;
   width: 100%;
   height: auto;
+  opacity: 0.94;
 }
 .candy-prop-veil {
   opacity: 0.78;
@@ -1158,19 +1222,19 @@ details > summary::-webkit-details-marker {
 @keyframes candy-prop-bob {
   0%,
   100% {
-    transform: translate(-50%, -50%);
+    transform: translateY(0);
   }
   50% {
-    transform: translate(-50%, calc(-50% - 0.07rem));
+    transform: translateY(-0.06rem);
   }
 }
 @keyframes candy-prop-sway {
   0%,
   100% {
-    transform: translate(-50%, -50%) rotate(-1.15deg) skewX(-0.45deg);
+    transform: rotate(-1.15deg) skewX(-0.45deg);
   }
   50% {
-    transform: translate(-50%, -50%) rotate(1.25deg) skewX(0.5deg);
+    transform: rotate(1.25deg) skewX(0.5deg);
   }
 }
 @keyframes candy-prop-spin {
@@ -1203,23 +1267,23 @@ details > summary::-webkit-details-marker {
 @keyframes candy-prop-shimmer {
   0%,
   100% {
-    transform: translate(-50%, -50%);
+    transform: translateY(0);
     filter: brightness(1);
   }
   50% {
-    transform: translate(-50%, calc(-50% - 0.05rem));
+    transform: translateY(-0.05rem);
     filter: brightness(1.06);
   }
 }
 @keyframes candy-prop-fall {
   0% {
-    transform: translate(-50%, -50%) scaleY(1);
+    transform: scaleY(1);
   }
   50% {
-    transform: translate(-50%, -50%) scaleY(1.018);
+    transform: scaleY(1.018);
   }
   100% {
-    transform: translate(-50%, -50%) scaleY(1);
+    transform: scaleY(1);
   }
 }
 @keyframes candy-fall-sheen {
@@ -1269,7 +1333,7 @@ details > summary::-webkit-details-marker {
   z-index: 5;
   width: 2.85rem;
   height: 2.85rem;
-  transform: translate(-50%, -62%);
+  transform: translate(-50%, -108%);
   transform-origin: 50% 82%;
   pointer-events: none;
   will-change: left, top, transform;
@@ -1318,7 +1382,7 @@ details > summary::-webkit-details-marker {
   height: 46%;
 }
 .candy-sign-fog {
-  opacity: 0.72;
+  opacity: 0.48;
 }
 .candy-dock {
   display: flex;
