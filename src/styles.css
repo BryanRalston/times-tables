@@ -1133,9 +1133,10 @@ details > summary::-webkit-details-marker {
 .candy-prop-shore {
   transform: translate(-50%, -84%);
 }
-.candy-prop-obstacle {
+.candy-prop.candy-prop-obstacle {
   z-index: 3;
-  transform: translate(-50%, -64%);
+  transform: translate(-50%, -52%);
+  transform-origin: 50% 50%;
 }
 .candy-prop-obstacle img {
   opacity: 1;

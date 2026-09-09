@@ -40,8 +40,12 @@ const TALL_MAP_UNIT_PADS: readonly PathPad[] = [
   { zone: "forest", map: { x: 51.27, y: 6.52 }, unitNumber: 13 },
 ];
 
-/** Shoreline stone between cove units 8 and 9 — path obstacle, not a unit. */
-export const TALL_MAP_DECORATIVE_PAD: PathNodePos = { x: 45.51, y: 32.55 };
+/**
+ * Boulder on the left shoulder of the 8↔9 bend (PNG %).
+ * Cover-crop pulls x left; 46.7 sits on the path edge over the old disc
+ * without covering pads 8 or 9. Tall-map has no cream circle there.
+ */
+export const TALL_MAP_DECORATIVE_PAD: PathNodePos = { x: 46.7, y: 32.7 };
 
 export const GRADE3_PATH_PADS: readonly PathPad[] = TALL_MAP_UNIT_PADS;
 
@@ -147,13 +151,13 @@ export type PathObstacle = {
   seat: OverlaySeat;
 };
 
-/** Vinyl candy boulder seated on the old blank disc. Not tappable. */
+/** Vinyl candy boulder centered on the old 8↔9 disc. Not tappable. */
 export const PATH_OBSTACLE: PathObstacle = {
   id: "cove-boulder",
   file: "cove-boulder.png",
   zone: "cove",
   map: TALL_MAP_DECORATIVE_PAD,
-  width: 14,
+  width: 20,
   seat: "land",
 };
 

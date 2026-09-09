@@ -20,8 +20,8 @@ Magenta key `#FF00FF`. Use `*.png` in the UI (transparent). JPGs are the Imagine
 
 ## Lessons world (`public/candy-zones/`)
 One continuous quiet map. Keep hop, numbers, locks, glow, and mist as overlays — do not bake them into the PNG. Do not stack zone plates.
-- `tall-map.png` — meadow → cove → forest, path + cream pads; cove 8→9 stone is a hop-over boulder seat
-- `overlays/cove-boulder.png` — vinyl candy boulder on that stone, not a unit
+- `tall-map.png` — meadow → cove → forest, path + cream pads; the old 8→9 blank disc is painted to path wood
+- `overlays/cove-boulder.png` — vinyl candy boulder centered on that bend, not a unit
 
 Older `meadow.png` / `cove.png` / `forest.png` plates are leftovers, not the Lessons world model.
 

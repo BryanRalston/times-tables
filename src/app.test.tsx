@@ -262,7 +262,8 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-prop-land");
     expect(css).toContain(".candy-prop-water");
     expect(css).toContain(".candy-prop-shore");
-    expect(css).toContain(".candy-prop-obstacle");
+    expect(css).toContain(".candy-prop.candy-prop-obstacle");
+    expect(css).toContain("transform: translate(-50%, -52%)");
     expect(css).toContain(".candy-hopper-art");
     expect(css).toContain(".candy-hopper-shadow");
     expect(css).toContain("@keyframes candy-hop");
