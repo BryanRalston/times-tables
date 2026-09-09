@@ -154,39 +154,31 @@ export const TALL_MAP_OVERLAY_DIR = "candy-zones/overlays";
  * PNG-space props in the cover-crop gutters, beside the trail.
  * Visible x is roughly 36.7–63.3 of the 1536px art.
  *
- * Waterfall seat is the splash (shore transform −84%). On tall-map.png the
- * left-gutter pink→beige lip is y ≈ 26.5–27.9 at x ≈ 40–42; y ≤ 27 parks rocks
- * on dry pink, y ≈ 42–54 is mid-open-water. Splash pours toward larger y.
+ * Density follows the locked Candyland Grade 3 Path mock: grassy ten-frame
+ * mounds + pink/yellow flowers; cove coins/palm/dock/two boats; forest
+ * fraction-pie trees. Waterfall is extra to the mock — splash seat (−84%)
+ * on the left-gutter pink→beige lip (y ≈ 26.5–27.9 at x ≈ 40–42).
  */
 export const TALL_MAP_OVERLAYS: readonly PathOverlay[] = [
-  { id: "tenframe-a", file: "tenframe.png", zone: "meadow", map: { x: 40.15, y: 88.35 }, width: 15, motion: "bob", seat: "land" },
-  { id: "tenframe-b", file: "tenframe.png", zone: "meadow", map: { x: 59.55, y: 77.85 }, width: 12, motion: "bob", seat: "land" },
-  { id: "tenframe-c", file: "tenframe.png", zone: "meadow", map: { x: 39.55, y: 68.85 }, width: 13, motion: "bob", seat: "land" },
-  { id: "daisies", file: "daisies.png", zone: "meadow", map: { x: 39.85, y: 80.15 }, width: 10, motion: "bob", seat: "land" },
-  { id: "daisies-b", file: "daisies.png", zone: "meadow", map: { x: 60.25, y: 86.55 }, width: 9, motion: "bob", seat: "land" },
-  { id: "daisies-c", file: "daisies.png", zone: "meadow", map: { x: 40.05, y: 73.25 }, width: 8, motion: "bob", seat: "land" },
-  { id: "gumdrop", file: "gumdrop.png", zone: "meadow", map: { x: 59.25, y: 69.45 }, width: 10, motion: "sway", seat: "land" },
-  { id: "gumdrop-b", file: "gumdrop.png", zone: "meadow", map: { x: 39.45, y: 96.15 }, width: 9, motion: "sway", seat: "land" },
-  { id: "lollipop", file: "lollipop.png", zone: "meadow", map: { x: 60.15, y: 92.25 }, width: 8, motion: "sway", seat: "land" },
-  { id: "lollipop-b", file: "lollipop.png", zone: "meadow", map: { x: 40.45, y: 84.15 }, width: 7, motion: "sway", seat: "land" },
+  { id: "tenframe-a", file: "tenframe-mound.png", zone: "meadow", map: { x: 40.15, y: 88.35 }, width: 16, motion: "bob", seat: "land" },
+  { id: "tenframe-b", file: "tenframe-mound.png", zone: "meadow", map: { x: 59.55, y: 77.85 }, width: 14, motion: "bob", seat: "land" },
+  { id: "tenframe-c", file: "tenframe-mound.png", zone: "meadow", map: { x: 39.55, y: 68.85 }, width: 14, motion: "bob", seat: "land" },
+  { id: "flowers", file: "meadow-flowers.png", zone: "meadow", map: { x: 39.85, y: 80.15 }, width: 9, motion: "bob", seat: "land" },
+  { id: "flowers-b", file: "meadow-flowers.png", zone: "meadow", map: { x: 60.25, y: 86.55 }, width: 8, motion: "bob", seat: "land" },
+  { id: "flowers-c", file: "meadow-flowers.png", zone: "meadow", map: { x: 40.05, y: 73.25 }, width: 8, motion: "bob", seat: "land" },
+  { id: "daisies", file: "daisies.png", zone: "meadow", map: { x: 59.25, y: 69.45 }, width: 8, motion: "bob", seat: "land" },
   { id: "waterfall", file: "waterfall.png", zone: "cove", map: { x: 40.9, y: 28.5 }, width: 14, motion: "fall", seat: "shore" },
   { id: "palm", file: "palm.png", zone: "cove", map: { x: 60.45, y: 56.85 }, width: 13, motion: "sway", seat: "land" },
-  { id: "sailboat", file: "sailboat.png", zone: "cove", map: { x: 59.4, y: 49.6 }, width: 10, motion: "bob", seat: "water" },
-  { id: "sailboat-b", file: "sailboat.png", zone: "cove", map: { x: 39.85, y: 54.25 }, width: 9, motion: "bob", seat: "water" },
+  { id: "dock", file: "dock.png", zone: "cove", map: { x: 59.55, y: 52.85 }, width: 12, motion: "bob", seat: "water" },
+  { id: "sailboat", file: "sailboat.png", zone: "cove", map: { x: 58.35, y: 50.15 }, width: 9, motion: "bob", seat: "water" },
+  { id: "sailboat-b", file: "sailboat.png", zone: "cove", map: { x: 61.05, y: 48.45 }, width: 8, motion: "bob", seat: "water" },
   { id: "coins", file: "coins.png", zone: "cove", map: { x: 60.15, y: 42.55 }, width: 11, motion: "bob", seat: "land" },
   { id: "coins-b", file: "coins.png", zone: "cove", map: { x: 39.95, y: 58.55 }, width: 10, motion: "bob", seat: "land" },
   { id: "coin-spin", file: "coin-spin.png", zone: "cove", map: { x: 61.25, y: 40.75 }, width: 5, motion: "spin", seat: "water" },
-  { id: "peppermint", file: "peppermint.png", zone: "cove", map: { x: 60.35, y: 36.25 }, width: 8, motion: "bob", seat: "land" },
-  { id: "peppermint-b", file: "peppermint.png", zone: "cove", map: { x: 39.75, y: 47.85 }, width: 8, motion: "bob", seat: "water" },
-  { id: "shell", file: "shell.png", zone: "cove", map: { x: 60.55, y: 53.15 }, width: 8, motion: "bob", seat: "land" },
-  { id: "shell-b", file: "shell.png", zone: "cove", map: { x: 40.25, y: 35.65 }, width: 7, motion: "bob", seat: "shore" },
-  { id: "fraction-pie", file: "fraction-pie.png", zone: "forest", map: { x: 39.55, y: 14.35 }, width: 11, motion: "sway", seat: "land" },
-  { id: "fraction-pie-b", file: "fraction-pie.png", zone: "forest", map: { x: 60.25, y: 10.85 }, width: 10, motion: "sway", seat: "land" },
-  { id: "pie-tart", file: "pie-tart.png", zone: "forest", map: { x: 39.85, y: 22.15 }, width: 11, motion: "sway", seat: "land" },
-  { id: "pie-tart-b", file: "pie-tart.png", zone: "forest", map: { x: 60.85, y: 16.15 }, width: 10, motion: "sway", seat: "land" },
-  { id: "gumdrop-forest", file: "gumdrop.png", zone: "forest", map: { x: 39.45, y: 7.25 }, width: 9, motion: "bob", seat: "land" },
-  { id: "numbered-sweet", file: "numbered-sweet.png", zone: "forest", map: { x: 60.35, y: 24.55 }, width: 8, motion: "bob", seat: "land" },
-  { id: "numbered-sweet-b", file: "numbered-sweet.png", zone: "forest", map: { x: 40.15, y: 18.85 }, width: 7, motion: "bob", seat: "land" },
+  { id: "fraction-tree", file: "fraction-tree.png", zone: "forest", map: { x: 39.55, y: 14.35 }, width: 11, motion: "sway", seat: "land" },
+  { id: "fraction-tree-b", file: "fraction-tree.png", zone: "forest", map: { x: 60.25, y: 10.85 }, width: 10, motion: "sway", seat: "land" },
+  { id: "fraction-tree-c", file: "fraction-tree.png", zone: "forest", map: { x: 39.85, y: 22.15 }, width: 11, motion: "sway", seat: "land" },
+  { id: "fraction-tree-d", file: "fraction-tree.png", zone: "forest", map: { x: 60.85, y: 16.15 }, width: 10, motion: "sway", seat: "land" },
 ];
 
 /** Keep scenery off cream discs / numbers. Existing tenframes sit ~6.5 away. */
