@@ -56,7 +56,7 @@ describe("CandyPath", () => {
     expect(html).toContain('data-path-obstacle="cove-boulder"');
     expect(html).toContain("candy-zones/overlays/cove-boulder.png");
     expect(html).toContain("candy-prop-obstacle");
-    expect(html).toContain("width: 24%");
+    expect(html).toContain("width:24%");
     expect(html).not.toMatch(/<button[^>]*data-path-obstacle/);
     expect(html).toContain('data-candy-prop="waterfall"');
     expect(html).toContain('data-candy-prop="tenframe-a"');
