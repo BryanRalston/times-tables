@@ -367,6 +367,17 @@ export const CandyPath = forwardRef<
           decoding="async"
           data-candy-tall-map="1"
         />
+        <div
+          className="candy-water"
+          data-candy-water="1"
+          style={{
+            maskImage: `url("${asset(`${TALL_MAP_OVERLAY_DIR}/cove-water-mask.png`)}")`,
+            WebkitMaskImage: `url("${asset(`${TALL_MAP_OVERLAY_DIR}/cove-water-mask.png`)}")`,
+          }}
+        >
+          <span className="candy-water-flow" />
+          <span className="candy-water-glint" />
+        </div>
       </div>
 
       <div className="candy-overlay">

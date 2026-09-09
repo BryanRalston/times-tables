@@ -8,6 +8,8 @@ import {
   TALL_MAP_FILE,
   TALL_MAP_OVERLAYS,
   TALL_MAP_SIZE,
+  overlayClearsPads,
+  overlayInOpenCoveWater,
   TRAIL_PEEK_ARM_MS,
   TRAIL_PEEK_ARM_SPREAD_MS,
   TRAIL_PEEK_MIN_HOPPER_DIST,
@@ -70,12 +72,30 @@ describe("grade path", () => {
     expect(TALL_MAP_OVERLAYS.map((p) => p.id)).toEqual([
       "tenframe-a",
       "tenframe-b",
+      "daisies",
+      "gumdrop",
       "waterfall",
       "palm",
+      "sailboat",
       "coins",
+      "coin-spin",
+      "candy-cane",
       "fraction-pie",
     ]);
     expect(TALL_MAP_OVERLAYS.every((p) => p.map.x > 38 && p.map.x < 62)).toBe(true);
+    expect(TALL_MAP_OVERLAYS.every((p) => overlayClearsPads(p))).toBe(true);
+    const fall = TALL_MAP_OVERLAYS.find((p) => p.id === "waterfall")!;
+    expect(fall.map).toEqual({ x: 39.65, y: 32.85 });
+    expect(fall.map.y).toBeGreaterThan(28);
+    expect(fall.map.y).toBeLessThan(36);
+    expect(overlayInOpenCoveWater(fall)).toBe(false);
+    expect(TALL_MAP_OVERLAYS.find((p) => p.id === "sailboat")?.motion).toBe("bob");
+    expect(TALL_MAP_OVERLAYS.find((p) => p.id === "coins")?.motion).toBe("bob");
+    expect(TALL_MAP_OVERLAYS.find((p) => p.id === "coin-spin")?.motion).toBe("spin");
+    expect(TALL_MAP_OVERLAYS.find((p) => p.id === "candy-cane")?.motion).toBe("sway");
+    expect(TALL_MAP_OVERLAYS.find((p) => p.id === "palm")?.motion).toBe("sway");
+    expect(TALL_MAP_OVERLAYS.find((p) => p.id === "daisies")?.motion).toBe("bob");
+    expect(TALL_MAP_OVERLAYS.find((p) => p.id === "gumdrop")?.motion).toBe("sway");
     expect(TRAIL_PEEK_SPOTS).toHaveLength(9);
     expect(TRAIL_PEEK_SPOTS.every((p) => p.map.x > 38 && p.map.x < 62)).toBe(true);
     expect(TRAIL_PEEK_MIN_HOPPER_DIST).toBeGreaterThan(TRAIL_PEEK_MIN_PAD_DIST);
