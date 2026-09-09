@@ -2,6 +2,8 @@ import { GRADE3_PATH_NODES, type PathNodePos } from "./grade-path";
 
 export type HopPhase = "air" | "land";
 
+export type PathHopSfx = "hop" | "land";
+
 export type HopPose = {
   x: number;
   y: number;
@@ -68,6 +70,26 @@ export function hopProgressAt(
   const local = elapsedMs - hopIndex * cycle;
   if (local < HOP_MS) return { hopIndex, t: clamp01(local / HOP_MS), phase: "air", done: false };
   return { hopIndex, t: clamp01((local - HOP_MS) / LAND_MS), phase: "land", done: false };
+}
+
+/** One hop takeoff and one land tick per pad jump — not every animation frame. */
+export function pathHopSfxKind(
+  prev: { hopIndex: number; phase: HopPhase } | null,
+  next: { hopIndex: number; phase: HopPhase; done: boolean },
+): PathHopSfx | null {
+  if (next.done) return null;
+  switch (next.phase) {
+    case "air":
+      if (!prev || prev.hopIndex !== next.hopIndex) return "hop";
+      return null;
+    case "land":
+      if (prev?.phase !== "land") return "land";
+      return null;
+    default: {
+      const _never: never = next.phase;
+      return _never;
+    }
+  }
 }
 
 export function hopSquash(t: number): { x: number; y: number } {

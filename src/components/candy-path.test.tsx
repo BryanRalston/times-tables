@@ -73,6 +73,7 @@ describe("CandyPath", () => {
     expect(html).toMatch(/data-peek-side="(left|right)"/);
     expect(html).not.toContain("data-squishee-shop");
     expect(html).not.toContain("data-trail-collect");
+    expect(html).not.toContain("data-continue-peek");
   });
 
   it("keeps nearby nodes clear and fogs the far forest on unit 1", () => {

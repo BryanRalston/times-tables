@@ -79,3 +79,50 @@ export function playStreak() {
   tone(783.99, t + 0.06, 0.08, "sine", 0.04);
   tone(1046.5, t + 0.13, 0.12, "sine", 0.045);
 }
+
+function chirp(fromFreq: number, toFreq: number, start: number, dur: number, type: OscillatorType, gain: number) {
+  const c = ac();
+  if (!c) return;
+  const o = c.createOscillator();
+  const g = c.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(fromFreq, start);
+  o.frequency.exponentialRampToValueAtTime(Math.max(1, toFreq), start + dur);
+  g.gain.setValueAtTime(0.0001, start);
+  g.gain.exponentialRampToValueAtTime(gain, start + Math.min(0.014, dur * 0.28));
+  g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  o.connect(g);
+  g.connect(c.destination);
+  o.start(start);
+  o.stop(start + dur + 0.02);
+}
+
+/** Mid-chain hops stay a bit quieter so long jumps do not stack. */
+export function hopChainGain(index: number, length: number, base: number): number {
+  if (length <= 2) return base;
+  if (index <= 0 || index >= length - 1) return base;
+  return base * 0.68;
+}
+
+export function playHop(chainIndex = 0, chainLength = 1) {
+  const c = ac();
+  if (!c) return;
+  const t = c.currentTime;
+  const gain = hopChainGain(chainIndex, chainLength, 0.024);
+  chirp(370, 523.25, t, 0.08, "sine", gain);
+  tone(659.25, t + 0.045, 0.045, "sine", gain * 0.5);
+}
+
+export function playLand(chainIndex = 0, chainLength = 1) {
+  const c = ac();
+  if (!c) return;
+  tone(246.94, c.currentTime, 0.032, "triangle", hopChainGain(chainIndex, chainLength, 0.012));
+}
+
+export function playPeek() {
+  const c = ac();
+  if (!c) return;
+  const t = c.currentTime;
+  tone(698.46, t, 0.045, "sine", 0.026);
+  tone(880, t + 0.028, 0.06, "sine", 0.02);
+}
