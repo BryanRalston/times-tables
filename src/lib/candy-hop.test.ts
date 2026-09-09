@@ -12,6 +12,7 @@ import {
   hopSquash,
   hopTravelMs,
   hopUnitStops,
+  pathHopSfxKind,
   restHopPose,
 } from "./candy-hop";
 import { GRADE3_PATH_NODES, mapToViewPos } from "./grade-path";
@@ -113,5 +114,29 @@ describe("candy hop", () => {
     const rest = restHopPose({ x: 10, y: 20 });
     expect(rest).toMatchObject({ x: 10, y: 20, squashX: 1, squashY: 1, shadowX: 10, shadowY: 20 });
     expect(rest.shadowOpacity).toBeGreaterThan(0);
+  });
+
+  it("plays one hop and one land per pad, not every frame", () => {
+    const samples = [
+      0,
+      12,
+      HOP_MS / 2,
+      HOP_MS,
+      HOP_MS + 8,
+      HOP_MS + LAND_MS,
+      HOP_MS + LAND_MS + 10,
+      hopTravelMs([1, 2, 3]) - 4,
+      hopTravelMs([1, 2, 3]),
+    ];
+    let prev: { hopIndex: number; phase: "air" | "land" } | null = null;
+    const kinds = samples.map((elapsed) => {
+      const next = hopProgressAt(elapsed, 2);
+      const kind = pathHopSfxKind(prev, next);
+      if (!next.done) prev = { hopIndex: next.hopIndex, phase: next.phase };
+      return kind;
+    });
+    expect(kinds.filter((k) => k === "hop")).toHaveLength(2);
+    expect(kinds.filter((k) => k === "land")).toHaveLength(2);
+    expect(pathHopSfxKind(null, hopProgressAt(0, 0))).toBeNull();
   });
 });

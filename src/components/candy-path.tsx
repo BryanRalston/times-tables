@@ -9,7 +9,9 @@ import {
   hopProgressAt,
   hopTravelMs,
   hopUnitStops,
+  pathHopSfxKind,
   restHopPose,
+  type HopPhase,
   type HopPose,
 } from "@/lib/candy-hop";
 import { todayIso } from "@/lib/calendar";
@@ -38,6 +40,7 @@ import { parseLocale } from "@/lib/i18n";
 import { unitText } from "@/lib/labels";
 import { unitStatus, type NodeStatus } from "@/lib/path";
 import { unitMaxStars, unitStars, useProgress } from "@/lib/progress";
+import { playHop, playLand, playPeek } from "@/lib/sound";
 import { pathHopperId, squisheeSrc, trailPeekFace } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
@@ -127,6 +130,7 @@ function TrailPeek({
       timer = window.setTimeout(() => {
         if (played.current) return;
         played.current = true;
+        playPeek();
         setArmed(true);
       }, delay);
     };
@@ -276,6 +280,7 @@ export const CandyPath = forwardRef<
     setPose(restHopPose(views[0]!));
     let raf = 0;
     let wasLand = false;
+    let prevSfx: { hopIndex: number; phase: HopPhase } | null = null;
     const start = performance.now();
     const tick = (now: number) => {
       const { hopIndex, t, phase, done } = hopProgressAt(now - start, hopCount);
@@ -288,6 +293,22 @@ export const CandyPath = forwardRef<
         wasLand = isLand;
         setLanding(isLand);
       }
+      const sfx = pathHopSfxKind(prevSfx, { hopIndex, phase, done });
+      switch (sfx) {
+        case "hop":
+          playHop(hopIndex, hopCount);
+          break;
+        case "land":
+          playLand(hopIndex, hopCount);
+          break;
+        case null:
+          break;
+        default: {
+          const _never: never = sfx;
+          return _never;
+        }
+      }
+      prevSfx = { hopIndex, phase };
       switch (phase) {
         case "land":
           setPose(hopLandSettle(views[hopIndex + 1]!, t));
