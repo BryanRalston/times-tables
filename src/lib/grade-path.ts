@@ -156,13 +156,20 @@ export const TALL_MAP_OVERLAY_DIR = "candy-zones/overlays";
  *
  * Density follows the locked Candyland Grade 3 Path mock: grassy ten-frame
  * mounds + pink/yellow flowers; cove coins/palm/dock/two boats; forest
- * fraction-pie trees. Waterfall is extra to the mock — splash seat (−84%)
- * on the left-gutter pink→beige lip (y ≈ 26.5–27.9 at x ≈ 40–42).
+ * fraction-pie trees. Extra copies of those same landmarks fill the gutters
+ * so meadow/cove/forest read as a grove, not a sparse scatter. Waterfall is
+ * extra to the mock — splash seat (−84%) on the left-gutter pink→beige lip
+ * (y ≈ 26.5–27.9 at x ≈ 40–42).
  */
 export const TALL_MAP_OVERLAYS: readonly PathOverlay[] = [
   { id: "tenframe-a", file: "tenframe-mound.png", zone: "meadow", map: { x: 40.15, y: 88.35 }, width: 16, motion: "bob", seat: "land" },
   { id: "tenframe-b", file: "tenframe-mound.png", zone: "meadow", map: { x: 59.55, y: 77.85 }, width: 14, motion: "bob", seat: "land" },
   { id: "tenframe-c", file: "tenframe-mound.png", zone: "meadow", map: { x: 39.55, y: 68.85 }, width: 14, motion: "bob", seat: "land" },
+  { id: "tenframe-d", file: "tenframe-mound.png", zone: "meadow", map: { x: 60.85, y: 64.25 }, width: 13, motion: "bob", seat: "land" },
+  { id: "tenframe-e", file: "tenframe-mound.png", zone: "meadow", map: { x: 40.45, y: 76.55 }, width: 13, motion: "bob", seat: "land" },
+  { id: "tenframe-f", file: "tenframe-mound.png", zone: "meadow", map: { x: 61.25, y: 82.15 }, width: 13, motion: "bob", seat: "land" },
+  { id: "tenframe-g", file: "tenframe-mound.png", zone: "meadow", map: { x: 40.85, y: 85.65 }, width: 13, motion: "bob", seat: "land" },
+  { id: "tenframe-h", file: "tenframe-mound.png", zone: "meadow", map: { x: 61.35, y: 75.55 }, width: 12, motion: "bob", seat: "land" },
   { id: "flowers", file: "meadow-flowers.png", zone: "meadow", map: { x: 39.85, y: 80.15 }, width: 9, motion: "bob", seat: "land" },
   { id: "flowers-b", file: "meadow-flowers.png", zone: "meadow", map: { x: 60.25, y: 86.55 }, width: 8, motion: "bob", seat: "land" },
   { id: "flowers-c", file: "meadow-flowers.png", zone: "meadow", map: { x: 40.05, y: 73.25 }, width: 8, motion: "bob", seat: "land" },
@@ -174,11 +181,22 @@ export const TALL_MAP_OVERLAYS: readonly PathOverlay[] = [
   { id: "sailboat-b", file: "sailboat.png", zone: "cove", map: { x: 61.05, y: 48.45 }, width: 8, motion: "bob", seat: "water" },
   { id: "coins", file: "coins.png", zone: "cove", map: { x: 60.15, y: 42.55 }, width: 11, motion: "bob", seat: "land" },
   { id: "coins-b", file: "coins.png", zone: "cove", map: { x: 39.95, y: 58.55 }, width: 10, motion: "bob", seat: "land" },
+  { id: "coins-c", file: "coins.png", zone: "cove", map: { x: 61.05, y: 45.15 }, width: 10, motion: "bob", seat: "land" },
+  { id: "coins-d", file: "coins.png", zone: "cove", map: { x: 58.85, y: 36.25 }, width: 9, motion: "bob", seat: "land" },
+  { id: "coins-e", file: "coins.png", zone: "cove", map: { x: 40.55, y: 54.75 }, width: 10, motion: "bob", seat: "land" },
+  { id: "coins-f", file: "coins.png", zone: "cove", map: { x: 61.25, y: 51.05 }, width: 9, motion: "bob", seat: "land" },
   { id: "coin-spin", file: "coin-spin.png", zone: "cove", map: { x: 61.25, y: 40.75 }, width: 5, motion: "spin", seat: "water" },
+  { id: "coin-spin-b", file: "coin-spin.png", zone: "cove", map: { x: 40.85, y: 56.85 }, width: 5, motion: "spin", seat: "land" },
   { id: "fraction-tree", file: "fraction-tree.png", zone: "forest", map: { x: 39.55, y: 14.35 }, width: 11, motion: "sway", seat: "land" },
   { id: "fraction-tree-b", file: "fraction-tree.png", zone: "forest", map: { x: 60.25, y: 10.85 }, width: 10, motion: "sway", seat: "land" },
   { id: "fraction-tree-c", file: "fraction-tree.png", zone: "forest", map: { x: 39.85, y: 22.15 }, width: 11, motion: "sway", seat: "land" },
   { id: "fraction-tree-d", file: "fraction-tree.png", zone: "forest", map: { x: 60.85, y: 16.15 }, width: 10, motion: "sway", seat: "land" },
+  { id: "fraction-tree-e", file: "fraction-tree.png", zone: "forest", map: { x: 40.85, y: 4.85 }, width: 10, motion: "sway", seat: "land" },
+  { id: "fraction-tree-f", file: "fraction-tree.png", zone: "forest", map: { x: 60.45, y: 5.95 }, width: 9, motion: "sway", seat: "land" },
+  { id: "fraction-tree-g", file: "fraction-tree.png", zone: "forest", map: { x: 40.15, y: 18.15 }, width: 10, motion: "sway", seat: "land" },
+  { id: "fraction-tree-h", file: "fraction-tree.png", zone: "forest", map: { x: 61.05, y: 20.95 }, width: 10, motion: "sway", seat: "land" },
+  { id: "fraction-tree-i", file: "fraction-tree.png", zone: "forest", map: { x: 59.35, y: 13.85 }, width: 9, motion: "sway", seat: "land" },
+  { id: "fraction-tree-j", file: "fraction-tree.png", zone: "forest", map: { x: 38.75, y: 24.15 }, width: 10, motion: "sway", seat: "land" },
 ];
 
 /** Keep scenery off cream discs / numbers. Existing tenframes sit ~6.5 away. */

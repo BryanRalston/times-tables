@@ -56,6 +56,7 @@ describe("CandyPath", () => {
     expect(html).toContain('data-candy-prop="waterfall"');
     expect(html).toContain('data-candy-prop="tenframe-a"');
     expect(html).toContain('data-candy-prop="tenframe-b"');
+    expect(html).toContain('data-candy-prop="tenframe-h"');
     expect(html).toContain('data-candy-prop="flowers"');
     expect(html).toContain('data-candy-prop="daisies"');
     expect(html).toContain('data-candy-prop="palm"');
@@ -63,8 +64,10 @@ describe("CandyPath", () => {
     expect(html).toContain('data-candy-prop="sailboat"');
     expect(html).toContain('data-candy-prop="sailboat-b"');
     expect(html).toContain('data-candy-prop="coins"');
+    expect(html).toContain('data-candy-prop="coins-f"');
     expect(html).toContain('data-candy-prop="coin-spin"');
     expect(html).toContain('data-candy-prop="fraction-tree"');
+    expect(html).toContain('data-candy-prop="fraction-tree-j"');
     expect(html).not.toContain('data-candy-prop="candy-cane"');
     expect(html).not.toContain("candy-cane.png");
     expect(html).not.toContain("lollipop.png");
