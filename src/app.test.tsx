@@ -127,6 +127,7 @@ describe("first-visit Home door", () => {
     useProgress.setState({
       activities: { "u1-leftover": { plays: 1, best: 4, last: 4, stars: 3, misses: [] } },
       pathHopperAt: 0,
+      pathNowSeen: 0,
     });
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
@@ -134,6 +135,22 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-path-travel="1"');
     expect(html).toMatch(/data-path-unit="u2"[^>]*data-path-status="now"/);
     expect(html).toMatch(/data-path-unit="u1"[^>]*data-path-status="open"/);
+  });
+
+  it("Guest returning from an earlier replay stays on that pad", () => {
+    useProgress.setState({
+      classUnitId: "u8",
+      pathHopperAt: 3,
+      pathNowSeen: 8,
+      seenWelcome: true,
+    });
+    stubHash("#/lessons");
+    const html = renderToStaticMarkup(<App />);
+    expect(html).toContain('data-path-hop-from="3"');
+    expect(html).toContain('data-path-hop-to="3"');
+    expect(html).toContain('data-path-travel="0"');
+    expect(html).toMatch(/data-path-unit="u8"[^>]*data-path-status="now"/);
+    expect(html).toContain('data-path-obstacle="cove-boulder"');
   });
 
   it("empty Guest at #/ on tablet/laptop gets the same Home shell", () => {
@@ -245,6 +262,7 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-prop-land");
     expect(css).toContain(".candy-prop-water");
     expect(css).toContain(".candy-prop-shore");
+    expect(css).toContain(".candy-prop-obstacle");
     expect(css).toContain(".candy-hopper-art");
     expect(css).toContain(".candy-hopper-shadow");
     expect(css).toContain("@keyframes candy-hop");

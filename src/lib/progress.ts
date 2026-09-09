@@ -25,7 +25,7 @@ import { schoolStreak } from "./streak";
 import type { DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
 import { parsePathGrade } from "./types";
 
-const SAVE_VERSION = 8;
+const SAVE_VERSION = 9;
 export const STORAGE_KEY = "g3-path-v2";
 export const LEGACY_STORAGE_KEYS = ["g3-path-v1", "times-tables-progress", "times-tables-settings"] as const;
 const DEFAULT_ID = "kid-1";
@@ -106,6 +106,7 @@ export function emptyLearner(name = ""): LearnerSlice {
     today: emptyToday(),
     runHonest: emptyRun(),
     pathHopperAt: 0,
+    pathNowSeen: 0,
   };
 }
 
@@ -127,6 +128,7 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
     today: parseToday(s.today),
     runHonest: parseRun(s.runHonest),
     pathHopperAt: clampPathHopperAt(s.pathHopperAt),
+    pathNowSeen: clampPathHopperAt(s.pathNowSeen),
   };
 }
 
@@ -166,6 +168,7 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
     today: parseToday(raw.today),
     runHonest: parseRun(raw.runHonest),
     pathHopperAt: raw.pathHopperAt ?? 0,
+    pathNowSeen: raw.pathNowSeen ?? 0,
   });
   const learners = { ...(raw.learners ?? {}) };
   if (!learners[learnerId]) learners[learnerId] = fromFlat;
@@ -194,6 +197,7 @@ interface ProgressApi extends SaveState {
   markWelcome: () => void;
   setClassUnit: (id: string) => void;
   setPathHopperAt: (n: number) => void;
+  setPathNowSeen: (n: number) => void;
   setPathGrade: (grade: PathGrade) => void;
   setSkipWeekend: (v: boolean) => void;
   setLocale: (locale: Locale) => void;
@@ -241,6 +245,7 @@ function snapshotSave(s: SaveState): SaveState {
     today: s.today,
     runHonest: s.runHonest,
     pathHopperAt: s.pathHopperAt,
+    pathNowSeen: s.pathNowSeen,
     learners: s.learners,
   };
 }
@@ -284,6 +289,8 @@ export const useProgress = create<ProgressApi>()(
       markWelcome: () => commit(get, set, { seenWelcome: true }),
       setClassUnit: (id) => set({ classUnitId: id }),
       setPathHopperAt: (n) => commit(get, set, { pathHopperAt: clampPathHopperAt(n) }),
+      setPathNowSeen: (n) =>
+        commit(get, set, { pathNowSeen: Math.max(get().pathNowSeen, clampPathHopperAt(n)) }),
       setPathGrade: (grade) => {
         const pathGrade = parsePathGrade(grade);
         const classUnitId = unitsFor(pathGrade).some((u) => u.id === get().classUnitId) ? get().classUnitId : "";

@@ -4,9 +4,11 @@ import { useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
 import { asset } from "@/lib/art";
 import {
+  hopAirMsList,
   hopAlong,
   hopLandSettle,
   hopProgressAt,
+  hopSpanIsObstacle,
   hopTravelMs,
   hopUnitStops,
   pathHopSfxKind,
@@ -19,6 +21,7 @@ import { UNITS } from "@/lib/curriculum";
 import {
   GRADE3_PATH_NODES,
   GRADE3_PATH_PADS,
+  PATH_OBSTACLE,
   TALL_MAP_FILE,
   TALL_MAP_OVERLAY_DIR,
   TALL_MAP_OVERLAYS,
@@ -209,23 +212,28 @@ export const CandyPath = forwardRef<
   {
     suggestedId: string;
     standFrom?: number;
+    standTo?: number;
     onStart: () => void;
     onOpenUnit: (id: string) => void;
   }
->(function CandyPath({ suggestedId, standFrom, onStart, onOpenUnit }, ref) {
+>(function CandyPath({ suggestedId, standFrom, standTo, onStart, onOpenUnit }, ref) {
   const ui = useUi();
   const locale = parseLocale(useProgress((s) => s.locale));
   const owned = useProgress((s) => s.squishees);
   const setPathHopperAt = useProgress((s) => s.setPathHopperAt);
+  const setPathNowSeen = useProgress((s) => s.setPathNowSeen);
+  const nowSeen = useProgress((s) => s.pathNowSeen);
   const hopperId = pathHopperId(owned);
   const current = UNITS.find((u) => u.id === suggestedId) ?? UNITS[0]!;
   const origin = standFrom && standFrom > 0 ? standFrom : current.number;
+  const target =
+    standTo && standTo > 0 ? standTo : current.number > nowSeen ? current.number : origin;
   const originPos = mapToViewPos(GRADE3_PATH_NODES[origin - 1] ?? GRADE3_PATH_NODES[0]!);
   const settled = useRef(origin);
   const pending = useRef<(() => void) | null>(null);
-  const [dest, setDest] = useState(current.number);
+  const [dest, setDest] = useState(target);
   const [travelFrom, setTravelFrom] = useState(origin);
-  const [travel, setTravel] = useState(origin !== current.number);
+  const [travel, setTravel] = useState(origin !== target);
   const [landing, setLanding] = useState(false);
   const [pose, setPose] = useState<HopPose>(() => restHopPose(originPos));
   const destPos = mapToViewPos(GRADE3_PATH_NODES[dest - 1] ?? GRADE3_PATH_NODES[0]!);
@@ -246,8 +254,8 @@ export const CandyPath = forwardRef<
   }, [pose.y, travel]);
 
   useEffect(() => {
-    setDest(current.number);
-  }, [current.number]);
+    if (current.number > nowSeen) setDest(current.number);
+  }, [current.number, nowSeen]);
 
   useEffect(() => {
     const from = settled.current;
@@ -255,6 +263,7 @@ export const CandyPath = forwardRef<
     const finish = (pad: number) => {
       settled.current = pad;
       setPathHopperAt(pad);
+      if (pad === current.number) setPathNowSeen(current.number);
       setTravel(false);
       setLanding(false);
       setPose(restHopPose(mapToViewPos(GRADE3_PATH_NODES[pad - 1] ?? GRADE3_PATH_NODES[0]!)));
@@ -277,6 +286,7 @@ export const CandyPath = forwardRef<
 
     const views = stops.map((n) => mapToViewPos(GRADE3_PATH_NODES[n - 1]!));
     const hopCount = views.length - 1;
+    const airMs = hopAirMsList(stops);
     setTravel(true);
     setLanding(false);
     setPose(restHopPose(views[0]!));
@@ -285,7 +295,7 @@ export const CandyPath = forwardRef<
     let prevSfx: { hopIndex: number; phase: HopPhase } | null = null;
     const start = performance.now();
     const tick = (now: number) => {
-      const { hopIndex, t, phase, done } = hopProgressAt(now - start, hopCount);
+      const { hopIndex, t, phase, done } = hopProgressAt(now - start, hopCount, airMs);
       if (done) {
         finish(to);
         return;
@@ -316,7 +326,14 @@ export const CandyPath = forwardRef<
           setPose(hopLandSettle(views[hopIndex + 1]!, t));
           break;
         case "air":
-          setPose(hopAlong(views[hopIndex]!, views[hopIndex + 1]!, t));
+          setPose(
+            hopAlong(
+              views[hopIndex]!,
+              views[hopIndex + 1]!,
+              t,
+              hopSpanIsObstacle(stops[hopIndex]!, stops[hopIndex + 1]!),
+            ),
+          );
           break;
         default: {
           const _never: never = phase;
@@ -327,7 +344,7 @@ export const CandyPath = forwardRef<
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [dest, destPos.x, destPos.y, setPathHopperAt]);
+  }, [current.number, dest, destPos.x, destPos.y, setPathHopperAt, setPathNowSeen]);
 
   const hopThen = (to: number, then: () => void) => {
     if (settled.current === to && !travel) {
@@ -401,6 +418,36 @@ export const CandyPath = forwardRef<
         >
           {zoneLabel("forest", ui)}
         </p>
+
+        {(() => {
+          const view = mapToViewPos(PATH_OBSTACLE.map);
+          const veiled = overlayIsVeiled(PATH_OBSTACLE.map.y, current.number);
+          return (
+            <span
+              className={cn(
+                "candy-prop candy-prop-obstacle",
+                overlaySeatClass(PATH_OBSTACLE.seat),
+                veiled && "candy-prop-veil",
+              )}
+              style={{ left: `${view.x}%`, top: `${view.y}%`, width: `${PATH_OBSTACLE.width}%` }}
+              data-path-obstacle={PATH_OBSTACLE.id}
+              data-candy-prop={PATH_OBSTACLE.id}
+              data-candy-prop-zone={PATH_OBSTACLE.zone}
+              data-candy-prop-seat={PATH_OBSTACLE.seat}
+              data-candy-prop-veil={veiled ? "1" : "0"}
+              aria-hidden
+            >
+              <span className="candy-prop-art">
+                <img
+                  src={asset(`${TALL_MAP_OVERLAY_DIR}/${PATH_OBSTACLE.file}`)}
+                  alt=""
+                  draggable={false}
+                  decoding="async"
+                />
+              </span>
+            </span>
+          );
+        })()}
 
         {TALL_MAP_OVERLAYS.map((prop) => {
           const view = mapToViewPos(prop.map);
@@ -491,6 +538,11 @@ export const CandyPath = forwardRef<
           data-path-hop-from={travel ? String(travelFrom) : String(dest)}
           data-path-hop-to={String(dest)}
           data-path-hop-ms={travel ? String(hopTravelMs(hopUnitStops(travelFrom, dest))) : "0"}
+          data-path-clear-obstacle={
+            travel && hopUnitStops(travelFrom, dest).some((n, i, all) => hopSpanIsObstacle(n, all[i + 1] ?? n))
+              ? "1"
+              : "0"
+          }
         >
           <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
         </div>

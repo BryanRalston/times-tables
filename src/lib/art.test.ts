@@ -35,6 +35,7 @@ describe("asset URLs", () => {
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/numbered-sweet.png"))).toBe(false);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/sailboat.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/cove-water-mask.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/cove-boulder.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/art/home-peek.png"))).toBe(false);
   });
 });

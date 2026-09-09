@@ -2,12 +2,16 @@ import { describe, expect, it } from "vitest";
 import {
   HOP_MS,
   LAND_MS,
+  OBSTACLE_HOP_MS,
+  OBSTACLE_LIFT_PERCENT,
   clamp01,
   easeHopTravel,
   hopAlong,
   hopLandSettle,
   hopLandSquash,
   hopLiftPercent,
+  hopSpanIsObstacle,
+  hopSpanMs,
   hopProgressAt,
   hopSquash,
   hopTravelMs,
@@ -15,7 +19,7 @@ import {
   pathHopSfxKind,
   restHopPose,
 } from "./candy-hop";
-import { GRADE3_PATH_NODES, mapToViewPos } from "./grade-path";
+import { GRADE3_PATH_NODES, TALL_MAP_DECORATIVE_PAD, mapToViewPos } from "./grade-path";
 
 describe("candy hop", () => {
   it("walks every intermediate pad, both directions", () => {
@@ -138,5 +142,29 @@ describe("candy hop", () => {
     expect(kinds.filter((k) => k === "hop")).toHaveLength(2);
     expect(kinds.filter((k) => k === "land")).toHaveLength(2);
     expect(pathHopSfxKind(null, hopProgressAt(0, 0))).toBeNull();
+  });
+
+  it("vaults higher and longer over the cove boulder between pads 8 and 9", () => {
+    expect(hopSpanIsObstacle(8, 9)).toBe(true);
+    expect(hopSpanIsObstacle(9, 8)).toBe(true);
+    expect(hopSpanIsObstacle(7, 8)).toBe(false);
+    expect(hopSpanMs(8, 9)).toBe(OBSTACLE_HOP_MS);
+    expect(hopSpanMs(1, 2)).toBe(HOP_MS);
+    expect(hopTravelMs([8, 9])).toBe(OBSTACLE_HOP_MS + LAND_MS);
+    expect(hopTravelMs([8, 9])).toBeGreaterThan(hopTravelMs([1, 2]));
+    const a = mapToViewPos(GRADE3_PATH_NODES[7]!);
+    const b = mapToViewPos(GRADE3_PATH_NODES[8]!);
+    const obs = mapToViewPos(TALL_MAP_DECORATIVE_PAD);
+    const mid = hopAlong(a, b, 0.5, true);
+    const low = hopAlong(a, b, 0.5, false);
+    expect(hopLiftPercent(a, b, true)).toBe(OBSTACLE_LIFT_PERCENT);
+    expect(hopLiftPercent(a, b, true)).toBeGreaterThan(hopLiftPercent(a, b, false));
+    expect(mid.y).toBeLessThan(low.y - 1.4);
+    expect(mid.y).toBeLessThan(obs.y - 4);
+    expect(mid.shadowY).toBeGreaterThan(mid.y);
+    const midProg = hopProgressAt(OBSTACLE_HOP_MS / 2, 1, [OBSTACLE_HOP_MS]);
+    expect(midProg.phase).toBe("air");
+    expect(midProg.t).toBeCloseTo(0.5);
+    expect(hopProgressAt(OBSTACLE_HOP_MS + 8, 1, [OBSTACLE_HOP_MS]).phase).toBe("land");
   });
 });

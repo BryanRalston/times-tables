@@ -22,7 +22,7 @@ export const CANDY_WORLD_ASPECT = 2 / 5;
 
 /**
  * Painted cream pads on tall-map.png, percent of the PNG (y = 0 is the top).
- * Art has 14 discs; the cove→forest shoreline stone is decorative.
+ * Art has 13 numbered discs. The cove shoreline stone is a hop-over obstacle.
  */
 const TALL_MAP_UNIT_PADS: readonly PathPad[] = [
   { zone: "meadow", map: { x: 45.05, y: 92.69 }, unitNumber: 1 },
@@ -40,7 +40,7 @@ const TALL_MAP_UNIT_PADS: readonly PathPad[] = [
   { zone: "forest", map: { x: 51.27, y: 6.52 }, unitNumber: 13 },
 ];
 
-/** Shoreline stone between cove and forest — painted, not a unit. */
+/** Shoreline stone between cove units 8 and 9 — path obstacle, not a unit. */
 export const TALL_MAP_DECORATIVE_PAD: PathNodePos = { x: 45.51, y: 32.55 };
 
 export const GRADE3_PATH_PADS: readonly PathPad[] = TALL_MAP_UNIT_PADS;
@@ -137,6 +137,25 @@ export function fogCoverPercent(nowNumber: number, nodes: readonly PathNodePos[]
 export type OverlayMotion = "bob" | "sway" | "shimmer" | "fall" | "spin";
 
 export type OverlaySeat = "land" | "water" | "shore";
+
+export type PathObstacle = {
+  id: string;
+  file: string;
+  zone: PathZone;
+  map: PathNodePos;
+  width: number;
+  seat: OverlaySeat;
+};
+
+/** Vinyl candy boulder seated on the old blank disc. Not tappable. */
+export const PATH_OBSTACLE: PathObstacle = {
+  id: "cove-boulder",
+  file: "cove-boulder.png",
+  zone: "cove",
+  map: TALL_MAP_DECORATIVE_PAD,
+  width: 14,
+  seat: "land",
+};
 
 export type PathOverlay = {
   id: string;

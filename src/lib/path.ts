@@ -62,3 +62,20 @@ export function lessonsHopFrom(hopperAt: number, nowNumber: number, cleared: num
   if (cleared > 0) return Math.min(now, Math.max(1, Math.round(cleared)));
   return now;
 }
+
+/**
+ * Pad to stand on / hop to.
+ * Auto-travel to the frontier only when that now pad is newly unlocked
+ * (now > nowSeen). Replay returns stay on the pad the kid just left.
+ */
+export function lessonsHopTo(
+  hopperAt: number,
+  nowNumber: number,
+  nowSeen: number,
+  cleared: number,
+): number {
+  const now = Math.max(1, Math.round(nowNumber));
+  const from = lessonsHopFrom(hopperAt, now, cleared);
+  if (now > Math.max(0, Math.round(nowSeen))) return now;
+  return from;
+}

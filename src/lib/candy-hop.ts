@@ -18,6 +18,16 @@ export type HopPose = {
 /** One pad-to-pad hop. */
 export const HOP_MS = 520;
 
+/** Longer air time so the 8↔9 vault over the cove boulder reads as a hop. */
+export const OBSTACLE_HOP_MS = 740;
+
+/** Extra lift (map %) so that span clears the boulder. */
+export const OBSTACLE_LIFT_PERCENT = 8.1;
+
+/** Grade 3 pads the cove boulder sits between. */
+export const OBSTACLE_HOP_FROM = 8;
+export const OBSTACLE_HOP_TO = 9;
+
 /** Squash and settle on a pad, including after the last hop. */
 export const LAND_MS = 160;
 
@@ -47,15 +57,38 @@ export function hopUnitStops(fromNumber: number, toNumber: number, total = GRADE
   return out;
 }
 
+export function hopSpanIsObstacle(fromNumber: number, toNumber: number): boolean {
+  const a = Math.min(fromNumber, toNumber);
+  const b = Math.max(fromNumber, toNumber);
+  return a === OBSTACLE_HOP_FROM && b === OBSTACLE_HOP_TO;
+}
+
+export function hopSpanMs(fromNumber: number, toNumber: number): number {
+  return hopSpanIsObstacle(fromNumber, toNumber) ? OBSTACLE_HOP_MS : HOP_MS;
+}
+
+export function hopAirMsList(stops: readonly number[]): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < stops.length - 1; i++) out.push(hopSpanMs(stops[i]!, stops[i + 1]!));
+  return out;
+}
+
 export function hopTravelMs(stops: readonly number[]): number {
-  const hops = Math.max(0, stops.length - 1);
-  if (hops === 0) return 0;
-  return hops * (HOP_MS + LAND_MS);
+  if (stops.length < 2) return 0;
+  let ms = 0;
+  for (let i = 0; i < stops.length - 1; i++) ms += hopSpanMs(stops[i]!, stops[i + 1]!) + LAND_MS;
+  return ms;
+}
+
+function airMsAt(hopIndex: number, airMs: number | readonly number[]): number {
+  if (typeof airMs === "number") return airMs;
+  return airMs[hopIndex] ?? HOP_MS;
 }
 
 export function hopProgressAt(
   elapsedMs: number,
   hopCount: number,
+  airMs: number | readonly number[] = HOP_MS,
 ): {
   hopIndex: number;
   t: number;
@@ -63,13 +96,18 @@ export function hopProgressAt(
   done: boolean;
 } {
   if (hopCount <= 0) return { hopIndex: 0, t: 1, phase: "land", done: true };
-  const cycle = HOP_MS + LAND_MS;
-  const total = hopCount * cycle;
-  if (elapsedMs >= total) return { hopIndex: hopCount - 1, t: 1, phase: "land", done: true };
-  const hopIndex = Math.min(hopCount - 1, Math.max(0, Math.floor(elapsedMs / cycle)));
-  const local = elapsedMs - hopIndex * cycle;
-  if (local < HOP_MS) return { hopIndex, t: clamp01(local / HOP_MS), phase: "air", done: false };
-  return { hopIndex, t: clamp01((local - HOP_MS) / LAND_MS), phase: "land", done: false };
+  let acc = 0;
+  for (let i = 0; i < hopCount; i++) {
+    const air = airMsAt(i, airMs);
+    const cycle = air + LAND_MS;
+    if (elapsedMs < acc + cycle) {
+      const local = elapsedMs - acc;
+      if (local < air) return { hopIndex: i, t: clamp01(local / air), phase: "air", done: false };
+      return { hopIndex: i, t: clamp01((local - air) / LAND_MS), phase: "land", done: false };
+    }
+    acc += cycle;
+  }
+  return { hopIndex: hopCount - 1, t: 1, phase: "land", done: true };
 }
 
 /** One hop takeoff and one land tick per pad jump — not every animation frame. */
@@ -120,9 +158,11 @@ export function hopLandSquash(t: number): { x: number; y: number } {
   return { x: peakX + (1 - peakX) * s, y: peakY + (1 - peakY) * s };
 }
 
-export function hopLiftPercent(from: PathNodePos, to: PathNodePos): number {
+export function hopLiftPercent(from: PathNodePos, to: PathNodePos, clearObstacle = false): number {
   const dist = Math.hypot(to.x - from.x, to.y - from.y);
-  return Math.min(6.4, 3.3 + dist * 0.26);
+  const base = Math.min(6.4, 3.3 + dist * 0.26);
+  if (clearObstacle) return Math.max(base, OBSTACLE_LIFT_PERCENT);
+  return base;
 }
 
 function withShadow(pos: PathNodePos, scale: number, opacity: number, squash: { x: number; y: number }): HopPose {
@@ -138,10 +178,10 @@ function withShadow(pos: PathNodePos, scale: number, opacity: number, squash: { 
   };
 }
 
-export function hopAlong(from: PathNodePos, to: PathNodePos, t: number): HopPose {
+export function hopAlong(from: PathNodePos, to: PathNodePos, t: number, clearObstacle = false): HopPose {
   const u = easeHopTravel(t);
   const liftAmt = Math.sin(Math.PI * clamp01(t));
-  const lift = hopLiftPercent(from, to) * liftAmt;
+  const lift = hopLiftPercent(from, to, clearObstacle) * liftAmt;
   const squash = hopSquash(t);
   const ground = { x: from.x + (to.x - from.x) * u, y: from.y + (to.y - from.y) * u };
   return {

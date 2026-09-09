@@ -338,6 +338,8 @@ export interface LearnerSlice {
   runHonest: HonestRun;
   /** Last pad the Lessons hopper settled on. 0 = never stood on the map. */
   pathHopperAt: number;
+  /** Highest "now" pad Lessons already presented. Replay returns stay put. */
+  pathNowSeen: number;
 }
 
 export interface SaveState extends LearnerSlice {

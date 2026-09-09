@@ -4,11 +4,11 @@ import { AppHeader, AppScene, AppTabs, useUi } from "@/components/chrome";
 import { todayIso } from "@/lib/calendar";
 import { UNITS, suggestedUnitId, unitById } from "@/lib/curriculum";
 import { navigate } from "@/lib/nav";
-import { farthestClearedUnitNumber, lessonsHopFrom, pathNowUnitId } from "@/lib/path";
+import { farthestClearedUnitNumber, lessonsHopFrom, lessonsHopTo, pathNowUnitId } from "@/lib/path";
 import { useProgress } from "@/lib/progress";
 
 export function LessonsPage() {
-  useProgress((s) => `${s.classUnitId}:${s.pathHopperAt}:${Object.keys(s.sessions).length}:${Object.keys(s.activities).length}`);
+  useProgress((s) => `${s.classUnitId}:${s.pathHopperAt}:${s.pathNowSeen}:${Object.keys(s.sessions).length}:${Object.keys(s.activities).length}`);
   const st = useProgress.getState();
   const ui = useUi();
   const date = todayIso();
@@ -16,7 +16,9 @@ export function LessonsPage() {
   const calendarId = suggestedUnitId(date, g3Class, 3);
   const pathSuggested = pathNowUnitId(calendarId, st.sessions, st.activities);
   const nowNumber = unitById(pathSuggested)?.number ?? 1;
-  const standFrom = lessonsHopFrom(st.pathHopperAt, nowNumber, farthestClearedUnitNumber(st.sessions, st.activities));
+  const cleared = farthestClearedUnitNumber(st.sessions, st.activities);
+  const standFrom = lessonsHopFrom(st.pathHopperAt, nowNumber, cleared);
+  const standTo = lessonsHopTo(st.pathHopperAt, nowNumber, st.pathNowSeen, cleared);
   const pathRef = useRef<CandyPathHandle>(null);
 
   return (
@@ -27,6 +29,7 @@ export function LessonsPage() {
           ref={pathRef}
           suggestedId={pathSuggested}
           standFrom={standFrom}
+          standTo={standTo}
           onStart={() => navigate({ id: "play", kind: "daily" })}
           onOpenUnit={(id) => navigate({ id: "unit", unitId: id })}
         />

@@ -3,7 +3,7 @@ import { SCHOOL_DAYS, isSchoolDay, prevSchoolDay, weekdayName } from "./calendar
 import { GRADE3_SOLS, UNITS, WELCOME_ACTIVITY, activityById, coversSol, fluencyFactorsForUnit, suggestedUnitId, unitById } from "./curriculum";
 import { makeDailyWalk } from "./daily";
 import { doorRoute, parseHash } from "./nav";
-import { farthestClearedUnitNumber, isUnitOpen, lessonsHopFrom, pathNowUnitId, unitStatus } from "./path";
+import { farthestClearedUnitNumber, isUnitOpen, lessonsHopFrom, lessonsHopTo, pathNowUnitId, unitStatus } from "./path";
 import { qCopy, UI } from "./i18n";
 import { makeActivityRound, makeQuestion, makeWelcomeRound, placeOnGraph, untieExtreme, welcomeFirst, wordForm } from "./questions";
 import type { GraphData, MeasureData, MoneyData, PlaceValueData } from "./types";
@@ -530,5 +530,12 @@ describe("path", () => {
     expect(lessonsHopFrom(0, 2, 1)).toBe(1);
     expect(lessonsHopFrom(1, 2, 1)).toBe(1);
     expect(lessonsHopFrom(2, 2, 1)).toBe(2);
+    expect(lessonsHopTo(0, 2, 0, 1)).toBe(2);
+    expect(lessonsHopTo(1, 2, 0, 1)).toBe(2);
+    expect(lessonsHopTo(1, 2, 2, 1)).toBe(1);
+    expect(lessonsHopTo(3, 8, 8, 7)).toBe(3);
+    expect(lessonsHopTo(8, 8, 8, 7)).toBe(8);
+    expect(lessonsHopTo(4, 5, 4, 4)).toBe(5);
+    expect(lessonsHopTo(4, 5, 5, 4)).toBe(4);
   });
 });

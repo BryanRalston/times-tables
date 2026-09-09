@@ -4,6 +4,7 @@ import {
   CANDY_WORLD_ASPECT,
   GRADE3_PATH_NODES,
   GRADE3_PATH_PADS,
+  PATH_OBSTACLE,
   TALL_MAP_DECORATIVE_PAD,
   TALL_MAP_FILE,
   TALL_MAP_OVERLAYS,
@@ -64,6 +65,13 @@ describe("grade path", () => {
     expect(GRADE3_PATH_NODES.every((n, i, all) => i === 0 || n.y < all[i - 1]!.y)).toBe(true);
     expect(TALL_MAP_DECORATIVE_PAD.y).toBeGreaterThan(GRADE3_PATH_PADS[8]!.map.y);
     expect(TALL_MAP_DECORATIVE_PAD.y).toBeLessThan(GRADE3_PATH_PADS[7]!.map.y);
+    expect(PATH_OBSTACLE.map).toEqual(TALL_MAP_DECORATIVE_PAD);
+    expect(PATH_OBSTACLE.id).toBe("cove-boulder");
+    expect(PATH_OBSTACLE.file).toBe("cove-boulder.png");
+    expect(PATH_OBSTACLE.width).toBeGreaterThan(10);
+    expect(PATH_OBSTACLE.width).toBeLessThan(18);
+    expect(TALL_MAP_OVERLAYS.some((p) => p.id === PATH_OBSTACLE.id)).toBe(false);
+    expect(GRADE3_PATH_PADS.some((p) => p.map.x === PATH_OBSTACLE.map.x && p.map.y === PATH_OBSTACLE.map.y)).toBe(false);
     const mid = mapToViewPos({ x: 50, y: 50 });
     expect(mid.x).toBeCloseTo(50);
     expect(mid.y).toBeCloseTo(50);
