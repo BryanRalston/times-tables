@@ -156,7 +156,7 @@ export const TALL_MAP_OVERLAY_DIR = "candy-zones/overlays";
  *
  * Landmarks are Imagine props seated only on empty tall-map pixels — not on
  * painted bushes, rocks, trees, or islands. Fewer well-spaced copies beat a
- * clutter wall: ~5 meadow mounds, ~4 cove coin stacks, ~5 forest trees.
+ * clutter wall: ~5 meadow mounds, ~3 cove coin stacks, ~5 forest trees.
  * Waterfall stays extra to the Candyland mock — splash seat (−84%) on the
  * left-gutter pink→beige lip (y ≈ 26.5–27.9 at x ≈ 40–42).
  */
@@ -166,22 +166,21 @@ export const TALL_MAP_OVERLAYS: readonly PathOverlay[] = [
   { id: "tenframe-c", file: "tenframe-mound.png", zone: "meadow", map: { x: 39.75, y: 72.35 }, width: 14, motion: "bob", seat: "land" },
   { id: "tenframe-d", file: "tenframe-mound.png", zone: "meadow", map: { x: 60.15, y: 70.25 }, width: 13, motion: "bob", seat: "land" },
   { id: "tenframe-e", file: "tenframe-mound.png", zone: "meadow", map: { x: 39.85, y: 62.45 }, width: 13, motion: "bob", seat: "land" },
-  { id: "flowers", file: "meadow-flowers.png", zone: "meadow", map: { x: 60.35, y: 92.4 }, width: 8, motion: "bob", seat: "land" },
-  { id: "daisies", file: "daisies.png", zone: "meadow", map: { x: 41.35, y: 75.15 }, width: 8, motion: "bob", seat: "land" },
+  { id: "flowers", file: "meadow-flowers.png", zone: "meadow", map: { x: 59.15, y: 93.55 }, width: 8, motion: "bob", seat: "land" },
+  { id: "daisies", file: "daisies.png", zone: "meadow", map: { x: 59.55, y: 76.85 }, width: 8, motion: "bob", seat: "land" },
   { id: "waterfall", file: "waterfall.png", zone: "cove", map: { x: 40.9, y: 28.5 }, width: 14, motion: "fall", seat: "shore" },
   { id: "palm", file: "palm.png", zone: "cove", map: { x: 60.45, y: 56.85 }, width: 13, motion: "sway", seat: "land" },
   { id: "dock", file: "dock.png", zone: "cove", map: { x: 59.55, y: 52.85 }, width: 12, motion: "bob", seat: "water" },
   { id: "sailboat", file: "sailboat.png", zone: "cove", map: { x: 58.35, y: 50.15 }, width: 9, motion: "bob", seat: "water" },
   { id: "sailboat-b", file: "sailboat.png", zone: "cove", map: { x: 61.05, y: 48.45 }, width: 8, motion: "bob", seat: "water" },
   { id: "coins", file: "coin-stack.png", zone: "cove", map: { x: 39.85, y: 45.55 }, width: 9, motion: "bob", seat: "water" },
-  { id: "coins-b", file: "coin-stack.png", zone: "cove", map: { x: 40.25, y: 54.15 }, width: 8, motion: "bob", seat: "water" },
+  { id: "coins-b", file: "coin-stack.png", zone: "cove", map: { x: 40.15, y: 51.85 }, width: 8, motion: "bob", seat: "water" },
   { id: "coins-c", file: "coin-stack.png", zone: "cove", map: { x: 60.7, y: 41.55 }, width: 9, motion: "bob", seat: "water" },
-  { id: "coins-d", file: "coin-stack.png", zone: "cove", map: { x: 38.95, y: 37.85 }, width: 8, motion: "bob", seat: "land" },
-  { id: "fraction-tree", file: "fraction-tree.png", zone: "forest", map: { x: 39.75, y: 23.15 }, width: 11, motion: "sway", seat: "land" },
-  { id: "fraction-tree-b", file: "fraction-tree.png", zone: "forest", map: { x: 58.85, y: 9.85 }, width: 10, motion: "sway", seat: "land" },
-  { id: "fraction-tree-c", file: "fraction-tree.png", zone: "forest", map: { x: 40.65, y: 16.45 }, width: 10, motion: "sway", seat: "land" },
-  { id: "fraction-tree-d", file: "fraction-tree.png", zone: "forest", map: { x: 60.85, y: 16.25 }, width: 10, motion: "sway", seat: "land" },
-  { id: "fraction-tree-e", file: "fraction-tree.png", zone: "forest", map: { x: 43.05, y: 4.65 }, width: 9, motion: "sway", seat: "land" },
+  { id: "fraction-tree", file: "fraction-tree.png", zone: "forest", map: { x: 41.2, y: 23.4 }, width: 11, motion: "sway", seat: "land" },
+  { id: "fraction-tree-b", file: "fraction-tree.png", zone: "forest", map: { x: 59.55, y: 8.15 }, width: 10, motion: "sway", seat: "land" },
+  { id: "fraction-tree-c", file: "fraction-tree.png", zone: "forest", map: { x: 40.9, y: 16.6 }, width: 10, motion: "sway", seat: "land" },
+  { id: "fraction-tree-d", file: "fraction-tree.png", zone: "forest", map: { x: 57.25, y: 14.55 }, width: 10, motion: "sway", seat: "land" },
+  { id: "fraction-tree-e", file: "fraction-tree.png", zone: "forest", map: { x: 61.15, y: 19.85 }, width: 10, motion: "sway", seat: "land" },
 ];
 
 /** Same-file landmarks stay this far apart so gutters do not become a clutter wall. */

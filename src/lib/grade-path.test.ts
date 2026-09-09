@@ -94,7 +94,6 @@ describe("grade path", () => {
       "coins",
       "coins-b",
       "coins-c",
-      "coins-d",
       "fraction-tree",
       "fraction-tree-b",
       "fraction-tree-c",
@@ -104,10 +103,10 @@ describe("grade path", () => {
     expect(TALL_MAP_OVERLAYS.some((p) => p.id === "candy-cane" || p.file === "candy-cane.png")).toBe(false);
     expect(TALL_MAP_OVERLAYS.filter((p) => p.file === "tenframe-mound.png")).toHaveLength(5);
     expect(TALL_MAP_OVERLAYS.filter((p) => p.file === "sailboat.png")).toHaveLength(2);
-    expect(TALL_MAP_OVERLAYS.filter((p) => p.file === "coin-stack.png")).toHaveLength(4);
+    expect(TALL_MAP_OVERLAYS.filter((p) => p.file === "coin-stack.png")).toHaveLength(3);
     expect(TALL_MAP_OVERLAYS.filter((p) => p.file === "fraction-tree.png")).toHaveLength(5);
     expect(TALL_MAP_OVERLAYS.filter((p) => p.zone === "meadow").length).toBe(7);
-    expect(TALL_MAP_OVERLAYS.filter((p) => p.zone === "cove").length).toBe(9);
+    expect(TALL_MAP_OVERLAYS.filter((p) => p.zone === "cove").length).toBe(8);
     expect(TALL_MAP_OVERLAYS.filter((p) => p.zone === "forest").length).toBe(5);
     expect(
       TALL_MAP_OVERLAYS.filter((p) => p.file === "tenframe-mound.png" && p.id !== "tenframe-a").every((p) => p.map.y < 88),
