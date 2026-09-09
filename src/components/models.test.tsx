@@ -6,9 +6,21 @@ import { describe, expect, it } from "vitest";
 import { activityById } from "@/lib/curriculum";
 import { makeQuestion, welcomeFirst } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
-import type { ChoiceData, ClockData, DecimalData, GraphData, MeasureData, MoneyData, Question } from "@/lib/types";
+import type {
+  ChoiceData,
+  ClockData,
+  CompareData,
+  DecimalData,
+  FractionData,
+  GraphData,
+  JumpsData,
+  MeasureData,
+  MoneyData,
+  PlaceValueData,
+  Question,
+} from "@/lib/types";
 import { moneyFmt } from "@/lib/utils";
-import { BEAKER_FACE, Board, beakerMeniscusY, moneyBox, rulerPointerX, scaleNeedleDeg, type BoardProps } from "./models";
+import { BEAKER_FACE, Board, beakerMeniscusY, jumpTickLabel, moneyBox, rulerPointerX, scaleNeedleDeg, type BoardProps } from "./models";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -354,5 +366,89 @@ describe("boards", () => {
     const x = rulerPointerX(d.value, d.max);
     expect(html).toContain(`data-ruler-x="${x}"`);
     expect(Number(html.match(/data-ruler-x="([^"]+)"/)?.[1])).toBe(x);
+  });
+
+  it("number compare does not leak greater/less with bar height", () => {
+    const q = makeQuestion(activityById("u2-compare")!.activity, rngFromSeed("cmp:bars"));
+    const d = q.data as CompareData;
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain(`${d.a} ○ ${d.b}`);
+    expect(html).toContain("left");
+    expect(html).toContain("right");
+    expect(html).not.toMatch(/height:\s*\d/);
+    expect(html).not.toContain("style=\"height:");
+  });
+
+  it("how-many-more stories still use comparison bars", () => {
+    const q = makeQuestion(activityById("u7-compare")!.activity, rngFromSeed("cmp:story"));
+    expect(q.input).toBe("keypad");
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toMatch(/height:\s*\d/);
+  });
+
+  it("jump ticks hide the missing factor", () => {
+    expect(jumpTickLabel({ size: 4, jumps: 3, hide: "product" }, 3)).toBe("n");
+    expect(jumpTickLabel({ size: 4, jumps: 3, hide: "product" }, 2)).toBe("8");
+    expect(jumpTickLabel({ size: 4, jumps: 3, hide: "size" }, 1)).toBe("");
+    expect(jumpTickLabel({ size: 4, jumps: 3, hide: "size" }, 3)).toBe("12");
+    expect(jumpTickLabel({ size: 4, jumps: 3, hide: "jumps" }, 3)).toBe("12");
+    for (let i = 0; i < 24; i++) {
+      const q = makeQuestion(activityById("u3-jumps")!.activity, rngFromSeed(`jp:leak:${i}`));
+      const d = q.data as JumpsData;
+      const html = renderToStaticMarkup(<Board {...stub(q)} />);
+      const product = d.size * d.jumps;
+      if (d.hide === "product") {
+        expect(html).not.toContain(`>${product}<`);
+        expect(html).toContain(">n<");
+      }
+      if (d.hide === "size") {
+        expect(html).not.toContain(`>${d.size}<`);
+      }
+    }
+  });
+
+  it("fraction number-line name does not caption the answer", () => {
+    const q = makeQuestion(activityById("u5-line")!.activity, rngFromSeed("fline:name"));
+    const d = q.data as FractionData;
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).not.toMatch(/jumps? of/);
+    expect(html).not.toContain(`${d.num}/${d.den}`);
+  });
+
+  it("build board does not print the hundreds count", () => {
+    const q = makeQuestion(activityById("u2-build")!.activity, rngFromSeed("build:leak"));
+    const hundreds = Math.floor((q.data as { target: number }).target / 100) % 10;
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain('data-build-place="hundreds"');
+    expect(html).not.toMatch(new RegExp(`data-build-place="hundreds"[^>]*>\\s*<p[^>]*>${hundreds}<`));
+    expect((html.match(/data-build-block="hundreds"/g) ?? []).length).toBe(hundreds);
+  });
+
+  it("place-mode chart hides place-name labels until correct", () => {
+    let q = makeQuestion(activityById("u2-place")!.activity, rngFromSeed("place:label:0"));
+    for (let i = 0; i < 40; i++) {
+      const next = makeQuestion(activityById("u2-place")!.activity, rngFromSeed(`place:label:${i}`));
+      if ((next.data as PlaceValueData).mode === "place") {
+        q = next;
+        break;
+      }
+    }
+    const d = q.data as PlaceValueData;
+    expect(d.mode).toBe("place");
+    const idle = renderToStaticMarkup(<Board {...stub(q)} status="idle" />);
+    expect(idle).not.toContain(d.place);
+    expect(idle).not.toContain("hundreds");
+    expect(idle).not.toContain("thousands");
+    const ok = renderToStaticMarkup(<Board {...stub(q)} status="correct" />);
+    expect(ok).toContain(d.place);
+  });
+
+  it("of-a-set board is a group of pieces, not a bar", () => {
+    const q = makeQuestion(activityById("u5-set")!.activity, rngFromSeed("set:board"));
+    const d = q.data as FractionData;
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect((html.match(/data-set-piece=/g) ?? []).length).toBe(d.den);
+    expect((html.match(/data-set-piece="shaded"/g) ?? []).length).toBe(d.num);
+    expect(html).not.toContain("h-12 overflow-hidden");
   });
 });

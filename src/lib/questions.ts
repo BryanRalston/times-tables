@@ -269,7 +269,7 @@ function compareQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const ans = a < b ? "<" : a > b ? ">" : "=";
   return keypadQ(rng, {
     kind: "compare",
-    prompt: `${a} ○ ${b}`,
+    prompt: t().compareNumbers,
     answer: ans,
     input: "compare",
     data: { a, b },
@@ -473,7 +473,7 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       const ans = num1 < num2 ? "<" : num1 > num2 ? ">" : "=";
       return keypadQ(rng, {
         kind: "fraction",
-        prompt: `${num1}/${den1} ○ ${num2}/${den1} ${t().fractionLine}`,
+        prompt: t().compareFractions,
         answer: ans,
         input: "compare",
         data: { num: num1, den: den1, num2, den2: den1, mode: "line", shaded: num1 },
@@ -491,7 +491,7 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   if (mode === "unit") {
     return keypadQ(rng, {
       kind: "fraction",
-      prompt: t().unitFraction(den),
+      prompt: t().unitFraction,
       answer: `1/${den}`,
       input: "fraction",
       data: { num: 1, den, mode: "unit", shaded: 1 },
@@ -533,7 +533,7 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const ans = v1 < v2 ? "<" : v1 > v2 ? ">" : "=";
     return keypadQ(rng, {
       kind: "fraction",
-      prompt: `${num1}/${den1} ○ ${num2}/${den2}`,
+      prompt: t().compareFractions,
       answer: ans,
       input: "compare",
       data: { num: num1, den: den1, num2, den2, mode: "compare", shaded: num1 },
@@ -573,12 +573,13 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     });
   }
   const num = rng.int(1, den);
+  const set = Boolean(params.set);
   return keypadQ(rng, {
     kind: "fraction",
-    prompt: t().shaded,
+    prompt: set ? t().shadedSet : t().shaded,
     answer: `${num}/${den}`,
     input: "fraction",
-    data: { num, den, mode: "name", shaded: num },
+    data: { num, den, mode: "name", shaded: num, set },
   });
 }
 
