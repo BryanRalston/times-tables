@@ -125,7 +125,7 @@ export function fogCoverPercent(nowNumber: number, nodes: readonly PathNodePos[]
   return Math.max(6, lastVisible.y - 6);
 }
 
-export type OverlayMotion = "bob" | "sway" | "shimmer" | "fall";
+export type OverlayMotion = "bob" | "sway" | "shimmer" | "fall" | "spin";
 
 export type PathOverlay = {
   id: string;
@@ -141,15 +141,39 @@ export const TALL_MAP_OVERLAY_DIR = "candy-zones/overlays";
 /**
  * PNG-space props in the cover-crop gutters, beside the trail.
  * Visible x is roughly 36.7–63.3 of the 1536px art.
+ *
+ * Waterfall sits on the cove's upper-left rocky/pink shore (forest→water),
+ * not the open-water band around y ≈ 42–54. Splash is toward larger y.
  */
 export const TALL_MAP_OVERLAYS: readonly PathOverlay[] = [
   { id: "tenframe-a", file: "tenframe.png", zone: "meadow", map: { x: 40.15, y: 88.35 }, width: 20, motion: "bob" },
   { id: "tenframe-b", file: "tenframe.png", zone: "meadow", map: { x: 59.55, y: 77.85 }, width: 16, motion: "bob" },
-  { id: "waterfall", file: "waterfall.png", zone: "cove", map: { x: 39.2, y: 51.15 }, width: 20, motion: "fall" },
+  { id: "daisies", file: "daisies.png", zone: "meadow", map: { x: 39.85, y: 80.15 }, width: 11, motion: "bob" },
+  { id: "gumdrop", file: "gumdrop.png", zone: "meadow", map: { x: 59.25, y: 69.45 }, width: 12, motion: "sway" },
+  { id: "waterfall", file: "waterfall.png", zone: "cove", map: { x: 40.2, y: 25.55 }, width: 14, motion: "fall" },
   { id: "palm", file: "palm.png", zone: "cove", map: { x: 60.45, y: 56.85 }, width: 15, motion: "sway" },
-  { id: "coins", file: "coins.png", zone: "cove", map: { x: 60.15, y: 42.55 }, width: 13, motion: "shimmer" },
+  { id: "sailboat", file: "sailboat.png", zone: "cove", map: { x: 59.4, y: 49.6 }, width: 12, motion: "bob" },
+  { id: "coins", file: "coins.png", zone: "cove", map: { x: 60.15, y: 42.55 }, width: 13, motion: "bob" },
+  { id: "coin-spin", file: "coin-spin.png", zone: "cove", map: { x: 61.25, y: 40.75 }, width: 5.5, motion: "spin" },
+  { id: "candy-cane", file: "candy-cane.png", zone: "forest", map: { x: 59.85, y: 28.15 }, width: 10, motion: "sway" },
   { id: "fraction-pie", file: "fraction-pie.png", zone: "forest", map: { x: 39.55, y: 14.35 }, width: 13, motion: "sway" },
 ];
+
+/** Keep scenery off cream discs / numbers. Existing tenframes sit ~6.5 away. */
+export const OVERLAY_MIN_PAD_DIST = 6.4;
+
+export function overlayPadDistance(prop: PathOverlay, pad: PathNodePos): number {
+  return Math.hypot(pad.x - prop.map.x, pad.y - prop.map.y);
+}
+
+export function overlayClearsPads(prop: PathOverlay): boolean {
+  return GRADE3_PATH_PADS.every((pad) => overlayPadDistance(prop, pad.map) >= OVERLAY_MIN_PAD_DIST);
+}
+
+/** Open water on the left gutter — the old mid-cove float. */
+export function overlayInOpenCoveWater(prop: PathOverlay): boolean {
+  return prop.zone === "cove" && prop.map.x < 45 && prop.map.y > 42 && prop.map.y < 54;
+}
 
 export type TrailPeekSpot = {
   id: string;
@@ -258,6 +282,8 @@ export function overlayMotionClass(motion: OverlayMotion): string {
       return "candy-prop-shimmer";
     case "fall":
       return "candy-prop-fall";
+    case "spin":
+      return "candy-prop-spin";
     default: {
       const _never: never = motion;
       return _never;

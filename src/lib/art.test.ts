@@ -19,8 +19,14 @@ describe("asset URLs", () => {
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/waterfall.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/tenframe.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/coins.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/coin-spin.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/palm.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/fraction-pie.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/daisies.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/candy-cane.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/sailboat.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/gumdrop.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/overlays/cove-water-mask.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/art/home-peek.png"))).toBe(false);
   });
 });

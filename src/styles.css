@@ -940,6 +940,44 @@ details > summary::-webkit-details-marker {
   object-fit: cover;
   object-position: center;
 }
+.candy-water {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  mask-size: cover;
+  mask-position: center;
+  -webkit-mask-size: cover;
+  -webkit-mask-position: center;
+}
+.candy-water-flow,
+.candy-water-glint {
+  position: absolute;
+  pointer-events: none;
+}
+.candy-water-flow {
+  inset: -22%;
+  background: repeating-linear-gradient(
+    168deg,
+    rgb(255 255 255 / 0) 0 20px,
+    rgb(255 255 255 / 0.15) 32px,
+    rgb(186 236 255 / 0.1) 46px,
+    rgb(255 255 255 / 0) 62px
+  );
+  background-size: 180% 180%;
+  mix-blend-mode: soft-light;
+  opacity: 0.68;
+  animation: candy-water-flow 16s linear infinite;
+}
+.candy-water-glint {
+  inset: -12%;
+  background:
+    radial-gradient(ellipse 42% 18% at 28% 38%, rgb(255 255 255 / 0.2), transparent 58%),
+    radial-gradient(ellipse 36% 16% at 72% 64%, rgb(206 242 255 / 0.15), transparent 62%);
+  mix-blend-mode: soft-light;
+  opacity: 0.5;
+  animation: candy-water-glint 11s ease-in-out infinite;
+}
 .candy-overlay {
   position: absolute;
   inset: 0;
@@ -1066,7 +1104,14 @@ details > summary::-webkit-details-marker {
   animation: candy-prop-bob 2.8s ease-in-out infinite;
 }
 .candy-prop-sway {
-  animation: candy-prop-sway 3.2s ease-in-out infinite;
+  animation: candy-prop-sway 4.1s ease-in-out infinite;
+}
+.candy-prop-spin {
+  perspective: 56px;
+}
+.candy-prop-spin img {
+  transform-style: preserve-3d;
+  animation: candy-prop-spin 7.4s linear infinite;
 }
 .candy-prop-shimmer {
   animation: candy-prop-shimmer 2.4s ease-in-out infinite;
@@ -1122,10 +1167,37 @@ details > summary::-webkit-details-marker {
 @keyframes candy-prop-sway {
   0%,
   100% {
-    transform: translate(-50%, -50%) rotate(-1.05deg);
+    transform: translate(-50%, -50%) rotate(-1.15deg) skewX(-0.45deg);
   }
   50% {
-    transform: translate(-50%, -50%) rotate(1.15deg);
+    transform: translate(-50%, -50%) rotate(1.25deg) skewX(0.5deg);
+  }
+}
+@keyframes candy-prop-spin {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+@keyframes candy-water-flow {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-8%, -6%, 0);
+  }
+}
+@keyframes candy-water-glint {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.38;
+  }
+  50% {
+    transform: translate3d(4%, 3%, 0);
+    opacity: 0.58;
   }
 }
 @keyframes candy-prop-shimmer {
@@ -1299,6 +1371,9 @@ details > summary::-webkit-details-marker {
   .candy-prop-shimmer,
   .candy-prop-fall,
   .candy-prop-fall::after,
+  .candy-prop-spin img,
+  .candy-water-flow,
+  .candy-water-glint,
   .candy-trail-peek-art {
     animation: none !important;
   }

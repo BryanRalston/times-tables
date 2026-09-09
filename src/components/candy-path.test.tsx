@@ -47,10 +47,20 @@ describe("CandyPath", () => {
     expect(html).toContain('data-candy-prop="waterfall"');
     expect(html).toContain('data-candy-prop="tenframe-a"');
     expect(html).toContain('data-candy-prop="tenframe-b"');
+    expect(html).toContain('data-candy-prop="daisies"');
+    expect(html).toContain('data-candy-prop="gumdrop"');
     expect(html).toContain('data-candy-prop="palm"');
+    expect(html).toContain('data-candy-prop="sailboat"');
     expect(html).toContain('data-candy-prop="coins"');
+    expect(html).toContain('data-candy-prop="coin-spin"');
+    expect(html).toContain('data-candy-prop="candy-cane"');
     expect(html).toContain('data-candy-prop="fraction-pie"');
     expect(html).toContain("candy-zones/overlays/waterfall.png");
+    expect(html).toContain("data-candy-water");
+    expect(html).toContain("candy-zones/overlays/cove-water-mask.png");
+    expect(html).toContain("candy-zones/overlays/daisies.png");
+    expect(html).toContain("candy-zones/overlays/sailboat.png");
+    expect(html).toContain("candy-prop-spin");
     expect((html.match(/data-path-pad="1"/g) ?? []).length).toBe(13);
     expect((html.match(/data-path-unit="/g) ?? []).length).toBe(13);
     expect(html).not.toContain("data-candy-plates-blend");
@@ -61,7 +71,6 @@ describe("CandyPath", () => {
     expect(html).not.toContain("candy-fog-cloud");
     expect(html).not.toContain("tf-bed");
     expect(html).not.toContain("pie-tree");
-    expect(html).not.toContain("sailboat");
     expect(html).not.toContain("candy-sprinkle");
     expect(html).not.toContain("g4-");
     const peek = pickTrailPeekSpot(5, trailPeekHash(todayIso(), 5));
