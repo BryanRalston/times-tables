@@ -10,6 +10,8 @@ import {
   TALL_MAP_SIZE,
   overlayClearsPads,
   overlayInOpenCoveWater,
+  overlaySeatClass,
+  padChromeStars,
   TRAIL_PEEK_ARM_MS,
   TRAIL_PEEK_ARM_SPREAD_MS,
   TRAIL_PEEK_MIN_HOPPER_DIST,
@@ -69,6 +71,10 @@ describe("grade path", () => {
     expect(displayUnitStars(0, 15)).toBe(0);
     expect(displayUnitStars(5, 15)).toBe(1);
     expect(displayUnitStars(15, 15)).toBe(3);
+    expect(padChromeStars(0, { now: false, locked: false })).toBe(0);
+    expect(padChromeStars(3, { now: true, locked: false })).toBe(0);
+    expect(padChromeStars(2, { now: false, locked: true })).toBe(0);
+    expect(padChromeStars(2, { now: false, locked: false })).toBe(2);
     expect(TALL_MAP_OVERLAYS.map((p) => p.id)).toEqual([
       "tenframe-a",
       "tenframe-b",
@@ -84,8 +90,13 @@ describe("grade path", () => {
     ]);
     expect(TALL_MAP_OVERLAYS.every((p) => p.map.x > 38 && p.map.x < 62)).toBe(true);
     expect(TALL_MAP_OVERLAYS.every((p) => overlayClearsPads(p))).toBe(true);
+    expect(TALL_MAP_OVERLAYS.every((p) => p.seat === "land" || p.seat === "water" || p.seat === "shore")).toBe(true);
+    expect(overlaySeatClass("land")).toBe("candy-prop-land");
+    expect(overlaySeatClass("water")).toBe("candy-prop-water");
+    expect(overlaySeatClass("shore")).toBe("candy-prop-shore");
     const fall = TALL_MAP_OVERLAYS.find((p) => p.id === "waterfall")!;
     expect(fall.map).toEqual({ x: 40.2, y: 25.55 });
+    expect(fall.seat).toBe("shore");
     expect(fall.map.y).toBeGreaterThan(24);
     expect(fall.map.y).toBeLessThan(28);
     expect(overlayInOpenCoveWater(fall)).toBe(false);

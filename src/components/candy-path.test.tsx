@@ -44,6 +44,15 @@ describe("CandyPath", () => {
     expect(html).toContain("candy-zones/tall-map.png");
     expect(html).toContain('data-path-fog="1"');
     expect(html).toContain("data-path-tall");
+    expect(html).toContain('data-candy-sign="meadow"');
+    expect(html).toContain('data-candy-sign="cove"');
+    expect(html).toContain('data-candy-sign="forest"');
+    expect(html).not.toContain("candy-star-on");
+    expect(html).toContain('data-path-unit="u12"');
+    expect(html).toContain('data-candy-prop-seat="shore"');
+    expect(html).toContain('data-candy-prop-seat="land"');
+    expect(html).toContain('data-candy-prop-seat="water"');
+    expect(html).toContain("translate(-50%, -108%)");
     expect(html).toContain('data-candy-prop="waterfall"');
     expect(html).toContain('data-candy-prop="tenframe-a"');
     expect(html).toContain('data-candy-prop="tenframe-b"');
