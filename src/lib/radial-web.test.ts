@@ -82,6 +82,26 @@ describe("radial web", () => {
     expect(hopCreditsOf({ "daily:u1": leftover }, 0)).toBe(1);
     expect(hopCreditsOf({ "u1-leftover": leftover }, 1)).toBe(0);
     expect(hopCreditsOf({ "u1-leftover": leftover, "u1-friends": leftover }, 1)).toBe(1);
+    const replayed = { ...leftover, plays: 4 };
+    const walk = {
+      date: "2026-09-10",
+      unitId: "u1",
+      schoolDay: 1,
+      correct: 8,
+      total: 8,
+      fresh: 8,
+      review: 0,
+      completed: true,
+    };
+    expect(hopLessonsCompleted({ "u1-leftover": replayed })).toBe(1);
+    expect(hopCreditsOf({ "u1-leftover": replayed }, 0)).toBe(1);
+    expect(hopLessonsCompleted({ "daily:u1": leftover }, { "2026-09-10": walk })).toBe(1);
+    expect(
+      hopCreditsOf({ "daily:u1": leftover }, 0, {
+        "2026-09-10": walk,
+        "2026-09-10-again": { ...walk, date: "2026-09-10" },
+      }),
+    ).toBe(1);
   });
 
   it("does not invent spent hops, and refunds a burned pre-v12 Guest ledger", () => {

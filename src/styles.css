@@ -1110,6 +1110,39 @@ details > summary::-webkit-details-marker {
 .candy-node-choice:not(:disabled) {
   cursor: pointer;
 }
+.candy-node-radial.candy-node-quiet {
+  pointer-events: none;
+}
+.candy-node-radial.candy-node-quiet .candy-node-disc {
+  width: 1.05rem;
+  height: 1.05rem;
+  background: rgb(52 40 48 / 0.4);
+  opacity: 0.55;
+  filter: saturate(0.2) brightness(0.78);
+  box-shadow: none;
+}
+.candy-node-radial.candy-node-portal.candy-node-quiet .candy-node-disc {
+  width: 1.35rem;
+  height: 1.35rem;
+  background: rgb(42 32 52 / 0.46);
+  opacity: 0.5;
+  filter: saturate(0.12) brightness(0.7);
+}
+/* Keep the 1.7rem hit box. Inner-ring neighbors sit ~21px apart on a 390px
+   phone; a 44px target steals the next pad's tap. Glow is the read. */
+.candy-node-radial.candy-node-choice {
+  z-index: 7;
+}
+.candy-node-radial.candy-node-choice .candy-node-disc {
+  width: 1.2rem;
+  height: 1.2rem;
+  background: rgb(255 252 246 / 0.42);
+  box-shadow:
+    0 0 0 2px rgb(255 255 255 / 0.94),
+    0 0 18px 8px rgb(60 210 255 / 0.7),
+    0 0 28px 14px rgb(255 248 238 / 0.32);
+  animation: candy-choice-pulse 1.05s ease-in-out infinite;
+}
 .candy-node-enterable .candy-node-disc {
   box-shadow:
     0 0 0 2px rgb(255 248 238 / 0.92),
@@ -1117,16 +1150,60 @@ details > summary::-webkit-details-marker {
     0 0 22px 10px rgb(60 210 255 / 0.28);
   animation: candy-portal-pulse 1.15s ease-in-out infinite;
 }
+.candy-node-radial.candy-node-enterable {
+  z-index: 8;
+}
+.candy-node-radial.candy-node-enterable .candy-node-disc {
+  width: 1.32rem;
+  height: 1.32rem;
+  background: rgb(255 236 210 / 0.5);
+  box-shadow:
+    0 0 0 3px rgb(255 248 238 / 0.96),
+    0 0 18px 8px rgb(196 92 38 / 0.78),
+    0 0 30px 14px rgb(255 176 72 / 0.5);
+  animation: candy-portal-swirl 0.95s ease-in-out infinite;
+}
+.candy-node-radial.candy-node-enterable .candy-node-disc::after {
+  content: "";
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: inherit;
+  border: 2px solid rgb(255 220 160 / 0.7);
+  box-shadow: 0 0 10px 2px rgb(255 168 64 / 0.35);
+  animation: candy-portal-ring 0.95s linear infinite;
+  pointer-events: none;
+}
+.candy-node-radial.candy-node-here {
+  z-index: 6;
+}
+.candy-node-radial.candy-node-here .candy-node-disc {
+  width: 1.18rem;
+  height: 1.18rem;
+  background: rgb(255 248 220 / 0.38);
+  box-shadow:
+    0 0 0 2px rgb(255 252 236 / 0.92),
+    0 0 16px 8px rgb(255 214 80 / 0.48);
+  animation: candy-here-pulse 1.55s ease-in-out infinite;
+}
 .candy-warp-fx {
   position: absolute;
   z-index: 6;
-  width: 1.85rem;
-  height: 1.85rem;
+  width: 2.7rem;
+  height: 2.7rem;
   border-radius: 9999px;
   transform: translate(-50%, -50%);
   pointer-events: none;
-  background: radial-gradient(circle, rgb(255 248 238 / 0.88) 0%, rgb(196 92 38 / 0.5) 36%, transparent 72%);
-  animation: candy-warp-flash 0.64s ease-out;
+  background: radial-gradient(circle, rgb(255 252 244 / 0.96) 0%, rgb(255 176 72 / 0.68) 28%, rgb(196 92 38 / 0.38) 54%, transparent 74%);
+  box-shadow: 0 0 22px 10px rgb(255 200 100 / 0.42);
+  animation: candy-warp-flash 0.9s ease-out;
+}
+.candy-warp-fx::after {
+  content: "";
+  position: absolute;
+  inset: -38%;
+  border-radius: inherit;
+  border: 2px solid rgb(255 248 238 / 0.78);
+  animation: candy-warp-ring 0.9s ease-out;
 }
 .candy-unit-rail {
   position: relative;
@@ -1390,30 +1467,46 @@ details > summary::-webkit-details-marker {
 .candy-hopper-shadow {
   position: absolute;
   z-index: 3;
-  width: 1.45rem;
-  height: 0.36rem;
+  width: 1.7rem;
+  height: 0.4rem;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgb(46 30 22 / 0.34) 0%, rgb(46 30 22 / 0) 72%);
+  background: radial-gradient(ellipse at center, rgb(46 30 22 / 0.4) 0%, rgb(46 30 22 / 0) 72%);
   pointer-events: none;
   will-change: left, top, transform, opacity;
 }
 .candy-hopper {
   position: absolute;
   z-index: 5;
-  width: 2.85rem;
-  height: 2.85rem;
+  width: 3.3rem;
+  height: 3.3rem;
   transform: translate(-50%, -108%);
   transform-origin: 50% 82%;
   pointer-events: none;
   will-change: left, top, transform;
 }
 .candy-hopper-art {
-  width: 2.85rem;
-  height: 2.85rem;
+  width: 3.3rem;
+  height: 3.3rem;
+  filter:
+    drop-shadow(0 0 1px rgb(255 255 255 / 0.95))
+    drop-shadow(0 2px 4px rgb(40 20 30 / 0.38));
   animation: candy-hop 1.9s ease-in-out infinite;
 }
 .candy-hopper-travel .candy-hopper-art {
   animation: none;
+}
+.candy-hopper-here::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0.08rem;
+  width: 1.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgb(255 224 96 / 0.42) 0%, transparent 72%);
+  transform: translateX(-50%);
+  animation: candy-here-glow 1.55s ease-in-out infinite;
+  pointer-events: none;
 }
 .candy-fog {
   position: absolute;
@@ -1503,18 +1596,80 @@ details > summary::-webkit-details-marker {
     filter: brightness(1.08);
   }
 }
+@keyframes candy-choice-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.16);
+    filter: brightness(1.1);
+  }
+}
+@keyframes candy-portal-swirl {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.22) rotate(12deg);
+    filter: brightness(1.14);
+  }
+}
+@keyframes candy-portal-ring {
+  0% {
+    transform: scale(0.82) rotate(0deg);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1.28) rotate(180deg);
+    opacity: 0.2;
+  }
+}
+@keyframes candy-here-pulse {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+@keyframes candy-here-glow {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
 @keyframes candy-warp-flash {
   0% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.4);
+    transform: translate(-50%, -50%) scale(0.35);
   }
-  35% {
+  28% {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1.15);
+    transform: translate(-50%, -50%) scale(1.22);
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(1.55);
+    transform: translate(-50%, -50%) scale(1.85);
+  }
+}
+@keyframes candy-warp-ring {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.45);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1534,7 +1689,12 @@ details > summary::-webkit-details-marker {
   .candy-water-glint,
   .candy-trail-peek-art,
   .candy-node-enterable .candy-node-disc,
-  .candy-warp-fx {
+  .candy-node-radial.candy-node-choice .candy-node-disc,
+  .candy-node-radial.candy-node-here .candy-node-disc,
+  .candy-node-radial.candy-node-enterable .candy-node-disc::after,
+  .candy-hopper-here::before,
+  .candy-warp-fx,
+  .candy-warp-fx::after {
     animation: none !important;
   }
 }

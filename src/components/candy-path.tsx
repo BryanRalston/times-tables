@@ -79,7 +79,8 @@ export const CandyPath = forwardRef<
   const warpRef = useRef<{ from: number; to: number } | null>(null);
   const destPos = padView(dest);
   const credits = hopCredits ?? hopCreditsOf(activities, hopsSpent, sessions);
-  const choices = credits > 0 && !travel && !warp ? adjacentPadIds(dest) : [];
+  const picking = credits > 0 && !travel && !warp;
+  const choices = picking ? adjacentPadIds(dest) : [];
 
   useEffect(() => {
     const hopper = document.querySelector<HTMLElement>("[data-path-hopper]");
@@ -216,14 +217,14 @@ export const CandyPath = forwardRef<
     let raf = 0;
     const start = performance.now();
     const tick = (now: number) => {
-      const { phase, done, opacity } = warpProgressAt(now - start);
+      const { t, phase, done, opacity } = warpProgressAt(now - start);
       if (done) {
         landWarp(warp.to);
         playLand(0, 1);
         return;
       }
       setHopperOpacity(opacity);
-      setPose(warpPose(padView(warp.from), padView(warp.to), phase));
+      setPose(warpPose(padView(warp.from), padView(warp.to), phase, t));
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -265,15 +266,18 @@ export const CandyPath = forwardRef<
           const choice = choices.includes(pad.id);
           const enterable = choice && pad.portal;
           const here = pad.id === dest && !travel && !warp;
+          const quiet = picking && !choice && !here;
           return (
             <button
               key={pad.id}
               type="button"
               className={cn(
                 "candy-node candy-node-bare candy-node-radial",
+                pad.portal && "candy-node-portal",
                 choice && "candy-node-choice",
                 enterable && "candy-node-enterable",
                 here && "candy-node-here",
+                quiet && "candy-node-quiet",
               )}
               style={{ left: `${view.x}%`, top: `${view.y}%` }}
               data-path-pad="1"
@@ -281,6 +285,8 @@ export const CandyPath = forwardRef<
               data-pad-choice={choice ? "1" : "0"}
               data-pad-portal={pad.portal ? "1" : "0"}
               data-pad-enterable={enterable ? "1" : "0"}
+              data-pad-here={here ? "1" : "0"}
+              data-pad-quiet={quiet ? "1" : "0"}
               disabled={!choice}
               aria-disabled={!choice}
               aria-label={choice ? ui.hopOne : undefined}
@@ -320,7 +326,7 @@ export const CandyPath = forwardRef<
           aria-hidden
         />
         <div
-          className={cn("candy-hopper", (travel || warp) && "candy-hopper-travel")}
+          className={cn("candy-hopper", (travel || warp) && "candy-hopper-travel", !travel && !warp && "candy-hopper-here")}
           style={{
             left: `${pose.x}%`,
             top: `${pose.y}%`,
