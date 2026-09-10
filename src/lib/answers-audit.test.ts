@@ -528,6 +528,7 @@ function assertKind(activityId: string, q: Question) {
     }
     case "groups": {
       const d = q.data as GroupsData;
+      expect(q.needsInteract, activityId).toBeFalsy();
       const p = d.groups * d.size;
       if (d.hide === "product") {
         if (activityId.endsWith("-two")) {

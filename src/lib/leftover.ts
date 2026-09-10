@@ -11,6 +11,13 @@ export function leftoverWhyMoveMs(): number {
   return 400;
 }
 
+/** True why-moves may gate Check. Group / fluency tallies never do. */
+export function interactGatesSubmit(kind: string, needsInteract?: boolean): boolean {
+  if (!needsInteract) return false;
+  if (kind === "groups" || kind === "fluency") return false;
+  return true;
+}
+
 export function leftoverPanelOpen(args: {
   kind: string;
   needsInteract?: boolean;
@@ -19,10 +26,12 @@ export function leftoverPanelOpen(args: {
 }): boolean {
   if (isLeftoverFrame(args.kind)) {
     if (args.status === "correct") return false;
-    if (args.needsInteract && !args.interacted) return false;
+    if (interactGatesSubmit(args.kind, args.needsInteract) && !args.interacted) return false;
     return true;
   }
-  if (args.kind === "graph" && args.needsInteract && !args.interacted) return false;
+  if (args.kind === "graph" && interactGatesSubmit(args.kind, args.needsInteract) && !args.interacted) {
+    return false;
+  }
   return true;
 }
 
@@ -47,7 +56,7 @@ export function leftoverSkipOpen(args: {
   interacted: boolean;
   status: "idle" | "correct" | "wrong";
 }): boolean {
-  if (args.needsInteract && !args.interacted) return false;
+  if (interactGatesSubmit(args.kind, args.needsInteract) && !args.interacted) return false;
   if (isLeftoverFrame(args.kind) && args.status !== "idle") return false;
   return true;
 }

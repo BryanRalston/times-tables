@@ -10,6 +10,7 @@ import {
   adjacentPadIds,
   areAdjacent,
   hopCreditsOf,
+  migratePathHopSpent,
   portalPartner,
   radialHopStops,
   smallLessonsCompleted,
@@ -70,5 +71,27 @@ describe("radial web", () => {
     expect(hopCreditsOf({ "u1-leftover": leftover }, 0)).toBe(1);
     expect(hopCreditsOf({ "u1-leftover": leftover }, 1)).toBe(0);
     expect(hopCreditsOf({ "u1-leftover": leftover, "u1-friends": leftover }, 1)).toBe(1);
+  });
+
+  it("does not invent spent hops, and refunds a burned v10 Guest ledger", () => {
+    const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
+    const done = { "u1-leftover": leftover, "u1-friends": leftover };
+    expect(migratePathHopSpent({ activities: done, pathHopSpent: undefined, pathHopperAt: 0, saveVersion: 9 })).toBe(0);
+    expect(hopCreditsOf(done, 0)).toBe(2);
+    expect(
+      migratePathHopSpent({ activities: done, pathHopSpent: 2, pathHopperAt: 0, saveVersion: 10 }),
+    ).toBe(0);
+    expect(
+      migratePathHopSpent({ activities: done, pathHopSpent: 2, pathHopperAt: 1, saveVersion: 10 }),
+    ).toBe(0);
+    expect(
+      migratePathHopSpent({ activities: done, pathHopSpent: 2, pathHopperAt: 8, saveVersion: 10 }),
+    ).toBe(1);
+    expect(
+      migratePathHopSpent({ activities: done, pathHopSpent: 1, pathHopperAt: 4, saveVersion: 10 }),
+    ).toBe(1);
+    expect(
+      migratePathHopSpent({ activities: done, pathHopSpent: 2, pathHopperAt: 1, saveVersion: 11 }),
+    ).toBe(2);
   });
 });

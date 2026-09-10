@@ -227,3 +227,33 @@ export function smallLessonsCompleted(activities: Record<string, ActivitySave>):
 export function hopCreditsOf(activities: Record<string, ActivitySave>, hopsSpent: number): number {
   return Math.max(0, smallLessonsCompleted(activities) - Math.max(0, Math.round(hopsSpent)));
 }
+
+/**
+ * #58 treated missing pathHopSpent as "already spent every prior lesson",
+ * so a Guest with completed Grade 3 work landed on 0 hop credits.
+ * Missing spent stays 0. A one-time pre-v11 heal refunds unused hops:
+ * hopper still at Start → all credits; otherwise one leftover credit.
+ */
+export function migratePathHopSpent(args: {
+  activities: Record<string, ActivitySave>;
+  pathHopSpent: unknown;
+  pathHopperAt: unknown;
+  saveVersion: unknown;
+}): number {
+  const completed = smallLessonsCompleted(args.activities);
+  const hopper =
+    typeof args.pathHopperAt === "number" && Number.isFinite(args.pathHopperAt)
+      ? Math.max(0, Math.round(args.pathHopperAt))
+      : 0;
+  const version = typeof args.saveVersion === "number" && Number.isFinite(args.saveVersion) ? args.saveVersion : 0;
+  if (args.pathHopSpent == null) return 0;
+  const spent =
+    typeof args.pathHopSpent === "number" && Number.isFinite(args.pathHopSpent)
+      ? Math.max(0, Math.round(args.pathHopSpent))
+      : 0;
+  if (version >= 11) return spent;
+  const credits = hopCreditsOf(args.activities, spent);
+  if (credits > 0 || completed <= 0) return spent;
+  if (hopper <= START_PAD) return 0;
+  return Math.max(0, completed - 1);
+}

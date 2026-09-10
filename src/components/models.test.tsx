@@ -14,6 +14,7 @@ import type {
   DecimalData,
   FluencyData,
   FractionData,
+  GroupsData,
   GraphData,
   JumpsData,
   MeasureData,
@@ -403,6 +404,28 @@ describe("boards", () => {
     expect((html.match(/rounded-full bg-teal/g) ?? []).length).toBe(20);
     expect(html).toContain("data-group-tally");
     expect(html).toContain("<button");
+  });
+
+  it("partitive n × groups boards stay tappable and do not gate Check", () => {
+    const q = makeQuestion(activityById("u3-share")!.activity, rngFromSeed("share:n4"));
+    const d = q.data as GroupsData;
+    expect(d.hide).toBe("size");
+    expect(q.needsInteract).toBeFalsy();
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain(`n × ${d.groups} = ${d.groups * d.size}`);
+    expect(html).toContain("<button");
+    expect(html).toContain('aria-label="group 1"');
+    expect(html).toContain("Tap a group to isolate it, then name n.");
+  });
+
+  it("missing-factor group boards also keep Check ungated", () => {
+    const q = makeQuestion(activityById("u3-factor")!.activity, rngFromSeed("factor:groups"));
+    const d = q.data as GroupsData;
+    expect(d.hide).toBe("groups");
+    expect(q.needsInteract).toBeFalsy();
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain("<button");
+    expect(html).toContain("Tap a group to isolate it, then name n.");
   });
 
   it("fluency 40 ÷ 4 groups are tappable tallies and do not gate Check", () => {

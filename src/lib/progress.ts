@@ -3,7 +3,7 @@ import { persist, type PersistStorage, type StorageValue } from "zustand/middlew
 import { todayIso } from "./calendar";
 import { applyBuy, type BuyReason } from "./coins";
 import { GRADE4_SPANS, UNIT_SPANS, UNITS, unitById, unitsFor } from "./curriculum";
-import { RADIAL_PAD_COUNT, smallLessonsCompleted } from "./radial-web";
+import { RADIAL_PAD_COUNT, migratePathHopSpent } from "./radial-web";
 import { parseLocale } from "./i18n";
 import {
   applyBests,
@@ -26,7 +26,7 @@ import { schoolStreak } from "./streak";
 import type { DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
 import { parsePathGrade } from "./types";
 
-const SAVE_VERSION = 10;
+const SAVE_VERSION = 11;
 export const STORAGE_KEY = "g3-path-v2";
 export const LEGACY_STORAGE_KEYS = ["g3-path-v1", "times-tables-progress", "times-tables-settings"] as const;
 const DEFAULT_ID = "kid-1";
@@ -140,6 +140,19 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
   };
 }
 
+function sliceOfWithHopHeal(s: LearnerSlice, saveVersion: number): LearnerSlice {
+  const next = sliceOf(s);
+  return {
+    ...next,
+    pathHopSpent: migratePathHopSpent({
+      activities: next.activities,
+      pathHopSpent: s.pathHopSpent,
+      pathHopperAt: next.pathHopperAt,
+      saveVersion,
+    }),
+  };
+}
+
 function empty(): SaveState {
   const kid = emptyLearner();
   return {
@@ -159,29 +172,33 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
   const base = empty();
   if (!raw || typeof raw !== "object") return base;
   const learnerId = raw.learnerId || DEFAULT_ID;
-  const fromFlat = sliceOf({
-    name: raw.name ?? "",
-    stars: typeof raw.stars === "number" ? raw.stars : 0,
-    seenWelcome: Boolean(raw.seenWelcome),
-    activities: raw.activities ?? {},
-    badges: raw.badges ?? [],
-    shaky: raw.shaky ?? {},
-    sessions: raw.sessions ?? {},
-    squishees: raw.squishees ?? [],
-    coins: typeof raw.coins === "number" ? raw.coins : 0,
-    attempts: raw.attempts ?? {},
-    perfectWalks: raw.perfectWalks ?? 0,
-    facts: parseFacts(raw.facts),
-    bests: parseBests(raw.bests),
-    today: parseToday(raw.today),
-    runHonest: parseRun(raw.runHonest),
-    pathHopperAt: raw.pathHopperAt ?? 0,
-    pathNowSeen: raw.pathNowSeen ?? 0,
-    pathHopSpent: raw.pathHopSpent ?? smallLessonsCompleted(raw.activities ?? {}),
-  });
+  const saveVersion = typeof raw.version === "number" && Number.isFinite(raw.version) ? raw.version : 0;
+  const fromFlat = sliceOfWithHopHeal(
+    {
+      name: raw.name ?? "",
+      stars: typeof raw.stars === "number" ? raw.stars : 0,
+      seenWelcome: Boolean(raw.seenWelcome),
+      activities: raw.activities ?? {},
+      badges: raw.badges ?? [],
+      shaky: raw.shaky ?? {},
+      sessions: raw.sessions ?? {},
+      squishees: raw.squishees ?? [],
+      coins: typeof raw.coins === "number" ? raw.coins : 0,
+      attempts: raw.attempts ?? {},
+      perfectWalks: raw.perfectWalks ?? 0,
+      facts: parseFacts(raw.facts),
+      bests: parseBests(raw.bests),
+      today: parseToday(raw.today),
+      runHonest: parseRun(raw.runHonest),
+      pathHopperAt: raw.pathHopperAt ?? 0,
+      pathNowSeen: raw.pathNowSeen ?? 0,
+      pathHopSpent: raw.pathHopSpent ?? 0,
+    },
+    saveVersion,
+  );
   const learners = { ...(raw.learners ?? {}) };
   if (!learners[learnerId]) learners[learnerId] = fromFlat;
-  for (const id of Object.keys(learners)) learners[id] = sliceOf(learners[id]!);
+  for (const id of Object.keys(learners)) learners[id] = sliceOfWithHopHeal(learners[id]!, saveVersion);
   const cur = learners[learnerId] ?? fromFlat;
   const pathGrade = parsePathGrade(raw.pathGrade);
   let classUnitId = raw.classUnitId ?? "";

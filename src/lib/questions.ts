@@ -138,7 +138,6 @@ function groupsQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     prompt,
     hint: t().groupsHint,
     answer,
-    needsInteract: hide !== "product",
     factKey: `${Math.min(size, groups)}×${Math.max(size, groups)}`,
     data: { groups, size, hide, equation } satisfies GroupsData,
   });

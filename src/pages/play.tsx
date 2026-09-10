@@ -12,7 +12,7 @@ import { activityById, suggestedUnitId } from "@/lib/curriculum";
 import { pathNowUnitId } from "@/lib/path";
 import { makeDailyWalk, walkLabel } from "@/lib/daily";
 import { parseLocale, UI } from "@/lib/i18n";
-import { cardHeading, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen, leftoverSpeechOpen } from "@/lib/leftover";
+import { cardHeading, interactGatesSubmit, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen, leftoverSpeechOpen } from "@/lib/leftover";
 import { aliasActivityId, navigate } from "@/lib/nav";
 import { holdMsFor, REVEAL_AFTER_MISSES, WRONG_REVEAL_MS, WRONG_RETRY_MS, type FactStat } from "@/lib/practice";
 import { useProgress } from "@/lib/progress";
@@ -185,7 +185,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
           choices: q.choices ?? null,
           prompt: q.prompt,
           interacted,
-          checkDisabled: Boolean(q.needsInteract && !interacted),
+          checkDisabled: Boolean(interactGatesSubmit(q.kind, q.needsInteract) && !interacted),
           value: typeof data.value === "number" ? data.value : null,
           max: typeof data.max === "number" ? data.max : null,
           unit: typeof data.unit === "string" ? data.unit : null,
@@ -209,7 +209,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       const t = e.target as HTMLElement | null;
       if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
       if (status !== "idle") return;
-      if (q.needsInteract && !interacted) return;
+      if (interactGatesSubmit(q.kind, q.needsInteract) && !interacted) return;
       const leftover = q.kind === "tenframe";
       const allowDot = keypadAllowsDot(q);
       if (e.key === "Enter") {
@@ -302,7 +302,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   function check(override?: string) {
     if (!q || status !== "idle") return;
-    if (q.needsInteract && !interacted) {
+    if (interactGatesSubmit(q.kind, q.needsInteract) && !interacted) {
       setShake((n) => n + 1);
       return;
     }
@@ -353,7 +353,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   function skip() {
     if (!q || status !== "idle") return;
-    if (q.needsInteract && !interacted) return;
+    if (interactGatesSubmit(q.kind, q.needsInteract) && !interacted) return;
     const key = q.factKey ?? q.prompt;
     const nextMisses = misses.includes(key) ? misses : [...misses, key].slice(0, 12);
     setMisses(nextMisses);
@@ -482,7 +482,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       value={value}
       setValue={setValue}
       onCheck={check}
-      disabled={status !== "idle" || Boolean(q.needsInteract && !interacted)}
+      disabled={status !== "idle" || Boolean(interactGatesSubmit(q.kind, q.needsInteract) && !interacted)}
     />
   ) : null;
 

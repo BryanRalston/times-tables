@@ -13,6 +13,7 @@ import {
   unwrapSave,
   useProgress,
 } from "./progress";
+import { hopCreditsOf } from "./radial-web";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -188,6 +189,39 @@ describe("progress persist", () => {
     expect(s.soundOn).toBe(true);
     s.setSoundOn(false);
     expect(useProgress.getState().soundOn).toBe(false);
+  });
+
+  it("restores hop credits when a v10 Guest ledger burned unused hops", async () => {
+    const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        state: seedKid({
+          activities: { "u1-leftover": leftover, "u3-share": leftover },
+          pathHopperAt: 0,
+          pathHopSpent: 2,
+        }),
+        version: 0,
+      }),
+    );
+    await hydrateProgress();
+    const s = useProgress.getState();
+    expect(s.pathHopSpent).toBe(0);
+    expect(hopCreditsOf(s.activities, s.pathHopSpent)).toBe(2);
+  });
+
+  it("keeps hops already taken on a current save", async () => {
+    const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
+    const prior = seedKid({
+      activities: { "u1-leftover": leftover, "u3-share": leftover },
+      pathHopperAt: 4,
+      pathHopSpent: 1,
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: { ...prior, version: 11 }, version: 0 }));
+    await hydrateProgress();
+    const s = useProgress.getState();
+    expect(s.pathHopSpent).toBe(1);
+    expect(hopCreditsOf(s.activities, s.pathHopSpent)).toBe(1);
   });
 
   it("does not call resetAll from main boot", () => {
