@@ -3,6 +3,7 @@ import { persist, type PersistStorage, type StorageValue } from "zustand/middlew
 import { todayIso } from "./calendar";
 import { applyBuy, type BuyReason } from "./coins";
 import { GRADE4_SPANS, UNIT_SPANS, UNITS, unitById, unitsFor } from "./curriculum";
+import { RADIAL_PAD_COUNT, smallLessonsCompleted } from "./radial-web";
 import { parseLocale } from "./i18n";
 import {
   applyBests,
@@ -25,7 +26,7 @@ import { schoolStreak } from "./streak";
 import type { DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
 import { parsePathGrade } from "./types";
 
-const SAVE_VERSION = 9;
+const SAVE_VERSION = 10;
 export const STORAGE_KEY = "g3-path-v2";
 export const LEGACY_STORAGE_KEYS = ["g3-path-v1", "times-tables-progress", "times-tables-settings"] as const;
 const DEFAULT_ID = "kid-1";
@@ -85,7 +86,12 @@ export function readFirstSave(): Partial<SaveState> | null {
 
 function clampPathHopperAt(n: unknown): number {
   if (typeof n !== "number" || !Number.isFinite(n)) return 0;
-  return Math.min(UNITS.length, Math.max(0, Math.round(n)));
+  return Math.min(RADIAL_PAD_COUNT, Math.max(0, Math.round(n)));
+}
+
+function clampPathHopSpent(n: unknown): number {
+  if (typeof n !== "number" || !Number.isFinite(n)) return 0;
+  return Math.max(0, Math.round(n));
 }
 
 export function emptyLearner(name = ""): LearnerSlice {
@@ -107,6 +113,7 @@ export function emptyLearner(name = ""): LearnerSlice {
     runHonest: emptyRun(),
     pathHopperAt: 0,
     pathNowSeen: 0,
+    pathHopSpent: 0,
   };
 }
 
@@ -129,6 +136,7 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
     runHonest: parseRun(s.runHonest),
     pathHopperAt: clampPathHopperAt(s.pathHopperAt),
     pathNowSeen: clampPathHopperAt(s.pathNowSeen),
+    pathHopSpent: clampPathHopSpent(s.pathHopSpent),
   };
 }
 
@@ -169,6 +177,7 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
     runHonest: parseRun(raw.runHonest),
     pathHopperAt: raw.pathHopperAt ?? 0,
     pathNowSeen: raw.pathNowSeen ?? 0,
+    pathHopSpent: raw.pathHopSpent ?? smallLessonsCompleted(raw.activities ?? {}),
   });
   const learners = { ...(raw.learners ?? {}) };
   if (!learners[learnerId]) learners[learnerId] = fromFlat;
@@ -198,6 +207,7 @@ interface ProgressApi extends SaveState {
   setClassUnit: (id: string) => void;
   setPathHopperAt: (n: number) => void;
   setPathNowSeen: (n: number) => void;
+  spendPathHop: () => void;
   setPathGrade: (grade: PathGrade) => void;
   setSkipWeekend: (v: boolean) => void;
   setLocale: (locale: Locale) => void;
@@ -246,6 +256,7 @@ function snapshotSave(s: SaveState): SaveState {
     runHonest: s.runHonest,
     pathHopperAt: s.pathHopperAt,
     pathNowSeen: s.pathNowSeen,
+    pathHopSpent: s.pathHopSpent,
     learners: s.learners,
   };
 }
@@ -291,6 +302,7 @@ export const useProgress = create<ProgressApi>()(
       setPathHopperAt: (n) => commit(get, set, { pathHopperAt: clampPathHopperAt(n) }),
       setPathNowSeen: (n) =>
         commit(get, set, { pathNowSeen: Math.max(get().pathNowSeen, clampPathHopperAt(n)) }),
+      spendPathHop: () => commit(get, set, { pathHopSpent: get().pathHopSpent + 1 }),
       setPathGrade: (grade) => {
         const pathGrade = parsePathGrade(grade);
         const classUnitId = unitsFor(pathGrade).some((u) => u.id === get().classUnitId) ? get().classUnitId : "";

@@ -518,7 +518,7 @@ describe("path", () => {
     expect(isUnitOpen(later, "u1")).toBe(true);
   });
 
-  it("advances Lessons now after unit 1 is finished so Guest can hop to pad 2", () => {
+  it("keeps Lessons hopper on the current pad — never auto-hops to a frontier", () => {
     const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
     expect(farthestClearedUnitNumber({}, {})).toBe(0);
     expect(farthestClearedUnitNumber({}, { "u1-leftover": leftover })).toBe(1);
@@ -530,12 +530,12 @@ describe("path", () => {
     expect(lessonsHopFrom(0, 2, 1)).toBe(1);
     expect(lessonsHopFrom(1, 2, 1)).toBe(1);
     expect(lessonsHopFrom(2, 2, 1)).toBe(2);
-    expect(lessonsHopTo(0, 2, 0, 1)).toBe(2);
-    expect(lessonsHopTo(1, 2, 0, 1)).toBe(2);
+    expect(lessonsHopTo(0, 2, 0, 1)).toBe(1);
+    expect(lessonsHopTo(1, 2, 0, 1)).toBe(1);
     expect(lessonsHopTo(1, 2, 2, 1)).toBe(1);
     expect(lessonsHopTo(3, 8, 8, 7)).toBe(3);
     expect(lessonsHopTo(8, 8, 8, 7)).toBe(8);
-    expect(lessonsHopTo(4, 5, 4, 4)).toBe(5);
+    expect(lessonsHopTo(4, 5, 4, 4)).toBe(4);
     expect(lessonsHopTo(4, 5, 5, 4)).toBe(4);
   });
 });

@@ -1,4 +1,5 @@
 import { activityById, UNITS, unitById } from "./curriculum";
+import { START_PAD, clampPad } from "./radial-web";
 import type { ActivitySave, DaySession, UnitDef } from "./types";
 
 export type NodeStatus = "now" | "open" | "locked";
@@ -55,27 +56,21 @@ export function pathNowUnitId(
   return UNITS[now - 1]?.id ?? suggestedId;
 }
 
-/** Pad the hopper should leave from when Lessons mounts. */
-export function lessonsHopFrom(hopperAt: number, nowNumber: number, cleared: number): number {
-  const now = Math.max(1, Math.round(nowNumber));
-  if (hopperAt > 0) return Math.max(1, Math.round(hopperAt));
-  if (cleared > 0) return Math.min(now, Math.max(1, Math.round(cleared)));
-  return now;
+/** Pad the hopper should leave from when Lessons mounts. Never the calendar frontier. */
+export function lessonsHopFrom(hopperAt: number, _nowNumber?: number, _cleared?: number): number {
+  if (hopperAt > 0) return clampPad(hopperAt);
+  return START_PAD;
 }
 
 /**
- * Pad to stand on / hop to.
- * Auto-travel to the frontier only when that now pad is newly unlocked
- * (now > nowSeen). Replay returns stay on the pad the kid just left.
+ * Pad to stand on. Replay / return never auto-hops to a frontier.
+ * A hop happens only when the kid picks one adjacent space.
  */
 export function lessonsHopTo(
   hopperAt: number,
-  nowNumber: number,
-  nowSeen: number,
-  cleared: number,
+  nowNumber?: number,
+  _nowSeen?: number,
+  cleared?: number,
 ): number {
-  const now = Math.max(1, Math.round(nowNumber));
-  const from = lessonsHopFrom(hopperAt, now, cleared);
-  if (now > Math.max(0, Math.round(nowSeen))) return now;
-  return from;
+  return lessonsHopFrom(hopperAt, nowNumber, cleared);
 }

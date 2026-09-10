@@ -142,6 +142,8 @@ export type Ui = {
   start: string;
   allUnits: string;
   grade3Path: string;
+  hopPick: string;
+  hopOne: string;
   zoneMeadow: string;
   zoneCove: string;
   zoneForest: string;
@@ -308,6 +310,8 @@ export const UI: Record<Locale, Ui> = {
     start: "Start",
     allUnits: "All units",
     grade3Path: "Grade 3 Path",
+    hopPick: "Pick a space",
+    hopOne: "Hop one space",
     zoneMeadow: "Ten-Frame Meadow",
     zoneCove: "Coin Cove",
     zoneForest: "Fraction Forest",
@@ -472,6 +476,8 @@ export const UI: Record<Locale, Ui> = {
     start: "Empezar",
     allUnits: "Todas las unidades",
     grade3Path: "Sendero de 3.º",
+    hopPick: "Elige un espacio",
+    hopOne: "Salta un espacio",
     zoneMeadow: "Prado de decenas",
     zoneCove: "Cala de monedas",
     zoneForest: "Bosque de fracciones",
@@ -636,6 +642,8 @@ export const UI: Record<Locale, Ui> = {
     start: "Começar",
     allUnits: "Todas as unidades",
     grade3Path: "Trilha do 3.º ano",
+    hopPick: "Escolha um espaço",
+    hopOne: "Pule um espaço",
     zoneMeadow: "Prado das dezenas",
     zoneCove: "Enseada das moedas",
     zoneForest: "Floresta das frações",

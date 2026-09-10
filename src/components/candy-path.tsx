@@ -1,4 +1,3 @@
-import { Lock } from "lucide-react";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
@@ -8,7 +7,6 @@ import {
   hopAlong,
   hopLandSettle,
   hopProgressAt,
-  hopSpanIsObstacle,
   hopTravelMs,
   hopUnitStops,
   pathHopSfxKind,
@@ -16,191 +14,28 @@ import {
   type HopPhase,
   type HopPose,
 } from "@/lib/candy-hop";
-import { todayIso } from "@/lib/calendar";
 import { UNITS } from "@/lib/curriculum";
-import {
-  GRADE3_PATH_NODES,
-  GRADE3_PATH_PADS,
-  PATH_OBSTACLE,
-  TALL_MAP_FILE,
-  TALL_MAP_OVERLAY_DIR,
-  TALL_MAP_OVERLAYS,
-  TRAIL_PEEK_ARM_MS,
-  TRAIL_PEEK_ARM_SPREAD_MS,
-  pickTrailPeekSpot,
-  trailPeekHash,
-  displayUnitStars,
-  fogCoverPercent,
-  mapToViewPos,
-  nodeIsFogged,
-  overlayIsVeiled,
-  overlayMotionClass,
-  overlaySeatClass,
-  padChromeStars,
-  zoneForUnitNumber,
-  zoneLabelIsFogged,
-  type PathZone,
-} from "@/lib/grade-path";
 import { parseLocale } from "@/lib/i18n";
 import { unitText } from "@/lib/labels";
-import { unitStatus, type NodeStatus } from "@/lib/path";
-import { unitMaxStars, unitStars, useProgress } from "@/lib/progress";
-import { playHop, playLand, playPeek } from "@/lib/sound";
-import { pathHopperId, squisheeSrc, trailPeekFace } from "@/lib/squishees";
+import { unitStatus } from "@/lib/path";
+import { useProgress } from "@/lib/progress";
+import {
+  RADIAL_MAP_FILE,
+  RADIAL_PADS,
+  START_PAD,
+  adjacentPadIds,
+  areAdjacent,
+  clampPad,
+  hopCreditsOf,
+  portalPartner,
+  radialPad,
+} from "@/lib/radial-web";
+import { playHop, playLand } from "@/lib/sound";
+import { pathHopperId, squisheeSrc } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
-function zoneLabel(zone: PathZone, ui: ReturnType<typeof useUi>): string {
-  switch (zone) {
-    case "meadow":
-      return ui.zoneMeadow;
-    case "cove":
-      return ui.zoneCove;
-    case "forest":
-      return ui.zoneForest;
-    default: {
-      const _never: never = zone;
-      return _never;
-    }
-  }
-}
-
-function openTone(zone: PathZone, n: number): string {
-  if (n % 2 === 0) return "candy-node-yellow";
-  switch (zone) {
-    case "meadow":
-      return "candy-node-green";
-    case "cove":
-      return "candy-node-orange";
-    case "forest":
-      return "candy-node-lilac";
-    default: {
-      const _never: never = zone;
-      return _never;
-    }
-  }
-}
-
-function usePrefersReducedMotion(): boolean {
-  const [reduce, setReduce] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setReduce(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-  return reduce;
-}
-
-function trailPeekInScroller(el: HTMLElement, root: HTMLElement): boolean {
-  const er = el.getBoundingClientRect();
-  const sr = root.getBoundingClientRect();
-  return er.bottom > sr.top + 4 && er.top < sr.bottom - 4 && er.width > 0 && er.height > 0;
-}
-
-function TrailPeek({
-  nowNumber,
-  hopperId,
-  hold,
-}: {
-  nowNumber: number;
-  hopperId: string;
-  hold: boolean;
-}) {
-  const reduce = usePrefersReducedMotion();
-  const nodeRef = useRef<HTMLSpanElement>(null);
-  const played = useRef(false);
-  const [armed, setArmed] = useState(false);
-  const iso = todayIso();
-  const hash = trailPeekHash(iso, nowNumber);
-  const spot = pickTrailPeekSpot(nowNumber, hash);
-
-  useEffect(() => {
-    if (played.current) return;
-    if (reduce || !spot || hold) {
-      if (!played.current) setArmed(false);
-      return;
-    }
-    const el = nodeRef.current;
-    const root = el?.closest(".candy-scroll");
-    if (!el || !(root instanceof HTMLElement)) return;
-
-    let timer = 0;
-    let arming = false;
-    const delay = TRAIL_PEEK_ARM_MS + (hash % TRAIL_PEEK_ARM_SPREAD_MS);
-
-    const schedule = () => {
-      if (played.current || arming || !trailPeekInScroller(el, root)) return;
-      arming = true;
-      timer = window.setTimeout(() => {
-        if (played.current) return;
-        played.current = true;
-        playPeek();
-        setArmed(true);
-      }, delay);
-    };
-
-    let io: IntersectionObserver | undefined;
-    if (typeof IntersectionObserver === "function") {
-      io = new IntersectionObserver(
-        (entries) => {
-          if (entries.some((e) => e.isIntersecting)) schedule();
-        },
-        { root, threshold: 0.12, rootMargin: "12% 0px" },
-      );
-      io.observe(el);
-    }
-
-    const raf = requestAnimationFrame(schedule);
-    const poll = window.setTimeout(schedule, 480);
-    root.addEventListener("scroll", schedule, { passive: true });
-    return () => {
-      io?.disconnect();
-      root.removeEventListener("scroll", schedule);
-      cancelAnimationFrame(raf);
-      window.clearTimeout(poll);
-      window.clearTimeout(timer);
-    };
-  }, [hash, hold, reduce, spot]);
-
-  if (reduce || !spot) return null;
-  const view = mapToViewPos(spot.map);
-  const turn = trailPeekFace(hash, hopperId);
-  return (
-    <span
-      ref={nodeRef}
-      className="candy-trail-peek"
-      style={{ left: `${view.x}%`, top: `${view.y}%` }}
-      data-trail-peek={spot.id}
-      data-peek-id={turn.id}
-      data-peek-armed={armed ? "1" : "0"}
-      data-peek-exited={played.current && !armed ? "1" : "0"}
-      data-peek-side={spot.map.x < 50 ? "left" : "right"}
-      aria-hidden
-      onAnimationEnd={(e) => {
-        if (!(e.target instanceof HTMLElement)) return;
-        if (!e.target.classList.contains("candy-trail-peek-art")) return;
-        setArmed(false);
-      }}
-    >
-      {armed ? <MagentaImg src={squisheeSrc(turn.id)} alt="" className="candy-trail-peek-art" /> : null}
-    </span>
-  );
-}
-
-function nodeTone(status: NodeStatus, zone: PathZone, n: number): string {
-  switch (status) {
-    case "now":
-      return "candy-node-now";
-    case "open":
-      return openTone(zone, n);
-    case "locked":
-      return "candy-node-locked";
-    default: {
-      const _never: never = status;
-      return _never;
-    }
-  }
+function padView(id: number) {
+  return radialPad(id).map;
 }
 
 export type CandyPathHandle = {
@@ -213,31 +48,32 @@ export const CandyPath = forwardRef<
     suggestedId: string;
     standFrom?: number;
     standTo?: number;
+    hopCredits?: number;
     onStart: () => void;
     onOpenUnit: (id: string) => void;
   }
->(function CandyPath({ suggestedId, standFrom, standTo, onStart, onOpenUnit }, ref) {
+>(function CandyPath({ suggestedId, standFrom, standTo, hopCredits, onStart, onOpenUnit }, ref) {
   const ui = useUi();
   const locale = parseLocale(useProgress((s) => s.locale));
   const owned = useProgress((s) => s.squishees);
+  const activities = useProgress((s) => s.activities);
+  const hopsSpent = useProgress((s) => s.pathHopSpent);
   const setPathHopperAt = useProgress((s) => s.setPathHopperAt);
-  const setPathNowSeen = useProgress((s) => s.setPathNowSeen);
-  const nowSeen = useProgress((s) => s.pathNowSeen);
+  const spendPathHop = useProgress((s) => s.spendPathHop);
   const hopperId = pathHopperId(owned);
-  const current = UNITS.find((u) => u.id === suggestedId) ?? UNITS[0]!;
-  const origin = standFrom && standFrom > 0 ? standFrom : current.number;
-  const target =
-    standTo && standTo > 0 ? standTo : current.number > nowSeen ? current.number : origin;
-  const originPos = mapToViewPos(GRADE3_PATH_NODES[origin - 1] ?? GRADE3_PATH_NODES[0]!);
+  const origin = standFrom && standFrom > 0 ? clampPad(standFrom) : START_PAD;
+  const requested = standTo && standTo > 0 ? clampPad(standTo) : origin;
+  const target = requested === origin || areAdjacent(origin, requested) ? requested : origin;
+  const originPos = padView(origin);
   const settled = useRef(origin);
-  const pending = useRef<(() => void) | null>(null);
   const [dest, setDest] = useState(target);
   const [travelFrom, setTravelFrom] = useState(origin);
-  const [travel, setTravel] = useState(origin !== target);
+  const [travel, setTravel] = useState(origin !== target && areAdjacent(origin, target));
   const [landing, setLanding] = useState(false);
   const [pose, setPose] = useState<HopPose>(() => restHopPose(originPos));
-  const destPos = mapToViewPos(GRADE3_PATH_NODES[dest - 1] ?? GRADE3_PATH_NODES[0]!);
-  const fogH = fogCoverPercent(current.number);
+  const destPos = padView(dest);
+  const credits = hopCredits ?? hopCreditsOf(activities, hopsSpent);
+  const choices = credits > 0 && !travel ? adjacentPadIds(dest) : [];
 
   useEffect(() => {
     const hopper = document.querySelector<HTMLElement>("[data-path-hopper]");
@@ -260,25 +96,23 @@ export const CandyPath = forwardRef<
   }, [pose.y, travel]);
 
   useEffect(() => {
-    if (current.number > nowSeen) setDest(current.number);
-  }, [current.number, nowSeen]);
-
-  useEffect(() => {
     const from = settled.current;
     const to = dest;
-    const finish = (pad: number) => {
-      settled.current = pad;
-      setPathHopperAt(pad);
-      if (pad === current.number) setPathNowSeen(current.number);
+    const finish = (pad: number, entered: boolean) => {
+      let land = pad;
+      if (entered) {
+        const pair = portalPartner(pad);
+        if (pair) land = pair;
+      }
+      settled.current = land;
+      setPathHopperAt(land);
+      setDest(land);
       setTravel(false);
       setLanding(false);
-      setPose(restHopPose(mapToViewPos(GRADE3_PATH_NODES[pad - 1] ?? GRADE3_PATH_NODES[0]!)));
-      const next = pending.current;
-      pending.current = null;
-      next?.();
+      setPose(restHopPose(padView(land)));
     };
     if (from === to) {
-      finish(to);
+      finish(to, false);
       return;
     }
 
@@ -286,11 +120,11 @@ export const CandyPath = forwardRef<
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     setTravelFrom(from);
     if (reduce || stops.length < 2) {
-      finish(to);
+      finish(from, false);
       return;
     }
 
-    const views = stops.map((n) => mapToViewPos(GRADE3_PATH_NODES[n - 1]!));
+    const views = stops.map((n) => padView(n));
     const hopCount = views.length - 1;
     const airMs = hopAirMsList(stops);
     setTravel(true);
@@ -303,7 +137,7 @@ export const CandyPath = forwardRef<
     const tick = (now: number) => {
       const { hopIndex, t, phase, done } = hopProgressAt(now - start, hopCount, airMs);
       if (done) {
-        finish(to);
+        finish(to, true);
         return;
       }
       const isLand = phase === "land";
@@ -332,14 +166,7 @@ export const CandyPath = forwardRef<
           setPose(hopLandSettle(views[hopIndex + 1]!, t));
           break;
         case "air":
-          setPose(
-            hopAlong(
-              views[hopIndex]!,
-              views[hopIndex + 1]!,
-              t,
-              hopSpanIsObstacle(stops[hopIndex]!, stops[hopIndex + 1]!),
-            ),
-          );
+          setPose(hopAlong(views[hopIndex]!, views[hopIndex + 1]!, t, false));
           break;
         default: {
           const _never: never = phase;
@@ -350,172 +177,62 @@ export const CandyPath = forwardRef<
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [current.number, dest, destPos.x, destPos.y, setPathHopperAt, setPathNowSeen]);
+  }, [dest, destPos.x, destPos.y, setPathHopperAt]);
 
-  const hopThen = (to: number, then: () => void) => {
-    if (settled.current === to && !travel) {
-      then();
-      return;
-    }
-    pending.current = then;
-    if (dest !== to) setDest(to);
+  const chooseHop = (to: number) => {
+    if (travel || credits <= 0) return;
+    if (!areAdjacent(settled.current, to)) return;
+    spendPathHop();
+    setDest(to);
   };
 
   useImperativeHandle(ref, () => ({
-    playNow: () => hopThen(current.number, onStart),
+    playNow: () => onStart(),
   }));
 
-  const activate = (status: NodeStatus, unitId: string, unitNumber: number) => {
-    switch (status) {
-      case "now":
-        hopThen(unitNumber, onStart);
-        return;
-      case "open":
-        hopThen(unitNumber, () => onOpenUnit(unitId));
-        return;
-      case "locked":
-        return;
-      default: {
-        const _never: never = status;
-        return _never;
-      }
-    }
-  };
-
   return (
-    <div className="candy-map" data-grade-path="1" data-path-tall="1" data-path-wide="1" data-candy-world="1">
-      <div className="candy-world" aria-hidden>
+    <div
+      className="candy-map"
+      data-grade-path="1"
+      data-radial-web="1"
+      data-candy-world="1"
+      data-candy-radial-map="1"
+      data-hop-credits={String(credits)}
+    >
+      <div className="candy-world">
         <img
           className="candy-world-art"
-          src={asset(TALL_MAP_FILE)}
+          src={asset(RADIAL_MAP_FILE)}
           alt=""
           decoding="async"
-          data-candy-tall-map="1"
+          data-candy-radial-map-art="1"
+          aria-hidden
         />
-        <div
-          className="candy-water"
-          data-candy-water="1"
-          style={{
-            maskImage: `url("${asset(`${TALL_MAP_OVERLAY_DIR}/cove-water-mask.png`)}")`,
-            WebkitMaskImage: `url("${asset(`${TALL_MAP_OVERLAY_DIR}/cove-water-mask.png`)}")`,
-          }}
-        >
-          <span className="candy-water-flow" />
-          <span className="candy-water-glint" />
-        </div>
-      </div>
-
-      <div className="candy-overlay">
-        <p
-          className={cn("candy-sign candy-sign-meadow", zoneLabelIsFogged("meadow", current.number) && "candy-sign-fog")}
-          data-candy-sign="meadow"
-        >
-          {zoneLabel("meadow", ui)}
-        </p>
-        <p
-          className={cn("candy-sign candy-sign-cove", zoneLabelIsFogged("cove", current.number) && "candy-sign-fog")}
-          data-candy-sign="cove"
-        >
-          {zoneLabel("cove", ui)}
-        </p>
-        <p
-          className={cn("candy-sign candy-sign-forest", zoneLabelIsFogged("forest", current.number) && "candy-sign-fog")}
-          data-candy-sign="forest"
-        >
-          {zoneLabel("forest", ui)}
-        </p>
-
-        {(() => {
-          const view = mapToViewPos(PATH_OBSTACLE.map);
-          const veiled = overlayIsVeiled(PATH_OBSTACLE.map.y, current.number);
-          return (
-            <span
-              className={cn(
-                "candy-prop candy-prop-obstacle",
-                overlaySeatClass(PATH_OBSTACLE.seat),
-                veiled && "candy-prop-veil",
-              )}
-              style={{ left: `${view.x}%`, top: `${view.y}%`, width: `${PATH_OBSTACLE.width}%` }}
-              data-path-obstacle={PATH_OBSTACLE.id}
-              data-candy-prop={PATH_OBSTACLE.id}
-              data-candy-prop-zone={PATH_OBSTACLE.zone}
-              data-candy-prop-seat={PATH_OBSTACLE.seat}
-              data-candy-prop-veil={veiled ? "1" : "0"}
-              aria-hidden
-            >
-              <span className="candy-prop-art">
-                <img
-                  src={asset(`${TALL_MAP_OVERLAY_DIR}/${PATH_OBSTACLE.file}`)}
-                  alt=""
-                  draggable={false}
-                  decoding="async"
-                />
-              </span>
-            </span>
-          );
-        })()}
-
-        {TALL_MAP_OVERLAYS.map((prop) => {
-          const view = mapToViewPos(prop.map);
-          const veiled = overlayIsVeiled(prop.map.y, current.number);
-          return (
-            <span
-              key={prop.id}
-              className={cn("candy-prop", overlaySeatClass(prop.seat), veiled && "candy-prop-veil")}
-              style={{ left: `${view.x}%`, top: `${view.y}%`, width: `${prop.width}%` }}
-              data-candy-prop={prop.id}
-              data-candy-prop-zone={prop.zone}
-              data-candy-prop-seat={prop.seat}
-              data-candy-prop-veil={veiled ? "1" : "0"}
-              aria-hidden
-            >
-              <span className={cn("candy-prop-art", overlayMotionClass(prop.motion))}>
-                <img src={asset(`${TALL_MAP_OVERLAY_DIR}/${prop.file}`)} alt="" draggable={false} decoding="async" />
-              </span>
-            </span>
-          );
-        })}
-
-        {GRADE3_PATH_PADS.map((pad) => {
-          const unit = UNITS[pad.unitNumber - 1];
-          if (!unit) return null;
-          const view = mapToViewPos(pad.map);
-          const status = unitStatus(unit, suggestedId);
-          const zone = zoneForUnitNumber(unit.number);
-          const earned = displayUnitStars(unitStars(unit.id), unitMaxStars(unit.id));
-          const fogged = nodeIsFogged(unit.number, current.number);
-          const locked = status === "locked" || fogged;
-          const stars = padChromeStars(earned, { now: status === "now", locked });
-          const short = unitText(unit, locale).short;
+        <div className="candy-overlay">
+        {RADIAL_PADS.map((pad) => {
+          const view = pad.map;
+          const choice = choices.includes(pad.id);
+          const here = pad.id === dest && !travel;
           return (
             <button
-              key={unit.id}
+              key={pad.id}
               type="button"
-              className={cn("candy-node candy-node-bare", nodeTone(status, zone, unit.number))}
+              className={cn(
+                "candy-node candy-node-bare candy-node-radial",
+                choice && "candy-node-choice",
+                here && "candy-node-here",
+              )}
               style={{ left: `${view.x}%`, top: `${view.y}%` }}
-              data-path-unit={unit.id}
               data-path-pad="1"
-              data-path-status={status}
-              data-path-zone={zone}
-              data-path-stars={stars}
-              data-path-fog={fogged ? "1" : "0"}
-              disabled={locked}
-              aria-disabled={locked}
-              aria-label={`${ui.unitN(unit.number)}. ${short}${status === "now" ? `, ${ui.now}` : ""}${locked ? `, ${ui.pathLocked}` : ""}`}
-              onClick={() => activate(status, unit.id, unit.number)}
+              data-pad-id={String(pad.id)}
+              data-pad-choice={choice ? "1" : "0"}
+              data-pad-portal={pad.portal ? "1" : "0"}
+              disabled={!choice}
+              aria-disabled={!choice}
+              aria-label={choice ? ui.hopOne : undefined}
+              onClick={() => chooseHop(pad.id)}
             >
-              <span className="candy-node-disc">{fogged ? "" : unit.number}</span>
-              {fogged || status === "locked" ? (
-                <Lock className="candy-lock" aria-hidden />
-              ) : stars > 0 ? (
-                <span className="candy-stars" aria-hidden>
-                  {Array.from({ length: stars }, (_, s) => (
-                    <span key={s} className="candy-star candy-star-on">
-                      ★
-                    </span>
-                  ))}
-                </span>
-              ) : null}
+              <span className="candy-node-disc" />
             </button>
           );
         })}
@@ -544,24 +261,32 @@ export const CandyPath = forwardRef<
           data-path-hop-from={travel ? String(travelFrom) : String(dest)}
           data-path-hop-to={String(dest)}
           data-path-hop-ms={travel ? String(hopTravelMs(hopUnitStops(travelFrom, dest))) : "0"}
-          data-path-clear-obstacle={
-            travel && hopUnitStops(travelFrom, dest).some((n, i, all) => hopSpanIsObstacle(n, all[i + 1] ?? n))
-              ? "1"
-              : "0"
-          }
+          data-path-clear-obstacle="0"
         >
           <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
         </div>
+        </div>
+      </div>
 
-        <TrailPeek nowNumber={current.number} hopperId={hopperId} hold={travel} />
-
-        {fogH > 0 ? (
-          <div className="candy-fog" data-candy-fog="1" data-candy-mist="1" style={{ height: `${fogH}%` }} aria-hidden>
-            <span className="candy-fog-mist candy-fog-mist-a" />
-            <span className="candy-fog-mist candy-fog-mist-b" />
-          </div>
-        ) : null}
-        {fogH > 0 ? <p className="sr-only">{ui.pathFogAhead}</p> : null}
+      <div className="candy-unit-rail" data-unit-rail="1">
+        {UNITS.map((unit) => {
+          const status = unitStatus(unit, suggestedId);
+          const short = unitText(unit, locale).short;
+          const chipStatus = status === "locked" ? "open" : status;
+          return (
+            <button
+              key={unit.id}
+              type="button"
+              className={cn("candy-unit-chip", status === "now" && "candy-unit-chip-now")}
+              data-path-unit={unit.id}
+              data-path-status={chipStatus}
+              aria-label={`${ui.unitN(unit.number)}. ${short}${status === "now" ? `, ${ui.now}` : ""}`}
+              onClick={() => (status === "now" ? onStart() : onOpenUnit(unit.id))}
+            >
+              {unit.number}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

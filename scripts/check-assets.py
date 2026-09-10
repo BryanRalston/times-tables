@@ -298,6 +298,15 @@ def main() -> int:
         if mag > 8:
             fails.append(f"money/{name}: leftover magenta {mag}px")
 
+    radial = PUBLIC / "candy-zones" / "radial-web-locked.jpg"
+    if not radial.exists():
+        fails.append("missing candy-zones/radial-web-locked.jpg")
+    else:
+        rim = Image.open(radial)
+        rw, rh = rim.size
+        if abs(rw / rh - 16 / 9) > 0.04:
+            fails.append(f"radial-web-locked.jpg: expected landscape 16:9, got {rw}x{rh}")
+
     tall = PUBLIC / "candy-zones" / "tall-map.png"
     if not tall.exists():
         fails.append("missing candy-zones/tall-map.png")
