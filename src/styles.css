@@ -990,6 +990,12 @@ details > summary::-webkit-details-marker {
   z-index: 2;
   pointer-events: none;
 }
+.candy-overlay[data-hop-pick="1"] {
+  pointer-events: auto;
+}
+.candy-overlay[data-hop-pick="1"] .candy-node-radial {
+  pointer-events: none;
+}
 .candy-sign,
 .candy-node {
   pointer-events: auto;
@@ -1128,8 +1134,8 @@ details > summary::-webkit-details-marker {
   opacity: 0.5;
   filter: saturate(0.12) brightness(0.7);
 }
-/* Keep the 1.7rem hit box. Inner-ring neighbors sit ~21px apart on a 390px
-   phone; a 44px target steals the next pad's tap. Glow is the read. */
+/* Visual discs stay small. Phone taps hit the overlay and resolve to the
+   nearest glowing neighbor (HOP_SNAP_PX) so a 44px box never steals. */
 .candy-node-radial.candy-node-choice {
   z-index: 7;
 }

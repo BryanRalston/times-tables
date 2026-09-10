@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { UNITS } from "./curriculum";
 import {
+  HOP_SNAP_PX,
+  PHONE_MAP_BOARD,
   PORTAL_PAIRS,
   RADIAL_EDGES,
   RADIAL_MAP_FILE,
@@ -12,6 +14,8 @@ import {
   hopCreditsOf,
   hopLessonsCompleted,
   migratePathHopSpent,
+  nearestHopTarget,
+  padClientPos,
   portalPartner,
   radialHopStops,
   smallLessonsCompleted,
@@ -130,5 +134,70 @@ describe("radial web", () => {
     expect(
       migratePathHopSpent({ activities: done, pathHopSpent: 2, pathHopperAt: 1, saveVersion: 12 }),
     ).toBe(2);
+  });
+});
+
+describe("radial hop hit testing", () => {
+  const board = PHONE_MAP_BOARD;
+  const plaza = adjacentPadIds(START_PAD);
+  const a = plaza[0]!;
+  const b = plaza[1]!;
+
+  function tapPad(id: number) {
+    const p = padClientPos(id, board);
+    return nearestHopTarget(p.x, p.y, board, plaza, START_PAD);
+  }
+
+  function toward(fromId: number, toId: number, t: number) {
+    const from = padClientPos(fromId, board);
+    const to = padClientPos(toId, board);
+    return { x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t };
+  }
+
+  it("keeps plaza neighbors closer than a 44px box on a 390 phone", () => {
+    const pa = padClientPos(a, board);
+    const pb = padClientPos(b, board);
+    const gap = Math.hypot(pb.x - pa.x, pb.y - pa.y);
+    expect(HOP_SNAP_PX).toBe(24);
+    expect(gap).toBeGreaterThan(18);
+    expect(gap).toBeLessThan(24);
+    expect(gap).toBeLessThan(HOP_SNAP_PX * 2);
+  });
+
+  it("lands a tap on the closest glowing pad, not the overlapping neighbor", () => {
+    expect(tapPad(a)).toBe(a);
+    const nearA = toward(a, b, 0.2);
+    expect(nearestHopTarget(nearA.x, nearA.y, board, plaza, START_PAD)).toBe(a);
+    const nearB = toward(a, b, 0.8);
+    expect(nearestHopTarget(nearB.x, nearB.y, board, plaza, START_PAD)).toBe(b);
+    const mid = toward(a, b, 0.5);
+    const hit = nearestHopTarget(mid.x, mid.y, board, plaza, START_PAD);
+    expect(hit === a || hit === b).toBe(true);
+    expect([a, b].filter((id) => id === hit)).toHaveLength(1);
+  });
+
+  it("does not hop when the tap is on the current pad or far from every glow", () => {
+    expect(tapPad(START_PAD)).toBeUndefined();
+    expect(nearestHopTarget(0, 0, board, plaza, START_PAD)).toBeUndefined();
+    const far = RADIAL_PADS.find((p) => p.ring === 4 && !plaza.includes(p.id))!;
+    expect(tapPad(far.id)).toBeUndefined();
+  });
+
+  it("never selects a quiet pad, and still warps from an adjacent portal", () => {
+    const portal = RADIAL_PADS.find((p) => p.portal)!;
+    const neighbor = adjacentPadIds(portal.id)[0]!;
+    const choices = adjacentPadIds(neighbor);
+    expect(choices).toContain(portal.id);
+    const p = padClientPos(portal.id, board);
+    expect(nearestHopTarget(p.x, p.y, board, choices, neighbor)).toBe(portal.id);
+    const here = padClientPos(neighbor, board);
+    const quiet = RADIAL_PADS.filter((pad) => !choices.includes(pad.id) && pad.id !== neighbor).sort((left, right) => {
+      const ql = padClientPos(left.id, board);
+      const qr = padClientPos(right.id, board);
+      return Math.hypot(qr.x - here.x, qr.y - here.y) - Math.hypot(ql.x - here.x, ql.y - here.y);
+    })[0]!;
+    const q = padClientPos(quiet.id, board);
+    expect(nearestHopTarget(q.x, q.y, board, choices, neighbor)).toBeUndefined();
+    expect(nearestHopTarget(p.x, p.y, board, choices, neighbor)).not.toBe(quiet.id);
   });
 });

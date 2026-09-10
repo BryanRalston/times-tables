@@ -1,8 +1,13 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { resetProgressMemory } from "@/lib/progress";
-import { RADIAL_PAD_COUNT, RADIAL_PADS, START_PAD, adjacentPadIds } from "@/lib/radial-web";
+import { HOP_SNAP_PX, RADIAL_PAD_COUNT, RADIAL_PADS, START_PAD, adjacentPadIds } from "@/lib/radial-web";
 import { CandyPath } from "./candy-path";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
 
 describe("CandyPath", () => {
   beforeEach(() => {
@@ -59,6 +64,9 @@ describe("CandyPath", () => {
     expect(html).toContain('data-path-hop-to="1"');
     expect(html).toContain('data-path-travel="0"');
     expect(html).toContain('data-hop-credits="1"');
+    expect(html).toContain('data-hop-board="1"');
+    expect(html).toContain('data-hop-pick="1"');
+    expect(html).toContain(`data-hop-snap="${HOP_SNAP_PX}"`);
     expect((html.match(/data-pad-choice="1"/g) ?? []).length).toBe(next.length);
     expect((html.match(/data-pad-quiet="1"/g) ?? []).length).toBe(RADIAL_PAD_COUNT - next.length - 1);
     expect((html.match(/data-pad-here="1"/g) ?? []).length).toBe(1);
@@ -73,6 +81,8 @@ describe("CandyPath", () => {
       <CandyPath suggestedId="u2" standFrom={1} standTo={1} hopCredits={0} onStart={() => {}} onOpenUnit={() => {}} />,
     );
     expect(html).toContain('data-hop-credits="0"');
+    expect(html).toContain('data-hop-board="1"');
+    expect(html).toContain('data-hop-pick="0"');
     expect(html).not.toContain('data-pad-choice="1"');
     expect(html).not.toContain('data-pad-quiet="1"');
     expect(html).not.toContain('data-pad-enterable="1"');
@@ -122,5 +132,12 @@ describe("CandyPath", () => {
     expect(html).toContain('data-path-travel="0"');
     expect(html).toContain('data-path-hop-to="1"');
     expect((html.match(/data-path-pad="1"/g) ?? []).length).toBe(RADIAL_PAD_COUNT);
+  });
+
+  it("resolves phone taps on the board to the nearest glowing pad", () => {
+    const src = readFileSync(join(HERE, "candy-path.tsx"), "utf8");
+    expect(src).toContain("nearestHopTarget");
+    expect(src).toContain("onPointerUp={onBoardPointerUp}");
+    expect(src).toContain("board.getBoundingClientRect()");
   });
 });
