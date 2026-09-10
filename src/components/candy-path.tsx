@@ -22,19 +22,23 @@ import { unitText } from "@/lib/labels";
 import { unitStatus } from "@/lib/path";
 import { useProgress } from "@/lib/progress";
 import {
+  DICE_TUMBLE_MS,
   HOP_SNAP_PX,
   RADIAL_MAP_FILE,
   RADIAL_PADS,
   START_PAD,
   adjacentPadIds,
   areAdjacent,
+  canStartDiceTurn,
   clampPad,
   hopCreditsOf,
   nearestHopTarget,
   portalPartner,
   radialPad,
+  rollDieFace,
+  type DieFace,
 } from "@/lib/radial-web";
-import { playHop, playLand, playWarp } from "@/lib/sound";
+import { playDice, playHop, playLand, playWarp } from "@/lib/sound";
 import { pathHopperId, squisheeSrc } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
@@ -42,8 +46,47 @@ function padView(id: number) {
   return radialPad(id).map;
 }
 
+function diePips(face: DieFace): { x: number; y: number }[] {
+  switch (face) {
+    case 1:
+      return [{ x: 50, y: 50 }];
+    case 2:
+      return [
+        { x: 30, y: 30 },
+        { x: 70, y: 70 },
+      ];
+    case 3:
+      return [
+        { x: 28, y: 28 },
+        { x: 50, y: 50 },
+        { x: 72, y: 72 },
+      ];
+    default: {
+      const _never: never = face;
+      return _never;
+    }
+  }
+}
+
+function KidDie({ face, tumbling }: { face: DieFace; tumbling: boolean }) {
+  return (
+    <div
+      className={cn("candy-die", tumbling && "candy-die-tumble")}
+      data-path-die="1"
+      data-die-face={String(face)}
+      data-die-tumble={tumbling ? "1" : "0"}
+      aria-hidden
+    >
+      {diePips(face).map((p, i) => (
+        <span key={i} className="candy-die-pip" style={{ left: `${p.x}%`, top: `${p.y}%` }} />
+      ))}
+    </div>
+  );
+}
+
 export type CandyPathHandle = {
   playNow: () => void;
+  rollDie: () => void;
 };
 
 export const CandyPath = forwardRef<
@@ -53,18 +96,21 @@ export const CandyPath = forwardRef<
     standFrom?: number;
     standTo?: number;
     hopCredits?: number;
+    stepsLeft?: number;
     onStart: () => void;
     onOpenUnit: (id: string) => void;
   }
->(function CandyPath({ suggestedId, standFrom, standTo, hopCredits, onStart, onOpenUnit }, ref) {
+>(function CandyPath({ suggestedId, standFrom, standTo, hopCredits, stepsLeft, onStart, onOpenUnit }, ref) {
   const ui = useUi();
   const locale = parseLocale(useProgress((s) => s.locale));
   const owned = useProgress((s) => s.squishees);
   const activities = useProgress((s) => s.activities);
   const hopsSpent = useProgress((s) => s.pathHopSpent);
+  const storedSteps = useProgress((s) => s.pathStepsLeft);
   const sessions = useProgress((s) => s.sessions);
   const setPathHopperAt = useProgress((s) => s.setPathHopperAt);
-  const spendPathHop = useProgress((s) => s.spendPathHop);
+  const startDiceTurn = useProgress((s) => s.startDiceTurn);
+  const spendPathStep = useProgress((s) => s.spendPathStep);
   const hopperId = pathHopperId(owned);
   const origin = standFrom && standFrom > 0 ? clampPad(standFrom) : START_PAD;
   const requested = standTo && standTo > 0 ? clampPad(standTo) : origin;
@@ -81,7 +127,11 @@ export const CandyPath = forwardRef<
   const warpRef = useRef<{ from: number; to: number } | null>(null);
   const destPos = padView(dest);
   const credits = hopCredits ?? hopCreditsOf(activities, hopsSpent, sessions);
-  const picking = credits > 0 && !travel && !warp;
+  const steps = stepsLeft ?? storedSteps;
+  const [rolling, setRolling] = useState<DieFace | null>(null);
+  const [tumbleFace, setTumbleFace] = useState<DieFace>(1);
+  const inviting = canStartDiceTurn(credits, steps) && !travel && !warp && rolling == null;
+  const picking = steps > 0 && !travel && !warp && rolling == null;
   const choices = picking ? adjacentPadIds(dest) : [];
   const boardRef = useRef<HTMLDivElement>(null);
   const tapStart = useRef<{ x: number; y: number } | null>(null);
@@ -235,10 +285,38 @@ export const CandyPath = forwardRef<
     return () => cancelAnimationFrame(raf);
   }, [warp, setPathHopperAt]);
 
+  useEffect(() => {
+    if (rolling == null) return;
+    const faces: DieFace[] = [1, 2, 3, 2, 1, 3, rolling];
+    let i = 0;
+    setTumbleFace(faces[0]!);
+    const tick = window.setInterval(() => {
+      i += 1;
+      setTumbleFace(faces[Math.min(i, faces.length - 1)]!);
+      if (i >= faces.length - 1) window.clearInterval(tick);
+    }, 90);
+    const done = window.setTimeout(() => setRolling(null), DICE_TUMBLE_MS);
+    return () => {
+      window.clearInterval(tick);
+      window.clearTimeout(done);
+    };
+  }, [rolling]);
+
+  const beginRoll = () => {
+    if (rolling != null || travel || warp || !canStartDiceTurn(credits, steps)) return;
+    const face = rollDieFace();
+    if (!startDiceTurn(face)) return;
+    playDice();
+    const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+    setRolling(face);
+    setTumbleFace(1);
+  };
+
   const chooseHop = (to: number) => {
-    if (travel || warp || credits <= 0) return;
+    if (travel || warp || rolling != null || steps <= 0) return;
     if (!areAdjacent(settled.current, to)) return;
-    spendPathHop();
+    spendPathStep();
     setDest(to);
   };
 
@@ -264,6 +342,7 @@ export const CandyPath = forwardRef<
 
   useImperativeHandle(ref, () => ({
     playNow: () => onStart(),
+    rollDie: () => beginRoll(),
   }));
 
   return (
@@ -274,6 +353,8 @@ export const CandyPath = forwardRef<
       data-candy-world="1"
       data-candy-radial-map="1"
       data-hop-credits={String(credits)}
+      data-dice-invite={inviting ? "1" : "0"}
+      data-dice-steps={String(steps)}
     >
       <div className="candy-world">
         <div className="candy-world-stage" data-radial-stage="1">
@@ -290,6 +371,8 @@ export const CandyPath = forwardRef<
           className="candy-overlay"
           data-hop-board="1"
           data-hop-pick={picking ? "1" : "0"}
+          data-dice-invite={inviting ? "1" : "0"}
+          data-dice-steps={String(steps)}
           data-hop-snap={String(HOP_SNAP_PX)}
           onPointerDown={onBoardPointerDown}
           onPointerUp={onBoardPointerUp}
@@ -330,6 +413,8 @@ export const CandyPath = forwardRef<
             </button>
           );
         })}
+
+        {rolling != null ? <KidDie face={tumbleFace} tumbling /> : null}
 
         {warp ? (
           <>

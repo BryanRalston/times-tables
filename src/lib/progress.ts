@@ -3,7 +3,16 @@ import { persist, type PersistStorage, type StorageValue } from "zustand/middlew
 import { todayIso } from "./calendar";
 import { applyBuy, type BuyReason } from "./coins";
 import { GRADE4_SPANS, UNIT_SPANS, UNITS, unitById, unitsFor } from "./curriculum";
-import { RADIAL_PAD_COUNT, migratePathHopSpent } from "./radial-web";
+import {
+  RADIAL_PAD_COUNT,
+  canStartDiceTurn,
+  clampDieFace,
+  clampPathStepsLeft,
+  hopCreditsOf,
+  migratePathHopSpent,
+  migratePathStepsLeft,
+  type DieFace,
+} from "./radial-web";
 import { parseLocale } from "./i18n";
 import {
   applyBests,
@@ -26,7 +35,7 @@ import { schoolStreak } from "./streak";
 import type { ActivitySave, DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
 import { parsePathGrade } from "./types";
 
-const SAVE_VERSION = 12;
+const SAVE_VERSION = 13;
 export const STORAGE_KEY = "g3-path-v2";
 export const LEGACY_STORAGE_KEYS = ["g3-path-v1", "times-tables-progress", "times-tables-settings"] as const;
 const DEFAULT_ID = "kid-1";
@@ -114,6 +123,7 @@ export function emptyLearner(name = ""): LearnerSlice {
     pathHopperAt: 0,
     pathNowSeen: 0,
     pathHopSpent: 0,
+    pathStepsLeft: 0,
   };
 }
 
@@ -137,6 +147,7 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
     pathHopperAt: clampPathHopperAt(s.pathHopperAt),
     pathNowSeen: clampPathHopperAt(s.pathNowSeen),
     pathHopSpent: clampPathHopSpent(s.pathHopSpent),
+    pathStepsLeft: clampPathStepsLeft(s.pathStepsLeft),
   };
 }
 
@@ -185,6 +196,10 @@ function sliceOfWithHopHeal(s: LearnerSlice, saveVersion: number): LearnerSlice 
       pathHopperAt: next.pathHopperAt,
       saveVersion,
     }),
+    pathStepsLeft: migratePathStepsLeft({
+      pathStepsLeft: s.pathStepsLeft,
+      saveVersion,
+    }),
   };
 }
 
@@ -228,6 +243,7 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
       pathHopperAt: raw.pathHopperAt ?? 0,
       pathNowSeen: raw.pathNowSeen ?? 0,
       pathHopSpent: raw.pathHopSpent ?? 0,
+      pathStepsLeft: raw.pathStepsLeft ?? 0,
     },
     saveVersion,
   );
@@ -245,6 +261,7 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
       stars: Math.max(fromFlat.stars, typeof kid.stars === "number" ? kid.stars : 0),
       pathHopperAt: kid.pathHopperAt || fromFlat.pathHopperAt,
       pathHopSpent: kid.pathHopSpent ?? fromFlat.pathHopSpent,
+      pathStepsLeft: kid.pathStepsLeft ?? fromFlat.pathStepsLeft,
     };
   }
   for (const id of Object.keys(learners)) learners[id] = sliceOfWithHopHeal(learners[id]!, saveVersion);
@@ -273,7 +290,8 @@ interface ProgressApi extends SaveState {
   setClassUnit: (id: string) => void;
   setPathHopperAt: (n: number) => void;
   setPathNowSeen: (n: number) => void;
-  spendPathHop: () => void;
+  startDiceTurn: (face: DieFace) => boolean;
+  spendPathStep: () => void;
   setPathGrade: (grade: PathGrade) => void;
   setSkipWeekend: (v: boolean) => void;
   setLocale: (locale: Locale) => void;
@@ -323,6 +341,7 @@ function snapshotSave(s: SaveState): SaveState {
     pathHopperAt: s.pathHopperAt,
     pathNowSeen: s.pathNowSeen,
     pathHopSpent: s.pathHopSpent,
+    pathStepsLeft: s.pathStepsLeft,
     learners: s.learners,
   };
 }
@@ -368,7 +387,19 @@ export const useProgress = create<ProgressApi>()(
       setPathHopperAt: (n) => commit(get, set, { pathHopperAt: clampPathHopperAt(n) }),
       setPathNowSeen: (n) =>
         commit(get, set, { pathNowSeen: Math.max(get().pathNowSeen, clampPathHopperAt(n)) }),
-      spendPathHop: () => commit(get, set, { pathHopSpent: get().pathHopSpent + 1 }),
+      startDiceTurn: (face) => {
+        const s = get();
+        const steps = clampDieFace(face);
+        const rolls = hopCreditsOf(s.activities, s.pathHopSpent, s.sessions);
+        if (!canStartDiceTurn(rolls, s.pathStepsLeft)) return false;
+        commit(get, set, { pathHopSpent: s.pathHopSpent + 1, pathStepsLeft: steps });
+        return true;
+      },
+      spendPathStep: () => {
+        const left = clampPathStepsLeft(get().pathStepsLeft);
+        if (left <= 0) return;
+        commit(get, set, { pathStepsLeft: left - 1 });
+      },
       setPathGrade: (grade) => {
         const pathGrade = parsePathGrade(grade);
         const classUnitId = unitsFor(pathGrade).some((u) => u.id === get().classUnitId) ? get().classUnitId : "";

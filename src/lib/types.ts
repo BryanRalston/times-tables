@@ -340,8 +340,10 @@ export interface LearnerSlice {
   pathHopperAt: number;
   /** Highest "now" pad Lessons already presented. Replay returns stay put. */
   pathNowSeen: number;
-  /** One-space hops already taken on the radial board. */
+  /** Dice rolls already started on the radial board (v13+). v12 stored hops taken. */
   pathHopSpent: number;
+  /** Adjacent steps left in the current dice turn. 0 = no active turn. */
+  pathStepsLeft: number;
 }
 
 export interface SaveState extends LearnerSlice {

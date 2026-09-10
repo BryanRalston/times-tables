@@ -135,3 +135,14 @@ export function playWarp() {
   chirp(784, 523.25, t + 0.14, 0.18, "sine", 0.022);
   tone(659.25, t + 0.28, 0.08, "sine", 0.018);
 }
+
+/** Short playful ticks — not a casino spin. */
+export function playDice() {
+  const c = ac();
+  if (!c) return;
+  const t = c.currentTime;
+  tone(392, t, 0.045, "triangle", 0.02);
+  tone(494, t + 0.07, 0.045, "triangle", 0.018);
+  tone(587, t + 0.14, 0.05, "triangle", 0.016);
+  tone(659.25, t + 0.28, 0.09, "sine", 0.022);
+}

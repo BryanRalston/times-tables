@@ -393,8 +393,9 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     const streak = schoolStreak(sessions, pack.date);
     const st = useProgress.getState();
     const shop = canAffordAnything(st.coins, st.squishees);
-    const hopNow = hopCreditsOf(st.activities, st.pathHopSpent, st.sessions) > 0;
-    const toLessons = kind === "activity" || hopNow;
+    const rollsNow = hopCreditsOf(st.activities, st.pathHopSpent, st.sessions);
+    const stepsNow = st.pathStepsLeft;
+    const toLessons = kind === "activity" || rollsNow > 0 || stepsNow > 0;
     return (
       <AppScene scene="hills" tabs={<AppTabs active="home" />}>
         <AppHeader />
@@ -414,7 +415,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
             size="lg"
             onClick={() => navigate({ id: toLessons ? "lessons" : "home" }, { replace: true })}
           >
-            {toLessons ? ui.hopPick : ui.home}
+            {stepsNow > 0 ? ui.hopPick : rollsNow > 0 ? ui.rollDie : ui.home}
           </Button>
           {shop ? (
             <Button

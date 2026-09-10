@@ -40,6 +40,8 @@ describe("CandyPath", () => {
     expect(html).toContain("peach.png");
     expect(html).toContain("translate(-50%, -108%)");
     expect(html).toContain('data-hop-credits="0"');
+    expect(html).toContain('data-dice-invite="0"');
+    expect(html).toContain('data-dice-steps="0"');
     expect(html).toContain('data-path-clear-obstacle="0"');
     expect((html.match(/data-path-pad="1"/g) ?? []).length).toBe(RADIAL_PAD_COUNT);
     expect((html.match(/data-path-unit="/g) ?? []).length).toBe(13);
@@ -56,15 +58,39 @@ describe("CandyPath", () => {
     expect(html).not.toContain("data-trail-peek");
   });
 
-  it("offers adjacent one-space choices after a small lesson, without auto-hopping", () => {
-    const next = adjacentPadIds(START_PAD);
+  it("invites a dice roll after a small lesson, without glowing pads yet", () => {
     const html = renderToStaticMarkup(
-      <CandyPath suggestedId="u2" standFrom={1} standTo={1} hopCredits={1} onStart={() => {}} onOpenUnit={() => {}} />,
+      <CandyPath suggestedId="u2" standFrom={1} standTo={1} hopCredits={1} stepsLeft={0} onStart={() => {}} onOpenUnit={() => {}} />,
     );
     expect(html).toContain('data-path-hop-from="1"');
     expect(html).toContain('data-path-hop-to="1"');
     expect(html).toContain('data-path-travel="0"');
     expect(html).toContain('data-hop-credits="1"');
+    expect(html).toContain('data-dice-invite="1"');
+    expect(html).toContain('data-dice-steps="0"');
+    expect(html).toContain('data-hop-board="1"');
+    expect(html).toContain('data-hop-pick="0"');
+    expect(html).not.toContain('data-pad-choice="1"');
+    expect(html).not.toContain('data-path-die');
+    expect(html).not.toContain('data-path-hop-to="2"');
+  });
+
+  it("offers adjacent one-space choices while a dice turn has steps left", () => {
+    const next = adjacentPadIds(START_PAD);
+    const html = renderToStaticMarkup(
+      <CandyPath
+        suggestedId="u2"
+        standFrom={1}
+        standTo={1}
+        hopCredits={0}
+        stepsLeft={2}
+        onStart={() => {}}
+        onOpenUnit={() => {}}
+      />,
+    );
+    expect(html).toContain('data-hop-credits="0"');
+    expect(html).toContain('data-dice-invite="0"');
+    expect(html).toContain('data-dice-steps="2"');
     expect(html).toContain('data-hop-board="1"');
     expect(html).toContain('data-hop-pick="1"');
     expect(html).toContain(`data-hop-snap="${HOP_SNAP_PX}"`);
@@ -79,9 +105,19 @@ describe("CandyPath", () => {
 
   it("clears hop targets when credits are gone and still marks the current pad", () => {
     const html = renderToStaticMarkup(
-      <CandyPath suggestedId="u2" standFrom={1} standTo={1} hopCredits={0} onStart={() => {}} onOpenUnit={() => {}} />,
+      <CandyPath
+        suggestedId="u2"
+        standFrom={1}
+        standTo={1}
+        hopCredits={0}
+        stepsLeft={0}
+        onStart={() => {}}
+        onOpenUnit={() => {}}
+      />,
     );
     expect(html).toContain('data-hop-credits="0"');
+    expect(html).toContain('data-dice-invite="0"');
+    expect(html).toContain('data-dice-steps="0"');
     expect(html).toContain('data-hop-board="1"');
     expect(html).toContain('data-hop-pick="0"');
     expect(html).not.toContain('data-pad-choice="1"');
@@ -110,7 +146,8 @@ describe("CandyPath", () => {
         suggestedId="u2"
         standFrom={neighbor}
         standTo={neighbor}
-        hopCredits={1}
+        hopCredits={0}
+        stepsLeft={1}
         onStart={() => {}}
         onOpenUnit={() => {}}
       />,
@@ -140,5 +177,8 @@ describe("CandyPath", () => {
     expect(src).toContain("nearestHopTarget");
     expect(src).toContain("onPointerUp={onBoardPointerUp}");
     expect(src).toContain("board.getBoundingClientRect()");
+    expect(src).toContain("rollDie");
+    expect(src).toContain("startDiceTurn");
+    expect(src).toContain("spendPathStep");
   });
 });

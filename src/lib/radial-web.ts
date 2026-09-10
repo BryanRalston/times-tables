@@ -307,10 +307,37 @@ export function smallLessonsCompleted(activities: Record<string, ActivitySave>):
   return n;
 }
 
+export const DIE_MIN = 1;
+export const DIE_MAX = 3;
+export type DieFace = 1 | 2 | 3;
+export const DICE_TUMBLE_MS = 720;
+
+export function clampDieFace(n: unknown): DieFace {
+  if (typeof n !== "number" || !Number.isFinite(n)) return DIE_MIN;
+  const v = Math.round(n);
+  if (v <= DIE_MIN) return DIE_MIN;
+  if (v >= DIE_MAX) return DIE_MAX;
+  return v as DieFace;
+}
+
+export function clampPathStepsLeft(n: unknown): number {
+  if (typeof n !== "number" || !Number.isFinite(n)) return 0;
+  return Math.min(DIE_MAX, Math.max(0, Math.round(n)));
+}
+
+/** Fair 1–3. Pass a 0–1 sampler in tests. */
+export function rollDieFace(next = Math.random): DieFace {
+  return clampDieFace(DIE_MIN + Math.floor(next() * (DIE_MAX - DIE_MIN + 1)));
+}
+
+export function canStartDiceTurn(rolls: number, stepsLeft: number): boolean {
+  return rolls > 0 && clampPathStepsLeft(stepsLeft) <= 0;
+}
+
 /**
  * Hop-earning first-time Grade 3 plays: named small lessons, plus a unit's
  * first daily walk / completed session. Welcome, Grade 4, and replays do not
- * add extra hops. Guests who only press Lessons → Start still earn a credit.
+ * add extra rolls. Guests who only press Lessons → Start still earn a credit.
  */
 export function hopLessonsCompleted(
   activities: Record<string, ActivitySave>,
@@ -345,6 +372,7 @@ export function hopLessonsCompleted(
   return n;
 }
 
+/** Banked dice rolls. Same earn rules as the old hop-credit ledger. */
 export function hopCreditsOf(
   activities: Record<string, ActivitySave>,
   hopsSpent: number,
@@ -352,6 +380,8 @@ export function hopCreditsOf(
 ): number {
   return Math.max(0, hopLessonsCompleted(activities, sessions) - Math.max(0, Math.round(hopsSpent)));
 }
+
+export const diceRollsOf = hopCreditsOf;
 
 /**
  * #58 treated missing pathHopSpent as "already spent every prior lesson",
@@ -383,4 +413,14 @@ export function migratePathHopSpent(args: {
   if (credits > 0 || completed <= 0) return spent;
   if (hopper <= START_PAD) return 0;
   return Math.min(spent, Math.max(0, completed - 1));
+}
+
+/**
+ * Mid-turn steps are new in v13. Older saves have leftover hop credits that
+ * become leftover rolls; they should not inherit a half-finished turn.
+ */
+export function migratePathStepsLeft(args: { pathStepsLeft: unknown; saveVersion: unknown }): number {
+  const version = typeof args.saveVersion === "number" && Number.isFinite(args.saveVersion) ? args.saveVersion : 0;
+  if (version < 13) return 0;
+  return clampPathStepsLeft(args.pathStepsLeft);
 }

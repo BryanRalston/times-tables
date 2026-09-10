@@ -123,12 +123,13 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-path-travel="0"');
   });
 
-  it("Guest who finished one small lesson stays put and may pick one adjacent hop", () => {
+  it("Guest who finished one small lesson stays put and may roll the die", () => {
     useProgress.setState({
       activities: { "u1-leftover": { plays: 1, best: 4, last: 4, stars: 3, misses: [] } },
       pathHopperAt: 0,
       pathNowSeen: 0,
       pathHopSpent: 0,
+      pathStepsLeft: 0,
     });
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
@@ -136,15 +137,19 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-path-travel="0"');
     expect(html).toContain('data-hop-credits="1"');
     expect(html).toContain('data-hop-credits-ui="1"');
-    expect(html).toContain('data-hop-pick="1"');
-    expect(html).toContain("Pick a space");
-    expect(html).toContain("1 hop");
-    expect(html).toContain('data-pad-choice="1"');
+    expect(html).toContain('data-dice-invite="1"');
+    expect(html).toContain('data-dice-steps="0"');
+    expect(html).toContain('data-hop-pick="0"');
+    expect(html).toContain("Roll the die");
+    expect(html).toContain("Roll");
+    expect(html).toContain('data-dock-roll="1"');
+    expect(html).not.toContain('data-pad-choice="1"');
+    expect(html).not.toContain("Pick a space");
     expect(html).toMatch(/data-path-unit="u2"[^>]*data-path-status="now"/);
     expect(html).toMatch(/data-path-unit="u1"[^>]*data-path-status="open"/);
   });
 
-  it("Guest with completed lessons and a burned hop ledger can still pick a hop", () => {
+  it("Guest with completed lessons and a burned hop ledger can still roll", () => {
     const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
     const activities = { "u1-leftover": leftover, "u1-friends": leftover, "u3-share": leftover };
     useProgress.setState({
@@ -157,18 +162,19 @@ describe("first-visit Home door", () => {
         pathHopperAt: 0,
         saveVersion: 10,
       }),
+      pathStepsLeft: 0,
     });
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
     expect(html).toContain('data-hop-credits="3"');
     expect(html).toContain('data-hop-credits-ui="3"');
-    expect(html).toContain("Pick a space");
-    expect(html).toContain("3 hops");
-    expect(html).toContain('data-pad-choice="1"');
+    expect(html).toContain("Roll the die");
+    expect(html).toContain('data-dice-invite="1"');
+    expect(html).not.toContain('data-pad-choice="1"');
     expect(html).toContain('data-path-travel="0"');
   });
 
-  it("Guest who finished today's walk can pick an adjacent hop", () => {
+  it("Guest who finished today's walk can roll the die", () => {
     useProgress.setState({
       activities: { "daily:u1": { plays: 1, best: 8, last: 8, stars: 3, misses: [] } },
       sessions: {
@@ -186,14 +192,38 @@ describe("first-visit Home door", () => {
       pathHopperAt: 0,
       pathNowSeen: 0,
       pathHopSpent: 0,
+      pathStepsLeft: 0,
       coins: 39,
     });
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
     expect(html).toContain('data-hop-credits="1"');
+    expect(html).toContain('data-dice-invite="1"');
+    expect(html).toContain('data-hop-pick="0"');
+    expect(html).toContain("Roll the die");
+    expect(html).not.toContain('data-pad-choice="1"');
+  });
+
+  it("Guest mid-turn picks each adjacent step until the roll is spent", () => {
+    useProgress.setState({
+      activities: { "u1-leftover": { plays: 1, best: 4, last: 4, stars: 3, misses: [] } },
+      pathHopperAt: 1,
+      pathNowSeen: 1,
+      pathHopSpent: 1,
+      pathStepsLeft: 2,
+    });
+    stubHash("#/lessons");
+    const html = renderToStaticMarkup(<App />);
+    expect(html).toContain('data-hop-credits="0"');
+    expect(html).toContain('data-dice-invite="0"');
+    expect(html).toContain('data-dice-steps="2"');
+    expect(html).toContain('data-dice-steps-ui="2"');
     expect(html).toContain('data-hop-pick="1"');
     expect(html).toContain("Pick a space");
+    expect(html).toContain("2 left");
     expect(html).toContain('data-pad-choice="1"');
+    expect(html).toContain("Start");
+    expect(html).not.toContain("Roll the die");
   });
 
   it("Guest with no hop credits sees Grade 3 Path and no hop targets", () => {
@@ -202,13 +232,16 @@ describe("first-visit Home door", () => {
       pathHopperAt: 2,
       pathNowSeen: 1,
       pathHopSpent: 1,
+      pathStepsLeft: 0,
     });
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
     expect(html).toContain('data-hop-credits="0"');
     expect(html).toContain('data-hop-pick="0"');
+    expect(html).toContain('data-dice-invite="0"');
     expect(html).toContain("Grade 3 Path");
     expect(html).not.toContain("Pick a space");
+    expect(html).not.toContain("Roll the die");
     expect(html).not.toContain('data-pad-choice="1"');
     expect(html).not.toContain('data-pad-quiet="1"');
     expect(html).toContain('data-pad-here="1"');

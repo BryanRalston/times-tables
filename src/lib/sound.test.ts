@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   hopChainGain,
   playCorrect,
+  playDice,
   playHop,
   playLand,
   playPeek,
@@ -23,12 +24,14 @@ describe("optional sounds", () => {
     expect(() => playLand(1, 4)).not.toThrow();
     expect(() => playPeek()).not.toThrow();
     expect(() => playWarp()).not.toThrow();
+    expect(() => playDice()).not.toThrow();
     setSoundMuted(false);
     expect(soundMuted()).toBe(false);
     expect(() => playHop()).not.toThrow();
     expect(() => playLand()).not.toThrow();
     expect(() => playPeek()).not.toThrow();
     expect(() => playWarp()).not.toThrow();
+    expect(() => playDice()).not.toThrow();
   });
 
   it("softens mid-chain hops so long jumps stay quiet", () => {

@@ -11,13 +11,18 @@ import {
   START_PAD,
   adjacentPadIds,
   areAdjacent,
+  canStartDiceTurn,
+  clampDieFace,
+  clampPathStepsLeft,
   hopCreditsOf,
   hopLessonsCompleted,
   migratePathHopSpent,
+  migratePathStepsLeft,
   nearestHopTarget,
   padClientPos,
   portalPartner,
   radialHopStops,
+  rollDieFace,
   smallLessonsCompleted,
 } from "./radial-web";
 
@@ -134,6 +139,27 @@ describe("radial web", () => {
     expect(
       migratePathHopSpent({ activities: done, pathHopSpent: 2, pathHopperAt: 1, saveVersion: 12 }),
     ).toBe(2);
+    expect(
+      migratePathHopSpent({ activities: done, pathHopSpent: 2, pathHopperAt: 1, saveVersion: 13 }),
+    ).toBe(2);
+  });
+
+  it("rolls a 1–3 die and only starts a turn from banked rolls", () => {
+    expect(clampDieFace(0)).toBe(1);
+    expect(clampDieFace(2)).toBe(2);
+    expect(clampDieFace(9)).toBe(3);
+    expect(rollDieFace(() => 0)).toBe(1);
+    expect(rollDieFace(() => 0.34)).toBe(2);
+    expect(rollDieFace(() => 0.99)).toBe(3);
+    expect(canStartDiceTurn(1, 0)).toBe(true);
+    expect(canStartDiceTurn(2, 3)).toBe(false);
+    expect(canStartDiceTurn(0, 0)).toBe(false);
+    expect(clampPathStepsLeft(2)).toBe(2);
+    expect(clampPathStepsLeft(8)).toBe(3);
+    expect(clampPathStepsLeft(-1)).toBe(0);
+    expect(migratePathStepsLeft({ pathStepsLeft: 2, saveVersion: 12 })).toBe(0);
+    expect(migratePathStepsLeft({ pathStepsLeft: 2, saveVersion: 13 })).toBe(2);
+    expect(migratePathStepsLeft({ pathStepsLeft: undefined, saveVersion: 13 })).toBe(0);
   });
 });
 

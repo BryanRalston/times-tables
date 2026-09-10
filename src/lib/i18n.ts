@@ -145,6 +145,9 @@ export type Ui = {
   hopPick: string;
   hopOne: string;
   hopCreditsN: (n: number) => string;
+  rollDie: string;
+  rollInvite: string;
+  stepsLeftN: (n: number) => string;
   zoneMeadow: string;
   zoneCove: string;
   zoneForest: string;
@@ -314,6 +317,9 @@ export const UI: Record<Locale, Ui> = {
     hopPick: "Pick a space",
     hopOne: "Hop one space",
     hopCreditsN: (n) => (n === 1 ? "1 hop" : `${n} hops`),
+    rollDie: "Roll",
+    rollInvite: "Roll the die",
+    stepsLeftN: (n) => (n === 1 ? "1 left" : `${n} left`),
     zoneMeadow: "Ten-Frame Meadow",
     zoneCove: "Coin Cove",
     zoneForest: "Fraction Forest",
@@ -481,6 +487,9 @@ export const UI: Record<Locale, Ui> = {
     hopPick: "Elige un espacio",
     hopOne: "Salta un espacio",
     hopCreditsN: (n) => (n === 1 ? "1 salto" : `${n} saltos`),
+    rollDie: "Tirar",
+    rollInvite: "Tira el dado",
+    stepsLeftN: (n) => (n === 1 ? "1 queda" : `${n} quedan`),
     zoneMeadow: "Prado de decenas",
     zoneCove: "Cala de monedas",
     zoneForest: "Bosque de fracciones",
@@ -648,6 +657,9 @@ export const UI: Record<Locale, Ui> = {
     hopPick: "Escolha um espaço",
     hopOne: "Pule um espaço",
     hopCreditsN: (n) => (n === 1 ? "1 pulo" : `${n} pulos`),
+    rollDie: "Lançar",
+    rollInvite: "Lance o dado",
+    stepsLeftN: (n) => (n === 1 ? "1 restante" : `${n} restantes`),
     zoneMeadow: "Prado das dezenas",
     zoneCove: "Enseada das moedas",
     zoneForest: "Floresta das frações",

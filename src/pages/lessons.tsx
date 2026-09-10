@@ -6,12 +6,12 @@ import { UNITS, suggestedUnitId } from "@/lib/curriculum";
 import { navigate } from "@/lib/nav";
 import { lessonsHopFrom, lessonsHopTo, pathNowUnitId } from "@/lib/path";
 import { useProgress } from "@/lib/progress";
-import { hopCreditsOf } from "@/lib/radial-web";
+import { canStartDiceTurn, hopCreditsOf } from "@/lib/radial-web";
 
 export function LessonsPage() {
   useProgress(
     (s) =>
-      `${s.classUnitId}:${s.pathHopperAt}:${s.pathHopSpent}:${Object.keys(s.sessions).sort().join(",")}:${Object.keys(s.activities).sort().join(",")}`,
+      `${s.classUnitId}:${s.pathHopperAt}:${s.pathHopSpent}:${s.pathStepsLeft}:${Object.keys(s.sessions).sort().join(",")}:${Object.keys(s.activities).sort().join(",")}`,
   );
   const st = useProgress.getState();
   const ui = useUi();
@@ -21,8 +21,15 @@ export function LessonsPage() {
   const pathSuggested = pathNowUnitId(calendarId, st.sessions, st.activities);
   const standFrom = lessonsHopFrom(st.pathHopperAt);
   const standTo = lessonsHopTo(st.pathHopperAt);
-  const credits = hopCreditsOf(st.activities, st.pathHopSpent, st.sessions);
+  const rolls = hopCreditsOf(st.activities, st.pathHopSpent, st.sessions);
+  const steps = st.pathStepsLeft;
+  const inviting = canStartDiceTurn(rolls, steps);
+  const picking = steps > 0;
   const pathRef = useRef<CandyPathHandle>(null);
+
+  let caption = ui.grade3Path;
+  if (picking) caption = `${ui.hopPick} · ${ui.stepsLeftN(steps)}`;
+  else if (inviting) caption = ui.rollInvite;
 
   return (
     <AppScene scene="hills" tabs={<AppTabs active="lessons" />}>
@@ -33,7 +40,8 @@ export function LessonsPage() {
           suggestedId={pathSuggested}
           standFrom={standFrom}
           standTo={standTo}
-          hopCredits={credits}
+          hopCredits={rolls}
+          stepsLeft={steps}
           onStart={() => navigate({ id: "play", kind: "daily" })}
           onOpenUnit={(id) => navigate({ id: "unit", unitId: id })}
         />
@@ -41,16 +49,29 @@ export function LessonsPage() {
       <div className="candy-dock">
         <p
           className="candy-caption"
-          data-hop-pick={credits > 0 ? "1" : "0"}
-          data-hop-credits-ui={String(credits)}
+          data-hop-pick={picking ? "1" : "0"}
+          data-dice-invite={inviting ? "1" : "0"}
+          data-hop-credits-ui={String(rolls)}
+          data-dice-steps-ui={String(steps)}
         >
           <span aria-hidden>★</span>
-          {credits > 0 ? `${ui.hopPick} · ${ui.hopCreditsN(credits)}` : ui.grade3Path}
+          {caption}
           <span aria-hidden>★</span>
         </p>
-        <button type="button" className="candy-dock-start" onClick={() => pathRef.current?.playNow()}>
-          {ui.start}
-        </button>
+        {inviting ? (
+          <button
+            type="button"
+            className="candy-dock-start"
+            data-dock-roll="1"
+            onClick={() => pathRef.current?.rollDie()}
+          >
+            {ui.rollDie}
+          </button>
+        ) : (
+          <button type="button" className="candy-dock-start" data-dock-start="1" onClick={() => pathRef.current?.playNow()}>
+            {ui.start}
+          </button>
+        )}
       </div>
     </AppScene>
   );
