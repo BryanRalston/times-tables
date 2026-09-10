@@ -9,7 +9,10 @@ import { useProgress } from "@/lib/progress";
 import { hopCreditsOf } from "@/lib/radial-web";
 
 export function LessonsPage() {
-  useProgress((s) => `${s.classUnitId}:${s.pathHopperAt}:${s.pathHopSpent}:${Object.keys(s.sessions).length}:${Object.keys(s.activities).length}`);
+  useProgress(
+    (s) =>
+      `${s.classUnitId}:${s.pathHopperAt}:${s.pathHopSpent}:${Object.keys(s.sessions).sort().join(",")}:${Object.keys(s.activities).sort().join(",")}`,
+  );
   const st = useProgress.getState();
   const ui = useUi();
   const date = todayIso();
@@ -18,7 +21,7 @@ export function LessonsPage() {
   const pathSuggested = pathNowUnitId(calendarId, st.sessions, st.activities);
   const standFrom = lessonsHopFrom(st.pathHopperAt);
   const standTo = lessonsHopTo(st.pathHopperAt);
-  const credits = hopCreditsOf(st.activities, st.pathHopSpent);
+  const credits = hopCreditsOf(st.activities, st.pathHopSpent, st.sessions);
   const pathRef = useRef<CandyPathHandle>(null);
 
   return (
@@ -36,9 +39,13 @@ export function LessonsPage() {
         />
       </div>
       <div className="candy-dock">
-        <p className="candy-caption">
+        <p
+          className="candy-caption"
+          data-hop-pick={credits > 0 ? "1" : "0"}
+          data-hop-credits-ui={String(credits)}
+        >
           <span aria-hidden>★</span>
-          {credits > 0 ? ui.hopPick : ui.grade3Path}
+          {credits > 0 ? `${ui.hopPick} · ${ui.hopCreditsN(credits)}` : ui.grade3Path}
           <span aria-hidden>★</span>
         </p>
         <button type="button" className="candy-dock-start" onClick={() => pathRef.current?.playNow()}>

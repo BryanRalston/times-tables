@@ -135,7 +135,10 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-path-hop-from="1"');
     expect(html).toContain('data-path-travel="0"');
     expect(html).toContain('data-hop-credits="1"');
+    expect(html).toContain('data-hop-credits-ui="1"');
+    expect(html).toContain('data-hop-pick="1"');
     expect(html).toContain("Pick a space");
+    expect(html).toContain("1 hop");
     expect(html).toContain('data-pad-choice="1"');
     expect(html).toMatch(/data-path-unit="u2"[^>]*data-path-status="now"/);
     expect(html).toMatch(/data-path-unit="u1"[^>]*data-path-status="open"/);
@@ -158,9 +161,39 @@ describe("first-visit Home door", () => {
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
     expect(html).toContain('data-hop-credits="3"');
+    expect(html).toContain('data-hop-credits-ui="3"');
     expect(html).toContain("Pick a space");
+    expect(html).toContain("3 hops");
     expect(html).toContain('data-pad-choice="1"');
     expect(html).toContain('data-path-travel="0"');
+  });
+
+  it("Guest who finished today's walk can pick an adjacent hop", () => {
+    useProgress.setState({
+      activities: { "daily:u1": { plays: 1, best: 8, last: 8, stars: 3, misses: [] } },
+      sessions: {
+        "2026-09-10": {
+          date: "2026-09-10",
+          unitId: "u1",
+          schoolDay: 1,
+          correct: 8,
+          total: 8,
+          fresh: 8,
+          review: 0,
+          completed: true,
+        },
+      },
+      pathHopperAt: 0,
+      pathNowSeen: 0,
+      pathHopSpent: 0,
+      coins: 39,
+    });
+    stubHash("#/lessons");
+    const html = renderToStaticMarkup(<App />);
+    expect(html).toContain('data-hop-credits="1"');
+    expect(html).toContain('data-hop-pick="1"');
+    expect(html).toContain("Pick a space");
+    expect(html).toContain('data-pad-choice="1"');
   });
 
   it("Guest returning from an earlier replay stays on that pad", () => {

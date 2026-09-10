@@ -207,7 +207,21 @@ describe("progress persist", () => {
     await hydrateProgress();
     const s = useProgress.getState();
     expect(s.pathHopSpent).toBe(0);
-    expect(hopCreditsOf(s.activities, s.pathHopSpent)).toBe(2);
+    expect(hopCreditsOf(s.activities, s.pathHopSpent, s.sessions)).toBe(2);
+  });
+
+  it("restores hop credits when a v11 Guest ledger is still burned", async () => {
+    const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
+    const prior = seedKid({
+      activities: { "u1-leftover": leftover, "u3-share": leftover },
+      pathHopperAt: 0,
+      pathHopSpent: 2,
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: { ...prior, version: 11 }, version: 0 }));
+    await hydrateProgress();
+    const s = useProgress.getState();
+    expect(s.pathHopSpent).toBe(0);
+    expect(hopCreditsOf(s.activities, s.pathHopSpent, s.sessions)).toBe(2);
   });
 
   it("keeps hops already taken on a current save", async () => {
@@ -217,11 +231,88 @@ describe("progress persist", () => {
       pathHopperAt: 4,
       pathHopSpent: 1,
     });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: { ...prior, version: 11 }, version: 0 }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: { ...prior, version: 12 }, version: 0 }));
     await hydrateProgress();
     const s = useProgress.getState();
     expect(s.pathHopSpent).toBe(1);
-    expect(hopCreditsOf(s.activities, s.pathHopSpent)).toBe(1);
+    expect(hopCreditsOf(s.activities, s.pathHopSpent, s.sessions)).toBe(1);
+  });
+
+  it("counts a Guest daily walk as a hop-earning lesson", async () => {
+    const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        state: seedKid({
+          activities: { "daily:u1": leftover },
+          sessions: {
+            "2026-09-10": {
+              date: "2026-09-10",
+              unitId: "u1",
+              schoolDay: 1,
+              correct: 8,
+              total: 8,
+              fresh: 8,
+              review: 0,
+              completed: true,
+            },
+          },
+          coins: 39,
+          pathHopperAt: 0,
+          pathHopSpent: 0,
+        }),
+        version: 0,
+      }),
+    );
+    await hydrateProgress();
+    const s = useProgress.getState();
+    expect(hopCreditsOf(s.activities, s.pathHopSpent, s.sessions)).toBe(1);
+  });
+
+  it("merges flat Guest lesson progress onto an empty learner slice", async () => {
+    const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
+    const kid = {
+      name: "",
+      stars: 0,
+      seenWelcome: true,
+      activities: {},
+      badges: [],
+      shaky: {},
+      sessions: {},
+      squishees: [],
+      coins: 39,
+      attempts: {},
+      perfectWalks: 0,
+      pathHopperAt: 0,
+      pathHopSpent: 0,
+    };
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        state: {
+          version: 11,
+          learnerId: "kid-1",
+          classUnitId: "",
+          pathGrade: 3,
+          skipWeekend: true,
+          locale: "en",
+          ...kid,
+          coins: 39,
+          activities: { "u1-leftover": leftover, "u3-share": leftover },
+          pathHopperAt: 0,
+          pathHopSpent: 2,
+          learners: { "kid-1": kid },
+        },
+        version: 0,
+      }),
+    );
+    await hydrateProgress();
+    const s = useProgress.getState();
+    expect(s.activities["u1-leftover"]?.plays).toBe(1);
+    expect(s.activities["u3-share"]?.plays).toBe(1);
+    expect(s.coins).toBe(39);
+    expect(s.pathHopSpent).toBe(0);
+    expect(hopCreditsOf(s.activities, s.pathHopSpent, s.sessions)).toBe(2);
   });
 
   it("does not call resetAll from main boot", () => {

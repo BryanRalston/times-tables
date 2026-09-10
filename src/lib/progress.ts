@@ -23,10 +23,10 @@ import {
   shakyFromFacts,
 } from "./practice";
 import { schoolStreak } from "./streak";
-import type { DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
+import type { ActivitySave, DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
 import { parsePathGrade } from "./types";
 
-const SAVE_VERSION = 11;
+const SAVE_VERSION = 12;
 export const STORAGE_KEY = "g3-path-v2";
 export const LEGACY_STORAGE_KEYS = ["g3-path-v1", "times-tables-progress", "times-tables-settings"] as const;
 const DEFAULT_ID = "kid-1";
@@ -140,12 +140,47 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
   };
 }
 
+function mergeActivitySaves(
+  a: Record<string, ActivitySave> = {},
+  b: Record<string, ActivitySave> = {},
+): Record<string, ActivitySave> {
+  const out: Record<string, ActivitySave> = { ...a };
+  for (const [id, y] of Object.entries(b)) {
+    const x = out[id];
+    if (!x) {
+      out[id] = y;
+      continue;
+    }
+    out[id] = {
+      plays: Math.max(x.plays ?? 0, y.plays ?? 0),
+      best: Math.max(x.best ?? 0, y.best ?? 0),
+      last: y.last ?? x.last,
+      stars: Math.max(x.stars ?? 0, y.stars ?? 0),
+      misses: y.misses?.length ? y.misses : (x.misses ?? []),
+    };
+  }
+  return out;
+}
+
+function mergeSessions(
+  a: Record<string, DaySession> = {},
+  b: Record<string, DaySession> = {},
+): Record<string, DaySession> {
+  const out: Record<string, DaySession> = { ...a };
+  for (const [date, y] of Object.entries(b)) {
+    const x = out[date];
+    out[date] = x?.completed && !y.completed ? x : y;
+  }
+  return out;
+}
+
 function sliceOfWithHopHeal(s: LearnerSlice, saveVersion: number): LearnerSlice {
   const next = sliceOf(s);
   return {
     ...next,
     pathHopSpent: migratePathHopSpent({
       activities: next.activities,
+      sessions: next.sessions,
       pathHopSpent: s.pathHopSpent,
       pathHopperAt: next.pathHopperAt,
       saveVersion,
@@ -197,7 +232,21 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
     saveVersion,
   );
   const learners = { ...(raw.learners ?? {}) };
-  if (!learners[learnerId]) learners[learnerId] = fromFlat;
+  if (!learners[learnerId]) {
+    learners[learnerId] = fromFlat;
+  } else {
+    const kid = learners[learnerId]!;
+    learners[learnerId] = {
+      ...kid,
+      name: kid.name?.trim() ? kid.name : fromFlat.name,
+      activities: mergeActivitySaves(fromFlat.activities, kid.activities),
+      sessions: mergeSessions(fromFlat.sessions, kid.sessions),
+      coins: Math.max(fromFlat.coins, typeof kid.coins === "number" ? kid.coins : 0),
+      stars: Math.max(fromFlat.stars, typeof kid.stars === "number" ? kid.stars : 0),
+      pathHopperAt: kid.pathHopperAt || fromFlat.pathHopperAt,
+      pathHopSpent: kid.pathHopSpent ?? fromFlat.pathHopSpent,
+    };
+  }
   for (const id of Object.keys(learners)) learners[id] = sliceOfWithHopHeal(learners[id]!, saveVersion);
   const cur = learners[learnerId] ?? fromFlat;
   const pathGrade = parsePathGrade(raw.pathGrade);
