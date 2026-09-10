@@ -8,9 +8,9 @@ export type PathHopSfx = "hop" | "land";
 export type WarpPhase = "out" | "flash" | "in";
 
 /** Fade off the entry pad, flash both gates, fade onto the exit pad. */
-export const WARP_OUT_MS = 220;
-export const WARP_FLASH_MS = 200;
-export const WARP_IN_MS = 260;
+export const WARP_OUT_MS = 240;
+export const WARP_FLASH_MS = 300;
+export const WARP_IN_MS = 280;
 export const WARP_MS = WARP_OUT_MS + WARP_FLASH_MS + WARP_IN_MS;
 
 export type HopPose = {
@@ -41,7 +41,7 @@ export const OBSTACLE_HOP_FROM = 4;
 export const OBSTACLE_HOP_TO = 5;
 
 /** Squash and settle on a pad, including after the last hop. */
-export const LAND_MS = 160;
+export const LAND_MS = 240;
 
 const REST_SHADOW_SCALE = 1;
 const REST_SHADOW_OPACITY = 0.14;
@@ -147,26 +147,30 @@ export function hopSquash(t: number): { x: number; y: number } {
     const s = 1 - x / 0.13;
     return { x: 1 + 0.15 * s, y: 1 - 0.13 * s };
   }
-  if (x > 0.87) {
-    const s = (x - 0.87) / 0.13;
-    return { x: 1 + 0.17 * s, y: 1 - 0.15 * s };
+  if (x > 0.84) {
+    const s = (x - 0.84) / 0.16;
+    return { x: 1 + 0.24 * s, y: 1 - 0.22 * s };
   }
   const lift = Math.sin(Math.PI * x);
   return { x: 1 - 0.05 * lift, y: 1 + 0.08 * lift };
 }
 
-/** Impact squash, then ease back to rest on the same pad. */
+/** Impact squash, then a short pop back to rest on the same pad. */
 export function hopLandSquash(t: number): { x: number; y: number } {
   const u = clamp01(t);
   const land = hopSquash(1);
-  if (u < 0.38) {
-    const s = easeHopTravel(u / 0.38);
-    return { x: land.x + 0.07 * s, y: land.y - 0.06 * s };
+  if (u < 0.34) {
+    const s = easeHopTravel(u / 0.34);
+    return { x: land.x + 0.14 * s, y: land.y - 0.12 * s };
   }
-  const s = 1 - (1 - (u - 0.38) / 0.62) ** 2;
-  const peakX = land.x + 0.07;
-  const peakY = land.y - 0.06;
-  return { x: peakX + (1 - peakX) * s, y: peakY + (1 - peakY) * s };
+  if (u < 0.62) {
+    const s = easeHopTravel((u - 0.34) / 0.28);
+    const peakX = land.x + 0.14;
+    const peakY = land.y - 0.12;
+    return { x: peakX + (0.92 - peakX) * s, y: peakY + (1.1 - peakY) * s };
+  }
+  const s = 1 - (1 - (u - 0.62) / 0.38) ** 2;
+  return { x: 0.92 + 0.08 * s, y: 1.1 - 0.1 * s };
 }
 
 export function hopLiftPercent(from: PathNodePos, to: PathNodePos, clearObstacle = false): number {
@@ -236,13 +240,16 @@ export function warpProgressAt(elapsed: number): {
   return { t, phase: "in", done: false, opacity: easeHopTravel(t) };
 }
 
-export function warpPose(from: PathNodePos, to: PathNodePos, phase: WarpPhase): HopPose {
+export function warpPose(from: PathNodePos, to: PathNodePos, phase: WarpPhase, t = 1): HopPose {
   switch (phase) {
-    case "out":
-      return restHopPose(from);
+    case "out": {
+      const shrink = 1 - 0.2 * easeHopTravel(t);
+      return { ...restHopPose(from), squashX: shrink, squashY: shrink };
+    }
     case "flash":
-    case "in":
       return restHopPose(to);
+    case "in":
+      return hopLandSettle(to, t);
     default: {
       const _never: never = phase;
       return _never;

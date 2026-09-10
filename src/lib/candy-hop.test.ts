@@ -86,6 +86,8 @@ describe("candy hop", () => {
     expect(apex.x).toBeLessThan(1);
     expect(land.x).toBeGreaterThan(1);
     expect(land.y).toBeLessThan(1);
+    expect(land.x).toBeGreaterThan(takeoff.x);
+    expect(land.y).toBeLessThan(takeoff.y);
   });
 
   it("settles on the landing pad without sliding", () => {
@@ -105,6 +107,8 @@ describe("candy hop", () => {
     expect(rest.squashY).toBeCloseTo(1, 5);
     expect(hopLandSquash(0).x).toBeCloseTo(hopSquash(1).x, 5);
     expect(hopLandSquash(1)).toEqual({ x: 1, y: 1 });
+    expect(hopLandSquash(0.2).y).toBeLessThan(hopLandSquash(0).y);
+    expect(hopLandSquash(0.5).y).toBeGreaterThan(hopLandSquash(0.2).y);
   });
 
   it("reports hop index, land phase, and done across a two-hop trip", () => {
@@ -186,5 +190,7 @@ describe("candy hop", () => {
     expect(warpPose(a, b, "out").x).toBe(a.x);
     expect(warpPose(a, b, "flash").x).toBe(b.x);
     expect(warpPose(a, b, "in").x).toBe(b.x);
+    expect(warpPose(a, b, "out", 1).squashX).toBeLessThan(1);
+    expect(warpPose(a, b, "in", 0).squashX).toBeGreaterThan(1);
   });
 });

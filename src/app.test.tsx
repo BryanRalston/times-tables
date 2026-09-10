@@ -196,6 +196,25 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-pad-choice="1"');
   });
 
+  it("Guest with no hop credits sees Grade 3 Path and no hop targets", () => {
+    useProgress.setState({
+      activities: { "u1-leftover": { plays: 1, best: 4, last: 4, stars: 3, misses: [] } },
+      pathHopperAt: 2,
+      pathNowSeen: 1,
+      pathHopSpent: 1,
+    });
+    stubHash("#/lessons");
+    const html = renderToStaticMarkup(<App />);
+    expect(html).toContain('data-hop-credits="0"');
+    expect(html).toContain('data-hop-pick="0"');
+    expect(html).toContain("Grade 3 Path");
+    expect(html).not.toContain("Pick a space");
+    expect(html).not.toContain('data-pad-choice="1"');
+    expect(html).not.toContain('data-pad-quiet="1"');
+    expect(html).toContain('data-pad-here="1"');
+    expect(html).toContain("Start");
+  });
+
   it("Guest returning from an earlier replay stays on that pad", () => {
     useProgress.setState({
       classUnitId: "u8",
@@ -341,6 +360,13 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-fog");
     expect(css).toContain(".candy-fog-mist");
     expect(css).toContain("box-shadow: 0 0 16px 7px rgb(60 210 255 / 0.38)");
+    expect(css).toContain(".candy-node-quiet");
+    expect(css).toContain(".candy-node-here");
+    expect(css).toContain(".candy-hopper-here");
+    expect(css).toContain("@keyframes candy-choice-pulse");
+    expect(css).toContain("@keyframes candy-portal-swirl");
+    expect(css).toContain("@keyframes candy-here-pulse");
+    expect(css).toContain("@keyframes candy-warp-ring");
     expect(css).toContain("aspect-ratio: 16 / 9");
     expect(css).toContain("width: max(100%, 68rem)");
     expect(css).toContain("object-fit: cover");

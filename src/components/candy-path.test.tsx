@@ -60,7 +60,24 @@ describe("CandyPath", () => {
     expect(html).toContain('data-path-travel="0"');
     expect(html).toContain('data-hop-credits="1"');
     expect((html.match(/data-pad-choice="1"/g) ?? []).length).toBe(next.length);
+    expect((html.match(/data-pad-quiet="1"/g) ?? []).length).toBe(RADIAL_PAD_COUNT - next.length - 1);
+    expect((html.match(/data-pad-here="1"/g) ?? []).length).toBe(1);
+    expect(html).toContain("candy-hopper-here");
+    expect(html).toContain("candy-node-quiet");
+    expect(html).not.toContain('data-pad-enterable="1"');
     expect(html).not.toContain('data-path-hop-to="2"');
+  });
+
+  it("clears hop targets when credits are gone and still marks the current pad", () => {
+    const html = renderToStaticMarkup(
+      <CandyPath suggestedId="u2" standFrom={1} standTo={1} hopCredits={0} onStart={() => {}} onOpenUnit={() => {}} />,
+    );
+    expect(html).toContain('data-hop-credits="0"');
+    expect(html).not.toContain('data-pad-choice="1"');
+    expect(html).not.toContain('data-pad-quiet="1"');
+    expect(html).not.toContain('data-pad-enterable="1"');
+    expect((html.match(/data-pad-here="1"/g) ?? []).length).toBe(1);
+    expect(html).toContain("candy-hopper-here");
   });
 
   it("stays on a replayed pad instead of auto-hopping to the frontier", () => {
@@ -90,6 +107,8 @@ describe("CandyPath", () => {
     expect(html).toContain('data-pad-enterable="1"');
     expect(html).toContain("candy-node-enterable");
     expect(html).toContain(`data-pad-id="${portal.id}"`);
+    expect((html.match(/data-pad-enterable="1"/g) ?? []).length).toBe(1);
+    expect(html).toContain("candy-node-quiet");
     expect(html).not.toContain("data-portal-pair");
     expect(html).not.toContain("data-portal-to");
     expect(html).toContain('data-path-warp="0"');
