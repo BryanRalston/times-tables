@@ -235,7 +235,56 @@ describe("progress persist", () => {
     await hydrateProgress();
     const s = useProgress.getState();
     expect(s.pathHopSpent).toBe(1);
+    expect(s.pathStepsLeft).toBe(0);
     expect(hopCreditsOf(s.activities, s.pathHopSpent, s.sessions)).toBe(1);
+  });
+
+  it("keeps a mid-turn dice step count on a v13 save", async () => {
+    const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
+    const prior = seedKid({
+      activities: { "u1-leftover": leftover, "u3-share": leftover },
+      pathHopperAt: 4,
+      pathHopSpent: 1,
+      pathStepsLeft: 2,
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: { ...prior, version: 13 }, version: 0 }));
+    await hydrateProgress();
+    const s = useProgress.getState();
+    expect(s.pathHopSpent).toBe(1);
+    expect(s.pathStepsLeft).toBe(2);
+    expect(hopCreditsOf(s.activities, s.pathHopSpent, s.sessions)).toBe(1);
+  });
+
+  it("starts a dice turn from one banked roll and spends steps one pad at a time", () => {
+    const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
+    const activities = { "u1-leftover": leftover, "u1-friends": leftover };
+    useProgress.setState((s) => {
+      const id = s.learnerId;
+      const kid = { ...(s.learners[id] ?? s), activities, pathHopSpent: 0, pathStepsLeft: 0 };
+      return {
+        activities,
+        pathHopSpent: 0,
+        pathStepsLeft: 0,
+        learners: { ...s.learners, [id]: kid },
+      };
+    });
+    expect(hopCreditsOf(useProgress.getState().activities, 0)).toBe(2);
+    expect(useProgress.getState().startDiceTurn(3)).toBe(true);
+    expect(useProgress.getState().pathHopSpent).toBe(1);
+    expect(useProgress.getState().pathStepsLeft).toBe(3);
+    expect(hopCreditsOf(useProgress.getState().activities, useProgress.getState().pathHopSpent)).toBe(1);
+    expect(useProgress.getState().startDiceTurn(1)).toBe(false);
+    expect(useProgress.getState().pathHopSpent).toBe(1);
+    useProgress.getState().spendPathStep();
+    expect(useProgress.getState().pathStepsLeft).toBe(2);
+    useProgress.getState().spendPathStep();
+    useProgress.getState().spendPathStep();
+    expect(useProgress.getState().pathStepsLeft).toBe(0);
+    expect(useProgress.getState().startDiceTurn(2)).toBe(true);
+    expect(useProgress.getState().pathHopSpent).toBe(2);
+    expect(useProgress.getState().pathStepsLeft).toBe(2);
+    expect(hopCreditsOf(useProgress.getState().activities, useProgress.getState().pathHopSpent)).toBe(0);
+    expect(useProgress.getState().startDiceTurn(1)).toBe(false);
   });
 
   it("counts a Guest daily walk as a hop-earning lesson", async () => {

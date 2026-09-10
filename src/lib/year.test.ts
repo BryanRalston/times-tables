@@ -428,6 +428,11 @@ describe("locale", () => {
     expect(UI.en.grownupBlurb).toMatch(/Grade 4/);
     expect(UI.en.grownupBlurb).toMatch(/Nothing leaves/i);
     expect(UI.en.grade3Path).toBe("Grade 3 Path");
+    expect(UI.en.rollDie).toBe("Roll");
+    expect(UI.en.rollInvite).toBe("Roll the die");
+    expect(UI.en.stepsLeftN(2)).toBe("2 left");
+    expect(UI.es.rollInvite).toBe("Tira el dado");
+    expect(UI["pt-BR"].rollInvite).toBe("Lance o dado");
     expect(UI.es.zoneMeadow).toBe("Prado de decenas");
     expect(UI["pt-BR"].zoneForest).toBe("Floresta das frações");
     expect(UI.en.pathGrade4).toBe("Advanced (Grade 4) — preview");
