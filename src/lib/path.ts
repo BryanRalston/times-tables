@@ -56,6 +56,23 @@ export function pathNowUnitId(
   return UNITS[now - 1]?.id ?? suggestedId;
 }
 
+/**
+ * Unit for Home / Lessons Start. Class-is-on wins. Same-day replay keeps
+ * today's completed walk so pathNow advancing cannot mint a new daily key.
+ */
+export function dailyStartUnitId(
+  classUnitId: string | undefined,
+  calendarId: string,
+  sessions: Record<string, DaySession>,
+  activities: Record<string, ActivitySave>,
+  date: string,
+): string {
+  if (classUnitId) return classUnitId;
+  const today = sessions[date];
+  if (today?.unitId && !today.unitId.startsWith("g4-")) return today.unitId;
+  return pathNowUnitId(calendarId, sessions, activities);
+}
+
 /** Pad the hopper should leave from when Lessons mounts. Never the calendar frontier. */
 export function lessonsHopFrom(hopperAt: number, _nowNumber?: number, _cleared?: number): number {
   if (hopperAt > 0) return clampPad(hopperAt);

@@ -334,41 +334,53 @@ export function canStartDiceTurn(rolls: number, stepsLeft: number): boolean {
   return rolls > 0 && clampPathStepsLeft(stepsLeft) <= 0;
 }
 
+/** Guest-local calendar day. Same-day Start replay must reuse this key. */
+export function dailyWalkActivityId(date: string): string {
+  return `daily:${date}`;
+}
+
+function isGrade3DailyWalkId(id: string): boolean {
+  if (!id.startsWith("daily:")) return false;
+  const rest = id.slice("daily:".length);
+  return Boolean(rest) && !rest.startsWith("g4-");
+}
+
+function hasGrade3DailyWalk(
+  activities: Record<string, ActivitySave>,
+  sessions?: Record<string, DaySession>,
+): boolean {
+  for (const [id, save] of Object.entries(activities)) {
+    if (save.plays && isGrade3DailyWalkId(id)) return true;
+  }
+  if (!sessions) return false;
+  for (const session of Object.values(sessions)) {
+    if (!session.completed) continue;
+    const unitId = session.unitId;
+    if (!unitId || unitId.startsWith("g4-")) continue;
+    return true;
+  }
+  return false;
+}
+
 /**
- * Hop-earning first-time Grade 3 plays: named small lessons, plus a unit's
- * first daily walk / completed session. Welcome, Grade 4, and replays do not
- * add extra rolls. Guests who only press Lessons → Start still earn a credit.
+ * Hop-earning first-time Grade 3 plays: each unique named small lesson, plus
+ * the first daily walk (any Start / completed session). The daily earn key is
+ * the Guest-local calendar day (`daily:YYYY-MM-DD`), not the unit. Welcome,
+ * Grade 4, same-day Start replay, and a later unit from pathNow advancing do
+ * not add extra rolls. Guests who only press Lessons → Start still earn one.
  */
 export function hopLessonsCompleted(
   activities: Record<string, ActivitySave>,
   sessions?: Record<string, DaySession>,
 ): number {
   let n = 0;
-  const dailyUnits = new Set<string>();
   for (const [id, save] of Object.entries(activities)) {
     if (!save.plays) continue;
-    if (id === "welcome" || id.startsWith("g4-")) continue;
-    if (id.startsWith("daily:")) {
-      const unitId = id.slice("daily:".length);
-      if (!unitId || unitId.startsWith("g4-")) continue;
-      dailyUnits.add(unitId);
-      n += 1;
-      continue;
-    }
+    if (id === "welcome" || id.startsWith("g4-") || isGrade3DailyWalkId(id)) continue;
     if (!activityById(id)) continue;
     n += 1;
   }
-  if (sessions) {
-    const extra = new Set<string>();
-    for (const session of Object.values(sessions)) {
-      if (!session.completed) continue;
-      const unitId = session.unitId;
-      if (!unitId || unitId.startsWith("g4-")) continue;
-      if (dailyUnits.has(unitId)) continue;
-      extra.add(unitId);
-    }
-    n += extra.size;
-  }
+  if (hasGrade3DailyWalk(activities, sessions)) n += 1;
   return n;
 }
 

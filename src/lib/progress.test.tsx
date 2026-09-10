@@ -13,7 +13,7 @@ import {
   unwrapSave,
   useProgress,
 } from "./progress";
-import { hopCreditsOf } from "./radial-web";
+import { dailyWalkActivityId, hopCreditsOf } from "./radial-web";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -316,6 +316,45 @@ describe("progress persist", () => {
     await hydrateProgress();
     const s = useProgress.getState();
     expect(hopCreditsOf(s.activities, s.pathHopSpent, s.sessions)).toBe(1);
+  });
+
+  it("does not bank a second roll on same-day daily walk replay after the unit advances", () => {
+    const date = "2026-09-10";
+    const key = dailyWalkActivityId(date);
+    const finish = (activityId: string, unitId: string) => {
+      useProgress.getState().recordRound({
+        activityId,
+        correct: 14,
+        total: 15,
+        earned: 14,
+        misses: ["7×8"],
+      });
+      useProgress.getState().recordSession({
+        date,
+        unitId,
+        schoolDay: 1,
+        correct: 14,
+        total: 15,
+        fresh: 8,
+        review: 4,
+        completed: true,
+      });
+    };
+    finish(key, "u12");
+    expect(hopCreditsOf(useProgress.getState().activities, 0, useProgress.getState().sessions)).toBe(1);
+    finish(key, "u12");
+    expect(useProgress.getState().activities[key]?.plays).toBe(2);
+    expect(hopCreditsOf(useProgress.getState().activities, 0, useProgress.getState().sessions)).toBe(1);
+    finish("daily:u13", "u13");
+    expect(hopCreditsOf(useProgress.getState().activities, 0, useProgress.getState().sessions)).toBe(1);
+    useProgress.getState().recordRound({
+      activityId: "u1-leftover",
+      correct: 4,
+      total: 4,
+      earned: 6,
+      misses: [],
+    });
+    expect(hopCreditsOf(useProgress.getState().activities, 0, useProgress.getState().sessions)).toBe(2);
   });
 
   it("merges flat Guest lesson progress onto an empty learner slice", async () => {

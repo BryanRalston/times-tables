@@ -3,7 +3,7 @@ import { SCHOOL_DAYS, isSchoolDay, prevSchoolDay, weekdayName } from "./calendar
 import { GRADE3_SOLS, UNITS, WELCOME_ACTIVITY, activityById, coversSol, fluencyFactorsForUnit, suggestedUnitId, unitById } from "./curriculum";
 import { makeDailyWalk } from "./daily";
 import { doorRoute, parseHash } from "./nav";
-import { farthestClearedUnitNumber, isUnitOpen, lessonsHopFrom, lessonsHopTo, pathNowUnitId, unitStatus } from "./path";
+import { dailyStartUnitId, farthestClearedUnitNumber, isUnitOpen, lessonsHopFrom, lessonsHopTo, pathNowUnitId, unitStatus } from "./path";
 import { qCopy, UI } from "./i18n";
 import { makeActivityRound, makeQuestion, makeWelcomeRound, placeOnGraph, untieExtreme, welcomeFirst, wordForm } from "./questions";
 import type { GraphData, MeasureData, MoneyData, PlaceValueData } from "./types";
@@ -531,6 +531,18 @@ describe("path", () => {
     expect(pathNowUnitId("u1", {}, {})).toBe("u1");
     expect(pathNowUnitId("u1", {}, { "u1-leftover": leftover })).toBe("u2");
     expect(pathNowUnitId("u5", {}, { "u1-leftover": leftover })).toBe("u5");
+    expect(pathNowUnitId("u12", { "2026-09-10": { date: "2026-09-10", unitId: "u12", schoolDay: 1, correct: 8, total: 8, fresh: 8, review: 0, completed: true } }, {})).toBe("u13");
+    expect(
+      dailyStartUnitId(
+        undefined,
+        "u12",
+        { "2026-09-10": { date: "2026-09-10", unitId: "u12", schoolDay: 1, correct: 8, total: 8, fresh: 8, review: 0, completed: true } },
+        {},
+        "2026-09-10",
+      ),
+    ).toBe("u12");
+    expect(dailyStartUnitId(undefined, "u1", {}, {}, "2026-09-10")).toBe("u1");
+    expect(dailyStartUnitId("u5", "u1", {}, {}, "2026-09-10")).toBe("u5");
     expect(lessonsHopFrom(0, 1, 0)).toBe(1);
     expect(lessonsHopFrom(0, 2, 1)).toBe(1);
     expect(lessonsHopFrom(1, 2, 1)).toBe(1);
