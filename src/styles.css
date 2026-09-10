@@ -939,7 +939,7 @@ details > summary::-webkit-details-marker {
 /* Taller card on the phone shell: crop white letterbox, keep the locked
    16:9 camera. Art + overlay share .candy-world-stage so pad % stay on-art. */
 .candy-map[data-radial-web="1"] .candy-world {
-  aspect-ratio: 15 / 16;
+  aspect-ratio: 10 / 9;
 }
 .candy-world-stage {
   position: absolute;

@@ -161,7 +161,7 @@ describe("radial hop hit testing", () => {
     expect(PHONE_MAP_BOARD.width).toBeGreaterThan(368);
     expect(PHONE_MAP_BOARD.height).toBeGreaterThan(207);
     expect(HOP_SNAP_PX).toBe(36);
-    expect(gap).toBeGreaterThan(32);
+    expect(gap).toBeGreaterThan(28);
     expect(gap).toBeLessThan(48);
     expect(gap).toBeLessThan(HOP_SNAP_PX * 2);
   });

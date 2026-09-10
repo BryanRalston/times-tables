@@ -338,7 +338,7 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-world-stage");
     expect(css).toContain(".candy-world-art");
     expect(css).toContain(".candy-overlay");
-    expect(css).toContain("aspect-ratio: 15 / 16");
+    expect(css).toContain("aspect-ratio: 10 / 9");
     expect(css).toContain('.candy-overlay[data-hop-pick="1"]');
     expect(css).toContain(".candy-prop-land");
     expect(css).toContain(".candy-prop-water");
