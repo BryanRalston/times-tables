@@ -154,13 +154,15 @@ describe("radial hop hit testing", () => {
     return { x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t };
   }
 
-  it("keeps plaza neighbors closer than a 44px box on a 390 phone", () => {
+  it("enlarges the 390 phone board so plaza pads have a comfortable gap", () => {
     const pa = padClientPos(a, board);
     const pb = padClientPos(b, board);
     const gap = Math.hypot(pb.x - pa.x, pb.y - pa.y);
-    expect(HOP_SNAP_PX).toBe(24);
-    expect(gap).toBeGreaterThan(18);
-    expect(gap).toBeLessThan(24);
+    expect(PHONE_MAP_BOARD.width).toBeGreaterThan(368);
+    expect(PHONE_MAP_BOARD.height).toBeGreaterThan(207);
+    expect(HOP_SNAP_PX).toBe(36);
+    expect(gap).toBeGreaterThan(32);
+    expect(gap).toBeLessThan(48);
     expect(gap).toBeLessThan(HOP_SNAP_PX * 2);
   });
 

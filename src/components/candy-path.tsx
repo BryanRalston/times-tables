@@ -276,6 +276,7 @@ export const CandyPath = forwardRef<
       data-hop-credits={String(credits)}
     >
       <div className="candy-world">
+        <div className="candy-world-stage" data-radial-stage="1">
         <img
           className="candy-world-art"
           src={asset(RADIAL_MAP_FILE)}
@@ -376,6 +377,7 @@ export const CandyPath = forwardRef<
           data-path-clear-obstacle="0"
         >
           <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
+        </div>
         </div>
         </div>
       </div>
