@@ -1121,23 +1121,21 @@ details > summary::-webkit-details-marker {
   filter: saturate(0.2) brightness(0.78);
   box-shadow: none;
 }
-.candy-node-radial.candy-node-portal.candy-node-quiet {
-  width: 2.2rem;
-}
 .candy-node-radial.candy-node-portal.candy-node-quiet .candy-node-disc {
-  width: 1.7rem;
-  height: 1.7rem;
+  width: 1.35rem;
+  height: 1.35rem;
   background: rgb(42 32 52 / 0.46);
   opacity: 0.5;
   filter: saturate(0.12) brightness(0.7);
 }
+/* Keep the 1.7rem hit box. Inner-ring neighbors sit ~21px apart on a 390px
+   phone; a 44px target steals the next pad's tap. Glow is the read. */
 .candy-node-radial.candy-node-choice {
   z-index: 7;
-  width: 2.75rem;
 }
 .candy-node-radial.candy-node-choice .candy-node-disc {
-  width: 1.28rem;
-  height: 1.28rem;
+  width: 1.2rem;
+  height: 1.2rem;
   background: rgb(255 252 246 / 0.42);
   box-shadow:
     0 0 0 2px rgb(255 255 255 / 0.94),
@@ -1154,11 +1152,10 @@ details > summary::-webkit-details-marker {
 }
 .candy-node-radial.candy-node-enterable {
   z-index: 8;
-  width: 2.9rem;
 }
 .candy-node-radial.candy-node-enterable .candy-node-disc {
-  width: 1.42rem;
-  height: 1.42rem;
+  width: 1.32rem;
+  height: 1.32rem;
   background: rgb(255 236 210 / 0.5);
   box-shadow:
     0 0 0 3px rgb(255 248 238 / 0.96),
@@ -1168,12 +1165,13 @@ details > summary::-webkit-details-marker {
 }
 .candy-node-radial.candy-node-enterable .candy-node-disc::after {
   content: "";
-  width: 1.85rem;
-  height: 1.85rem;
+  width: 1.7rem;
+  height: 1.7rem;
   border-radius: inherit;
   border: 2px solid rgb(255 220 160 / 0.7);
   box-shadow: 0 0 10px 2px rgb(255 168 64 / 0.35);
   animation: candy-portal-ring 0.95s linear infinite;
+  pointer-events: none;
 }
 .candy-node-radial.candy-node-here {
   z-index: 6;
