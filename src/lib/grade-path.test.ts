@@ -53,8 +53,8 @@ describe("grade path", () => {
   });
 
   it("sits the 13 units on painted cream pads of one tall map", () => {
-    expect(TALL_MAP_FILE).toBe("candy-zones/tall-map.png");
-    expect(TALL_MAP_SIZE).toEqual({ w: 1920, h: 1080 });
+    expect(TALL_MAP_FILE).toBe("candy-zones/radial-web-locked.jpg");
+    expect(TALL_MAP_SIZE).toEqual({ w: 1280, h: 720 });
     expect(CANDY_WORLD_ASPECT).toBeCloseTo(16 / 9);
     expect(GRADE3_PATH_PADS.filter((p) => p.zone === "meadow")).toHaveLength(4);
     expect(GRADE3_PATH_PADS.filter((p) => p.zone === "cove")).toHaveLength(4);

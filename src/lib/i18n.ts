@@ -140,6 +140,8 @@ export type Ui = {
   sounds: string;
   mystery: string;
   start: string;
+  hopPick: string;
+  hopOne: string;
   allUnits: string;
   grade3Path: string;
   zoneMeadow: string;
@@ -306,6 +308,8 @@ export const UI: Record<Locale, Ui> = {
     sounds: "Sounds",
     mystery: "???",
     start: "Start",
+    hopPick: "Pick a space",
+    hopOne: "Hop one space",
     allUnits: "All units",
     grade3Path: "Grade 3 Path",
     zoneMeadow: "Ten-Frame Meadow",
@@ -470,6 +474,8 @@ export const UI: Record<Locale, Ui> = {
     sounds: "Sonidos",
     mystery: "???",
     start: "Empezar",
+    hopPick: "Elige un espacio",
+    hopOne: "Salta un espacio",
     allUnits: "Todas las unidades",
     grade3Path: "Sendero de 3.º",
     zoneMeadow: "Prado de decenas",
@@ -634,6 +640,8 @@ export const UI: Record<Locale, Ui> = {
     sounds: "Sons",
     mystery: "???",
     start: "Começar",
+    hopPick: "Escolha um espaço",
+    hopOne: "Pule um espaço",
     allUnits: "Todas as unidades",
     grade3Path: "Trilha do 3.º ano",
     zoneMeadow: "Prado das dezenas",
