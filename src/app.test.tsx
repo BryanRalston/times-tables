@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "@/app";
 import { doorRoute } from "@/lib/nav";
 import { resetProgressMemory, useProgress } from "@/lib/progress";
+import { migratePathHopSpent } from "@/lib/radial-web";
 import { SQUISHEE_IDS } from "@/lib/squishees";
 import { HomePage } from "@/pages/home";
 
@@ -138,6 +139,28 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-pad-choice="1"');
     expect(html).toMatch(/data-path-unit="u2"[^>]*data-path-status="now"/);
     expect(html).toMatch(/data-path-unit="u1"[^>]*data-path-status="open"/);
+  });
+
+  it("Guest with completed lessons and a burned hop ledger can still pick a hop", () => {
+    const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
+    const activities = { "u1-leftover": leftover, "u1-friends": leftover, "u3-share": leftover };
+    useProgress.setState({
+      activities,
+      pathHopperAt: 0,
+      pathNowSeen: 0,
+      pathHopSpent: migratePathHopSpent({
+        activities,
+        pathHopSpent: 3,
+        pathHopperAt: 0,
+        saveVersion: 10,
+      }),
+    });
+    stubHash("#/lessons");
+    const html = renderToStaticMarkup(<App />);
+    expect(html).toContain('data-hop-credits="3"');
+    expect(html).toContain("Pick a space");
+    expect(html).toContain('data-pad-choice="1"');
+    expect(html).toContain('data-path-travel="0"');
   });
 
   it("Guest returning from an earlier replay stays on that pad", () => {

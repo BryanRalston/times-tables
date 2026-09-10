@@ -4,7 +4,7 @@ import { activityById } from "./curriculum";
 import { makeQuestion } from "./questions";
 import { rngFromSeed } from "./rng";
 import type { GraphData } from "./types";
-import { cardHeading, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen, leftoverSpeechOpen, leftoverWhyMoveMs, splitCounted } from "./leftover";
+import { cardHeading, interactGatesSubmit, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen, leftoverSpeechOpen, leftoverWhyMoveMs, splitCounted } from "./leftover";
 
 describe("leftover why-move gates", () => {
   it("hides keypad, Check, and Skip until the known group is taken", () => {
@@ -54,6 +54,17 @@ describe("leftover why-move gates", () => {
     const money = { kind: "money", needsInteract: false, interacted: false, status: "idle" as const };
     expect(leftoverPanelOpen(money)).toBe(true);
     expect(leftoverSkipOpen(money)).toBe(true);
+  });
+
+  it("never gates Check or Skip on group or fluency tallies", () => {
+    expect(interactGatesSubmit("tenframe", true)).toBe(true);
+    expect(interactGatesSubmit("graph", true)).toBe(true);
+    for (const kind of ["groups", "fluency"] as const) {
+      const waiting = { kind, needsInteract: true, interacted: false, status: "idle" as const };
+      expect(interactGatesSubmit(kind, true)).toBe(false);
+      expect(leftoverPanelOpen(waiting)).toBe(true);
+      expect(leftoverSkipOpen(waiting)).toBe(true);
+    }
   });
 
   it("hides graph collect ChoiceList until the tray is sorted", () => {
