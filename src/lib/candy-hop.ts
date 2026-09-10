@@ -1,4 +1,5 @@
-import { GRADE3_PATH_NODES, type PathNodePos } from "./grade-path";
+import type { PathNodePos } from "./grade-path";
+import { RADIAL_PAD_COUNT, areAdjacent, clampPad, radialHopStops } from "./radial-web";
 
 export type HopPhase = "air" | "land";
 
@@ -24,11 +25,8 @@ export const OBSTACLE_HOP_MS = 740;
 /** Extra lift (map %) so water spans clear the shoulder boulder / cove. */
 export const OBSTACLE_LIFT_PERCENT = 8.1;
 
-/** Consecutive pads with a water-crossing vault (rise onto cove, lift to forest). */
-export const OBSTACLE_HOP_SPANS: readonly (readonly [number, number])[] = [
-  [4, 5],
-  [8, 9],
-];
+/** No water vaults on the radial web — every hop is a one-space tile jump. */
+export const OBSTACLE_HOP_SPANS: readonly (readonly [number, number])[] = [];
 
 /** Primary water-rise vault (meadow → cove). */
 export const OBSTACLE_HOP_FROM = 4;
@@ -52,15 +50,14 @@ export function easeHopTravel(t: number): number {
   return x * x * (3 - 2 * x);
 }
 
-export function hopUnitStops(fromNumber: number, toNumber: number, total = GRADE3_PATH_NODES.length): number[] {
-  const a = Math.min(total, Math.max(1, Math.round(fromNumber)));
-  const b = Math.min(total, Math.max(1, Math.round(toNumber)));
-  if (a === b) return [a];
-  const step = a < b ? 1 : -1;
-  const out: number[] = [a];
-  for (let n = a + step; n !== b; n += step) out.push(n);
-  out.push(b);
-  return out;
+export function hopUnitStops(fromNumber: number, toNumber: number, _total = RADIAL_PAD_COUNT): number[] {
+  return radialHopStops(fromNumber, toNumber);
+}
+
+export function hopIsOneSpace(fromNumber: number, toNumber: number): boolean {
+  const a = clampPad(fromNumber);
+  const b = clampPad(toNumber);
+  return a === b || areAdjacent(a, b);
 }
 
 export function hopSpanIsObstacle(fromNumber: number, toNumber: number): boolean {

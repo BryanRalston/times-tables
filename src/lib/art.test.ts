@@ -16,6 +16,7 @@ describe("asset URLs", () => {
     expect(squisheeSrc("peach")).toBe("/times-tables/squishees/peach.png");
     expect(existsSync(join(HERE, "../../public/squishees/peach.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/tall-map.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/candy-zones/radial-web-locked.jpg"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/waterfall.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/tenframe.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/tenframe-mound.png"))).toBe(true);

@@ -15,19 +15,22 @@ import {
   hopProgressAt,
   hopSquash,
   hopTravelMs,
+  hopIsOneSpace,
   hopUnitStops,
   pathHopSfxKind,
   restHopPose,
 } from "./candy-hop";
 import { GRADE3_PATH_NODES, TALL_MAP_DECORATIVE_PAD, mapToViewPos } from "./grade-path";
+import { START_PAD, adjacentPadIds } from "./radial-web";
 
 describe("candy hop", () => {
-  it("walks every intermediate pad, both directions", () => {
+  it("lists only the current pad or one adjacent pad", () => {
+    const next = adjacentPadIds(START_PAD)[0]!;
     expect(hopUnitStops(1, 1)).toEqual([1]);
-    expect(hopUnitStops(2, 5)).toEqual([2, 3, 4, 5]);
-    expect(hopUnitStops(8, 6)).toEqual([8, 7, 6]);
-    expect(hopUnitStops(1, 13)).toHaveLength(13);
-    expect(hopUnitStops(0, 99)).toEqual(hopUnitStops(1, 13));
+    expect(hopUnitStops(START_PAD, next)).toEqual([START_PAD, next]);
+    expect(hopIsOneSpace(START_PAD, next)).toBe(true);
+    expect(hopUnitStops(START_PAD, 40)).toEqual([START_PAD]);
+    expect(hopUnitStops(1, 13)).toHaveLength(1);
   });
 
   it("times multi-hop travel with a land settle after every hop", () => {
@@ -144,16 +147,12 @@ describe("candy hop", () => {
     expect(pathHopSfxKind(null, hopProgressAt(0, 0))).toBeNull();
   });
 
-  it("vaults higher and longer over water crossings on the loop", () => {
-    expect(hopSpanIsObstacle(4, 5)).toBe(true);
-    expect(hopSpanIsObstacle(5, 4)).toBe(true);
-    expect(hopSpanIsObstacle(8, 9)).toBe(true);
-    expect(hopSpanIsObstacle(7, 8)).toBe(false);
-    expect(hopSpanMs(4, 5)).toBe(OBSTACLE_HOP_MS);
+  it("does not mark radial hops as water vaults", () => {
+    expect(hopSpanIsObstacle(4, 5)).toBe(false);
+    expect(hopSpanIsObstacle(8, 9)).toBe(false);
+    expect(hopSpanMs(4, 5)).toBe(HOP_MS);
     expect(hopSpanMs(1, 2)).toBe(HOP_MS);
-    expect(hopTravelMs([4, 5])).toBe(OBSTACLE_HOP_MS + LAND_MS);
-    expect(hopTravelMs([4, 5])).toBeGreaterThan(hopTravelMs([1, 2]));
-    expect(hopUnitStops(1, 13)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+    expect(hopTravelMs([4, 5])).toBe(HOP_MS + LAND_MS);
     const a = mapToViewPos(GRADE3_PATH_NODES[3]!);
     const b = mapToViewPos(GRADE3_PATH_NODES[4]!);
     const obs = mapToViewPos(TALL_MAP_DECORATIVE_PAD);

@@ -340,6 +340,8 @@ export interface LearnerSlice {
   pathHopperAt: number;
   /** Highest "now" pad Lessons already presented. Replay returns stay put. */
   pathNowSeen: number;
+  /** One-space hops already taken on the radial board. */
+  pathHopSpent: number;
 }
 
 export interface SaveState extends LearnerSlice {
