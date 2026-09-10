@@ -79,18 +79,16 @@ function expectHomeShell(html: string) {
 function expectLessonsPath(html: string) {
   expect(html).toContain("data-lessons-path");
   expect(html).toContain("data-grade-path");
+  expect(html).toContain("data-radial-web");
   expect(html).toContain("Grade 3 Path");
-  expect(html).toContain("Ten-Frame Meadow");
-  expect(html).toContain("Coin Cove");
-  expect(html).toContain("Fraction Forest");
   expect(html).toContain('data-path-hopper="peach"');
   expect(html).toContain('data-path-unit="u1"');
-    expect(html).toContain('data-path-unit="u13"');
-    expect(html).toContain("Start");
-    expect(html).toContain("data-candy-fog");
-    expect(html).toContain('data-path-fog="1"');
-    expect(html).not.toContain("g4-");
-    expect(html).not.toContain("data-lessons-continue");
+  expect(html).toContain('data-path-unit="u13"');
+  expect(html).toContain("Start");
+  expect(html).toContain("radial-web-locked.jpg");
+  expect(html).not.toContain("data-candy-fog");
+  expect(html).not.toContain("g4-");
+  expect(html).not.toContain("data-lessons-continue");
 }
 
 describe("first-visit Home door", () => {
@@ -123,16 +121,20 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-path-travel="0"');
   });
 
-  it("Guest who finished unit 1 leftover hops to pad 2 on Lessons", () => {
+  it("Guest who finished one small lesson stays put and may pick one adjacent hop", () => {
     useProgress.setState({
       activities: { "u1-leftover": { plays: 1, best: 4, last: 4, stars: 3, misses: [] } },
       pathHopperAt: 0,
       pathNowSeen: 0,
+      pathHopSpent: 0,
     });
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
     expect(html).toContain('data-path-hop-from="1"');
-    expect(html).toContain('data-path-travel="1"');
+    expect(html).toContain('data-path-travel="0"');
+    expect(html).toContain('data-hop-credits="1"');
+    expect(html).toContain("Pick a space");
+    expect(html).toContain('data-pad-choice="1"');
     expect(html).toMatch(/data-path-unit="u2"[^>]*data-path-status="now"/);
     expect(html).toMatch(/data-path-unit="u1"[^>]*data-path-status="open"/);
   });
@@ -150,7 +152,7 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-path-hop-to="3"');
     expect(html).toContain('data-path-travel="0"');
     expect(html).toMatch(/data-path-unit="u8"[^>]*data-path-status="now"/);
-    expect(html).toContain('data-path-obstacle="cove-boulder"');
+    expect(html).toContain("data-radial-web");
   });
 
   it("empty Guest at #/ on tablet/laptop gets the same Home shell", () => {

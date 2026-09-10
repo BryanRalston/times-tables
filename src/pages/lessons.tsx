@@ -6,9 +6,10 @@ import { UNITS, suggestedUnitId, unitById } from "@/lib/curriculum";
 import { navigate } from "@/lib/nav";
 import { farthestClearedUnitNumber, lessonsHopFrom, lessonsHopTo, pathNowUnitId } from "@/lib/path";
 import { useProgress } from "@/lib/progress";
+import { hopCreditsOf } from "@/lib/radial-web";
 
 export function LessonsPage() {
-  useProgress((s) => `${s.classUnitId}:${s.pathHopperAt}:${s.pathNowSeen}:${Object.keys(s.sessions).length}:${Object.keys(s.activities).length}`);
+  useProgress((s) => `${s.classUnitId}:${s.pathHopperAt}:${s.pathHopSpent}:${Object.keys(s.sessions).length}:${Object.keys(s.activities).length}`);
   const st = useProgress.getState();
   const ui = useUi();
   const date = todayIso();
@@ -19,6 +20,7 @@ export function LessonsPage() {
   const cleared = farthestClearedUnitNumber(st.sessions, st.activities);
   const standFrom = lessonsHopFrom(st.pathHopperAt, nowNumber, cleared);
   const standTo = lessonsHopTo(st.pathHopperAt, nowNumber, st.pathNowSeen, cleared);
+  const credits = hopCreditsOf(st.activities, st.pathHopSpent);
   const pathRef = useRef<CandyPathHandle>(null);
 
   return (
@@ -30,6 +32,7 @@ export function LessonsPage() {
           suggestedId={pathSuggested}
           standFrom={standFrom}
           standTo={standTo}
+          hopCredits={credits}
           onStart={() => navigate({ id: "play", kind: "daily" })}
           onOpenUnit={(id) => navigate({ id: "unit", unitId: id })}
         />
@@ -37,7 +40,7 @@ export function LessonsPage() {
       <div className="candy-dock">
         <p className="candy-caption">
           <span aria-hidden>★</span>
-          {ui.grade3Path}
+          {credits > 0 ? ui.hopPick : ui.grade3Path}
           <span aria-hidden>★</span>
         </p>
         <button type="button" className="candy-dock-start" onClick={() => pathRef.current?.playNow()}>

@@ -1,3 +1,5 @@
+import { RADIAL_MAP_FILE, RADIAL_MAP_SIZE } from "./radial-web";
+
 export type PathZone = "meadow" | "cove" | "forest";
 
 export type PathNodePos = { x: number; y: number };
@@ -8,10 +10,10 @@ export type PathPad = {
   unitNumber: number;
 };
 
-/** Locked quiet world: landscape winding boardwalk + 13 cream pads. 1920×1080. */
-export const TALL_MAP_FILE = "candy-zones/tall-map.png";
+/** Locked radial-web Lessons art (same file the hopper stands on). */
+export const TALL_MAP_FILE = RADIAL_MAP_FILE;
 
-export const TALL_MAP_SIZE = { w: 1920, h: 1080 } as const;
+export const TALL_MAP_SIZE = RADIAL_MAP_SIZE;
 
 /**
  * CSS `aspect-ratio` width/height for the Lessons world.

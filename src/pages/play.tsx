@@ -406,8 +406,12 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
           </p>
           {kind === "daily" ? <p className="mt-1 text-sm text-star">{ui.streak(streak)}</p> : null}
           <p className="mt-4 text-sm text-teal">{ui.youEarnedCoins(coinsEarned)}</p>
-          <Button className="mt-6 w-full" size="lg" onClick={() => navigate({ id: "home" }, { replace: true })}>
-            {ui.home}
+          <Button
+            className="mt-6 w-full"
+            size="lg"
+            onClick={() => navigate({ id: kind === "activity" ? "lessons" : "home" }, { replace: true })}
+          >
+            {kind === "activity" ? ui.hopPick : ui.home}
           </Button>
           {shop ? (
             <Button
