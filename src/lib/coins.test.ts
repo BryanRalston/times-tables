@@ -80,7 +80,7 @@ describe("migrate", () => {
     });
     expect(next.squishees).toEqual(["frog", "cat"]);
     expect(next.coins).toBe(0);
-    expect(next.version).toBe(11);
+    expect(next.version).toBe(12);
     expect(next.pathHopSpent).toBe(0);
     expect(next.pathNowSeen).toBe(0);
     expect(next.pathGrade).toBe(3);

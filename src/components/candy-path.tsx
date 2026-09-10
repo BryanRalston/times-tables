@@ -60,6 +60,7 @@ export const CandyPath = forwardRef<
   const owned = useProgress((s) => s.squishees);
   const activities = useProgress((s) => s.activities);
   const hopsSpent = useProgress((s) => s.pathHopSpent);
+  const sessions = useProgress((s) => s.sessions);
   const setPathHopperAt = useProgress((s) => s.setPathHopperAt);
   const spendPathHop = useProgress((s) => s.spendPathHop);
   const hopperId = pathHopperId(owned);
@@ -77,7 +78,7 @@ export const CandyPath = forwardRef<
   const [hopperOpacity, setHopperOpacity] = useState(1);
   const warpRef = useRef<{ from: number; to: number } | null>(null);
   const destPos = padView(dest);
-  const credits = hopCredits ?? hopCreditsOf(activities, hopsSpent);
+  const credits = hopCredits ?? hopCreditsOf(activities, hopsSpent, sessions);
   const choices = credits > 0 && !travel && !warp ? adjacentPadIds(dest) : [];
 
   useEffect(() => {

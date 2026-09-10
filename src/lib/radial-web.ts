@@ -1,5 +1,5 @@
 import { activityById } from "./curriculum";
-import type { ActivitySave } from "./types";
+import type { ActivitySave, DaySession } from "./types";
 
 export type RadialPos = { x: number; y: number };
 
@@ -224,23 +224,67 @@ export function smallLessonsCompleted(activities: Record<string, ActivitySave>):
   return n;
 }
 
-export function hopCreditsOf(activities: Record<string, ActivitySave>, hopsSpent: number): number {
-  return Math.max(0, smallLessonsCompleted(activities) - Math.max(0, Math.round(hopsSpent)));
+/**
+ * Hop-earning first-time Grade 3 plays: named small lessons, plus a unit's
+ * first daily walk / completed session. Welcome, Grade 4, and replays do not
+ * add extra hops. Guests who only press Lessons → Start still earn a credit.
+ */
+export function hopLessonsCompleted(
+  activities: Record<string, ActivitySave>,
+  sessions?: Record<string, DaySession>,
+): number {
+  let n = 0;
+  const dailyUnits = new Set<string>();
+  for (const [id, save] of Object.entries(activities)) {
+    if (!save.plays) continue;
+    if (id === "welcome" || id.startsWith("g4-")) continue;
+    if (id.startsWith("daily:")) {
+      const unitId = id.slice("daily:".length);
+      if (!unitId || unitId.startsWith("g4-")) continue;
+      dailyUnits.add(unitId);
+      n += 1;
+      continue;
+    }
+    if (!activityById(id)) continue;
+    n += 1;
+  }
+  if (sessions) {
+    const extra = new Set<string>();
+    for (const session of Object.values(sessions)) {
+      if (!session.completed) continue;
+      const unitId = session.unitId;
+      if (!unitId || unitId.startsWith("g4-")) continue;
+      if (dailyUnits.has(unitId)) continue;
+      extra.add(unitId);
+    }
+    n += extra.size;
+  }
+  return n;
+}
+
+export function hopCreditsOf(
+  activities: Record<string, ActivitySave>,
+  hopsSpent: number,
+  sessions?: Record<string, DaySession>,
+): number {
+  return Math.max(0, hopLessonsCompleted(activities, sessions) - Math.max(0, Math.round(hopsSpent)));
 }
 
 /**
  * #58 treated missing pathHopSpent as "already spent every prior lesson",
  * so a Guest with completed Grade 3 work landed on 0 hop credits.
- * Missing spent stays 0. A one-time pre-v11 heal refunds unused hops:
- * hopper still at Start → all credits; otherwise one leftover credit.
+ * Missing spent stays 0. A one-time pre-v12 heal refunds unused hops
+ * (v11 Pages loads could persist a still-burned ledger):
+ * hopper still at Start → all credits; otherwise leave one leftover credit.
  */
 export function migratePathHopSpent(args: {
   activities: Record<string, ActivitySave>;
+  sessions?: Record<string, DaySession>;
   pathHopSpent: unknown;
   pathHopperAt: unknown;
   saveVersion: unknown;
 }): number {
-  const completed = smallLessonsCompleted(args.activities);
+  const completed = hopLessonsCompleted(args.activities, args.sessions);
   const hopper =
     typeof args.pathHopperAt === "number" && Number.isFinite(args.pathHopperAt)
       ? Math.max(0, Math.round(args.pathHopperAt))
@@ -251,9 +295,9 @@ export function migratePathHopSpent(args: {
     typeof args.pathHopSpent === "number" && Number.isFinite(args.pathHopSpent)
       ? Math.max(0, Math.round(args.pathHopSpent))
       : 0;
-  if (version >= 11) return spent;
-  const credits = hopCreditsOf(args.activities, spent);
+  if (version >= 12) return spent;
+  const credits = Math.max(0, completed - spent);
   if (credits > 0 || completed <= 0) return spent;
   if (hopper <= START_PAD) return 0;
-  return Math.max(0, completed - 1);
+  return Math.min(spent, Math.max(0, completed - 1));
 }

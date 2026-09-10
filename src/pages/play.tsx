@@ -16,6 +16,7 @@ import { cardHeading, interactGatesSubmit, leftoverHoldMs, leftoverPanelOpen, le
 import { aliasActivityId, navigate } from "@/lib/nav";
 import { holdMsFor, REVEAL_AFTER_MISSES, WRONG_REVEAL_MS, WRONG_RETRY_MS, type FactStat } from "@/lib/practice";
 import { useProgress } from "@/lib/progress";
+import { hopCreditsOf } from "@/lib/radial-web";
 import { makeActivityRound, makeWelcomeRound } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
 import { canAffordAnything, coinsForResult } from "@/lib/coins";
@@ -392,6 +393,8 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     const streak = schoolStreak(sessions, pack.date);
     const st = useProgress.getState();
     const shop = canAffordAnything(st.coins, st.squishees);
+    const hopNow = hopCreditsOf(st.activities, st.pathHopSpent, st.sessions) > 0;
+    const toLessons = kind === "activity" || hopNow;
     return (
       <AppScene scene="hills" tabs={<AppTabs active="home" />}>
         <AppHeader />
@@ -409,9 +412,9 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
           <Button
             className="mt-6 w-full"
             size="lg"
-            onClick={() => navigate({ id: kind === "activity" ? "lessons" : "home" }, { replace: true })}
+            onClick={() => navigate({ id: toLessons ? "lessons" : "home" }, { replace: true })}
           >
-            {kind === "activity" ? ui.hopPick : ui.home}
+            {toLessons ? ui.hopPick : ui.home}
           </Button>
           {shop ? (
             <Button

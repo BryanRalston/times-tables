@@ -10,6 +10,7 @@ import {
   adjacentPadIds,
   areAdjacent,
   hopCreditsOf,
+  hopLessonsCompleted,
   migratePathHopSpent,
   portalPartner,
   radialHopStops,
@@ -68,12 +69,22 @@ describe("radial web", () => {
     expect(smallLessonsCompleted({ "u1-leftover": leftover })).toBe(1);
     expect(smallLessonsCompleted({ "u1-leftover": leftover, "u1-friends": leftover })).toBe(2);
     expect(smallLessonsCompleted({ welcome: leftover, "daily:u1": leftover, "g4-u1-place": leftover })).toBe(0);
+    expect(hopLessonsCompleted({ welcome: leftover, "g4-u1-place": leftover })).toBe(0);
+    expect(hopLessonsCompleted({ "daily:u1": leftover })).toBe(1);
+    expect(hopLessonsCompleted({ "u1-leftover": leftover, "daily:u1": leftover })).toBe(2);
+    expect(
+      hopLessonsCompleted(
+        { welcome: leftover },
+        { "2026-09-10": { date: "2026-09-10", unitId: "u2", schoolDay: 1, correct: 8, total: 8, fresh: 8, review: 0, completed: true } },
+      ),
+    ).toBe(1);
     expect(hopCreditsOf({ "u1-leftover": leftover }, 0)).toBe(1);
+    expect(hopCreditsOf({ "daily:u1": leftover }, 0)).toBe(1);
     expect(hopCreditsOf({ "u1-leftover": leftover }, 1)).toBe(0);
     expect(hopCreditsOf({ "u1-leftover": leftover, "u1-friends": leftover }, 1)).toBe(1);
   });
 
-  it("does not invent spent hops, and refunds a burned v10 Guest ledger", () => {
+  it("does not invent spent hops, and refunds a burned pre-v12 Guest ledger", () => {
     const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
     const done = { "u1-leftover": leftover, "u1-friends": leftover };
     expect(migratePathHopSpent({ activities: done, pathHopSpent: undefined, pathHopperAt: 0, saveVersion: 9 })).toBe(0);
@@ -92,6 +103,12 @@ describe("radial web", () => {
     ).toBe(1);
     expect(
       migratePathHopSpent({ activities: done, pathHopSpent: 2, pathHopperAt: 1, saveVersion: 11 }),
+    ).toBe(0);
+    expect(
+      migratePathHopSpent({ activities: done, pathHopSpent: 1, pathHopperAt: 4, saveVersion: 11 }),
+    ).toBe(1);
+    expect(
+      migratePathHopSpent({ activities: done, pathHopSpent: 2, pathHopperAt: 1, saveVersion: 12 }),
     ).toBe(2);
   });
 });
