@@ -934,6 +934,25 @@ details > summary::-webkit-details-marker {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+/* Taller card on the phone shell: crop white letterbox, keep the locked
+   16:9 camera. Art + overlay share .candy-world-stage so pad % stay on-art. */
+.candy-map[data-radial-web="1"] .candy-world {
+  aspect-ratio: 10 / 9;
+}
+.candy-world-stage {
+  position: absolute;
+  inset: 0;
+}
+.candy-map[data-radial-web="1"] .candy-world-stage {
+  inset: auto;
+  height: 100%;
+  width: auto;
+  aspect-ratio: 16 / 9;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 .candy-world-art {
   position: absolute;
@@ -1473,8 +1492,8 @@ details > summary::-webkit-details-marker {
 .candy-hopper-shadow {
   position: absolute;
   z-index: 3;
-  width: 1.7rem;
-  height: 0.4rem;
+  width: 1.85rem;
+  height: 0.44rem;
   border-radius: 50%;
   background: radial-gradient(ellipse at center, rgb(46 30 22 / 0.4) 0%, rgb(46 30 22 / 0) 72%);
   pointer-events: none;
@@ -1483,16 +1502,16 @@ details > summary::-webkit-details-marker {
 .candy-hopper {
   position: absolute;
   z-index: 5;
-  width: 3.3rem;
-  height: 3.3rem;
+  width: 3.65rem;
+  height: 3.65rem;
   transform: translate(-50%, -108%);
   transform-origin: 50% 82%;
   pointer-events: none;
   will-change: left, top, transform;
 }
 .candy-hopper-art {
-  width: 3.3rem;
-  height: 3.3rem;
+  width: 3.65rem;
+  height: 3.65rem;
   filter:
     drop-shadow(0 0 1px rgb(255 255 255 / 0.95))
     drop-shadow(0 2px 4px rgb(40 20 30 / 0.38));

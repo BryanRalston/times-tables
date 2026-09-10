@@ -214,16 +214,31 @@ export function isPortalPad(id: number): boolean {
 }
 
 /**
- * Phone-fair snap radius. On a ~390px Lessons board the eight plaza
- * neighbors sit ~21px apart, so a flat 44px CSS box overlaps. Hits use
- * nearest valid neighbor (plus the current pad as a tap sink) instead.
- * 24px is a 48px-wide comfort circle; Voronoi among glowing pads
- * keeps neighbors from stealing.
+ * Phone-fair snap radius. The Lessons card zooms the locked 16:9 board
+ * (taller crop, side letterbox gone). Plaza neighbors sit ~34px apart on
+ * that stage, so a 36px snap is a comfortable fat-finger circle. Hits use
+ * nearest valid neighbor (plus the current pad as a tap sink). Voronoi
+ * among glowing pads keeps neighbors from stealing.
  */
-export const HOP_SNAP_PX = 24;
+export const HOP_SNAP_PX = 36;
 
-/** 390×844 Lessons map after scroll padding and the 4px frame. */
-export const PHONE_MAP_BOARD = { left: 0, top: 0, width: 368, height: 207 } as const;
+/**
+ * Visible radial card on a 390 phone after 0.45rem scroll pad + 4px frame.
+ * CSS `.candy-world` uses 10/9 so the island grows without shearing
+ * the outer E/W portal arches off the card.
+ */
+export const PHONE_MAP_VIEW = { width: 368, height: (368 * 9) / 10 } as const;
+
+/**
+ * Overlay / art stage: same 16:9 as radial-web-locked.jpg, height-matched
+ * to the card so pad % stays on-art. Wider than the card — sides crop.
+ */
+export const PHONE_MAP_BOARD = {
+  left: 0,
+  top: 0,
+  width: PHONE_MAP_VIEW.height * (RADIAL_MAP_SIZE.w / RADIAL_MAP_SIZE.h),
+  height: PHONE_MAP_VIEW.height,
+} as const;
 
 export type HopBoardRect = {
   left: number;
