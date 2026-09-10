@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type PointerEvent } from "react";
 import { useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
 import { asset } from "@/lib/art";
@@ -22,6 +22,7 @@ import { unitText } from "@/lib/labels";
 import { unitStatus } from "@/lib/path";
 import { useProgress } from "@/lib/progress";
 import {
+  HOP_SNAP_PX,
   RADIAL_MAP_FILE,
   RADIAL_PADS,
   START_PAD,
@@ -29,6 +30,7 @@ import {
   areAdjacent,
   clampPad,
   hopCreditsOf,
+  nearestHopTarget,
   portalPartner,
   radialPad,
 } from "@/lib/radial-web";
@@ -81,6 +83,8 @@ export const CandyPath = forwardRef<
   const credits = hopCredits ?? hopCreditsOf(activities, hopsSpent, sessions);
   const picking = credits > 0 && !travel && !warp;
   const choices = picking ? adjacentPadIds(dest) : [];
+  const boardRef = useRef<HTMLDivElement>(null);
+  const tapStart = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const hopper = document.querySelector<HTMLElement>("[data-path-hopper]");
@@ -238,6 +242,26 @@ export const CandyPath = forwardRef<
     setDest(to);
   };
 
+  const onBoardPointerDown = (e: PointerEvent<HTMLDivElement>) => {
+    if (!picking || e.button !== 0) return;
+    tapStart.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const onBoardPointerUp = (e: PointerEvent<HTMLDivElement>) => {
+    if (!picking || e.button !== 0) return;
+    const start = tapStart.current;
+    tapStart.current = null;
+    if (!start || Math.hypot(e.clientX - start.x, e.clientY - start.y) > 12) return;
+    const board = boardRef.current;
+    if (!board) return;
+    const hit = nearestHopTarget(e.clientX, e.clientY, board.getBoundingClientRect(), choices, dest);
+    if (hit != null) chooseHop(hit);
+  };
+
+  const onBoardPointerCancel = () => {
+    tapStart.current = null;
+  };
+
   useImperativeHandle(ref, () => ({
     playNow: () => onStart(),
   }));
@@ -260,7 +284,16 @@ export const CandyPath = forwardRef<
           data-candy-radial-map-art="1"
           aria-hidden
         />
-        <div className="candy-overlay">
+        <div
+          ref={boardRef}
+          className="candy-overlay"
+          data-hop-board="1"
+          data-hop-pick={picking ? "1" : "0"}
+          data-hop-snap={String(HOP_SNAP_PX)}
+          onPointerDown={onBoardPointerDown}
+          onPointerUp={onBoardPointerUp}
+          onPointerCancel={onBoardPointerCancel}
+        >
         {RADIAL_PADS.map((pad) => {
           const view = pad.map;
           const choice = choices.includes(pad.id);

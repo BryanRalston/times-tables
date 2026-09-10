@@ -213,6 +213,74 @@ export function isPortalPad(id: number): boolean {
   return radialPad(id).portal;
 }
 
+/**
+ * Phone-fair snap radius. On a ~390px Lessons board the eight plaza
+ * neighbors sit ~21px apart, so a flat 44px CSS box overlaps. Hits use
+ * nearest valid neighbor (plus the current pad as a tap sink) instead.
+ * 24px is a 48px-wide comfort circle; Voronoi among glowing pads
+ * keeps neighbors from stealing.
+ */
+export const HOP_SNAP_PX = 24;
+
+/** 390×844 Lessons map after scroll padding and the 4px frame. */
+export const PHONE_MAP_BOARD = { left: 0, top: 0, width: 368, height: 207 } as const;
+
+export type HopBoardRect = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
+export function padClientPos(id: number, board: HopBoardRect): RadialPos {
+  const p = radialPad(id).map;
+  return {
+    x: board.left + (p.x / 100) * board.width,
+    y: board.top + (p.y / 100) * board.height,
+  };
+}
+
+/**
+ * Closest glowing (adjacent) pad under a tap. The current pad wins its
+ * own Voronoi cell so a tap on the hopper does not hop. Quiet pads are
+ * never candidates. Distance is board pixels, not map percent.
+ */
+export function nearestHopTarget(
+  clientX: number,
+  clientY: number,
+  board: HopBoardRect,
+  choiceIds: readonly number[],
+  hereId?: number,
+  snapPx = HOP_SNAP_PX,
+): number | undefined {
+  if (!choiceIds.length || board.width <= 0 || board.height <= 0 || snapPx <= 0) return undefined;
+  const seen = new Set<number>();
+  const candidates: number[] = [];
+  for (const id of choiceIds) {
+    const pad = clampPad(id);
+    if (seen.has(pad)) continue;
+    seen.add(pad);
+    candidates.push(pad);
+  }
+  if (hereId != null) {
+    const here = clampPad(hereId);
+    if (!seen.has(here)) candidates.push(here);
+  }
+  let bestId: number | undefined;
+  let bestD = Infinity;
+  for (const id of candidates) {
+    const p = padClientPos(id, board);
+    const d = Math.hypot(clientX - p.x, clientY - p.y);
+    if (d < bestD || (d === bestD && id < (bestId ?? Infinity))) {
+      bestD = d;
+      bestId = id;
+    }
+  }
+  if (bestId == null || bestD > snapPx) return undefined;
+  if (hereId != null && bestId === clampPad(hereId)) return undefined;
+  return choiceIds.some((id) => clampPad(id) === bestId) ? bestId : undefined;
+}
+
 export function smallLessonsCompleted(activities: Record<string, ActivitySave>): number {
   let n = 0;
   for (const [id, save] of Object.entries(activities)) {
