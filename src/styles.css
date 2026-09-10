@@ -1110,6 +1110,24 @@ details > summary::-webkit-details-marker {
 .candy-node-choice:not(:disabled) {
   cursor: pointer;
 }
+.candy-node-enterable .candy-node-disc {
+  box-shadow:
+    0 0 0 2px rgb(255 248 238 / 0.92),
+    0 0 14px 6px rgb(196 92 38 / 0.55),
+    0 0 22px 10px rgb(60 210 255 / 0.28);
+  animation: candy-portal-pulse 1.15s ease-in-out infinite;
+}
+.candy-warp-fx {
+  position: absolute;
+  z-index: 6;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 9999px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background: radial-gradient(circle, rgb(255 248 238 / 0.88) 0%, rgb(196 92 38 / 0.5) 36%, transparent 72%);
+  animation: candy-warp-flash 0.64s ease-out;
+}
 .candy-unit-rail {
   position: relative;
   z-index: 6;
@@ -1474,6 +1492,31 @@ details > summary::-webkit-details-marker {
     transform: translateY(-0.28rem);
   }
 }
+@keyframes candy-portal-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.18);
+    filter: brightness(1.08);
+  }
+}
+@keyframes candy-warp-flash {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.55);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .candy-hopper-art {
     animation: none !important;
@@ -1489,7 +1532,9 @@ details > summary::-webkit-details-marker {
   .candy-prop-spin img,
   .candy-water-flow,
   .candy-water-glint,
-  .candy-trail-peek-art {
+  .candy-trail-peek-art,
+  .candy-node-enterable .candy-node-disc,
+  .candy-warp-fx {
     animation: none !important;
   }
 }

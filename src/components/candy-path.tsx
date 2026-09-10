@@ -11,6 +11,8 @@ import {
   hopUnitStops,
   pathHopSfxKind,
   restHopPose,
+  warpPose,
+  warpProgressAt,
   type HopPhase,
   type HopPose,
 } from "@/lib/candy-hop";
@@ -30,7 +32,7 @@ import {
   portalPartner,
   radialPad,
 } from "@/lib/radial-web";
-import { playHop, playLand } from "@/lib/sound";
+import { playHop, playLand, playWarp } from "@/lib/sound";
 import { pathHopperId, squisheeSrc } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
@@ -71,9 +73,12 @@ export const CandyPath = forwardRef<
   const [travel, setTravel] = useState(origin !== target && areAdjacent(origin, target));
   const [landing, setLanding] = useState(false);
   const [pose, setPose] = useState<HopPose>(() => restHopPose(originPos));
+  const [warp, setWarp] = useState<{ from: number; to: number } | null>(null);
+  const [hopperOpacity, setHopperOpacity] = useState(1);
+  const warpRef = useRef<{ from: number; to: number } | null>(null);
   const destPos = padView(dest);
   const credits = hopCredits ?? hopCreditsOf(activities, hopsSpent);
-  const choices = credits > 0 && !travel ? adjacentPadIds(dest) : [];
+  const choices = credits > 0 && !travel && !warp ? adjacentPadIds(dest) : [];
 
   useEffect(() => {
     const hopper = document.querySelector<HTMLElement>("[data-path-hopper]");
@@ -98,21 +103,32 @@ export const CandyPath = forwardRef<
   useEffect(() => {
     const from = settled.current;
     const to = dest;
-    const finish = (pad: number, entered: boolean) => {
-      let land = pad;
-      if (entered) {
-        const pair = portalPartner(pad);
-        if (pair) land = pair;
-      }
-      settled.current = land;
-      setPathHopperAt(land);
-      setDest(land);
+    const settlePad = (pad: number) => {
+      settled.current = pad;
+      setPathHopperAt(pad);
+      setDest(pad);
       setTravel(false);
       setLanding(false);
-      setPose(restHopPose(padView(land)));
+      setPose(restHopPose(padView(pad)));
+    };
+    const finishHop = (pad: number, entered: boolean) => {
+      const pair = entered ? portalPartner(pad) : undefined;
+      if (pair && pair !== pad) {
+        settled.current = pad;
+        setTravel(false);
+        setLanding(false);
+        setPose(restHopPose(padView(pad)));
+        setDest(pad);
+        const next = { from: pad, to: pair };
+        warpRef.current = next;
+        setWarp(next);
+        return;
+      }
+      settlePad(pad);
     };
     if (from === to) {
-      finish(to, false);
+      if (warpRef.current) return;
+      settlePad(to);
       return;
     }
 
@@ -120,7 +136,7 @@ export const CandyPath = forwardRef<
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     setTravelFrom(from);
     if (reduce || stops.length < 2) {
-      finish(from, false);
+      finishHop(from, false);
       return;
     }
 
@@ -137,7 +153,7 @@ export const CandyPath = forwardRef<
     const tick = (now: number) => {
       const { hopIndex, t, phase, done } = hopProgressAt(now - start, hopCount, airMs);
       if (done) {
-        finish(to, true);
+        finishHop(to, true);
         return;
       }
       const isLand = phase === "land";
@@ -179,8 +195,42 @@ export const CandyPath = forwardRef<
     return () => cancelAnimationFrame(raf);
   }, [dest, destPos.x, destPos.y, setPathHopperAt]);
 
+  useEffect(() => {
+    if (!warp) return;
+    const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const landWarp = (pad: number) => {
+      warpRef.current = null;
+      settled.current = pad;
+      setPathHopperAt(pad);
+      setDest(pad);
+      setPose(restHopPose(padView(pad)));
+      setHopperOpacity(1);
+      setWarp(null);
+    };
+    if (reduce) {
+      landWarp(warp.to);
+      return;
+    }
+    playWarp();
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const { phase, done, opacity } = warpProgressAt(now - start);
+      if (done) {
+        landWarp(warp.to);
+        playLand(0, 1);
+        return;
+      }
+      setHopperOpacity(opacity);
+      setPose(warpPose(padView(warp.from), padView(warp.to), phase));
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [warp, setPathHopperAt]);
+
   const chooseHop = (to: number) => {
-    if (travel || credits <= 0) return;
+    if (travel || warp || credits <= 0) return;
     if (!areAdjacent(settled.current, to)) return;
     spendPathHop();
     setDest(to);
@@ -212,7 +262,8 @@ export const CandyPath = forwardRef<
         {RADIAL_PADS.map((pad) => {
           const view = pad.map;
           const choice = choices.includes(pad.id);
-          const here = pad.id === dest && !travel;
+          const enterable = choice && pad.portal;
+          const here = pad.id === dest && !travel && !warp;
           return (
             <button
               key={pad.id}
@@ -220,6 +271,7 @@ export const CandyPath = forwardRef<
               className={cn(
                 "candy-node candy-node-bare candy-node-radial",
                 choice && "candy-node-choice",
+                enterable && "candy-node-enterable",
                 here && "candy-node-here",
               )}
               style={{ left: `${view.x}%`, top: `${view.y}%` }}
@@ -227,6 +279,7 @@ export const CandyPath = forwardRef<
               data-pad-id={String(pad.id)}
               data-pad-choice={choice ? "1" : "0"}
               data-pad-portal={pad.portal ? "1" : "0"}
+              data-pad-enterable={enterable ? "1" : "0"}
               disabled={!choice}
               aria-disabled={!choice}
               aria-label={choice ? ui.hopOne : undefined}
@@ -236,6 +289,23 @@ export const CandyPath = forwardRef<
             </button>
           );
         })}
+
+        {warp ? (
+          <>
+            <span
+              className="candy-warp-fx"
+              style={{ left: `${padView(warp.from).x}%`, top: `${padView(warp.from).y}%` }}
+              data-path-warp-fx="from"
+              aria-hidden
+            />
+            <span
+              className="candy-warp-fx"
+              style={{ left: `${padView(warp.to).x}%`, top: `${padView(warp.to).y}%` }}
+              data-path-warp-fx="to"
+              aria-hidden
+            />
+          </>
+        ) : null}
 
         <span
           className="candy-hopper-shadow"
@@ -249,14 +319,16 @@ export const CandyPath = forwardRef<
           aria-hidden
         />
         <div
-          className={cn("candy-hopper", travel && "candy-hopper-travel")}
+          className={cn("candy-hopper", (travel || warp) && "candy-hopper-travel")}
           style={{
             left: `${pose.x}%`,
             top: `${pose.y}%`,
+            opacity: hopperOpacity,
             transform: `translate(-50%, -108%) scale(${pose.squashX}, ${pose.squashY})`,
           }}
           data-path-hopper={hopperId}
           data-path-travel={travel ? "1" : "0"}
+          data-path-warp={warp ? "1" : "0"}
           data-path-land={landing ? "1" : "0"}
           data-path-hop-from={travel ? String(travelFrom) : String(dest)}
           data-path-hop-to={String(dest)}

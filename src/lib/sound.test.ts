@@ -6,6 +6,7 @@ import {
   playLand,
   playPeek,
   playStreak,
+  playWarp,
   playWrong,
   setSoundMuted,
   soundMuted,
@@ -21,11 +22,13 @@ describe("optional sounds", () => {
     expect(() => playHop(1, 4)).not.toThrow();
     expect(() => playLand(1, 4)).not.toThrow();
     expect(() => playPeek()).not.toThrow();
+    expect(() => playWarp()).not.toThrow();
     setSoundMuted(false);
     expect(soundMuted()).toBe(false);
     expect(() => playHop()).not.toThrow();
     expect(() => playLand()).not.toThrow();
     expect(() => playPeek()).not.toThrow();
+    expect(() => playWarp()).not.toThrow();
   });
 
   it("softens mid-chain hops so long jumps stay quiet", () => {

@@ -126,3 +126,12 @@ export function playPeek() {
   tone(698.46, t, 0.045, "sine", 0.026);
   tone(880, t + 0.028, 0.06, "sine", 0.02);
 }
+
+export function playWarp() {
+  const c = ac();
+  if (!c) return;
+  const t = c.currentTime;
+  chirp(392, 784, t, 0.16, "sine", 0.028);
+  chirp(784, 523.25, t + 0.14, 0.18, "sine", 0.022);
+  tone(659.25, t + 0.28, 0.08, "sine", 0.018);
+}

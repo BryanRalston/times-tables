@@ -10,7 +10,9 @@ import type {
   ChoiceData,
   ClockData,
   CompareData,
+  ComputeData,
   DecimalData,
+  FluencyData,
   FractionData,
   GraphData,
   JumpsData,
@@ -20,7 +22,7 @@ import type {
   Question,
 } from "@/lib/types";
 import { moneyFmt } from "@/lib/utils";
-import { BEAKER_FACE, Board, beakerMeniscusY, jumpTickLabel, moneyBox, rulerPointerX, scaleNeedleDeg, type BoardProps } from "./models";
+import { BEAKER_FACE, Board, beakerMeniscusY, comparePlaceCols, jumpTickLabel, moneyBox, rulerPointerX, scaleNeedleDeg, type BoardProps } from "./models";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -372,11 +374,68 @@ describe("boards", () => {
     const q = makeQuestion(activityById("u2-compare")!.activity, rngFromSeed("cmp:bars"));
     const d = q.data as CompareData;
     const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    const cols = comparePlaceCols(d.a, d.b);
     expect(html).toContain(`${d.a} ○ ${d.b}`);
     expect(html).toContain("left");
     expect(html).toContain("right");
+    expect(html).toContain("data-compare-places");
+    expect(html).toContain(`data-compare-place="${cols[0]!.placeEn}"`);
+    expect(html).toContain("ones");
     expect(html).not.toMatch(/height:\s*\d/);
     expect(html).not.toContain("style=\"height:");
+  });
+
+  it("fluency 10 × 2 is ten groups of two, not a ghost 0 × 2 split", () => {
+    const q: Question = {
+      id: "t10x2",
+      kind: "fluency",
+      prompt: "10 × 2",
+      answer: "20",
+      input: "keypad",
+      data: { a: 10, b: 2, op: "×" } satisfies FluencyData,
+    };
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(q.needsInteract).toBeFalsy();
+    expect(html).toContain("10 × 2");
+    expect(html).not.toMatch(/>0 × 2</);
+    expect((html.match(/10 × 2/g) ?? []).length).toBe(1);
+    expect((html.match(/data-equal-group/g) ?? []).length).toBe(10);
+    expect((html.match(/rounded-full bg-teal/g) ?? []).length).toBe(20);
+    expect(html).toContain("data-group-tally");
+    expect(html).toContain("<button");
+  });
+
+  it("fluency 40 ÷ 4 groups are tappable tallies and do not gate Check", () => {
+    const q: Question = {
+      id: "t40d4",
+      kind: "fluency",
+      prompt: "40 ÷ 4",
+      answer: "10",
+      input: "keypad",
+      data: { a: 40, b: 4, op: "÷" } satisfies FluencyData,
+    };
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(q.needsInteract).toBeFalsy();
+    expect((html.match(/data-equal-group/g) ?? []).length).toBe(10);
+    expect((html.match(/data-group-tally="0"/g) ?? []).length).toBe(10);
+    expect(html).toContain("<button");
+    expect(html).toContain('aria-label="group 1"');
+  });
+
+  it("large add/sub boards keep two-sided pieces; only the smaller side is tappable", () => {
+    const add = makeQuestion(activityById("u7-exact")!.activity, rngFromSeed("add:why"));
+    const sub = makeQuestion(activityById("u13-compute")!.activity, rngFromSeed("sub:why"));
+    for (const q of [add, sub]) {
+      const d = q.data as ComputeData;
+      const html = renderToStaticMarkup(<Board {...stub(q)} />);
+      expect(q.needsInteract).toBeFalsy();
+      expect(html).toContain("data-compute-piece");
+      expect(html).toContain('data-compute-small="1"');
+      expect(html).toContain('data-compute-why=');
+      const small = d.a >= d.b ? "right" : "left";
+      expect(html).toContain(`data-compute-side="${small}"`);
+      expect(html).toMatch(new RegExp(`data-compute-side="${small}"[^>]*data-compute-small="1"`));
+    }
   });
 
   it("how-many-more stories still use comparison bars", () => {
