@@ -9,14 +9,14 @@ import { ScratchPad } from "@/components/scratch";
 import { Button } from "@/components/ui/button";
 import { todayIso } from "@/lib/calendar";
 import { activityById, suggestedUnitId } from "@/lib/curriculum";
-import { pathNowUnitId } from "@/lib/path";
+import { dailyStartUnitId } from "@/lib/path";
 import { makeDailyWalk, walkLabel } from "@/lib/daily";
 import { parseLocale, UI } from "@/lib/i18n";
 import { cardHeading, interactGatesSubmit, leftoverHoldMs, leftoverPanelOpen, leftoverSkipOpen, leftoverSpeechOpen } from "@/lib/leftover";
 import { aliasActivityId, navigate } from "@/lib/nav";
 import { holdMsFor, REVEAL_AFTER_MISSES, WRONG_REVEAL_MS, WRONG_RETRY_MS, type FactStat } from "@/lib/practice";
 import { useProgress } from "@/lib/progress";
-import { hopCreditsOf } from "@/lib/radial-web";
+import { dailyWalkActivityId, hopCreditsOf } from "@/lib/radial-web";
 import { makeActivityRound, makeWelcomeRound } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
 import { canAffordAnything, coinsForResult } from "@/lib/coins";
@@ -38,10 +38,10 @@ interface Pack {
   activityId: string;
 }
 
-function playKey(kind: Kind, activityId: string | undefined, unitId: string): string {
+function playKey(kind: Kind, activityId: string | undefined, date: string): string {
   if (kind === "welcome") return "welcome";
   if (kind === "activity") return activityId ?? "practice";
-  return `daily:${unitId}`;
+  return dailyWalkActivityId(date);
 }
 
 function buildPack(
@@ -111,7 +111,7 @@ function buildPack(
     schoolDay: walk.schoolDay,
     fresh: walk.fresh,
     review: walk.review,
-    activityId: `daily:${walk.unit.id}`,
+    activityId: dailyWalkActivityId(walk.date),
   };
 }
 
@@ -125,9 +125,10 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   const [pack] = useState(() => {
     const st = useProgress.getState();
-    const calendarId = suggestedUnitId(todayIso(), st.classUnitId || undefined, st.pathGrade);
-    const unitGuess = pathNowUnitId(calendarId, st.sessions, st.activities);
-    const key = playKey(kind, activityId, unitGuess);
+    const date = todayIso();
+    const calendarId = suggestedUnitId(date, st.classUnitId || undefined, st.pathGrade);
+    const unitGuess = dailyStartUnitId(st.classUnitId || undefined, calendarId, st.sessions, st.activities, date);
+    const key = playKey(kind, activityId, date);
     const attempt = st.beginPlay(key);
     const locale = parseLocale(st.locale);
     return buildPack(

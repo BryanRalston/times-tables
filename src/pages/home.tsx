@@ -7,6 +7,7 @@ import { parseLocale } from "@/lib/i18n";
 import { unitText } from "@/lib/labels";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
+import { dailyWalkActivityId } from "@/lib/radial-web";
 
 export function HomePage() {
   const classUnitId = useProgress((s) => s.classUnitId);
@@ -23,7 +24,7 @@ export function HomePage() {
   const date = todayIso();
   const suggested = suggestedUnitId(date, classUnitId || undefined, pathGrade);
   const unit = unitById(suggested);
-  const nextAttempt = (attempts[`daily:${suggested}`] ?? 0) + 1;
+  const nextAttempt = (attempts[dailyWalkActivityId(date)] ?? 0) + 1;
   const walk = useMemo(
     () =>
       makeDailyWalk({

@@ -14,6 +14,7 @@ import {
   canStartDiceTurn,
   clampDieFace,
   clampPathStepsLeft,
+  dailyWalkActivityId,
   hopCreditsOf,
   hopLessonsCompleted,
   migratePathHopSpent,
@@ -111,6 +112,22 @@ describe("radial web", () => {
         "2026-09-10-again": { ...walk, date: "2026-09-10" },
       }),
     ).toBe(1);
+    const dated = dailyWalkActivityId("2026-09-10");
+    expect(dated).toBe("daily:2026-09-10");
+    expect(hopLessonsCompleted({ [dated]: leftover }, { "2026-09-10": walk })).toBe(1);
+    expect(hopLessonsCompleted({ [dated]: replayed }, { "2026-09-10": walk })).toBe(1);
+    expect(
+      hopLessonsCompleted(
+        { "daily:u12": leftover, "daily:u13": leftover },
+        { "2026-09-10": { ...walk, unitId: "u13" } },
+      ),
+    ).toBe(1);
+    expect(
+      hopLessonsCompleted(
+        { [dated]: leftover, "daily:u13": leftover, "u1-leftover": leftover },
+        { "2026-09-10": { ...walk, unitId: "u13" } },
+      ),
+    ).toBe(2);
   });
 
   it("does not invent spent hops, and refunds a burned pre-v12 Guest ledger", () => {
