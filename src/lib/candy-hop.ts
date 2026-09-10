@@ -5,6 +5,14 @@ export type HopPhase = "air" | "land";
 
 export type PathHopSfx = "hop" | "land";
 
+export type WarpPhase = "out" | "flash" | "in";
+
+/** Fade off the entry pad, flash both gates, fade onto the exit pad. */
+export const WARP_OUT_MS = 220;
+export const WARP_FLASH_MS = 200;
+export const WARP_IN_MS = 260;
+export const WARP_MS = WARP_OUT_MS + WARP_FLASH_MS + WARP_IN_MS;
+
 export type HopPose = {
   x: number;
   y: number;
@@ -207,4 +215,37 @@ export function hopLandSettle(pos: PathNodePos, t: number): HopPose {
 
 export function restHopPose(pos: PathNodePos): HopPose {
   return withShadow(pos, REST_SHADOW_SCALE, REST_SHADOW_OPACITY, { x: 1, y: 1 });
+}
+
+export function warpProgressAt(elapsed: number): {
+  t: number;
+  phase: WarpPhase;
+  done: boolean;
+  opacity: number;
+} {
+  if (elapsed >= WARP_MS) return { t: 1, phase: "in", done: true, opacity: 1 };
+  if (elapsed < WARP_OUT_MS) {
+    const t = clamp01(elapsed / WARP_OUT_MS);
+    return { t, phase: "out", done: false, opacity: 1 - easeHopTravel(t) };
+  }
+  if (elapsed < WARP_OUT_MS + WARP_FLASH_MS) {
+    const t = clamp01((elapsed - WARP_OUT_MS) / WARP_FLASH_MS);
+    return { t, phase: "flash", done: false, opacity: 0 };
+  }
+  const t = clamp01((elapsed - WARP_OUT_MS - WARP_FLASH_MS) / WARP_IN_MS);
+  return { t, phase: "in", done: false, opacity: easeHopTravel(t) };
+}
+
+export function warpPose(from: PathNodePos, to: PathNodePos, phase: WarpPhase): HopPose {
+  switch (phase) {
+    case "out":
+      return restHopPose(from);
+    case "flash":
+    case "in":
+      return restHopPose(to);
+    default: {
+      const _never: never = phase;
+      return _never;
+    }
+  }
 }

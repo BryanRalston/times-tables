@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ClockFace } from "@/components/clock-face";
 import { ChoiceList } from "@/components/keypad";
-import { G4Q, parseLocale, PLACE, UI } from "@/lib/i18n";
+import { G4Q, parseLocale, PLACE, UI, type Locale } from "@/lib/i18n";
+import {
+  freshComputeTap,
+  smallerComputeSide,
+  tapComputePiece,
+  type ComputeTapState,
+  type PlaceKind,
+  type PlaceParts,
+} from "@/lib/compute-model";
 import { leftoverWhyMoveMs, splitCounted } from "@/lib/leftover";
 import { useProgress } from "@/lib/progress";
 import { asset } from "@/lib/art";
@@ -370,6 +378,110 @@ function tensOnes(n: number) {
   return { thousands, hundreds, tens, ones };
 }
 
+export type ComparePlaceCol = {
+  placeEn: string;
+  label: string;
+  left: string;
+  right: string;
+  leftN: number;
+  rightN: number;
+};
+
+export function comparePlaceCols(a: number, b: number, locale: Locale = "en"): ComparePlaceCol[] {
+  const left = Math.max(0, Math.floor(Math.abs(a)));
+  const right = Math.max(0, Math.floor(Math.abs(b)));
+  const width = Math.max(String(left).length, String(right).length, 1);
+  const labels = PLACE[locale];
+  const cols: ComparePlaceCol[] = [];
+  for (let i = width - 1; i >= 0; i--) {
+    const leftHas = String(left).length > i;
+    const rightHas = String(right).length > i;
+    const pow = 10 ** i;
+    const leftN = leftHas ? Math.floor(left / pow) % 10 : 0;
+    const rightN = rightHas ? Math.floor(right / pow) % 10 : 0;
+    cols.push({
+      placeEn: PLACE.en[i] ?? "ones",
+      label: labels[i] ?? "",
+      left: leftHas ? String(leftN) : "",
+      right: rightHas ? String(rightN) : "",
+      leftN: leftHas ? leftN : 0,
+      rightN: rightHas ? rightN : 0,
+    });
+  }
+  return cols;
+}
+
+function placeTokenClass(placeEn: string): string {
+  switch (placeEn) {
+    case "ones":
+      return "size-2 rounded-[2px] bg-star";
+    case "tens":
+      return "h-6 w-1.5 rounded-sm bg-teal";
+    case "hundreds":
+      return "size-3 rounded-[3px] bg-q2";
+    default:
+      return "size-3.5 rounded-[3px] bg-ink/40";
+  }
+}
+
+function TallyGroups({
+  groups,
+  size,
+  prompt,
+  status,
+  shake,
+}: {
+  groups: number;
+  size: number;
+  prompt: string;
+  status: BoardProps["status"];
+  shake: number;
+}) {
+  const [marked, setMarked] = useState(() => Array.from({ length: groups }, () => false));
+  useEffect(() => {
+    setMarked(Array.from({ length: groups }, () => false));
+  }, [groups, size, prompt]);
+
+  function toggle(i: number) {
+    setMarked((prev) => prev.map((on, j) => (j === i ? !on : on)));
+    playTap();
+  }
+
+  return (
+    <Frame shake={shake} status={status}>
+      <p className="mb-3 text-center font-display text-2xl sm:text-3xl">{prompt}</p>
+      <div className="flex flex-wrap justify-center gap-2">
+        {Array.from({ length: groups }, (_, g) => (
+          <button
+            type="button"
+            key={g}
+            data-equal-group=""
+            data-group-tally={marked[g] ? "1" : "0"}
+            aria-pressed={marked[g]}
+            aria-label={`group ${g + 1}`}
+            onClick={() => toggle(g)}
+            className={cn(
+              "flex flex-wrap gap-1 rounded-[12px] border bg-bg-warm p-1.5",
+              marked[g] ? "border-teal bg-teal-soft ring-2 ring-teal/40" : "border-line",
+            )}
+          >
+            {size === 0 ? (
+              <span className="px-1 text-[10px] text-faint">0</span>
+            ) : (
+              Array.from({ length: size }, (_, i) => (
+                <span
+                  key={i}
+                  className={cn("rounded-full bg-teal", groups * size > 40 ? "size-2" : "size-3 sm:size-4")}
+                />
+              ))
+            )}
+          </button>
+        ))}
+      </div>
+    </Frame>
+  );
+}
+
 function PlaceValue({ question, status, shake }: BoardProps) {
   const data = question.data as PlaceValueData;
   const s = String(data.number);
@@ -502,9 +614,11 @@ function BuildNumber({ question, status, shake }: BoardProps) {
 
 function CompareNums({ question, status, shake }: BoardProps) {
   const data = question.data as CompareData;
-  const ui = UI[parseLocale(useProgress((st) => st.locale))];
+  const locale = parseLocale(useProgress((st) => st.locale));
+  const ui = UI[locale];
   const showBars = data.visual === "bars";
   const max = Math.max(data.a, data.b, 1);
+  const cols = !showBars && question.input === "compare" ? comparePlaceCols(data.a, data.b, locale) : [];
   return (
     <Frame shake={shake} status={status}>
       <div className={cn("flex justify-center gap-8", showBars ? "items-end" : "items-start")}>
@@ -523,6 +637,31 @@ function CompareNums({ question, status, shake }: BoardProps) {
           </div>
         ))}
       </div>
+      {cols.length ? (
+        <div
+          className="mt-3 grid gap-1 text-center text-[9px] leading-tight text-muted"
+          style={{ gridTemplateColumns: `repeat(${cols.length}, minmax(0, 1fr))` }}
+          data-compare-places=""
+        >
+          {cols.map((col) => (
+            <div key={col.placeEn} className="rounded-[10px] border border-line bg-bg-warm p-1" data-compare-place={col.placeEn}>
+              <p className="font-display text-base text-ink tabular-nums sm:text-lg">{col.left || "·"}</p>
+              <div className="flex min-h-6 flex-wrap items-end justify-center gap-0.5">
+                {Array.from({ length: col.leftN }, (_, i) => (
+                  <span key={`l-${i}`} className={placeTokenClass(col.placeEn)} />
+                ))}
+              </div>
+              <p className="mt-1 font-display text-base text-ink tabular-nums sm:text-lg">{col.right || "·"}</p>
+              <div className="flex min-h-6 flex-wrap items-end justify-center gap-0.5">
+                {Array.from({ length: col.rightN }, (_, i) => (
+                  <span key={`r-${i}`} className={placeTokenClass(col.placeEn)} />
+                ))}
+              </div>
+              {col.label}
+            </div>
+          ))}
+        </div>
+      ) : null}
       {question.input === "compare" ? (
         <p className="mt-3 text-center font-display text-2xl tabular-nums">
           {data.a} ○ {data.b}
@@ -1283,12 +1422,103 @@ function PatternBoard({ question, status, shake }: BoardProps) {
   );
 }
 
-function hundredsParts(n: number) {
-  return {
-    h: Math.floor(n / 100),
-    t: Math.floor((n % 100) / 10),
-    o: n % 10,
-  };
+function computePieceClass(kind: PlaceKind, dimmed: boolean): string {
+  return cn(
+    kind === "h" && "size-5 rounded-[3px] bg-q2",
+    kind === "t" && "h-8 w-1.5 rounded-sm bg-teal",
+    kind === "o" && "size-2 rounded-[2px] bg-star",
+    dimmed && "opacity-30 grayscale",
+  );
+}
+
+function ComputePlaceRow({
+  kind,
+  count,
+  gone,
+  tappable,
+  onTap,
+}: {
+  kind: PlaceKind;
+  count: number;
+  gone: number;
+  tappable: boolean;
+  onTap: () => void;
+}) {
+  return (
+    <div className={cn(kind === "h" ? "flex flex-wrap justify-center gap-0.5" : "mt-1 flex justify-center gap-0.5")}>
+      {Array.from({ length: count }, (_, k) => {
+        const dimmed = k < gone;
+        const canTap = tappable && !dimmed;
+        const className = computePieceClass(kind, dimmed);
+        if (canTap) {
+          return (
+            <button
+              type="button"
+              key={k}
+              data-compute-piece={kind}
+              data-compute-dim="0"
+              aria-label={kind}
+              className={className}
+              onClick={onTap}
+            />
+          );
+        }
+        return <span key={k} data-compute-piece={kind} data-compute-dim={dimmed ? "1" : "0"} className={className} />;
+      })}
+    </div>
+  );
+}
+
+function ComputeBlocks({
+  a,
+  b,
+  op,
+  mode,
+  status,
+  shake,
+}: {
+  a: number;
+  b: number;
+  op: "+" | "−";
+  mode: ComputeData["mode"];
+  status: BoardProps["status"];
+  shake: number;
+}) {
+  const ui = UI[parseLocale(useProgress((st) => st.locale))];
+  const [state, setState] = useState<ComputeTapState>(() => freshComputeTap(a, b));
+  const small = smallerComputeSide(a, b);
+
+  function tap(side: "left" | "right", place: PlaceKind) {
+    const next = tapComputePiece(op, state, side, place, a, b);
+    if (!next) return;
+    setState(next);
+    playTap();
+  }
+
+  function column(side: "left" | "right", parts: PlaceParts, gone: PlaceParts, n: number) {
+    const tappable = side === small;
+    return (
+      <div data-compute-side={side} data-compute-small={tappable ? "1" : "0"}>
+        <ComputePlaceRow kind="h" count={parts.h} gone={gone.h} tappable={tappable} onTap={() => tap(side, "h")} />
+        <ComputePlaceRow kind="t" count={parts.t} gone={gone.t} tappable={tappable} onTap={() => tap(side, "t")} />
+        <ComputePlaceRow kind="o" count={parts.o} gone={gone.o} tappable={tappable} onTap={() => tap(side, "o")} />
+        {n}
+      </div>
+    );
+  }
+
+  return (
+    <Frame shake={shake} status={status}>
+      <p className="mb-3 text-center font-display text-2xl tabular-nums">
+        {a} {op} {b}
+        {mode === "estimate" ? <span className="block text-sm font-sans text-muted">{ui.nearestHundred}</span> : null}
+      </p>
+      <div className="flex justify-center gap-6 text-center text-[11px] text-muted" data-compute-why={op === "+" ? "join" : "cancel"}>
+        {column("left", state.left, state.leftGone, a)}
+        {column("right", state.right, state.rightGone, b)}
+      </div>
+    </Frame>
+  );
 }
 
 export function jumpTickLabel(data: JumpsData, i: number): string {
@@ -1366,37 +1596,16 @@ function ComputeBoard({ question, status, shake }: BoardProps) {
       </Frame>
     );
   }
-  const left = hundredsParts(data.a);
-  const right = hundredsParts(data.b);
   return (
-    <Frame shake={shake} status={status}>
-      <p className="mb-3 text-center font-display text-2xl tabular-nums">
-        {data.a} {data.op} {data.b}
-        {data.mode === "estimate" ? <span className="block text-sm font-sans text-muted">{ui.nearestHundred}</span> : null}
-      </p>
-      <div className="flex justify-center gap-6 text-center text-[11px] text-muted">
-        {[left, right].map((p, i) => (
-          <div key={i}>
-            <div className="flex flex-wrap justify-center gap-0.5">
-              {Array.from({ length: p.h }, (_, k) => (
-                <span key={k} className="size-5 rounded-[3px] bg-q2" />
-              ))}
-            </div>
-            <div className="mt-1 flex justify-center gap-0.5">
-              {Array.from({ length: p.t }, (_, k) => (
-                <span key={k} className="h-8 w-1.5 rounded-sm bg-teal" />
-              ))}
-            </div>
-            <div className="mt-1 flex justify-center gap-0.5">
-              {Array.from({ length: p.o }, (_, k) => (
-                <span key={k} className="size-2 rounded-[2px] bg-star" />
-              ))}
-            </div>
-            {i === 0 ? data.a : data.b}
-          </div>
-        ))}
-      </div>
-    </Frame>
+    <ComputeBlocks
+      key={`${data.a}:${data.b}:${data.op}`}
+      a={data.a}
+      b={data.b}
+      op={data.op}
+      mode={data.mode}
+      status={status}
+      shake={shake}
+    />
   );
 }
 
@@ -1682,7 +1891,16 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
 
 function FluencyBoard({ question, status, shake }: BoardProps) {
   const data = question.data as FluencyData;
-  if (data.op === "×" && data.a >= 10 && data.a <= 49 && data.b >= 2 && data.b <= 9) {
+  const factTimes = data.op === "×" && data.a > 0 && data.b > 0 && data.a <= 12 && data.b <= 12;
+  const splitApart =
+    data.op === "×" &&
+    !factTimes &&
+    data.a >= 13 &&
+    data.a <= 49 &&
+    data.b >= 2 &&
+    data.b <= 9 &&
+    data.a % 10 !== 0;
+  if (splitApart) {
     const tens = Math.floor(data.a / 10) * 10;
     const ones = data.a % 10;
     return (
@@ -1721,27 +1939,14 @@ function FluencyBoard({ question, status, shake }: BoardProps) {
       </Frame>
     );
   }
-  const times = data.op === "×" && data.a > 0 && data.b > 0 && data.a <= 12 && data.b <= 12;
+  const times = factTimes;
   const div =
     data.op === "÷" && data.b > 0 && data.a % data.b === 0 && data.a / data.b <= 12 && data.b <= 12 && data.a / data.b >= 1;
   const addSmall = (data.op === "+" || data.op === "−") && data.a <= 20 && data.b <= 20;
   if (times || div) {
     const groups = times ? data.a : data.a / data.b;
-    const size = times ? data.b : data.b;
-    return (
-      <Frame shake={shake} status={status}>
-        <p className="mb-3 text-center font-display text-2xl sm:text-3xl">{question.prompt}</p>
-        <div className="flex flex-wrap justify-center gap-2">
-          {Array.from({ length: groups }, (_, g) => (
-            <div key={g} className="flex flex-wrap gap-1 rounded-[12px] border border-line bg-bg-warm p-1.5">
-              {Array.from({ length: size }, (_, i) => (
-                <span key={i} className={cn("rounded-full bg-teal", groups * size > 40 ? "size-2" : "size-3 sm:size-4")} />
-              ))}
-            </div>
-          ))}
-        </div>
-      </Frame>
-    );
+    const size = data.b;
+    return <TallyGroups groups={groups} size={size} prompt={question.prompt} status={status} shake={shake} />;
   }
   if (addSmall) {
     const shown = data.op === "+" ? data.a : data.b;

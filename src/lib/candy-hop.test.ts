@@ -19,6 +19,10 @@ import {
   hopUnitStops,
   pathHopSfxKind,
   restHopPose,
+  warpPose,
+  warpProgressAt,
+  WARP_MS,
+  WARP_OUT_MS,
 } from "./candy-hop";
 import { GRADE3_PATH_NODES, TALL_MAP_DECORATIVE_PAD, mapToViewPos } from "./grade-path";
 import { START_PAD, adjacentPadIds } from "./radial-web";
@@ -167,5 +171,20 @@ describe("candy hop", () => {
     expect(midProg.phase).toBe("air");
     expect(midProg.t).toBeCloseTo(0.5);
     expect(hopProgressAt(OBSTACLE_HOP_MS + 8, 1, [OBSTACLE_HOP_MS]).phase).toBe("land");
+  });
+
+  it("fades the hopper off the entry pad and onto the exit pad", () => {
+    const a = { x: 20, y: 40 };
+    const b = { x: 80, y: 40 };
+    expect(warpProgressAt(0).phase).toBe("out");
+    expect(warpProgressAt(0).opacity).toBeCloseTo(1);
+    expect(warpProgressAt(WARP_OUT_MS / 2).opacity).toBeLessThan(1);
+    expect(warpProgressAt(WARP_OUT_MS + 10).phase).toBe("flash");
+    expect(warpProgressAt(WARP_OUT_MS + 10).opacity).toBe(0);
+    expect(warpProgressAt(WARP_MS - 8).phase).toBe("in");
+    expect(warpProgressAt(WARP_MS).done).toBe(true);
+    expect(warpPose(a, b, "out").x).toBe(a.x);
+    expect(warpPose(a, b, "flash").x).toBe(b.x);
+    expect(warpPose(a, b, "in").x).toBe(b.x);
   });
 });

@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { resetProgressMemory } from "@/lib/progress";
-import { RADIAL_PAD_COUNT, START_PAD, adjacentPadIds } from "@/lib/radial-web";
+import { RADIAL_PAD_COUNT, RADIAL_PADS, START_PAD, adjacentPadIds } from "@/lib/radial-web";
 import { CandyPath } from "./candy-path";
 
 describe("CandyPath", () => {
@@ -72,6 +72,28 @@ describe("CandyPath", () => {
     expect(html).toContain('data-path-travel="0"');
     expect(html).toMatch(/data-path-unit="u8"[^>]*data-path-status="now"/);
     expect((html.match(/data-path-pad="1"/g) ?? []).length).toBe(RADIAL_PAD_COUNT);
+  });
+
+  it("marks an adjacent portal hop as enterable without naming the exit", () => {
+    const portal = RADIAL_PADS.find((p) => p.portal)!;
+    const neighbor = adjacentPadIds(portal.id)[0]!;
+    const html = renderToStaticMarkup(
+      <CandyPath
+        suggestedId="u2"
+        standFrom={neighbor}
+        standTo={neighbor}
+        hopCredits={1}
+        onStart={() => {}}
+        onOpenUnit={() => {}}
+      />,
+    );
+    expect(html).toContain('data-pad-enterable="1"');
+    expect(html).toContain("candy-node-enterable");
+    expect(html).toContain(`data-pad-id="${portal.id}"`);
+    expect(html).not.toContain("data-portal-pair");
+    expect(html).not.toContain("data-portal-to");
+    expect(html).toContain('data-path-warp="0"');
+    expect(html).not.toContain("data-path-warp-fx");
   });
 
   it("never starts a multi-pad travel even if standTo is far away", () => {
