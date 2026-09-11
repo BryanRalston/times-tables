@@ -1674,13 +1674,11 @@ details > summary::-webkit-details-marker {
 .candy-unwrap {
   position: absolute;
   z-index: 12;
-  left: 50%;
-  top: 44%;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.28rem;
-  width: 26%;
+  width: 22%;
   min-width: 7.2rem;
   padding: 0.7rem 0.55rem 0.65rem;
   border: 0;
@@ -1689,7 +1687,7 @@ details > summary::-webkit-details-marker {
   box-shadow:
     0 0 0 2px rgb(255 255 255 / 0.8),
     0 10px 22px -12px rgb(80 30 50 / 0.45);
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -118%);
   pointer-events: auto;
   color: #4a2d55;
   cursor: pointer;

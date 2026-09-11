@@ -22,7 +22,7 @@ export const GRADE3_PRESENTS: readonly PresentSpot[] = [
 ];
 
 export const UNWRAP_OPEN_MS = 640;
-export const UNWRAP_HOLD_MS = 2600;
+export const UNWRAP_HOLD_MS = 9000;
 
 const presentByPad = new Map(GRADE3_PRESENTS.map((p) => [p.pad, p.squisheeId]));
 

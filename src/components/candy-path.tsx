@@ -561,6 +561,7 @@ export const CandyPath = forwardRef<
           <button
             type="button"
             className="candy-unwrap"
+            style={{ left: `${padView(unwrap.pad).x}%`, top: `${padView(unwrap.pad).y}%` }}
             data-present-unwrap={unwrap.phase}
             aria-label={
               unwrap.phase === "reveal"
