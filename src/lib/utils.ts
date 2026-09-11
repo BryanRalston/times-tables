@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { clockTimesMatch } from "./clock";
+import { clockTimesMatch, elapsedEndTime } from "./clock";
 import { UI, type Locale } from "./i18n";
 
 export function cn(...inputs: ClassValue[]) {
@@ -59,8 +59,18 @@ export function questionCorrect(
   q: { input: string; answer: string; alts?: string[]; data: unknown },
 ): boolean {
   if (q.input === "clock") {
-    const d = q.data as { hours?: number; minutes?: number };
+    const d = q.data as {
+      hours?: number;
+      minutes?: number;
+      find?: string;
+      elapsedHours?: number;
+      elapsedMinutes?: number;
+    };
     if (typeof d.hours === "number" && typeof d.minutes === "number") {
+      if (d.find === "end") {
+        const end = elapsedEndTime(d.hours, d.minutes, d.elapsedHours ?? 1, d.elapsedMinutes ?? 0);
+        return clockTimesMatch(given, end.hours, end.minutes);
+      }
       return clockTimesMatch(given, d.hours, d.minutes);
     }
   }

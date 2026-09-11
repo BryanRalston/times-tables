@@ -528,6 +528,10 @@ describe("first-visit Home door", () => {
     expect(css).toContain("animation: none !important");
     expect(css).toContain(".keypad-dock");
     expect(css).toContain(".squishee-silhouette");
+    expect(css).toContain(".mini-tap");
+    expect(css).toContain(".mini-hole");
+    expect(css).toContain(".mini-pad-glow");
+    expect(css).toContain("min-width: 4.75rem");
     expect(css).toContain("[data-leftover-board] .leftover-dot");
     expect(css).not.toContain("[data-welcome-leftover]");
     const models = readFileSync(join(HERE, "components/models.tsx"), "utf8");

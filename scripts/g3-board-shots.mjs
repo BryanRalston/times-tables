@@ -166,7 +166,7 @@ function rngFromSeed(seed) {
 }
 
 function pickMiniKind(seed) {
-  return rngFromSeed(seed).pick(["match", "who-hid", "poke"]);
+  return rngFromSeed(seed).pick(["match", "who-hid", "poke", "peek", "twin", "hop"]);
 }
 
 function todayIso() {
@@ -183,7 +183,7 @@ function miniSeeds() {
   for (const id of ACTIVITIES) {
     const kind = pickMiniKind(`minigame:kid-1:${id}:${date}`);
     if (!found[kind]) found[kind] = id;
-    if (found.match && found["who-hid"] && found.poke) break;
+    if (found.match && found["who-hid"] && found.poke && found.peek && found.twin && found.hop) break;
   }
   return found;
 }
@@ -309,8 +309,8 @@ async function skipToMinigame(page, activityId) {
   await waitBoard(page, activityId);
   for (let n = 0; n < 16; n++) {
     const t = await page.locator("#app").innerText();
-    if (/Find the pairs|Who hid\?|Poke the /i.test(t)) {
-      if (/Who hid\?/i.test(t)) await page.waitForTimeout(2600);
+    if (/Find the pairs|Who hid\?|Remember these toys|Poke the |Who's peeking|Tap two that match|Tap the glow/i.test(t)) {
+      if (/Remember these toys/i.test(t)) await page.waitForTimeout(2600);
       return page.locator("#app").innerText();
     }
     const skip = page.getByRole("button", { name: /^Skip$/i });
@@ -323,7 +323,10 @@ async function skipToMinigame(page, activityId) {
 
 function miniKindFromText(t) {
   if (/Find the pairs/i.test(t)) return "match";
-  if (/Who hid\?/i.test(t)) return "who-hid";
+  if (/Who hid\?|Remember these toys/i.test(t)) return "who-hid";
+  if (/Who's peeking/i.test(t)) return "peek";
+  if (/Tap two that match/i.test(t)) return "twin";
+  if (/Tap the glow/i.test(t)) return "hop";
   if (/Poke the /i.test(t)) return "poke";
   return null;
 }
@@ -405,7 +408,7 @@ for (const [vpName, viewport] of [
   }
 
   const seenMini = new Set();
-  for (const kind of ["match", "who-hid", "poke"]) {
+  for (const kind of ["match", "who-hid", "poke", "peek", "twin", "hop"]) {
     const act = seeds[kind];
     if (!act) continue;
     try {

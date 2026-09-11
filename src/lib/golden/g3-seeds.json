@@ -6812,7 +6812,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "4 groups of 0. How many in all?",
+      "prompt": "0 groups of 5. How many in all?",
       "answer": "0",
       "alts": null,
       "choices": null,
@@ -12796,7 +12796,7 @@
   ],
   "u11-match": [
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "5:14",
       "alts": null,
       "choices": null,
@@ -12805,7 +12805,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "10:41",
       "alts": null,
       "choices": null,
@@ -12814,7 +12814,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "9:27",
       "alts": null,
       "choices": null,
@@ -12823,7 +12823,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "6:34",
       "alts": null,
       "choices": null,
@@ -12832,7 +12832,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "10:51",
       "alts": null,
       "choices": null,
@@ -12841,7 +12841,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "3:10",
       "alts": null,
       "choices": null,
@@ -12850,7 +12850,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "8:35",
       "alts": null,
       "choices": null,
@@ -12859,7 +12859,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "1:15",
       "alts": null,
       "choices": null,
@@ -12868,7 +12868,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "11:16",
       "alts": null,
       "choices": null,
@@ -12877,7 +12877,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "5:10",
       "alts": null,
       "choices": null,
@@ -12886,7 +12886,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "1:42",
       "alts": null,
       "choices": null,
@@ -12895,7 +12895,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "3:42",
       "alts": null,
       "choices": null,
@@ -12904,7 +12904,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "1:40",
       "alts": null,
       "choices": null,
@@ -12913,7 +12913,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "1:16",
       "alts": null,
       "choices": null,
@@ -12922,7 +12922,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "6:26",
       "alts": null,
       "choices": null,
@@ -12931,7 +12931,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "12:39",
       "alts": null,
       "choices": null,
@@ -12940,7 +12940,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "2:44",
       "alts": null,
       "choices": null,
@@ -12949,7 +12949,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "11:51",
       "alts": null,
       "choices": null,
@@ -12958,7 +12958,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "9:01",
       "alts": null,
       "choices": null,
@@ -12967,7 +12967,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "What time is it?",
+      "prompt": "Show this time on the clock.",
       "answer": "7:56",
       "alts": null,
       "choices": null,
@@ -12978,243 +12978,183 @@
   ],
   "u11-elapsed": [
     {
-      "prompt": "Start 12:25. End 1:25. How many hours passed?",
-      "answer": "1",
-      "alts": [
-        "1 hour",
-        "1 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "1:25",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 6:55. End 7:55. How many hours passed?",
-      "answer": "1",
-      "alts": [
-        "1 hour",
-        "1 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "7:55",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 5:45. End 6:45. How many hours passed?",
-      "answer": "1",
-      "alts": [
-        "1 hour",
-        "1 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "6:45",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 9:40. End 11:40. How many hours passed?",
-      "answer": "2",
-      "alts": [
-        "2 hour",
-        "2 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "10:40",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 4:45. End 5:45. How many hours passed?",
-      "answer": "1",
-      "alts": [
-        "1 hour",
-        "1 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "5:45",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 10:50. End 1:50. How many hours passed?",
-      "answer": "3",
-      "alts": [
-        "3 hour",
-        "3 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "11:50",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 11:30. End 1:30. How many hours passed?",
-      "answer": "2",
-      "alts": [
-        "2 hour",
-        "2 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "12:30",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 8:45. End 9:45. How many hours passed?",
-      "answer": "1",
-      "alts": [
-        "1 hour",
-        "1 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "9:45",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 1:45. End 4:45. How many hours passed?",
-      "answer": "3",
-      "alts": [
-        "3 hour",
-        "3 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "2:45",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 12:25. End 3:25. How many hours passed?",
-      "answer": "3",
-      "alts": [
-        "3 hour",
-        "3 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "1:25",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 8:30. End 9:30. How many hours passed?",
-      "answer": "1",
-      "alts": [
-        "1 hour",
-        "1 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "9:30",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 6:10. End 7:10. How many hours passed?",
-      "answer": "1",
-      "alts": [
-        "1 hour",
-        "1 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "7:10",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 3:20. End 5:20. How many hours passed?",
-      "answer": "2",
-      "alts": [
-        "2 hour",
-        "2 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "4:20",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 10:55. End 1:55. How many hours passed?",
-      "answer": "3",
-      "alts": [
-        "3 hour",
-        "3 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "11:55",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 10:05. End 1:05. How many hours passed?",
-      "answer": "3",
-      "alts": [
-        "3 hour",
-        "3 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "11:05",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 8:25. End 10:25. How many hours passed?",
-      "answer": "2",
-      "alts": [
-        "2 hour",
-        "2 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "9:25",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 2:20. End 4:20. How many hours passed?",
-      "answer": "2",
-      "alts": [
-        "2 hour",
-        "2 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "3:20",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 3:00. End 5:00. How many hours passed?",
-      "answer": "2",
-      "alts": [
-        "2 hour",
-        "2 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "4:00",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 8:50. End 10:50. How many hours passed?",
-      "answer": "2",
-      "alts": [
-        "2 hour",
-        "2 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "9:50",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     },
     {
-      "prompt": "Start 1:35. End 4:35. How many hours passed?",
-      "answer": "3",
-      "alts": [
-        "3 hour",
-        "3 hours"
-      ],
+      "prompt": "One hour later. What time is it?",
+      "answer": "2:35",
+      "alts": null,
       "choices": null,
       "kind": "clock",
-      "input": "keypad",
+      "input": "clock",
       "needsInteract": false
     }
   ],
@@ -15856,7 +15796,7 @@
   ],
   "u13-area": [
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Noah covers a garden bed with squares. How many squares cover it?",
       "answer": "14",
       "alts": null,
       "choices": null,
@@ -15865,7 +15805,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Maya covers a garden bed with squares. How many squares cover it?",
       "answer": "23",
       "alts": null,
       "choices": null,
@@ -15874,7 +15814,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Cole covers a garden bed with squares. How many squares cover it?",
       "answer": "13",
       "alts": null,
       "choices": null,
@@ -15883,7 +15823,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Leo puts tiles on a rug. How many tiles cover the rug?",
       "answer": "7",
       "alts": null,
       "choices": null,
@@ -15892,7 +15832,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Noah covers a garden bed with squares. How many squares cover it?",
       "answer": "15",
       "alts": null,
       "choices": null,
@@ -15901,7 +15841,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Maya puts tiles on a rug. How many tiles cover the rug?",
       "answer": "14",
       "alts": null,
       "choices": null,
@@ -15910,7 +15850,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Cole covers a patio with tiles. How many tiles cover it?",
       "answer": "4",
       "alts": null,
       "choices": null,
@@ -15919,7 +15859,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Leo covers a garden bed with squares. How many squares cover it?",
       "answer": "7",
       "alts": null,
       "choices": null,
@@ -15928,7 +15868,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Theo covers a patio with tiles. How many tiles cover it?",
       "answer": "13",
       "alts": null,
       "choices": null,
@@ -15937,7 +15877,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Rosa puts tiles on a rug. How many tiles cover the rug?",
       "answer": "11",
       "alts": null,
       "choices": null,
@@ -15946,7 +15886,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Ivy covers a garden bed with squares. How many squares cover it?",
       "answer": "12",
       "alts": null,
       "choices": null,
@@ -15955,7 +15895,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Rosa covers a patio with tiles. How many tiles cover it?",
       "answer": "8",
       "alts": null,
       "choices": null,
@@ -15964,7 +15904,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Kai puts tiles on a rug. How many tiles cover the rug?",
       "answer": "12",
       "alts": null,
       "choices": null,
@@ -15973,7 +15913,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Theo covers a garden bed with squares. How many squares cover it?",
       "answer": "16",
       "alts": null,
       "choices": null,
@@ -15982,7 +15922,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Zoe puts tiles on a rug. How many tiles cover the rug?",
       "answer": "25",
       "alts": null,
       "choices": null,
@@ -15991,7 +15931,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Mila covers a garden bed with squares. How many squares cover it?",
       "answer": "15",
       "alts": null,
       "choices": null,
@@ -16000,7 +15940,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "June covers a garden bed with squares. How many squares cover it?",
       "answer": "17",
       "alts": null,
       "choices": null,
@@ -16009,7 +15949,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Zoe covers a patio with tiles. How many tiles cover it?",
       "answer": "14",
       "alts": null,
       "choices": null,
@@ -16018,7 +15958,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "June puts tiles on a rug. How many tiles cover the rug?",
       "answer": "20",
       "alts": null,
       "choices": null,
@@ -16027,7 +15967,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "How many unit squares?",
+      "prompt": "Rosa covers a garden bed with squares. How many squares cover it?",
       "answer": "15",
       "alts": null,
       "choices": null,

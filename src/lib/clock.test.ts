@@ -9,6 +9,7 @@ import {
   clockAngleFromPoint,
   clockTimesMatch,
   displayedClockTime,
+  elapsedEndTime,
   formatClockTime,
   pickHand,
   startClockTime,
@@ -78,5 +79,17 @@ describe("clock angle to time", () => {
     const q = makeQuestion(activityById("u11-clock")!.activity, rngFromSeed("face:check"));
     const cd = q.data as ClockData;
     expect(questionCorrect(formatClockTime(cd.hours, cd.minutes), q)).toBe(true);
+  });
+
+  it("elapsed end time is exactly one hour later", () => {
+    expect(elapsedEndTime(3, 15, 1, 0)).toEqual({ hours: 4, minutes: 15 });
+    expect(elapsedEndTime(12, 0, 1, 0)).toEqual({ hours: 1, minutes: 0 });
+    expect(elapsedEndTime(11, 45, 1, 0)).toEqual({ hours: 12, minutes: 45 });
+    const q = makeQuestion(activityById("u11-elapsed")!.activity, rngFromSeed("later:check"));
+    const d = q.data as ClockData;
+    expect(d.elapsedHours).toBe(1);
+    const end = elapsedEndTime(d.hours, d.minutes, 1, 0);
+    expect(questionCorrect(formatClockTime(end.hours, end.minutes), q)).toBe(true);
+    expect(questionCorrect(formatClockTime(d.hours, d.minutes), q)).toBe(false);
   });
 });
