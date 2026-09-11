@@ -21,38 +21,38 @@ export type RadialPad = {
 };
 
 /**
- * Pixel-space center of the painted plaza. Percent coords so hops sit on
- * the circular board (y = 0 is the top of the JPG).
+ * Painted plaza center in map %. The #64/#68 6/7 crop made the old
+ * 50.04 / 47.35 south-shift obvious — inner cream tiles sat above the
+ * hopper. Locked to the clay disc so hops sit on tiles, not grass.
  */
-const CX = 50.04;
-const CY = 47.35;
-
-function polar(angleDeg: number, rPx: number): RadialPos {
-  const th = (angleDeg * Math.PI) / 180;
-  return {
-    x: CX + (100 * rPx * Math.sin(th)) / RADIAL_MAP_SIZE.w,
-    y: CY + (100 * -rPx * Math.cos(th)) / RADIAL_MAP_SIZE.h,
-  };
-}
+export const RADIAL_PLAZA = { x: 49.88, y: 45.15 } as const;
 
 /**
  * Ring radii in art pixels, tuned so pads land on painted tiles:
  * inner 8 around the plaza, inner swirl ring, mid ring, outer walking ring.
  */
-const RING_RADIUS = [0, 92, 172, 228, 274] as const;
+export const RADIAL_RING_PX = [0, 85, 150, 216, 262] as const;
+
+function polar(angleDeg: number, rPx: number): RadialPos {
+  const th = (angleDeg * Math.PI) / 180;
+  return {
+    x: RADIAL_PLAZA.x + (100 * rPx * Math.sin(th)) / RADIAL_MAP_SIZE.w,
+    y: RADIAL_PLAZA.y + (100 * -rPx * Math.cos(th)) / RADIAL_MAP_SIZE.h,
+  };
+}
 
 function buildPads(): RadialPad[] {
-  const pads: RadialPad[] = [{ id: 1, map: { x: CX, y: CY }, ring: 0, angle: 0, portal: false }];
+  const pads: RadialPad[] = [{ id: 1, map: { ...RADIAL_PLAZA }, ring: 0, angle: 0, portal: false }];
   let id = 2;
   for (let i = 0; i < 8; i++) {
     const angle = i * 45;
-    pads.push({ id: id++, map: polar(angle, RING_RADIUS[1]), ring: 1, angle, portal: false });
+    pads.push({ id: id++, map: polar(angle, RADIAL_RING_PX[1]), ring: 1, angle, portal: false });
   }
   for (let i = 0; i < 16; i++) {
     const angle = i * 22.5;
     pads.push({
       id: id++,
-      map: polar(angle, RING_RADIUS[2]),
+      map: polar(angle, RADIAL_RING_PX[2]),
       ring: 2,
       angle,
       portal: angle % 90 === 0,
@@ -60,13 +60,13 @@ function buildPads(): RadialPad[] {
   }
   for (let i = 0; i < 16; i++) {
     const angle = i * 22.5;
-    pads.push({ id: id++, map: polar(angle, RING_RADIUS[3]), ring: 3, angle, portal: false });
+    pads.push({ id: id++, map: polar(angle, RADIAL_RING_PX[3]), ring: 3, angle, portal: false });
   }
   for (let i = 0; i < 40; i++) {
     const angle = i * 9;
     pads.push({
       id: id++,
-      map: polar(angle, RING_RADIUS[4]),
+      map: polar(angle, RADIAL_RING_PX[4]),
       ring: 4,
       angle,
       portal: angle % 45 === 0,
@@ -213,12 +213,102 @@ export function isPortalPad(id: number): boolean {
   return radialPad(id).portal;
 }
 
+export type HopCardinal = "up" | "down" | "left" | "right";
+
+export type HopDir = {
+  id: number;
+  /** 0 = north / up, clockwise, in painted-art pixels. */
+  bearing: number;
+  cardinal: HopCardinal | null;
+  portal: boolean;
+};
+
+/** Within this of a compass point counts as a cardinal button, not an angled spoke. */
+const CARDINAL_ALIGN_DEG = 16;
+
+/** Fat-finger snap from the squishee to the nearest visible direction. */
+export const HOP_DIR_SNAP_DEG = 32;
+
+/** Ignore taps on the face; ignore taps past the direction ring. */
+export const HOP_DIR_MIN_PX = 22;
+export const HOP_DIR_MAX_PX = 78;
+
+function hopBearingDeg(fromId: number, toId: number): number {
+  const a = radialPad(fromId).map;
+  const b = radialPad(toId).map;
+  const dx = ((b.x - a.x) / 100) * RADIAL_MAP_SIZE.w;
+  const dy = ((b.y - a.y) / 100) * RADIAL_MAP_SIZE.h;
+  return (Math.atan2(dx, -dy) * 180) / Math.PI;
+}
+
+function wrapDeg(deg: number): number {
+  return ((deg % 360) + 360) % 360;
+}
+
+function cardinalOfBearing(bearing: number): HopCardinal | null {
+  const slots: { c: HopCardinal; a: number }[] = [
+    { c: "up", a: 0 },
+    { c: "right", a: 90 },
+    { c: "down", a: 180 },
+    { c: "left", a: 270 },
+  ];
+  let best: HopCardinal | null = null;
+  let bestD = CARDINAL_ALIGN_DEG;
+  for (const s of slots) {
+    const d = angleDiff(wrapDeg(bearing), s.a);
+    if (d < bestD) {
+      bestD = d;
+      best = s.c;
+    }
+  }
+  return best;
+}
+
+/** Valid one-space hops from a pad, each aimed along the painted path. */
+export function hopDirs(fromId: number): readonly HopDir[] {
+  return adjacentPadIds(fromId)
+    .map((id) => {
+      const bearing = wrapDeg(hopBearingDeg(fromId, id));
+      return { id, bearing, cardinal: cardinalOfBearing(bearing), portal: isPortalPad(id) };
+    })
+    .sort((a, b) => a.bearing - b.bearing || a.id - b.id);
+}
+
 /**
- * Phone-fair snap radius. The Lessons card zooms the locked 16:9 board
- * (taller 6/7 crop, side letterbox gone). Plaza neighbors sit ~42px apart
- * on that stage, so a 36px snap is a comfortable fat-finger circle. Hits
- * use nearest valid neighbor (plus the current pad as a tap sink). Voronoi
- * among glowing pads keeps neighbors from stealing.
+ * Nearest visible direction around the squishee. Taps on the face or
+ * outside the ring do not hop. Tie-break is smaller bearing, then id.
+ */
+export function nearestHopDir(
+  originX: number,
+  originY: number,
+  tapX: number,
+  tapY: number,
+  dirs: readonly HopDir[],
+  snapDeg = HOP_DIR_SNAP_DEG,
+  minPx = HOP_DIR_MIN_PX,
+  maxPx = HOP_DIR_MAX_PX,
+): number | undefined {
+  if (!dirs.length || snapDeg <= 0) return undefined;
+  const dist = Math.hypot(tapX - originX, tapY - originY);
+  if (dist < minPx || dist > maxPx) return undefined;
+  const bearing = wrapDeg((Math.atan2(tapX - originX, -(tapY - originY)) * 180) / Math.PI);
+  let bestId: number | undefined;
+  let bestD = snapDeg;
+  let bestBearing = 361;
+  for (const d of dirs) {
+    const gap = angleDiff(bearing, d.bearing);
+    if (gap < bestD || (gap === bestD && (d.bearing < bestBearing || (d.bearing === bestBearing && (bestId == null || d.id < bestId))))) {
+      bestD = gap;
+      bestId = d.id;
+      bestBearing = d.bearing;
+    }
+  }
+  return bestId;
+}
+
+/**
+ * Phone-fair snap radius kept for pad-space math. Plaza neighbors sit
+ * ~39px apart on the 6/7 stage. Direction-pad hits use nearestHopDir.
  */
 export const HOP_SNAP_PX = 36;
 
