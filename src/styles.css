@@ -1561,11 +1561,11 @@ details > summary::-webkit-details-marker {
   padding: 0;
   border: 0;
   border-radius: 9999px;
-  background: linear-gradient(180deg, #fffdf8 0%, #ffe6f0 100%);
+  background: #fffdf8;
   box-shadow:
-    0 0 0 2px rgb(255 255 255 / 0.95),
+    0 0 0 2px #0e8a86,
     0 3px 0 #d46a90,
-    0 6px 10px rgb(80 30 50 / 0.16);
+    0 6px 10px rgb(80 30 50 / 0.2);
   pointer-events: auto;
   cursor: pointer;
 }
