@@ -9,6 +9,7 @@ import type {
   AreaData,
   ArrayData,
   BuildData,
+  ChoiceData,
   ClockData,
   CompareData,
   ComputeData,
@@ -382,6 +383,12 @@ describe("answer audit", () => {
     for (let i = 0; i < 30; i++) {
       const q = makeQuestion(found.activity, rngFromSeed(`fam:${i}`));
       expect(q.choices).toContain(q.answer);
+      expect(q.needsInteract).toBeFalsy();
+      const d = q.data as ChoiceData;
+      expect(d.visual).toBe("groups");
+      expect(d.groups).toBeGreaterThanOrEqual(2);
+      expect(d.size).toBeGreaterThanOrEqual(2);
+      expect(q.prompt).toContain(`${d.groups} groups of ${d.size}`);
       for (const c of q.choices ?? []) {
         const m = c.match(/(\d+)\s*([×÷+\u2212-])\s*(\d+)\s*=\s*(\d+)/);
         expect(m).toBeTruthy();
