@@ -93,6 +93,9 @@ export type Ui = {
   rareShelf: string;
   shelfBlurb: (have: number, total: number) => string;
   rareBlurb: string;
+  findOnMap: string;
+  youFound: (name: string) => string;
+  surprisePresent: string;
   coins: string;
   buy: string;
   notEnough: string;
@@ -268,7 +271,10 @@ export const UI: Record<Locale, Ui> = {
     squisheeShelf: "Shelf",
     rareShelf: "Rares",
     shelfBlurb: (have, total) => `${have} of ${total} on the shelf.`,
-    rareBlurb: "Rares cost more coins.",
+    rareBlurb: "Find mystery presents on the Lessons map.",
+    findOnMap: "Find on Lessons",
+    youFound: (name) => `You found ${name}!`,
+    surprisePresent: "Surprise present",
     coins: "Coins",
     buy: "Buy",
     notEnough: "Need more coins",
@@ -445,7 +451,10 @@ export const UI: Record<Locale, Ui> = {
     squisheeShelf: "Estante",
     rareShelf: "Raros",
     shelfBlurb: (have, total) => `${have} de ${total} en el estante.`,
-    rareBlurb: "Los raros cuestan más monedas.",
+    rareBlurb: "Encuentra regalos misteriosos en el mapa de Lecciones.",
+    findOnMap: "Búscalos en Lecciones",
+    youFound: (name) => `¡Encontraste a ${name}!`,
+    surprisePresent: "Regalo sorpresa",
     coins: "Monedas",
     buy: "Comprar",
     notEnough: "Faltan monedas",
@@ -622,7 +631,10 @@ export const UI: Record<Locale, Ui> = {
     squisheeShelf: "Prateleira",
     rareShelf: "Raros",
     shelfBlurb: (have, total) => `${have} de ${total} na prateleira.`,
-    rareBlurb: "Os raros custam mais moedas.",
+    rareBlurb: "Ache presentes misteriosos no mapa de Lições.",
+    findOnMap: "Ache nas Lições",
+    youFound: (name) => `Você achou ${name}!`,
+    surprisePresent: "Presente surpresa",
     coins: "Moedas",
     buy: "Comprar",
     notEnough: "Faltam moedas",

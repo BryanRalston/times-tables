@@ -446,6 +446,12 @@ describe("locale", () => {
     expect(UI.es.pathGrade4).toBe("Avanzado (4.º) — vista previa");
     expect(UI["pt-BR"].pathGrade4).toBe("Avançado (4.º) — prévia");
     expect(UI.en.preview).toBe("Preview");
+    expect(UI.en.rareBlurb).toMatch(/Lessons map/);
+    expect(UI.en.findOnMap).toBe("Find on Lessons");
+    expect(UI.en.youFound("Peach")).toBe("You found Peach!");
+    expect(UI.en.surprisePresent).toBe("Surprise present");
+    expect(UI.es.surprisePresent).toBe("Regalo sorpresa");
+    expect(UI["pt-BR"].findOnMap).toBe("Ache nas Lições");
     expect(UI.en.grownupPoints.some((p) => /VDOE Grade 4 strands/.test(p))).toBe(true);
     expect(UI.en.grownupPoints.some((p) => /LCPS 2026–27 year map/.test(p))).toBe(true);
   });

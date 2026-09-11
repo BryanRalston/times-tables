@@ -2,6 +2,7 @@ import { Check } from "lucide-react";
 import { useState } from "react";
 import { AppHeader, AppScene, AppTabs, useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
+import { MysteryPresent } from "@/components/mystery-present";
 import { PokeToy } from "@/components/poke-toy";
 import { squisheePrice } from "@/lib/coins";
 import { COMMON_SQUISHEES, RARE_SQUISHEES, squisheeSrc, type Squishee } from "@/lib/squishees";
@@ -20,6 +21,7 @@ function Plank({
   earned,
   coins,
   onBuy,
+  blurb,
 }: {
   title: string;
   mark: string;
@@ -27,12 +29,14 @@ function Plank({
   earned: string[];
   coins: number;
   onBuy: (id: string) => boolean | void;
+  blurb?: string;
 }) {
   return (
     <section className="shelf-plank" data-shelf-plank="1">
       <h2 className="shelf-section">
         <span aria-hidden>{mark}</span> {title}
       </h2>
+      {blurb ? <p className="shelf-blurb">{blurb}</p> : null}
       <div className="plank-rail">
         <div className="plank-board">
           {toys.map((s) => (
@@ -70,7 +74,15 @@ export function ShelfPage() {
           </div>
         ) : null}
         <Plank title={ui.commons} mark="★" toys={COMMON_SQUISHEES} earned={earned} coins={coins} onBuy={buy} />
-        <Plank title={ui.rares} mark="◇" toys={RARE_SQUISHEES} earned={earned} coins={coins} onBuy={buy} />
+        <Plank
+          title={ui.rares}
+          mark="◇"
+          toys={RARE_SQUISHEES}
+          earned={earned}
+          coins={coins}
+          onBuy={buy}
+          blurb={ui.rareBlurb}
+        />
       </div>
     </AppScene>
   );
@@ -93,8 +105,9 @@ export function ShopCard({
 }) {
   const ui = useUi();
   const [justBought, setJustBought] = useState(cheer);
+  const findOnly = s.rarity === "rare";
   const price = squisheePrice(s.id);
-  const canBuy = !got && coins >= price;
+  const canBuy = !got && !findOnly && coins >= price;
   const playCheer = justBought;
 
   const toy = got ? (
@@ -105,6 +118,10 @@ export function ShopCard({
       onCheerEnd={() => setJustBought(false)}
       className={cn("h-20 w-20 overflow-visible", s.rarity === "rare" && "rare-glow")}
     />
+  ) : findOnly ? (
+    <span data-rare-find="1" className="grid h-20 w-20 place-items-center" aria-hidden>
+      <MysteryPresent size="shelf" />
+    </span>
   ) : (
     <span data-silhouette="1" className="grid h-20 w-20 place-items-center" aria-hidden>
       <MagentaImg src={squisheeSrc(s.id)} alt="" className="squishee-silhouette pointer-events-none h-20 w-20" />
@@ -119,6 +136,11 @@ export function ShopCard({
         {ui.owned}
       </span>
     </>
+  ) : findOnly ? (
+    <>
+      <span className="mt-1 text-center text-xs font-bold text-plum">{ui.mystery}</span>
+      <span className="shelf-find">{ui.findOnMap}</span>
+    </>
   ) : (
     <>
       <span className="mt-1 text-center text-xs font-bold text-plum">{ui.mystery}</span>
@@ -129,9 +151,12 @@ export function ShopCard({
     </>
   );
 
-  if (got) {
+  if (got || findOnly) {
     return (
-      <div className={cn("shelf-slot", featured && "shelf-slot-featured", s.rarity === "rare" && "rare-glow")}>
+      <div
+        className={cn("shelf-slot", featured && "shelf-slot-featured", got && s.rarity === "rare" && "rare-glow")}
+        data-rare-locked={findOnly && !got ? "1" : undefined}
+      >
         {toy}
         {meta}
       </div>

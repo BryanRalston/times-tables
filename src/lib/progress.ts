@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, type PersistStorage, type StorageValue } from "zustand/middleware";
 import { todayIso } from "./calendar";
 import { applyBuy, type BuyReason } from "./coins";
+import { applyUnlock } from "./presents";
 import { GRADE4_SPANS, UNIT_SPANS, UNITS, unitById, unitsFor } from "./curriculum";
 import {
   RADIAL_PAD_COUNT,
@@ -325,6 +326,7 @@ interface ProgressApi extends SaveState {
   beginPlay: (activityId: string) => number;
   awardCoins: (n: number) => void;
   buySquishee: (id: string) => { ok: boolean; reason: BuyReason };
+  unlockSquishee: (id: string) => { ok: boolean; reason: "ok" | "missing" | "owned" };
   switchLearner: (id: string) => void;
   addLearner: (name: string) => string;
   resetAll: () => void;
@@ -517,6 +519,11 @@ export const useProgress = create<ProgressApi>()(
       buySquishee: (id) => {
         const r = applyBuy(get().coins, get().squishees, id);
         if (r.ok) commit(get, set, { coins: r.coins, squishees: r.squishees });
+        return { ok: r.ok, reason: r.reason };
+      },
+      unlockSquishee: (id) => {
+        const r = applyUnlock(get().squishees, id);
+        if (r.ok) commit(get, set, { squishees: r.squishees });
         return { ok: r.ok, reason: r.reason };
       },
       switchLearner: (id) => {

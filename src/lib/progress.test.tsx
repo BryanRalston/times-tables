@@ -526,6 +526,21 @@ describe("progress persist", () => {
     expect(useProgress.getState().coins).toBe(10);
   });
 
+  it("keeps a Guest rare after map unlock and reload", async () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: seedKid(), version: 0 }));
+    await hydrateProgress();
+    expect(useProgress.getState().buySquishee("aurora-jelly")).toEqual({ ok: false, reason: "find" });
+    expect(useProgress.getState().squishees).toEqual([]);
+    expect(useProgress.getState().unlockSquishee("galaxy-narwhal")).toEqual({ ok: true, reason: "ok" });
+    expect(useProgress.getState().squishees).toEqual(["galaxy-narwhal"]);
+    const raw = localStorage.getItem(STORAGE_KEY);
+    expect(raw).toContain("galaxy-narwhal");
+    resetProgressMemory();
+    await hydrateProgress();
+    expect(useProgress.getState().squishees).toEqual(["galaxy-narwhal"]);
+    expect(useProgress.getState().unlockSquishee("galaxy-narwhal").ok).toBe(false);
+  });
+
   it("does not call resetAll from main boot", () => {
     const main = readFileSync(join(HERE, "../main.tsx"), "utf8");
     expect(main).toContain("hydrateProgress");
