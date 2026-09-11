@@ -27,6 +27,7 @@ import {
   RADIAL_MAP_FILE,
   RADIAL_PADS,
   START_PAD,
+  activePathStepsLeft,
   adjacentPadIds,
   areAdjacent,
   canStartDiceTurn,
@@ -127,7 +128,7 @@ export const CandyPath = forwardRef<
   const warpRef = useRef<{ from: number; to: number } | null>(null);
   const destPos = padView(dest);
   const credits = hopCredits ?? hopCreditsOf(activities, hopsSpent, sessions);
-  const steps = stepsLeft ?? storedSteps;
+  const steps = stepsLeft ?? activePathStepsLeft(hopsSpent, storedSteps);
   const [rolling, setRolling] = useState<DieFace | null>(null);
   const [tumbleFace, setTumbleFace] = useState<DieFace>(1);
   const inviting = canStartDiceTurn(credits, steps) && !travel && !warp && rolling == null;

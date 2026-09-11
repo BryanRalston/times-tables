@@ -287,6 +287,24 @@ describe("progress persist", () => {
     expect(useProgress.getState().startDiceTurn(1)).toBe(false);
   });
 
+  it("starts a roll when leftover steps were stored without a spent turn", () => {
+    const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
+    const activities = { "u1-leftover": leftover };
+    useProgress.setState((s) => {
+      const id = s.learnerId;
+      const kid = { ...(s.learners[id] ?? s), activities, pathHopSpent: 0, pathStepsLeft: 2 };
+      return {
+        activities,
+        pathHopSpent: 0,
+        pathStepsLeft: 2,
+        learners: { ...s.learners, [id]: kid },
+      };
+    });
+    expect(useProgress.getState().startDiceTurn(1)).toBe(true);
+    expect(useProgress.getState().pathHopSpent).toBe(1);
+    expect(useProgress.getState().pathStepsLeft).toBe(1);
+  });
+
   it("counts a Guest daily walk as a hop-earning lesson", async () => {
     const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
     localStorage.setItem(
@@ -355,6 +373,86 @@ describe("progress persist", () => {
       misses: [],
     });
     expect(hopCreditsOf(useProgress.getState().activities, 0, useProgress.getState().sessions)).toBe(2);
+  });
+
+  it("clears stale steps on a fresh daily earn so Lessons can invite a roll", () => {
+    useProgress.setState((s) => {
+      const id = s.learnerId;
+      const kid = { ...(s.learners[id] ?? s), pathHopSpent: 0, pathStepsLeft: 2 };
+      return { pathHopSpent: 0, pathStepsLeft: 2, learners: { ...s.learners, [id]: kid } };
+    });
+    const date = "2026-09-11";
+    useProgress.getState().recordRound({
+      activityId: dailyWalkActivityId(date),
+      correct: 12,
+      total: 14,
+      earned: 12,
+      misses: [],
+    });
+    useProgress.getState().recordSession({
+      date,
+      unitId: "u13",
+      schoolDay: 170,
+      correct: 12,
+      total: 14,
+      fresh: 8,
+      review: 4,
+      completed: true,
+    });
+    const s = useProgress.getState();
+    expect(s.pathHopSpent).toBe(0);
+    expect(s.pathStepsLeft).toBe(0);
+    expect(hopCreditsOf(s.activities, s.pathHopSpent, s.sessions)).toBe(1);
+    useProgress.getState().recordRound({
+      activityId: dailyWalkActivityId(date),
+      correct: 10,
+      total: 14,
+      earned: 10,
+      misses: [],
+    });
+    expect(hopCreditsOf(useProgress.getState().activities, useProgress.getState().pathHopSpent, useProgress.getState().sessions)).toBe(
+      1,
+    );
+    expect(useProgress.getState().pathStepsLeft).toBe(0);
+  });
+
+  it("keeps a real mid-turn when a later lesson is recorded", () => {
+    const leftover = { plays: 1, best: 4, last: 4, stars: 3, misses: [] };
+    useProgress.setState((s) => {
+      const id = s.learnerId;
+      const kid = { ...(s.learners[id] ?? s), activities: { "u1-leftover": leftover }, pathHopSpent: 1, pathStepsLeft: 2 };
+      return {
+        activities: { "u1-leftover": leftover },
+        pathHopSpent: 1,
+        pathStepsLeft: 2,
+        learners: { ...s.learners, [id]: kid },
+      };
+    });
+    useProgress.getState().recordRound({
+      activityId: "u3-share",
+      correct: 4,
+      total: 4,
+      earned: 6,
+      misses: [],
+    });
+    expect(useProgress.getState().pathHopSpent).toBe(1);
+    expect(useProgress.getState().pathStepsLeft).toBe(2);
+  });
+
+  it("heals a v13 Guest who rolled a farmed extra daily turn", async () => {
+    const leftover = { plays: 1, best: 8, last: 8, stars: 3, misses: [] };
+    const prior = seedKid({
+      activities: { "daily:u12": leftover, "daily:u13": leftover },
+      pathHopperAt: 1,
+      pathHopSpent: 1,
+      pathStepsLeft: 2,
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: { ...prior, version: 13 }, version: 0 }));
+    await hydrateProgress();
+    const s = useProgress.getState();
+    expect(s.pathHopSpent).toBe(0);
+    expect(s.pathStepsLeft).toBe(0);
+    expect(hopCreditsOf(s.activities, s.pathHopSpent, s.sessions)).toBe(1);
   });
 
   it("merges flat Guest lesson progress onto an empty learner slice", async () => {

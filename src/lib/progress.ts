@@ -5,10 +5,12 @@ import { applyBuy, type BuyReason } from "./coins";
 import { GRADE4_SPANS, UNIT_SPANS, UNITS, unitById, unitsFor } from "./curriculum";
 import {
   RADIAL_PAD_COUNT,
+  activePathStepsLeft,
   canStartDiceTurn,
   clampDieFace,
   clampPathStepsLeft,
   hopCreditsOf,
+  migrateDiceTurnState,
   migratePathHopSpent,
   migratePathStepsLeft,
   type DieFace,
@@ -35,7 +37,7 @@ import { schoolStreak } from "./streak";
 import type { ActivitySave, DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
 import { parsePathGrade } from "./types";
 
-const SAVE_VERSION = 13;
+const SAVE_VERSION = 14;
 export const STORAGE_KEY = "g3-path-v2";
 export const LEGACY_STORAGE_KEYS = ["g3-path-v1", "times-tables-progress", "times-tables-settings"] as const;
 const DEFAULT_ID = "kid-1";
@@ -187,19 +189,27 @@ function mergeSessions(
 
 function sliceOfWithHopHeal(s: LearnerSlice, saveVersion: number): LearnerSlice {
   const next = sliceOf(s);
+  const pathHopSpent = migratePathHopSpent({
+    activities: next.activities,
+    sessions: next.sessions,
+    pathHopSpent: s.pathHopSpent,
+    pathHopperAt: next.pathHopperAt,
+    saveVersion,
+  });
+  const pathStepsLeft = migratePathStepsLeft({
+    pathStepsLeft: s.pathStepsLeft,
+    saveVersion,
+  });
+  const turn = migrateDiceTurnState({
+    activities: next.activities,
+    pathHopSpent,
+    pathStepsLeft,
+    saveVersion,
+  });
   return {
     ...next,
-    pathHopSpent: migratePathHopSpent({
-      activities: next.activities,
-      sessions: next.sessions,
-      pathHopSpent: s.pathHopSpent,
-      pathHopperAt: next.pathHopperAt,
-      saveVersion,
-    }),
-    pathStepsLeft: migratePathStepsLeft({
-      pathStepsLeft: s.pathStepsLeft,
-      saveVersion,
-    }),
+    pathHopSpent: turn.pathHopSpent,
+    pathStepsLeft: turn.pathStepsLeft,
   };
 }
 
@@ -391,7 +401,7 @@ export const useProgress = create<ProgressApi>()(
         const s = get();
         const steps = clampDieFace(face);
         const rolls = hopCreditsOf(s.activities, s.pathHopSpent, s.sessions);
-        if (!canStartDiceTurn(rolls, s.pathStepsLeft)) return false;
+        if (!canStartDiceTurn(rolls, activePathStepsLeft(s.pathHopSpent, s.pathStepsLeft))) return false;
         commit(get, set, { pathHopSpent: s.pathHopSpent + 1, pathStepsLeft: steps });
         return true;
       },
@@ -418,6 +428,7 @@ export const useProgress = create<ProgressApi>()(
         const pct = total === 0 ? 0 : correct / total;
         const stars = Math.max(prev.stars, pct >= 1 ? 3 : pct >= 0.7 ? 2 : pct >= 0.4 ? 1 : 0);
         const avg = runAverageMs(get().runHonest);
+        const spent = clampPathHopSpent(get().pathHopSpent);
         commit(get, set, {
           stars: get().stars + earned,
           perfectWalks: get().perfectWalks + (total > 0 && correct === total ? 1 : 0),
@@ -426,6 +437,8 @@ export const useProgress = create<ProgressApi>()(
             avgMs: avg ?? undefined,
           }),
           runHonest: emptyRun(),
+          // Fresh earn with no started turn must not keep stale mid-turn steps.
+          pathStepsLeft: spent <= 0 ? 0 : get().pathStepsLeft,
           activities: {
             ...get().activities,
             [activityId]: {

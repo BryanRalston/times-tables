@@ -11,12 +11,14 @@ import {
   START_PAD,
   adjacentPadIds,
   areAdjacent,
+  activePathStepsLeft,
   canStartDiceTurn,
   clampDieFace,
   clampPathStepsLeft,
   dailyWalkActivityId,
   hopCreditsOf,
   hopLessonsCompleted,
+  migrateDiceTurnState,
   migratePathHopSpent,
   migratePathStepsLeft,
   nearestHopTarget,
@@ -171,12 +173,52 @@ describe("radial web", () => {
     expect(canStartDiceTurn(1, 0)).toBe(true);
     expect(canStartDiceTurn(2, 3)).toBe(false);
     expect(canStartDiceTurn(0, 0)).toBe(false);
+    expect(activePathStepsLeft(0, 2)).toBe(0);
+    expect(activePathStepsLeft(1, 2)).toBe(2);
+    expect(canStartDiceTurn(1, activePathStepsLeft(0, 2))).toBe(true);
     expect(clampPathStepsLeft(2)).toBe(2);
     expect(clampPathStepsLeft(8)).toBe(3);
     expect(clampPathStepsLeft(-1)).toBe(0);
     expect(migratePathStepsLeft({ pathStepsLeft: 2, saveVersion: 12 })).toBe(0);
     expect(migratePathStepsLeft({ pathStepsLeft: 2, saveVersion: 13 })).toBe(2);
     expect(migratePathStepsLeft({ pathStepsLeft: undefined, saveVersion: 13 })).toBe(0);
+  });
+
+  it("refunds a farmed extra daily roll and clears leftover steps", () => {
+    const leftover = { plays: 1, best: 8, last: 8, stars: 3, misses: [] };
+    const farmed = { "daily:u12": leftover, "daily:u13": leftover };
+    expect(
+      migrateDiceTurnState({
+        activities: farmed,
+        pathHopSpent: 1,
+        pathStepsLeft: 2,
+        saveVersion: 13,
+      }),
+    ).toEqual({ pathHopSpent: 0, pathStepsLeft: 0 });
+    expect(
+      migrateDiceTurnState({
+        activities: { "daily:2026-09-11": leftover },
+        pathHopSpent: 0,
+        pathStepsLeft: 2,
+        saveVersion: 13,
+      }),
+    ).toEqual({ pathHopSpent: 0, pathStepsLeft: 0 });
+    expect(
+      migrateDiceTurnState({
+        activities: { "u1-leftover": leftover },
+        pathHopSpent: 1,
+        pathStepsLeft: 2,
+        saveVersion: 13,
+      }),
+    ).toEqual({ pathHopSpent: 1, pathStepsLeft: 2 });
+    expect(
+      migrateDiceTurnState({
+        activities: farmed,
+        pathHopSpent: 0,
+        pathStepsLeft: 0,
+        saveVersion: 14,
+      }),
+    ).toEqual({ pathHopSpent: 0, pathStepsLeft: 0 });
   });
 });
 

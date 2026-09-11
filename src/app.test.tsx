@@ -204,6 +204,51 @@ describe("first-visit Home door", () => {
     expect(html).not.toContain('data-pad-choice="1"');
   });
 
+  it("fresh daily earn with leftover steps still invites Roll the die", () => {
+    useProgress.setState({
+      activities: { "daily:2026-09-11": { plays: 1, best: 8, last: 8, stars: 3, misses: [] } },
+      sessions: {
+        "2026-09-11": {
+          date: "2026-09-11",
+          unitId: "u13",
+          schoolDay: 170,
+          correct: 8,
+          total: 8,
+          fresh: 8,
+          review: 0,
+          completed: true,
+        },
+      },
+      pathHopperAt: 0,
+      pathNowSeen: 0,
+      pathHopSpent: 0,
+      pathStepsLeft: 2,
+      coins: 39,
+    });
+    stubHash("#/lessons");
+    const html = renderToStaticMarkup(<App />);
+    expect(html).toContain('data-hop-credits="1"');
+    expect(html).toContain('data-dice-invite="1"');
+    expect(html).toContain('data-hop-pick="0"');
+    expect(html).toContain('data-dice-steps="0"');
+    expect(html).toContain("Roll the die");
+    expect(html).toContain('data-dock-roll="1"');
+    expect(html).not.toContain("Pick a space");
+    expect(html).not.toContain("2 left");
+    expect(html).not.toContain('data-pad-choice="1"');
+  });
+
+  it("missing-side perimeter keeps the keypad usable before any tap", () => {
+    stubHash("#/play/activity/u8-missing");
+    const html = renderToStaticMarkup(<App />);
+    expect(html).toMatch(/n is the missing side/i);
+    expect(html).toContain("data-keypad");
+    expect(html).toContain("Your answer");
+    expect(html).toMatch(/aria-label="1"/);
+    expect(html).not.toMatch(/aria-label="1"[^>]*disabled/);
+    expect(html).not.toMatch(/aria-label="7"[^>]*disabled/);
+  });
+
   it("Guest mid-turn picks each adjacent step until the roll is spent", () => {
     useProgress.setState({
       activities: { "u1-leftover": { plays: 1, best: 4, last: 4, stars: 3, misses: [] } },
