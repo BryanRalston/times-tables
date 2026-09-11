@@ -1039,6 +1039,8 @@ export type QCopy = {
   equivN: (num: number, den: number, den2: number) => string;
   shaded: string;
   whatTime: string;
+  matchTime: string;
+  oneHourLater: string;
   elapsedHours: (start: string, end: string) => string;
   makeMoney: (fmt: string) => string;
   makeHint: string;
@@ -1050,6 +1052,7 @@ export type QCopy = {
   howMuchMoney: string;
   compareMoney: string;
   unitSquares: string;
+  areaStories: (name: string) => string[];
   squaresHide: (shown: number) => string;
   periName: (name: string) => string;
   periMissing: (name: string, peri: number, shown: number) => string;
@@ -1163,6 +1166,8 @@ export function qCopy(locale: Locale): QCopy {
       equivN: (num, den, den2) => `${num}/${den} = n/${den2}. ¿Cuánto es n?`,
       shaded: "¿Qué fracción está sombreada?",
       whatTime: "¿Qué hora es?",
+      matchTime: "Muestra esta hora en el reloj.",
+      oneHourLater: "Una hora después. ¿Qué hora es?",
       elapsedHours: (start, end) => `Empieza ${start}. Termina ${end}. ¿Cuántas horas pasaron?`,
       makeMoney: (fmt) => `Arma ${fmt}. Toca billetes y monedas.`,
       makeHint: "Arma la cantidad. Comprueba cuando el total coincida.",
@@ -1174,6 +1179,11 @@ export function qCopy(locale: Locale): QCopy {
       howMuchMoney: "¿Cuánto dinero?",
       compareMoney: "¿El dinero de la izquierda es menor que, igual a, o mayor que el de la derecha?",
       unitSquares: "¿Cuántos cuadrados unitarios?",
+      areaStories: (name) => [
+        `${name} cubre un patio con losetas. ¿Cuántas losetas lo cubren?`,
+        `${name} pone losetas en una alfombra. ¿Cuántas losetas cubren la alfombra?`,
+        `${name} cubre un jardín con cuadrados. ¿Cuántos cuadrados lo cubren?`,
+      ],
       squaresHide: (shown) => `${shown} cuadrados se ven. n se esconden. ¿Área?`,
       periName: (name) => `¿Perímetro de este ${name}?`,
       periMissing: (name, peri, shown) => `Un ${name}. Los lados suman ${peri}. Ves ${shown}. ¿Cuánto mide el lado que falta?`,
@@ -1285,6 +1295,8 @@ export function qCopy(locale: Locale): QCopy {
       equivN: (num, den, den2) => `${num}/${den} = n/${den2}. Quanto é n?`,
       shaded: "Que fração está pintada?",
       whatTime: "Que horas são?",
+      matchTime: "Mostre esta hora no relógio.",
+      oneHourLater: "Uma hora depois. Que horas são?",
       elapsedHours: (start, end) => `Começa ${start}. Termina ${end}. Quantas horas passaram?`,
       makeMoney: (fmt) => `Monte ${fmt}. Toque notas e moedas.`,
       makeHint: "Monte o valor. Conferir quando o total bater.",
@@ -1296,6 +1308,11 @@ export function qCopy(locale: Locale): QCopy {
       howMuchMoney: "Quanto dinheiro?",
       compareMoney: "O dinheiro da esquerda é menor que, igual a, ou maior que o da direita?",
       unitSquares: "Quantos quadrados unitários?",
+      areaStories: (name) => [
+        `${name} cobre um pátio com azulejos. Quantos azulejos cobrem?`,
+        `${name} põe azulejos num tapete. Quantos azulejos cobrem o tapete?`,
+        `${name} cobre um canteiro com quadrados. Quantos quadrados cobrem?`,
+      ],
       squaresHide: (shown) => `${shown} quadrados aparecem. n se escondem. Área?`,
       periName: (name) => `Perímetro deste ${name}?`,
       periMissing: (name, peri, shown) => `Um ${name}. Os lados somam ${peri}. Você vê ${shown}. Qual é o lado que falta?`,
@@ -1406,6 +1423,8 @@ export function qCopy(locale: Locale): QCopy {
     equivN: (num, den, den2) => `${num}/${den} = n/${den2}. What is n?`,
     shaded: "What fraction is shaded?",
     whatTime: "What time is it?",
+    matchTime: "Show this time on the clock.",
+    oneHourLater: "One hour later. What time is it?",
     elapsedHours: (start, end) => `Start ${start}. End ${end}. How many hours passed?`,
     makeMoney: (fmt) => `Make ${fmt}. Tap bills and coins.`,
     makeHint: "Build the amount. Check when the total matches.",
@@ -1417,6 +1436,11 @@ export function qCopy(locale: Locale): QCopy {
     howMuchMoney: "How much money?",
     compareMoney: "Is the left money less than, equal to, or greater than the right money?",
     unitSquares: "How many unit squares?",
+    areaStories: (name) => [
+      `${name} covers a patio with tiles. How many tiles cover it?`,
+      `${name} puts tiles on a rug. How many tiles cover the rug?`,
+      `${name} covers a garden bed with squares. How many squares cover it?`,
+    ],
     squaresHide: (shown) => `${shown} squares showing. n hide. Area?`,
     periName: (name) => `Perimeter of this ${name}?`,
     periMissing: (name, peri, shown) => `A ${name}. Sides add to ${peri}. You see ${shown}. What is the missing side?`,

@@ -585,4 +585,61 @@ describe("boards", () => {
     expect((html.match(/data-set-piece="shaded"/g) ?? []).length).toBe(d.num);
     expect(html).not.toContain("h-12 overflow-hidden");
   });
+
+  it("one-hour-later board shows only the start face and no end time", () => {
+    const q = makeQuestion(activityById("u11-elapsed")!.activity, rngFromSeed("later:board"));
+    const d = q.data as ClockData;
+    expect(d.find).toBe("end");
+    expect(d.elapsedHours).toBe(1);
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain("data-elapsed-start");
+    expect(html).toContain("stroke-linecap");
+    expect(html).not.toContain(`${d.hours}:${String(d.minutes).padStart(2, "0")}`);
+    expect(html).not.toContain(q.answer);
+    expect((html.match(/<svg /g) ?? []).length).toBe(1);
+  });
+
+  it("match-the-clocks board is a written time, not analog hands", () => {
+    const q = makeQuestion(activityById("u11-match")!.activity, rngFromSeed("match:board"));
+    const d = q.data as ClockData;
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain(`data-match-time="${d.hours}:${String(d.minutes).padStart(2, "0")}"`);
+    expect(html).not.toContain("stroke-linecap");
+  });
+
+  it("zero-groups boards show an empty 0, not groups of nothing", () => {
+    const q: Question = {
+      id: "z0",
+      kind: "groups",
+      prompt: "0 groups of 5. How many in all?",
+      answer: "0",
+      input: "keypad",
+      data: { groups: 0, size: 5, hide: "product", equation: "0 × 5 = n" } satisfies GroupsData,
+    };
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain("data-zero-groups");
+    expect(html).not.toContain("data-equal-group");
+    expect(html).toContain("0 × 5 = n");
+  });
+
+  it("fluency 0 × 5 is zero groups of five", () => {
+    const q: Question = {
+      id: "t0x5",
+      kind: "fluency",
+      prompt: "0 × 5",
+      answer: "0",
+      input: "keypad",
+      data: { a: 0, b: 5, op: "×" } satisfies FluencyData,
+    };
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain("data-zero-groups");
+    expect(html).toContain("0 × 5");
+    expect(html).not.toContain("data-equal-group");
+  });
+
+  it("array boards do not repeat the heading prompt", () => {
+    const q = makeQuestion(activityById("u3-array")!.activity, rngFromSeed("arr:chrome"));
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).not.toContain(q.prompt);
+  });
 });

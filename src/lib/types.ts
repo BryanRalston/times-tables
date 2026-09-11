@@ -136,6 +136,8 @@ export interface ClockData {
   elapsedHours?: number;
   elapsedMinutes?: number;
   find: "time" | "end" | "start" | "elapsed";
+  /** Written time on the board; kid sets the analog answer clock. */
+  match?: boolean;
 }
 
 export interface MoneyData {

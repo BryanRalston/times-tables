@@ -274,8 +274,14 @@ describe("answer audit", () => {
       expect(clock.answer).toBe(`${cd.hours}:${String(cd.minutes).padStart(2, "0")}`);
 
       const elapsed = makeQuestion(activityById("u11-elapsed")!.activity, rngFromSeed(`e:${i}`));
-      expect(Number(elapsed.answer)).toBeGreaterThanOrEqual(1);
-      expect(Number(elapsed.answer)).toBeLessThanOrEqual(3);
+      const ed = elapsed.data as ClockData;
+      expect(ed.elapsedHours).toBe(1);
+      expect(ed.find).toBe("end");
+      expect(elapsed.input).toBe("clock");
+      expect(elapsed.answer).toMatch(/^\d{1,2}:\d{2}$/);
+      expect(elapsed.prompt).toMatch(/one hour later|una hora después|uma hora depois/i);
+      const endH = ((ed.hours - 1 + 1) % 12) + 1;
+      expect(elapsed.answer).toBe(`${endH}:${String(ed.minutes).padStart(2, "0")}`);
 
       const exact = makeQuestion(activityById("u7-exact")!.activity, rngFromSeed(`x:${i}`));
       const xd = exact.data as ComputeData;
@@ -621,6 +627,69 @@ describe("answer audit", () => {
     expect(seen.some((p) => /length of a paper clip|largo de un clip|comprimento de um clipe/i.test(p))).toBe(true);
     expect(seen.every((p) => !/^Best unit for a watermelon\?$/.test(p))).toBe(true);
   });
+
+  it("one hour later is exactly +1 hour and asks for the end time", () => {
+    for (const locale of ["en", "es", "pt-BR"] as const) {
+      for (let i = 0; i < 24; i++) {
+        const q = makeQuestion(activityById("u11-elapsed")!.activity, rngFromSeed(`hr1:${locale}:${i}`), locale);
+        const d = q.data as ClockData;
+        expect(d.elapsedHours).toBe(1);
+        expect(d.elapsedMinutes ?? 0).toBe(0);
+        expect(d.find).toBe("end");
+        expect(q.input).toBe("clock");
+        expect(q.prompt).toMatch(/one hour later|una hora después|uma hora depois/i);
+        expect(q.prompt).not.toMatch(/how many hours|cuántas horas|quantas horas/i);
+        const endH = ((d.hours) % 12) + 1;
+        expect(q.answer).toBe(`${endH}:${String(d.minutes).padStart(2, "0")}`);
+        expect(q.prompt).not.toContain(q.answer);
+      }
+    }
+  });
+
+  it("area stories tell a cover story and still count the tiles", () => {
+    for (const locale of ["en", "es", "pt-BR"] as const) {
+      for (let i = 0; i < 16; i++) {
+        const q = makeQuestion(activityById("u13-area")!.activity, rngFromSeed(`story:${locale}:${i}`), locale);
+        const d = q.data as AreaData;
+        expect(Number(q.answer)).toBe(d.cells.flat().filter(Boolean).length);
+        expect(q.prompt).toMatch(/tiles|squares|losetas|cuadrados|azulejos|quadrados/i);
+        expect(q.prompt).not.toMatch(/^how many unit squares/i);
+        expect(q.prompt).not.toContain(q.answer);
+      }
+    }
+    const cover = makeQuestion(activityById("u8-area")!.activity, rngFromSeed("cover:plain"));
+    expect(cover.prompt).toMatch(/unit squares|cuadrados unitarios|quadrados unitários/i);
+  });
+
+  it("0s facts are zero groups, never groups of nothing", () => {
+    let zeros = 0;
+    for (const locale of ["en", "es", "pt-BR"] as const) {
+      for (let i = 0; i < 80; i++) {
+        const q = makeQuestion(activityById("u6-facts")!.activity, rngFromSeed(`z0:${locale}:${i}`), locale);
+        const d = q.data as GroupsData;
+        expect(d.size).toBeGreaterThanOrEqual(1);
+        expect(q.prompt).not.toMatch(/groups of 0|grupos de 0/i);
+        if (d.groups === 0) {
+          zeros += 1;
+          expect(d.hide).toBe("product");
+          expect(Number(q.answer)).toBe(0);
+          expect(q.prompt).toMatch(/^0 groups of |^0 grupos de /i);
+        }
+      }
+    }
+    expect(zeros).toBeGreaterThan(5);
+  });
+
+  it("match-the-clocks is a written time, not another analog read", () => {
+    for (let i = 0; i < 12; i++) {
+      const q = makeQuestion(activityById("u11-match")!.activity, rngFromSeed(`match:${i}`));
+      const d = q.data as ClockData;
+      expect(d.match).toBe(true);
+      expect(q.input).toBe("clock");
+      expect(q.prompt).toMatch(/show this time|muestra esta hora|mostre esta hora/i);
+      expect(q.answer).toBe(`${d.hours}:${String(d.minutes).padStart(2, "0")}`);
+    }
+  });
 });
 
 function assertKind(activityId: string, q: Question) {
@@ -707,6 +776,11 @@ function assertKind(activityId: string, q: Question) {
       const d = q.data as ClockData;
       if (d.mode === "read" && d.find === "time") {
         expect(q.answer).toMatch(/^\d{1,2}:\d{2}$/);
+      }
+      if (d.find === "end") {
+        expect(d.elapsedHours, activityId).toBe(1);
+        expect(q.input, activityId).toBe("clock");
+        expect(q.answer, activityId).toMatch(/^\d{1,2}:\d{2}$/);
       }
       break;
     }

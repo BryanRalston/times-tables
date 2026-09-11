@@ -51,6 +51,22 @@ export function formatClockTime(hours: number, minutes: number): string {
   return `${t.hours}:${String(t.minutes).padStart(2, "0")}`;
 }
 
+/** Start time plus elapsed hours/minutes, wrapped onto a 1–12 clock. */
+export function elapsedEndTime(
+  hours: number,
+  minutes: number,
+  elapsedHours = 0,
+  elapsedMinutes = 0,
+): { hours: number; minutes: number } {
+  let endM = minutes + elapsedMinutes;
+  let endH = hours + elapsedHours;
+  if (endM >= 60) {
+    endM -= 60;
+    endH += 1;
+  }
+  return wrapClockParts(endH, endM);
+}
+
 export function parseClockTime(value: string, fallback = "12:00"): { hours: number; minutes: number } {
   const [hRaw, mRaw] = (value || fallback).split(":");
   let hours = Number(hRaw || 12);

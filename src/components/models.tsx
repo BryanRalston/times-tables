@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ClockFace } from "@/components/clock-face";
 import { ChoiceList } from "@/components/keypad";
-import { G4Q, parseLocale, PLACE, UI, type Locale } from "@/lib/i18n";
+import { elapsedEndTime } from "@/lib/clock";
 import {
   freshComputeTap,
   smallerComputeSide,
@@ -10,6 +10,7 @@ import {
   type PlaceKind,
   type PlaceParts,
 } from "@/lib/compute-model";
+import { G4Q, parseLocale, PLACE, UI, type Locale } from "@/lib/i18n";
 import { leftoverWhyMoveMs, splitCounted } from "@/lib/leftover";
 import { useProgress } from "@/lib/progress";
 import { asset } from "@/lib/art";
@@ -312,7 +313,7 @@ function Groups({ question, onInteract, status, shake }: BoardProps) {
   const data = question.data as GroupsData;
   const ui = UI[parseLocale(useProgress((st) => st.locale))];
   const [taken, setTaken] = useState(false);
-  const groups = Math.max(1, data.groups);
+  const groups = data.hide === "product" ? Math.max(0, data.groups) : Math.max(1, data.groups);
   const size = Math.max(0, data.size);
 
   if (data.hide === "product") {
@@ -358,7 +359,6 @@ function ArrayGrid({ question, status, shake }: BoardProps) {
   const data = question.data as ArrayData;
   return (
     <Frame shake={shake} status={status}>
-      <p className="mb-3 text-center text-sm text-muted">{question.prompt}</p>
       <div className="flex flex-col items-center gap-1">
         {Array.from({ length: data.rows }, (_, r) => (
           <div key={r} className="flex gap-1">
@@ -452,6 +452,14 @@ function TallyGroups({
   return (
     <Frame shake={shake} status={status}>
       {prompt ? <p className="mb-3 text-center font-display text-2xl sm:text-3xl">{prompt}</p> : null}
+      {groups === 0 ? (
+        <div
+          data-zero-groups=""
+          className="mx-auto w-fit rounded-[12px] border border-dashed border-faint px-8 py-5 text-center"
+        >
+          <p className="font-display text-3xl tabular-nums">0</p>
+        </div>
+      ) : (
       <div className="flex flex-wrap justify-center gap-2">
         {Array.from({ length: groups }, (_, g) => (
           <button
@@ -480,6 +488,7 @@ function TallyGroups({
           </button>
         ))}
       </div>
+      )}
     </Frame>
   );
 }
@@ -985,15 +994,29 @@ function FractionBar({ question, onInteract, status, shake }: BoardProps) {
 function AnalogClock({ question, status, shake }: BoardProps) {
   const data = question.data as ClockData;
   const ui = UI[parseLocale(useProgress((st) => st.locale))];
-  const extraM = data.elapsedMinutes ?? 0;
+  if (data.match) {
+    return (
+      <Frame shake={shake} status={status}>
+        <p
+          className="text-center font-display text-5xl tabular-nums sm:text-6xl"
+          data-match-time={`${data.hours}:${pad2(data.minutes)}`}
+        >
+          {data.hours}:{pad2(data.minutes)}
+        </p>
+      </Frame>
+    );
+  }
   if (data.mode === "elapsed") {
-    let endM = data.minutes + extraM;
-    let endH = data.hours + (data.elapsedHours ?? 0);
-    if (endM >= 60) {
-      endM -= 60;
-      endH += 1;
+    const end = elapsedEndTime(data.hours, data.minutes, data.elapsedHours ?? 0, data.elapsedMinutes ?? 0);
+    if (data.find === "end") {
+      return (
+        <Frame shake={shake} status={status}>
+          <div className="flex justify-center" data-elapsed-start="">
+            <ClockFace hours={data.hours} minutes={data.minutes} size="size-36 sm:size-44" />
+          </div>
+        </Frame>
+      );
     }
-    endH = ((endH - 1) % 12) + 1;
     return (
       <Frame shake={shake} status={status}>
         <div className="flex justify-center gap-4">
@@ -1002,8 +1025,8 @@ function AnalogClock({ question, status, shake }: BoardProps) {
             <p className="mt-1 text-xs text-muted">{data.hours}:{pad2(data.minutes)}</p>
           </div>
           <div className="text-center">
-            <ClockFace hours={endH} minutes={endM} size="size-36 sm:size-44" />
-            <p className="mt-1 text-xs text-muted">{endH}:{pad2(endM)}</p>
+            <ClockFace hours={end.hours} minutes={end.minutes} size="size-36 sm:size-44" />
+            <p className="mt-1 text-xs text-muted">{end.hours}:{pad2(end.minutes)}</p>
           </div>
         </div>
       </Frame>
@@ -1940,6 +1963,11 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
 
 function FluencyBoard({ question, status, shake }: BoardProps) {
   const data = question.data as FluencyData;
+  const zeroTimes = data.op === "×" && (data.a === 0 || data.b === 0) && data.a <= 12 && data.b <= 12;
+  if (zeroTimes) {
+    const size = data.a === 0 ? data.b || 1 : data.a;
+    return <TallyGroups groups={0} size={size} prompt={question.prompt} status={status} shake={shake} />;
+  }
   const factTimes = data.op === "×" && data.a > 0 && data.b > 0 && data.a <= 12 && data.b <= 12;
   const splitApart =
     data.op === "×" &&
