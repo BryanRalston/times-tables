@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type PointerEvent } from "react";
 import { useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
 import { asset } from "@/lib/art";
@@ -23,23 +23,21 @@ import { unitStatus } from "@/lib/path";
 import { useProgress } from "@/lib/progress";
 import {
   DICE_TUMBLE_MS,
-  HOP_DIR_SNAP_DEG,
+  HOP_SNAP_PX,
   RADIAL_MAP_FILE,
   RADIAL_PADS,
   START_PAD,
   activePathStepsLeft,
+  adjacentPadIds,
   areAdjacent,
   canStartDiceTurn,
   clampPad,
   hopCreditsOf,
-  hopDirs,
-  nearestHopDir,
+  nearestHopTarget,
   portalPartner,
   radialPad,
   rollDieFace,
   type DieFace,
-  type HopCardinal,
-  type HopDir,
 } from "@/lib/radial-web";
 import { playDice, playHop, playLand, playWarp } from "@/lib/sound";
 import { pathHopperId, squisheeSrc } from "@/lib/squishees";
@@ -47,22 +45,6 @@ import { cn } from "@/lib/utils";
 
 function padView(id: number) {
   return radialPad(id).map;
-}
-
-function hopDirKind(dir: HopDir): HopCardinal | "angle" {
-  switch (dir.cardinal) {
-    case "up":
-    case "down":
-    case "left":
-    case "right":
-      return dir.cardinal;
-    case null:
-      return "angle";
-    default: {
-      const _never: never = dir.cardinal;
-      return _never;
-    }
-  }
 }
 
 function diePips(face: DieFace): { x: number; y: number }[] {
@@ -153,7 +135,8 @@ export const CandyPath = forwardRef<
   const [tumbleFace, setTumbleFace] = useState<DieFace>(1);
   const inviting = !freeMove && canStartDiceTurn(credits, steps) && !travel && !warp && rolling == null;
   const picking = (freeMove || steps > 0) && !travel && !warp && rolling == null;
-  const dirs = picking ? hopDirs(dest) : [];
+  const choices = picking ? adjacentPadIds(dest) : [];
+  const boardRef = useRef<HTMLDivElement>(null);
   const tapStart = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
@@ -340,26 +323,23 @@ export const CandyPath = forwardRef<
     setDest(to);
   };
 
-  const onDpadPointerDown = (e: PointerEvent<HTMLDivElement>) => {
+  const onBoardPointerDown = (e: PointerEvent<HTMLDivElement>) => {
     if (!picking || e.button !== 0) return;
     tapStart.current = { x: e.clientX, y: e.clientY };
   };
 
-  const onDpadPointerUp = (e: PointerEvent<HTMLDivElement>) => {
+  const onBoardPointerUp = (e: PointerEvent<HTMLDivElement>) => {
     if (!picking || e.button !== 0) return;
     const start = tapStart.current;
     tapStart.current = null;
     if (!start || Math.hypot(e.clientX - start.x, e.clientY - start.y) > 12) return;
-    const onBtn = e.target instanceof Element && e.target.closest("[data-hop-to]");
-    if (onBtn) return;
-    const hopper = e.currentTarget.closest("[data-path-hopper]");
-    if (!(hopper instanceof HTMLElement)) return;
-    const box = hopper.getBoundingClientRect();
-    const hit = nearestHopDir(box.left + box.width / 2, box.top + box.height / 2, e.clientX, e.clientY, dirs);
+    const board = boardRef.current;
+    if (!board) return;
+    const hit = nearestHopTarget(e.clientX, e.clientY, board.getBoundingClientRect(), choices, dest);
     if (hit != null) chooseHop(hit);
   };
 
-  const onDpadPointerCancel = () => {
+  const onBoardPointerCancel = () => {
     tapStart.current = null;
   };
 
@@ -392,29 +372,50 @@ export const CandyPath = forwardRef<
           aria-hidden
         />
         <div
+          ref={boardRef}
           className="candy-overlay"
           data-hop-board="1"
           data-hop-pick={picking ? "1" : "0"}
           data-dice-invite={inviting ? "1" : "0"}
           data-dice-steps={String(steps)}
-          data-hop-snap={String(HOP_DIR_SNAP_DEG)}
+          data-hop-snap={String(HOP_SNAP_PX)}
+          onPointerDown={onBoardPointerDown}
+          onPointerUp={onBoardPointerUp}
+          onPointerCancel={onBoardPointerCancel}
         >
         {RADIAL_PADS.map((pad) => {
           const view = pad.map;
+          const choice = choices.includes(pad.id);
+          const enterable = choice && pad.portal;
           const here = pad.id === dest && !travel && !warp;
+          const quiet = picking && !choice && !here;
           return (
-            <span
+            <button
               key={pad.id}
-              className={cn("candy-node candy-node-bare candy-node-radial", here && "candy-node-here")}
+              type="button"
+              className={cn(
+                "candy-node candy-node-bare candy-node-radial",
+                pad.portal && "candy-node-portal",
+                choice && "candy-node-choice",
+                enterable && "candy-node-enterable",
+                here && "candy-node-here",
+                quiet && "candy-node-quiet",
+              )}
               style={{ left: `${view.x}%`, top: `${view.y}%` }}
               data-path-pad="1"
               data-pad-id={String(pad.id)}
+              data-pad-choice={choice ? "1" : "0"}
               data-pad-portal={pad.portal ? "1" : "0"}
+              data-pad-enterable={enterable ? "1" : "0"}
               data-pad-here={here ? "1" : "0"}
-              aria-hidden
+              data-pad-quiet={quiet ? "1" : "0"}
+              disabled={!choice}
+              aria-disabled={!choice}
+              aria-label={choice ? ui.hopOne : undefined}
+              onClick={() => chooseHop(pad.id)}
             >
               <span className="candy-node-disc" />
-            </span>
+            </button>
           );
         })}
 
@@ -466,39 +467,6 @@ export const CandyPath = forwardRef<
           data-path-clear-obstacle="0"
         >
           <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
-          {picking ? (
-            <div
-              className="candy-dpad"
-              data-hop-dpad="1"
-              data-hop-dirs={String(dirs.length)}
-              onPointerDown={onDpadPointerDown}
-              onPointerUp={onDpadPointerUp}
-              onPointerCancel={onDpadPointerCancel}
-            >
-              {dirs.map((dir) => {
-                const kind = hopDirKind(dir);
-                const aim: CSSProperties = {
-                  transform: `translate(-50%, -50%) rotate(${dir.bearing}deg) translateY(-2.85rem)`,
-                };
-                return (
-                  <button
-                    key={dir.id}
-                    type="button"
-                    className={cn("candy-dpad-btn", kind !== "angle" && "candy-dpad-cardinal", dir.portal && "candy-dpad-portal")}
-                    style={aim}
-                    data-hop-dir={kind}
-                    data-hop-bearing={dir.bearing.toFixed(1)}
-                    data-hop-to={String(dir.id)}
-                    data-hop-portal={dir.portal ? "1" : "0"}
-                    aria-label={ui.hopOne}
-                    onClick={() => chooseHop(dir.id)}
-                  >
-                    <span className="candy-dpad-chevron" aria-hidden />
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
         </div>
         </div>
         </div>

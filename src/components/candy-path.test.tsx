@@ -5,7 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { resetProgressMemory } from "@/lib/progress";
 import { unitsFor } from "@/lib/curriculum";
-import { HOP_DIR_SNAP_DEG, RADIAL_PAD_COUNT, RADIAL_PADS, START_PAD, adjacentPadIds, hopDirs } from "@/lib/radial-web";
+import { HOP_SNAP_PX, RADIAL_PAD_COUNT, RADIAL_PADS, START_PAD, adjacentPadIds } from "@/lib/radial-web";
 import { CandyPath } from "./candy-path";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -95,21 +95,18 @@ describe("CandyPath", () => {
     expect(html).toContain('data-dice-steps="2"');
     expect(html).toContain('data-hop-board="1"');
     expect(html).toContain('data-hop-pick="1"');
-    expect(html).toContain(`data-hop-snap="${HOP_DIR_SNAP_DEG}"`);
-    expect(html).toContain('data-hop-dpad="1"');
-    expect(html).toContain(`data-hop-dirs="${next.length}"`);
-    expect((html.match(/data-hop-dir="/g) ?? []).length).toBe(next.length);
-    expect((html.match(/data-hop-dir="up"/g) ?? []).length).toBe(1);
-    expect((html.match(/data-hop-dir="down"/g) ?? []).length).toBe(1);
-    expect((html.match(/data-hop-dir="left"/g) ?? []).length).toBe(1);
-    expect((html.match(/data-hop-dir="right"/g) ?? []).length).toBe(1);
-    expect((html.match(/data-hop-dir="angle"/g) ?? []).length).toBe(4);
-    expect(html).not.toContain('data-pad-choice="1"');
-    expect(html).not.toContain("candy-node-choice");
-    expect(html).not.toContain("candy-node-quiet");
+    expect(html).toContain(`data-hop-snap="${HOP_SNAP_PX}"`);
+    expect((html.match(/data-pad-choice="1"/g) ?? []).length).toBe(next.length);
+    expect((html.match(/data-pad-quiet="1"/g) ?? []).length).toBe(RADIAL_PAD_COUNT - next.length - 1);
     expect((html.match(/data-pad-here="1"/g) ?? []).length).toBe(1);
     expect(html).toContain("candy-hopper-here");
-    expect(html).not.toContain('data-pad-enterable="1"');
+    expect(html).toContain("candy-node-choice");
+    expect(html).toContain("candy-node-quiet");
+    expect(html).not.toContain("data-hop-dpad");
+    expect(html).not.toContain("candy-dpad");
+    expect(html).not.toContain("data-hop-dir");
+    const portalChoices = next.filter((id) => RADIAL_PADS.find((p) => p.id === id)?.portal).length;
+    expect((html.match(/data-pad-enterable="1"/g) ?? []).length).toBe(portalChoices);
     expect(html).not.toContain('data-path-hop-to="2"');
   });
 
@@ -130,8 +127,9 @@ describe("CandyPath", () => {
     expect(html).toContain('data-dice-steps="0"');
     expect(html).toContain('data-hop-board="1"');
     expect(html).toContain('data-hop-pick="0"');
-    expect(html).not.toContain('data-hop-dpad="1"');
+    expect(html).not.toContain("data-hop-dpad");
     expect(html).not.toContain('data-pad-choice="1"');
+    expect(html).not.toContain('data-pad-quiet="1"');
     expect(html).not.toContain("candy-node-choice");
     expect(html).not.toContain('data-pad-enterable="1"');
     expect((html.match(/data-pad-here="1"/g) ?? []).length).toBe(1);
@@ -163,13 +161,13 @@ describe("CandyPath", () => {
         onOpenUnit={() => {}}
       />,
     );
-    expect(html).toContain('data-hop-dpad="1"');
-    expect(html).toContain(`data-hop-to="${portal.id}"`);
-    expect(html).toContain('data-hop-portal="1"');
+    expect(html).toContain('data-pad-enterable="1"');
+    expect(html).toContain("candy-node-enterable");
     expect(html).toContain(`data-pad-id="${portal.id}"`);
-    expect(html).not.toContain('data-pad-enterable="1"');
-    expect(html).not.toContain("candy-node-enterable");
-    expect(html).not.toContain("candy-node-choice");
+    expect((html.match(/data-pad-enterable="1"/g) ?? []).length).toBe(1);
+    expect(html).toContain("candy-node-choice");
+    expect(html).toContain("candy-node-quiet");
+    expect(html).not.toContain("data-hop-dpad");
     expect(html).not.toContain("data-portal-pair");
     expect(html).not.toContain("data-portal-to");
     expect(html).toContain('data-path-warp="0"');
@@ -202,9 +200,9 @@ describe("CandyPath", () => {
     expect(html).toContain('data-test-free-move="1"');
     expect(html).toContain('data-dice-invite="0"');
     expect(html).toContain('data-hop-pick="1"');
-    expect(html).toContain('data-hop-dpad="1"');
-    expect((html.match(/data-hop-dir="/g) ?? []).length).toBe(next.length);
-    expect(html).not.toContain("candy-node-choice");
+    expect((html.match(/data-pad-choice="1"/g) ?? []).length).toBe(next.length);
+    expect(html).toContain("candy-node-choice");
+    expect(html).not.toContain("data-hop-dpad");
     expect(html).not.toContain("g4-");
   });
 
@@ -223,15 +221,16 @@ describe("CandyPath", () => {
     expect(html).not.toContain('data-path-unit="u13"');
   });
 
-  it("resolves phone taps on the direction pad to the nearest valid hop", () => {
+  it("resolves phone taps on the board to the nearest glowing pad", () => {
     const src = readFileSync(join(HERE, "candy-path.tsx"), "utf8");
-    expect(src).toContain("nearestHopDir");
-    expect(src).toContain("onPointerUp={onDpadPointerUp}");
-    expect(src).toContain("hopDirs");
+    expect(src).toContain("nearestHopTarget");
+    expect(src).toContain("onPointerUp={onBoardPointerUp}");
+    expect(src).toContain("board.getBoundingClientRect()");
     expect(src).toContain("rollDie");
     expect(src).toContain("startDiceTurn");
     expect(src).toContain("spendPathStep");
-    expect(src).not.toContain("nearestHopTarget");
-    expect(hopDirs(START_PAD).length).toBe(adjacentPadIds(START_PAD).length);
+    expect(src).not.toContain("nearestHopDir");
+    expect(src).not.toContain("candy-dpad");
+    expect(src).not.toContain("onDpadPointerUp");
   });
 });
