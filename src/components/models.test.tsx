@@ -216,8 +216,11 @@ describe("boards", () => {
     expect(src).toContain("size-11");
     expect(src).toContain("leftover-dot");
     expect(src).toContain("leftover-eq");
+    expect(html).toContain("data-n-hiding");
+    expect(html).toMatch(/data-n-hiding=""[^>]*>n</);
     expect(src).toContain("onClick={takeGroup}");
     expect(src).toContain("grid-cols-5");
+    expect(src).toContain("data-n-hiding");
   });
 
   it("18 − n = 10 still has a takeable known group and four leftover rows", () => {
@@ -239,6 +242,8 @@ describe("boards", () => {
     expect(html).toContain("data-known-group");
     expect(html).toContain("known-glow");
     expect((html.match(/aria-label="dot"/g) ?? []).length).toBe(10);
+    expect(html).toContain("data-n-hiding");
+    expect(html).toMatch(/data-n-hiding=""[^>]*>n</);
     expect(html).not.toContain(`n is ${q.answer}`);
   });
 
@@ -246,6 +251,8 @@ describe("boards", () => {
     const q = welcomeFirst(rngFromSeed(1));
     const html = renderToStaticMarkup(<Board {...stub(q)} status="correct" interacted />);
     expect(html).toContain("data-n-isolate");
+    expect(html).toContain("data-n-hiding");
+    expect(html).toMatch(/data-n-hiding=""[^>]*>n</);
     expect(html).not.toContain(`n = ${q.answer}`);
     expect(html).toContain('aria-label="leftover"');
     expect(html).not.toContain(`n is ${q.answer}`);

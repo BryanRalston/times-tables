@@ -42,6 +42,14 @@ describe("leftover why-move gates", () => {
     expect(play).toContain("leftoverPanelOpen");
   });
 
+  it("leftover ten-frame writes n on the hiding cells, not a lecture", () => {
+    const models = readFileSync(new URL("../components/models.tsx", import.meta.url), "utf8");
+    expect(models).toContain("data-n-hiding");
+    expect(models).not.toMatch(/variable|algebra|Grade 4/i);
+    const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+    expect(css).toContain("[data-leftover-board] .leftover-n");
+  });
+
   it("holds leftover about two seconds", () => {
     expect(leftoverHoldMs()).toBe(2000);
   });

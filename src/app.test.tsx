@@ -533,6 +533,7 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".mini-pad-glow");
     expect(css).toContain("min-width: 4.75rem");
     expect(css).toContain("[data-leftover-board] .leftover-dot");
+    expect(css).toContain("[data-leftover-board] .leftover-n");
     expect(css).not.toContain("[data-welcome-leftover]");
     const models = readFileSync(join(HERE, "components/models.tsx"), "utf8");
     expect(models).not.toContain("md:min-h-72");

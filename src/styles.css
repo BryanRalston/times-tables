@@ -239,6 +239,20 @@
   min-width: 36px;
   min-height: 36px;
 }
+[data-leftover-board] .leftover-n {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-size: clamp(1.15rem, 5vw, 1.55rem);
+  line-height: 1;
+  text-align: center;
+  color: #c45c26;
+  align-self: start;
+  margin-top: 0.1rem;
+}
+[data-leftover-board][data-leftover-rows="4"] .leftover-n {
+  font-size: clamp(0.95rem, 3.8vw, 1.2rem);
+}
 
 @keyframes star-pop {
   0% {

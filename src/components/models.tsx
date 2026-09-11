@@ -267,6 +267,7 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
           const hiding = idxs.filter((i) => i >= data.shown && i < data.total);
           const extra = idxs.filter((i) => i >= data.total);
           const showN = status === "correct" && hiding.length > 0 && r === lastLeftoverRow;
+          const markN = hiding.length > 0 && r === lastLeftoverRow;
           return (
             <div
               key={r}
@@ -301,6 +302,20 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
               {extra.map((i) => (
                 <Dot key={i} filled={false} />
               ))}
+              {markN ? (
+                <>
+                  {known.map((i) => (
+                    <span key={`n-gap-${i}`} aria-hidden className="leftover-n-gap" />
+                  ))}
+                  <span
+                    data-n-hiding=""
+                    className="leftover-n"
+                    style={{ gridColumn: `span ${hiding.length}` }}
+                  >
+                    n
+                  </span>
+                </>
+              ) : null}
             </div>
           );
         })}
