@@ -223,9 +223,10 @@ export function isPortalPad(id: number): boolean {
 export const HOP_SNAP_PX = 36;
 
 /**
- * Visible radial card on a 390 phone after 0.45rem scroll pad + 4px frame.
- * CSS `.candy-world` uses 10/9 so the island grows without shearing
- * the outer E/W portal arches off the card.
+ * Visible radial card on a 390 phone after scroll pad + 4px frame.
+ * CSS `.candy-world` caps at 10/9 so the island grows without shearing
+ * the outer E/W portal arches off the card. The Lessons plate may be
+ * taller — leftover column is studio white, not a deeper crop.
  */
 export const PHONE_MAP_VIEW = { width: 368, height: (368 * 9) / 10 } as const;
 

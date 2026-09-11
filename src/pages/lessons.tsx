@@ -34,7 +34,7 @@ export function LessonsPage() {
   return (
     <AppScene scene="hills" tabs={<AppTabs active="lessons" />}>
       <AppHeader variant="shelf" title={ui.lessons} />
-      <div className="candy-scroll" data-lessons-path="1">
+      <div className="candy-scroll" data-lessons-path="1" data-lessons-fill="1">
         <CandyPath
           ref={pathRef}
           suggestedId={pathSuggested}

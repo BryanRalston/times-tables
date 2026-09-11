@@ -24,6 +24,7 @@ describe("CandyPath", () => {
     );
     expect(html).toContain("data-grade-path");
     expect(html).toContain("data-radial-web");
+    expect(html).toContain("data-radial-fill");
     expect(html).toContain("data-candy-world");
     expect(html).toContain("data-radial-stage");
     expect(html).toContain("data-candy-radial-map");

@@ -351,6 +351,7 @@ export const CandyPath = forwardRef<
       className="candy-map"
       data-grade-path="1"
       data-radial-web="1"
+      data-radial-fill="1"
       data-candy-world="1"
       data-candy-radial-map="1"
       data-hop-credits={String(credits)}
