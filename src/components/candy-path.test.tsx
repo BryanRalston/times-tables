@@ -284,6 +284,7 @@ describe("CandyPath", () => {
     expect(src).toContain("landPresent");
     expect(src).toContain("MysteryPresent");
     expect(src).toContain("data-present-unwrap");
+    expect(src).toContain("padView(unwrap.pad)");
     expect(src).toContain("HOPPER_BOARD_WIDTH_PCT");
     expect(src).toContain("HOP_GLOW_BOARD_WIDTH_PCT");
   });
