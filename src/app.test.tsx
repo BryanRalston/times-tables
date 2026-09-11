@@ -458,7 +458,7 @@ describe("first-visit Home door", () => {
     expect(css).toContain("100cqi * 7 / 6");
     expect(css).toContain("grid-template-rows: minmax(0, 1fr) auto");
     expect(css).toContain("container-name: radial-card");
-    expect(css).toContain('.candy-overlay[data-hop-pick="1"]');
+    expect(css).toMatch(/\.candy-overlay\[data-hop-pick="1"\]\s*\{[^}]*touch-action:\s*none/);
     expect(css).toContain(".candy-prop-land");
     expect(css).toContain(".candy-prop-water");
     expect(css).toContain(".candy-prop-shore");

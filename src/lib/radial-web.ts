@@ -368,8 +368,14 @@ export function nearestHopDir(
 }
 
 /**
- * Phone-fair snap radius. Plaza neighbors sit ~28–39px apart on the 6/7
- * stage. Board taps resolve to the nearest glowing neighbor.
+ * #63 comfort floor: a 48px-wide circle around each glow. Used when the
+ * painted board is smaller than the 390 phone stage.
+ */
+export const HOP_SNAP_MIN_PX = 24;
+
+/**
+ * Phone-fair snap radius on the 6/7 390 stage. Plaza neighbors sit
+ * ~28–39px apart. Board taps resolve to the nearest glowing neighbor.
  */
 export const HOP_SNAP_PX = 36;
 
@@ -431,6 +437,17 @@ export function hopGlowBoardPx(board: HopBoardRect = PHONE_MAP_BOARD): number {
   return (HOP_GLOW_BOARD_WIDTH_PCT / 100) * board.width;
 }
 
+/**
+ * Fat-finger snap in CSS pixels of `board`. Scales from the 390 phone
+ * stage so a painted tile stays tappable when the overlay is a different
+ * size; never tighter than {@link HOP_SNAP_MIN_PX}.
+ */
+export function hopSnapPx(board: HopBoardRect = PHONE_MAP_BOARD): number {
+  if (board.width <= 0) return HOP_SNAP_PX;
+  const scaled = (HOP_SNAP_PX * board.width) / PHONE_MAP_BOARD.width;
+  return Math.max(HOP_SNAP_MIN_PX, Math.round(scaled));
+}
+
 /** Center-to-center gap to the closest painted neighbor. */
 export function minAdjacentGapPx(id: number, board: HopBoardRect = PHONE_MAP_BOARD): number {
   const here = padClientPos(id, board);
@@ -454,7 +471,7 @@ export function nearestHopTarget(
   board: HopBoardRect,
   choiceIds: readonly number[],
   hereId?: number,
-  snapPx = HOP_SNAP_PX,
+  snapPx = hopSnapPx(board),
 ): number | undefined {
   if (!choiceIds.length || board.width <= 0 || board.height <= 0 || snapPx <= 0) return undefined;
   const seen = new Set<number>();

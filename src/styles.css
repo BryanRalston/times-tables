@@ -1033,6 +1033,7 @@ details > summary::-webkit-details-marker {
 }
 .candy-overlay[data-hop-pick="1"] {
   pointer-events: auto;
+  touch-action: none;
 }
 .candy-overlay[data-hop-pick="1"] .candy-node-radial {
   pointer-events: none;
