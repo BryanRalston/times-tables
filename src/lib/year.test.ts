@@ -428,6 +428,10 @@ describe("locale", () => {
     expect(UI.en.grownupBlurb).toMatch(/Grade 4/);
     expect(UI.en.grownupBlurb).toMatch(/Nothing leaves/i);
     expect(UI.en.grade3Path).toBe("Grade 3 Path");
+    expect(UI.en.testMode).toBe("Test mode");
+    expect(UI.es.testMode).toBe("Modo de prueba");
+    expect(UI["pt-BR"].testMode).toBe("Modo de teste");
+    expect(UI.en.testModeFreeMove).toBe("Test mode · free move");
     expect(UI.en.rollDie).toBe("Roll");
     expect(UI.en.rollInvite).toBe("Roll the die");
     expect(UI.en.stepsLeftN(2)).toBe("2 left");

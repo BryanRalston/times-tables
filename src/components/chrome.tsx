@@ -4,6 +4,7 @@ import { MagentaImg } from "@/components/magenta-video";
 import { parseLocale, UI } from "@/lib/i18n";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
+import { holdPathGrade } from "@/lib/test-mode";
 import { PEEK_SQUISHEE_IDS, peekTurn, squisheeSrc } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
@@ -51,7 +52,7 @@ export function MuteButton({ className }: { className?: string }) {
 
 export function Wordmark({ compact }: { compact?: boolean }) {
   const ui = useUi();
-  const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
+  const pathGrade = holdPathGrade(useProgress((s) => s.testMode), useProgress((s) => s.pathGrade));
   const hydrated = useProgress((s) => s.hydrated);
   return (
     <div className="min-w-0">

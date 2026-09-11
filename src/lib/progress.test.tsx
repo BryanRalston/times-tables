@@ -501,6 +501,31 @@ describe("progress persist", () => {
     expect(hopCreditsOf(s.activities, s.pathHopSpent, s.sessions)).toBe(2);
   });
 
+  it("persists Test mode on the device save and holds Grade 4 when it turns off", () => {
+    expect(useProgress.getState().testMode).toBe(false);
+    useProgress.getState().setTestMode(true);
+    useProgress.getState().setPathGrade(4);
+    expect(useProgress.getState().testMode).toBe(true);
+    expect(useProgress.getState().pathGrade).toBe(4);
+    useProgress.getState().setTestMode(false);
+    expect(useProgress.getState().testMode).toBe(false);
+    expect(useProgress.getState().pathGrade).toBe(3);
+  });
+
+  it("refunds a spent roll and clears leftover steps from Test mode cheats", () => {
+    useProgress.setState((s) => {
+      const id = s.learnerId;
+      const kid = { ...(s.learners[id] ?? s), pathHopSpent: 2, pathStepsLeft: 3 };
+      return { pathHopSpent: 2, pathStepsLeft: 3, learners: { ...s.learners, [id]: kid } };
+    });
+    useProgress.getState().grantTestRoll();
+    expect(useProgress.getState().pathHopSpent).toBe(1);
+    useProgress.getState().clearPathSteps();
+    expect(useProgress.getState().pathStepsLeft).toBe(0);
+    useProgress.getState().awardCoins(10);
+    expect(useProgress.getState().coins).toBe(10);
+  });
+
   it("does not call resetAll from main boot", () => {
     const main = readFileSync(join(HERE, "../main.tsx"), "utf8");
     expect(main).toContain("hydrateProgress");

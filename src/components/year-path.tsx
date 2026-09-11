@@ -5,11 +5,12 @@ import { parseLocale } from "@/lib/i18n";
 import { unitText } from "@/lib/labels";
 import { unitStatus } from "@/lib/path";
 import { useProgress } from "@/lib/progress";
+import { holdPathGrade } from "@/lib/test-mode";
 import { cn } from "@/lib/utils";
 
 export function YearPath({ suggestedId, onOpen }: { suggestedId: string; onOpen: (id: string) => void }) {
   const sessions = useProgress((s) => s.sessions);
-  const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
+  const pathGrade = holdPathGrade(useProgress((s) => s.testMode), useProgress((s) => s.pathGrade));
   const locale = parseLocale(useProgress((s) => s.locale));
   const ui = useUi();
   const qName = [ui.q1, ui.q2, ui.q3, ui.q4];

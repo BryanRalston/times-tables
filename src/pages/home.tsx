@@ -7,11 +7,12 @@ import { parseLocale } from "@/lib/i18n";
 import { unitText } from "@/lib/labels";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
+import { holdPathGrade } from "@/lib/test-mode";
 import { dailyWalkActivityId } from "@/lib/radial-web";
 
 export function HomePage() {
   const classUnitId = useProgress((s) => s.classUnitId);
-  const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
+  const pathGrade = holdPathGrade(useProgress((s) => s.testMode), useProgress((s) => s.pathGrade));
   const skipWeekend = useProgress((s) => s.skipWeekend);
   const shaky = useProgress((s) => s.shaky);
   const facts = useProgress((s) => s.facts);

@@ -138,6 +138,12 @@ export type Ui = {
   mute: string;
   unmute: string;
   sounds: string;
+  testMode: string;
+  testModeBlurb: string;
+  testModeFreeMove: string;
+  testAddRoll: string;
+  testAddCoins: string;
+  testClearSteps: string;
   mystery: string;
   start: string;
   allUnits: string;
@@ -310,6 +316,13 @@ export const UI: Record<Locale, Ui> = {
     mute: "Mute sounds",
     unmute: "Unmute sounds",
     sounds: "Sounds",
+    testMode: "Test mode",
+    testModeBlurb:
+      "Playtest without dice or earn gates. Grade 4 is available only while this is on. Turn off to restore the kid rules.",
+    testModeFreeMove: "Test mode · free move",
+    testAddRoll: "+1 roll",
+    testAddCoins: "+10 coins",
+    testClearSteps: "Clear steps",
     mystery: "???",
     start: "Start",
     allUnits: "All units",
@@ -480,6 +493,13 @@ export const UI: Record<Locale, Ui> = {
     mute: "Silenciar sonidos",
     unmute: "Activar sonidos",
     sounds: "Sonidos",
+    testMode: "Modo de prueba",
+    testModeBlurb:
+      "Prueba sin dados ni candados. El 4.º grado solo está disponible con esto encendido. Apágalo para volver a las reglas del niño.",
+    testModeFreeMove: "Modo de prueba · movimiento libre",
+    testAddRoll: "+1 tirada",
+    testAddCoins: "+10 monedas",
+    testClearSteps: "Borrar pasos",
     mystery: "???",
     start: "Empezar",
     allUnits: "Todas las unidades",
@@ -650,6 +670,13 @@ export const UI: Record<Locale, Ui> = {
     mute: "Silenciar sons",
     unmute: "Ativar sons",
     sounds: "Sons",
+    testMode: "Modo de teste",
+    testModeBlurb:
+      "Teste sem dados nem bloqueios. O 4.º ano só fica disponível com isto ligado. Desligue para voltar às regras da criança.",
+    testModeFreeMove: "Modo de teste · movimento livre",
+    testAddRoll: "+1 jogada",
+    testAddCoins: "+10 moedas",
+    testClearSteps: "Limpar passos",
     mystery: "???",
     start: "Começar",
     allUnits: "Todas as unidades",

@@ -273,6 +273,36 @@ describe("first-visit Home door", () => {
     expect(html).not.toContain("Roll the die");
   });
 
+  it("Test mode on Lessons offers free adjacent hops without a banked roll", () => {
+    useProgress.setState({
+      testMode: true,
+      activities: {},
+      pathHopperAt: 1,
+      pathHopSpent: 0,
+      pathStepsLeft: 0,
+    });
+    stubHash("#/lessons");
+    const html = renderToStaticMarkup(<App />);
+    expect(html).toContain('data-test-free-move="1"');
+    expect(html).toContain("Test mode · free move");
+    expect(html).toContain('data-hop-pick="1"');
+    expect(html).toContain('data-dice-invite="0"');
+    expect(html).toContain('data-pad-choice="1"');
+    expect(html).toContain("Start");
+    expect(html).not.toContain("Roll the die");
+    expect(html).not.toContain("data-test-mode-toggle");
+  });
+
+  it("does not put Test mode on Home chrome, even when the flag is on", () => {
+    useProgress.setState({ testMode: true });
+    stubHash("#/");
+    const html = renderToStaticMarkup(<App />);
+    expectHomeShell(html);
+    expect(html).not.toContain("Test mode");
+    expect(html).not.toContain("data-test-mode-toggle");
+    expect(html).not.toContain("data-test-free-move");
+  });
+
   it("Guest with no hop credits sees Grade 3 Path and no hop targets", () => {
     useProgress.setState({
       activities: { "u1-leftover": { plays: 1, best: 4, last: 4, stars: 3, misses: [] } },

@@ -354,5 +354,7 @@ export interface SaveState extends LearnerSlice {
   skipWeekend: boolean;
   locale: Locale;
   soundOn: boolean;
+  /** Grown-ups playtest flag. Remove with src/lib/test-mode.ts before publish. */
+  testMode: boolean;
   learners: Record<string, LearnerSlice>;
 }

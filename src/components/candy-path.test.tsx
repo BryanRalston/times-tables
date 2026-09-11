@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { resetProgressMemory } from "@/lib/progress";
+import { unitsFor } from "@/lib/curriculum";
 import { HOP_SNAP_PX, RADIAL_PAD_COUNT, RADIAL_PADS, START_PAD, adjacentPadIds } from "@/lib/radial-web";
 import { CandyPath } from "./candy-path";
 
@@ -171,6 +172,42 @@ describe("CandyPath", () => {
     expect(html).toContain('data-path-travel="0"');
     expect(html).toContain('data-path-hop-to="1"');
     expect((html.match(/data-path-pad="1"/g) ?? []).length).toBe(RADIAL_PAD_COUNT);
+  });
+
+  it("offers adjacent hops with no die when Test mode is on", () => {
+    const next = adjacentPadIds(START_PAD);
+    const html = renderToStaticMarkup(
+      <CandyPath
+        suggestedId="u2"
+        standFrom={1}
+        standTo={1}
+        hopCredits={0}
+        stepsLeft={0}
+        freeMove
+        onStart={() => {}}
+        onOpenUnit={() => {}}
+      />,
+    );
+    expect(html).toContain('data-test-free-move="1"');
+    expect(html).toContain('data-dice-invite="0"');
+    expect(html).toContain('data-hop-pick="1"');
+    expect((html.match(/data-pad-choice="1"/g) ?? []).length).toBe(next.length);
+    expect(html).not.toContain("g4-");
+  });
+
+  it("keeps Grade 4 off the rail unless Test mode and Grade 4 are both on", () => {
+    const html = renderToStaticMarkup(
+      <CandyPath
+        suggestedId="g4-u1"
+        standFrom={1}
+        standTo={1}
+        railUnits={unitsFor(4)}
+        onStart={() => {}}
+        onOpenUnit={() => {}}
+      />,
+    );
+    expect(html).toContain('data-path-unit="g4-u1"');
+    expect(html).not.toContain('data-path-unit="u13"');
   });
 
   it("resolves phone taps on the board to the nearest glowing pad", () => {

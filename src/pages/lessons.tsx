@@ -2,16 +2,17 @@ import { useRef } from "react";
 import { CandyPath, type CandyPathHandle } from "@/components/candy-path";
 import { AppHeader, AppScene, AppTabs, useUi } from "@/components/chrome";
 import { todayIso } from "@/lib/calendar";
-import { UNITS, suggestedUnitId } from "@/lib/curriculum";
+import { UNITS, suggestedUnitId, unitsFor } from "@/lib/curriculum";
 import { navigate } from "@/lib/nav";
 import { lessonsHopFrom, lessonsHopTo, pathNowUnitId } from "@/lib/path";
 import { useProgress } from "@/lib/progress";
 import { activePathStepsLeft, canStartDiceTurn, hopCreditsOf } from "@/lib/radial-web";
+import { holdPathGrade, isTestMode, testFreeMove } from "@/lib/test-mode";
 
 export function LessonsPage() {
   useProgress(
     (s) =>
-      `${s.classUnitId}:${s.pathHopperAt}:${s.pathHopSpent}:${s.pathStepsLeft}:${Object.keys(s.sessions).sort().join(",")}:${Object.keys(s.activities).sort().join(",")}`,
+      `${s.classUnitId}:${s.pathHopperAt}:${s.pathHopSpent}:${s.pathStepsLeft}:${s.testMode}:${Object.keys(s.sessions).sort().join(",")}:${Object.keys(s.activities).sort().join(",")}`,
   );
   const st = useProgress.getState();
   const ui = useUi();
@@ -23,12 +24,14 @@ export function LessonsPage() {
   const standTo = lessonsHopTo(st.pathHopperAt);
   const rolls = hopCreditsOf(st.activities, st.pathHopSpent, st.sessions);
   const steps = activePathStepsLeft(st.pathHopSpent, st.pathStepsLeft);
-  const inviting = canStartDiceTurn(rolls, steps);
-  const picking = steps > 0;
+  const freeMove = testFreeMove(st.testMode);
+  const inviting = !freeMove && canStartDiceTurn(rolls, steps);
+  const picking = freeMove || steps > 0;
   const pathRef = useRef<CandyPathHandle>(null);
 
   let caption = ui.grade3Path;
-  if (picking) caption = `${ui.hopPick} · ${ui.stepsLeftN(steps)}`;
+  if (freeMove) caption = ui.testModeFreeMove;
+  else if (picking) caption = `${ui.hopPick} · ${ui.stepsLeftN(steps)}`;
   else if (inviting) caption = ui.rollInvite;
 
   return (
@@ -42,6 +45,8 @@ export function LessonsPage() {
           standTo={standTo}
           hopCredits={rolls}
           stepsLeft={steps}
+          freeMove={freeMove}
+          railUnits={isTestMode(st.testMode) ? unitsFor(holdPathGrade(st.testMode, st.pathGrade)) : undefined}
           onStart={() => navigate({ id: "play", kind: "daily" })}
           onOpenUnit={(id) => navigate({ id: "unit", unitId: id })}
         />
@@ -53,6 +58,7 @@ export function LessonsPage() {
           data-dice-invite={inviting ? "1" : "0"}
           data-hop-credits-ui={String(rolls)}
           data-dice-steps-ui={String(steps)}
+          data-test-free-move={freeMove ? "1" : "0"}
         >
           <span aria-hidden>★</span>
           {caption}
