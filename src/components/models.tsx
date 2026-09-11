@@ -10,7 +10,7 @@ import {
   type PlaceKind,
   type PlaceParts,
 } from "@/lib/compute-model";
-import { G4Q, parseLocale, PLACE, UI, type Locale } from "@/lib/i18n";
+import { G4Q, parseLocale, PLACE, qCopy, UI, type Locale } from "@/lib/i18n";
 import { leftoverWhyMoveMs, splitCounted } from "@/lib/leftover";
 import { useProgress } from "@/lib/progress";
 import { asset } from "@/lib/art";
@@ -311,13 +311,16 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
 
 function Groups({ question, onInteract, status, shake }: BoardProps) {
   const data = question.data as GroupsData;
-  const ui = UI[parseLocale(useProgress((st) => st.locale))];
+  const locale = parseLocale(useProgress((st) => st.locale));
+  const ui = UI[locale];
+  const copy = qCopy(locale);
   const [taken, setTaken] = useState(false);
   const groups = data.hide === "product" ? Math.max(0, data.groups) : Math.max(1, data.groups);
   const size = Math.max(0, data.size);
 
   if (data.hide === "product") {
-    return <TallyGroups groups={groups} size={size} prompt={data.equation} status={status} shake={shake} />;
+    const why = groups === 0 ? copy.zeroGroupsWhy : size === 0 ? copy.emptyEachWhy(groups) : undefined;
+    return <TallyGroups groups={groups} size={size} prompt={data.equation} why={why} status={status} shake={shake} />;
   }
 
   function isolate() {
@@ -430,12 +433,14 @@ function TallyGroups({
   groups,
   size,
   prompt,
+  why,
   status,
   shake,
 }: {
   groups: number;
   size: number;
   prompt: string;
+  why?: string;
   status: BoardProps["status"];
   shake: number;
 }) {
@@ -466,17 +471,19 @@ function TallyGroups({
             type="button"
             key={g}
             data-equal-group=""
+            data-empty-group={size === 0 ? "" : undefined}
             data-group-tally={marked[g] ? "1" : "0"}
             aria-pressed={marked[g]}
-            aria-label={`group ${g + 1}`}
+            aria-label={size === 0 ? `empty group ${g + 1}` : `group ${g + 1}`}
             onClick={() => toggle(g)}
             className={cn(
-              "flex flex-wrap gap-1 rounded-[12px] border bg-bg-warm p-1.5",
-              marked[g] ? "border-teal bg-teal-soft ring-2 ring-teal/40" : "border-line",
+              "flex flex-wrap items-center justify-center gap-1 rounded-[12px] border bg-bg-warm p-1.5",
+              size === 0 && "min-h-12 min-w-12 border-dashed border-faint",
+              marked[g] ? "border-teal bg-teal-soft ring-2 ring-teal/40" : size === 0 ? "border-faint" : "border-line",
             )}
           >
             {size === 0 ? (
-              <span className="px-1 text-[10px] text-faint">0</span>
+              <span className="font-display text-xl text-faint">0</span>
             ) : (
               Array.from({ length: size }, (_, i) => (
                 <span
@@ -489,6 +496,7 @@ function TallyGroups({
         ))}
       </div>
       )}
+      {why ? <p className="mt-3 text-center text-sm text-muted">{why}</p> : null}
     </Frame>
   );
 }
@@ -1963,10 +1971,31 @@ function MeasureBoard({ question, status, shake }: BoardProps) {
 
 function FluencyBoard({ question, status, shake }: BoardProps) {
   const data = question.data as FluencyData;
+  const copy = qCopy(parseLocale(useProgress((st) => st.locale)));
   const zeroTimes = data.op === "×" && (data.a === 0 || data.b === 0) && data.a <= 12 && data.b <= 12;
   if (zeroTimes) {
-    const size = data.a === 0 ? data.b || 1 : data.a;
-    return <TallyGroups groups={0} size={size} prompt={question.prompt} status={status} shake={shake} />;
+    if (data.a === 0) {
+      return (
+        <TallyGroups
+          groups={0}
+          size={data.b || 1}
+          prompt={question.prompt}
+          why={copy.zeroGroupsWhy}
+          status={status}
+          shake={shake}
+        />
+      );
+    }
+    return (
+      <TallyGroups
+        groups={data.a}
+        size={0}
+        prompt={question.prompt}
+        why={copy.emptyEachWhy(data.a)}
+        status={status}
+        shake={shake}
+      />
+    );
   }
   const factTimes = data.op === "×" && data.a > 0 && data.b > 0 && data.a <= 12 && data.b <= 12;
   const splitApart =

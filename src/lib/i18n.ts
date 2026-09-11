@@ -995,6 +995,8 @@ export type QCopy = {
   groupsHint: string;
   groupsOf: (g: number, s: number) => string;
   groupsEach: (g: number, product: number) => string;
+  zeroGroupsWhy: string;
+  emptyEachWhy: (n: number) => string;
   jumpsOf: (jumps: number, size: number) => string;
   jumpsCount: (size: number, product: number) => string;
   jumpsSize: (jumps: number, product: number) => string;
@@ -1110,6 +1112,8 @@ export function qCopy(locale: Locale): QCopy {
       groupsHint: "Cuenta un grupo, luego cuenta los grupos.",
       groupsOf: (g, s) => `${g} grupos de ${s}. ¿Cuántos en total?`,
       groupsEach: (g, product) => `${g} grupos. ${product} en total. ¿Cuántos en cada grupo?`,
+      zeroGroupsWhy: "0 grupos. Nada que contar.",
+      emptyEachWhy: (n) => `${n} grupos de 0. Nada en cada grupo.`,
       jumpsOf: (jumps, size) => `${jumps} saltos de ${size} en la recta. ¿Dónde caes?`,
       jumpsCount: (size, product) => `Saltos de ${size} llegan a ${product}. ¿Cuántos saltos?`,
       jumpsSize: (jumps, product) => `${jumps} saltos iguales llegan a ${product}. ¿De cuánto es cada salto?`,
@@ -1239,6 +1243,8 @@ export function qCopy(locale: Locale): QCopy {
       groupsHint: "Conte um grupo, depois conte os grupos.",
       groupsOf: (g, s) => `${g} grupos de ${s}. Quantos no total?`,
       groupsEach: (g, product) => `${g} grupos. ${product} no total. Quantos em cada grupo?`,
+      zeroGroupsWhy: "0 grupos. Nada para contar.",
+      emptyEachWhy: (n) => `${n} grupos de 0. Nada em cada grupo.`,
       jumpsOf: (jumps, size) => `${jumps} saltos de ${size} na reta. Onde você cai?`,
       jumpsCount: (size, product) => `Saltos de ${size} chegam a ${product}. Quantos saltos?`,
       jumpsSize: (jumps, product) => `${jumps} saltos iguais chegam a ${product}. Qual é o tamanho de cada salto?`,
@@ -1367,6 +1373,8 @@ export function qCopy(locale: Locale): QCopy {
     groupsHint: "Count one group, then count the groups.",
     groupsOf: (g, s) => `${g} groups of ${s}. How many in all?`,
     groupsEach: (g, product) => `${g} groups. ${product} in all. How many in each group?`,
+    zeroGroupsWhy: "0 groups. Nothing to count.",
+    emptyEachWhy: (n) => `${n} groups of 0. Nothing in each group.`,
     jumpsOf: (jumps, size) => `${jumps} jumps of ${size} on the number line. Where do you land?`,
     jumpsCount: (size, product) => `Jumps of ${size} land on ${product}. How many jumps?`,
     jumpsSize: (jumps, product) => `${jumps} equal jumps land on ${product}. How big is each jump?`,

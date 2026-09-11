@@ -620,6 +620,7 @@ describe("boards", () => {
     expect(html).toContain("data-zero-groups");
     expect(html).not.toContain("data-equal-group");
     expect(html).toContain("0 × 5 = n");
+    expect(html).toContain("0 groups. Nothing to count.");
   });
 
   it("fluency 0 × 5 is zero groups of five", () => {
@@ -634,7 +635,25 @@ describe("boards", () => {
     const html = renderToStaticMarkup(<Board {...stub(q)} />);
     expect(html).toContain("data-zero-groups");
     expect(html).toContain("0 × 5");
+    expect(html).toContain("0 groups. Nothing to count.");
     expect(html).not.toContain("data-equal-group");
+  });
+
+  it("fluency 4 × 0 shows four empty groups, not a bare equation", () => {
+    const q: Question = {
+      id: "t4x0",
+      kind: "fluency",
+      prompt: "4 × 0",
+      answer: "0",
+      input: "keypad",
+      data: { a: 4, b: 0, op: "×" } satisfies FluencyData,
+    };
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain("4 × 0");
+    expect(html).toContain("4 groups of 0. Nothing in each group.");
+    expect((html.match(/data-empty-group/g) ?? []).length).toBe(4);
+    expect((html.match(/data-equal-group/g) ?? []).length).toBe(4);
+    expect(html).not.toContain("data-zero-groups");
   });
 
   it("array boards do not repeat the heading prompt", () => {

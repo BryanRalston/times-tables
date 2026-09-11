@@ -680,6 +680,20 @@ describe("answer audit", () => {
     expect(zeros).toBeGreaterThan(5);
   });
 
+  it("fluency 0-facts never ship a bare equation with no model", () => {
+    let zeros = 0;
+    for (let i = 0; i < 80; i++) {
+      const q = makeQuestion(activityById("u12-mix")!.activity, rngFromSeed(`mix0:${i}`));
+      const d = q.data as FluencyData;
+      if (d.op !== "×" || (d.a !== 0 && d.b !== 0)) continue;
+      zeros += 1;
+      expect(q.kind).toBe("fluency");
+      expect(q.answer).toBe("0");
+      expect(q.prompt).toMatch(/× 0|0 ×/);
+    }
+    expect(zeros).toBeGreaterThan(0);
+  });
+
   it("match-the-clocks is a written time, not another analog read", () => {
     for (let i = 0; i < 12; i++) {
       const q = makeQuestion(activityById("u11-match")!.activity, rngFromSeed(`match:${i}`));
