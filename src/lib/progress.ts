@@ -34,6 +34,7 @@ import {
   shakyFromFacts,
 } from "./practice";
 import { schoolStreak } from "./streak";
+import { parseTestMode } from "./test-mode";
 import type { ActivitySave, DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
 import { parsePathGrade } from "./types";
 
@@ -223,6 +224,7 @@ function empty(): SaveState {
     skipWeekend: true,
     locale: "en",
     soundOn: true,
+    testMode: false,
     learners: { [DEFAULT_ID]: kid },
     ...kid,
   };
@@ -287,6 +289,7 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
     skipWeekend: raw.skipWeekend !== false,
     locale: parseLocale(raw.locale),
     soundOn: raw.soundOn !== false,
+    testMode: parseTestMode(raw.testMode),
     learners,
     ...cur,
   };
@@ -305,6 +308,9 @@ interface ProgressApi extends SaveState {
   setPathGrade: (grade: PathGrade) => void;
   setSkipWeekend: (v: boolean) => void;
   setLocale: (locale: Locale) => void;
+  setTestMode: (on: boolean) => void;
+  grantTestRoll: () => void;
+  clearPathSteps: () => void;
   recordRound: (opts: {
     activityId: string;
     correct: number;
@@ -336,6 +342,7 @@ function snapshotSave(s: SaveState): SaveState {
     skipWeekend: s.skipWeekend,
     locale: s.locale,
     soundOn: s.soundOn,
+    testMode: s.testMode,
     activities: s.activities,
     badges: s.badges,
     shaky: s.shaky,
@@ -417,6 +424,20 @@ export const useProgress = create<ProgressApi>()(
       },
       setSkipWeekend: (v) => set({ skipWeekend: v }),
       setLocale: (locale) => set({ locale: parseLocale(locale) }),
+      setTestMode: (on) => {
+        const testMode = parseTestMode(on);
+        if (testMode) {
+          set({ testMode: true });
+          return;
+        }
+        const classUnitId = unitsFor(3).some((u) => u.id === get().classUnitId) ? get().classUnitId : "";
+        set({ testMode: false, pathGrade: 3, classUnitId });
+      },
+      grantTestRoll: () => {
+        const spent = clampPathHopSpent(get().pathHopSpent);
+        commit(get, set, { pathHopSpent: Math.max(0, spent - 1) });
+      },
+      clearPathSteps: () => commit(get, set, { pathStepsLeft: 0 }),
       recordRound: ({ activityId, correct, total, earned, misses }) => {
         const prev = get().activities[activityId] ?? {
           plays: 0,
@@ -526,6 +547,7 @@ export const useProgress = create<ProgressApi>()(
           skipWeekend: get().skipWeekend,
           locale: get().locale,
           soundOn: get().soundOn !== false,
+          testMode: parseTestMode(get().testMode),
           learners: { ...get().learners, [id]: kid },
           ...kid,
         });

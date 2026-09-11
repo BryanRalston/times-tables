@@ -16,6 +16,7 @@ import { cardHeading, interactGatesSubmit, leftoverHoldMs, leftoverPanelOpen, le
 import { aliasActivityId, navigate } from "@/lib/nav";
 import { holdMsFor, REVEAL_AFTER_MISSES, WRONG_REVEAL_MS, WRONG_RETRY_MS, type FactStat } from "@/lib/practice";
 import { useProgress } from "@/lib/progress";
+import { holdPathGrade } from "@/lib/test-mode";
 import { activePathStepsLeft, dailyWalkActivityId, hopCreditsOf } from "@/lib/radial-web";
 import { makeActivityRound, makeWelcomeRound } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
@@ -126,7 +127,8 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const [pack] = useState(() => {
     const st = useProgress.getState();
     const date = todayIso();
-    const calendarId = suggestedUnitId(date, st.classUnitId || undefined, st.pathGrade);
+    const grade = holdPathGrade(st.testMode, st.pathGrade);
+    const calendarId = suggestedUnitId(date, st.classUnitId || undefined, grade);
     const unitGuess = dailyStartUnitId(st.classUnitId || undefined, calendarId, st.sessions, st.activities, date);
     const key = playKey(kind, activityId, date);
     const attempt = st.beginPlay(key);
@@ -141,7 +143,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       st.learnerId,
       attempt,
       locale,
-      st.pathGrade ?? 3,
+      grade,
     );
   });
   const [coinsEarned, setCoinsEarned] = useState(0);

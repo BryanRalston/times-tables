@@ -7,11 +7,12 @@ import { activityText, unitText } from "@/lib/labels";
 import { todayIso } from "@/lib/calendar";
 import { navigate } from "@/lib/nav";
 import { sessionsForUnit, useProgress } from "@/lib/progress";
+import { holdPathGrade } from "@/lib/test-mode";
 
 export function UnitPage({ unitId }: { unitId: string }) {
   const unit = unitById(unitId);
   const classUnitId = useProgress((s) => s.classUnitId);
-  const pathGrade = useProgress((s) => s.pathGrade) ?? 3;
+  const pathGrade = holdPathGrade(useProgress((s) => s.testMode), useProgress((s) => s.pathGrade));
   const activities = useProgress((s) => s.activities);
   const suggested = suggestedUnitId(todayIso(), classUnitId || undefined, pathGrade);
 

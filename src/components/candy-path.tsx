@@ -98,10 +98,12 @@ export const CandyPath = forwardRef<
     standTo?: number;
     hopCredits?: number;
     stepsLeft?: number;
+    freeMove?: boolean;
+    railUnits?: typeof UNITS;
     onStart: () => void;
     onOpenUnit: (id: string) => void;
   }
->(function CandyPath({ suggestedId, standFrom, standTo, hopCredits, stepsLeft, onStart, onOpenUnit }, ref) {
+>(function CandyPath({ suggestedId, standFrom, standTo, hopCredits, stepsLeft, freeMove = false, railUnits, onStart, onOpenUnit }, ref) {
   const ui = useUi();
   const locale = parseLocale(useProgress((s) => s.locale));
   const owned = useProgress((s) => s.squishees);
@@ -131,8 +133,8 @@ export const CandyPath = forwardRef<
   const steps = stepsLeft ?? activePathStepsLeft(hopsSpent, storedSteps);
   const [rolling, setRolling] = useState<DieFace | null>(null);
   const [tumbleFace, setTumbleFace] = useState<DieFace>(1);
-  const inviting = canStartDiceTurn(credits, steps) && !travel && !warp && rolling == null;
-  const picking = steps > 0 && !travel && !warp && rolling == null;
+  const inviting = !freeMove && canStartDiceTurn(credits, steps) && !travel && !warp && rolling == null;
+  const picking = (freeMove || steps > 0) && !travel && !warp && rolling == null;
   const choices = picking ? adjacentPadIds(dest) : [];
   const boardRef = useRef<HTMLDivElement>(null);
   const tapStart = useRef<{ x: number; y: number } | null>(null);
@@ -304,7 +306,7 @@ export const CandyPath = forwardRef<
   }, [rolling]);
 
   const beginRoll = () => {
-    if (rolling != null || travel || warp || !canStartDiceTurn(credits, steps)) return;
+    if (freeMove || rolling != null || travel || warp || !canStartDiceTurn(credits, steps)) return;
     const face = rollDieFace();
     if (!startDiceTurn(face)) return;
     playDice();
@@ -315,9 +317,9 @@ export const CandyPath = forwardRef<
   };
 
   const chooseHop = (to: number) => {
-    if (travel || warp || rolling != null || steps <= 0) return;
+    if (travel || warp || rolling != null || (!freeMove && steps <= 0)) return;
     if (!areAdjacent(settled.current, to)) return;
-    spendPathStep();
+    if (!freeMove) spendPathStep();
     setDest(to);
   };
 
@@ -356,6 +358,7 @@ export const CandyPath = forwardRef<
       data-hop-credits={String(credits)}
       data-dice-invite={inviting ? "1" : "0"}
       data-dice-steps={String(steps)}
+      data-test-free-move={freeMove ? "1" : "0"}
     >
       <div className="candy-world">
         <div className="candy-world-stage" data-radial-stage="1">
@@ -469,7 +472,7 @@ export const CandyPath = forwardRef<
       </div>
 
       <div className="candy-unit-rail" data-unit-rail="1">
-        {UNITS.map((unit) => {
+        {(railUnits ?? UNITS).map((unit) => {
           const status = unitStatus(unit, suggestedId);
           const short = unitText(unit, locale).short;
           const chipStatus = status === "locked" ? "open" : status;

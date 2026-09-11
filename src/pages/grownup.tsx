@@ -8,7 +8,8 @@ import { LOCALES, LOCALE_NATIVE, parseLocale, UI, type Ui } from "@/lib/i18n";
 import { navigate } from "@/lib/nav";
 import { formatAvgSeconds, needsPracticeList, todayView } from "@/lib/practice";
 import { exportSaveJson, importSaveJson, useProgress } from "@/lib/progress";
-import type { FactStat, PersonalBests, TodayPractice } from "@/lib/types";
+import { isTestMode } from "@/lib/test-mode";
+import { parsePathGrade, type FactStat, type PersonalBests, type TodayPractice } from "@/lib/types";
 
 const GROWNUP_PIN = "2026";
 const PIN_KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "back", "0"] as const;
@@ -29,11 +30,20 @@ export function GrownupPage({ unlocked: startUnlocked = false }: { unlocked?: bo
   const learners = useProgress((s) => s.learners);
   const soundOn = useProgress((s) => s.soundOn !== false);
   const setSoundOn = useProgress((s) => s.setSoundOn);
+  useProgress((s) => `${s.testMode}:${s.pathGrade}`);
+  const testMode = isTestMode(useProgress.getState().testMode);
+  const pathGrade = useProgress.getState().pathGrade ?? 3;
+  const setTestMode = useProgress((s) => s.setTestMode);
+  const setPathGrade = useProgress((s) => s.setPathGrade);
+  const grantTestRoll = useProgress((s) => s.grantTestRoll);
+  const awardCoins = useProgress((s) => s.awardCoins);
+  const clearPathSteps = useProgress((s) => s.clearPathSteps);
   const facts = useProgress((s) => s.facts);
   const shaky = useProgress((s) => s.shaky);
   const today = useProgress((s) => s.today);
   const bests = useProgress((s) => s.bests);
   const ui = UI[locale];
+  const classUnits = unitsFor(testMode && pathGrade === 4 ? 4 : 3);
   const roster = Object.entries(learners).map(([id, k]) => ({
     id,
     name: k.name.trim() || (id === "kid-1" ? ui.kid1 : ui.play),
@@ -171,7 +181,7 @@ export function GrownupPage({ unlocked: startUnlocked = false }: { unlocked?: bo
           className="mt-1 h-12 w-full rounded-[14px] border border-line bg-surface px-3"
         >
           <option value="">{ui.followCalendar}</option>
-          {unitsFor(3).map((u) => (
+          {classUnits.map((u) => (
             <option key={u.id} value={u.id}>
               {ui.unitN(u.number)}: {u.short}
             </option>
@@ -180,8 +190,8 @@ export function GrownupPage({ unlocked: startUnlocked = false }: { unlocked?: bo
       </label>
       {classUnitId ? (
         <p className="mt-2 text-sm text-muted">
-          {unitsFor(3).find((u) => u.id === classUnitId)?.title}
-          <span className="mt-1 block text-xs text-faint">{unitsFor(3).find((u) => u.id === classUnitId)?.sol.join(" · ")}</span>
+          {classUnits.find((u) => u.id === classUnitId)?.title}
+          <span className="mt-1 block text-xs text-faint">{classUnits.find((u) => u.id === classUnitId)?.sol.join(" · ")}</span>
         </p>
       ) : null}
 
@@ -199,6 +209,44 @@ export function GrownupPage({ unlocked: startUnlocked = false }: { unlocked?: bo
         />
         {ui.sounds}
       </label>
+
+      {/* remove before publish */}
+      <div className="frost mt-4 rounded-[16px] border border-line p-3" data-test-mode-panel="1">
+        <label className="flex items-center gap-3 text-sm">
+          <input
+            type="checkbox"
+            checked={testMode}
+            onChange={(e) => setTestMode(e.target.checked)}
+            data-test-mode-toggle="1"
+          />
+          {ui.testMode}
+        </label>
+        <p className="mt-2 text-xs text-muted">{ui.testModeBlurb}</p>
+        {testMode ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button variant="secondary" data-test-add-roll="1" onClick={() => grantTestRoll()}>
+              {ui.testAddRoll}
+            </Button>
+            <Button variant="secondary" data-test-add-coins="1" onClick={() => awardCoins(10)}>
+              {ui.testAddCoins}
+            </Button>
+            <Button variant="secondary" data-test-clear-steps="1" onClick={() => clearPathSteps()}>
+              {ui.testClearSteps}
+            </Button>
+          </div>
+        ) : null}
+        {testMode ? (
+          <label className="mt-3 flex items-center gap-3 text-sm">
+            <input
+              type="checkbox"
+              checked={pathGrade === 4}
+              onChange={(e) => setPathGrade(parsePathGrade(e.target.checked ? 4 : 3))}
+              data-test-grade4="1"
+            />
+            {ui.pathGrade4}
+          </label>
+        ) : null}
+      </div>
 
       <PracticeSummary
         ui={ui}
