@@ -5,7 +5,17 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { resetProgressMemory } from "@/lib/progress";
 import { unitsFor } from "@/lib/curriculum";
-import { HOP_SNAP_PX, RADIAL_PAD_COUNT, RADIAL_PADS, START_PAD, adjacentPadIds } from "@/lib/radial-web";
+import {
+  HOPPER_ART_ZOOM_PCT,
+  HOPPER_BOARD_WIDTH_PCT,
+  HOPPER_SIT_TRANSLATE,
+  HOP_GLOW_BOARD_WIDTH_PCT,
+  HOP_SNAP_PX,
+  RADIAL_PAD_COUNT,
+  RADIAL_PADS,
+  START_PAD,
+  adjacentPadIds,
+} from "@/lib/radial-web";
 import { CandyPath } from "./candy-path";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -40,7 +50,14 @@ describe("CandyPath", () => {
     expect(html).toContain('data-path-travel="0"');
     expect(html).toContain("candy-hopper-shadow");
     expect(html).toContain("peach.png");
-    expect(html).toContain("translate(-50%, -108%)");
+    expect(html).toContain(HOPPER_SIT_TRANSLATE);
+    expect(html).toContain('data-hopper-fit="pad"');
+    expect(html).toContain("candy-hopper-fit");
+    expect(html).toContain(`--hop-tile:${HOPPER_BOARD_WIDTH_PCT}%`);
+    expect(html).toContain(`--hop-art-zoom:${HOPPER_ART_ZOOM_PCT}%`);
+    expect(html).toContain(`--hop-glow:${HOP_GLOW_BOARD_WIDTH_PCT}%`);
+    expect(html).toContain(`--hop-glow-fill:${(HOP_GLOW_BOARD_WIDTH_PCT / HOPPER_BOARD_WIDTH_PCT) * 100}%`);
+    expect(html).not.toContain("translate(-50%, -108%)");
     expect(html).toContain('data-hop-credits="0"');
     expect(html).toContain('data-dice-invite="0"');
     expect(html).toContain('data-dice-steps="0"');
@@ -202,6 +219,8 @@ describe("CandyPath", () => {
     expect(html).toContain('data-hop-pick="1"');
     expect((html.match(/data-pad-choice="1"/g) ?? []).length).toBe(next.length);
     expect(html).toContain("candy-node-choice");
+    expect(html).toContain('data-hopper-fit="pad"');
+    expect(html).toContain(HOPPER_SIT_TRANSLATE);
     expect(html).not.toContain("data-hop-dpad");
     expect(html).not.toContain("g4-");
   });

@@ -1141,18 +1141,19 @@ details > summary::-webkit-details-marker {
 }
 .candy-node-now .candy-node-disc {
   background: transparent;
-  box-shadow: 0 0 16px 7px rgb(60 210 255 / 0.38);
+  box-shadow: 0 0 5px 1px rgb(60 210 255 / 0.26);
 }
 .candy-node-radial {
-  width: 1.7rem;
+  width: var(--hop-tile, 3.2%);
 }
 .candy-node-radial .candy-node-disc {
-  width: 0.95rem;
-  height: 0.95rem;
+  width: var(--hop-glow-fill, 69%);
+  height: auto;
+  aspect-ratio: 1;
 }
 .candy-node-choice .candy-node-disc {
   background: transparent;
-  box-shadow: 0 0 16px 7px rgb(60 210 255 / 0.38);
+  box-shadow: 0 0 5px 1px rgb(60 210 255 / 0.26);
 }
 .candy-node-choice:not(:disabled) {
   cursor: pointer;
@@ -1161,75 +1162,77 @@ details > summary::-webkit-details-marker {
   pointer-events: none;
 }
 .candy-node-radial.candy-node-quiet .candy-node-disc {
-  width: 1.05rem;
-  height: 1.05rem;
-  background: rgb(52 40 48 / 0.4);
-  opacity: 0.55;
+  width: 66%;
+  height: auto;
+  aspect-ratio: 1;
+  background: rgb(52 40 48 / 0.28);
+  opacity: 0.4;
   filter: saturate(0.2) brightness(0.78);
   box-shadow: none;
 }
 .candy-node-radial.candy-node-portal.candy-node-quiet .candy-node-disc {
-  width: 1.35rem;
-  height: 1.35rem;
-  background: rgb(42 32 52 / 0.46);
-  opacity: 0.5;
+  width: 74%;
+  height: auto;
+  aspect-ratio: 1;
+  background: rgb(42 32 52 / 0.34);
+  opacity: 0.38;
   filter: saturate(0.12) brightness(0.7);
 }
-/* Visual discs stay small. Phone taps hit the overlay and resolve to the
-   nearest glowing neighbor (HOP_SNAP_PX) so a 44px box never steals. */
+/* One disc per neighbor tile. Phone taps hit the overlay and resolve to
+   the nearest glowing neighbor (HOP_SNAP_PX) so the disc never steals. */
 .candy-node-radial.candy-node-choice {
   z-index: 7;
 }
 .candy-node-radial.candy-node-choice .candy-node-disc {
-  width: 1.2rem;
-  height: 1.2rem;
-  background: rgb(255 252 246 / 0.42);
+  width: var(--hop-glow-fill, 69%);
+  height: auto;
+  aspect-ratio: 1;
+  background: rgb(255 252 246 / 0.28);
   box-shadow:
-    0 0 0 2px rgb(255 255 255 / 0.94),
-    0 0 18px 8px rgb(60 210 255 / 0.7),
-    0 0 28px 14px rgb(255 248 238 / 0.32);
-  animation: candy-choice-pulse 1.05s ease-in-out infinite;
+    0 0 0 1.5px rgb(255 255 255 / 0.88),
+    0 0 5px 1px rgb(60 210 255 / 0.38);
+  animation: candy-choice-pulse 1.2s ease-in-out infinite;
 }
 .candy-node-enterable .candy-node-disc {
   box-shadow:
-    0 0 0 2px rgb(255 248 238 / 0.92),
-    0 0 14px 6px rgb(196 92 38 / 0.55),
-    0 0 22px 10px rgb(60 210 255 / 0.28);
+    0 0 0 1.5px rgb(255 248 238 / 0.88),
+    0 0 5px 1px rgb(196 92 38 / 0.4);
   animation: candy-portal-pulse 1.15s ease-in-out infinite;
 }
 .candy-node-radial.candy-node-enterable {
   z-index: 8;
 }
 .candy-node-radial.candy-node-enterable .candy-node-disc {
-  width: 1.32rem;
-  height: 1.32rem;
-  background: rgb(255 236 210 / 0.5);
+  width: 74%;
+  height: auto;
+  aspect-ratio: 1;
+  background: rgb(255 236 210 / 0.32);
   box-shadow:
-    0 0 0 3px rgb(255 248 238 / 0.96),
-    0 0 18px 8px rgb(196 92 38 / 0.78),
-    0 0 30px 14px rgb(255 176 72 / 0.5);
-  animation: candy-portal-swirl 0.95s ease-in-out infinite;
+    0 0 0 1.5px rgb(255 248 238 / 0.9),
+    0 0 5px 1px rgb(196 92 38 / 0.42);
+  animation: candy-portal-swirl 1.1s ease-in-out infinite;
 }
 .candy-node-radial.candy-node-enterable .candy-node-disc::after {
   content: "";
-  width: 1.7rem;
-  height: 1.7rem;
+  width: 128%;
+  height: 128%;
   border-radius: inherit;
-  border: 2px solid rgb(255 220 160 / 0.7);
-  box-shadow: 0 0 10px 2px rgb(255 168 64 / 0.35);
-  animation: candy-portal-ring 0.95s linear infinite;
+  border: 1.5px solid rgb(255 220 160 / 0.55);
+  box-shadow: none;
+  animation: candy-portal-ring 1.1s linear infinite;
   pointer-events: none;
 }
 .candy-node-radial.candy-node-here {
   z-index: 6;
 }
 .candy-node-radial.candy-node-here .candy-node-disc {
-  width: 1.18rem;
-  height: 1.18rem;
-  background: rgb(255 248 220 / 0.38);
+  width: 68%;
+  height: auto;
+  aspect-ratio: 1;
+  background: rgb(255 248 220 / 0.18);
   box-shadow:
-    0 0 0 2px rgb(255 252 236 / 0.92),
-    0 0 16px 8px rgb(255 214 80 / 0.48);
+    0 0 0 1px rgb(255 252 236 / 0.7),
+    0 0 5px 1px rgb(255 214 80 / 0.26);
   animation: candy-here-pulse 1.55s ease-in-out infinite;
 }
 .candy-warp-fx {
@@ -1514,8 +1517,8 @@ details > summary::-webkit-details-marker {
 .candy-hopper-shadow {
   position: absolute;
   z-index: 3;
-  width: 1.28rem;
-  height: 0.3rem;
+  width: 2.1%;
+  height: 0.22rem;
   border-radius: 50%;
   background: radial-gradient(ellipse at center, rgb(46 30 22 / 0.4) 0%, rgb(46 30 22 / 0) 72%);
   pointer-events: none;
@@ -1524,19 +1527,36 @@ details > summary::-webkit-details-marker {
 .candy-hopper {
   position: absolute;
   z-index: 5;
-  width: 2.5rem;
-  height: 2.5rem;
-  transform: translate(-50%, -108%);
-  transform-origin: 50% 82%;
+  width: var(--hop-tile, 3.2%);
+  aspect-ratio: 1;
+  height: auto;
+  transform: translate(-50%, -50%);
+  transform-origin: 50% 70%;
   pointer-events: none;
   will-change: left, top, transform;
 }
+.candy-hopper-fit {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 28%;
+}
 .candy-hopper-art {
-  width: 2.5rem;
-  height: 2.5rem;
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: var(--hop-art-zoom, 140%);
+  height: var(--hop-art-zoom, 140%);
+  max-width: none;
+  margin: 0;
+  object-fit: contain;
+  object-position: center;
+  transform: translate(-50%, -50%);
   filter:
     drop-shadow(0 0 1px rgb(255 255 255 / 0.95))
-    drop-shadow(0 2px 4px rgb(40 20 30 / 0.38));
+    drop-shadow(0 1px 2px rgb(40 20 30 / 0.34));
   animation: candy-hop 1.9s ease-in-out infinite;
 }
 .candy-hopper-travel .candy-hopper-art {
@@ -1546,11 +1566,11 @@ details > summary::-webkit-details-marker {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: 0.08rem;
-  width: 1.08rem;
-  height: 0.38rem;
+  bottom: 6%;
+  width: 58%;
+  height: 18%;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgb(255 224 96 / 0.42) 0%, transparent 72%);
+  background: radial-gradient(ellipse at center, rgb(255 224 96 / 0.32) 0%, transparent 72%);
   transform: translateX(-50%);
   animation: candy-here-glow 1.55s ease-in-out infinite;
   pointer-events: none;
@@ -1673,10 +1693,10 @@ details > summary::-webkit-details-marker {
 @keyframes candy-hop {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translate(-50%, -50%);
   }
   50% {
-    transform: translateY(-0.2rem);
+    transform: translate(-50%, calc(-50% - 0.1rem));
   }
 }
 @keyframes candy-portal-pulse {
@@ -1697,8 +1717,8 @@ details > summary::-webkit-details-marker {
     filter: brightness(1);
   }
   50% {
-    transform: scale(1.16);
-    filter: brightness(1.1);
+    transform: scale(1.05);
+    filter: brightness(1.04);
   }
 }
 @keyframes candy-portal-swirl {
@@ -1708,8 +1728,8 @@ details > summary::-webkit-details-marker {
     filter: brightness(1);
   }
   50% {
-    transform: scale(1.22) rotate(12deg);
-    filter: brightness(1.14);
+    transform: scale(1.06) rotate(8deg);
+    filter: brightness(1.06);
   }
 }
 @keyframes candy-portal-ring {
@@ -1725,12 +1745,12 @@ details > summary::-webkit-details-marker {
 @keyframes candy-here-pulse {
   0%,
   100% {
-    opacity: 0.72;
+    opacity: 0.62;
     transform: scale(1);
   }
   50% {
-    opacity: 1;
-    transform: scale(1.06);
+    opacity: 0.9;
+    transform: scale(1.03);
   }
 }
 @keyframes candy-here-glow {
