@@ -20,59 +20,134 @@ export type RadialPad = {
   portal: boolean;
 };
 
-/**
- * Painted plaza center in map %. The #64/#68 6/7 crop made the old
- * 50.04 / 47.35 south-shift obvious — inner cream tiles sat above the
- * hopper. Locked to the clay disc so hops sit on tiles, not grass.
- */
-export const RADIAL_PLAZA = { x: 49.88, y: 45.15 } as const;
+/** Painted plaza center on radial-web-locked.jpg (1280×720). */
+export const RADIAL_PLAZA = { x: 49.682, y: 46.272 } as const;
 
 /**
- * Ring radii in art pixels, tuned so pads land on painted tiles:
- * inner 8 around the plaza, inner swirl ring, mid ring, outer walking ring.
+ * One hop node per painted path tile (cream / beige, light purple,
+ * and portal-arch pads). Measured from the locked art so hops sit on
+ * tiles, not grass. #70’s 4-ring polar table (81 nodes) skipped purple
+ * pads and sat off-tile after the 6/7 crop.
  */
-export const RADIAL_RING_PX = [0, 85, 150, 216, 262] as const;
+type PadSpot = { x: number; y: number; ring: RadialRing; angle: number; portal?: boolean };
 
-function polar(angleDeg: number, rPx: number): RadialPos {
-  const th = (angleDeg * Math.PI) / 180;
-  return {
-    x: RADIAL_PLAZA.x + (100 * rPx * Math.sin(th)) / RADIAL_MAP_SIZE.w,
-    y: RADIAL_PLAZA.y + (100 * -rPx * Math.cos(th)) / RADIAL_MAP_SIZE.h,
-  };
-}
+const PAD_SPOTS: readonly PadSpot[] = [
+  { x: 49.682, y: 46.272, ring: 0, angle: 0 },
+  { x: 55.448, y: 38.237, ring: 1, angle: 51.9 },
+  { x: 57.26, y: 44.075, ring: 1, angle: 80.7 },
+  { x: 55.364, y: 50.124, ring: 1, angle: 110.9 },
+  { x: 50.866, y: 57.397, ring: 1, angle: 169.3 },
+  { x: 49.82, y: 53.159, ring: 1, angle: 178.0 },
+  { x: 48.94, y: 57.406, ring: 1, angle: 186.8 },
+  { x: 44.432, y: 50.112, ring: 1, angle: 247.6 },
+  { x: 42.45, y: 44.138, ring: 1, angle: 279.4 },
+  { x: 44.218, y: 38.245, ring: 1, angle: 309.6 },
+  { x: 49.86, y: 29.631, ring: 2, angle: 1.1, portal: true },
+  { x: 50.771, y: 33.108, ring: 2, angle: 8.4 },
+  { x: 55.981, y: 34.205, ring: 2, angle: 42.9 },
+  { x: 58.286, y: 35.092, ring: 2, angle: 53.8 },
+  { x: 61.088, y: 44.231, ring: 2, angle: 84.3 },
+  { x: 64.613, y: 44.066, ring: 2, angle: 85.2, portal: true },
+  { x: 58.033, y: 53.856, ring: 2, angle: 117.1 },
+  { x: 56.767, y: 55.307, ring: 2, angle: 125.7 },
+  { x: 53.518, y: 57.544, ring: 2, angle: 148.8 },
+  { x: 49.818, y: 58.302, ring: 2, angle: 178.8 },
+  { x: 46.151, y: 57.504, ring: 2, angle: 209.2 },
+  { x: 42.986, y: 55.273, ring: 2, angle: 232.9 },
+  { x: 41.86, y: 53.84, ring: 2, angle: 241.4 },
+  { x: 37.764, y: 49.099, ring: 2, angle: 262.4 },
+  { x: 35.698, y: 43.915, ring: 2, angle: 275.4, portal: true },
+  { x: 38.695, y: 44.241, ring: 2, angle: 275.9 },
+  { x: 41.59, y: 35.222, ring: 2, angle: 307.5 },
+  { x: 43.875, y: 34.217, ring: 2, angle: 319.4 },
+  { x: 48.952, y: 33.181, ring: 2, angle: 354.3 },
+  { x: 50.063, y: 24.352, ring: 3, angle: 1.8 },
+  { x: 54.3, y: 24.902, ring: 3, angle: 21.0 },
+  { x: 57.82, y: 26.16, ring: 3, angle: 35.7 },
+  { x: 63.729, y: 29.631, ring: 3, angle: 56.3 },
+  { x: 66.273, y: 34.47, ring: 3, angle: 68.2 },
+  { x: 68.474, y: 38.827, ring: 3, angle: 77.4 },
+  { x: 70.149, y: 44.105, ring: 3, angle: 86.6 },
+  { x: 68.261, y: 49.751, ring: 3, angle: 96.0 },
+  { x: 66.825, y: 54.724, ring: 3, angle: 105.5 },
+  { x: 63.711, y: 60.475, ring: 3, angle: 119.7 },
+  { x: 58.865, y: 63.823, ring: 3, angle: 137.1 },
+  { x: 54.949, y: 65.376, ring: 3, angle: 153.9 },
+  { x: 49.812, y: 69.04, ring: 3, angle: 179.4, portal: true },
+  { x: 44.849, y: 65.481, ring: 3, angle: 204.1 },
+  { x: 40.923, y: 63.832, ring: 3, angle: 221.6 },
+  { x: 33.058, y: 54.749, ring: 3, angle: 254.0 },
+  { x: 31.418, y: 49.687, ring: 3, angle: 264.0 },
+  { x: 29.819, y: 44.086, ring: 3, angle: 273.5 },
+  { x: 31.393, y: 38.853, ring: 3, angle: 282.9 },
+  { x: 33.625, y: 34.53, ring: 3, angle: 292.4 },
+  { x: 36.177, y: 29.689, ring: 3, angle: 304.6 },
+  { x: 42.083, y: 26.105, ring: 3, angle: 326.2 },
+  { x: 45.617, y: 24.961, ring: 3, angle: 341.3 },
+  { x: 49.751, y: 15.003, ring: 4, angle: 0.2, portal: true },
+  { x: 50.793, y: 18.417, ring: 4, angle: 4.1 },
+  { x: 53.932, y: 15.302, ring: 4, angle: 13.7 },
+  { x: 57.811, y: 16.068, ring: 4, angle: 25.6 },
+  { x: 58.847, y: 16.612, ring: 4, angle: 28.8 },
+  { x: 61.556, y: 17.407, ring: 4, angle: 36.2 },
+  { x: 65.145, y: 19.496, ring: 4, angle: 45.8, portal: true },
+  { x: 68.611, y: 22.436, ring: 4, angle: 54.7 },
+  { x: 66.151, y: 26.163, ring: 4, angle: 55.5 },
+  { x: 71.504, y: 25.683, ring: 4, angle: 62.0 },
+  { x: 73.933, y: 29.594, ring: 4, angle: 68.9 },
+  { x: 75.824, y: 34.011, ring: 4, angle: 75.2 },
+  { x: 77.12, y: 39.019, ring: 4, angle: 81.5 },
+  { x: 73.816, y: 44.294, ring: 4, angle: 87.4 },
+  { x: 77.749, y: 44.124, ring: 4, angle: 87.5, portal: true },
+  { x: 77.774, y: 49.379, ring: 4, angle: 93.6 },
+  { x: 77.18, y: 54.757, ring: 4, angle: 99.8 },
+  { x: 75.673, y: 59.902, ring: 4, angle: 106.4 },
+  { x: 72.698, y: 63.538, ring: 4, angle: 112.9 },
+  { x: 71.34, y: 66.848, ring: 4, angle: 118.1 },
+  { x: 69.809, y: 68.521, ring: 4, angle: 121.9, portal: true },
+  { x: 68.948, y: 70.104, ring: 4, angle: 124.8 },
+  { x: 66.188, y: 72.988, ring: 4, angle: 132.3 },
+  { x: 60.377, y: 76.86, ring: 4, angle: 148.1 },
+  { x: 59.016, y: 77.502, ring: 4, angle: 152.0 },
+  { x: 54.895, y: 78.657, ring: 4, angle: 164.0 },
+  { x: 53.436, y: 76.193, ring: 4, angle: 167.4 },
+  { x: 49.826, y: 73.799, ring: 4, angle: 179.5 },
+  { x: 46.378, y: 76.28, ring: 4, angle: 191.1 },
+  { x: 44.791, y: 78.756, ring: 4, angle: 195.0, portal: true },
+  { x: 40.456, y: 77.398, ring: 4, angle: 207.8 },
+  { x: 39.282, y: 76.938, ring: 4, angle: 211.1 },
+  { x: 33.318, y: 72.954, ring: 4, angle: 227.5 },
+  { x: 30.552, y: 70.102, ring: 4, angle: 235.0 },
+  { x: 29.694, y: 68.575, ring: 4, angle: 237.9, portal: true },
+  { x: 28.148, y: 66.876, ring: 4, angle: 241.7 },
+  { x: 26.937, y: 63.62, ring: 4, angle: 246.8 },
+  { x: 24.122, y: 59.706, ring: 4, angle: 253.5 },
+  { x: 22.64, y: 54.81, ring: 4, angle: 259.9 },
+  { x: 21.965, y: 49.365, ring: 4, angle: 266.4 },
+  { x: 22.055, y: 43.997, ring: 4, angle: 272.7, portal: true },
+  { x: 26.039, y: 44.295, ring: 4, angle: 272.7 },
+  { x: 22.682, y: 38.914, ring: 4, angle: 278.7 },
+  { x: 23.969, y: 34.031, ring: 4, angle: 285.0 },
+  { x: 25.908, y: 29.611, ring: 4, angle: 291.5 },
+  { x: 28.291, y: 25.723, ring: 4, angle: 298.4 },
+  { x: 33.758, y: 26.111, ring: 4, angle: 305.5 },
+  { x: 31.246, y: 22.363, ring: 4, angle: 306.1 },
+  { x: 34.631, y: 19.42, ring: 4, angle: 315.1, portal: true },
+  { x: 38.188, y: 17.368, ring: 4, angle: 324.7 },
+  { x: 41.095, y: 16.441, ring: 4, angle: 332.9 },
+  { x: 41.969, y: 16.026, ring: 4, angle: 335.6 },
+  { x: 45.853, y: 15.242, ring: 4, angle: 347.6 },
+  { x: 48.953, y: 18.444, ring: 4, angle: 357.3 },
+];
 
 function buildPads(): RadialPad[] {
-  const pads: RadialPad[] = [{ id: 1, map: { ...RADIAL_PLAZA }, ring: 0, angle: 0, portal: false }];
-  let id = 2;
-  for (let i = 0; i < 8; i++) {
-    const angle = i * 45;
-    pads.push({ id: id++, map: polar(angle, RADIAL_RING_PX[1]), ring: 1, angle, portal: false });
-  }
-  for (let i = 0; i < 16; i++) {
-    const angle = i * 22.5;
-    pads.push({
-      id: id++,
-      map: polar(angle, RADIAL_RING_PX[2]),
-      ring: 2,
-      angle,
-      portal: angle % 90 === 0,
-    });
-  }
-  for (let i = 0; i < 16; i++) {
-    const angle = i * 22.5;
-    pads.push({ id: id++, map: polar(angle, RADIAL_RING_PX[3]), ring: 3, angle, portal: false });
-  }
-  for (let i = 0; i < 40; i++) {
-    const angle = i * 9;
-    pads.push({
-      id: id++,
-      map: polar(angle, RADIAL_RING_PX[4]),
-      ring: 4,
-      angle,
-      portal: angle % 45 === 0,
-    });
-  }
-  return pads;
+  return PAD_SPOTS.map((spot, i) => ({
+    id: i + 1,
+    map: { x: spot.x, y: spot.y },
+    ring: spot.ring,
+    angle: spot.angle,
+    portal: Boolean(spot.portal),
+  }));
 }
 
 export const RADIAL_PADS: readonly RadialPad[] = buildPads();
@@ -90,61 +165,35 @@ export function clampPad(n: unknown): number {
   return Math.min(RADIAL_PAD_COUNT, Math.max(START_PAD, Math.round(n)));
 }
 
-function ringPads(ring: RadialRing): RadialPad[] {
-  return RADIAL_PADS.filter((p) => p.ring === ring);
-}
-
 function angleDiff(a: number, b: number): number {
   const d = Math.abs(a - b) % 360;
   return d > 180 ? 360 - d : d;
 }
 
+/** Adjacent = sharing a painted-path connection. No grass skips. */
+const PAD_EDGES: readonly (readonly [number, number])[] = [
+  [1, 2], [1, 3], [1, 4], [1, 6], [1, 8], [1, 9], [1, 10], [1, 12],
+  [2, 13], [2, 14], [3, 15], [4, 17], [4, 18], [5, 19], [5, 20], [6, 19],
+  [6, 21], [7, 20], [7, 21], [8, 22], [8, 23], [9, 26], [10, 27], [10, 28],
+  [11, 12], [11, 29], [11, 30], [11, 31], [11, 52], [12, 13], [12, 29], [13, 14],
+  [15, 16], [16, 35], [16, 36], [16, 37], [17, 18], [18, 19], [21, 22], [22, 23],
+  [23, 24], [24, 25], [24, 26], [25, 26], [25, 47], [25, 48], [27, 28], [28, 29],
+  [30, 31], [30, 52], [30, 54], [30, 106], [31, 32], [33, 34], [33, 61], [34, 35],
+  [35, 36], [36, 37], [36, 66], [37, 38], [38, 39], [39, 40], [40, 41], [41, 42],
+  [42, 43], [42, 80], [43, 44], [45, 46], [46, 47], [47, 48], [47, 94], [48, 49],
+  [49, 50], [50, 99], [51, 52], [53, 54], [53, 55], [53, 105], [53, 106], [54, 55],
+  [54, 106], [55, 56], [56, 57], [57, 58], [58, 59], [59, 60], [59, 61], [60, 61],
+  [60, 62], [61, 62], [62, 63], [63, 64], [64, 65], [65, 66], [65, 67], [66, 67],
+  [66, 68], [67, 68], [68, 69], [69, 70], [70, 71], [71, 72], [72, 73], [73, 74],
+  [74, 75], [76, 77], [77, 78], [77, 79], [78, 79], [79, 80], [80, 81], [81, 82],
+  [81, 83], [82, 83], [83, 84], [85, 86], [86, 87], [87, 88], [88, 89], [89, 90],
+  [90, 91], [91, 92], [92, 93], [92, 94], [93, 94], [93, 95], [94, 95], [95, 96],
+  [96, 97], [97, 98], [98, 99], [98, 100], [99, 100], [99, 101], [100, 101], [101, 102],
+  [102, 103], [103, 104], [104, 105], [105, 106],
+];
+
 function buildEdges(): readonly (readonly [number, number])[] {
-  const edges: [number, number][] = [];
-  const add = (a: number, b: number) => {
-    if (a === b) return;
-    const lo = Math.min(a, b);
-    const hi = Math.max(a, b);
-    if (!edges.some(([x, y]) => x === lo && y === hi)) edges.push([lo, hi]);
-  };
-
-  for (const ring of [1, 2, 3, 4] as const) {
-    const row = ringPads(ring);
-    for (let i = 0; i < row.length; i++) add(row[i]!.id, row[(i + 1) % row.length]!.id);
-  }
-
-  const r1 = ringPads(1);
-  const r2 = ringPads(2);
-  const r3 = ringPads(3);
-  const r4 = ringPads(4);
-
-  for (const p of r1) add(START_PAD, p.id);
-  for (const inner of r1) {
-    let best: RadialPad | undefined;
-    let bestD = 8;
-    for (const outer of r2) {
-      const d = angleDiff(inner.angle, outer.angle);
-      if (d < bestD) {
-        bestD = d;
-        best = outer;
-      }
-    }
-    if (best) add(inner.id, best.id);
-  }
-  for (let i = 0; i < r2.length; i++) add(r2[i]!.id, r3[i]!.id);
-  for (const inner of r3) {
-    let best: RadialPad | undefined;
-    let bestD = 8;
-    for (const outer of r4) {
-      const d = angleDiff(inner.angle, outer.angle);
-      if (d < bestD) {
-        bestD = d;
-        best = outer;
-      }
-    }
-    if (best) add(inner.id, best.id);
-  }
-  return edges;
+  return PAD_EDGES;
 }
 
 export const RADIAL_EDGES: readonly (readonly [number, number])[] = buildEdges();
@@ -180,20 +229,33 @@ export function radialHopStops(fromId: number, toId: number): number[] {
  *
  * Inner N↔S, E↔W. Outer N↔S, NE↔SW, E↔W, SE↔NW.
  */
+function nearestAtAngle(row: RadialPad[], angle: number, maxDeg = 28): RadialPad | undefined {
+  let best: RadialPad | undefined;
+  let bestD = maxDeg;
+  for (const p of row) {
+    const d = angleDiff(p.angle, angle);
+    if (d < bestD) {
+      bestD = d;
+      best = p;
+    }
+  }
+  return best;
+}
+
 function buildPortalPairs(): readonly (readonly [number, number])[] {
-  const inner = ringPads(2).filter((p) => p.portal);
-  const outer = ringPads(4).filter((p) => p.portal);
-  const at = (row: RadialPad[], angle: number) => row.find((p) => p.angle === angle);
+  const portals = RADIAL_PADS.filter((p) => p.portal);
+  const inner = portals.filter((p) => p.ring === 2 || p.ring === 3);
+  const outer = portals.filter((p) => p.ring === 4);
   const pairs: [number, number][] = [];
   const link = (a?: RadialPad, b?: RadialPad) => {
-    if (a && b) pairs.push([a.id, b.id]);
+    if (a && b && a.id !== b.id) pairs.push([a.id, b.id]);
   };
-  link(at(inner, 0), at(inner, 180));
-  link(at(inner, 90), at(inner, 270));
-  link(at(outer, 0), at(outer, 180));
-  link(at(outer, 45), at(outer, 225));
-  link(at(outer, 90), at(outer, 270));
-  link(at(outer, 135), at(outer, 315));
+  link(nearestAtAngle(inner, 0), nearestAtAngle(inner, 180));
+  link(nearestAtAngle(inner, 90), nearestAtAngle(inner, 270));
+  link(nearestAtAngle(outer, 0), nearestAtAngle(outer, 180));
+  link(nearestAtAngle(outer, 45), nearestAtAngle(outer, 225));
+  link(nearestAtAngle(outer, 90), nearestAtAngle(outer, 270));
+  link(nearestAtAngle(outer, 135), nearestAtAngle(outer, 315));
   return pairs;
 }
 
