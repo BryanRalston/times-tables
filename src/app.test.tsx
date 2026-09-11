@@ -243,7 +243,7 @@ describe("first-visit Home door", () => {
   it("missing-side perimeter keeps the keypad usable before any tap", () => {
     stubHash("#/play/activity/u8-missing");
     const html = renderToStaticMarkup(<App />);
-    expect(html).toMatch(/n is the missing side/i);
+    expect(html).toMatch(/what is the missing side/i);
     expect(html).toContain("data-keypad");
     expect(html).toContain("Your answer");
     expect(html).toMatch(/aria-label="1"/);

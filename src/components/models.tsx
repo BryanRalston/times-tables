@@ -315,6 +315,10 @@ function Groups({ question, onInteract, status, shake }: BoardProps) {
   const groups = Math.max(1, data.groups);
   const size = Math.max(0, data.size);
 
+  if (data.hide === "product") {
+    return <TallyGroups groups={groups} size={size} prompt={data.equation} status={status} shake={shake} />;
+  }
+
   function isolate() {
     setTaken(true);
     playTap();
@@ -345,9 +349,7 @@ function Groups({ question, onInteract, status, shake }: BoardProps) {
           </button>
         ))}
       </div>
-      <p className="mt-3 text-center text-sm text-muted">
-        {data.hide === "product" ? ui.countThemAll : ui.tapAGroup}
-      </p>
+      <p className="mt-3 text-center text-sm text-muted">{ui.tapAGroup}</p>
     </Frame>
   );
 }
@@ -682,6 +684,9 @@ function OrderNums({ question, value, setValue, status, shake }: BoardProps) {
       <div className="flex flex-wrap justify-center gap-2">
         {labels.map((n, i) => {
           const used = picked.includes(n);
+          const frac = n.match(/^(\d+)\/(\d+)$/);
+          const num = frac ? Number(frac[1]) : 0;
+          const den = frac ? Number(frac[2]) : 0;
           return (
             <button
               type="button"
@@ -689,11 +694,18 @@ function OrderNums({ question, value, setValue, status, shake }: BoardProps) {
               disabled={used}
               onClick={() => setValue([...picked, n].join(" "))}
               className={cn(
-                "h-12 min-w-16 rounded-[14px] border px-3 font-display text-xl tabular-nums",
+                "min-h-12 min-w-16 rounded-[14px] border px-3 py-1.5 font-display text-xl tabular-nums",
                 used ? "border-line bg-bg-warm text-faint" : "border-line bg-surface",
               )}
             >
               {n}
+              {den >= 2 ? (
+                <span className="mt-1 flex h-2 overflow-hidden rounded-sm border border-line" data-order-bar="">
+                  {Array.from({ length: den }, (_, k) => (
+                    <span key={k} className={cn("h-full flex-1", k < num ? "bg-teal" : "bg-surface")} />
+                  ))}
+                </span>
+              ) : null}
             </button>
           );
         })}
@@ -872,6 +884,27 @@ function FractionBar({ question, onInteract, status, shake }: BoardProps) {
             {data.num}/{data.den} ○ {data.num2}/{data.den2}
           </p>
         ) : null}
+      </Frame>
+    );
+  }
+
+  if (data.mode === "equiv" && data.den2) {
+    const dens = [den, data.den2];
+    return (
+      <Frame shake={shake} status={status}>
+        {dens.map((thisDen, b) => (
+          <div key={thisDen} className="mb-2 flex h-12 overflow-hidden rounded-[12px] border border-line" data-equiv-bar={b === 0 ? "known" : "ask"}>
+            {Array.from({ length: thisDen }, (_, i) => (
+              <span
+                key={i}
+                className={cn(
+                  "h-full flex-1 border-r border-line last:border-r-0",
+                  b === 0 && i < (data.shaded ?? data.num) ? "bg-teal" : "bg-surface",
+                )}
+              />
+            ))}
+          </div>
+        ))}
       </Frame>
     );
   }

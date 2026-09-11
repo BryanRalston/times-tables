@@ -202,6 +202,10 @@ describe("answer audit", () => {
       expect(d.value).toBeLessThanOrEqual(d.max);
       expect(Number.isInteger(d.value * 2)).toBe(true);
       expect(String(q.answer)).toBe(String(d.value));
+      expect(answersMatch(String(d.value), q.answer, q.alts)).toBe(true);
+      if (!Number.isInteger(d.value)) {
+        expect(answersMatch(`${Math.floor(d.value)} 1/2`, q.answer, q.alts)).toBe(true);
+      }
     }
   });
 
@@ -513,6 +517,102 @@ describe("answer audit", () => {
       expect(setQ.prompt).toMatch(/group/i);
       expect(barQ.prompt).not.toMatch(/group/i);
     }
+  });
+
+  it("leftover fraction asks for the hiding fraction, not a bare n", () => {
+    for (const locale of ["en", "es", "pt-BR"] as const) {
+      for (let i = 0; i < 16; i++) {
+        const q = makeQuestion(activityById("u5-leftover")!.activity, rngFromSeed(`lf:${locale}:${i}`), locale);
+        const d = q.data as FractionData;
+        expect(q.answer).toBe(`${d.den - d.num}/${d.den}`);
+        expect(q.prompt).toMatch(/hiding|esconde|escondida/i);
+        expect(q.prompt).not.toMatch(/what is n\?/i);
+        if (q.answer !== `${d.num}/${d.den}`) expect(q.prompt).not.toContain(q.answer);
+      }
+    }
+  });
+
+  it("benchmarks skip 1/4 and 3/4 ties so closer-to has one winner", () => {
+    for (let i = 0; i < 40; i++) {
+      const q = makeQuestion(activityById("u10-bench")!.activity, rngFromSeed(`bench:${i}`));
+      const d = q.data as FractionData;
+      expect(4 * d.num === d.den || 4 * d.num === 3 * d.den).toBe(false);
+      const v = d.num / d.den;
+      const hits = [Math.abs(v), Math.abs(v - 0.5), Math.abs(v - 1)].filter((x) => x === Math.min(Math.abs(v), Math.abs(v - 0.5), Math.abs(v - 1)));
+      expect(hits.length).toBe(1);
+    }
+  });
+
+  it("two-step take-away never gives away more than the packs hold", () => {
+    for (let i = 0; i < 40; i++) {
+      const q = makeQuestion(activityById("u13-two")!.activity, rngFromSeed(`two:${i}`));
+      const d = q.data as GroupsData;
+      const product = d.groups * d.size;
+      expect(Number(q.answer)).toBeGreaterThanOrEqual(1);
+      if (/gives away|regala|dá /.test(q.prompt)) {
+        expect(Number(q.answer)).toBeLessThan(product);
+      } else {
+        expect(Number(q.answer)).toBeGreaterThan(product);
+      }
+    }
+  });
+
+  it("pictograph key-of-2 read names the key before how many", () => {
+    for (const locale of ["en", "es", "pt-BR"] as const) {
+      let seen = 0;
+      for (let i = 0; i < 40; i++) {
+        const q = makeQuestion(activityById("u6-picto")!.activity, rngFromSeed(`k2:${locale}:${i}`), locale);
+        const d = q.data as GraphData;
+        expect(d.key).toBe(2);
+        if (d.ask !== "value") continue;
+        seen += 1;
+        expect(d.readPrompt).toMatch(/stands for 2|vale 2/i);
+        expect(d.readPrompt).toMatch(/how many|cuántos|quantos/i);
+      }
+      expect(seen).toBeGreaterThan(5);
+    }
+  });
+
+  it("build hundreds accepts the block count and the place value", () => {
+    for (let i = 0; i < 20; i++) {
+      const q = makeQuestion(activityById("u2-build")!.activity, rngFromSeed(`bh:${i}`));
+      const hundreds = Math.floor((q.data as BuildData).target / 100) % 10;
+      expect(q.answer).toBe(String(hundreds));
+      expect(q.alts ?? []).toContain(String(hundreds * 100));
+      expect(q.prompt).toMatch(/hundreds blocks|bloques de centenas|blocos de centenas/i);
+    }
+  });
+
+  it("combine prompts ask kids to count outside sides", () => {
+    for (let i = 0; i < 16; i++) {
+      const q = makeQuestion(activityById("u4-combine")!.activity, rngFromSeed(`out:${i}`));
+      expect(q.prompt).toMatch(/outside sides|lados de afuera|lados de fora/i);
+      expect(q.prompt).not.toMatch(/joined on a side/i);
+    }
+  });
+
+  it("missing-side perimeter asks a question and still names peri and shown", () => {
+    for (let i = 0; i < 16; i++) {
+      const q = makeQuestion(activityById("u8-missing")!.activity, rngFromSeed(`missq:${i}`));
+      const d = q.data as PerimeterData;
+      const peri = d.sides.reduce((a, b) => a + b, 0);
+      const shown = peri - d.sides[d.hideIndex ?? 0]!;
+      expect(q.prompt).toContain(String(peri));
+      expect(q.prompt).toContain(String(shown));
+      expect(q.prompt).toMatch(/what is the missing side|cuánto mide el lado|qual é o lado/i);
+      expect(q.prompt).not.toMatch(/n is the missing side/i);
+    }
+  });
+
+  it("pick-the-unit names the attribute so kids know weight vs length", () => {
+    const seen: string[] = [];
+    for (let i = 0; i < 40; i++) {
+      const q = makeQuestion(activityById("u8-unit")!.activity, rngFromSeed(`unitask:${i}`));
+      seen.push(q.prompt);
+    }
+    expect(seen.some((p) => /weight of a watermelon|peso de una sandía|peso de uma melancia/i.test(p))).toBe(true);
+    expect(seen.some((p) => /length of a paper clip|largo de un clip|comprimento de um clipe/i.test(p))).toBe(true);
+    expect(seen.every((p) => !/^Best unit for a watermelon\?$/.test(p))).toBe(true);
   });
 });
 

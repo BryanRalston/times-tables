@@ -23,8 +23,12 @@ export function pad2(n: number): string {
   return n.toString().padStart(2, "0");
 }
 
-/** Decimal key only for money count / change / make. */
+/** Decimal key for money amounts and half-unit length reads. */
 export function keypadAllowsDot(q: { kind: string; data?: unknown }): boolean {
+  if (q.kind === "measure") {
+    const d = q.data as { mode?: string; attribute?: string } | undefined;
+    return (d?.mode ?? "read") === "read" && d?.attribute === "length";
+  }
   if (q.kind !== "money") return false;
   const mode = (q.data as { mode?: string } | undefined)?.mode;
   return mode === "count" || mode === "change" || mode === "make";

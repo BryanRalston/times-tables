@@ -497,6 +497,38 @@ describe("boards", () => {
     expect(html).not.toContain(`${d.num}/${d.den}`);
   });
 
+  it("equal-groups product boards tally instead of isolating one group", () => {
+    let found = false;
+    for (let i = 0; i < 30; i++) {
+      const q = makeQuestion(activityById("u3-groups")!.activity, rngFromSeed(`prod:${i}`));
+      const d = q.data as GroupsData;
+      if (d.hide !== "product") continue;
+      found = true;
+      const html = renderToStaticMarkup(<Board {...stub(q)} />);
+      expect(html).toContain("data-group-tally");
+      expect(html).toContain(d.equation);
+      expect(html).not.toContain("Tap a group to isolate it, then name n.");
+      expect((html.match(/data-equal-group/g) ?? []).length).toBe(d.groups);
+    }
+    expect(found).toBe(true);
+  });
+
+  it("equivalent-fraction board shows a known bar and an empty ask bar", () => {
+    const q = makeQuestion(activityById("u10-equiv")!.activity, rngFromSeed("equiv:bars"));
+    const d = q.data as FractionData;
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain('data-equiv-bar="known"');
+    expect(html).toContain('data-equiv-bar="ask"');
+    expect((html.match(/data-equiv-bar=/g) ?? []).length).toBe(2);
+    expect(d.den2).toBeGreaterThan(d.den);
+  });
+
+  it("fraction order chips show same-whole bars", () => {
+    const q = makeQuestion(activityById("u10-order")!.activity, rngFromSeed("ord:bars"));
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect((html.match(/data-order-bar=/g) ?? []).length).toBe(3);
+  });
+
   it("build board does not print the hundreds count", () => {
     const q = makeQuestion(activityById("u2-build")!.activity, rngFromSeed("build:leak"));
     const hundreds = Math.floor((q.data as { target: number }).target / 100) % 10;
