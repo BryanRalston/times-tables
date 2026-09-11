@@ -53,6 +53,31 @@ describe("radial web", () => {
     expect(UNITS.every((u) => !u.id.startsWith("g4-"))).toBe(true);
   });
 
+  it("keeps every hop off the #70 grass gaps and on a painted tile center", () => {
+    const grassNE = { x: 54.58, y: 36.8 };
+    const betweenOuterTiles = { x: 59.033, y: 16.408 };
+    const northGrass = { x: 48.923, y: 18.515 };
+    const artDist = (a: { x: number; y: number }, b: { x: number; y: number }) =>
+      Math.hypot(((a.x - b.x) / 100) * 1280, ((a.y - b.y) / 100) * 720);
+    for (const pad of RADIAL_PADS) {
+      expect(artDist(pad.map, grassNE)).toBeGreaterThan(10);
+      expect(artDist(pad.map, betweenOuterTiles)).toBeGreaterThan(8);
+      expect(artDist(pad.map, northGrass)).toBeGreaterThan(8);
+    }
+    const ne = RADIAL_PADS.find((p) => p.id === 3)!;
+    expect(ne.map.x).toBeGreaterThan(54.9);
+    expect(ne.map.y).toBeGreaterThan(37.5);
+    expect(ne.map.y).toBeLessThan(39.5);
+    const outerN = RADIAL_PADS.find((p) => p.portal && p.ring === 4 && p.map.y < 10)!;
+    expect(outerN?.id).toBe(54);
+    const outerSW = RADIAL_PADS.find((p) => p.portal && p.map.x < 28 && p.map.y > 68)!;
+    expect(outerSW?.id).toBe(57);
+    expect(adjacentPadIds(54)).toContain(95);
+    expect(adjacentPadIds(57)).toEqual(expect.arrayContaining([80, 81]));
+    expect(areAdjacent(56, 58)).toBe(true);
+    expect(areAdjacent(56, 57)).toBe(false);
+  });
+
   it("hops exactly one adjacent space and never skips pads", () => {
     const next = adjacentPadIds(START_PAD)[0]!;
     expect(areAdjacent(START_PAD, next)).toBe(true);
