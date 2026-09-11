@@ -490,7 +490,7 @@ describe("first-visit Home door", () => {
     expect(css).not.toContain("left 0.72s");
     expect(css).toContain(".candy-fog");
     expect(css).toContain(".candy-fog-mist");
-    expect(css).toContain("0 0 5px 1px rgb(60 210 255 / 0.38)");
+    expect(css).toContain("0 0 5px 1px rgb(60 210 255 / 0.48)");
     expect(css).not.toContain("0 0 28px 14px");
     expect(css).not.toContain("0 0 18px 8px");
     expect(css).toContain(".candy-node-quiet");

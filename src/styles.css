@@ -1187,10 +1187,10 @@ details > summary::-webkit-details-marker {
   width: var(--hop-glow-fill, 69%);
   height: auto;
   aspect-ratio: 1;
-  background: rgb(255 252 246 / 0.28);
+  background: rgb(186 238 255 / 0.42);
   box-shadow:
-    0 0 0 1.5px rgb(255 255 255 / 0.88),
-    0 0 5px 1px rgb(60 210 255 / 0.38);
+    0 0 0 1.5px rgb(255 255 255 / 0.9),
+    0 0 5px 1px rgb(60 210 255 / 0.48);
   animation: candy-choice-pulse 1.2s ease-in-out infinite;
 }
 .candy-node-enterable .candy-node-disc {
@@ -1206,10 +1206,10 @@ details > summary::-webkit-details-marker {
   width: 74%;
   height: auto;
   aspect-ratio: 1;
-  background: rgb(255 236 210 / 0.32);
+  background: rgb(255 214 160 / 0.4);
   box-shadow:
-    0 0 0 1.5px rgb(255 248 238 / 0.9),
-    0 0 5px 1px rgb(196 92 38 / 0.42);
+    0 0 0 1.5px rgb(255 248 238 / 0.92),
+    0 0 5px 1px rgb(196 92 38 / 0.5);
   animation: candy-portal-swirl 1.1s ease-in-out infinite;
 }
 .candy-node-radial.candy-node-enterable .candy-node-disc::after {
