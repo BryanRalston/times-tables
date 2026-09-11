@@ -1032,7 +1032,7 @@ details > summary::-webkit-details-marker {
   pointer-events: none;
 }
 .candy-overlay[data-hop-pick="1"] {
-  pointer-events: none;
+  pointer-events: auto;
 }
 .candy-overlay[data-hop-pick="1"] .candy-node-radial {
   pointer-events: none;
@@ -1538,51 +1538,6 @@ details > summary::-webkit-details-marker {
     drop-shadow(0 0 1px rgb(255 255 255 / 0.95))
     drop-shadow(0 2px 4px rgb(40 20 30 / 0.38));
   animation: candy-hop 1.9s ease-in-out infinite;
-}
-.candy-dpad {
-  position: absolute;
-  z-index: 6;
-  left: 50%;
-  top: 50%;
-  width: 7.6rem;
-  height: 7.6rem;
-  margin: -3.8rem 0 0 -3.8rem;
-  pointer-events: auto;
-}
-.candy-dpad-btn {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: 2.35rem;
-  height: 2.35rem;
-  padding: 0;
-  border: 0;
-  border-radius: 9999px;
-  background: #fffdf8;
-  box-shadow:
-    0 0 0 2px #0e8a86,
-    0 3px 0 #d46a90,
-    0 6px 10px rgb(80 30 50 / 0.2);
-  pointer-events: auto;
-  cursor: pointer;
-}
-.candy-dpad-btn[data-hop-portal="1"] {
-  background: linear-gradient(180deg, #fff8e4 0%, #ffd89a 100%);
-  box-shadow:
-    0 0 0 2px rgb(255 248 238 / 0.96),
-    0 3px 0 #c45c26,
-    0 0 10px 3px rgb(255 176 72 / 0.35);
-}
-.candy-dpad-chevron {
-  width: 0;
-  height: 0;
-  border-left: 0.38rem solid transparent;
-  border-right: 0.38rem solid transparent;
-  border-bottom: 0.52rem solid #0e8a86;
-  filter: drop-shadow(0 1px 0 #fff);
 }
 .candy-hopper-travel .candy-hopper-art {
   animation: none;

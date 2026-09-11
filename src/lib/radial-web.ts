@@ -368,8 +368,8 @@ export function nearestHopDir(
 }
 
 /**
- * Phone-fair snap radius kept for pad-space math. Plaza neighbors sit
- * ~39px apart on the 6/7 stage. Direction-pad hits use nearestHopDir.
+ * Phone-fair snap radius. Plaza neighbors sit ~39px apart on the 6/7
+ * stage. Board taps resolve to the nearest glowing neighbor.
  */
 export const HOP_SNAP_PX = 36;
 
