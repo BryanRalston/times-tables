@@ -27,22 +27,25 @@ export const RADIAL_PLAZA = { x: 49.682, y: 46.272 } as const;
  * One hop node per painted path tile: cream / beige, light pink, and
  * purple (including portal-arch floors). Grass, flowers, trees, and
  * water are not hoppable. Measured on radial-web-locked.jpg so each
- * painted walkable square is a real adjacent move.
+ * painted walkable square is a real adjacent move. #70 polar nodes
+ * (plaza 49.88/45.15, r=85) sat on grass NE of the inner north gate
+ * and between the plaza and the north cream pad — hops must land on
+ * the tile center, not those gaps.
  */
 type PadSpot = { x: number; y: number; ring: RadialRing; angle: number; portal?: boolean };
 
 const PAD_SPOTS: readonly PadSpot[] = [
   { x: 49.682, y: 46.272, ring: 0, angle: 0 },
-  { x: 50.547, y: 39.167, ring: 1, angle: 6.9 },
+  { x: 50.547, y: 39.167, ring: 2, angle: 6.9, portal: true },
   { x: 55.391, y: 38.472, ring: 1, angle: 36.2 },
   { x: 57.109, y: 44.028, ring: 1, angle: 73.2 },
   { x: 55.391, y: 50.278, ring: 1, angle: 125.1 },
-  { x: 50.234, y: 57.778, ring: 1, angle: 177.3 },
+  { x: 50.262, y: 57.338, ring: 1, angle: 177.3 },
   { x: 49.453, y: 53.333, ring: 1, angle: 181.9 },
   { x: 44.375, y: 50.417, ring: 1, angle: 232.0 },
   { x: 42.109, y: 44.167, ring: 1, angle: 285.5 },
   { x: 44.219, y: 38.472, ring: 1, angle: 325.0 },
-  { x: 49.844, y: 33.750, ring: 2, angle: 0.7 },
+  { x: 49.833, y: 33.126, ring: 2, angle: 0.7 },
   { x: 60.625, y: 30.556, ring: 2, angle: 34.8 },
   { x: 58.281, y: 35.000, ring: 2, angle: 37.3 },
   { x: 60.781, y: 44.167, ring: 2, angle: 79.3 },
@@ -50,14 +53,14 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 58.203, y: 53.889, ring: 2, angle: 131.8 },
   { x: 58.828, y: 63.750, ring: 2, angle: 152.4 },
   { x: 55.078, y: 65.278, ring: 2, angle: 164.2 },
-  { x: 50.313, y: 62.778, ring: 2, angle: 177.8 },
+  { x: 50.322, y: 62.762, ring: 2, angle: 177.8, portal: true },
   { x: 44.844, y: 65.417, ring: 2, angle: 194.2 },
   { x: 40.781, y: 63.750, ring: 2, angle: 207.0 },
   { x: 41.719, y: 53.889, ring: 2, angle: 226.3 },
   { x: 35.234, y: 44.306, ring: 2, angle: 277.7, portal: true },
   { x: 38.594, y: 44.167, ring: 2, angle: 280.7 },
   { x: 41.484, y: 35.417, ring: 2, angle: 322.9 },
-  { x: 49.219, y: 29.583, ring: 2, angle: 358.4, portal: true },
+  { x: 49.219, y: 29.583, ring: 2, angle: 358.4 },
   { x: 50.313, y: 23.611, ring: 3, angle: 1.6 },
   { x: 54.531, y: 25.000, ring: 3, angle: 12.8 },
   { x: 57.578, y: 26.111, ring: 3, angle: 21.4 },
@@ -71,7 +74,7 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 66.953, y: 54.861, ring: 3, angle: 116.4 },
   { x: 63.906, y: 60.278, ring: 3, angle: 134.6 },
   { x: 66.719, y: 64.444, ring: 3, angle: 136.8 },
-  { x: 50.156, y: 68.889, ring: 3, angle: 178.8, portal: true },
+  { x: 50.156, y: 68.889, ring: 3, angle: 178.8 },
   { x: 49.609, y: 74.583, ring: 3, angle: 180.1 },
   { x: 33.047, y: 64.444, ring: 3, angle: 222.5 },
   { x: 36.094, y: 60.278, ring: 3, angle: 224.1 },
@@ -85,10 +88,10 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 33.750, y: 26.111, ring: 3, angle: 321.7 },
   { x: 42.188, y: 26.111, ring: 3, angle: 339.6 },
   { x: 45.234, y: 25.000, ring: 3, angle: 348.2 },
-  { x: 48.984, y: 18.889, ring: 3, angle: 358.5 },
+  { x: 48.923, y: 18.515, ring: 3, angle: 358.5 },
   { x: 53.438, y: 15.278, ring: 4, angle: 6.9 },
   { x: 57.344, y: 15.972, ring: 4, angle: 14.2 },
-  { x: 59.370, y: 16.650, ring: 4, angle: 18.1 },
+  { x: 59.033, y: 16.408, ring: 4, angle: 18.1 },
   { x: 61.797, y: 17.639, ring: 4, angle: 22.9 },
   { x: 65.000, y: 19.583, ring: 4, angle: 29.9, portal: true },
   { x: 68.594, y: 22.500, ring: 4, angle: 38.5 },
@@ -106,13 +109,13 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 63.438, y: 75.278, ring: 4, angle: 154.6 },
   { x: 58.906, y: 77.639, ring: 4, angle: 163.6 },
   { x: 55.156, y: 78.611, ring: 4, angle: 170.4 },
-  { x: 49.860, y: 82.500, ring: 4, angle: 179.7, portal: true },
+  { x: 49.828, y: 82.449, ring: 4, angle: 179.7, portal: true },
   { x: 45.312, y: 78.889, ring: 4, angle: 187.6 },
   { x: 40.703, y: 77.639, ring: 4, angle: 196.0 },
   { x: 36.406, y: 75.417, ring: 4, angle: 204.5 },
   { x: 32.734, y: 72.361, ring: 4, angle: 213.0 },
   { x: 29.531, y: 68.472, ring: 4, angle: 222.2 },
-  { x: 26.641, y: 64.306, ring: 4, angle: 232.0, portal: true },
+  { x: 26.782, y: 64.009, ring: 4, angle: 232.0, portal: true },
   { x: 23.828, y: 60.000, ring: 4, angle: 242.0 },
   { x: 22.344, y: 54.861, ring: 4, angle: 252.6 },
   { x: 21.406, y: 49.444, ring: 4, angle: 263.6 },
