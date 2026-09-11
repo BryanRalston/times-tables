@@ -11,6 +11,7 @@ import {
   HOPPER_BOARD_WIDTH_PCT,
   HOPPER_SIT_TRANSLATE,
   HOP_GLOW_BOARD_WIDTH_PCT,
+  HOP_SNAP_MIN_PX,
   HOP_SNAP_PX,
   RADIAL_PAD_COUNT,
   RADIAL_PADS,
@@ -142,6 +143,7 @@ describe("CandyPath", () => {
     expect(html).toContain('data-hop-board="1"');
     expect(html).toContain('data-hop-pick="1"');
     expect(html).toContain(`data-hop-snap="${HOP_SNAP_PX}"`);
+    expect(html).toContain(`data-hop-snap-min="${HOP_SNAP_MIN_PX}"`);
     expect((html.match(/data-pad-choice="1"/g) ?? []).length).toBe(next.length);
     expect((html.match(/data-pad-quiet="1"/g) ?? []).length).toBe(RADIAL_PAD_COUNT - next.length - 1);
     expect((html.match(/data-pad-here="1"/g) ?? []).length).toBe(1);
@@ -269,9 +271,34 @@ describe("CandyPath", () => {
     expect(html).not.toContain('data-path-unit="u13"');
   });
 
+  it("lets a Guest with 1 step left tap the board without a d-pad or Test mode", () => {
+    const next = adjacentPadIds(START_PAD);
+    const html = renderToStaticMarkup(
+      <CandyPath
+        suggestedId="u2"
+        standFrom={1}
+        standTo={1}
+        hopCredits={0}
+        stepsLeft={1}
+        onStart={() => {}}
+        onOpenUnit={() => {}}
+      />,
+    );
+    expect(html).toContain('data-test-free-move="0"');
+    expect(html).toContain('data-dice-steps="1"');
+    expect(html).toContain('data-hop-pick="1"');
+    expect(html).toContain(`data-hop-snap="${HOP_SNAP_PX}"`);
+    expect(html).toContain(`data-hop-snap-min="${HOP_SNAP_MIN_PX}"`);
+    expect((html.match(/data-pad-choice="1"/g) ?? []).length).toBe(next.length);
+    expect(html).not.toContain("data-hop-dpad");
+    expect(html).not.toContain("g4-");
+  });
+
   it("resolves phone taps on the board to the nearest glowing pad", () => {
     const src = readFileSync(join(HERE, "candy-path.tsx"), "utf8");
     expect(src).toContain("nearestHopTarget");
+    expect(src).toContain("hopSnapPx");
+    expect(src).toContain("setPointerCapture");
     expect(src).toContain("onPointerUp={onBoardPointerUp}");
     expect(src).toContain("board.getBoundingClientRect()");
     expect(src).toContain("rollDie");

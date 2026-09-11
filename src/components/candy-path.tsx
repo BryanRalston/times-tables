@@ -29,7 +29,9 @@ import {
   HOPPER_BOARD_WIDTH_PCT,
   HOPPER_SIT_TRANSLATE,
   HOP_GLOW_BOARD_WIDTH_PCT,
+  HOP_SNAP_MIN_PX,
   HOP_SNAP_PX,
+  hopSnapPx,
   RADIAL_MAP_FILE,
   RADIAL_PADS,
   START_PAD,
@@ -370,23 +372,34 @@ export const CandyPath = forwardRef<
     setDest(to);
   };
 
+  const isPrimaryBoardTap = (e: PointerEvent<HTMLDivElement>) => {
+    if (!e.isPrimary) return false;
+    if (e.pointerType === "mouse") return e.button === 0;
+    return true;
+  };
+
   const onBoardPointerDown = (e: PointerEvent<HTMLDivElement>) => {
-    if (!picking || e.button !== 0) return;
+    if (!picking || !isPrimaryBoardTap(e)) return;
     tapStart.current = { x: e.clientX, y: e.clientY };
+    if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
   };
 
   const onBoardPointerUp = (e: PointerEvent<HTMLDivElement>) => {
-    if (!picking || e.button !== 0) return;
+    if (!picking || !e.isPrimary) return;
+    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
     const start = tapStart.current;
     tapStart.current = null;
-    if (!start || Math.hypot(e.clientX - start.x, e.clientY - start.y) > 12) return;
     const board = boardRef.current;
-    if (!board) return;
-    const hit = nearestHopTarget(e.clientX, e.clientY, board.getBoundingClientRect(), choices, dest);
+    if (!start || !board) return;
+    const rect = board.getBoundingClientRect();
+    const snap = hopSnapPx(rect);
+    if (Math.hypot(e.clientX - start.x, e.clientY - start.y) > snap) return;
+    const hit = nearestHopTarget(e.clientX, e.clientY, rect, choices, dest, snap);
     if (hit != null) chooseHop(hit);
   };
 
-  const onBoardPointerCancel = () => {
+  const onBoardPointerCancel = (e: PointerEvent<HTMLDivElement>) => {
+    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
     tapStart.current = null;
   };
 
@@ -427,6 +440,7 @@ export const CandyPath = forwardRef<
           data-dice-invite={inviting ? "1" : "0"}
           data-dice-steps={String(steps)}
           data-hop-snap={String(HOP_SNAP_PX)}
+          data-hop-snap-min={String(HOP_SNAP_MIN_PX)}
           data-hopper-fit="pad"
           style={{
             ["--hop-tile" as string]: `${HOPPER_BOARD_WIDTH_PCT}%`,

@@ -6,7 +6,9 @@ import {
   HOPPER_BOARD_WIDTH_PCT,
   HOPPER_SIT_TRANSLATE,
   HOP_GLOW_BOARD_WIDTH_PCT,
+  HOP_SNAP_MIN_PX,
   HOP_SNAP_PX,
+  hopSnapPx,
   hopGlowBoardPx,
   hopperBoardPx,
   minAdjacentGapPx,
@@ -282,7 +284,9 @@ describe("radial hop hit testing", () => {
     const gap = Math.hypot(pb.x - pa.x, pb.y - pa.y);
     expect(PHONE_MAP_BOARD.width).toBeGreaterThan(368);
     expect(PHONE_MAP_BOARD.height).toBeGreaterThan(207);
+    expect(HOP_SNAP_MIN_PX).toBe(24);
     expect(HOP_SNAP_PX).toBe(36);
+    expect(hopSnapPx(board)).toBe(36);
     expect(gap).toBeGreaterThan(28);
     expect(gap).toBeLessThan(48);
     expect(gap).toBeLessThan(HOP_SNAP_PX * 2);
@@ -302,6 +306,24 @@ describe("radial hop hit testing", () => {
     expect(HOPPER_BOARD_WIDTH_PCT).toBe(3.2);
     expect(HOP_GLOW_BOARD_WIDTH_PCT).toBe(2.2);
     expect(adjacentPadIds(START_PAD)).toHaveLength(8);
+  });
+
+  it("snaps a 24–36px comfort tap beside a glow, and ignores far dim pads", () => {
+    expect(hopSnapPx(board)).toBe(HOP_SNAP_PX);
+    expect(hopSnapPx({ ...board, width: board.width / 2, height: board.height / 2 })).toBe(HOP_SNAP_MIN_PX);
+    const here = padClientPos(START_PAD, board);
+    const glow = padClientPos(a, board);
+    const dx = glow.x - here.x;
+    const dy = glow.y - here.y;
+    const len = Math.hypot(dx, dy);
+    expect(len).toBeGreaterThan(0);
+    const along = (px: number) => ({ x: glow.x + (dx / len) * px, y: glow.y + (dy / len) * px });
+    expect(nearestHopTarget(along(24).x, along(24).y, board, plaza, START_PAD)).toBe(a);
+    expect(nearestHopTarget(along(36).x, along(36).y, board, plaza, START_PAD)).toBe(a);
+    expect(nearestHopTarget(along(48).x, along(48).y, board, plaza, START_PAD)).toBeUndefined();
+    const far = RADIAL_PADS.find((p) => p.ring === 4 && !plaza.includes(p.id))!;
+    const q = padClientPos(far.id, board);
+    expect(nearestHopTarget(q.x, q.y, board, plaza, START_PAD)).toBeUndefined();
   });
 
   it("lands a tap on the closest glowing pad, not the overlapping neighbor", () => {
