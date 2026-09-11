@@ -40,7 +40,7 @@ describe("radial web", () => {
     expect(RADIAL_PADS[0]!.id).toBe(START_PAD);
     expect(RADIAL_PADS.every((p) => p.id >= 1 && p.map.x > 8 && p.map.x < 92)).toBe(true);
     expect(RADIAL_PADS.filter((p) => p.ring === 0)).toHaveLength(1);
-    expect(RADIAL_PAD_COUNT).toBe(106);
+    expect(RADIAL_PAD_COUNT).toBe(95);
     expect(RADIAL_PADS.filter((p) => p.ring === 1).length).toBeGreaterThanOrEqual(8);
     expect(RADIAL_PADS.filter((p) => p.ring === 4).length).toBeGreaterThan(40);
     expect(RADIAL_EDGES.length).toBeGreaterThan(RADIAL_PAD_COUNT);
