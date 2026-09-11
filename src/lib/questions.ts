@@ -1,3 +1,4 @@
+import { elapsedEndTime } from "./clock";
 import { G4Q, GRAPH_CATS, NAMES, PLACE, qCopy, SHAPE, THINGS, parseLocale, wordForm as formWords, type Locale } from "./i18n";
 import {
   leftoverKey,
@@ -120,7 +121,14 @@ function groupsQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const sizePick = sizePool.length ? sizePool : [2, 3, 4, 5];
   let size = rng.pick(sizePick);
   size = maybePreferFactor(size, params.preferFact, sizePick, rng);
-  const groups = rng.int(2, size >= 11 ? 4 : 6);
+  let groups = rng.int(2, size >= 11 ? 4 : 6);
+  if (hide === "product" && size === 0) {
+    const nonzero = pool.filter((n) => n >= 1);
+    const zeroSizePick = nonzero.length ? nonzero : [1, 2, 5, 10];
+    size = rng.pick(zeroSizePick);
+    size = maybePreferFactor(size, params.preferFact, zeroSizePick, rng);
+    groups = 0;
+  }
   const product = size * groups;
   let prompt = "";
   let answer = "";
@@ -593,6 +601,15 @@ function clockQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const hours = rng.int(1, 12);
   const minutePool = params.nearest === "minute" ? rng.int(0, 59) : rng.pick([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]);
   const minutes = minutePool;
+  if (params.match) {
+    return keypadQ(rng, {
+      kind: "clock",
+      prompt: t().matchTime,
+      answer: `${hours}:${pad2(minutes)}`,
+      input: "clock",
+      data: { hours, minutes, mode: "read", find: "time", match: true } satisfies ClockData,
+    });
+  }
   if (String(params.mode ?? "read") === "elapsed") {
     if (params.minutes) {
       const startH = hours;
@@ -626,16 +643,15 @@ function clockQ(rng: Rng, params: Record<string, unknown> = {}): Question {
         } satisfies ClockData,
       });
     }
-    const hoursLater = rng.pick([1, 2, 3]);
-    const endH = ((hours - 1 + hoursLater) % 12) + 1;
-    const endClock = `${endH}:${pad2(minutes)}`;
+    const hoursLater = 1;
+    const end = elapsedEndTime(hours, minutes, hoursLater, 0);
+    const endClock = `${end.hours}:${pad2(end.minutes)}`;
     return keypadQ(rng, {
       kind: "clock",
-      prompt: t().elapsedHours(`${hours}:${pad2(minutes)}`, endClock),
-      answer: String(hoursLater),
-      alts: [`${hoursLater} hour`, `${hoursLater} hours`],
-      input: "keypad",
-      data: { hours, minutes, mode: "elapsed", elapsedHours: hoursLater, elapsedMinutes: 0, find: "elapsed" } satisfies ClockData,
+      prompt: t().oneHourLater,
+      answer: endClock,
+      input: "clock",
+      data: { hours, minutes, mode: "elapsed", elapsedHours: hoursLater, elapsedMinutes: 0, find: "end" } satisfies ClockData,
     });
   }
   return keypadQ(rng, {
@@ -733,9 +749,11 @@ function areaQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const hide = Boolean(params.hide);
   const hideCount = hide ? rng.int(1, Math.min(4, total - 1)) : 0;
   const shown = total - hideCount;
+  const story = Boolean(params.story) && !hide;
+  const prompt = hide ? t().squaresHide(shown) : story ? rng.pick(t().areaStories(rng.pick(NAMES[loc]))) : t().unitSquares;
   return keypadQ(rng, {
     kind: "area",
-    prompt: hide ? t().squaresHide(shown) : t().unitSquares,
+    prompt,
     answer: hide ? String(hideCount) : String(total),
     alts: hide ? [String(total)] : undefined,
     needsInteract: hide,

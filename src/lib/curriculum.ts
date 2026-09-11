@@ -240,7 +240,7 @@ export const UNITS: UnitDef[] = [
     blurb: "Time to the nearest minute. Elapsed time in one-hour increments. Money to $5.00.",
     activities: [
       A("u11-clock", "Time to the minute", "Hour and minute hands, nearest minute.", ["3.MG.3.a"], "clock", { mode: "read", nearest: "minute" }),
-      A("u11-match", "Match the clocks", "A written time and the analog clock.", ["3.MG.3.b"], "clock", { mode: "read", nearest: "minute" }),
+      A("u11-match", "Match the clocks", "A written time and the analog clock.", ["3.MG.3.b"], "clock", { mode: "read", nearest: "minute", match: true }),
       A("u11-elapsed", "One hour later", "Elapsed time in one-hour increments.", ["3.MG.3.c"], "clock", { mode: "elapsed", hours: true }),
       A("u11-count", "Count to $5", "Bills and coins up to five dollars.", ["3.NS.4.a"], "money", { mode: "count", max: 500 }),
       A("u11-compare", "Compare money", "Which set is more?", ["3.NS.4.b"], "money", { mode: "compare", max: 500 }),
@@ -277,7 +277,7 @@ export const UNITS: UnitDef[] = [
       A("u13-compute", "Add and subtract mix", "To 1,000, with hundreds you can see.", ["3.CE.1"], "compute", { mode: "exact" }),
       A("u13-pattern", "Number patterns", "Increasing and decreasing +/− patterns.", ["3.PFA.1"], "pattern", { steps: [2, 3, 4, 5, 6, 8, 10] }),
       A("u13-measure", "Measure again", "A ruler, a scale, or a beaker from the year.", ["3.MG.1"], "measure"),
-      A("u13-area", "Area stories", "Covering a space in a story.", ["3.MG.2"], "area"),
+      A("u13-area", "Area stories", "Covering a space in a story.", ["3.MG.2"], "area", { story: true }),
     ],
   },
 ];
