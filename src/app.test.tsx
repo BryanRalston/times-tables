@@ -419,9 +419,9 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-world-stage");
     expect(css).toContain(".candy-world-art");
     expect(css).toContain(".candy-overlay");
-    expect(css).toContain("aspect-ratio: 10 / 9");
+    expect(css).toContain("aspect-ratio: 6 / 7");
     expect(css).toContain(".candy-scroll[data-lessons-path]");
-    expect(css).toContain("100cqi * 9 / 10");
+    expect(css).toContain("100cqi * 7 / 6");
     expect(css).toContain("grid-template-rows: minmax(0, 1fr) auto");
     expect(css).toContain("container-name: radial-card");
     expect(css).toContain('.candy-overlay[data-hop-pick="1"]');

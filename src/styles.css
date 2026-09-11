@@ -953,13 +953,13 @@ details > summary::-webkit-details-marker {
 }
 /* Taller card on the phone shell: crop white letterbox, keep the locked
    16:9 camera. Art + overlay share .candy-world-stage so pad % stay on-art.
-   Height may shrink on short phones; it never grows past 10/9 or E/W
+   Height may shrink on short phones; it never grows past 6/7 or E/W
    portal arches shear off the card. Extra plate is studio white. */
 .candy-map[data-radial-web="1"] .candy-world {
-  aspect-ratio: 10 / 9;
+  aspect-ratio: 6 / 7;
   width: 100%;
   height: auto;
-  max-height: min(100%, calc(100cqi * 9 / 10));
+  max-height: min(100%, calc(100cqi * 7 / 6));
   align-self: start;
   justify-self: stretch;
 }

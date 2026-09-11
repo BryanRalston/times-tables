@@ -215,20 +215,20 @@ export function isPortalPad(id: number): boolean {
 
 /**
  * Phone-fair snap radius. The Lessons card zooms the locked 16:9 board
- * (taller crop, side letterbox gone). Plaza neighbors sit ~34px apart on
- * that stage, so a 36px snap is a comfortable fat-finger circle. Hits use
- * nearest valid neighbor (plus the current pad as a tap sink). Voronoi
+ * (taller 6/7 crop, side letterbox gone). Plaza neighbors sit ~42px apart
+ * on that stage, so a 36px snap is a comfortable fat-finger circle. Hits
+ * use nearest valid neighbor (plus the current pad as a tap sink). Voronoi
  * among glowing pads keeps neighbors from stealing.
  */
 export const HOP_SNAP_PX = 36;
 
 /**
  * Visible radial card on a 390 phone after scroll pad + 4px frame.
- * CSS `.candy-world` caps at 10/9 so the island grows without shearing
+ * CSS `.candy-world` caps at 6/7 so the island grows without shearing
  * the outer E/W portal arches off the card. The Lessons plate may be
  * taller — leftover column is studio white, not a deeper crop.
  */
-export const PHONE_MAP_VIEW = { width: 368, height: (368 * 9) / 10 } as const;
+export const PHONE_MAP_VIEW = { width: 368, height: (368 * 7) / 6 } as const;
 
 /**
  * Overlay / art stage: same 16:9 as radial-web-locked.jpg, height-matched
