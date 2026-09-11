@@ -2,7 +2,14 @@ import { describe, expect, it } from "vitest";
 import { UNITS } from "./curriculum";
 import {
   HOP_DIR_SNAP_DEG,
+  HOPPER_ART_ZOOM_PCT,
+  HOPPER_BOARD_WIDTH_PCT,
+  HOPPER_SIT_TRANSLATE,
+  HOP_GLOW_BOARD_WIDTH_PCT,
   HOP_SNAP_PX,
+  hopGlowBoardPx,
+  hopperBoardPx,
+  minAdjacentGapPx,
   PHONE_MAP_BOARD,
   PORTAL_PAIRS,
   RADIAL_EDGES,
@@ -279,6 +286,22 @@ describe("radial hop hit testing", () => {
     expect(gap).toBeGreaterThan(28);
     expect(gap).toBeLessThan(48);
     expect(gap).toBeLessThan(HOP_SNAP_PX * 2);
+  });
+
+  it("keeps the hopper and each hop glow inside one plaza tile", () => {
+    const gap = minAdjacentGapPx(START_PAD, board);
+    const hopper = hopperBoardPx(board);
+    const glow = hopGlowBoardPx(board);
+    expect(HOPPER_SIT_TRANSLATE).toBe("translate(-50%, -50%)");
+    expect(HOPPER_ART_ZOOM_PCT).toBeGreaterThan(100);
+    expect(hopper).toBeGreaterThan(20);
+    expect(hopper).toBeLessThan(gap);
+    expect(glow).toBeGreaterThan(16);
+    expect(glow).toBeLessThan(hopper);
+    expect(glow + 8).toBeLessThan(gap);
+    expect(HOPPER_BOARD_WIDTH_PCT).toBe(3.2);
+    expect(HOP_GLOW_BOARD_WIDTH_PCT).toBe(2.2);
+    expect(adjacentPadIds(START_PAD)).toHaveLength(8);
   });
 
   it("lands a tap on the closest glowing pad, not the overlapping neighbor", () => {

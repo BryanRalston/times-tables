@@ -368,10 +368,26 @@ export function nearestHopDir(
 }
 
 /**
- * Phone-fair snap radius. Plaza neighbors sit ~39px apart on the 6/7
+ * Phone-fair snap radius. Plaza neighbors sit ~28–39px apart on the 6/7
  * stage. Board taps resolve to the nearest glowing neighbor.
  */
 export const HOP_SNAP_PX = 36;
+
+/**
+ * Hopper box as % of the 16:9 board width. Plaza cream tiles are ~3.7%
+ * (~28px on a 390 phone). Must stay inside one painted tile — a rem box
+ * on the full 1024 PNG still overflowed neighbors.
+ */
+export const HOPPER_BOARD_WIDTH_PCT = 3.2;
+
+/** Zoom the 1024 sprite so the opaque peach/body fills the pad box. */
+export const HOPPER_ART_ZOOM_PCT = 140;
+
+/** Sit the piece in the tile, not standing above it onto the north pad. */
+export const HOPPER_SIT_TRANSLATE = "translate(-50%, -50%)";
+
+/** Choice-glow disc as % of board width. One disc per neighbor tile. */
+export const HOP_GLOW_BOARD_WIDTH_PCT = 2.2;
 
 /**
  * Visible radial card on a 390 phone after scroll pad + 4px frame.
@@ -405,6 +421,26 @@ export function padClientPos(id: number, board: HopBoardRect): RadialPos {
     x: board.left + (p.x / 100) * board.width,
     y: board.top + (p.y / 100) * board.height,
   };
+}
+
+export function hopperBoardPx(board: HopBoardRect = PHONE_MAP_BOARD): number {
+  return (HOPPER_BOARD_WIDTH_PCT / 100) * board.width;
+}
+
+export function hopGlowBoardPx(board: HopBoardRect = PHONE_MAP_BOARD): number {
+  return (HOP_GLOW_BOARD_WIDTH_PCT / 100) * board.width;
+}
+
+/** Center-to-center gap to the closest painted neighbor. */
+export function minAdjacentGapPx(id: number, board: HopBoardRect = PHONE_MAP_BOARD): number {
+  const here = padClientPos(id, board);
+  let min = Infinity;
+  for (const n of adjacentPadIds(id)) {
+    const p = padClientPos(n, board);
+    const d = Math.hypot(p.x - here.x, p.y - here.y);
+    if (d < min) min = d;
+  }
+  return min;
 }
 
 /**

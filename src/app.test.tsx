@@ -470,7 +470,10 @@ describe("first-visit Home door", () => {
     expect(css).not.toContain(".candy-dpad-btn");
     expect(css).not.toContain(".candy-dpad-chevron");
     expect(css).toContain(".candy-node-choice");
-    expect(css).toContain("width: 2.5rem");
+    expect(css).toContain("width: var(--hop-tile, 3.2%)");
+    expect(css).toContain("width: var(--hop-art-zoom, 140%)");
+    expect(css).toContain(".candy-hopper-fit");
+    expect(css).not.toContain("width: 2.5rem");
     expect(css).not.toContain("width: 3.65rem");
     expect(css).toContain("@keyframes candy-hop");
     expect(css).toContain("@keyframes candy-prop-sway");
@@ -483,11 +486,13 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-water");
     expect(css).toContain("skewX");
     expect(css).toContain("animation: candy-trail-peek 4.6s 1 forwards");
-    expect(css).toContain("transform-origin: 50% 82%");
+    expect(css).toContain("transform-origin: 50% 70%");
     expect(css).not.toContain("left 0.72s");
     expect(css).toContain(".candy-fog");
     expect(css).toContain(".candy-fog-mist");
-    expect(css).toContain("box-shadow: 0 0 16px 7px rgb(60 210 255 / 0.38)");
+    expect(css).toContain("0 0 5px 1px rgb(60 210 255 / 0.48)");
+    expect(css).not.toContain("0 0 28px 14px");
+    expect(css).not.toContain("0 0 18px 8px");
     expect(css).toContain(".candy-node-quiet");
     expect(css).toContain(".candy-node-here");
     expect(css).toContain(".candy-hopper-here");

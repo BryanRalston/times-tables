@@ -23,6 +23,10 @@ import { unitStatus } from "@/lib/path";
 import { useProgress } from "@/lib/progress";
 import {
   DICE_TUMBLE_MS,
+  HOPPER_ART_ZOOM_PCT,
+  HOPPER_BOARD_WIDTH_PCT,
+  HOPPER_SIT_TRANSLATE,
+  HOP_GLOW_BOARD_WIDTH_PCT,
   HOP_SNAP_PX,
   RADIAL_MAP_FILE,
   RADIAL_PADS,
@@ -379,6 +383,13 @@ export const CandyPath = forwardRef<
           data-dice-invite={inviting ? "1" : "0"}
           data-dice-steps={String(steps)}
           data-hop-snap={String(HOP_SNAP_PX)}
+          data-hopper-fit="pad"
+          style={{
+            ["--hop-tile" as string]: `${HOPPER_BOARD_WIDTH_PCT}%`,
+            ["--hop-art-zoom" as string]: `${HOPPER_ART_ZOOM_PCT}%`,
+            ["--hop-glow" as string]: `${HOP_GLOW_BOARD_WIDTH_PCT}%`,
+            ["--hop-glow-fill" as string]: `${(HOP_GLOW_BOARD_WIDTH_PCT / HOPPER_BOARD_WIDTH_PCT) * 100}%`,
+          }}
           onPointerDown={onBoardPointerDown}
           onPointerUp={onBoardPointerUp}
           onPointerCancel={onBoardPointerCancel}
@@ -455,7 +466,7 @@ export const CandyPath = forwardRef<
             left: `${pose.x}%`,
             top: `${pose.y}%`,
             opacity: hopperOpacity,
-            transform: `translate(-50%, -108%) scale(${pose.squashX}, ${pose.squashY})`,
+            transform: `${HOPPER_SIT_TRANSLATE} scale(${pose.squashX}, ${pose.squashY})`,
           }}
           data-path-hopper={hopperId}
           data-path-travel={travel ? "1" : "0"}
@@ -466,7 +477,9 @@ export const CandyPath = forwardRef<
           data-path-hop-ms={travel ? String(hopTravelMs(hopUnitStops(travelFrom, dest))) : "0"}
           data-path-clear-obstacle="0"
         >
-          <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
+          <span className="candy-hopper-fit" aria-hidden>
+            <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
+          </span>
         </div>
         </div>
         </div>
