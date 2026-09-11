@@ -770,16 +770,21 @@
   "u1-tally": [
     {
       "prompt": "Sort every picture.",
-      "answer": "2",
-      "alts": null,
-      "choices": null,
+      "answer": "ducks",
+      "alts": [],
+      "choices": [
+        "frogs",
+        "ducks",
+        "owls",
+        "pigs"
+      ],
       "kind": "graph",
-      "input": "keypad",
+      "input": "choice",
       "needsInteract": true
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "frogs",
+      "answer": "cats",
       "alts": [],
       "choices": [
         "frogs",
@@ -807,16 +812,121 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "owls",
+      "answer": "2",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "4",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "frogs",
       "alts": [],
       "choices": [
-        "ducks",
-        "owls",
-        "frogs",
-        "pigs"
+        "pandas",
+        "pigs",
+        "bunnies",
+        "frogs"
       ],
       "kind": "graph",
       "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "bunnies",
+      "alts": [],
+      "choices": [
+        "frogs",
+        "bunnies",
+        "pandas",
+        "cats"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "pigs",
+      "alts": [],
+      "choices": [
+        "ducks",
+        "pigs",
+        "sharks",
+        "pandas"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "4",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "5",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "2",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "owls",
+      "alts": [],
+      "choices": [
+        "sharks",
+        "pigs",
+        "owls",
+        "cats"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "3",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "3",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
       "needsInteract": true
     },
     {
@@ -839,12 +949,12 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "pandas",
+      "answer": "cats",
       "alts": [],
       "choices": [
-        "frogs",
         "bunnies",
-        "pandas",
+        "frogs",
+        "sharks",
         "cats"
       ],
       "kind": "graph",
@@ -853,67 +963,11 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "ducks",
-      "alts": [],
-      "choices": [
-        "ducks",
-        "pigs",
-        "sharks",
-        "pandas"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "2",
+      "answer": "3",
       "alts": null,
       "choices": null,
       "kind": "graph",
       "input": "keypad",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "owls",
-      "alts": [],
-      "choices": [
-        "owls",
-        "cats",
-        "sharks",
-        "pigs"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "pandas",
-      "alts": [],
-      "choices": [
-        "sharks",
-        "pandas",
-        "cats",
-        "ducks"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "sharks",
-      "alts": [],
-      "choices": [
-        "sharks",
-        "pigs",
-        "owls",
-        "cats"
-      ],
-      "kind": "graph",
-      "input": "choice",
       "needsInteract": true
     },
     {
@@ -921,10 +975,10 @@
       "answer": "bunnies",
       "alts": [],
       "choices": [
+        "owls",
         "ducks",
         "bunnies",
-        "sharks",
-        "pandas"
+        "cats"
       ],
       "kind": "graph",
       "input": "choice",
@@ -937,90 +991,6 @@
       "choices": null,
       "kind": "graph",
       "input": "keypad",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "owls",
-      "alts": [],
-      "choices": [
-        "owls",
-        "cats",
-        "ducks",
-        "sharks"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "ducks",
-      "alts": [],
-      "choices": [
-        "owls",
-        "frogs",
-        "cats",
-        "ducks"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "frogs",
-      "alts": [],
-      "choices": [
-        "bunnies",
-        "frogs",
-        "sharks",
-        "cats"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "ducks",
-      "alts": [],
-      "choices": [
-        "ducks",
-        "owls",
-        "sharks",
-        "bunnies"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "ducks",
-      "alts": [],
-      "choices": [
-        "owls",
-        "ducks",
-        "bunnies",
-        "cats"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "ducks",
-      "alts": [],
-      "choices": [
-        "frogs",
-        "bunnies",
-        "pigs",
-        "ducks"
-      ],
-      "kind": "graph",
-      "input": "choice",
       "needsInteract": true
     }
   ],
@@ -1785,180 +1755,220 @@
   ],
   "u2-build": [
     {
-      "prompt": "Build 8387. How many hundreds?",
+      "prompt": "This is 8387. How many hundreds blocks?",
       "answer": "3",
-      "alts": null,
+      "alts": [
+        "300"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 494. How many hundreds?",
+      "prompt": "This is 494. How many hundreds blocks?",
       "answer": "4",
-      "alts": null,
+      "alts": [
+        "400"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 872. How many hundreds?",
+      "prompt": "This is 872. How many hundreds blocks?",
       "answer": "8",
-      "alts": null,
+      "alts": [
+        "800"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 585. How many hundreds?",
+      "prompt": "This is 585. How many hundreds blocks?",
       "answer": "5",
-      "alts": null,
+      "alts": [
+        "500"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 9791. How many hundreds?",
+      "prompt": "This is 9791. How many hundreds blocks?",
       "answer": "7",
-      "alts": null,
+      "alts": [
+        "700"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 6624. How many hundreds?",
+      "prompt": "This is 6624. How many hundreds blocks?",
       "answer": "6",
-      "alts": null,
+      "alts": [
+        "600"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 1874. How many hundreds?",
+      "prompt": "This is 1874. How many hundreds blocks?",
       "answer": "8",
-      "alts": null,
+      "alts": [
+        "800"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 1069. How many hundreds?",
+      "prompt": "This is 1069. How many hundreds blocks?",
       "answer": "0",
-      "alts": null,
+      "alts": [
+        "0"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 2499. How many hundreds?",
+      "prompt": "This is 2499. How many hundreds blocks?",
       "answer": "4",
-      "alts": null,
+      "alts": [
+        "400"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 4485. How many hundreds?",
+      "prompt": "This is 4485. How many hundreds blocks?",
       "answer": "4",
-      "alts": null,
+      "alts": [
+        "400"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 6073. How many hundreds?",
+      "prompt": "This is 6073. How many hundreds blocks?",
       "answer": "0",
-      "alts": null,
+      "alts": [
+        "0"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 9154. How many hundreds?",
+      "prompt": "This is 9154. How many hundreds blocks?",
       "answer": "1",
-      "alts": null,
+      "alts": [
+        "100"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 2476. How many hundreds?",
+      "prompt": "This is 2476. How many hundreds blocks?",
       "answer": "4",
-      "alts": null,
+      "alts": [
+        "400"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 558. How many hundreds?",
+      "prompt": "This is 558. How many hundreds blocks?",
       "answer": "5",
-      "alts": null,
+      "alts": [
+        "500"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 491. How many hundreds?",
+      "prompt": "This is 491. How many hundreds blocks?",
       "answer": "4",
-      "alts": null,
+      "alts": [
+        "400"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 6692. How many hundreds?",
+      "prompt": "This is 6692. How many hundreds blocks?",
       "answer": "6",
-      "alts": null,
+      "alts": [
+        "600"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 4467. How many hundreds?",
+      "prompt": "This is 4467. How many hundreds blocks?",
       "answer": "4",
-      "alts": null,
+      "alts": [
+        "400"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 3612. How many hundreds?",
+      "prompt": "This is 3612. How many hundreds blocks?",
       "answer": "6",
-      "alts": null,
+      "alts": [
+        "600"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 2792. How many hundreds?",
+      "prompt": "This is 2792. How many hundreds blocks?",
       "answer": "7",
-      "alts": null,
+      "alts": [
+        "700"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
       "needsInteract": false
     },
     {
-      "prompt": "Build 7564. How many hundreds?",
+      "prompt": "This is 7564. How many hundreds blocks?",
       "answer": "5",
-      "alts": null,
+      "alts": [
+        "500"
+      ],
       "choices": null,
       "kind": "build",
       "input": "keypad",
@@ -4928,7 +4938,7 @@
   ],
   "u4-combine": [
     {
-      "prompt": "Two quadrilaterals joined on a side can make which polygon?",
+      "prompt": "Two quadrilaterals share one side. Count the outside sides. What polygon?",
       "answer": "hexagon",
       "alts": [
         "hexagon"
@@ -4944,7 +4954,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "A triangle joined to a pentagon on one side makes which polygon?",
+      "prompt": "A triangle and a pentagon share one side. Count the outside sides. What polygon?",
       "answer": "hexagon",
       "alts": [
         "hexagon"
@@ -4960,7 +4970,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "A triangle joined to a quadrilateral on one side makes which polygon?",
+      "prompt": "A triangle and a quadrilateral share one side. Count the outside sides. What polygon?",
       "answer": "pentagon",
       "alts": [
         "pentagon"
@@ -4976,7 +4986,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Two quadrilaterals joined on a side can make which polygon?",
+      "prompt": "Two quadrilaterals share one side. Count the outside sides. What polygon?",
       "answer": "hexagon",
       "alts": [
         "hexagon"
@@ -4992,7 +5002,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "A triangle joined to a pentagon on one side makes which polygon?",
+      "prompt": "A triangle and a pentagon share one side. Count the outside sides. What polygon?",
       "answer": "hexagon",
       "alts": [
         "hexagon"
@@ -5008,7 +5018,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Two quadrilaterals joined on a side can make which polygon?",
+      "prompt": "Two quadrilaterals share one side. Count the outside sides. What polygon?",
       "answer": "hexagon",
       "alts": [
         "hexagon"
@@ -5024,7 +5034,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Two quadrilaterals joined on a side can make which polygon?",
+      "prompt": "Two quadrilaterals share one side. Count the outside sides. What polygon?",
       "answer": "hexagon",
       "alts": [
         "hexagon"
@@ -5040,7 +5050,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "A triangle joined to a quadrilateral on one side makes which polygon?",
+      "prompt": "A triangle and a quadrilateral share one side. Count the outside sides. What polygon?",
       "answer": "pentagon",
       "alts": [
         "pentagon"
@@ -5056,7 +5066,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "A triangle joined to a pentagon on one side makes which polygon?",
+      "prompt": "A triangle and a pentagon share one side. Count the outside sides. What polygon?",
       "answer": "hexagon",
       "alts": [
         "hexagon"
@@ -5072,7 +5082,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "A triangle joined to a pentagon on one side makes which polygon?",
+      "prompt": "A triangle and a pentagon share one side. Count the outside sides. What polygon?",
       "answer": "hexagon",
       "alts": [
         "hexagon"
@@ -5088,7 +5098,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Two triangles joined on a side make which polygon?",
+      "prompt": "Two triangles share one side. Count the outside sides. What polygon?",
       "answer": "quadrilateral",
       "alts": [
         "square",
@@ -5108,7 +5118,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Two triangles joined on a side make which polygon?",
+      "prompt": "Two triangles share one side. Count the outside sides. What polygon?",
       "answer": "quadrilateral",
       "alts": [
         "square",
@@ -5128,7 +5138,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "A triangle joined to a quadrilateral on one side makes which polygon?",
+      "prompt": "A triangle and a quadrilateral share one side. Count the outside sides. What polygon?",
       "answer": "pentagon",
       "alts": [
         "pentagon"
@@ -5144,7 +5154,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "A triangle joined to a quadrilateral on one side makes which polygon?",
+      "prompt": "A triangle and a quadrilateral share one side. Count the outside sides. What polygon?",
       "answer": "pentagon",
       "alts": [
         "pentagon"
@@ -5160,7 +5170,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "A triangle joined to a pentagon on one side makes which polygon?",
+      "prompt": "A triangle and a pentagon share one side. Count the outside sides. What polygon?",
       "answer": "hexagon",
       "alts": [
         "hexagon"
@@ -5176,7 +5186,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "A triangle joined to a quadrilateral on one side makes which polygon?",
+      "prompt": "A triangle and a quadrilateral share one side. Count the outside sides. What polygon?",
       "answer": "pentagon",
       "alts": [
         "pentagon"
@@ -5192,7 +5202,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "A triangle joined to a quadrilateral on one side makes which polygon?",
+      "prompt": "A triangle and a quadrilateral share one side. Count the outside sides. What polygon?",
       "answer": "pentagon",
       "alts": [
         "pentagon"
@@ -5208,7 +5218,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "A triangle joined to a pentagon on one side makes which polygon?",
+      "prompt": "A triangle and a pentagon share one side. Count the outside sides. What polygon?",
       "answer": "hexagon",
       "alts": [
         "hexagon"
@@ -5224,7 +5234,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Two triangles joined on a side make which polygon?",
+      "prompt": "Two triangles share one side. Count the outside sides. What polygon?",
       "answer": "quadrilateral",
       "alts": [
         "square",
@@ -5244,7 +5254,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "A triangle joined to a quadrilateral on one side makes which polygon?",
+      "prompt": "A triangle and a quadrilateral share one side. Count the outside sides. What polygon?",
       "answer": "pentagon",
       "alts": [
         "pentagon"
@@ -6090,7 +6100,7 @@
   ],
   "u5-leftover": [
     {
-      "prompt": "2/10 + n = 1. What is n?",
+      "prompt": "2/10 + n = 1. What fraction is hiding?",
       "answer": "8/10",
       "alts": [
         "8"
@@ -6101,7 +6111,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "3/4 + n = 1. What is n?",
+      "prompt": "3/4 + n = 1. What fraction is hiding?",
       "answer": "1/4",
       "alts": [
         "1"
@@ -6112,7 +6122,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "6/8 + n = 1. What is n?",
+      "prompt": "6/8 + n = 1. What fraction is hiding?",
       "answer": "2/8",
       "alts": [
         "2"
@@ -6123,7 +6133,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "1/2 + n = 1. What is n?",
+      "prompt": "1/2 + n = 1. What fraction is hiding?",
       "answer": "1/2",
       "alts": [
         "1"
@@ -6134,7 +6144,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "1/3 + n = 1. What is n?",
+      "prompt": "1/3 + n = 1. What fraction is hiding?",
       "answer": "2/3",
       "alts": [
         "2"
@@ -6145,7 +6155,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "1/5 + n = 1. What is n?",
+      "prompt": "1/5 + n = 1. What fraction is hiding?",
       "answer": "4/5",
       "alts": [
         "4"
@@ -6156,7 +6166,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "2/3 + n = 1. What is n?",
+      "prompt": "2/3 + n = 1. What fraction is hiding?",
       "answer": "1/3",
       "alts": [
         "1"
@@ -6167,7 +6177,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "3/6 + n = 1. What is n?",
+      "prompt": "3/6 + n = 1. What fraction is hiding?",
       "answer": "3/6",
       "alts": [
         "3"
@@ -6178,7 +6188,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "1/8 + n = 1. What is n?",
+      "prompt": "1/8 + n = 1. What fraction is hiding?",
       "answer": "7/8",
       "alts": [
         "7"
@@ -6189,7 +6199,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "1/2 + n = 1. What is n?",
+      "prompt": "1/2 + n = 1. What fraction is hiding?",
       "answer": "1/2",
       "alts": [
         "1"
@@ -6200,7 +6210,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "1/2 + n = 1. What is n?",
+      "prompt": "1/2 + n = 1. What fraction is hiding?",
       "answer": "1/2",
       "alts": [
         "1"
@@ -6211,7 +6221,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "3/6 + n = 1. What is n?",
+      "prompt": "3/6 + n = 1. What fraction is hiding?",
       "answer": "3/6",
       "alts": [
         "3"
@@ -6222,7 +6232,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "1/8 + n = 1. What is n?",
+      "prompt": "1/8 + n = 1. What fraction is hiding?",
       "answer": "7/8",
       "alts": [
         "7"
@@ -6233,7 +6243,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "3/6 + n = 1. What is n?",
+      "prompt": "3/6 + n = 1. What fraction is hiding?",
       "answer": "3/6",
       "alts": [
         "3"
@@ -6244,7 +6254,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "4/5 + n = 1. What is n?",
+      "prompt": "4/5 + n = 1. What fraction is hiding?",
       "answer": "1/5",
       "alts": [
         "1"
@@ -6255,7 +6265,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "1/2 + n = 1. What is n?",
+      "prompt": "1/2 + n = 1. What fraction is hiding?",
       "answer": "1/2",
       "alts": [
         "1"
@@ -6266,7 +6276,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "1/4 + n = 1. What is n?",
+      "prompt": "1/4 + n = 1. What fraction is hiding?",
       "answer": "3/4",
       "alts": [
         "3"
@@ -6277,7 +6287,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "2/5 + n = 1. What is n?",
+      "prompt": "2/5 + n = 1. What fraction is hiding?",
       "answer": "3/5",
       "alts": [
         "3"
@@ -6288,7 +6298,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "1/2 + n = 1. What is n?",
+      "prompt": "1/2 + n = 1. What fraction is hiding?",
       "answer": "1/2",
       "alts": [
         "1"
@@ -6299,7 +6309,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "7/8 + n = 1. What is n?",
+      "prompt": "7/8 + n = 1. What fraction is hiding?",
       "answer": "1/8",
       "alts": [
         "1"
@@ -8744,57 +8754,57 @@
   "u7-bar": [
     {
       "prompt": "Sort every picture.",
-      "answer": "2",
-      "alts": null,
-      "choices": null,
-      "kind": "graph",
-      "input": "keypad",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "pigs",
-      "alts": [],
-      "choices": [
-        "pandas",
-        "cats",
-        "sharks",
-        "pigs"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "frogs",
-      "alts": [],
-      "choices": [
-        "bunnies",
-        "frogs",
-        "cats",
-        "owls"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "2",
-      "alts": null,
-      "choices": null,
-      "kind": "graph",
-      "input": "keypad",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
       "answer": "3",
       "alts": null,
       "choices": null,
       "kind": "graph",
       "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "2",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "2",
+      "alts": null,
+      "choices": null,
+      "kind": "graph",
+      "input": "keypad",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "owls",
+      "alts": [],
+      "choices": [
+        "owls",
+        "pigs",
+        "sharks",
+        "bunnies"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "cats",
+      "alts": [],
+      "choices": [
+        "frogs",
+        "cats",
+        "owls",
+        "sharks"
+      ],
+      "kind": "graph",
+      "input": "choice",
       "needsInteract": true
     },
     {
@@ -8813,22 +8823,41 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "2",
-      "alts": null,
-      "choices": null,
+      "answer": "ducks",
+      "alts": [],
+      "choices": [
+        "pigs",
+        "ducks",
+        "frogs",
+        "cats"
+      ],
       "kind": "graph",
-      "input": "keypad",
+      "input": "choice",
       "needsInteract": true
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "frogs",
+      "answer": "pigs",
       "alts": [],
       "choices": [
         "bunnies",
         "ducks",
         "frogs",
         "pigs"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "bunnies",
+      "alts": [],
+      "choices": [
+        "ducks",
+        "pandas",
+        "owls",
+        "bunnies"
       ],
       "kind": "graph",
       "input": "choice",
@@ -8845,20 +8874,16 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "3",
-      "alts": null,
-      "choices": null,
+      "answer": "cats",
+      "alts": [],
+      "choices": [
+        "ducks",
+        "pandas",
+        "frogs",
+        "cats"
+      ],
       "kind": "graph",
-      "input": "keypad",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "3",
-      "alts": null,
-      "choices": null,
-      "kind": "graph",
-      "input": "keypad",
+      "input": "choice",
       "needsInteract": true
     },
     {
@@ -8877,78 +8902,27 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "2",
-      "alts": null,
-      "choices": null,
+      "answer": "pandas",
+      "alts": [],
+      "choices": [
+        "pandas",
+        "ducks",
+        "owls",
+        "cats"
+      ],
       "kind": "graph",
-      "input": "keypad",
+      "input": "choice",
       "needsInteract": true
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "pandas",
+      "answer": "frogs",
       "alts": [],
       "choices": [
         "sharks",
         "frogs",
         "pandas",
         "owls"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "ducks",
-      "alts": [],
-      "choices": [
-        "pigs",
-        "ducks",
-        "sharks",
-        "pandas"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "bunnies",
-      "alts": [],
-      "choices": [
-        "bunnies",
-        "cats",
-        "ducks",
-        "owls"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "owls",
-      "alts": [],
-      "choices": [
-        "pigs",
-        "frogs",
-        "pandas",
-        "owls"
-      ],
-      "kind": "graph",
-      "input": "choice",
-      "needsInteract": true
-    },
-    {
-      "prompt": "Sort every picture.",
-      "answer": "pandas",
-      "alts": [],
-      "choices": [
-        "cats",
-        "pandas",
-        "frogs",
-        "sharks"
       ],
       "kind": "graph",
       "input": "choice",
@@ -8965,11 +8939,72 @@
     },
     {
       "prompt": "Sort every picture.",
-      "answer": "2",
-      "alts": null,
-      "choices": null,
+      "answer": "cats",
+      "alts": [],
+      "choices": [
+        "bunnies",
+        "cats",
+        "ducks",
+        "owls"
+      ],
       "kind": "graph",
-      "input": "keypad",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "pandas",
+      "alts": [],
+      "choices": [
+        "pigs",
+        "frogs",
+        "pandas",
+        "owls"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "cats",
+      "alts": [],
+      "choices": [
+        "cats",
+        "pandas",
+        "frogs",
+        "sharks"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "bunnies",
+      "alts": [],
+      "choices": [
+        "bunnies",
+        "pandas",
+        "owls",
+        "ducks"
+      ],
+      "kind": "graph",
+      "input": "choice",
+      "needsInteract": true
+    },
+    {
+      "prompt": "Sort every picture.",
+      "answer": "pigs",
+      "alts": [],
+      "choices": [
+        "cats",
+        "owls",
+        "bunnies",
+        "pigs"
+      ],
+      "kind": "graph",
+      "input": "choice",
       "needsInteract": true
     }
   ],
@@ -8989,7 +9024,9 @@
       "prompt": "How long? (cm)",
       "answer": "8.5",
       "alts": [
-        "8.5 cm"
+        "8.5 cm",
+        "8 1/2",
+        "8 1/2 cm"
       ],
       "choices": null,
       "kind": "measure",
@@ -9000,7 +9037,9 @@
       "prompt": "How long? (cm)",
       "answer": "5.5",
       "alts": [
-        "5.5 cm"
+        "5.5 cm",
+        "5 1/2",
+        "5 1/2 cm"
       ],
       "choices": null,
       "kind": "measure",
@@ -9022,7 +9061,9 @@
       "prompt": "How long? (in)",
       "answer": "6.5",
       "alts": [
-        "6.5 in"
+        "6.5 in",
+        "6 1/2",
+        "6 1/2 in"
       ],
       "choices": null,
       "kind": "measure",
@@ -9033,7 +9074,9 @@
       "prompt": "How long? (in)",
       "answer": "3.5",
       "alts": [
-        "3.5 in"
+        "3.5 in",
+        "3 1/2",
+        "3 1/2 in"
       ],
       "choices": null,
       "kind": "measure",
@@ -9066,7 +9109,9 @@
       "prompt": "How long? (cm)",
       "answer": "5.5",
       "alts": [
-        "5.5 cm"
+        "5.5 cm",
+        "5 1/2",
+        "5 1/2 cm"
       ],
       "choices": null,
       "kind": "measure",
@@ -9077,7 +9122,9 @@
       "prompt": "How long? (cm)",
       "answer": "6.5",
       "alts": [
-        "6.5 cm"
+        "6.5 cm",
+        "6 1/2",
+        "6 1/2 cm"
       ],
       "choices": null,
       "kind": "measure",
@@ -9088,7 +9135,9 @@
       "prompt": "How long? (cm)",
       "answer": "2.5",
       "alts": [
-        "2.5 cm"
+        "2.5 cm",
+        "2 1/2",
+        "2 1/2 cm"
       ],
       "choices": null,
       "kind": "measure",
@@ -9099,7 +9148,9 @@
       "prompt": "How long? (cm)",
       "answer": "4.5",
       "alts": [
-        "4.5 cm"
+        "4.5 cm",
+        "4 1/2",
+        "4 1/2 cm"
       ],
       "choices": null,
       "kind": "measure",
@@ -9110,7 +9161,9 @@
       "prompt": "How long? (cm)",
       "answer": "9.5",
       "alts": [
-        "9.5 cm"
+        "9.5 cm",
+        "9 1/2",
+        "9 1/2 cm"
       ],
       "choices": null,
       "kind": "measure",
@@ -9121,7 +9174,9 @@
       "prompt": "How long? (in)",
       "answer": "7.5",
       "alts": [
-        "7.5 in"
+        "7.5 in",
+        "7 1/2",
+        "7 1/2 in"
       ],
       "choices": null,
       "kind": "measure",
@@ -9132,7 +9187,9 @@
       "prompt": "How long? (cm)",
       "answer": "8.5",
       "alts": [
-        "8.5 cm"
+        "8.5 cm",
+        "8 1/2",
+        "8 1/2 cm"
       ],
       "choices": null,
       "kind": "measure",
@@ -9143,7 +9200,9 @@
       "prompt": "How long? (in)",
       "answer": "2.5",
       "alts": [
-        "2.5 in"
+        "2.5 in",
+        "2 1/2",
+        "2 1/2 in"
       ],
       "choices": null,
       "kind": "measure",
@@ -9154,7 +9213,9 @@
       "prompt": "How long? (cm)",
       "answer": "3.5",
       "alts": [
-        "3.5 cm"
+        "3.5 cm",
+        "3 1/2",
+        "3 1/2 cm"
       ],
       "choices": null,
       "kind": "measure",
@@ -9165,7 +9226,9 @@
       "prompt": "How long? (cm)",
       "answer": "9.5",
       "alts": [
-        "9.5 cm"
+        "9.5 cm",
+        "9 1/2",
+        "9 1/2 cm"
       ],
       "choices": null,
       "kind": "measure",
@@ -9176,7 +9239,9 @@
       "prompt": "How long? (in)",
       "answer": "7.5",
       "alts": [
-        "7.5 in"
+        "7.5 in",
+        "7 1/2",
+        "7 1/2 in"
       ],
       "choices": null,
       "kind": "measure",
@@ -9187,7 +9252,9 @@
       "prompt": "How long? (cm)",
       "answer": "3.5",
       "alts": [
-        "3.5 cm"
+        "3.5 cm",
+        "3 1/2",
+        "3 1/2 cm"
       ],
       "choices": null,
       "kind": "measure",
@@ -9655,7 +9722,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Best unit for a paper clip?",
+      "prompt": "Best unit for the length of a paper clip?",
       "answer": "centimeter",
       "alts": null,
       "choices": [
@@ -9669,7 +9736,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Best unit for a bottle of milk?",
+      "prompt": "Best unit for the liquid in a bottle of milk?",
       "answer": "liter",
       "alts": null,
       "choices": [
@@ -9683,7 +9750,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Best unit for a watermelon?",
+      "prompt": "Best unit for the weight of a watermelon?",
       "answer": "pound",
       "alts": null,
       "choices": [
@@ -9725,7 +9792,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Best unit for a bag of apples?",
+      "prompt": "Best unit for the mass of a bag of apples?",
       "answer": "kilogram",
       "alts": null,
       "choices": [
@@ -9739,7 +9806,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Best unit for a bag of apples?",
+      "prompt": "Best unit for the mass of a bag of apples?",
       "answer": "kilogram",
       "alts": null,
       "choices": [
@@ -9779,7 +9846,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Best unit for a paper clip?",
+      "prompt": "Best unit for the length of a paper clip?",
       "answer": "centimeter",
       "alts": null,
       "choices": [
@@ -9807,7 +9874,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Best unit for a bag of apples?",
+      "prompt": "Best unit for the mass of a bag of apples?",
       "answer": "kilogram",
       "alts": null,
       "choices": [
@@ -9835,7 +9902,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Best unit for a bottle of milk?",
+      "prompt": "Best unit for the liquid in a bottle of milk?",
       "answer": "liter",
       "alts": null,
       "choices": [
@@ -9863,7 +9930,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Best unit for a bag of apples?",
+      "prompt": "Best unit for the mass of a bag of apples?",
       "answer": "kilogram",
       "alts": null,
       "choices": [
@@ -9891,7 +9958,7 @@
       "needsInteract": false
     },
     {
-      "prompt": "Best unit for a bag of apples?",
+      "prompt": "Best unit for the mass of a bag of apples?",
       "answer": "kilogram",
       "alts": null,
       "choices": [
@@ -10285,7 +10352,7 @@
   ],
   "u8-missing": [
     {
-      "prompt": "A hexagon. Sides add to 27. You see 20. n is the missing side.",
+      "prompt": "A hexagon. Sides add to 27. You see 20. What is the missing side?",
       "answer": "7",
       "alts": null,
       "choices": null,
@@ -10294,7 +10361,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A triangle. Sides add to 19. You see 16. n is the missing side.",
+      "prompt": "A triangle. Sides add to 19. You see 16. What is the missing side?",
       "answer": "3",
       "alts": null,
       "choices": null,
@@ -10303,7 +10370,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A quadrilateral. Sides add to 23. You see 15. n is the missing side.",
+      "prompt": "A quadrilateral. Sides add to 23. You see 15. What is the missing side?",
       "answer": "8",
       "alts": null,
       "choices": null,
@@ -10312,7 +10379,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A hexagon. Sides add to 26. You see 20. n is the missing side.",
+      "prompt": "A hexagon. Sides add to 26. You see 20. What is the missing side?",
       "answer": "6",
       "alts": null,
       "choices": null,
@@ -10321,7 +10388,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A hexagon. Sides add to 26. You see 21. n is the missing side.",
+      "prompt": "A hexagon. Sides add to 26. You see 21. What is the missing side?",
       "answer": "5",
       "alts": null,
       "choices": null,
@@ -10330,7 +10397,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A pentagon. Sides add to 22. You see 20. n is the missing side.",
+      "prompt": "A pentagon. Sides add to 22. You see 20. What is the missing side?",
       "answer": "2",
       "alts": null,
       "choices": null,
@@ -10339,7 +10406,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A hexagon. Sides add to 31. You see 25. n is the missing side.",
+      "prompt": "A hexagon. Sides add to 31. You see 25. What is the missing side?",
       "answer": "6",
       "alts": null,
       "choices": null,
@@ -10348,7 +10415,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A quadrilateral. Sides add to 21. You see 15. n is the missing side.",
+      "prompt": "A quadrilateral. Sides add to 21. You see 15. What is the missing side?",
       "answer": "6",
       "alts": null,
       "choices": null,
@@ -10357,7 +10424,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A pentagon. Sides add to 28. You see 20. n is the missing side.",
+      "prompt": "A pentagon. Sides add to 28. You see 20. What is the missing side?",
       "answer": "8",
       "alts": null,
       "choices": null,
@@ -10366,7 +10433,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A triangle. Sides add to 15. You see 9. n is the missing side.",
+      "prompt": "A triangle. Sides add to 15. You see 9. What is the missing side?",
       "answer": "6",
       "alts": null,
       "choices": null,
@@ -10375,7 +10442,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A triangle. Sides add to 16. You see 10. n is the missing side.",
+      "prompt": "A triangle. Sides add to 16. You see 10. What is the missing side?",
       "answer": "6",
       "alts": null,
       "choices": null,
@@ -10384,7 +10451,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A quadrilateral. Sides add to 18. You see 13. n is the missing side.",
+      "prompt": "A quadrilateral. Sides add to 18. You see 13. What is the missing side?",
       "answer": "5",
       "alts": null,
       "choices": null,
@@ -10393,7 +10460,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A quadrilateral. Sides add to 22. You see 14. n is the missing side.",
+      "prompt": "A quadrilateral. Sides add to 22. You see 14. What is the missing side?",
       "answer": "8",
       "alts": null,
       "choices": null,
@@ -10402,7 +10469,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A pentagon. Sides add to 24. You see 21. n is the missing side.",
+      "prompt": "A pentagon. Sides add to 24. You see 21. What is the missing side?",
       "answer": "3",
       "alts": null,
       "choices": null,
@@ -10411,7 +10478,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A hexagon. Sides add to 28. You see 23. n is the missing side.",
+      "prompt": "A hexagon. Sides add to 28. You see 23. What is the missing side?",
       "answer": "5",
       "alts": null,
       "choices": null,
@@ -10420,7 +10487,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A quadrilateral. Sides add to 16. You see 12. n is the missing side.",
+      "prompt": "A quadrilateral. Sides add to 16. You see 12. What is the missing side?",
       "answer": "4",
       "alts": null,
       "choices": null,
@@ -10429,7 +10496,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A quadrilateral. Sides add to 18. You see 10. n is the missing side.",
+      "prompt": "A quadrilateral. Sides add to 18. You see 10. What is the missing side?",
       "answer": "8",
       "alts": null,
       "choices": null,
@@ -10438,7 +10505,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A hexagon. Sides add to 24. You see 19. n is the missing side.",
+      "prompt": "A hexagon. Sides add to 24. You see 19. What is the missing side?",
       "answer": "5",
       "alts": null,
       "choices": null,
@@ -10447,7 +10514,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A hexagon. Sides add to 29. You see 21. n is the missing side.",
+      "prompt": "A hexagon. Sides add to 29. You see 21. What is the missing side?",
       "answer": "8",
       "alts": null,
       "choices": null,
@@ -10456,7 +10523,7 @@
       "needsInteract": true
     },
     {
-      "prompt": "A pentagon. Sides add to 31. You see 24. n is the missing side.",
+      "prompt": "A pentagon. Sides add to 31. You see 24. What is the missing side?",
       "answer": "7",
       "alts": null,
       "choices": null,
@@ -11867,11 +11934,9 @@
       "needsInteract": false
     },
     {
-      "prompt": "Is 6/8 closer to 0, 1/2, or 1?",
-      "answer": "1/2",
-      "alts": [
-        "1"
-      ],
+      "prompt": "Is 7/8 closer to 0, 1/2, or 1?",
+      "answer": "1",
+      "alts": [],
       "choices": [
         "0",
         "1/2",
@@ -11973,11 +12038,9 @@
       "needsInteract": false
     },
     {
-      "prompt": "Is 3/4 closer to 0, 1/2, or 1?",
-      "answer": "1/2",
-      "alts": [
-        "1"
-      ],
+      "prompt": "Is 4/4 closer to 0, 1/2, or 1?",
+      "answer": "1",
+      "alts": [],
       "choices": [
         "0",
         "1/2",
@@ -11988,11 +12051,9 @@
       "needsInteract": false
     },
     {
-      "prompt": "Is 6/8 closer to 0, 1/2, or 1?",
+      "prompt": "Is 5/8 closer to 0, 1/2, or 1?",
       "answer": "1/2",
-      "alts": [
-        "1"
-      ],
+      "alts": [],
       "choices": [
         "0",
         "1/2",
@@ -15017,8 +15078,8 @@
   ],
   "u13-two": [
     {
-      "prompt": "Maya has 2 packs of 3 erasers and gives away 7. How many left?",
-      "answer": "0",
+      "prompt": "Maya has 2 packs of 3 erasers and gives away 4. How many left?",
+      "answer": "2",
       "alts": null,
       "choices": null,
       "kind": "groups",
@@ -15026,8 +15087,8 @@
       "needsInteract": false
     },
     {
-      "prompt": "Ivy has 2 packs of 3 beads, then finds 2 more. How many now?",
-      "answer": "8",
+      "prompt": "Ivy has 2 packs of 3 beads, then finds 1 more. How many now?",
+      "answer": "7",
       "alts": null,
       "choices": null,
       "kind": "groups",
@@ -15053,8 +15114,8 @@
       "needsInteract": false
     },
     {
-      "prompt": "Kai has 3 packs of 5 buttons and gives away 8. How many left?",
-      "answer": "7",
+      "prompt": "Kai has 3 packs of 5 buttons and gives away 13. How many left?",
+      "answer": "2",
       "alts": null,
       "choices": null,
       "kind": "groups",
@@ -15062,17 +15123,17 @@
       "needsInteract": false
     },
     {
-      "prompt": "Lila has 5 packs of 5 crayons and gives away 3. How many left?",
+      "prompt": "Lila has 5 packs of 5 crayons and gives away 9. How many left?",
+      "answer": "16",
+      "alts": null,
+      "choices": null,
+      "kind": "groups",
+      "input": "keypad",
+      "needsInteract": false
+    },
+    {
+      "prompt": "Wes has 4 packs of 5 marbles, then finds 2 more. How many now?",
       "answer": "22",
-      "alts": null,
-      "choices": null,
-      "kind": "groups",
-      "input": "keypad",
-      "needsInteract": false
-    },
-    {
-      "prompt": "Wes has 4 packs of 5 marbles, then finds 1 more. How many now?",
-      "answer": "21",
       "alts": null,
       "choices": null,
       "kind": "groups",
@@ -15089,8 +15150,8 @@
       "needsInteract": false
     },
     {
-      "prompt": "Cole has 5 packs of 4 seeds, then finds 2 more. How many now?",
-      "answer": "22",
+      "prompt": "Cole has 5 packs of 4 seeds, then finds 4 more. How many now?",
+      "answer": "24",
       "alts": null,
       "choices": null,
       "kind": "groups",
@@ -15107,8 +15168,8 @@
       "needsInteract": false
     },
     {
-      "prompt": "Ben has 4 packs of 4 stamps and gives away 5. How many left?",
-      "answer": "11",
+      "prompt": "Ben has 4 packs of 4 stamps and gives away 9. How many left?",
+      "answer": "7",
       "alts": null,
       "choices": null,
       "kind": "groups",
@@ -15116,8 +15177,8 @@
       "needsInteract": false
     },
     {
-      "prompt": "Zoe has 4 packs of 3 crayons, then finds 4 more. How many now?",
-      "answer": "16",
+      "prompt": "Zoe has 4 packs of 3 crayons, then finds 6 more. How many now?",
+      "answer": "18",
       "alts": null,
       "choices": null,
       "kind": "groups",
@@ -15134,8 +15195,8 @@
       "needsInteract": false
     },
     {
-      "prompt": "Mila has 4 packs of 4 stars, then finds 7 more. How many now?",
-      "answer": "23",
+      "prompt": "Mila has 4 packs of 4 stars, then finds 13 more. How many now?",
+      "answer": "29",
       "alts": null,
       "choices": null,
       "kind": "groups",
@@ -15143,8 +15204,8 @@
       "needsInteract": false
     },
     {
-      "prompt": "Cole has 3 packs of 2 marbles, then finds 6 more. How many now?",
-      "answer": "12",
+      "prompt": "Cole has 3 packs of 2 marbles, then finds 4 more. How many now?",
+      "answer": "10",
       "alts": null,
       "choices": null,
       "kind": "groups",
@@ -15152,8 +15213,8 @@
       "needsInteract": false
     },
     {
-      "prompt": "Hugo has 5 packs of 5 ribbons and gives away 7. How many left?",
-      "answer": "18",
+      "prompt": "Hugo has 5 packs of 5 ribbons and gives away 19. How many left?",
+      "answer": "6",
       "alts": null,
       "choices": null,
       "kind": "groups",
@@ -15161,8 +15222,8 @@
       "needsInteract": false
     },
     {
-      "prompt": "Ava has 2 packs of 2 stars, then finds 5 more. How many now?",
-      "answer": "9",
+      "prompt": "Ava has 2 packs of 2 stars, then finds 2 more. How many now?",
+      "answer": "6",
       "alts": null,
       "choices": null,
       "kind": "groups",
@@ -15170,7 +15231,16 @@
       "needsInteract": false
     },
     {
-      "prompt": "Sam has 5 packs of 5 cards, then finds 1 more. How many now?",
+      "prompt": "Sam has 5 packs of 5 cards, then finds 3 more. How many now?",
+      "answer": "28",
+      "alts": null,
+      "choices": null,
+      "kind": "groups",
+      "input": "keypad",
+      "needsInteract": false
+    },
+    {
+      "prompt": "Ben has 5 packs of 3 beads, then finds 11 more. How many now?",
       "answer": "26",
       "alts": null,
       "choices": null,
@@ -15179,17 +15249,8 @@
       "needsInteract": false
     },
     {
-      "prompt": "Ben has 5 packs of 3 beads, then finds 6 more. How many now?",
-      "answer": "21",
-      "alts": null,
-      "choices": null,
-      "kind": "groups",
-      "input": "keypad",
-      "needsInteract": false
-    },
-    {
-      "prompt": "Mila has 4 packs of 3 ribbons and gives away 1. How many left?",
-      "answer": "11",
+      "prompt": "Mila has 4 packs of 3 ribbons and gives away 2. How many left?",
+      "answer": "10",
       "alts": null,
       "choices": null,
       "kind": "groups",
@@ -15599,7 +15660,9 @@
       "prompt": "How long? (cm)",
       "answer": "5.5",
       "alts": [
-        "5.5 cm"
+        "5.5 cm",
+        "5 1/2",
+        "5 1/2 cm"
       ],
       "choices": null,
       "kind": "measure",
@@ -15632,7 +15695,9 @@
       "prompt": "How long? (cm)",
       "answer": "7.5",
       "alts": [
-        "7.5 cm"
+        "7.5 cm",
+        "7 1/2",
+        "7 1/2 cm"
       ],
       "choices": null,
       "kind": "measure",
@@ -15643,7 +15708,9 @@
       "prompt": "How long? (cm)",
       "answer": "8.5",
       "alts": [
-        "8.5 cm"
+        "8.5 cm",
+        "8 1/2",
+        "8 1/2 cm"
       ],
       "choices": null,
       "kind": "measure",
@@ -15676,7 +15743,9 @@
       "prompt": "How long? (in)",
       "answer": "5.5",
       "alts": [
-        "5.5 in"
+        "5.5 in",
+        "5 1/2",
+        "5 1/2 in"
       ],
       "choices": null,
       "kind": "measure",
@@ -15753,7 +15822,9 @@
       "prompt": "How long? (in)",
       "answer": "3.5",
       "alts": [
-        "3.5 in"
+        "3.5 in",
+        "3 1/2",
+        "3 1/2 in"
       ],
       "choices": null,
       "kind": "measure",

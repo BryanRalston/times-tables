@@ -46,6 +46,11 @@ function qid(rng: Rng): string {
 }
 
 const DENS = [2, 3, 4, 5, 6, 8, 10] as const;
+
+/** 1/4 and 3/4 sit halfway between two benchmarks — Grade 3 can't tell which is "closer." */
+function benchmarkTied(num: number, den: number): boolean {
+  return 4 * num === den || 4 * num === 3 * den;
+}
 const PLACES = ["ones", "tens", "hundreds", "thousands", "ten thousands", "hundred thousands"] as const;
 const SHAPE_NAMES: Record<number, string> = {
   3: "triangle",
@@ -254,6 +259,7 @@ function buildQ(rng: Rng): Question {
     prompt: t().buildHundreds(target),
     hint: t().buildPlacesHint,
     answer: String(hundreds),
+    alts: [String(hundreds * 100)],
     data: { target },
   });
 }
@@ -539,7 +545,8 @@ function fractionQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     });
   }
   if (mode === "benchmark") {
-    const num = rng.int(1, den);
+    const pool = Array.from({ length: den }, (_, i) => i + 1).filter((n) => !benchmarkTied(n, den));
+    const num = rng.pick(pool.length ? pool : [1]);
     const v = num / den;
     const d0 = Math.abs(v - 0);
     const dHalf = Math.abs(v - 0.5);
@@ -805,10 +812,8 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   const labels = pack.map((p) => p.label);
   let key: number;
   if (params.key != null) key = Number(params.key);
-  else if (params.collect) {
-    rng.pick([1, 2]);
-    key = 1;
-  } else key = rng.pick([1, 2]);
+  else if (params.collect) key = 1;
+  else key = rng.pick([1, 2]);
   const kind = (params.kind as "picto" | "bar") ?? "picto";
   if (params.collect) {
     const ask = rng.pick(["value", "greatest", "least"] as const);
@@ -828,7 +833,7 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     for (const p of trayPack) counts[p.label] = (counts[p.label] ?? 0) + 1;
     const focus = labels.filter((l) => (counts[l] ?? 0) >= 2)[0] ?? pack[0]!.label;
     const trayFixed = trayPack.map((p, i) => ({ id: `t-${i}`, label: p.label, symbol: p.id }));
-    let readPrompt = t().graphHowMany(focus);
+    let     readPrompt = key > 1 ? `${t().graphKey(key)} ${t().graphHowMany(focus)}` : t().graphHowMany(focus);
     let answer = String((counts[focus] ?? 0) * key);
     let graphAlts: string[] | undefined;
     let input: Question["input"] = "keypad";
@@ -901,7 +906,7 @@ function graphQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     graphAlts = winners.slice(1).map((w) => w.label);
   } else if (ask === "value") {
     focus = rng.pick(rows).label;
-    prompt = t().graphHowMany(focus);
+    prompt = key > 1 ? `${t().graphKey(key)} ${t().graphHowMany(focus)}` : t().graphHowMany(focus);
     answer = String(byLabel[focus]);
   } else if (ask === "more") {
     const ranked = [...rows].sort((x, y) => y.value - x.value);
@@ -1017,11 +1022,12 @@ function measureQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const unit = metric ? "cm" : "in";
     const max = metric ? 10 : 8;
     const value = rng.int(1, max * 2) / 2;
+    const halfWord = Number.isInteger(value) ? [] : [`${Math.floor(value)} 1/2`, `${Math.floor(value)} 1/2 ${unit}`];
     return keypadQ(rng, {
       kind: "measure",
       prompt: t().howLong(unit),
       answer: String(value),
-      alts: [`${value} ${unit}`],
+      alts: [`${value} ${unit}`, ...halfWord],
       data: { attribute: "length", system: metric ? "metric" : "us", unit, value, max, mode: "read" },
     });
   }
@@ -1229,10 +1235,10 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   if (mode === "two" || mode === "mixed") {
     const groups = rng.int(2, 5);
     const size = rng.pick([2, 3, 4, 5]);
-    const extra = rng.int(1, 8);
-    const add = rng.next() < 0.5;
     const product = groups * size;
-    const answer = add ? product + extra : Math.max(product - extra, 0);
+    const extra = rng.int(1, Math.max(1, product - 1));
+    const add = rng.next() < 0.5;
+    const answer = add ? product + extra : product - extra;
     return keypadQ(rng, {
       kind: "groups",
       prompt: add

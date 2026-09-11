@@ -187,7 +187,7 @@ describe("answers", () => {
     expect(qCopy("pt-BR").changeHint).not.toMatch(/n é/i);
   });
 
-  it("puts the decimal key only on money count change and make", () => {
+  it("puts the decimal key on money amounts and half-unit length reads", () => {
     expect(keypadAllowsDot({ kind: "tenframe", data: {} })).toBe(false);
     expect(keypadAllowsDot({ kind: "fluency", data: {} })).toBe(false);
     expect(keypadAllowsDot({ kind: "clock", data: { mode: "elapsed" } })).toBe(false);
@@ -196,6 +196,9 @@ describe("answers", () => {
     expect(keypadAllowsDot({ kind: "money", data: { mode: "change" } })).toBe(true);
     expect(keypadAllowsDot({ kind: "money", data: { mode: "make" } })).toBe(true);
     expect(keypadAllowsDot({ kind: "money", data: { mode: "compare" } })).toBe(false);
+    expect(keypadAllowsDot({ kind: "measure", data: { mode: "read", attribute: "length" } })).toBe(true);
+    expect(keypadAllowsDot({ kind: "measure", data: { mode: "read", attribute: "mass" } })).toBe(false);
+    expect(keypadAllowsDot({ kind: "measure", data: { mode: "unit", attribute: "length" } })).toBe(false);
   });
 });
 
