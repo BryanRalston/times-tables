@@ -653,6 +653,8 @@ describe("boards", () => {
     expect(html).toContain("4 groups of 0. Nothing in each group.");
     expect((html.match(/data-empty-group/g) ?? []).length).toBe(4);
     expect((html.match(/data-equal-group/g) ?? []).length).toBe(4);
+    expect((html.match(/sr-only">empty/g) ?? []).length).toBe(4);
+    expect(html).not.toMatch(/data-empty-group[^>]*>[\s\S]*?text-xl text-faint">0/);
     expect(html).not.toContain("data-zero-groups");
   });
 

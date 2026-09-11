@@ -478,12 +478,12 @@ function TallyGroups({
             onClick={() => toggle(g)}
             className={cn(
               "flex flex-wrap items-center justify-center gap-1 rounded-[12px] border bg-bg-warm p-1.5",
-              size === 0 && "min-h-12 min-w-12 border-dashed border-faint",
+              size === 0 && "min-h-14 min-w-14 border-dashed border-faint",
               marked[g] ? "border-teal bg-teal-soft ring-2 ring-teal/40" : size === 0 ? "border-faint" : "border-line",
             )}
           >
             {size === 0 ? (
-              <span className="font-display text-xl text-faint">0</span>
+              <span className="sr-only">empty</span>
             ) : (
               Array.from({ length: size }, (_, i) => (
                 <span
