@@ -6,7 +6,7 @@ import { UNITS, suggestedUnitId } from "@/lib/curriculum";
 import { navigate } from "@/lib/nav";
 import { lessonsHopFrom, lessonsHopTo, pathNowUnitId } from "@/lib/path";
 import { useProgress } from "@/lib/progress";
-import { canStartDiceTurn, hopCreditsOf } from "@/lib/radial-web";
+import { activePathStepsLeft, canStartDiceTurn, hopCreditsOf } from "@/lib/radial-web";
 
 export function LessonsPage() {
   useProgress(
@@ -22,7 +22,7 @@ export function LessonsPage() {
   const standFrom = lessonsHopFrom(st.pathHopperAt);
   const standTo = lessonsHopTo(st.pathHopperAt);
   const rolls = hopCreditsOf(st.activities, st.pathHopSpent, st.sessions);
-  const steps = st.pathStepsLeft;
+  const steps = activePathStepsLeft(st.pathHopSpent, st.pathStepsLeft);
   const inviting = canStartDiceTurn(rolls, steps);
   const picking = steps > 0;
   const pathRef = useRef<CandyPathHandle>(null);

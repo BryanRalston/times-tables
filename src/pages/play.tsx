@@ -16,7 +16,7 @@ import { cardHeading, interactGatesSubmit, leftoverHoldMs, leftoverPanelOpen, le
 import { aliasActivityId, navigate } from "@/lib/nav";
 import { holdMsFor, REVEAL_AFTER_MISSES, WRONG_REVEAL_MS, WRONG_RETRY_MS, type FactStat } from "@/lib/practice";
 import { useProgress } from "@/lib/progress";
-import { dailyWalkActivityId, hopCreditsOf } from "@/lib/radial-web";
+import { activePathStepsLeft, dailyWalkActivityId, hopCreditsOf } from "@/lib/radial-web";
 import { makeActivityRound, makeWelcomeRound } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
 import { canAffordAnything, coinsForResult } from "@/lib/coins";
@@ -395,7 +395,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     const st = useProgress.getState();
     const shop = canAffordAnything(st.coins, st.squishees);
     const rollsNow = hopCreditsOf(st.activities, st.pathHopSpent, st.sessions);
-    const stepsNow = st.pathStepsLeft;
+    const stepsNow = activePathStepsLeft(st.pathHopSpent, st.pathStepsLeft);
     const toLessons = kind === "activity" || rollsNow > 0 || stepsNow > 0;
     return (
       <AppScene scene="hills" tabs={<AppTabs active="home" />}>

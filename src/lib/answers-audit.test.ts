@@ -635,8 +635,14 @@ function assertKind(activityId: string, q: Question) {
     }
     case "perimeter": {
       const d = q.data as PerimeterData;
-      if (d.hideIndex == null) expect(Number(q.answer)).toBe(d.sides.reduce((a, b) => a + b, 0));
-      else expect(Number(q.answer)).toBe(d.sides[d.hideIndex]);
+      const peri = d.sides.reduce((a, b) => a + b, 0);
+      if (d.hideIndex == null) expect(Number(q.answer)).toBe(peri);
+      else {
+        expect(Number(q.answer)).toBe(d.sides[d.hideIndex]);
+        const shown = peri - d.sides[d.hideIndex]!;
+        expect(q.prompt).toContain(String(peri));
+        expect(q.prompt).toContain(String(shown));
+      }
       break;
     }
     case "graph": {

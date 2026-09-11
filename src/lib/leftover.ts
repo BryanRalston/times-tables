@@ -11,11 +11,14 @@ export function leftoverWhyMoveMs(): number {
   return 400;
 }
 
-/** True why-moves may gate Check. Group / fluency tallies never do. */
+/**
+ * Only leftover take-out and graph-collect why-moves may gate Check.
+ * Numeric boards (perimeter, area, money, fraction leftover, …) stay usable.
+ * Group / fluency tallies never gate.
+ */
 export function interactGatesSubmit(kind: string, needsInteract?: boolean): boolean {
   if (!needsInteract) return false;
-  if (kind === "groups" || kind === "fluency") return false;
-  return true;
+  return kind === "tenframe" || kind === "graph";
 }
 
 export function leftoverPanelOpen(args: {

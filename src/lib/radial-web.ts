@@ -334,6 +334,14 @@ export function canStartDiceTurn(rolls: number, stepsLeft: number): boolean {
   return rolls > 0 && clampPathStepsLeft(stepsLeft) <= 0;
 }
 
+/** Steps only exist after a roll is spent. Spent 0 means a leftover "N left" is stale. */
+export function activePathStepsLeft(pathHopSpent: unknown, pathStepsLeft: unknown): number {
+  const spent =
+    typeof pathHopSpent === "number" && Number.isFinite(pathHopSpent) ? Math.max(0, Math.round(pathHopSpent)) : 0;
+  if (spent <= 0) return 0;
+  return clampPathStepsLeft(pathStepsLeft);
+}
+
 /** Guest-local calendar day. Same-day Start replay must reuse this key. */
 export function dailyWalkActivityId(date: string): string {
   return `daily:${date}`;
@@ -435,4 +443,38 @@ export function migratePathStepsLeft(args: { pathStepsLeft: unknown; saveVersion
   const version = typeof args.saveVersion === "number" && Number.isFinite(args.saveVersion) ? args.saveVersion : 0;
   if (version < 13) return 0;
   return clampPathStepsLeft(args.pathStepsLeft);
+}
+
+function grade3DailyWalkKeyCount(activities: Record<string, ActivitySave>): number {
+  let n = 0;
+  for (const [id, save] of Object.entries(activities)) {
+    if (save.plays && isGrade3DailyWalkId(id)) n += 1;
+  }
+  return n;
+}
+
+/**
+ * #66 collapsed many `daily:${unit}` keys into one calendar-day credit.
+ * A Guest who already rolled a farmed extra turn can be left with spent ≥ 1
+ * and leftover steps, so Lessons shows "N left" instead of the one real roll.
+ * Refund those extra spends once (pre-v14) and never keep steps with no turn.
+ */
+export function migrateDiceTurnState(args: {
+  activities: Record<string, ActivitySave>;
+  pathHopSpent: number;
+  pathStepsLeft: number;
+  saveVersion: unknown;
+}): { pathHopSpent: number; pathStepsLeft: number } {
+  const version = typeof args.saveVersion === "number" && Number.isFinite(args.saveVersion) ? args.saveVersion : 0;
+  let spent = Math.max(0, Math.round(args.pathHopSpent));
+  let steps = clampPathStepsLeft(args.pathStepsLeft);
+  if (version < 14) {
+    const extra = Math.max(0, grade3DailyWalkKeyCount(args.activities) - 1);
+    if (extra > 0) {
+      spent = Math.max(0, spent - extra);
+      steps = 0;
+    }
+  }
+  if (spent <= 0) steps = 0;
+  return { pathHopSpent: spent, pathStepsLeft: steps };
 }

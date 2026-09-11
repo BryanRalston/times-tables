@@ -67,6 +67,22 @@ describe("leftover why-move gates", () => {
     }
   });
 
+  it("does not invent keypad gates on numeric boards that set needsInteract", () => {
+    for (const kind of ["perimeter", "area", "money", "fraction", "compute"] as const) {
+      const waiting = { kind, needsInteract: true, interacted: false, status: "idle" as const };
+      expect(interactGatesSubmit(kind, true)).toBe(false);
+      expect(leftoverPanelOpen(waiting)).toBe(true);
+      expect(leftoverSkipOpen(waiting)).toBe(true);
+    }
+    const missing = makeQuestion(activityById("u8-missing")!.activity, rngFromSeed("peri:gate"));
+    expect(missing.kind).toBe("perimeter");
+    expect(missing.needsInteract).toBe(true);
+    expect(interactGatesSubmit(missing.kind, missing.needsInteract)).toBe(false);
+    expect(leftoverPanelOpen({ kind: missing.kind, needsInteract: missing.needsInteract, interacted: false, status: "idle" })).toBe(
+      true,
+    );
+  });
+
   it("hides graph collect ChoiceList until the tray is sorted", () => {
     const waiting = { kind: "graph", needsInteract: true, interacted: false, status: "idle" as const };
     expect(leftoverPanelOpen(waiting)).toBe(false);

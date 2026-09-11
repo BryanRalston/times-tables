@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { activityById } from "@/lib/curriculum";
 import { makeQuestion, welcomeFirst } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
+import { interactGatesSubmit } from "@/lib/leftover";
 import { AnswerPanel } from "./answer-panel";
 import { AnswerReadout, ClockKeys, CompareKeys, Keypad, applyKeypadKey } from "./keypad";
 
@@ -150,5 +151,24 @@ describe("answer panel keypad", () => {
     );
     expect(emptyBill).toContain("?");
     expect(emptyBill).not.toContain("$?");
+  });
+
+  it("missing-side perimeter digits stay enabled before any board tap", () => {
+    const q = makeQuestion(activityById("u8-missing")!.activity, rngFromSeed("peri:keys"));
+    expect(q.needsInteract).toBe(true);
+    const interacted = false;
+    const html = renderToStaticMarkup(
+      <AnswerPanel
+        question={q}
+        value=""
+        setValue={() => undefined}
+        onCheck={() => undefined}
+        disabled={Boolean(interactGatesSubmit(q.kind, q.needsInteract) && !interacted)}
+      />,
+    );
+    expect(html).toContain("data-keypad");
+    expect(html).toContain("Your answer");
+    expect(html).toMatch(/aria-label="1"/);
+    expect(html).not.toMatch(/aria-label="1"[^>]*disabled/);
   });
 });
