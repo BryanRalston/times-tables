@@ -917,6 +917,14 @@ details > summary::-webkit-details-marker {
   -webkit-overflow-scrolling: touch;
   padding: 0.15rem 0.45rem 0.2rem;
 }
+/* Lessons phone column: the radial card eats the leftover pink, chips
+   sit on the dock, island zoom stays portal-safe. */
+.candy-scroll[data-lessons-path] {
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  padding: 0.1rem 0.35rem 0;
+}
 .candy-map {
   position: relative;
   overflow: hidden;
@@ -929,6 +937,13 @@ details > summary::-webkit-details-marker {
 }
 .candy-map[data-radial-web="1"] {
   width: 100%;
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: 0;
+  background: #fff;
+  container-type: inline-size;
+  container-name: radial-card;
 }
 .candy-world {
   position: relative;
@@ -937,9 +952,16 @@ details > summary::-webkit-details-marker {
   overflow: hidden;
 }
 /* Taller card on the phone shell: crop white letterbox, keep the locked
-   16:9 camera. Art + overlay share .candy-world-stage so pad % stay on-art. */
+   16:9 camera. Art + overlay share .candy-world-stage so pad % stay on-art.
+   Height may shrink on short phones; it never grows past 6/7 or E/W
+   portal arches shear off the card. Extra plate is studio white. */
 .candy-map[data-radial-web="1"] .candy-world {
-  aspect-ratio: 10 / 9;
+  aspect-ratio: 6 / 7;
+  width: 100%;
+  height: auto;
+  max-height: min(100%, calc(100cqi * 7 / 6));
+  align-self: start;
+  justify-self: stretch;
 }
 .candy-world-stage {
   position: absolute;

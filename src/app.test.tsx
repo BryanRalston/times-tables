@@ -78,9 +78,11 @@ function expectHomeShell(html: string) {
 }
 
 function expectLessonsPath(html: string) {
-  expect(html).toContain("data-lessons-path");
-  expect(html).toContain("data-grade-path");
-  expect(html).toContain("data-radial-web");
+    expect(html).toContain("data-lessons-path");
+    expect(html).toContain("data-lessons-fill");
+    expect(html).toContain("data-grade-path");
+    expect(html).toContain("data-radial-web");
+    expect(html).toContain("data-radial-fill");
   expect(html).toContain("Grade 3 Path");
   expect(html).toContain("candy-zones/radial-web-locked.jpg");
   expect(html).toContain('data-path-hopper="peach"');
@@ -399,6 +401,7 @@ describe("first-visit Home door", () => {
     expect(chrome).not.toMatch(/\bstreak\b/);
     const lessons = readFileSync(join(HERE, "pages/lessons.tsx"), "utf8");
     expect(lessons).toContain("data-lessons-path");
+    expect(lessons).toContain("data-lessons-fill");
     expect(lessons).toContain("CandyPath");
     expect(lessons).toContain("ui.start");
     expect(lessons).not.toContain("lessonsIntro");
@@ -416,7 +419,11 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-world-stage");
     expect(css).toContain(".candy-world-art");
     expect(css).toContain(".candy-overlay");
-    expect(css).toContain("aspect-ratio: 10 / 9");
+    expect(css).toContain("aspect-ratio: 6 / 7");
+    expect(css).toContain(".candy-scroll[data-lessons-path]");
+    expect(css).toContain("100cqi * 7 / 6");
+    expect(css).toContain("grid-template-rows: minmax(0, 1fr) auto");
+    expect(css).toContain("container-name: radial-card");
     expect(css).toContain('.candy-overlay[data-hop-pick="1"]');
     expect(css).toContain(".candy-prop-land");
     expect(css).toContain(".candy-prop-water");
