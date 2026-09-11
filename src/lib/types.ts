@@ -108,13 +108,15 @@ export interface OrderData {
 }
 
 export interface ChoiceData {
-  visual?: "shape" | "none" | "combine" | "subdivide";
+  visual?: "shape" | "none" | "combine" | "subdivide" | "groups";
   shape?: string;
   rotation?: number;
   isPolygon?: boolean;
   sides?: number;
   parts?: string[];
   result?: string;
+  groups?: number;
+  size?: number;
 }
 
 export interface FractionData {

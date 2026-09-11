@@ -348,7 +348,7 @@ function familyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     input: "choice",
     choices: ensureChoices(rng, ask, wrong),
     factKey: `${Math.min(a, b)}×${Math.max(a, b)}`,
-    data: { visual: "none" },
+    data: { visual: "groups", groups: a, size: b },
   });
 }
 

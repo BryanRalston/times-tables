@@ -451,7 +451,7 @@ function TallyGroups({
 
   return (
     <Frame shake={shake} status={status}>
-      <p className="mb-3 text-center font-display text-2xl sm:text-3xl">{prompt}</p>
+      {prompt ? <p className="mb-3 text-center font-display text-2xl sm:text-3xl">{prompt}</p> : null}
       <div className="flex flex-wrap justify-center gap-2">
         {Array.from({ length: groups }, (_, g) => (
           <button
@@ -802,45 +802,61 @@ function ShapePoly({
 
 function ChoiceVisual({ question, status, shake }: BoardProps) {
   const data = question.data as ChoiceData;
-  if (data.visual === "none") {
-    return (
-      <Frame shake={shake} status={status}>
-        <p className="text-center text-sm text-muted">{question.prompt}</p>
-      </Frame>
-    );
+  const visual = data.visual ?? "shape";
+  switch (visual) {
+    case "none":
+      return (
+        <Frame shake={shake} status={status}>
+          <p className="text-center text-sm text-muted">{question.prompt}</p>
+        </Frame>
+      );
+    case "groups":
+      return (
+        <TallyGroups
+          groups={Math.max(0, data.groups ?? 0)}
+          size={Math.max(0, data.size ?? 0)}
+          prompt=""
+          status={status}
+          shake={shake}
+        />
+      );
+    case "combine": {
+      const parts = data.parts?.length ? data.parts : ["triangle", "triangle"];
+      return (
+        <Frame shake={shake} status={status}>
+          <div className="flex items-center justify-center gap-2">
+            <ShapePoly shape={parts[0]} sizeClass="size-16 sm:size-20" />
+            <span className="text-xl text-muted">+</span>
+            <ShapePoly shape={parts[1] ?? parts[0]} sizeClass="size-16 sm:size-20" />
+            <span className="text-xl text-muted">→</span>
+            <span className="grid size-16 place-items-center rounded-[16px] border border-dashed border-line font-display text-2xl text-muted sm:size-20">
+              ?
+            </span>
+          </div>
+        </Frame>
+      );
+    }
+    case "subdivide":
+      return (
+        <Frame shake={shake} status={status}>
+          <div className="flex justify-center">
+            <ShapePoly shape={data.shape} sides={data.sides} split sizeClass="mx-auto size-40" />
+          </div>
+        </Frame>
+      );
+    case "shape":
+      return (
+        <Frame shake={shake} status={status}>
+          <div className="flex justify-center">
+            <ShapePoly shape={data.shape} sides={data.sides} rotation={data.rotation ?? 0} />
+          </div>
+        </Frame>
+      );
+    default: {
+      const _never: never = visual;
+      return _never;
+    }
   }
-  if (data.visual === "combine") {
-    const parts = data.parts?.length ? data.parts : ["triangle", "triangle"];
-    return (
-      <Frame shake={shake} status={status}>
-        <div className="flex items-center justify-center gap-2">
-          <ShapePoly shape={parts[0]} sizeClass="size-16 sm:size-20" />
-          <span className="text-xl text-muted">+</span>
-          <ShapePoly shape={parts[1] ?? parts[0]} sizeClass="size-16 sm:size-20" />
-          <span className="text-xl text-muted">→</span>
-          <span className="grid size-16 place-items-center rounded-[16px] border border-dashed border-line font-display text-2xl text-muted sm:size-20">
-            ?
-          </span>
-        </div>
-      </Frame>
-    );
-  }
-  if (data.visual === "subdivide") {
-    return (
-      <Frame shake={shake} status={status}>
-        <div className="flex justify-center">
-          <ShapePoly shape={data.shape} sides={data.sides} split sizeClass="mx-auto size-40" />
-        </div>
-      </Frame>
-    );
-  }
-  return (
-    <Frame shake={shake} status={status}>
-      <div className="flex justify-center">
-        <ShapePoly shape={data.shape} sides={data.sides} rotation={data.rotation ?? 0} />
-      </div>
-    </Frame>
-  );
 }
 
 function FractionBar({ question, onInteract, status, shake }: BoardProps) {

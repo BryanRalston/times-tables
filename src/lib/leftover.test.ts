@@ -59,7 +59,7 @@ describe("leftover why-move gates", () => {
   it("never gates Check or Skip on group or fluency tallies", () => {
     expect(interactGatesSubmit("tenframe", true)).toBe(true);
     expect(interactGatesSubmit("graph", true)).toBe(true);
-    for (const kind of ["groups", "fluency"] as const) {
+    for (const kind of ["groups", "fluency", "choice"] as const) {
       const waiting = { kind, needsInteract: true, interacted: false, status: "idle" as const };
       expect(interactGatesSubmit(kind, true)).toBe(false);
       expect(leftoverPanelOpen(waiting)).toBe(true);

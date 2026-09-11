@@ -418,6 +418,26 @@ describe("boards", () => {
     expect(html).toContain("Tap a group to isolate it, then name n.");
   });
 
+  it("related-facts boards show equal groups that match the prompt, not a second question", () => {
+    for (const id of ["u3-family", "u9-family", "u12-family"] as const) {
+      for (let i = 0; i < 8; i++) {
+        const q = makeQuestion(activityById(id)!.activity, rngFromSeed(`fam:board:${id}:${i}`));
+        const d = q.data as ChoiceData;
+        expect(d.visual).toBe("groups");
+        expect(d.groups).toBeGreaterThanOrEqual(2);
+        expect(d.size).toBeGreaterThanOrEqual(2);
+        expect(q.needsInteract).toBeFalsy();
+        const html = renderToStaticMarkup(<Board {...stub(q)} />);
+        expect((html.match(/data-equal-group/g) ?? []).length).toBe(d.groups);
+        expect((html.match(/rounded-full bg-teal/g) ?? []).length).toBe(d.groups! * d.size!);
+        expect(html).not.toContain(q.prompt);
+        expect(html).not.toMatch(/\d+\s*[×÷]/);
+        expect(html).not.toContain(q.answer);
+        expect(html).not.toContain("Tap a group");
+      }
+    }
+  });
+
   it("missing-factor group boards also keep Check ungated", () => {
     const q = makeQuestion(activityById("u3-factor")!.activity, rngFromSeed("factor:groups"));
     const d = q.data as GroupsData;
