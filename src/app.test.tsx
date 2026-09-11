@@ -268,7 +268,7 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-hop-pick="1"');
     expect(html).toContain("Pick a space");
     expect(html).toContain("2 left");
-    expect(html).toContain('data-pad-choice="1"');
+    expect(html).toContain('data-hop-dpad="1"');
     expect(html).toContain("Start");
     expect(html).not.toContain("Roll the die");
   });
@@ -287,7 +287,7 @@ describe("first-visit Home door", () => {
     expect(html).toContain("Test mode · free move");
     expect(html).toContain('data-hop-pick="1"');
     expect(html).toContain('data-dice-invite="0"');
-    expect(html).toContain('data-pad-choice="1"');
+    expect(html).toContain('data-hop-dpad="1"');
     expect(html).toContain("Start");
     expect(html).not.toContain("Roll the die");
     expect(html).not.toContain("data-test-mode-toggle");
@@ -462,6 +462,11 @@ describe("first-visit Home door", () => {
     expect(css).toContain("transform: translate(-50%, -52%)");
     expect(css).toContain(".candy-hopper-art");
     expect(css).toContain(".candy-hopper-shadow");
+    expect(css).toContain(".candy-dpad");
+    expect(css).toContain(".candy-dpad-btn");
+    expect(css).toContain(".candy-dpad-chevron");
+    expect(css).toContain("width: 2.5rem");
+    expect(css).not.toContain("width: 3.65rem");
     expect(css).toContain("@keyframes candy-hop");
     expect(css).toContain("@keyframes candy-prop-sway");
     expect(css).toContain("@keyframes candy-trail-peek");

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { UNITS } from "./curriculum";
 import {
+  HOP_DIR_SNAP_DEG,
   HOP_SNAP_PX,
   PHONE_MAP_BOARD,
   PORTAL_PAIRS,
@@ -8,7 +9,11 @@ import {
   RADIAL_MAP_FILE,
   RADIAL_PAD_COUNT,
   RADIAL_PADS,
+  RADIAL_PLAZA,
+  RADIAL_RING_PX,
   START_PAD,
+  hopDirs,
+  nearestHopDir,
   adjacentPadIds,
   areAdjacent,
   activePathStepsLeft,
@@ -45,6 +50,9 @@ describe("radial web", () => {
       expect(adjacentPadIds(pad.id).length).toBeGreaterThan(0);
     }
     expect(adjacentPadIds(START_PAD)).toHaveLength(8);
+    expect(RADIAL_PLAZA).toEqual({ x: 49.88, y: 45.15 });
+    expect(RADIAL_RING_PX).toEqual([0, 85, 150, 216, 262]);
+    expect(RADIAL_PADS[0]!.map).toEqual(RADIAL_PLAZA);
     expect(UNITS.every((u) => !u.id.startsWith("g4-"))).toBe(true);
   });
 
@@ -286,5 +294,44 @@ describe("radial hop hit testing", () => {
     const q = padClientPos(quiet.id, board);
     expect(nearestHopTarget(q.x, q.y, board, choices, neighbor)).toBeUndefined();
     expect(nearestHopTarget(p.x, p.y, board, choices, neighbor)).not.toBe(quiet.id);
+  });
+});
+
+describe("radial hop direction pad", () => {
+  it("aims plaza hops at the eight painted spokes, with cardinals only on NESW", () => {
+    const dirs = hopDirs(START_PAD);
+    expect(dirs).toHaveLength(8);
+    const bearings = dirs.map((d) => Math.round(d.bearing));
+    expect(bearings).toEqual([0, 45, 90, 135, 180, 225, 270, 315]);
+    expect(dirs.filter((d) => d.cardinal).map((d) => d.cardinal)).toEqual(["up", "right", "down", "left"]);
+    expect(dirs.filter((d) => d.cardinal == null)).toHaveLength(4);
+    const north = RADIAL_PADS.find((p) => p.ring === 1 && p.angle === 0)!;
+    expect(dirs.find((d) => d.bearing === 0)?.id).toBe(north.id);
+  });
+
+  it("places angled buttons on the actual neighbor bearing, not a 45° grid", () => {
+    const north = RADIAL_PADS.find((p) => p.ring === 1 && p.angle === 0)!;
+    const dirs = hopDirs(north.id);
+    expect(dirs.length).toBeGreaterThanOrEqual(3);
+    const inward = dirs.find((d) => d.id === START_PAD);
+    expect(inward?.cardinal).toBe("down");
+    expect(inward && Math.abs(inward.bearing - 180)).toBeLessThan(8);
+    const along = dirs.filter((d) => d.id !== START_PAD && d.cardinal == null);
+    expect(along.length).toBeGreaterThan(0);
+    for (const d of along) {
+      const snapped = [0, 45, 90, 135, 180, 225, 270, 315].some((a) => Math.abs(d.bearing - a) < 2 || Math.abs(d.bearing - a - 360) < 2);
+      expect(snapped).toBe(false);
+    }
+  });
+
+  it("picks the nearest visible direction and ignores the squishee face", () => {
+    const dirs = hopDirs(START_PAD);
+    const up = dirs.find((d) => d.cardinal === "up")!;
+    expect(nearestHopDir(100, 100, 100, 100 - 40, dirs)).toBe(up.id);
+    expect(nearestHopDir(100, 100, 100, 100, dirs)).toBeUndefined();
+    expect(nearestHopDir(100, 100, 400, 100, dirs)).toBeUndefined();
+    const right = dirs.find((d) => d.cardinal === "right")!;
+    expect(nearestHopDir(100, 100, 100 + 40, 100, dirs)).toBe(right.id);
+    expect(HOP_DIR_SNAP_DEG).toBe(32);
   });
 });
