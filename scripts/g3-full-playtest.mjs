@@ -213,7 +213,7 @@ async function typeDigits(page, s) {
 async function statusOf(page) {
   return page.evaluate(() => {
     const t = document.body.innerText;
-    if (/n is |Nice walk|Find the pairs|Who hid\?|Poke the /i.test(t) && /Try again/i.test(t) === false) {
+    if (/n is |Nice walk|Find the pairs|Who hid\?|Poke the |Who's peeking|Tap two that match|Tap the glow/i.test(t) && /Try again/i.test(t) === false) {
       /* continue */
     }
     const wrong = document.querySelector(".shake, .border-bad");
@@ -485,7 +485,7 @@ async function miniGameDesk(page) {
   await waitApp(page);
   for (let i = 0; i < 5; i++) {
     const t = await page.locator("#app").innerText();
-    if (/Find the pairs|Who hid\?|Poke the /i.test(t)) break;
+    if (/Find the pairs|Who hid\?|Poke the |Who's peeking|Tap two that match|Tap the glow/i.test(t)) break;
     const skip = page.getByRole("button", { name: /^Skip$/i });
     if (await skip.count()) {
       await skip.first().click();
@@ -498,7 +498,7 @@ async function miniGameDesk(page) {
     [...document.querySelectorAll("#app img")].filter((img) => (img.getAttribute("src") || "").includes("squishees/") && img.naturalWidth > 0).length,
   );
   const qmarks = await page.getByText("?", { exact: true }).count();
-  const ok = /Find the pairs|Who hid\?|Poke the |Nice walk|Skip/i.test(t);
+  const ok = /Find the pairs|Who hid\?|Poke the |Who's peeking|Tap two that match|Tap the glow|Nice walk|Skip/i.test(t);
   const videos = await page.locator("video").count();
   return { ok, png, qmarks, videos, snip: t.slice(0, 180).replace(/\s+/g, " ") };
 }

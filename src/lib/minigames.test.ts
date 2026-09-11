@@ -1,12 +1,29 @@
 import { describe, expect, it } from "vitest";
-import { applyWhoHidPick, dealMatch, dealPoke, dealWhoHid, pickMiniKind } from "./minigames";
+import {
+  applyWhoHidPick,
+  dealHop,
+  dealMatch,
+  dealMini,
+  dealPeek,
+  dealPoke,
+  dealTwin,
+  dealWhoHid,
+  MINI_KINDS,
+  parseMiniKind,
+  pickMiniKind,
+  whoHidShowsFace,
+} from "./minigames";
 import { rngFromSeed } from "./rng";
 
 describe("minigame picker", () => {
-  it("cycles all 3 kinds across seeds", () => {
+  it("cycles every end-walk kind across seeds and honors a force", () => {
     const kinds = new Set<string>();
-    for (let i = 0; i < 60; i++) kinds.add(pickMiniKind(`minigame:kid:u1-tally:${i}`));
-    expect(kinds).toEqual(new Set(["match", "who-hid", "poke"]));
+    for (let i = 0; i < 120; i++) kinds.add(pickMiniKind(`minigame:kid:u1-tally:${i}`));
+    expect(kinds).toEqual(new Set(MINI_KINDS));
+    expect(pickMiniKind("anything", "who-hid")).toBe("who-hid");
+    expect(pickMiniKind("anything", "peek")).toBe("peek");
+    expect(parseMiniKind("nope")).toBeUndefined();
+    expect(parseMiniKind("hop")).toBe("hop");
   });
 });
 
@@ -32,6 +49,7 @@ describe("who-hid and poke-this", () => {
       expect(hid.missing).toBe("panda");
       expect(hid.shown).toHaveLength(3);
       expect(new Set(hid.shown).size).toBe(3);
+      expect(hid.choices).toEqual(hid.shown);
 
       const poke = dealPoke(["otter"], rngFromSeed(`pk:${i}`));
       expect(poke.choices).toContain(poke.target);
@@ -67,5 +85,45 @@ describe("who-hid and poke-this", () => {
     const poke = dealPoke([], rngFromSeed("empty-poke"));
     expect(poke.target).toBe("frog");
     expect(poke.choices).toContain("frog");
+  });
+
+  it("never opens unfound faces after a guess", () => {
+    expect(whoHidShowsFace("remember", "frog", null)).toBe(true);
+    expect(whoHidShowsFace("choose", "frog", null)).toBe(false);
+    expect(whoHidShowsFace("choose", "cat", null)).toBe(false);
+    expect(whoHidShowsFace("choose", "frog", "frog")).toBe(true);
+    expect(whoHidShowsFace("choose", "cat", "frog")).toBe(false);
+    expect(whoHidShowsFace("choose", "panda", "frog")).toBe(false);
+  });
+});
+
+describe("peek twin hop", () => {
+  it("deals one peeker, two hopper twins, and one glowing pad", () => {
+    for (let i = 0; i < 30; i++) {
+      const peek = dealPeek(["peach"], rngFromSeed(`peek:${i}`));
+      expect(peek.peeker).toBe("peach");
+      expect(peek.spots).toBe(4);
+      expect(peek.peekIndex).toBeGreaterThanOrEqual(0);
+      expect(peek.peekIndex).toBeLessThan(4);
+
+      const twin = dealTwin(["peach"], rngFromSeed(`twin:${i}`), "peach");
+      expect(twin.hopper).toBe("peach");
+      expect(twin.cards).toHaveLength(3);
+      expect(twin.cards.filter((c) => c.toy === "peach")).toHaveLength(2);
+      expect(twin.cards.filter((c) => c.toy !== "peach")).toHaveLength(1);
+
+      const hop = dealHop(["frog"], rngFromSeed(`hop:${i}`), "frog");
+      expect(hop.hopper).toBe("frog");
+      expect(hop.pads).toBe(3);
+      expect(hop.target).toBeGreaterThanOrEqual(0);
+      expect(hop.target).toBeLessThan(3);
+    }
+  });
+
+  it("dealMini stays exhaustive for every kind", () => {
+    for (const kind of MINI_KINDS) {
+      const deal = dealMini(kind, ["frog"], rngFromSeed(`deal:${kind}`), "frog");
+      expect(deal.kind).toBe(kind);
+    }
   });
 });
