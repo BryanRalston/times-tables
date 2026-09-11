@@ -79,6 +79,7 @@ describe("MiniGame", () => {
     expect(holes.length).toBe(3);
     expect(html).not.toContain("data-who-hole=\"open\"");
     expect(html).toContain("mini-hole");
+    expect(html).toContain("mini-hole-mound");
     const faces = html.match(/squishees\/[a-z0-9-]+\.png/g) ?? [];
     expect(faces).toHaveLength(0);
   });

@@ -1859,6 +1859,12 @@ details > summary::-webkit-details-marker {
 .mini-tap-bad {
   border-color: var(--color-bad);
 }
+.mini-tap [data-squash] {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+}
 .mini-face {
   display: inline-grid;
   width: 100%;
@@ -1874,6 +1880,7 @@ details > summary::-webkit-details-marker {
   place-items: end center;
   width: 100%;
   height: 100%;
+  min-height: 3.25rem;
 }
 .mini-hole-mound {
   width: 78%;

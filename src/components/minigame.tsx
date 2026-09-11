@@ -248,7 +248,7 @@ function WhoHidPlay({
                 onClick={() => pick(id)}
                 aria-label={open ? (squisheeById(id)?.name ?? id) : ui.hidingSpot(i + 1)}
               >
-                <SquashOnPoke active={wrong === id || hit === id}>
+                <SquashOnPoke active={wrong === id || hit === id} className="grid h-full w-full place-items-center">
                   {open ? <ToyFace id={id} /> : <HideHole />}
                 </SquashOnPoke>
               </button>
