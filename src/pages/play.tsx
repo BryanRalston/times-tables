@@ -387,6 +387,9 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         pokePrompt={ui.pokeThe}
         whoHidLabel={ui.whoHid}
         matchLabel={ui.findPairs}
+        peekLabel={ui.findPeek}
+        twinLabel={ui.matchTwins}
+        hopLabel={ui.quickHop}
         onDone={() => setFinishPhase("summary")}
       />
     );

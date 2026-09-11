@@ -82,7 +82,7 @@ const ACTIVITIES = [
   "u13-area",
 ];
 
-const extra = ["home", "lessons", "shelf", "grownup", "mini-match", "mini-who-hid", "mini-poke"];
+const extra = ["home", "lessons", "shelf", "grownup", "mini-match", "mini-who-hid", "mini-poke", "mini-peek", "mini-twin", "mini-hop"];
 
 const missing = [];
 for (const vp of ["phone", "desk"]) {

@@ -552,7 +552,7 @@ async function miniDesk(page) {
   for (let n = 0; n < 6; n++) {
     const t = await page.locator("#app").innerText();
     if (/Number sense|Missing addend/i.test(t)) break;
-    if (/Remember these toys|Nice walk|You earned/i.test(t)) break;
+    if (/Remember these toys|Who hid\?|Find the pairs|Poke the |Who's peeking|Tap two that match|Tap the glow|Nice walk|You earned/i.test(t)) break;
     const hook = await qa(page);
     if (hook?.checkDisabled || hook?.needsInteract) {
       await interactIfNeeded(page);
@@ -568,7 +568,7 @@ async function miniDesk(page) {
   }
   await page.waitForTimeout(400);
   const t = await page.locator("#app").innerText();
-  const dump = /Remember these toys|Nice walk|You earned/i.test(t);
+  const dump = /Remember these toys|Who hid\?|Find the pairs|Poke the |Who's peeking|Tap two that match|Tap the glow|Nice walk|You earned/i.test(t);
   const path = /Number sense/i.test(t) && /Missing addend/i.test(t) && /\b12\b/.test(t);
   const ok = path && !dump;
   return { ok, png: 0, videos: 0, emptyVid: false, dump, snip: t.slice(0, 200).replace(/\s+/g, " ") };

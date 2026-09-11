@@ -100,6 +100,10 @@ export type Ui = {
   pokeThe: (name: string) => string;
   whoHid: string;
   rememberToys: string;
+  findPeek: string;
+  matchTwins: string;
+  quickHop: string;
+  hidingSpot: (n: number) => string;
   askGrownup: string;
   enterPin: string;
   unlockGrownup: string;
@@ -276,6 +280,10 @@ export const UI: Record<Locale, Ui> = {
     pokeThe: (name) => `Poke the ${name}`,
     whoHid: "Who hid?",
     rememberToys: "Remember these toys.",
+    findPeek: "Who's peeking?",
+    matchTwins: "Tap two that match",
+    quickHop: "Tap the glow",
+    hidingSpot: (n) => `Hiding spot ${n}`,
     askGrownup: "Ask a grown-up to open this page.",
     enterPin: "Grown-up PIN",
     unlockGrownup: "Unlock",
@@ -453,6 +461,10 @@ export const UI: Record<Locale, Ui> = {
     pokeThe: (name) => `Toca el ${name}`,
     whoHid: "¿Quién se escondió?",
     rememberToys: "Recuerda estos juguetes.",
+    findPeek: "¿Quién asoma?",
+    matchTwins: "Toca dos iguales",
+    quickHop: "Toca el brillo",
+    hidingSpot: (n) => `Escondite ${n}`,
     askGrownup: "Pídele a un adulto que abra esta página.",
     enterPin: "PIN de un adulto",
     unlockGrownup: "Abrir",
@@ -630,6 +642,10 @@ export const UI: Record<Locale, Ui> = {
     pokeThe: (name) => `Toque o ${name}`,
     whoHid: "Quem se escondeu?",
     rememberToys: "Lembre destes brinquedos.",
+    findPeek: "Quem está espiando?",
+    matchTwins: "Toque dois iguais",
+    quickHop: "Toque o brilho",
+    hidingSpot: (n) => `Esconderijo ${n}`,
     askGrownup: "Peça a um adulto para abrir esta página.",
     enterPin: "PIN de um adulto",
     unlockGrownup: "Abrir",
