@@ -1,4 +1,4 @@
-import { COMMON_SQUISHEES, RARE_SQUISHEES, squisheeById } from "@/lib/squishees";
+import { COMMON_SQUISHEES, squisheeById } from "@/lib/squishees";
 
 export const COMMON_PRICE = 10;
 export const RARE_PRICE = 50;
@@ -13,7 +13,7 @@ export function squisheePrice(id: string): number {
   return squisheeById(id)?.rarity === "rare" ? RARE_PRICE : COMMON_PRICE;
 }
 
-export type BuyReason = "ok" | "missing" | "owned" | "poor";
+export type BuyReason = "ok" | "missing" | "owned" | "poor" | "find";
 
 export function applyBuy(
   coins: number,
@@ -23,11 +23,12 @@ export function applyBuy(
   const s = squisheeById(id);
   if (!s) return { ok: false, reason: "missing", coins, squishees: owned };
   if (owned.includes(id)) return { ok: false, reason: "owned", coins, squishees: owned };
+  if (s.rarity === "rare") return { ok: false, reason: "find", coins, squishees: owned };
   const price = squisheePrice(id);
   if (coins < price) return { ok: false, reason: "poor", coins, squishees: owned };
   return { ok: true, reason: "ok", coins: coins - price, squishees: [...owned, id] };
 }
 
 export function canAffordAnything(coins: number, owned: string[]): boolean {
-  return [...COMMON_SQUISHEES, ...RARE_SQUISHEES].some((s) => !owned.includes(s.id) && coins >= squisheePrice(s.id));
+  return COMMON_SQUISHEES.some((s) => !owned.includes(s.id) && coins >= squisheePrice(s.id));
 }

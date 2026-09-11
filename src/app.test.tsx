@@ -445,6 +445,9 @@ describe("first-visit Home door", () => {
     expect(shelf).toContain("data-shelf-empty");
     expect(shelf).not.toContain("grid-cols-3");
     expect(shelf).not.toContain("Squishee shop");
+    expect(shelf).toContain("MysteryPresent");
+    expect(shelf).toContain("ui.findOnMap");
+    expect(shelf).toContain("ui.rareBlurb");
     const css = readFileSync(join(HERE, "styles.css"), "utf8");
     expect(css).toContain(".app-scene");
     expect(css).toContain(".scene-hill");
@@ -496,6 +499,9 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-node-quiet");
     expect(css).toContain(".candy-node-here");
     expect(css).toContain(".candy-hopper-here");
+    expect(css).toContain(".candy-present");
+    expect(css).toContain(".mystery-present");
+    expect(css).toContain(".candy-unwrap");
     expect(css).toContain("@keyframes candy-choice-pulse");
     expect(css).toContain("@keyframes candy-portal-swirl");
     expect(css).toContain("@keyframes candy-here-pulse");

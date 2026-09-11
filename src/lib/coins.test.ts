@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { applyBuy, canAffordAnything, coinsForResult, COMMON_PRICE, MISSING_ADDEND_PRICE, RARE_PRICE, squisheePrice } from "./coins";
+import { COMMON_SQUISHEES } from "./squishees";
 import { migrateSave } from "./progress";
 import type { LearnerSlice } from "./types";
 
@@ -39,21 +40,24 @@ describe("buySquishee", () => {
     expect(r.coins).toBe(100);
   });
 
-  it("charges rare price", () => {
+  it("never sells rares for coins", () => {
     expect(squisheePrice("aurora-jelly")).toBe(RARE_PRICE);
     expect(squisheePrice("sleepy-moon")).toBe(RARE_PRICE);
     expect(squisheePrice("blush-cloud")).toBe(RARE_PRICE);
-    expect(applyBuy(49, [], "aurora-jelly").reason).toBe("poor");
-    const r = applyBuy(50, [], "aurora-jelly");
-    expect(r.ok).toBe(true);
-    expect(r.coins).toBe(0);
-    expect(r.squishees).toEqual(["aurora-jelly"]);
+    expect(applyBuy(50, [], "aurora-jelly")).toEqual({
+      ok: false,
+      reason: "find",
+      coins: 50,
+      squishees: [],
+    });
+    expect(applyBuy(100, [], "crystal-axolotl").reason).toBe("find");
   });
 
   it("knows when the shop has something they can buy", () => {
     expect(canAffordAnything(10, [])).toBe(true);
     expect(canAffordAnything(9, [])).toBe(false);
     expect(canAffordAnything(50, ["frog"])).toBe(true);
+    expect(canAffordAnything(50, COMMON_SQUISHEES.map((s) => s.id))).toBe(false);
   });
 });
 

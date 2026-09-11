@@ -5,7 +5,7 @@ import { squisheeById } from "@/lib/squishees";
 import { ShelfPage, ShopCard } from "./shelf";
 
 describe("shop prices", () => {
-  it("commons cost 10 and rares cost 50", () => {
+  it("commons cost 10; rares keep a catalog price but are not sold", () => {
     expect(squisheePrice("frog")).toBe(COMMON_PRICE);
     expect(squisheePrice("panda")).toBe(COMMON_PRICE);
     expect(squisheePrice("aurora-jelly")).toBe(RARE_PRICE);
@@ -26,6 +26,10 @@ describe("shop tiles", () => {
     expect(html).not.toContain("Squishee shop");
     expect(html).not.toMatch(/Buy\s*·/);
     expect(html).not.toContain("Spend coins on a toy");
+    expect(html).toContain("Find mystery presents");
+    expect(html).toContain("data-rare-find");
+    expect(html).not.toContain("crystal-axolotl.png");
+    expect(html).not.toContain("Crystal Axolotl");
   });
 
   it("owned avocado tile is a poke button with squash machinery", () => {
@@ -70,5 +74,20 @@ describe("shop tiles", () => {
     expect(html).not.toContain("panda-poke");
     expect(html).not.toContain('data-squash="1"');
     expect(html).not.toMatch(/[\s"]squash[\s"]/);
+  });
+
+  it("locked rares are mystery presents, not priced spoilers", () => {
+    const jelly = squisheeById("aurora-jelly")!;
+    const html = renderToStaticMarkup(<ShopCard s={jelly} got={false} coins={100} onBuy={() => {}} />);
+    expect(html).toContain("data-rare-find");
+    expect(html).toContain("data-mystery-present");
+    expect(html).toContain("???");
+    expect(html).toContain("Find on Lessons");
+    expect(html).not.toContain("Aurora Jelly");
+    expect(html).not.toContain("aurora-jelly.png");
+    expect(html).not.toContain("squishee-silhouette");
+    expect(html).not.toContain("<button");
+    expect(html).not.toContain("Rare");
+    expect(html).not.toMatch(/>\s*50\s*</);
   });
 });

@@ -1,6 +1,8 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type PointerEvent } from "react";
 import { useUi } from "@/components/chrome";
 import { MagentaImg } from "@/components/magenta-video";
+import { MysteryPresent } from "@/components/mystery-present";
+import { PokeToy } from "@/components/poke-toy";
 import { asset } from "@/lib/art";
 import {
   hopAirMsList,
@@ -43,9 +45,18 @@ import {
   rollDieFace,
   type DieFace,
 } from "@/lib/radial-web";
-import { playDice, playHop, playLand, playWarp } from "@/lib/sound";
-import { pathHopperId, squisheeSrc } from "@/lib/squishees";
+import {
+  UNWRAP_HOLD_MS,
+  UNWRAP_OPEN_MS,
+  foundPresentPads,
+  landPresent,
+  visiblePresentPads,
+} from "@/lib/presents";
+import { playDice, playHop, playLand, playStar, playWarp } from "@/lib/sound";
+import { pathHopperId, squisheeById, squisheeSrc } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
+
+type UnwrapBeat = { pad: number; id: string; phase: "open" | "reveal" };
 
 function padView(id: number) {
   return radialPad(id).map;
@@ -110,7 +121,8 @@ export const CandyPath = forwardRef<
 >(function CandyPath({ suggestedId, standFrom, standTo, hopCredits, stepsLeft, freeMove = false, railUnits, onStart, onOpenUnit }, ref) {
   const ui = useUi();
   const locale = parseLocale(useProgress((s) => s.locale));
-  const owned = useProgress((s) => s.squishees);
+  useProgress((s) => s.squishees.join("\0"));
+  const owned = useProgress.getState().squishees;
   const activities = useProgress((s) => s.activities);
   const hopsSpent = useProgress((s) => s.pathHopSpent);
   const storedSteps = useProgress((s) => s.pathStepsLeft);
@@ -118,7 +130,12 @@ export const CandyPath = forwardRef<
   const setPathHopperAt = useProgress((s) => s.setPathHopperAt);
   const startDiceTurn = useProgress((s) => s.startDiceTurn);
   const spendPathStep = useProgress((s) => s.spendPathStep);
+  const unlockSquishee = useProgress((s) => s.unlockSquishee);
   const hopperId = pathHopperId(owned);
+  const [unwrap, setUnwrap] = useState<UnwrapBeat | null>(null);
+  const boxedPads = visiblePresentPads(owned).filter((id) => unwrap?.pad !== id);
+  const foundPads = foundPresentPads(owned).filter((id) => unwrap?.pad !== id);
+  const boxed = new Set(boxedPads);
   const origin = standFrom && standFrom > 0 ? clampPad(standFrom) : START_PAD;
   const requested = standTo && standTo > 0 ? clampPad(standTo) : origin;
   const target = requested === origin || areAdjacent(origin, requested) ? requested : origin;
@@ -142,6 +159,30 @@ export const CandyPath = forwardRef<
   const choices = picking ? adjacentPadIds(dest) : [];
   const boardRef = useRef<HTMLDivElement>(null);
   const tapStart = useRef<{ x: number; y: number } | null>(null);
+
+  const maybeUnlock = (pad: number) => {
+    const id = landPresent(pad, useProgress.getState().squishees);
+    if (!id) return;
+    const r = unlockSquishee(id);
+    if (!r.ok) return;
+    playStar();
+    setUnwrap({ pad, id, phase: "open" });
+  };
+
+  useEffect(() => {
+    if (!unwrap) return;
+    if (unwrap.phase === "open") {
+      const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce) {
+        setUnwrap({ ...unwrap, phase: "reveal" });
+        return;
+      }
+      const t = window.setTimeout(() => setUnwrap((u) => (u ? { ...u, phase: "reveal" } : u)), UNWRAP_OPEN_MS);
+      return () => window.clearTimeout(t);
+    }
+    const t = window.setTimeout(() => setUnwrap(null), UNWRAP_HOLD_MS);
+    return () => window.clearTimeout(t);
+  }, [unwrap]);
 
   useEffect(() => {
     const hopper = document.querySelector<HTMLElement>("[data-path-hopper]");
@@ -173,6 +214,7 @@ export const CandyPath = forwardRef<
       setTravel(false);
       setLanding(false);
       setPose(restHopPose(padView(pad)));
+      maybeUnlock(pad);
     };
     const finishHop = (pad: number, entered: boolean) => {
       const pair = entered ? portalPartner(pad) : undefined;
@@ -269,6 +311,7 @@ export const CandyPath = forwardRef<
       setPose(restHopPose(padView(pad)));
       setHopperOpacity(1);
       setWarp(null);
+      maybeUnlock(pad);
     };
     if (reduce) {
       landWarp(warp.to);
@@ -364,6 +407,7 @@ export const CandyPath = forwardRef<
       data-dice-invite={inviting ? "1" : "0"}
       data-dice-steps={String(steps)}
       data-test-free-move={freeMove ? "1" : "0"}
+      data-present-count={String(boxedPads.length)}
     >
       <div className="candy-world">
         <div className="candy-world-stage" data-radial-stage="1">
@@ -394,6 +438,36 @@ export const CandyPath = forwardRef<
           onPointerUp={onBoardPointerUp}
           onPointerCancel={onBoardPointerCancel}
         >
+        {boxedPads.map((id) => {
+          const view = padView(id);
+          return (
+            <span
+              key={`present-${id}`}
+              className="candy-present"
+              style={{ left: `${view.x}%`, top: `${view.y}%` }}
+              data-pad-present="1"
+              data-present-pad={String(id)}
+              aria-hidden
+            >
+              <MysteryPresent />
+            </span>
+          );
+        })}
+        {foundPads.map((id) => {
+          const view = padView(id);
+          return (
+            <span
+              key={`found-${id}`}
+              className="candy-present candy-present-found"
+              style={{ left: `${view.x}%`, top: `${view.y}%` }}
+              data-pad-present-found="1"
+              data-present-pad={String(id)}
+              aria-hidden
+            >
+              <MysteryPresent found />
+            </span>
+          );
+        })}
         {RADIAL_PADS.map((pad) => {
           const view = pad.map;
           const choice = choices.includes(pad.id);
@@ -422,7 +496,9 @@ export const CandyPath = forwardRef<
               data-pad-quiet={quiet ? "1" : "0"}
               disabled={!choice}
               aria-disabled={!choice}
-              aria-label={choice ? ui.hopOne : undefined}
+              aria-label={
+                choice ? (boxed.has(pad.id) ? `${ui.hopOne}, ${ui.surprisePresent}` : ui.hopOne) : undefined
+              }
               onClick={() => chooseHop(pad.id)}
             >
               <span className="candy-node-disc" />
@@ -481,6 +557,30 @@ export const CandyPath = forwardRef<
             <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
           </span>
         </div>
+        {unwrap ? (
+          <button
+            type="button"
+            className="candy-unwrap"
+            style={{ left: `${padView(unwrap.pad).x}%`, top: `${padView(unwrap.pad).y}%` }}
+            data-present-unwrap={unwrap.phase}
+            aria-label={
+              unwrap.phase === "reveal"
+                ? ui.youFound(squisheeById(unwrap.id)?.name ?? ui.surprisePresent)
+                : ui.surprisePresent
+            }
+            onClick={() => setUnwrap(null)}
+          >
+            {unwrap.phase === "open" ? (
+              <MysteryPresent opening size="shelf" />
+            ) : (
+              <>
+                <PokeToy id={unwrap.id} size="sm" cheer className="h-20 w-20 overflow-visible rare-glow" />
+                <span className="candy-unwrap-name">{squisheeById(unwrap.id)?.name}</span>
+                <span className="candy-unwrap-line">{ui.youFound(squisheeById(unwrap.id)?.name ?? "")}</span>
+              </>
+            )}
+          </button>
+        ) : null}
         </div>
         </div>
       </div>
