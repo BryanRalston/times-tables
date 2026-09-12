@@ -10,7 +10,7 @@ import {
   canDressFace,
   cosmeticCompositeSrc,
   cosmeticLabel,
-  isCosmeticFace,
+  dressPreviewFace,
   type Cosmetic,
 } from "@/lib/cosmetics";
 import { COMMON_SQUISHEES, RARE_SQUISHEES, pathHopperId, squisheeSrc, type Squishee } from "@/lib/squishees";
@@ -151,7 +151,7 @@ export function ShelfPage() {
                   got={cosmetics.includes(item.id)}
                   worn={equipped === item.id}
                   coins={coins}
-                  previewFace={isCosmeticFace(hopperId) ? hopperId : "peach"}
+                  previewFace={dressPreviewFace(hopperId)}
                   onBuy={() => {
                     const r = buyCosmetic(item.id);
                     if (r.ok) playTap();
@@ -300,7 +300,7 @@ export function ShopCard({
   );
 }
 
-function CosmeticCard({
+export function CosmeticCard({
   item,
   got,
   worn,
@@ -323,8 +323,14 @@ function CosmeticCard({
   const name = cosmeticLabel(item.id, ui);
   const canBuy = !got && coins >= item.price;
   return (
-    <div className="shelf-slot" data-cosmetic-card={item.id} data-cosmetic-worn={worn ? "1" : "0"}>
+    <div
+      className="shelf-slot"
+      data-cosmetic-card={item.id}
+      data-cosmetic-worn={worn ? "1" : "0"}
+      data-preview-face={previewFace}
+    >
       <MagentaImg
+        key={`${previewFace}-${item.id}`}
         src={cosmeticCompositeSrc(previewFace, item.id)}
         alt=""
         className="h-20 w-20 object-contain"

@@ -1,8 +1,9 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { COMMON_PRICE, RARE_PRICE, squisheePrice } from "@/lib/coins";
+import { COSMETICS, dressPreviewFace } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
-import { ShelfPage, ShopCard } from "./shelf";
+import { CosmeticCard, ShelfPage, ShopCard } from "./shelf";
 
 describe("shop prices", () => {
   it("commons cost 10; rares keep a catalog price but are not sold", () => {
@@ -36,6 +37,26 @@ describe("shop tiles", () => {
     expect(html).toContain("Dress-up");
     expect(html).toContain("peach-party-hat.png");
     expect(html).toContain("data-buy-cosmetic=\"party-hat\"");
+    expect(html).toContain('data-preview-face="peach"');
+  });
+
+  it("dress-up tiles preview the Playing hopper, not a hardcoded Peach", () => {
+    const hat = COSMETICS.find((c) => c.id === "party-hat")!;
+    const scarf = COSMETICS.find((c) => c.id === "scarf")!;
+    const noop = () => {};
+    expect(dressPreviewFace("golden-dragon")).toBe("golden-dragon");
+    const dragon = renderToStaticMarkup(
+      <CosmeticCard item={hat} got worn coins={0} previewFace="golden-dragon" onBuy={noop} onWear={noop} onUnequip={noop} />,
+    );
+    expect(dragon).toContain('data-preview-face="golden-dragon"');
+    expect(dragon).toContain("golden-dragon-party-hat.png");
+    expect(dragon).not.toContain("peach-party-hat.png");
+    const otter = renderToStaticMarkup(
+      <CosmeticCard item={scarf} got worn={false} coins={0} previewFace="otter" onBuy={noop} onWear={noop} onUnequip={noop} />,
+    );
+    expect(otter).toContain('data-preview-face="otter"');
+    expect(otter).toContain("otter-scarf.png");
+    expect(otter).not.toContain("peach-scarf.png");
   });
 
   it("owned frog offers a Guest Use button without a Grown-ups PIN", () => {
