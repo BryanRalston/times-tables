@@ -278,7 +278,7 @@ function ContinuePeek() {
       }
     >
       <DressedSquishee
-        key={reduce ? hopperId : `${hopperId}-${index}`}
+        key={reduce ? `${hopperId}-${cosmetic}` : `${hopperId}-${cosmetic}-${index}`}
         id={hopperId}
         cosmetic={cosmetic}
         imgClassName="continue-peek-art"
