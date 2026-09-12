@@ -967,13 +967,13 @@ details > summary::-webkit-details-marker {
   -webkit-overflow-scrolling: touch;
   padding: 0.15rem 0.45rem 0.2rem;
 }
-/* Lessons column: phone cover-fills header→chips; 768+ hugs an 8/5
-   contain card so leftover is scene pink, not a white plate. */
+/* Lessons column: phone cover-fills header→chips; 768+ grows the card
+   so chips sit a few px above the dock. */
 .candy-scroll[data-lessons-path] {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding: 0.1rem 0.35rem 0;
+  padding: 0.1rem 0.35rem 0.2rem;
 }
 .candy-map {
   position: relative;
@@ -1001,16 +1001,18 @@ details > summary::-webkit-details-marker {
   aspect-ratio: 16 / 9;
   overflow: hidden;
 }
-/* Desk / tablet default: 8/5 card + height-fitted 16:9 stage. The green
-   rim and E/W arches stay inside the card. Phone overrides this to cover
-   the leftover column and pan the overflow. */
+/* Desk / tablet default: fill leftover; 16:9 stage contain-fits so the
+   rim and portals stay on-screen. Phone overrides to cover + pinch-pan. */
 .candy-map[data-radial-web="1"] .candy-world {
-  aspect-ratio: 8 / 5;
+  aspect-ratio: auto;
   width: 100%;
-  height: auto;
-  max-height: min(100%, calc(100cqi * 5 / 8));
-  align-self: start;
+  height: 100%;
+  max-height: none;
+  min-height: 0;
+  align-self: stretch;
   justify-self: stretch;
+  container-type: size;
+  container-name: radial-world;
 }
 .candy-world-stage {
   position: absolute;
@@ -1018,8 +1020,8 @@ details > summary::-webkit-details-marker {
 }
 .candy-map[data-radial-web="1"] .candy-world-stage {
   inset: auto;
-  height: 100%;
-  width: auto;
+  width: min(100cqi, calc(100cqh * 16 / 9));
+  height: min(100cqh, calc(100cqi * 9 / 16));
   aspect-ratio: 16 / 9;
   left: 50%;
   top: 50%;
@@ -2156,6 +2158,9 @@ details > summary::-webkit-details-marker {
     touch-action: none;
   }
   .candy-map[data-radial-web="1"] .candy-world-stage {
+    width: auto;
+    height: 100%;
+    aspect-ratio: 16 / 9;
     transform: translate(-50%, -50%) translate(var(--map-pan-x, 0px), var(--map-pan-y, 0px))
       scale(var(--map-scale, 1));
     transform-origin: center center;
@@ -2173,7 +2178,9 @@ details > summary::-webkit-details-marker {
   .app-phone {
     box-shadow: 0 24px 64px -28px rgb(80 30 50 / 0.35);
   }
-  .candy-map[data-radial-web="1"] {
-    flex: 0 0 auto;
+  /* Widen Lessons only so contain can height-fill the leftover. Home /
+     Shelf stay the 430 phone shell — do not retouch dress-up. */
+  .app-scene:has([data-lessons-path]) .app-phone {
+    max-width: min(100%, 68rem);
   }
 }

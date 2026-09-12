@@ -22,13 +22,41 @@ import { CandyPath } from "./candy-path";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
+function stubViewport(width: number) {
+  Object.defineProperty(globalThis, "innerWidth", { configurable: true, value: width });
+  Object.defineProperty(globalThis, "matchMedia", {
+    configurable: true,
+    writable: true,
+    value: (query: string) => {
+      const max = /max-width:\s*(\d+)/i.exec(query);
+      const min = /min-width:\s*(\d+)/i.exec(query);
+      let matches = false;
+      if (max) matches = width <= Number(max[1]);
+      else if (min) matches = width >= Number(min[1]);
+      return {
+        matches,
+        media: query,
+        addEventListener() {},
+        removeEventListener() {},
+        addListener() {},
+        removeListener() {},
+        dispatchEvent() {
+          return false;
+        },
+      };
+    },
+  });
+}
+
 describe("CandyPath", () => {
   beforeEach(() => {
     resetProgressMemory();
+    stubViewport(390);
   });
 
   afterEach(() => {
     resetProgressMemory();
+    stubViewport(390);
   });
 
   it("paints the radial-web map with hop pads and a Grade 3 unit rail", () => {
@@ -327,5 +355,23 @@ describe("CandyPath", () => {
     expect(src).toContain("padView(unwrap.pad)");
     expect(src).toContain("HOPPER_BOARD_WIDTH_PCT");
     expect(src).toContain("HOP_GLOW_BOARD_WIDTH_PCT");
+  });
+
+  it("contain-fits tablet and desktop with no pinch-pan chrome", () => {
+    stubViewport(1280);
+    const html = renderToStaticMarkup(
+      <CandyPath suggestedId="u5" onStart={() => {}} onOpenUnit={() => {}} />,
+    );
+    expect(html).toContain('data-map-fit="contain"');
+    expect(html).toContain('data-map-pan="0"');
+    expect(html).toContain('data-map-scale="1"');
+    expect(html).not.toContain("--map-pan-x");
+    expect(html).not.toContain("--map-scale");
+    stubViewport(768);
+    const tablet = renderToStaticMarkup(
+      <CandyPath suggestedId="u5" onStart={() => {}} onOpenUnit={() => {}} />,
+    );
+    expect(tablet).toContain('data-map-fit="contain"');
+    expect(tablet).toContain('data-map-pan="0"');
   });
 });
