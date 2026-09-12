@@ -448,6 +448,11 @@ describe("first-visit Home door", () => {
     expect(shelf).toContain("MysteryPresent");
     expect(shelf).toContain("ui.findOnMap");
     expect(shelf).toContain("ui.rareBlurb");
+    expect(shelf).toContain("data-avatar-picker");
+    expect(shelf).toContain("ui.thatsMe");
+    expect(shelf).toContain("ui.pickSquishee");
+    expect(shelf).toContain("data-cosmetics-plank");
+    expect(shelf).toContain("DressedSquishee");
     const css = readFileSync(join(HERE, "styles.css"), "utf8");
     expect(css).toContain(".app-scene");
     expect(css).toContain(".scene-hill");

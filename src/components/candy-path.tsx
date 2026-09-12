@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type PointerEvent } from "react";
 import { useUi } from "@/components/chrome";
+import { DressedSquishee } from "@/components/dressed-squishee";
 import { MagentaImg } from "@/components/magenta-video";
 import { MysteryPresent } from "@/components/mystery-present";
 import { PokeToy } from "@/components/poke-toy";
@@ -56,7 +57,7 @@ import {
   type PresentSpot,
 } from "@/lib/presents";
 import { playDice, playHop, playLand, playStar, playWarp } from "@/lib/sound";
-import { pathHopperId, squisheeById, squisheeSrc } from "@/lib/squishees";
+import { avatarOf, squisheeById } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
 type UnwrapBeat = { pad: number; reward: PresentSpot; phase: "open" | "reveal" };
@@ -126,8 +127,12 @@ export const CandyPath = forwardRef<
   const locale = parseLocale(useProgress((s) => s.locale));
   useProgress((s) => s.squishees.join("\0"));
   useProgress((s) => s.claimedPresentPads.join(","));
+  useProgress((s) => s.avatarId);
+  useProgress((s) => `${s.equippedCosmetics.hat ?? ""}:${s.equippedCosmetics.neck ?? ""}:${s.equippedCosmetics.face ?? ""}`);
   const owned = useProgress.getState().squishees;
   const claimedPads = useProgress.getState().claimedPresentPads ?? [];
+  const avatarId = useProgress.getState().avatarId;
+  const equipped = useProgress.getState().equippedCosmetics;
   const activities = useProgress((s) => s.activities);
   const hopsSpent = useProgress((s) => s.pathHopSpent);
   const storedSteps = useProgress((s) => s.pathStepsLeft);
@@ -136,7 +141,7 @@ export const CandyPath = forwardRef<
   const startDiceTurn = useProgress((s) => s.startDiceTurn);
   const spendPathStep = useProgress((s) => s.spendPathStep);
   const claimPresent = useProgress((s) => s.claimPresent);
-  const hopperId = pathHopperId(owned);
+  const hopperId = avatarOf(owned, avatarId);
   const [unwrap, setUnwrap] = useState<UnwrapBeat | null>(null);
   const boxedPads = visiblePresentPads(owned, claimedPads).filter((id) => unwrap?.pad !== id);
   const foundPads = foundPresentPads(owned).filter((id) => unwrap?.pad !== id);
@@ -570,7 +575,7 @@ export const CandyPath = forwardRef<
           data-path-clear-obstacle="0"
         >
           <span className="candy-hopper-fit" aria-hidden>
-            <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
+            <DressedSquishee id={hopperId} equipped={equipped} bodyClassName="candy-hopper-art" />
           </span>
         </div>
         {unwrap ? (

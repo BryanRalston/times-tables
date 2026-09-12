@@ -76,6 +76,23 @@ describe("shop tiles", () => {
     expect(html).not.toMatch(/[\s"]squash[\s"]/);
   });
 
+  it("puts a kid-obvious avatar picker and cheap cosmetics on Shelf", () => {
+    const html = renderToStaticMarkup(<ShelfPage />);
+    expect(html).toContain("data-avatar-picker");
+    expect(html).toContain("That&#x27;s me");
+    expect(html).toContain("Pick your squishee");
+    expect(html).toContain('data-avatar-pick="peach"');
+    expect(html).toContain('aria-pressed="true"');
+    expect(html).toContain("data-cosmetics-plank");
+    expect(html).toContain("Hats &amp; extras");
+    expect(html).toContain("data-cosmetic-buy");
+    expect(html).toContain("hat-party.png");
+    expect(html).toContain("bow.png");
+    expect(html).toContain("scarf.png");
+    expect(html).toContain("glasses.png");
+    expect(html).toContain("beanie.png");
+  });
+
   it("locked rares are mystery presents, not priced spoilers", () => {
     const jelly = squisheeById("aurora-jelly")!;
     const html = renderToStaticMarkup(<ShopCard s={jelly} got={false} coins={100} onBuy={() => {}} />);

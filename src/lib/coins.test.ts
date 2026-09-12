@@ -84,8 +84,10 @@ describe("migrate", () => {
     });
     expect(next.squishees).toEqual(["frog", "cat"]);
     expect(next.coins).toBe(0);
-    expect(next.version).toBe(15);
+    expect(next.version).toBe(16);
     expect(next.claimedPresentPads).toEqual([]);
+    expect(next.avatarId).toBe("cat");
+    expect(next.ownedCosmetics).toEqual([]);
     expect(next.pathHopSpent).toBe(0);
     expect(next.pathNowSeen).toBe(0);
     expect(next.pathGrade).toBe(3);

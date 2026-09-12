@@ -21,6 +21,7 @@ import { activePathStepsLeft, dailyWalkActivityId, hopCreditsOf } from "@/lib/ra
 import { makeActivityRound, makeWelcomeRound } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
 import { canAffordAnything, coinsForResult } from "@/lib/coins";
+import { avatarOf } from "@/lib/squishees";
 import { playCorrect, playStar, playStreak, playWrong, unlockAudio } from "@/lib/sound";
 import { schoolStreak } from "@/lib/streak";
 import type { Locale, Question } from "@/lib/types";
@@ -171,6 +172,8 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const who = q?.source === "review" ? "rem" : "nix";
   const ui = useUi();
   const locale = parseLocale(useProgress((s) => s.locale));
+  const avatarId = avatarOf(useProgress((s) => s.squishees), useProgress((s) => s.avatarId));
+  const equipped = useProgress((s) => s.equippedCosmetics);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -408,7 +411,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         <div className="grid flex-1 place-items-center px-4 py-8">
         <div className="w-full text-center">
           <div className="mx-auto grid h-52 w-52 place-items-center">
-            <Mascot pose="celebrate" hop size="lg" className="mx-auto" />
+            <Mascot id={avatarId} equipped={equipped} pose="celebrate" hop size="lg" className="mx-auto" />
           </div>
           <h1 className="mt-2 font-display text-3xl">{ui.niceWalk}</h1>
           <p className="text-muted">
@@ -524,7 +527,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
           <div className="keypad-dock shrink-0" data-play-keys="1">
             {showPanel ? (
               <div className="mascot-dock">
-                <Mascot who={who} pose={pose} hop={hop} size="sm" className="!h-full !w-full" />
+                <Mascot id={avatarId} equipped={equipped} who={who} pose={pose} hop={hop} size="sm" className="!h-full !w-full" />
                 <StarPop show={star} />
               </div>
             ) : null}
@@ -538,7 +541,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
           </div>
         ) : (
           <div className="relative mx-auto mb-1 h-16 w-16">
-            <Mascot who={who} pose={pose} hop={hop} size="sm" className="!h-16 !w-16" />
+            <Mascot id={avatarId} equipped={equipped} who={who} pose={pose} hop={hop} size="sm" className="!h-16 !w-16" />
             <StarPop show={star} />
           </div>
         )}

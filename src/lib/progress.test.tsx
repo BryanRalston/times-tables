@@ -541,6 +541,22 @@ describe("progress persist", () => {
     expect(useProgress.getState().unlockSquishee("galaxy-narwhal").ok).toBe(false);
   });
 
+  it("keeps the chosen avatar when a new toy is bought", async () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: seedKid({ coins: 20, squishees: ["frog"] }), version: 0 }));
+    await hydrateProgress();
+    expect(useProgress.getState().setAvatar("frog")).toBe(true);
+    expect(useProgress.getState().avatarId).toBe("frog");
+    expect(useProgress.getState().buySquishee("cat")).toEqual({ ok: true, reason: "ok" });
+    expect(useProgress.getState().squishees).toEqual(["frog", "cat"]);
+    expect(useProgress.getState().avatarId).toBe("frog");
+    expect(useProgress.getState().setAvatar("panda")).toBe(false);
+    expect(useProgress.getState().avatarId).toBe("frog");
+    expect(useProgress.getState().buyCosmetic("bow")).toEqual({ ok: true, reason: "ok" });
+    expect(useProgress.getState().equipCosmetic("bow")).toEqual({ ok: true, reason: "ok" });
+    expect(useProgress.getState().equippedCosmetics).toEqual({ hat: "bow" });
+    expect(useProgress.getState().equipCosmetic("hat-party").ok).toBe(false);
+  });
+
   it("grants present coins once and persists the claimed pad", async () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: seedKid(), version: 0 }));
     await hydrateProgress();

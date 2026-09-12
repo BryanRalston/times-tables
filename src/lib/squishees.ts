@@ -154,13 +154,43 @@ export function squisheeById(id: string): Squishee | undefined {
   return SQUISHEES.find((s) => s.id === id);
 }
 
-/** Last owned shelf toy, else the familiar first peek face. */
-export function pathHopperId(owned: readonly string[]): string {
+export const STARTER_AVATAR = "peach";
+
+export function canWearAvatar(owned: readonly string[], id: string): boolean {
+  if (!squisheeById(id)) return false;
+  if (id === STARTER_AVATAR) return true;
+  return owned.includes(id);
+}
+
+export function lastOwnedToy(owned: readonly string[]): string {
   for (let i = owned.length - 1; i >= 0; i--) {
     const id = owned[i]!;
     if (squisheeById(id)) return id;
   }
-  return PEEK_SQUISHEE_IDS[0] ?? SQUISHEE_IDS[0]!;
+  return STARTER_AVATAR;
+}
+
+/** Chosen avatar if owned (peach is always allowed). Never last-purchase. */
+export function avatarOf(owned: readonly string[], avatarId?: string | null): string {
+  if (avatarId && canWearAvatar(owned, avatarId)) return avatarId;
+  return STARTER_AVATAR;
+}
+
+/** Pre-v16 last-owned hopper. Pass avatarId so buying a toy does not steal the face. */
+export function pathHopperId(owned: readonly string[], avatarId?: string | null): string {
+  if (arguments.length >= 2) return avatarOf(owned, avatarId);
+  return lastOwnedToy(owned);
+}
+
+export function migrateAvatarId(args: {
+  avatarId: unknown;
+  owned: readonly string[];
+  saveVersion: unknown;
+}): string {
+  const version = typeof args.saveVersion === "number" && Number.isFinite(args.saveVersion) ? args.saveVersion : 0;
+  if (typeof args.avatarId === "string" && canWearAvatar(args.owned, args.avatarId)) return args.avatarId;
+  if (version < 16) return lastOwnedToy(args.owned);
+  return STARTER_AVATAR;
 }
 
 export function squisheeSrc(id: string): string {

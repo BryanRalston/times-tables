@@ -304,6 +304,26 @@ describe("CandyPath", () => {
     expect(html).not.toContain("g4-");
   });
 
+  it("uses the chosen avatar on the hopper, not the last bought toy", () => {
+    useProgress.setState({ squishees: ["frog", "cat"], avatarId: "frog" });
+    const html = renderToStaticMarkup(
+      <CandyPath suggestedId="u2" standFrom={1} standTo={1} onStart={() => {}} onOpenUnit={() => {}} />,
+    );
+    expect(html).toContain('data-path-hopper="frog"');
+    expect(html).not.toContain('data-path-hopper="cat"');
+    expect(html).toContain("frog.png");
+  });
+
+  it("wears an equipped hat on the map hopper", () => {
+    useProgress.setState({ ownedCosmetics: ["bow"], equippedCosmetics: { hat: "bow" } });
+    const html = renderToStaticMarkup(
+      <CandyPath suggestedId="u2" standFrom={1} standTo={1} onStart={() => {}} onOpenUnit={() => {}} />,
+    );
+    expect(html).toContain('data-path-hopper="peach"');
+    expect(html).toContain('data-cosmetic-hat="bow"');
+    expect(html).toContain("bow.png");
+  });
+
   it("resolves phone taps on the board to the nearest glowing pad", () => {
     const src = readFileSync(join(HERE, "candy-path.tsx"), "utf8");
     expect(src).toContain("nearestHopTarget");

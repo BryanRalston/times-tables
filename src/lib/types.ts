@@ -350,6 +350,12 @@ export interface LearnerSlice {
   pathStepsLeft: number;
   /** Mystery-present pads already unwrapped (coin grants). Missing → []. */
   claimedPresentPads: number[];
+  /** Chosen map/lesson face. Peach is always allowed. Missing migrates once. */
+  avatarId: string;
+  /** Bought hats/scarves/glasses. Missing → []. */
+  ownedCosmetics: string[];
+  /** One equipped cosmetic per slot. Missing → {}. */
+  equippedCosmetics: { hat?: string; neck?: string; face?: string };
 }
 
 export interface SaveState extends LearnerSlice {

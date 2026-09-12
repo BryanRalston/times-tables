@@ -218,9 +218,11 @@ describe("grade path", () => {
     expect(fogCoverPercent(13)).toBe(0);
   });
 
-  it("hops the last owned squishee, else the familiar first peek face", () => {
+  it("hops the chosen avatar, not the last bought toy", () => {
     expect(pathHopperId([])).toBe("peach");
     expect(pathHopperId(["frog", "cat"])).toBe("cat");
+    expect(pathHopperId(["frog", "cat"], "frog")).toBe("frog");
+    expect(pathHopperId(["frog", "cat"], "panda")).toBe("peach");
     expect(pathHopperId(["not-a-toy"])).toBe("peach");
   });
 });

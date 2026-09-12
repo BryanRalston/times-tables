@@ -786,6 +786,7 @@ details > summary::-webkit-details-marker {
   height: 4.4rem;
   pointer-events: none;
   z-index: 2;
+  overflow: visible;
 }
 .skip-quiet {
   display: block;
@@ -840,6 +841,67 @@ details > summary::-webkit-details-marker {
   flex-basis: 8.2rem;
   min-height: 10rem;
   background: rgb(255 246 250 / 0.55);
+}
+.shelf-slot-avatar {
+  border-color: #3fa66a;
+  box-shadow: 0 0 0 3px rgb(63 166 106 / 0.35);
+  background: rgb(255 252 246 / 0.72);
+}
+.avatar-picker {
+  margin-top: 0.2rem;
+}
+.avatar-hero {
+  display: grid;
+  place-items: center;
+  margin: 0.15rem auto 0.55rem;
+  width: 7.4rem;
+  height: 7.4rem;
+  overflow: visible;
+}
+.avatar-hero-face {
+  width: 7.4rem;
+  height: 7.4rem;
+}
+.cosmetic-wear {
+  background: #7a4d6a;
+}
+.dressed-squishee {
+  position: relative;
+  display: block;
+  overflow: visible;
+}
+.dressed-squishee-body {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+.dressed-hat,
+.dressed-neck,
+.dressed-face {
+  position: absolute;
+  left: 50%;
+  pointer-events: none;
+  object-fit: contain;
+}
+.dressed-hat {
+  top: 2%;
+  width: 78%;
+  transform: translate(-50%, -48%);
+  z-index: 3;
+}
+.dressed-neck {
+  top: 64%;
+  width: 92%;
+  transform: translate(-50%, -18%);
+  z-index: 2;
+}
+.dressed-face {
+  top: 40%;
+  width: 58%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
 }
 .shelf-empty {
   min-height: 6.4rem;
@@ -1554,8 +1616,9 @@ details > summary::-webkit-details-marker {
   display: block;
   width: 100%;
   aspect-ratio: 1;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 28%;
+  animation: candy-hop 1.9s ease-in-out infinite;
 }
 .candy-hopper-art {
   position: absolute;
@@ -1571,10 +1634,26 @@ details > summary::-webkit-details-marker {
   filter:
     drop-shadow(0 0 1px rgb(255 255 255 / 0.95))
     drop-shadow(0 1px 2px rgb(40 20 30 / 0.34));
-  animation: candy-hop 1.9s ease-in-out infinite;
 }
-.candy-hopper-travel .candy-hopper-art {
+.candy-hopper-travel .candy-hopper-fit {
   animation: none;
+}
+.candy-hopper .dressed-squishee {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.candy-hopper .dressed-hat {
+  top: -4%;
+  width: 92%;
+}
+.candy-hopper .dressed-neck {
+  top: 58%;
+  width: 110%;
+}
+.candy-hopper .dressed-face {
+  top: 42%;
+  width: 70%;
 }
 .candy-hopper-here::before {
   content: "";
@@ -1925,6 +2004,9 @@ details > summary::-webkit-details-marker {
 }
 @media (prefers-reduced-motion: reduce) {
   .candy-hopper-art {
+    animation: none !important;
+  }
+  .candy-hopper-fit {
     animation: none !important;
   }
   .candy-hopper {

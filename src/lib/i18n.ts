@@ -168,6 +168,17 @@ export type Ui = {
   pathLocked: string;
   pathFogAhead: string;
   owned: string;
+  thatsMe: string;
+  pickSquishee: string;
+  dressUp: string;
+  dressUpBlurb: string;
+  wearIt: string;
+  takeOff: string;
+  partyHat: string;
+  beanie: string;
+  bow: string;
+  scarf: string;
+  glasses: string;
   commons: string;
   rares: string;
   missingSubtrahend: string;
@@ -355,6 +366,17 @@ export const UI: Record<Locale, Ui> = {
     pathLocked: "Locked",
     pathFogAhead: "Mist hides the path ahead. Finish today’s walk to see more.",
     owned: "Owned",
+    thatsMe: "That's me",
+    pickSquishee: "Pick your squishee",
+    dressUp: "Hats & extras",
+    dressUpBlurb: "Cheap extras. They show on the map and in lessons.",
+    wearIt: "Wear",
+    takeOff: "Take off",
+    partyHat: "Party hat",
+    beanie: "Beanie",
+    bow: "Bow",
+    scarf: "Scarf",
+    glasses: "Glasses",
     commons: "Commons",
     rares: "Rares",
     missingSubtrahend: "Missing subtrahend",
@@ -540,6 +562,17 @@ export const UI: Record<Locale, Ui> = {
     pathLocked: "Cerrado",
     pathFogAhead: "La niebla esconde el sendero. Termina el paseo de hoy para ver más.",
     owned: "Tuyo",
+    thatsMe: "Este soy yo",
+    pickSquishee: "Elige tu squishee",
+    dressUp: "Sombreros y extras",
+    dressUpBlurb: "Extras baratos. Se ven en el mapa y en las lecciones.",
+    wearIt: "Poner",
+    takeOff: "Quitar",
+    partyHat: "Gorro de fiesta",
+    beanie: "Gorro",
+    bow: "Moño",
+    scarf: "Bufanda",
+    glasses: "Lentes",
     commons: "Comunes",
     rares: "Raros",
     missingSubtrahend: "Sustraendo que falta",
@@ -725,6 +758,17 @@ export const UI: Record<Locale, Ui> = {
     pathLocked: "Trancado",
     pathFogAhead: "A névoa esconde a trilha. Termine o passeio de hoje para ver mais.",
     owned: "Seu",
+    thatsMe: "Esse sou eu",
+    pickSquishee: "Escolha seu squishee",
+    dressUp: "Chapéus e extras",
+    dressUpBlurb: "Extras baratos. Aparecem no mapa e nas lições.",
+    wearIt: "Usar",
+    takeOff: "Tirar",
+    partyHat: "Chapéu de festa",
+    beanie: "Gorro",
+    bow: "Laço",
+    scarf: "Cachecol",
+    glasses: "Óculos",
     commons: "Comuns",
     rares: "Raros",
     missingSubtrahend: "Subtraendo que falta",

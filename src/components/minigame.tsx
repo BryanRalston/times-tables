@@ -17,7 +17,8 @@ import {
 } from "@/lib/minigames";
 import { rngFromSeed } from "@/lib/rng";
 import { playCorrect, playHop, playLand, playPeek, playTap, playWrong } from "@/lib/sound";
-import { pathHopperId, squisheeById, squisheeSrc } from "@/lib/squishees";
+import { useProgress } from "@/lib/progress";
+import { avatarOf, squisheeById, squisheeSrc } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
 function qaMiniKind(): string | null {
@@ -51,7 +52,7 @@ export function MiniGame({
   whoStage?: WhoHidStage;
 }) {
   const ui = useUi();
-  const hopperId = pathHopperId(owned);
+  const hopperId = avatarOf(owned, useProgress.getState().avatarId);
   const kind = useMemo(() => pickMiniKind(seed, qaMiniKind()), [seed]);
   const deal = useMemo(() => dealMini(kind, owned, rngFromSeed(`${seed}:deal`), hopperId), [hopperId, kind, owned, seed]);
 

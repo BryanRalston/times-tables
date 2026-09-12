@@ -2,7 +2,16 @@ import { create } from "zustand";
 import { persist, type PersistStorage, type StorageValue } from "zustand/middleware";
 import { todayIso } from "./calendar";
 import { applyBuy, type BuyReason } from "./coins";
+import {
+  applyBuyCosmetic,
+  applyEquipCosmetic,
+  parseEquippedCosmetics,
+  parseOwnedCosmetics,
+  type CosmeticBuyReason,
+  type CosmeticEquipReason,
+} from "./cosmetics";
 import { applyPresentClaim, applyUnlock, parseClaimedPresentPads, type PresentClaimReason, type PresentSpot } from "./presents";
+import { migrateAvatarId, STARTER_AVATAR } from "./squishees";
 import { GRADE4_SPANS, UNIT_SPANS, UNITS, unitById, unitsFor } from "./curriculum";
 import {
   RADIAL_PAD_COUNT,
@@ -39,7 +48,7 @@ import { parseTestMode } from "./test-mode";
 import type { ActivitySave, DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
 import { parsePathGrade } from "./types";
 
-const SAVE_VERSION = 15;
+const SAVE_VERSION = 16;
 export const STORAGE_KEY = "g3-path-v2";
 export const LEGACY_STORAGE_KEYS = ["g3-path-v1", "times-tables-progress", "times-tables-settings"] as const;
 const DEFAULT_ID = "kid-1";
@@ -129,6 +138,9 @@ export function emptyLearner(name = ""): LearnerSlice {
     pathHopSpent: 0,
     pathStepsLeft: 0,
     claimedPresentPads: [],
+    avatarId: STARTER_AVATAR,
+    ownedCosmetics: [],
+    equippedCosmetics: {},
   };
 }
 
@@ -154,6 +166,9 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
     pathHopSpent: clampPathHopSpent(s.pathHopSpent),
     pathStepsLeft: clampPathStepsLeft(s.pathStepsLeft),
     claimedPresentPads: parseClaimedPresentPads(s.claimedPresentPads),
+    avatarId: typeof s.avatarId === "string" ? s.avatarId : STARTER_AVATAR,
+    ownedCosmetics: parseOwnedCosmetics(s.ownedCosmetics),
+    equippedCosmetics: parseEquippedCosmetics(s.equippedCosmetics, parseOwnedCosmetics(s.ownedCosmetics)),
   };
 }
 
@@ -210,10 +225,14 @@ function sliceOfWithHopHeal(s: LearnerSlice, saveVersion: number): LearnerSlice 
     pathStepsLeft,
     saveVersion,
   });
+  const ownedCosmetics = parseOwnedCosmetics(s.ownedCosmetics);
   return {
     ...next,
     pathHopSpent: turn.pathHopSpent,
     pathStepsLeft: turn.pathStepsLeft,
+    avatarId: migrateAvatarId({ avatarId: s.avatarId, owned: next.squishees, saveVersion }),
+    ownedCosmetics,
+    equippedCosmetics: parseEquippedCosmetics(s.equippedCosmetics, ownedCosmetics),
   };
 }
 
@@ -260,6 +279,9 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
       pathHopSpent: raw.pathHopSpent ?? 0,
       pathStepsLeft: raw.pathStepsLeft ?? 0,
       claimedPresentPads: parseClaimedPresentPads(raw.claimedPresentPads),
+      avatarId: typeof raw.avatarId === "string" ? raw.avatarId : "",
+      ownedCosmetics: parseOwnedCosmetics(raw.ownedCosmetics),
+      equippedCosmetics: parseEquippedCosmetics(raw.equippedCosmetics, parseOwnedCosmetics(raw.ownedCosmetics)),
     },
     saveVersion,
   );
@@ -282,6 +304,18 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
         ...parseClaimedPresentPads(fromFlat.claimedPresentPads),
         ...parseClaimedPresentPads(kid.claimedPresentPads),
       ]),
+      avatarId: typeof kid.avatarId === "string" && kid.avatarId ? kid.avatarId : fromFlat.avatarId,
+      ownedCosmetics: parseOwnedCosmetics([
+        ...parseOwnedCosmetics(fromFlat.ownedCosmetics),
+        ...parseOwnedCosmetics(kid.ownedCosmetics),
+      ]),
+      equippedCosmetics: parseEquippedCosmetics(
+        kid.equippedCosmetics && Object.keys(kid.equippedCosmetics).length ? kid.equippedCosmetics : fromFlat.equippedCosmetics,
+        parseOwnedCosmetics([
+          ...parseOwnedCosmetics(fromFlat.ownedCosmetics),
+          ...parseOwnedCosmetics(kid.ownedCosmetics),
+        ]),
+      ),
     };
   }
   for (const id of Object.keys(learners)) learners[id] = sliceOfWithHopHeal(learners[id]!, saveVersion);
@@ -335,6 +369,9 @@ interface ProgressApi extends SaveState {
   buySquishee: (id: string) => { ok: boolean; reason: BuyReason };
   unlockSquishee: (id: string) => { ok: boolean; reason: "ok" | "missing" | "owned" };
   claimPresent: (pad: number) => { ok: boolean; reason: PresentClaimReason; reward?: PresentSpot };
+  setAvatar: (id: string) => boolean;
+  buyCosmetic: (id: string) => { ok: boolean; reason: CosmeticBuyReason };
+  equipCosmetic: (id: string) => { ok: boolean; reason: CosmeticEquipReason };
   switchLearner: (id: string) => void;
   addLearner: (name: string) => string;
   resetAll: () => void;
@@ -370,6 +407,9 @@ function snapshotSave(s: SaveState): SaveState {
     pathHopSpent: s.pathHopSpent,
     pathStepsLeft: s.pathStepsLeft,
     claimedPresentPads: s.claimedPresentPads,
+    avatarId: s.avatarId,
+    ownedCosmetics: s.ownedCosmetics,
+    equippedCosmetics: s.equippedCosmetics,
     learners: s.learners,
   };
 }
@@ -550,6 +590,22 @@ export const useProgress = create<ProgressApi>()(
           });
         }
         return { ok: r.ok, reason: r.reason, reward: r.reward };
+      },
+      setAvatar: (id) => {
+        const next = migrateAvatarId({ avatarId: id, owned: get().squishees, saveVersion: SAVE_VERSION });
+        if (next !== id) return false;
+        commit(get, set, { avatarId: next });
+        return true;
+      },
+      buyCosmetic: (id) => {
+        const r = applyBuyCosmetic(get().coins, get().ownedCosmetics, id);
+        if (r.ok) commit(get, set, { coins: r.coins, ownedCosmetics: r.owned });
+        return { ok: r.ok, reason: r.reason };
+      },
+      equipCosmetic: (id) => {
+        const r = applyEquipCosmetic(get().ownedCosmetics, get().equippedCosmetics, id);
+        if (r.ok) commit(get, set, { equippedCosmetics: r.equipped });
+        return { ok: r.ok, reason: r.reason };
       },
       switchLearner: (id) => {
         const kid = get().learners[id];

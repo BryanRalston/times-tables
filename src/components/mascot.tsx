@@ -1,5 +1,6 @@
-import { MagentaImg } from "@/components/magenta-video";
-import { squisheeSrc } from "@/lib/squishees";
+import { DressedSquishee } from "@/components/dressed-squishee";
+import type { EquippedCosmetics } from "@/lib/cosmetics";
+import { squisheeById } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
 export type Pose = "wave" | "think" | "celebrate" | "oops" | "star";
@@ -18,19 +19,23 @@ export function Mascot({
   hop = false,
   size = "md",
   className,
+  id,
+  equipped,
 }: {
   who?: "nix" | "rem";
   pose?: Pose;
   hop?: boolean;
   size?: "sm" | "md" | "lg";
   className?: string;
+  id?: string;
+  equipped?: EquippedCosmetics;
 }) {
-  const id = who === "rem" ? "owl" : POSE_ID[pose];
+  const face = id && squisheeById(id) ? id : who === "rem" ? "owl" : POSE_ID[pose];
   const squash = hop || pose === "celebrate" || pose === "star";
   return (
-    <MagentaImg
-      src={squisheeSrc(id)}
-      alt=""
+    <DressedSquishee
+      id={face}
+      equipped={equipped}
       className={cn(
         "pointer-events-none select-none",
         size === "sm" && "h-20 w-20",
