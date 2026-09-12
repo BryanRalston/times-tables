@@ -11,6 +11,7 @@ import {
   hopProgressAt,
   hopTravelMs,
   hopUnitStops,
+  instantHopLand,
   pathHopSfxKind,
   restHopPose,
   warpPose,
@@ -290,7 +291,8 @@ export const CandyPath = forwardRef<
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     setTravelFrom(from);
     if (reduce || stops.length < 2) {
-      finishHop(from, false);
+      const land = instantHopLand(from, to);
+      finishHop(land.pad, land.entered);
       return;
     }
 
