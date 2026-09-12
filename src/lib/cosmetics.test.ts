@@ -11,7 +11,9 @@ import {
   canDressFace,
   cosmeticCompositeFile,
   cosmeticLabel,
+  dressPreviewFace,
   dressedSquisheeSrc,
+  isCosmeticFace,
   wearForFace,
   parseCosmeticIds,
   parseEquippedCosmetic,
@@ -32,6 +34,12 @@ describe("catalog dress-up", () => {
     expect(canDressFace("avocado", "bow")).toBe(true);
     expect(canDressFace("crystal-axolotl", "shades")).toBe(true);
     expect(canDressFace("galaxy-narwhal", "party-hat")).toBe(true);
+    expect(isCosmeticFace("golden-dragon")).toBe(true);
+    expect(isCosmeticFace("otter")).toBe(true);
+    expect(dressPreviewFace("golden-dragon")).toBe("golden-dragon");
+    expect(dressPreviewFace("otter")).toBe("otter");
+    expect(dressPreviewFace("")).toBe("peach");
+    expect(dressPreviewFace("not-a-toy")).toBe("peach");
     expect(canDressFace("peach", "nope")).toBe(false);
     expect(canDressFace("not-a-toy", "party-hat")).toBe(false);
   });

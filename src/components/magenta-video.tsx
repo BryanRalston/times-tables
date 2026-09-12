@@ -34,8 +34,12 @@ export function MagentaImg({
   className?: string;
   onLoad?: () => void;
 }) {
+  const srcRef = useRef(src);
   const [cur, setCur] = useState(src);
-  useEffect(() => setCur(src), [src]);
+  if (src !== srcRef.current) {
+    srcRef.current = src;
+    setCur(src);
+  }
   return (
     <img
       src={cur}

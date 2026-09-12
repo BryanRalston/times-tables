@@ -40,6 +40,11 @@ export function isCosmeticFace(id: string): id is CosmeticFace {
   return faces.has(id);
 }
 
+/** Dress-up shop tiles follow the Playing hopper. Peach only when there is no catalog face. */
+export function dressPreviewFace(hopperId: string): string {
+  return isCosmeticFace(hopperId) ? hopperId : "peach";
+}
+
 export function cosmeticPrice(id: string): number {
   return cosmeticById(id)?.price ?? 0;
 }

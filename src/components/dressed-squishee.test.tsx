@@ -31,7 +31,7 @@ describe("fitted dress-up surfaces", () => {
     expect(home).toContain("equippedCosmetic");
     expect(home).toContain("${hopperId}-${cosmetic}");
     const shelf = readFileSync(join(HERE, "../pages/shelf.tsx"), "utf8");
-    expect(shelf).toContain("isCosmeticFace(hopperId)");
+    expect(shelf).toContain("dressPreviewFace(hopperId)");
     expect(shelf).toContain("canDressFace");
     expect(shelf).toContain("PokeToy");
     expect(shelf).toContain("cosmetic={equipped}");
