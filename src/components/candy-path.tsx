@@ -21,6 +21,16 @@ import {
 import { UNITS } from "@/lib/curriculum";
 import { parseLocale } from "@/lib/i18n";
 import { unitText } from "@/lib/labels";
+import {
+  clampMapCamera,
+  coverMapBoard,
+  pointerDistance,
+  pointerMid,
+  REST_MAP_CAMERA,
+  zoomMapCamera,
+  type MapCamera,
+} from "@/lib/map-viewport";
+import { usePhoneDoor } from "@/lib/nav";
 import { unitStatus } from "@/lib/path";
 import { useProgress } from "@/lib/progress";
 import {
@@ -181,8 +191,17 @@ export const CandyPath = forwardRef<
   const inviting = !freeMove && canStartDiceTurn(credits, steps) && !travel && !warp && rolling == null;
   const picking = (freeMove || steps > 0) && !travel && !warp && rolling == null;
   const choices = picking ? adjacentPadIds(dest) : [];
+  const phone = usePhoneDoor();
+  const worldRef = useRef<HTMLDivElement>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const tapStart = useRef<{ x: number; y: number } | null>(null);
+  const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const pinch = useRef<{ dist: number; cam: MapCamera } | null>(null);
+  const drag = useRef<{ x: number; y: number; cam: MapCamera } | null>(null);
+  const panned = useRef(false);
+  const [cam, setCam] = useState<MapCamera>(REST_MAP_CAMERA);
+  const camRef = useRef(cam);
+  camRef.current = cam;
 
   const maybeUnlock = (pad: number) => {
     const st = useProgress.getState();
@@ -366,6 +385,15 @@ export const CandyPath = forwardRef<
   }, [warp, setPathHopperAt]);
 
   useEffect(() => {
+    if (phone) return;
+    camRef.current = REST_MAP_CAMERA;
+    setCam(REST_MAP_CAMERA);
+    pinch.current = null;
+    drag.current = null;
+    panned.current = false;
+  }, [phone]);
+
+  useEffect(() => {
     if (rolling == null) return;
     const faces: DieFace[] = [1, 2, 3, 2, 1, 3, rolling];
     let i = 0;
@@ -406,17 +434,80 @@ export const CandyPath = forwardRef<
     return true;
   };
 
+  const viewBox = () => {
+    const el = worldRef.current;
+    if (!el) return { width: 0, height: 0 };
+    const r = el.getBoundingClientRect();
+    return { width: r.width, height: r.height };
+  };
+
+  const applyCam = (next: MapCamera) => {
+    const view = viewBox();
+    const board = coverMapBoard(view);
+    const clamped = clampMapCamera(next, view, board);
+    camRef.current = clamped;
+    setCam(clamped);
+    return clamped;
+  };
+
   const onBoardPointerDown = (e: PointerEvent<HTMLDivElement>) => {
-    if (!picking || !isPrimaryBoardTap(e)) return;
-    tapStart.current = { x: e.clientX, y: e.clientY };
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
+    if (phone && pointers.current.size >= 2) {
+      const pts = [...pointers.current.values()];
+      const a = pts[0]!;
+      const b = pts[1]!;
+      pinch.current = { dist: pointerDistance(a, b), cam: camRef.current };
+      drag.current = null;
+      tapStart.current = null;
+      panned.current = true;
+      return;
+    }
+    if (phone && isPrimaryBoardTap(e)) {
+      drag.current = { x: e.clientX, y: e.clientY, cam: camRef.current };
+    }
+    if (picking && isPrimaryBoardTap(e)) tapStart.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const onBoardPointerMove = (e: PointerEvent<HTMLDivElement>) => {
+    if (!pointers.current.has(e.pointerId)) return;
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (!phone) return;
+    if (pinch.current && pointers.current.size >= 2) {
+      const pts = [...pointers.current.values()];
+      const a = pts[0]!;
+      const b = pts[1]!;
+      const dist = pointerDistance(a, b);
+      if (pinch.current.dist <= 0 || dist <= 0) return;
+      const world = worldRef.current?.getBoundingClientRect();
+      if (!world) return;
+      const mid = pointerMid(a, b);
+      const focus = { x: mid.x - (world.left + world.width / 2), y: mid.y - (world.top + world.height / 2) };
+      applyCam(zoomMapCamera(pinch.current.cam, focus, pinch.current.cam.scale * (dist / pinch.current.dist)));
+      panned.current = true;
+      return;
+    }
+    const start = drag.current;
+    if (!start) return;
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+    if (!panned.current && Math.hypot(dx, dy) < 8) return;
+    panned.current = true;
+    applyCam({ scale: start.cam.scale, x: start.cam.x + dx, y: start.cam.y + dy });
   };
 
   const onBoardPointerUp = (e: PointerEvent<HTMLDivElement>) => {
-    if (!picking || !e.isPrimary) return;
     if (e.currentTarget.hasPointerCapture?.(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
+    pointers.current.delete(e.pointerId);
+    if (pointers.current.size < 2) pinch.current = null;
+    if (pointers.current.size === 0) drag.current = null;
     const start = tapStart.current;
-    tapStart.current = null;
+    const moved = panned.current;
+    if (pointers.current.size === 0) {
+      tapStart.current = null;
+      panned.current = false;
+    }
+    if (!picking || !e.isPrimary || moved) return;
     const board = boardRef.current;
     if (!start || !board) return;
     const rect = board.getBoundingClientRect();
@@ -428,7 +519,13 @@ export const CandyPath = forwardRef<
 
   const onBoardPointerCancel = (e: PointerEvent<HTMLDivElement>) => {
     if (e.currentTarget.hasPointerCapture?.(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
-    tapStart.current = null;
+    pointers.current.delete(e.pointerId);
+    if (pointers.current.size < 2) pinch.current = null;
+    if (pointers.current.size === 0) {
+      drag.current = null;
+      tapStart.current = null;
+      panned.current = false;
+    }
   };
 
   useImperativeHandle(ref, () => ({
@@ -449,8 +546,23 @@ export const CandyPath = forwardRef<
       data-dice-steps={String(steps)}
       data-test-free-move={freeMove ? "1" : "0"}
       data-present-count={String(boxedPads.length)}
+      data-map-fit={phone ? "cover" : "contain"}
+      data-map-pan={phone ? "1" : "0"}
+      data-map-scale={String(cam.scale)}
     >
-      <div className="candy-world">
+      <div
+        ref={worldRef}
+        className="candy-world"
+        style={
+          phone
+            ? {
+                ["--map-scale" as string]: String(cam.scale),
+                ["--map-pan-x" as string]: `${cam.x}px`,
+                ["--map-pan-y" as string]: `${cam.y}px`,
+              }
+            : undefined
+        }
+      >
         <div className="candy-world-stage" data-radial-stage="1">
         <img
           className="candy-world-art"
@@ -477,6 +589,7 @@ export const CandyPath = forwardRef<
             ["--hop-glow-fill" as string]: `${(HOP_GLOW_BOARD_WIDTH_PCT / HOPPER_BOARD_WIDTH_PCT) * 100}%`,
           }}
           onPointerDown={onBoardPointerDown}
+          onPointerMove={onBoardPointerMove}
           onPointerUp={onBoardPointerUp}
           onPointerCancel={onBoardPointerCancel}
         >

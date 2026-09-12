@@ -38,6 +38,9 @@ describe("CandyPath", () => {
     expect(html).toContain("data-grade-path");
     expect(html).toContain("data-radial-web");
     expect(html).toContain("data-radial-fill");
+    expect(html).toContain('data-map-fit="cover"');
+    expect(html).toContain('data-map-pan="1"');
+    expect(html).toContain('data-map-scale="1"');
     expect(html).toContain("data-candy-world");
     expect(html).toContain("data-radial-stage");
     expect(html).toContain("data-candy-radial-map");
@@ -301,6 +304,11 @@ describe("CandyPath", () => {
     expect(src).toContain("hopSnapPx");
     expect(src).toContain("setPointerCapture");
     expect(src).toContain("onPointerUp={onBoardPointerUp}");
+    expect(src).toContain("onPointerMove={onBoardPointerMove}");
+    expect(src).toContain("clampMapCamera");
+    expect(src).toContain("zoomMapCamera");
+    expect(src).toContain("usePhoneDoor");
+    expect(src).toContain("coverMapBoard");
     expect(src).toContain("board.getBoundingClientRect()");
     expect(src).toContain("rollDie");
     expect(src).toContain("startDiceTurn");

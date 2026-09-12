@@ -12,6 +12,8 @@ import {
   hopGlowBoardPx,
   hopperBoardPx,
   minAdjacentGapPx,
+  DESK_MAP_BOARD,
+  DESK_MAP_VIEW,
   PHONE_MAP_BOARD,
   PHONE_MAP_VIEW,
   PORTAL_PAIRS,
@@ -263,7 +265,7 @@ describe("radial web", () => {
 });
 
 describe("radial hop hit testing", () => {
-  const board = PHONE_MAP_BOARD;
+  const board = DESK_MAP_BOARD;
   const plaza = adjacentPadIds(START_PAD);
   const a = plaza[0]!;
   const b = plaza[1]!;
@@ -279,18 +281,20 @@ describe("radial hop hit testing", () => {
     return { x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t };
   }
 
-  it("fits the 390 phone board so the island rim stays on the card", () => {
+  it("cover-fills the 390 phone column and keeps the desk island whole", () => {
     const pa = padClientPos(a, board);
     const pb = padClientPos(b, board);
     const gap = Math.hypot(pb.x - pa.x, pb.y - pa.y);
     expect(PHONE_MAP_VIEW.width).toBe(368);
-    expect(PHONE_MAP_VIEW.height).toBeCloseTo((368 * 5) / 8);
-    expect(PHONE_MAP_BOARD.width).toBeGreaterThan(368);
-    expect(PHONE_MAP_BOARD.height).toBeGreaterThan(207);
-    expect(PHONE_MAP_BOARD.height).toBeLessThan(280);
-    const crop = (PHONE_MAP_BOARD.width - PHONE_MAP_VIEW.width) / 2;
-    const visibleMin = (crop / PHONE_MAP_BOARD.width) * 100;
-    const visibleMax = ((crop + PHONE_MAP_VIEW.width) / PHONE_MAP_BOARD.width) * 100;
+    expect(PHONE_MAP_VIEW.height).toBe(520);
+    expect(PHONE_MAP_BOARD.height).toBe(520);
+    expect(PHONE_MAP_BOARD.width).toBeGreaterThan(PHONE_MAP_VIEW.width);
+    expect(DESK_MAP_VIEW.height).toBeCloseTo((368 * 5) / 8);
+    expect(DESK_MAP_BOARD.height).toBeGreaterThan(207);
+    expect(DESK_MAP_BOARD.height).toBeLessThan(280);
+    const crop = (DESK_MAP_BOARD.width - DESK_MAP_VIEW.width) / 2;
+    const visibleMin = (crop / DESK_MAP_BOARD.width) * 100;
+    const visibleMax = ((crop + DESK_MAP_VIEW.width) / DESK_MAP_BOARD.width) * 100;
     const outer = RADIAL_PADS.filter((p) => p.portal && p.ring === 4);
     expect(outer.length).toBeGreaterThan(0);
     for (const p of outer) {
@@ -300,6 +304,7 @@ describe("radial hop hit testing", () => {
     expect(HOP_SNAP_MIN_PX).toBe(16);
     expect(HOP_SNAP_PX).toBe(22);
     expect(hopSnapPx(board)).toBe(22);
+    expect(hopSnapPx(PHONE_MAP_BOARD)).toBeGreaterThan(HOP_SNAP_PX);
     expect(gap).toBeGreaterThan(14);
     expect(gap).toBeLessThan(48);
     expect(gap).toBeLessThan(HOP_SNAP_PX * 2);
@@ -319,6 +324,18 @@ describe("radial hop hit testing", () => {
     expect(HOPPER_BOARD_WIDTH_PCT).toBe(3.2);
     expect(HOP_GLOW_BOARD_WIDTH_PCT).toBe(2.2);
     expect(adjacentPadIds(START_PAD)).toHaveLength(8);
+    const phoneGap = minAdjacentGapPx(START_PAD, PHONE_MAP_BOARD);
+    expect(hopperBoardPx(PHONE_MAP_BOARD)).toBeLessThan(phoneGap);
+    expect(hopGlowBoardPx(PHONE_MAP_BOARD) + 5).toBeLessThan(phoneGap);
+  });
+
+  it("still snaps hops on the taller cover-fill phone board", () => {
+    const phone = PHONE_MAP_BOARD;
+    const snap = hopSnapPx(phone);
+    const glow = padClientPos(a, phone);
+    expect(nearestHopTarget(glow.x, glow.y, phone, plaza, START_PAD, snap)).toBe(a);
+    expect(nearestHopTarget(glow.x, glow.y, phone, plaza, START_PAD, snap)).not.toBe(START_PAD);
+    expect(hopperBoardPx(phone)).toBeLessThan(minAdjacentGapPx(START_PAD, phone));
   });
 
   it("snaps a comfort tap beside a glow, and ignores far dim pads", () => {

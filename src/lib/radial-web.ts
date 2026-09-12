@@ -1,4 +1,5 @@
 import { activityById } from "./curriculum";
+import { coverMapBoard } from "./map-viewport";
 import type { ActivitySave, DaySession } from "./types";
 
 export type RadialPos = { x: number; y: number };
@@ -374,8 +375,8 @@ export function nearestHopDir(
 export const HOP_SNAP_MIN_PX = 16;
 
 /**
- * Phone-fair snap radius on the 8/5 390 stage. Plaza neighbors sit
- * ~16–32px apart. Board taps resolve to the nearest glowing neighbor.
+ * Phone-fair snap radius on the 8/5 390 contain stage. Plaza neighbors
+ * sit ~16–32px apart there. Cover-fill phone boards scale this up.
  */
 export const HOP_SNAP_PX = 22;
 
@@ -396,24 +397,24 @@ export const HOPPER_SIT_TRANSLATE = "translate(-50%, -50%)";
 export const HOP_GLOW_BOARD_WIDTH_PCT = 2.2;
 
 /**
- * Visible radial card on a 390 phone after scroll pad + 4px frame.
- * CSS `.candy-world` is 8/5: a 16:9 stage height-fitted to that card
- * keeps the green rim and E/W arches on-screen (about 5–95% of the art)
- * without letterboxing the island into a postage stamp.
+ * Visible Lessons world on a 390×844 phone after header, chips, dock,
+ * and tabs. Taller than the 8/5 contain card so grass sits on the rail.
  */
-export const PHONE_MAP_VIEW = { width: 368, height: (368 * 5) / 8 } as const;
+export const PHONE_MAP_VIEW = { width: 368, height: 520 } as const;
 
 /**
- * Overlay / art stage: same 16:9 as radial-web-locked.jpg, height-matched
- * to the 8/5 card. Slightly wider than the card — only the art’s white
- * margin crops, not the painted island.
+ * Cover-fitted 16:9 stage for that phone column. Wider than the view —
+ * pinch-zoom + drag pans around the overflow. Hop % stay on this board.
  */
-export const PHONE_MAP_BOARD = {
-  left: 0,
-  top: 0,
-  width: PHONE_MAP_VIEW.height * (RADIAL_MAP_SIZE.w / RADIAL_MAP_SIZE.h),
-  height: PHONE_MAP_VIEW.height,
-} as const;
+export const PHONE_MAP_BOARD = coverMapBoard(PHONE_MAP_VIEW);
+
+/**
+ * Tablet / desktop card: 8/5 + height-fitted 16:9 so the whole painted
+ * island (rim, arches, portals) stays on-screen. No pinch-pan.
+ */
+export const DESK_MAP_VIEW = { width: 368, height: (368 * 5) / 8 } as const;
+
+export const DESK_MAP_BOARD = coverMapBoard(DESK_MAP_VIEW);
 
 export type HopBoardRect = {
   left: number;
@@ -439,13 +440,13 @@ export function hopGlowBoardPx(board: HopBoardRect = PHONE_MAP_BOARD): number {
 }
 
 /**
- * Fat-finger snap in CSS pixels of `board`. Scales from the 390 phone
- * stage so a painted tile stays tappable when the overlay is a different
- * size; never tighter than {@link HOP_SNAP_MIN_PX}.
+ * Fat-finger snap in CSS pixels of `board`. Scales from the 8/5 390
+ * contain stage so a painted tile stays tappable on the cover-fill phone
+ * board; never tighter than {@link HOP_SNAP_MIN_PX}.
  */
 export function hopSnapPx(board: HopBoardRect = PHONE_MAP_BOARD): number {
   if (board.width <= 0) return HOP_SNAP_PX;
-  const scaled = (HOP_SNAP_PX * board.width) / PHONE_MAP_BOARD.width;
+  const scaled = (HOP_SNAP_PX * board.width) / DESK_MAP_BOARD.width;
   return Math.max(HOP_SNAP_MIN_PX, Math.round(scaled));
 }
 
