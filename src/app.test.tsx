@@ -457,6 +457,7 @@ describe("first-visit Home door", () => {
     expect(shelf).not.toContain("enterPin");
     const css = readFileSync(join(HERE, "styles.css"), "utf8");
     expect(css).toContain(".app-scene");
+    expect(css).toMatch(/\.app-phone \{[^}]*max-width: 430px/);
     expect(css).toContain(".scene-hill");
     expect(css).toContain(".candy-map");
     expect(css).toContain(".candy-world");
@@ -473,6 +474,15 @@ describe("first-visit Home door", () => {
     expect(css).toContain("@media (max-width: 767px)");
     expect(css).not.toContain("flex: 0 0 auto");
     expect(css).toContain("max-width: min(100%, 68rem)");
+    expect(css).not.toContain(".app-scene:has([data-lessons-path]) .app-phone");
+    expect(css).toMatch(
+      /@media \(min-width: 768px\) \{[\s\S]*?\.app-phone \{\s*max-width: min\(100%, 68rem\)/,
+    );
+    expect(css).toContain("max-width: 32rem");
+    expect(css).toMatch(
+      /\.candy-map\[data-radial-web="1"\]\s*\{[^}]*background:\s*linear-gradient\(180deg, #fde8f0/,
+    );
+    expect(css).not.toMatch(/\.candy-map\[data-radial-web="1"\]\s*\{[^}]*background:\s*#fff/);
     expect(css).toContain("grid-template-rows: minmax(0, 1fr) auto");
     expect(css).toContain("container-name: radial-card");
     expect(css).toMatch(/\.candy-overlay\[data-hop-pick="1"\]\s*\{[^}]*touch-action:\s*none/);

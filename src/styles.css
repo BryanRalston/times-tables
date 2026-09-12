@@ -991,7 +991,7 @@ details > summary::-webkit-details-marker {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   min-height: 0;
-  background: #fff;
+  background: linear-gradient(180deg, #fde8f0 0%, #f7c8dc 46%, #f4b8d0 100%);
   container-type: inline-size;
   container-name: radial-card;
 }
@@ -1002,7 +1002,8 @@ details > summary::-webkit-details-marker {
   overflow: hidden;
 }
 /* Desk / tablet default: fill leftover; 16:9 stage contain-fits so the
-   rim and portals stay on-screen. Phone overrides to cover + pinch-pan. */
+   rim and portals stay on-screen. Letterbox is Home pink, not a white
+   plate. Phone overrides to cover + pinch-pan. */
 .candy-map[data-radial-web="1"] .candy-world {
   aspect-ratio: auto;
   width: 100%;
@@ -2176,11 +2177,15 @@ details > summary::-webkit-details-marker {
     padding: 0;
   }
   .app-phone {
+    max-width: min(100%, 68rem);
     box-shadow: 0 24px 64px -28px rgb(80 30 50 / 0.35);
   }
-  /* Widen Lessons only so contain can height-fill the leftover. Home /
-     Shelf stay the 430 phone shell — do not retouch dress-up. */
-  .app-scene:has([data-lessons-path]) .app-phone {
-    max-width: min(100%, 68rem);
+  /* Home CTA stays a hug-sized card so leftover pink shows; dock/header
+     use the grown shell. Phone keeps the 430 column. */
+  .continue-stage {
+    max-width: 32rem;
+    width: calc(100% - 2rem);
+    margin-left: auto;
+    margin-right: auto;
   }
 }

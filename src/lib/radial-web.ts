@@ -441,7 +441,8 @@ export const TABLET_MAP_BOARD = containMapBoard(TABLET_MAP_VIEW);
 
 /**
  * Grown leftover on a 1280 desktop (68rem-capped shell). Wider than 16:9
- * — contain height-fills so chips sit on the dock with no pink plate.
+ * — contain height-fills so chips sit on the dock. Side letterbox is the
+ * Home pink plate, not white.
  */
 export const DESKTOP_MAP_VIEW = { width: 1056, height: 520 } as const;
 
