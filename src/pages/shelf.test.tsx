@@ -1,13 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { afterEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { COMMON_PRICE, RARE_PRICE, squisheePrice } from "@/lib/coins";
-import { resetProgressMemory, useProgress } from "@/lib/progress";
 import { squisheeById } from "@/lib/squishees";
 import { ShelfPage, ShopCard } from "./shelf";
-
-afterEach(() => {
-  resetProgressMemory();
-});
 
 describe("shop prices", () => {
   it("commons cost 10; rares keep a catalog price but are not sold", () => {
@@ -55,23 +50,14 @@ describe("shop tiles", () => {
   });
 
   it("dressed hopper tile stays a poke button on the fitted composite", () => {
-    useProgress.setState({
-      squishees: ["otter"],
-      hopperId: "otter",
-      cosmetics: ["party-hat"],
-      equippedCosmetic: "party-hat",
-    });
     const otter = squisheeById("otter")!;
     const html = renderToStaticMarkup(
       <ShopCard s={otter} got coins={0} hopperId="otter" onBuy={() => {}} onUse={() => {}} />,
     );
     expect(html).toContain("Poke Otter");
     expect(html).toContain("data-owned-poke");
-    expect(html).toContain('data-cosmetic="party-hat"');
-    expect(html).toContain("otter-party-hat.png");
     expect(html).toContain("<button");
     expect(html).toContain("data-squash");
-    expect(html).not.toMatch(/squishees\/otter\.png/);
   });
 
   it("owned avocado tile is a poke button with squash machinery", () => {

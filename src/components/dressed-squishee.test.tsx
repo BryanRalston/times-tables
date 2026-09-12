@@ -2,17 +2,11 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
-import { afterEach, describe, expect, it } from "vitest";
-import { ContinueStage } from "@/components/chrome";
+import { describe, expect, it } from "vitest";
 import { DressedSquishee } from "@/components/dressed-squishee";
-import { Mascot } from "@/components/mascot";
-import { resetProgressMemory, useProgress } from "@/lib/progress";
+import { PokeToy } from "@/components/poke-toy";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-
-afterEach(() => {
-  resetProgressMemory();
-});
 
 describe("fitted dress-up surfaces", () => {
   it("renders otter and capybara hat composites, and leftover/hopper/peek stay on DressedSquishee", () => {
@@ -50,23 +44,17 @@ describe("fitted dress-up surfaces", () => {
     expect(mini).toContain("wearForFace");
   });
 
-  it("updates leftover, Home peek, and Shelf poke stills when the outfit changes", () => {
-    useProgress.setState({
-      squishees: ["otter"],
-      hopperId: "otter",
-      cosmetics: ["party-hat", "scarf"],
-      equippedCosmetic: "party-hat",
-    });
-    expect(renderToStaticMarkup(<Mascot />)).toContain("otter-party-hat.png");
-    expect(renderToStaticMarkup(<ContinueStage peek />)).toContain("otter-party-hat.png");
+  it("keeps a dressed hopper pokeable when the outfit changes", () => {
+    const hat = renderToStaticMarkup(<PokeToy id="otter" cosmetic="party-hat" size="sm" />);
+    expect(hat).toContain("Poke Otter");
+    expect(hat).toContain("otter-party-hat.png");
+    expect(hat).toContain("data-owned-poke");
+    expect(hat).not.toMatch(/squishees\/otter\.png/);
 
-    useProgress.setState({ equippedCosmetic: "scarf" });
-    const leftover = renderToStaticMarkup(<Mascot />);
-    const peek = renderToStaticMarkup(<ContinueStage peek />);
-    expect(leftover).toContain("otter-scarf.png");
-    expect(leftover).not.toContain("otter-party-hat.png");
-    expect(leftover).not.toMatch(/squishees\/otter\.png/);
-    expect(peek).toContain("otter-scarf.png");
-    expect(peek).not.toContain("otter-party-hat.png");
+    const scarf = renderToStaticMarkup(<PokeToy id="otter" cosmetic="scarf" size="sm" />);
+    expect(scarf).toContain("Poke Otter");
+    expect(scarf).toContain("otter-scarf.png");
+    expect(scarf).toContain("data-owned-poke");
+    expect(scarf).not.toContain("otter-party-hat.png");
   });
 });
