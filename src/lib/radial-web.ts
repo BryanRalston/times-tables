@@ -34,7 +34,8 @@ export const RADIAL_PLAZA = { x: 49.682, y: 46.272 } as const;
  * Painted portals (inner swirl / hoop openings, mid-spoke arches, and
  * the eight rim arches) are their own hop pads, centered on the portal
  * art — not the inward cream / pink / purple neighbor. Cream mid-spoke
- * tiles 12 and 27 stay walkable path (documented decorative swirls).
+ * tiles 12, 27, 38, and 105 stay walkable path (no warp). Mid-N arch
+ * pad 103 is hop-only — the south spoke has no painted opposite.
  */
 type PadSpot = { x: number; y: number; ring: RadialRing; angle: number; portal?: boolean };
 
@@ -76,7 +77,8 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 73.777, y: 44.189, ring: 3, angle: 87.2 },
   { x: 68.284, y: 49.722, ring: 3, angle: 96.0 },
   { x: 66.796, y: 54.633, ring: 3, angle: 105.4 },
-  { x: 63.500, y: 60.200, ring: 3, angle: 119.8, portal: true },
+  // Cream south of the mid-SE arch. Path only — warp sits on pad 107.
+  { x: 63.500, y: 60.200, ring: 3, angle: 119.8 },
   { x: 66.709, y: 64.422, ring: 3, angle: 120.9 },
   { x: 49.769, y: 69.094, ring: 3, angle: 179.6 },
   { x: 49.680, y: 74.575, ring: 3, angle: 180.0 },
@@ -142,13 +144,18 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 83.514, y: 41.744, ring: 4, angle: 86.5, portal: true },
   { x: 16.090, y: 41.315, ring: 4, angle: 274.6, portal: true },
   { x: 26.480, y: 14.233, ring: 4, angle: 308.4, portal: true },
-  // Mid-NW spoke arch. Warp (pair of mid-SE pad 38).
+  // Mid-NW spoke arch. Warp (pair of mid-SE arch pad 107).
   { x: 39.140, y: 30.230, ring: 2, angle: 326.6, portal: true },
-  // Mid-spoke arches that still had no warp pad. 12 / 27 stay cream path.
-  { x: 49.860, y: 24.220, ring: 3, angle: 0.5, portal: true },
+  // Mid-N painted arch. Hoppable floor — no painted opposite on the
+  // south spoke (cream 40 / 105 / 41), so this is not a warp.
+  { x: 49.860, y: 24.220, ring: 3, angle: 0.5 },
   { x: 60.480, y: 30.600, ring: 2, angle: 34.6, portal: true },
-  { x: 49.850, y: 71.150, ring: 3, angle: 179.6, portal: true },
-  { x: 33.100, y: 62.400, ring: 3, angle: 225.8, portal: true },
+  // South-spoke cream path. No mid-S arch is painted here.
+  { x: 49.850, y: 71.150, ring: 3, angle: 179.6 },
+  // Mid-SW spoke arch. Warp (pair of mid-NE pad 104).
+  { x: 38.947, y: 56.392, ring: 3, angle: 242.1, portal: true },
+  // Mid-SE spoke arch. Warp (pair of mid-NW pad 102). Flag moved off cream 38.
+  { x: 61.442, y: 55.056, ring: 3, angle: 112.8, portal: true },
 ];
 
 function buildPads(): RadialPad[] {
@@ -197,7 +204,7 @@ const PAD_EDGES: readonly (readonly [number, number])[] = [
   [34, 35], [34, 36], [35, 36], [35, 64], [35, 65], [35, 66],
   [36, 37], [37, 38], [38, 39], [39, 70], [39, 71], [40, 105], [105, 41],
   [41, 74], [41, 75], [41, 76], [42, 79], [42, 80],
-  [42, 81], [42, 106], [43, 44], [43, 106], [44, 45], [45, 46], [45, 47], [46, 47],
+  [42, 81], [43, 44], [43, 106], [44, 45], [45, 46], [45, 47], [46, 47],
   [46, 84], [46, 85], [46, 86], [47, 48], [48, 49], [49, 50],
   [49, 51], [50, 51], [50, 52], [51, 89], [51, 90], [51, 91],
   [52, 53],   [54, 94], [54, 95], [54, 55], [55, 56],
@@ -213,7 +220,7 @@ const PAD_EDGES: readonly (readonly [number, number])[] = [
   [83, 100], [84, 100], [85, 100], [86, 100], [88, 101], [89, 101], [90, 101],
   [25, 102], [50, 102], [52, 102],
   [13, 104], [29, 104], [31, 104], [28, 103], [53, 103],
-  [21, 106],
+  [16, 107], [38, 107], [22, 106],
 ];
 
 function buildEdges(): readonly (readonly [number, number])[] {
@@ -253,20 +260,21 @@ export function radialHopStops(fromId: number, toId: number): number[] {
  *
  * Cream tiles 12 and 27 are documented mid-spoke path swirls — walkable,
  * not warps. The purple arches those pads used to sit on warp via 104
- * (mid-NE) and 103 (mid-N). Pad 41 is the cream south of the mid-S hoop.
+ * (mid-NE). Pad 41 is the cream south of outer-S. Cream 38 is the path
+ * south of the mid-SE arch (warp is 107). Cream 105 is south-spoke path;
+ * there is no painted mid-S arch, so mid-N pad 103 is hop-only.
  *
- * Inner N↔S, E↔W. Mid-spoke N↔S, NE↔SW, SE↔NW.
+ * Inner N↔S, E↔W. Mid-spoke NE↔SW, SE↔NW.
  * Outer N↔S, NE↔SW, E↔W, SE↔NW.
  *
  * Hardcoded so a new portal flag cannot steal a pair from nearest-angle
- * matching (pads 96–106 would otherwise orphan an old gate).
+ * matching (pads 96–107 would otherwise orphan an old gate).
  */
 export const PORTAL_PAIRS: readonly (readonly [number, number])[] = [
   [2, 19],
   [96, 97],
-  [103, 105],
   [104, 106],
-  [38, 102],
+  [107, 102],
   [54, 75],
   [98, 57],
   [99, 100],
@@ -275,6 +283,9 @@ export const PORTAL_PAIRS: readonly (readonly [number, number])[] = [
 
 /** Cream mid-spoke tiles beside portal arches. Walkable path, not warps. */
 export const PATH_SWIRL_PADS: readonly number[] = [12, 27];
+
+/** Path tiles that must never warp (cream / pink / purple neighbors + mid-S cream). */
+export const PATH_ONLY_PADS: readonly number[] = [12, 27, 38, 41, 105];
 
 const portalExit = new Map<number, number>();
 for (const [a, b] of PORTAL_PAIRS) {
@@ -441,7 +452,8 @@ export const TABLET_MAP_BOARD = containMapBoard(TABLET_MAP_VIEW);
 
 /**
  * Grown leftover on a 1280 desktop (68rem-capped shell). Wider than 16:9
- * — contain height-fills so chips sit on the dock with no pink plate.
+ * — contain height-fills so chips sit on the dock. Side letterbox is the
+ * Home pink plate, not white.
  */
 export const DESKTOP_MAP_VIEW = { width: 1056, height: 520 } as const;
 
@@ -630,13 +642,15 @@ export function hopLessonsCompleted(
   return n;
 }
 
-/** Banked dice rolls. Same earn rules as the old hop-credit ledger. */
+/** Banked dice rolls. Lesson earns plus gift rolls, minus spent turns. */
 export function hopCreditsOf(
   activities: Record<string, ActivitySave>,
   hopsSpent: number,
   sessions?: Record<string, DaySession>,
+  giftRolls = 0,
 ): number {
-  return Math.max(0, hopLessonsCompleted(activities, sessions) - Math.max(0, Math.round(hopsSpent)));
+  const gifts = typeof giftRolls === "number" && Number.isFinite(giftRolls) ? Math.max(0, Math.round(giftRolls)) : 0;
+  return Math.max(0, hopLessonsCompleted(activities, sessions) + gifts - Math.max(0, Math.round(hopsSpent)));
 }
 
 export const diceRollsOf = hopCreditsOf;

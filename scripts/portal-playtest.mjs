@@ -13,9 +13,8 @@ mkdirSync(shotDir, { recursive: true });
 const PAIRS = [
   [2, 19],
   [96, 97],
-  [103, 105],
   [104, 106],
-  [38, 102],
+  [107, 102],
   [54, 75],
   [98, 57],
   [99, 100],
@@ -25,7 +24,6 @@ const PAIRS = [
 const FIRST_NEIGHBOR = {
   2: 1,
   19: 6,
-  38: 17,
   54: 95,
   57: 79,
   69: 68,
@@ -37,10 +35,9 @@ const FIRST_NEIGHBOR = {
   100: 83,
   101: 88,
   102: 25,
-  103: 26,
   104: 12,
-  105: 40,
-  106: 42,
+  106: 43,
+  107: 38,
 };
 
 function seedGuest(hopperAt, steps = 3) {
@@ -76,7 +73,7 @@ function seedGuest(hopperAt, steps = 3) {
   };
   return {
     state: {
-      version: 15,
+      version: 16,
       learnerId: "kid-1",
       classUnitId: "",
       pathGrade: 3,

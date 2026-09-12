@@ -8,7 +8,16 @@ import {
   parseEquippedCosmetic,
   type CosmeticBuyReason,
 } from "./cosmetics";
-import { applyPresentLand, applyUnlock, healOpenedPresents, type LandedPresent } from "./presents";
+import {
+  applyPresentLand,
+  applyUnlock,
+  clampGiftRolls,
+  healLivePresentPads,
+  healOpenedPresents,
+  healPresentGrantedIds,
+  SEED_PRESENT_PADS,
+  type LandedPresent,
+} from "./presents";
 import { parseHopperId } from "./squishees";
 import { GRADE4_SPANS, UNIT_SPANS, UNITS, unitById, unitsFor } from "./curriculum";
 import {
@@ -46,7 +55,7 @@ import { parseTestMode } from "./test-mode";
 import type { ActivitySave, DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
 import { parsePathGrade } from "./types";
 
-const SAVE_VERSION = 15;
+const SAVE_VERSION = 16;
 export const STORAGE_KEY = "g3-path-v2";
 export const LEGACY_STORAGE_KEYS = ["g3-path-v1", "times-tables-progress", "times-tables-settings"] as const;
 const DEFAULT_ID = "kid-1";
@@ -136,6 +145,9 @@ export function emptyLearner(name = ""): LearnerSlice {
     pathHopSpent: 0,
     pathStepsLeft: 0,
     openedPresents: [],
+    livePresentPads: [...SEED_PRESENT_PADS],
+    presentGrantedIds: [],
+    pathGiftRolls: 0,
     hopperId: "",
     cosmetics: [],
     equippedCosmetic: "",
@@ -164,6 +176,15 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
     pathHopSpent: clampPathHopSpent(s.pathHopSpent),
     pathStepsLeft: clampPathStepsLeft(s.pathStepsLeft),
     openedPresents: healOpenedPresents(s.squishees ?? [], s.openedPresents, 15),
+    livePresentPads: healLivePresentPads({
+      owned: s.squishees ?? [],
+      rawLive: s.livePresentPads,
+      rawOpened: s.openedPresents,
+      saveVersion: 15,
+      hopperAt: s.pathHopperAt,
+    }),
+    presentGrantedIds: healPresentGrantedIds(s.squishees ?? [], s.presentGrantedIds),
+    pathGiftRolls: clampGiftRolls(s.pathGiftRolls),
     hopperId: parseHopperId(s.hopperId, s.squishees ?? []),
     cosmetics: parseCosmeticIds(s.cosmetics),
     equippedCosmetic: parseEquippedCosmetic(s.equippedCosmetic, parseCosmeticIds(s.cosmetics)),
@@ -228,6 +249,15 @@ function sliceOfWithHopHeal(s: LearnerSlice, saveVersion: number): LearnerSlice 
     pathHopSpent: turn.pathHopSpent,
     pathStepsLeft: turn.pathStepsLeft,
     openedPresents: healOpenedPresents(next.squishees, s.openedPresents, saveVersion),
+    livePresentPads: healLivePresentPads({
+      owned: next.squishees,
+      rawLive: s.livePresentPads,
+      rawOpened: s.openedPresents,
+      saveVersion,
+      hopperAt: next.pathHopperAt,
+    }),
+    presentGrantedIds: healPresentGrantedIds(next.squishees, s.presentGrantedIds),
+    pathGiftRolls: clampGiftRolls(s.pathGiftRolls),
   };
 }
 
@@ -274,6 +304,15 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
       pathHopSpent: raw.pathHopSpent ?? 0,
       pathStepsLeft: raw.pathStepsLeft ?? 0,
       openedPresents: raw.openedPresents ?? [],
+      livePresentPads: healLivePresentPads({
+        owned: raw.squishees ?? [],
+        rawLive: raw.livePresentPads,
+        rawOpened: raw.openedPresents,
+        saveVersion,
+        hopperAt: raw.pathHopperAt,
+      }),
+      presentGrantedIds: raw.presentGrantedIds ?? [],
+      pathGiftRolls: raw.pathGiftRolls ?? 0,
       hopperId: raw.hopperId ?? "",
       cosmetics: raw.cosmetics ?? [],
       equippedCosmetic: raw.equippedCosmetic ?? "",
@@ -387,6 +426,9 @@ function snapshotSave(s: SaveState): SaveState {
     pathHopSpent: s.pathHopSpent,
     pathStepsLeft: s.pathStepsLeft,
     openedPresents: s.openedPresents,
+    livePresentPads: s.livePresentPads,
+    presentGrantedIds: s.presentGrantedIds,
+    pathGiftRolls: s.pathGiftRolls,
     hopperId: s.hopperId,
     cosmetics: s.cosmetics,
     equippedCosmetic: s.equippedCosmetic,
@@ -438,7 +480,7 @@ export const useProgress = create<ProgressApi>()(
       startDiceTurn: (face) => {
         const s = get();
         const steps = clampDieFace(face);
-        const rolls = hopCreditsOf(s.activities, s.pathHopSpent, s.sessions);
+        const rolls = hopCreditsOf(s.activities, s.pathHopSpent, s.sessions, s.pathGiftRolls);
         if (!canStartDiceTurn(rolls, activePathStepsLeft(s.pathHopSpent, s.pathStepsLeft))) return false;
         commit(get, set, { pathHopSpent: s.pathHopSpent + 1, pathStepsLeft: steps });
         return true;
@@ -556,9 +598,22 @@ export const useProgress = create<ProgressApi>()(
         return { ok: r.ok, reason: r.reason };
       },
       landPresentPad: (pad) => {
-        const r = applyPresentLand(get().squishees, get().coins, get().openedPresents, pad);
+        const s = get();
+        const r = applyPresentLand(s.squishees, s.coins, s.openedPresents, pad, {
+          live: s.livePresentPads,
+          granted: s.presentGrantedIds,
+          giftRolls: s.pathGiftRolls,
+          hopperAt: s.pathHopperAt || pad,
+        });
         if (r.ok) {
-          commit(get, set, { squishees: r.squishees, coins: r.coins, openedPresents: r.opened });
+          commit(get, set, {
+            squishees: r.squishees,
+            coins: r.coins,
+            openedPresents: r.opened,
+            livePresentPads: r.livePads,
+            presentGrantedIds: r.granted,
+            pathGiftRolls: r.giftRolls,
+          });
         }
         return { ok: r.ok, reward: r.reward };
       },

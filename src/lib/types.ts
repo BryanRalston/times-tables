@@ -350,6 +350,12 @@ export interface LearnerSlice {
   pathStepsLeft: number;
   /** Mystery-present pads already unwrapped. Empty = none opened. */
   openedPresents: number[];
+  /** Pads that currently have a live mystery box. Refilled to stay populated. */
+  livePresentPads: number[];
+  /** Squishees already granted from presents. Shop buys are not required here. */
+  presentGrantedIds: string[];
+  /** Extra banked dice from presents. Same spend path as a lesson roll. */
+  pathGiftRolls: number;
   /** Kid-picked Lessons / play face. Empty = last owned, else Peach. */
   hopperId: string;
   /** Owned cheap wearables. Never required to progress. */
