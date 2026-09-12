@@ -51,6 +51,38 @@ describe("buySquishee", () => {
       squishees: [],
     });
     expect(applyBuy(100, [], "crystal-axolotl").reason).toBe("find");
+    expect(applyBuy(10, [], "mango")).toEqual({
+      ok: true,
+      reason: "ok",
+      coins: 0,
+      squishees: ["mango"],
+    });
+    expect(applyBuy(10, [], "croissant").ok).toBe(true);
+    expect(applyBuy(10, [], "hamster").ok).toBe(true);
+    expect(applyBuy(10, [], "macaron").ok).toBe(true);
+    expect(applyBuy(10, [], "taiyaki").ok).toBe(true);
+    expect(applyBuy(10, [], "lychee").ok).toBe(true);
+    for (const id of [
+      "solar-koi",
+      "velvet-octopus",
+      "lunar-lamb",
+      "thunder-quokka",
+      "coral-seahorse",
+      "eclipse-owl",
+      "amber-phoenix",
+      "mist-deer",
+      "sapphire-frog",
+      "gilded-otter",
+      "starlight-penguin",
+      "rose-gold-seal",
+    ]) {
+      expect(applyBuy(100, [], id)).toEqual({
+        ok: false,
+        reason: "find",
+        coins: 100,
+        squishees: [],
+      });
+    }
   });
 
   it("knows when the shop has something they can buy", () => {

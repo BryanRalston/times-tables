@@ -139,4 +139,21 @@ describe("shop tiles", () => {
     expect(html).not.toContain("Rare");
     expect(html).not.toMatch(/>\s*50\s*</);
   });
+
+  it("new commons are buyable silhouettes; new rares stay find-only", () => {
+    const mango = squisheeById("mango")!;
+    const buy = renderToStaticMarkup(<ShopCard s={mango} got={false} coins={10} onBuy={() => {}} />);
+    expect(buy).toContain("data-silhouette");
+    expect(buy).toContain("mango.png");
+    expect(buy).toContain("<button");
+    expect(buy).not.toContain("data-rare-find");
+
+    const koi = squisheeById("solar-koi")!;
+    const find = renderToStaticMarkup(<ShopCard s={koi} got={false} coins={100} onBuy={() => {}} />);
+    expect(find).toContain("data-rare-find");
+    expect(find).toContain("data-mystery-present");
+    expect(find).not.toContain("Solar Koi");
+    expect(find).not.toContain("solar-koi.png");
+    expect(find).not.toContain("<button");
+  });
 });

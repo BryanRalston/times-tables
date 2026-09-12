@@ -197,4 +197,33 @@ describe("new shop toys", () => {
     expect(squisheeById("capybara")?.rarity).toBe("common");
     expect(squisheeById("red-panda")?.rarity).toBe("common");
   });
+
+  it("registers six buyable commons and twelve find-only rares", () => {
+    const commons = ["mango", "croissant", "hamster", "macaron", "taiyaki", "lychee"] as const;
+    const rares = [
+      "solar-koi",
+      "velvet-octopus",
+      "lunar-lamb",
+      "thunder-quokka",
+      "coral-seahorse",
+      "eclipse-owl",
+      "amber-phoenix",
+      "mist-deer",
+      "sapphire-frog",
+      "gilded-otter",
+      "starlight-penguin",
+      "rose-gold-seal",
+    ] as const;
+    expect(SQUISHEE_IDS).toEqual(expect.arrayContaining([...commons, ...rares]));
+    for (const id of commons) {
+      expect(squisheeById(id)?.rarity).toBe("common");
+      expect(squisheeById(id)?.poke).toBeNull();
+      expect(squisheePrice(id)).toBe(squisheePrice("frog"));
+    }
+    for (const id of rares) {
+      expect(squisheeById(id)?.rarity).toBe("rare");
+      expect(squisheeById(id)?.poke).toBeNull();
+      expect(squisheePrice(id)).toBe(RARE_PRICE);
+    }
+  });
 });

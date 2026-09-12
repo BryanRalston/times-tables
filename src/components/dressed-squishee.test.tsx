@@ -39,9 +39,14 @@ describe("fitted dress-up surfaces", () => {
     const poke = readFileSync(join(HERE, "poke-toy.tsx"), "utf8");
     expect(poke).toContain("dressedSquisheeSrc");
     expect(poke).toContain("data-owned-poke");
+    expect(poke).toContain("!fitted");
+    expect(poke).toContain("playPokeClip");
     const mini = readFileSync(join(HERE, "minigame.tsx"), "utf8");
     expect(mini).toContain("dressedSquisheeSrc");
     expect(mini).toContain("wearForFace");
+    const models = readFileSync(join(HERE, "models.tsx"), "utf8");
+    expect(models).toContain("dressedSquisheeSrc");
+    expect(models).toContain("wearForFace");
   });
 
   it("keeps a dressed hopper pokeable when the outfit changes", () => {

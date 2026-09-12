@@ -45,7 +45,25 @@ describe("Grade 3 mystery presents", () => {
     expect(grade3PresentCommons().length).toBeGreaterThanOrEqual(1);
     expect(grade3PresentCommons().every((id) => COMMON_SQUISHEES.some((s) => s.id === id))).toBe(true);
     expect(heldRares().length + grade3PresentRares().length).toBe(RARE_SQUISHEES.length);
-    expect(heldRares()).toEqual(expect.arrayContaining(["nebula-fox", "frost-bun", "opal-otter"]));
+    expect(heldRares()).toEqual(
+      expect.arrayContaining([
+        "nebula-fox",
+        "frost-bun",
+        "opal-otter",
+        "solar-koi",
+        "velvet-octopus",
+        "lunar-lamb",
+        "thunder-quokka",
+        "coral-seahorse",
+        "eclipse-owl",
+        "amber-phoenix",
+        "mist-deer",
+        "sapphire-frog",
+        "gilded-otter",
+        "starlight-penguin",
+        "rose-gold-seal",
+      ]),
+    );
     expect(grade3PresentRares()).not.toEqual(expect.arrayContaining(["nebula-fox", "frost-bun"]));
   });
 

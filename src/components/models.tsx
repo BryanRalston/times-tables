@@ -14,9 +14,10 @@ import { G4Q, parseLocale, PLACE, qCopy, UI, type Locale } from "@/lib/i18n";
 import { leftoverWhyMoveMs, splitCounted } from "@/lib/leftover";
 import { useProgress } from "@/lib/progress";
 import { asset } from "@/lib/art";
+import { dressedSquisheeSrc, wearForFace } from "@/lib/cosmetics";
 import { placeOnGraph } from "@/lib/questions";
 import { playTap, playWrong } from "@/lib/sound";
-import { squisheeSrc } from "@/lib/squishees";
+import { pathHopperId } from "@/lib/squishees";
 import type {
   AreaData,
   ArrayData,
@@ -1357,13 +1358,19 @@ function PerimeterBoard({ question, onInteract, status, shake }: BoardProps) {
 }
 
 function GraphIcon({ id, size = 28 }: { id: string; size?: number }) {
+  const owned = useProgress((s) => s.squishees);
+  const chosen = useProgress((s) => s.hopperId);
+  const equipped = useProgress((s) => s.equippedCosmetic);
+  const wear = wearForFace(id, pathHopperId(owned, chosen), equipped);
   return (
     <img
-      src={squisheeSrc(id)}
+      src={dressedSquisheeSrc(id, wear)}
       alt=""
       width={size}
       height={size}
       data-squishee={id}
+      data-dressed={id}
+      data-cosmetic={wear || undefined}
       draggable={false}
       className={cn("object-contain", size >= 28 ? "size-7" : "inline size-5")}
       style={{ width: size, height: size }}
@@ -1747,14 +1754,18 @@ function ToolFace({
 function MeasureBoard({ question, status, shake }: BoardProps) {
   const data = question.data as MeasureData;
   const ui = UI[parseLocale(useProgress((st) => st.locale))];
+  const owned = useProgress((s) => s.squishees);
+  const chosen = useProgress((s) => s.hopperId);
+  const equipped = useProgress((s) => s.equippedCosmetic);
+  const hopperId = pathHopperId(owned, chosen);
   if (data.mode === "unit") {
     const p = question.prompt.toLowerCase();
     const src = /pencil|l[aá]piz|l[aá]pis/.test(p)
       ? asset("measure/pencil.png")
       : /grape|uva/.test(p)
-        ? asset("squishees/grape.png")
+        ? dressedSquisheeSrc("grape", wearForFace("grape", hopperId, equipped))
         : /watermelon|melon|sand[ií]a/.test(p)
-          ? asset("squishees/melon.png")
+          ? dressedSquisheeSrc("melon", wearForFace("melon", hopperId, equipped))
           : /apple|manzana|ma[cç]/.test(p) || /pound|gram|kilo|mass|weight|peso/.test(p)
             ? asset("measure/scale.png")
             : /water|milk|spoon|bottle|cup|liter|gallon|leche|leite|agua|água/.test(p)

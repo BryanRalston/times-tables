@@ -24,6 +24,22 @@ describe("PokeToy", () => {
     expect(html).not.toMatch(/squishees\/otter\.png/);
   });
 
+  it("dressed poke stills stay on the outfit and do not mount the bare poke clip", () => {
+    const frog = renderToStaticMarkup(<PokeToy id="frog" cosmetic="scarf" size="sm" />);
+    expect(frog).toContain("Poke Frog");
+    expect(frog).toContain("frog-scarf.png");
+    expect(frog).toContain("data-owned-poke");
+    expect(frog).toContain("data-squash");
+    expect(frog).not.toContain("frog-poke");
+    expect(frog).not.toMatch(/squishees\/frog\.png/);
+
+    const mango = renderToStaticMarkup(<PokeToy id="mango" cosmetic="party-hat" size="sm" />);
+    expect(mango).toContain("Poke Mango");
+    expect(mango).toContain("mango-party-hat.png");
+    expect(mango).toContain("data-owned-poke");
+    expect(mango).not.toMatch(/squishees\/mango\.png/);
+  });
+
   it("renders catalog toys used on home", () => {
     expect(renderToStaticMarkup(<PokeToy id="cat" />)).toContain("Poke Cat");
     expect(renderToStaticMarkup(<PokeToy id="panda" />)).toContain("Poke Panda");

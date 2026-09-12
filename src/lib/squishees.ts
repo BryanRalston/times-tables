@@ -112,6 +112,12 @@ const COMMON = [
   { id: "koala", name: "Koala", theme: "animal", file: "koala.png", poke: null, rarity: "common" },
   { id: "pretzel", name: "Pretzel", theme: "food", file: "pretzel.png", poke: null, rarity: "common" },
   { id: "hedgehog", name: "Hedgehog", theme: "animal", file: "hedgehog.png", poke: null, rarity: "common" },
+  { id: "mango", name: "Mango", theme: "food", file: "mango.png", poke: null, rarity: "common" },
+  { id: "croissant", name: "Croissant", theme: "food", file: "croissant.png", poke: null, rarity: "common" },
+  { id: "hamster", name: "Hamster", theme: "animal", file: "hamster.png", poke: null, rarity: "common" },
+  { id: "macaron", name: "Macaron", theme: "food", file: "macaron.png", poke: null, rarity: "common" },
+  { id: "taiyaki", name: "Taiyaki", theme: "food", file: "taiyaki.png", poke: null, rarity: "common" },
+  { id: "lychee", name: "Lychee", theme: "food", file: "lychee.png", poke: null, rarity: "common" },
 ].map(withWiredCheer) as Squishee[];
 
 const RARE = [
@@ -135,6 +141,18 @@ const RARE = [
   { id: "pearl-whale", name: "Pearl Whale", theme: "animal", file: "pearl-whale.png", poke: null, rarity: "rare" },
   { id: "sunset-sloth", name: "Sunset Sloth", theme: "animal", file: "sunset-sloth.png", poke: null, rarity: "rare" },
   { id: "frost-bun", name: "Frost Bun", theme: "food", file: "frost-bun.png", poke: null, rarity: "rare" },
+  { id: "solar-koi", name: "Solar Koi", theme: "animal", file: "solar-koi.png", poke: null, rarity: "rare" },
+  { id: "velvet-octopus", name: "Velvet Octopus", theme: "animal", file: "velvet-octopus.png", poke: null, rarity: "rare" },
+  { id: "lunar-lamb", name: "Lunar Lamb", theme: "animal", file: "lunar-lamb.png", poke: null, rarity: "rare" },
+  { id: "thunder-quokka", name: "Thunder Quokka", theme: "animal", file: "thunder-quokka.png", poke: null, rarity: "rare" },
+  { id: "coral-seahorse", name: "Coral Seahorse", theme: "animal", file: "coral-seahorse.png", poke: null, rarity: "rare" },
+  { id: "eclipse-owl", name: "Eclipse Owl", theme: "animal", file: "eclipse-owl.png", poke: null, rarity: "rare" },
+  { id: "amber-phoenix", name: "Amber Phoenix", theme: "animal", file: "amber-phoenix.png", poke: null, rarity: "rare" },
+  { id: "mist-deer", name: "Mist Deer", theme: "animal", file: "mist-deer.png", poke: null, rarity: "rare" },
+  { id: "sapphire-frog", name: "Sapphire Frog", theme: "animal", file: "sapphire-frog.png", poke: null, rarity: "rare" },
+  { id: "gilded-otter", name: "Gilded Otter", theme: "animal", file: "gilded-otter.png", poke: null, rarity: "rare" },
+  { id: "starlight-penguin", name: "Starlight Penguin", theme: "animal", file: "starlight-penguin.png", poke: null, rarity: "rare" },
+  { id: "rose-gold-seal", name: "Rose Gold Seal", theme: "animal", file: "rose-gold-seal.png", poke: null, rarity: "rare" },
 ].map(withWiredCheer) as Squishee[];
 
 export const SQUISHEES: Squishee[] = [...COMMON, ...RARE];

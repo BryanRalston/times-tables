@@ -121,9 +121,9 @@ export function PokeToy({
   const cheerClip = squisheeCheerSrc(id);
   const cheerStrip = squisheeCheerStrip(id);
   const skipVideo = skipPokeVideo();
-  const cheerVideo = Boolean(cheer) && Boolean(cheerClip) && !skipVideo;
-  const cheerSprite = Boolean(cheer) && Boolean(cheerStrip) && !cheerVideo;
-  const cheerPop = Boolean(cheer) && !cheerClip && !cheerStrip;
+  const cheerVideo = Boolean(cheer) && Boolean(cheerClip) && !skipVideo && !fitted;
+  const cheerSprite = Boolean(cheer) && Boolean(cheerStrip) && !cheerVideo && !fitted;
+  const cheerPop = Boolean(cheer) && !cheerVideo && !cheerSprite;
 
   const [poking, setPoking] = useState(false);
   const [pokeTick, setPokeTick] = useState(0);
@@ -145,8 +145,8 @@ export function PokeToy({
 
   const videoSrc = cheer ? cheerClip : pokeClip;
   const strip = cheer ? cheerStrip : pokeStrip;
-  const playPokeClip = Boolean(pokeClip) && !skipVideo;
-  const playPokeStrip = Boolean(pokeStrip) && !playPokeClip;
+  const playPokeClip = Boolean(pokeClip) && !skipVideo && !fitted;
+  const playPokeStrip = Boolean(pokeStrip) && !playPokeClip && !fitted;
 
   function stopClip() {
     setClipOn(false);

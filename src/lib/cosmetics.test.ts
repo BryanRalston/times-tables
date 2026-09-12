@@ -34,7 +34,12 @@ describe("catalog dress-up", () => {
     expect(canDressFace("avocado", "bow")).toBe(true);
     expect(canDressFace("crystal-axolotl", "shades")).toBe(true);
     expect(canDressFace("galaxy-narwhal", "party-hat")).toBe(true);
+    expect(canDressFace("mango", "party-hat")).toBe(true);
+    expect(canDressFace("solar-koi", "scarf")).toBe(true);
+    expect(canDressFace("rose-gold-seal", "shades")).toBe(true);
     expect(isCosmeticFace("golden-dragon")).toBe(true);
+    expect(isCosmeticFace("hamster")).toBe(true);
+    expect(isCosmeticFace("starlight-penguin")).toBe(true);
     expect(isCosmeticFace("otter")).toBe(true);
     expect(dressPreviewFace("golden-dragon")).toBe("golden-dragon");
     expect(dressPreviewFace("otter")).toBe("otter");
