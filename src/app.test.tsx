@@ -512,8 +512,8 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".shelf-use");
     expect(css).toContain(".shelf-avatar-hero");
     expect(css).toContain(".dressed-squishee");
-    expect(css).toContain(".cosmetic-overlay");
-    expect(css).toContain(".cosmetic-overlay-hat");
+    expect(css).not.toContain(".cosmetic-overlay");
+    expect(css).not.toContain(".cosmetic-overlay-hat");
     expect(css).toContain(".candy-unwrap");
     expect(css).toContain("@keyframes candy-choice-pulse");
     expect(css).toContain("@keyframes candy-portal-swirl");

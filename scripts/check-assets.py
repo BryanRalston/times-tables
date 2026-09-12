@@ -331,12 +331,28 @@ def main() -> int:
             if cream > 8:
                 fails.append(f"tall-map.png: extra cream disc still at {fx:.4f},{fy:.4f} ({cream}px)")
 
+    cosmetic_ids = ["party-hat", "scarf", "bow", "shades"]
+    public_cos = PUBLIC / "cosmetics"
+    master_cos = ROOT / "assets" / "squishee-cosmetics"
+    wanted = 0
+    for name in files:
+        face = Path(name).stem
+        for item in cosmetic_ids:
+            wanted += 1
+            fn = f"{face}-{item}.png"
+            if not (public_cos / fn).exists():
+                fails.append(f"missing cosmetics/{fn}")
+            if not (master_cos / fn).exists():
+                fails.append(f"missing assets/squishee-cosmetics/{fn}")
+
     if fails:
         print("check-assets FAIL")
         for f in fails:
             print(" ", f)
         return 1
-    print(f"check-assets OK {len(files)} squishees {len(MONEY_FILES)} money {len(MEASURE_FILES)} measure")
+    print(
+        f"check-assets OK {len(files)} squishees {len(MONEY_FILES)} money {len(MEASURE_FILES)} measure {wanted} cosmetics"
+    )
     return 0
 
 

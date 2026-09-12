@@ -897,34 +897,6 @@ details > summary::-webkit-details-marker {
   height: 100%;
   object-fit: contain;
 }
-.cosmetic-overlay {
-  position: absolute;
-  left: 50%;
-  pointer-events: none;
-  object-fit: contain;
-}
-.cosmetic-overlay-hat {
-  width: 64%;
-  top: -14%;
-  transform: translateX(-50%);
-  z-index: 3;
-}
-.cosmetic-overlay-face {
-  width: 56%;
-  top: 26%;
-  transform: translateX(-50%);
-  z-index: 4;
-}
-.cosmetic-overlay-neck {
-  width: 78%;
-  top: 46%;
-  transform: translateX(-50%);
-  z-index: 2;
-}
-.cosmetic-overlay[data-cosmetic-hat="bow"] {
-  width: 48%;
-  top: 2%;
-}
 .candy-hopper-fit .dressed-squishee {
   position: absolute;
   inset: 0;
