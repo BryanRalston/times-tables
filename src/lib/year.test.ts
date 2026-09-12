@@ -449,6 +449,8 @@ describe("locale", () => {
     expect(UI.en.rareBlurb).toMatch(/Lessons map/);
     expect(UI.en.findOnMap).toBe("Find on Lessons");
     expect(UI.en.youFound("Peach")).toBe("You found Peach!");
+    expect(UI.en.youFoundCoins(10)).toBe("You found 10 coins!");
+    expect(UI.es.youFoundCoins(10)).toBe("¡Encontraste 10 monedas!");
     expect(UI.en.surprisePresent).toBe("Surprise present");
     expect(UI.es.surprisePresent).toBe("Regalo sorpresa");
     expect(UI["pt-BR"].findOnMap).toBe("Ache nas Lições");

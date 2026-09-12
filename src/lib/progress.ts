@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, type PersistStorage, type StorageValue } from "zustand/middleware";
 import { todayIso } from "./calendar";
 import { applyBuy, type BuyReason } from "./coins";
-import { applyUnlock } from "./presents";
+import { applyPresentClaim, applyUnlock, parseClaimedPresentPads, type PresentClaimReason, type PresentSpot } from "./presents";
 import { GRADE4_SPANS, UNIT_SPANS, UNITS, unitById, unitsFor } from "./curriculum";
 import {
   RADIAL_PAD_COUNT,
@@ -39,7 +39,7 @@ import { parseTestMode } from "./test-mode";
 import type { ActivitySave, DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
 import { parsePathGrade } from "./types";
 
-const SAVE_VERSION = 14;
+const SAVE_VERSION = 15;
 export const STORAGE_KEY = "g3-path-v2";
 export const LEGACY_STORAGE_KEYS = ["g3-path-v1", "times-tables-progress", "times-tables-settings"] as const;
 const DEFAULT_ID = "kid-1";
@@ -128,6 +128,7 @@ export function emptyLearner(name = ""): LearnerSlice {
     pathNowSeen: 0,
     pathHopSpent: 0,
     pathStepsLeft: 0,
+    claimedPresentPads: [],
   };
 }
 
@@ -152,6 +153,7 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
     pathNowSeen: clampPathHopperAt(s.pathNowSeen),
     pathHopSpent: clampPathHopSpent(s.pathHopSpent),
     pathStepsLeft: clampPathStepsLeft(s.pathStepsLeft),
+    claimedPresentPads: parseClaimedPresentPads(s.claimedPresentPads),
   };
 }
 
@@ -257,6 +259,7 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
       pathNowSeen: raw.pathNowSeen ?? 0,
       pathHopSpent: raw.pathHopSpent ?? 0,
       pathStepsLeft: raw.pathStepsLeft ?? 0,
+      claimedPresentPads: parseClaimedPresentPads(raw.claimedPresentPads),
     },
     saveVersion,
   );
@@ -275,6 +278,10 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
       pathHopperAt: kid.pathHopperAt || fromFlat.pathHopperAt,
       pathHopSpent: kid.pathHopSpent ?? fromFlat.pathHopSpent,
       pathStepsLeft: kid.pathStepsLeft ?? fromFlat.pathStepsLeft,
+      claimedPresentPads: parseClaimedPresentPads([
+        ...parseClaimedPresentPads(fromFlat.claimedPresentPads),
+        ...parseClaimedPresentPads(kid.claimedPresentPads),
+      ]),
     };
   }
   for (const id of Object.keys(learners)) learners[id] = sliceOfWithHopHeal(learners[id]!, saveVersion);
@@ -327,6 +334,7 @@ interface ProgressApi extends SaveState {
   awardCoins: (n: number) => void;
   buySquishee: (id: string) => { ok: boolean; reason: BuyReason };
   unlockSquishee: (id: string) => { ok: boolean; reason: "ok" | "missing" | "owned" };
+  claimPresent: (pad: number) => { ok: boolean; reason: PresentClaimReason; reward?: PresentSpot };
   switchLearner: (id: string) => void;
   addLearner: (name: string) => string;
   resetAll: () => void;
@@ -361,6 +369,7 @@ function snapshotSave(s: SaveState): SaveState {
     pathNowSeen: s.pathNowSeen,
     pathHopSpent: s.pathHopSpent,
     pathStepsLeft: s.pathStepsLeft,
+    claimedPresentPads: s.claimedPresentPads,
     learners: s.learners,
   };
 }
@@ -525,6 +534,22 @@ export const useProgress = create<ProgressApi>()(
         const r = applyUnlock(get().squishees, id);
         if (r.ok) commit(get, set, { squishees: r.squishees });
         return { ok: r.ok, reason: r.reason };
+      },
+      claimPresent: (pad) => {
+        const r = applyPresentClaim({
+          pad,
+          owned: get().squishees,
+          coins: get().coins,
+          claimedPads: get().claimedPresentPads,
+        });
+        if (r.ok) {
+          commit(get, set, {
+            squishees: r.squishees,
+            coins: r.coins,
+            claimedPresentPads: r.claimedPads,
+          });
+        }
+        return { ok: r.ok, reason: r.reason, reward: r.reward };
       },
       switchLearner: (id) => {
         const kid = get().learners[id];

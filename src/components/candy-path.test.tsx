@@ -77,20 +77,30 @@ describe("CandyPath", () => {
     expect(html).not.toContain("data-portal-pair");
     expect(html).not.toContain("data-portal-to");
     expect(html).not.toContain("data-trail-peek");
-    expect(html).toContain('data-present-count="4"');
-    expect((html.match(/data-pad-present="1"/g) ?? []).length).toBe(4);
+    expect(html).toContain('data-present-count="8"');
+    expect(html).toContain('data-map-fit="contain"');
+    expect((html.match(/data-pad-present="1"/g) ?? []).length).toBe(8);
     expect(html).toContain("data-mystery-present");
+    expect(html).toContain('data-present-art="vinyl"');
+    expect(html).toContain("art/presents/present-closed.png");
+    expect(html).not.toContain("present-open.png");
     expect(html).not.toContain("data-present-unwrap");
     expect(html).not.toContain("Crystal Axolotl");
     expect(html).not.toContain("Galaxy Narwhal");
     expect(html).not.toContain("Golden Dragon");
     expect(html).not.toContain("Rainbow Cupcake");
+    expect(html).not.toContain("Capybara");
     expect(html).not.toContain("crystal-axolotl.png");
     expect(html).not.toContain("galaxy-narwhal.png");
     expect(html).not.toContain("golden-dragon.png");
     expect(html).not.toContain("rainbow-cupcake.png");
+    expect(html).not.toContain("capybara.png");
+    expect(html).not.toContain("boba.png");
+    expect(html).not.toContain("axolotl.png");
     expect(html).not.toContain("data-present-squishee");
     expect(html).not.toContain("Rare");
+    expect(html).not.toContain("You found 10 coins");
+    expect(html).not.toContain("coin-pile.png");
   });
 
   it("drops a found present without naming the rare on the map", () => {
@@ -98,8 +108,8 @@ describe("CandyPath", () => {
     const html = renderToStaticMarkup(
       <CandyPath suggestedId="u2" standFrom={1} standTo={1} onStart={() => {}} onOpenUnit={() => {}} />,
     );
-    expect(html).toContain('data-present-count="3"');
-    expect((html.match(/data-pad-present="1"/g) ?? []).length).toBe(3);
+    expect(html).toContain('data-present-count="7"');
+    expect((html.match(/data-pad-present="1"/g) ?? []).length).toBe(7);
     expect((html.match(/data-pad-present-found="1"/g) ?? []).length).toBe(1);
     expect(html).toContain(`data-present-pad="${GRADE3_PRESENTS[0]!.pad}"`);
     expect(html).not.toContain("Crystal Axolotl");
@@ -307,9 +317,9 @@ describe("CandyPath", () => {
     expect(src).not.toContain("nearestHopDir");
     expect(src).not.toContain("candy-dpad");
     expect(src).not.toContain("onDpadPointerUp");
-    expect(src).toContain("unlockSquishee");
-    expect(src).toContain("landPresent");
+    expect(src).toContain("claimPresent");
     expect(src).toContain("MysteryPresent");
+    expect(src).toContain("PRESENT_COIN_FILE");
     expect(src).toContain("data-present-unwrap");
     expect(src).toContain("padView(unwrap.pad)");
     expect(src).toContain("HOPPER_BOARD_WIDTH_PCT");

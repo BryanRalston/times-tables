@@ -25,4 +25,10 @@ One continuous quiet map. Keep hop, numbers, locks, glow, and mist as overlays �
 
 Older `meadow.png` / `cove.png` / `forest.png` plates are leftovers, not the Lessons world model.
 
+## Mystery presents (`public/art/presents/`)
+Vinyl gift boxes for the Lessons map. Closed boxes are identical across loot types.
+- `present-closed.png` — cream vinyl cube, satin blush ribbon
+- `present-open.png` — unwrap beat, empty interior
+- `coin-pile.png` — ~10 gold star coins for the unwrap overlay
+
 Do not put letters on new art. Chroma the magentas; do not leave hot pink boxes in the layout.

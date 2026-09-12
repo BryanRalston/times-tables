@@ -348,6 +348,8 @@ export interface LearnerSlice {
   pathHopSpent: number;
   /** Adjacent steps left in the current dice turn. 0 = no active turn. */
   pathStepsLeft: number;
+  /** Mystery-present pads already unwrapped (coin grants). Missing → []. */
+  claimedPresentPads: number[];
 }
 
 export interface SaveState extends LearnerSlice {

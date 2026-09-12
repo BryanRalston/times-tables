@@ -396,21 +396,20 @@ export const HOPPER_SIT_TRANSLATE = "translate(-50%, -50%)";
 export const HOP_GLOW_BOARD_WIDTH_PCT = 2.2;
 
 /**
- * Visible radial card on a 390 phone after scroll pad + 4px frame.
- * CSS `.candy-world` caps at 6/7 so the island grows without shearing
- * the outer E/W portal arches off the card. The Lessons plate may be
- * taller — leftover column is studio white, not a deeper crop.
+ * Visible 16:9 island on a 390 phone after scroll pad + 4px frame.
+ * Contained in the card so the painted rim stays on-screen. Extra
+ * Lessons plate is studio white, not a deeper crop.
  */
-export const PHONE_MAP_VIEW = { width: 368, height: (368 * 7) / 6 } as const;
+export const PHONE_MAP_VIEW = { width: 368, height: (368 * 9) / 16 } as const;
 
 /**
- * Overlay / art stage: same 16:9 as radial-web-locked.jpg, height-matched
- * to the card so pad % stays on-art. Wider than the card — sides crop.
+ * Overlay / art stage: same 16:9 as radial-web-locked.jpg, contained
+ * in the card so pad % stay on-art. Never wider than the view.
  */
 export const PHONE_MAP_BOARD = {
   left: 0,
   top: 0,
-  width: PHONE_MAP_VIEW.height * (RADIAL_MAP_SIZE.w / RADIAL_MAP_SIZE.h),
+  width: PHONE_MAP_VIEW.width,
   height: PHONE_MAP_VIEW.height,
 } as const;
 

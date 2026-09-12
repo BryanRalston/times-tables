@@ -95,6 +95,7 @@ export type Ui = {
   rareBlurb: string;
   findOnMap: string;
   youFound: (name: string) => string;
+  youFoundCoins: (n: number) => string;
   surprisePresent: string;
   coins: string;
   buy: string;
@@ -278,6 +279,7 @@ export const UI: Record<Locale, Ui> = {
     rareBlurb: "Find mystery presents on the Lessons map.",
     findOnMap: "Find on Lessons",
     youFound: (name) => `You found ${name}!`,
+    youFoundCoins: (n) => `You found ${n} coins!`,
     surprisePresent: "Surprise present",
     coins: "Coins",
     buy: "Buy",
@@ -462,6 +464,7 @@ export const UI: Record<Locale, Ui> = {
     rareBlurb: "Encuentra regalos misteriosos en el mapa de Lecciones.",
     findOnMap: "Búscalos en Lecciones",
     youFound: (name) => `¡Encontraste a ${name}!`,
+    youFoundCoins: (n) => `¡Encontraste ${n} monedas!`,
     surprisePresent: "Regalo sorpresa",
     coins: "Monedas",
     buy: "Comprar",
@@ -646,6 +649,7 @@ export const UI: Record<Locale, Ui> = {
     rareBlurb: "Ache presentes misteriosos no mapa de Lições.",
     findOnMap: "Ache nas Lições",
     youFound: (name) => `Você achou ${name}!`,
+    youFoundCoins: (n) => `Você achou ${n} moedas!`,
     surprisePresent: "Presente surpresa",
     coins: "Moedas",
     buy: "Comprar",

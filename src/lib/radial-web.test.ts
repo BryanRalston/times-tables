@@ -13,6 +13,7 @@ import {
   hopperBoardPx,
   minAdjacentGapPx,
   PHONE_MAP_BOARD,
+  PHONE_MAP_VIEW,
   PORTAL_PAIRS,
   RADIAL_EDGES,
   RADIAL_MAP_FILE,
@@ -278,18 +279,29 @@ describe("radial hop hit testing", () => {
     return { x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t };
   }
 
-  it("enlarges the 390 phone board so plaza pads have a comfortable gap", () => {
-    const pa = padClientPos(a, board);
-    const pb = padClientPos(b, board);
-    const gap = Math.hypot(pb.x - pa.x, pb.y - pa.y);
-    expect(PHONE_MAP_BOARD.width).toBeGreaterThan(368);
-    expect(PHONE_MAP_BOARD.height).toBeGreaterThan(207);
-    expect(HOP_SNAP_MIN_PX).toBe(24);
-    expect(HOP_SNAP_PX).toBe(36);
-    expect(hopSnapPx(board)).toBe(36);
-    expect(gap).toBeGreaterThan(28);
-    expect(gap).toBeLessThan(48);
-    expect(gap).toBeLessThan(HOP_SNAP_PX * 2);
+  it("contains the 16:9 island so the painted rim is on-screen", () => {
+    expect(PHONE_MAP_BOARD.width).toBe(PHONE_MAP_VIEW.width);
+    expect(PHONE_MAP_BOARD.height).toBe(PHONE_MAP_VIEW.height);
+    expect(PHONE_MAP_BOARD.width).toBeLessThanOrEqual(PHONE_MAP_VIEW.width);
+    expect(PHONE_MAP_BOARD.width / PHONE_MAP_BOARD.height).toBeCloseTo(16 / 9);
+    expect(PHONE_MAP_BOARD.width).toBe(368);
+    const north = padClientPos(54, board);
+    const south = padClientPos(75, board);
+    const west = padClientPos(85, board);
+    const east = padClientPos(66, board);
+    for (const p of [north, south, west, east]) {
+      expect(p.x).toBeGreaterThan(0);
+      expect(p.x).toBeLessThan(board.width);
+      expect(p.y).toBeGreaterThan(0);
+      expect(p.y).toBeLessThan(board.height);
+    }
+    for (const pad of RADIAL_PADS.filter((p) => p.ring === 4 && p.portal)) {
+      const pos = padClientPos(pad.id, board);
+      expect(pos.x).toBeGreaterThan(0);
+      expect(pos.x).toBeLessThan(board.width);
+      expect(pos.y).toBeGreaterThan(0);
+      expect(pos.y).toBeLessThan(board.height);
+    }
   });
 
   it("keeps the hopper and each hop glow inside one plaza tile", () => {
@@ -298,11 +310,11 @@ describe("radial hop hit testing", () => {
     const glow = hopGlowBoardPx(board);
     expect(HOPPER_SIT_TRANSLATE).toBe("translate(-50%, -50%)");
     expect(HOPPER_ART_ZOOM_PCT).toBeGreaterThan(100);
-    expect(hopper).toBeGreaterThan(20);
+    expect(hopper).toBeGreaterThan(8);
     expect(hopper).toBeLessThan(gap);
-    expect(glow).toBeGreaterThan(16);
+    expect(glow).toBeGreaterThan(6);
     expect(glow).toBeLessThan(hopper);
-    expect(glow + 8).toBeLessThan(gap);
+    expect(glow).toBeLessThan(gap);
     expect(HOPPER_BOARD_WIDTH_PCT).toBe(3.2);
     expect(HOP_GLOW_BOARD_WIDTH_PCT).toBe(2.2);
     expect(adjacentPadIds(START_PAD)).toHaveLength(8);
@@ -318,9 +330,11 @@ describe("radial hop hit testing", () => {
     const len = Math.hypot(dx, dy);
     expect(len).toBeGreaterThan(0);
     const along = (px: number) => ({ x: glow.x + (dx / len) * px, y: glow.y + (dy / len) * px });
-    expect(nearestHopTarget(along(24).x, along(24).y, board, plaza, START_PAD)).toBe(a);
-    expect(nearestHopTarget(along(36).x, along(36).y, board, plaza, START_PAD)).toBe(a);
-    expect(nearestHopTarget(along(48).x, along(48).y, board, plaza, START_PAD)).toBeUndefined();
+    const snap = hopSnapPx(board);
+    const beside = Math.min(12, Math.max(6, Math.round(len * 0.35)));
+    expect(nearestHopTarget(glow.x, glow.y, board, plaza, START_PAD)).toBe(a);
+    expect(nearestHopTarget(along(beside).x, along(beside).y, board, plaza, START_PAD)).toBe(a);
+    expect(nearestHopTarget(along(snap + 12).x, along(snap + 12).y, board, plaza, START_PAD)).toBeUndefined();
     const far = RADIAL_PADS.find((p) => p.ring === 4 && !plaza.includes(p.id))!;
     const q = padClientPos(far.id, board);
     expect(nearestHopTarget(q.x, q.y, board, plaza, START_PAD)).toBeUndefined();

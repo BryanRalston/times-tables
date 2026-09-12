@@ -456,9 +456,11 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-world-stage");
     expect(css).toContain(".candy-world-art");
     expect(css).toContain(".candy-overlay");
-    expect(css).toContain("aspect-ratio: 6 / 7");
+    expect(css).toContain("aspect-ratio: 16 / 9");
     expect(css).toContain(".candy-scroll[data-lessons-path]");
-    expect(css).toContain("100cqi * 7 / 6");
+    expect(css).toContain("100cqi * 9 / 16");
+    expect(css).not.toContain("aspect-ratio: 6 / 7");
+    expect(css).not.toContain("100cqi * 7 / 6");
     expect(css).toContain("grid-template-rows: minmax(0, 1fr) auto");
     expect(css).toContain("container-name: radial-card");
     expect(css).toMatch(/\.candy-overlay\[data-hop-pick="1"\]\s*\{[^}]*touch-action:\s*none/);
@@ -501,6 +503,10 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-hopper-here");
     expect(css).toContain(".candy-present");
     expect(css).toContain(".mystery-present");
+    expect(css).toContain(".mystery-present-glow");
+    expect(css).toContain(".mystery-present-art");
+    expect(css).toContain("@keyframes candy-present-glow");
+    expect(css).toContain("@keyframes candy-present-bob");
     expect(css).toContain(".candy-unwrap");
     expect(css).toContain("@keyframes candy-choice-pulse");
     expect(css).toContain("@keyframes candy-portal-swirl");
@@ -508,7 +514,7 @@ describe("first-visit Home door", () => {
     expect(css).toContain("@keyframes candy-warp-ring");
     expect(css).toContain("aspect-ratio: 16 / 9");
     expect(css).toContain("width: max(100%, 68rem)");
-    expect(css).toContain("object-fit: cover");
+    expect(css).toContain("object-fit: contain");
     expect(css).toContain("mask-image");
     expect(css).not.toContain(".candy-plate");
     expect(css).not.toContain("--candy-plate-overlap");

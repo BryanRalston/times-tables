@@ -541,6 +541,28 @@ describe("progress persist", () => {
     expect(useProgress.getState().unlockSquishee("galaxy-narwhal").ok).toBe(false);
   });
 
+  it("grants present coins once and persists the claimed pad", async () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: seedKid(), version: 0 }));
+    await hydrateProgress();
+    expect(useProgress.getState().claimedPresentPads).toEqual([]);
+    expect(useProgress.getState().coins).toBe(12);
+    const first = useProgress.getState().claimPresent(37);
+    expect(first.ok).toBe(true);
+    expect(first.reward).toEqual({ pad: 37, kind: "coins", amount: 10 });
+    expect(useProgress.getState().coins).toBe(22);
+    expect(useProgress.getState().claimedPresentPads).toEqual([37]);
+    expect(useProgress.getState().claimPresent(37).ok).toBe(false);
+    expect(useProgress.getState().coins).toBe(22);
+    const raw = localStorage.getItem(STORAGE_KEY);
+    expect(raw).toContain("claimedPresentPads");
+    expect(raw).toMatch(/37/);
+    resetProgressMemory();
+    await hydrateProgress();
+    expect(useProgress.getState().coins).toBe(22);
+    expect(useProgress.getState().claimedPresentPads).toEqual([37]);
+    expect(useProgress.getState().claimPresent(37).ok).toBe(false);
+  });
+
   it("does not call resetAll from main boot", () => {
     const main = readFileSync(join(HERE, "../main.tsx"), "utf8");
     expect(main).toContain("hydrateProgress");
