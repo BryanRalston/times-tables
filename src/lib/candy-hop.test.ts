@@ -17,6 +17,7 @@ import {
   hopTravelMs,
   hopIsOneSpace,
   hopUnitStops,
+  instantHopLand,
   pathHopSfxKind,
   restHopPose,
   warpPose,
@@ -35,6 +36,11 @@ describe("candy hop", () => {
     expect(hopIsOneSpace(START_PAD, next)).toBe(true);
     expect(hopUnitStops(START_PAD, 40)).toEqual([START_PAD]);
     expect(hopUnitStops(1, 13)).toHaveLength(1);
+    expect(instantHopLand(START_PAD, next)).toEqual({ pad: next, entered: true });
+    expect(instantHopLand(START_PAD, 40)).toEqual({ pad: START_PAD, entered: false });
+    const portal = 2;
+    const neighbor = adjacentPadIds(portal)[0]!;
+    expect(instantHopLand(neighbor, portal)).toEqual({ pad: portal, entered: true });
   });
 
   it("times multi-hop travel with a land settle after every hop", () => {

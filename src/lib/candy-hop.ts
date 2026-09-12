@@ -62,6 +62,16 @@ export function hopUnitStops(fromNumber: number, toNumber: number, _total = RADI
   return radialHopStops(fromNumber, toNumber);
 }
 
+/**
+ * Instant land (reduced motion or no-air hop). Adjacent hops still enter
+ * the destination so a portal warp fires. Non-adjacent dests stay put.
+ */
+export function instantHopLand(fromNumber: number, toNumber: number): { pad: number; entered: boolean } {
+  const stops = hopUnitStops(fromNumber, toNumber);
+  if (stops.length < 2) return { pad: clampPad(fromNumber), entered: false };
+  return { pad: clampPad(toNumber), entered: true };
+}
+
 export function hopIsOneSpace(fromNumber: number, toNumber: number): boolean {
   const a = clampPad(fromNumber);
   const b = clampPad(toNumber);
