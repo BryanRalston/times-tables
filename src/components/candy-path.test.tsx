@@ -69,7 +69,7 @@ describe("CandyPath", () => {
     expect(html).toContain('data-path-clear-obstacle="0"');
     expect((html.match(/data-path-pad="1"/g) ?? []).length).toBe(RADIAL_PAD_COUNT);
     expect((html.match(/data-path-unit="/g) ?? []).length).toBe(13);
-    expect((html.match(/data-pad-portal="1"/g) ?? []).length).toBe(12);
+    expect((html.match(/data-pad-portal="1"/g) ?? []).length).toBe(RADIAL_PADS.filter((p) => p.portal).length);
     expect(html).not.toContain("data-candy-tall-map");
     expect(html).not.toContain("candy-zones/tall-map.png");
     expect(html).not.toContain("data-candy-fog");
