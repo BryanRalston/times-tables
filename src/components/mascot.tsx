@@ -1,16 +1,9 @@
-import { MagentaImg } from "@/components/magenta-video";
-import { squisheeSrc } from "@/lib/squishees";
+import { DressedSquishee } from "@/components/dressed-squishee";
+import { pathHopperId } from "@/lib/squishees";
+import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
 
 export type Pose = "wave" | "think" | "celebrate" | "oops" | "star";
-
-const POSE_ID: Record<Pose, string> = {
-  wave: "frog",
-  think: "cat",
-  celebrate: "panda",
-  oops: "shark",
-  star: "peach",
-};
 
 export function Mascot({
   who = "nix",
@@ -25,12 +18,15 @@ export function Mascot({
   size?: "sm" | "md" | "lg";
   className?: string;
 }) {
-  const id = who === "rem" ? "owl" : POSE_ID[pose];
+  const owned = useProgress((s) => s.squishees);
+  const chosen = useProgress((s) => s.hopperId);
+  const cosmetic = useProgress((s) => s.equippedCosmetic);
+  const id = who === "rem" ? "owl" : pathHopperId(owned, chosen);
   const squash = hop || pose === "celebrate" || pose === "star";
   return (
-    <MagentaImg
-      src={squisheeSrc(id)}
-      alt=""
+    <DressedSquishee
+      id={id}
+      cosmetic={who === "rem" ? "" : cosmetic}
       className={cn(
         "pointer-events-none select-none",
         size === "sm" && "h-20 w-20",
@@ -40,6 +36,7 @@ export function Mascot({
         !squash && pose === "wave" && "idle-bob",
         className,
       )}
+      imgClassName="h-full w-full object-contain"
     />
   );
 }

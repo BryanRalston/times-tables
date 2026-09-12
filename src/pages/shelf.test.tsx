@@ -30,6 +30,23 @@ describe("shop tiles", () => {
     expect(html).toContain("data-rare-find");
     expect(html).not.toContain("crystal-axolotl.png");
     expect(html).not.toContain("Crystal Axolotl");
+    expect(html).toContain("data-avatar-picker");
+    expect(html).toContain("Your piece");
+    expect(html).toContain("data-shelf-dress");
+    expect(html).toContain("Dress-up");
+    expect(html).toContain("peach-party-hat.png");
+    expect(html).toContain("data-buy-cosmetic=\"party-hat\"");
+  });
+
+  it("owned frog offers a Guest Use button without a Grown-ups PIN", () => {
+    const frog = squisheeById("frog")!;
+    const html = renderToStaticMarkup(
+      <ShopCard s={frog} got coins={0} hopperId="peach" onBuy={() => {}} onUse={() => {}} />,
+    );
+    expect(html).toContain('data-use-piece="frog"');
+    expect(html).toContain("Use");
+    expect(html).not.toContain("enterPin");
+    expect(html).not.toContain("Grown-up");
   });
 
   it("owned avocado tile is a poke button with squash machinery", () => {

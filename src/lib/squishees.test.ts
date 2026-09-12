@@ -6,6 +6,7 @@ import {
   cheerStripJsonFile,
   parsePokeStripJson,
   PEEK_SQUISHEE_IDS,
+  pathHopperId,
   peekTurn,
   trailPeekFace,
   pokeStripFile,
@@ -113,6 +114,13 @@ describe("home peek roster", () => {
     expect(seen.size).toBe(SQUISHEE_IDS.length);
     expect([...slots].sort()).toEqual(["center", "left", "right"]);
     expect(peekTurn(PEEK_SQUISHEE_IDS.length).id).toBe("peach");
+  });
+
+  it("keeps a kid-picked owned face, else last owned, else Peach", () => {
+    expect(pathHopperId([])).toBe("peach");
+    expect(pathHopperId(["frog", "cat"])).toBe("cat");
+    expect(pathHopperId(["frog", "cat"], "frog")).toBe("frog");
+    expect(pathHopperId(["frog"], "peach")).toBe("peach");
   });
 
   it("picks a trail peek face that is not the hopper", () => {

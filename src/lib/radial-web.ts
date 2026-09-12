@@ -371,13 +371,13 @@ export function nearestHopDir(
  * #63 comfort floor: a 48px-wide circle around each glow. Used when the
  * painted board is smaller than the 390 phone stage.
  */
-export const HOP_SNAP_MIN_PX = 24;
+export const HOP_SNAP_MIN_PX = 16;
 
 /**
- * Phone-fair snap radius on the 6/7 390 stage. Plaza neighbors sit
- * ~28–39px apart. Board taps resolve to the nearest glowing neighbor.
+ * Phone-fair snap radius on the 8/5 390 stage. Plaza neighbors sit
+ * ~16–32px apart. Board taps resolve to the nearest glowing neighbor.
  */
-export const HOP_SNAP_PX = 36;
+export const HOP_SNAP_PX = 22;
 
 /**
  * Hopper box as % of the 16:9 board width. Plaza cream tiles are ~3.7%
@@ -397,15 +397,16 @@ export const HOP_GLOW_BOARD_WIDTH_PCT = 2.2;
 
 /**
  * Visible radial card on a 390 phone after scroll pad + 4px frame.
- * CSS `.candy-world` caps at 6/7 so the island grows without shearing
- * the outer E/W portal arches off the card. The Lessons plate may be
- * taller — leftover column is studio white, not a deeper crop.
+ * CSS `.candy-world` is 8/5: a 16:9 stage height-fitted to that card
+ * keeps the green rim and E/W arches on-screen (about 5–95% of the art)
+ * without letterboxing the island into a postage stamp.
  */
-export const PHONE_MAP_VIEW = { width: 368, height: (368 * 7) / 6 } as const;
+export const PHONE_MAP_VIEW = { width: 368, height: (368 * 5) / 8 } as const;
 
 /**
  * Overlay / art stage: same 16:9 as radial-web-locked.jpg, height-matched
- * to the card so pad % stays on-art. Wider than the card — sides crop.
+ * to the 8/5 card. Slightly wider than the card — only the art’s white
+ * margin crops, not the painted island.
  */
 export const PHONE_MAP_BOARD = {
   left: 0,

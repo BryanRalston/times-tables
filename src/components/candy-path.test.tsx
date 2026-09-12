@@ -83,25 +83,26 @@ describe("CandyPath", () => {
     expect(html).not.toContain("data-present-unwrap");
     expect(html).not.toContain("Crystal Axolotl");
     expect(html).not.toContain("Galaxy Narwhal");
-    expect(html).not.toContain("Golden Dragon");
-    expect(html).not.toContain("Rainbow Cupcake");
+    expect(html).not.toContain("Otter");
     expect(html).not.toContain("crystal-axolotl.png");
     expect(html).not.toContain("galaxy-narwhal.png");
-    expect(html).not.toContain("golden-dragon.png");
-    expect(html).not.toContain("rainbow-cupcake.png");
+    expect(html).not.toContain("otter.png");
     expect(html).not.toContain("data-present-squishee");
     expect(html).not.toContain("Rare");
+    expect(html).toContain("mystery-gift.png");
+    expect(html).toContain('data-present-art="vinyl"');
   });
 
   it("drops a found present without naming the rare on the map", () => {
-    useProgress.setState({ squishees: ["crystal-axolotl", "peach"] });
+    useProgress.setState({ squishees: ["crystal-axolotl", "peach"], openedPresents: [17] });
     const html = renderToStaticMarkup(
       <CandyPath suggestedId="u2" standFrom={1} standTo={1} onStart={() => {}} onOpenUnit={() => {}} />,
     );
     expect(html).toContain('data-present-count="3"');
     expect((html.match(/data-pad-present="1"/g) ?? []).length).toBe(3);
     expect((html.match(/data-pad-present-found="1"/g) ?? []).length).toBe(1);
-    expect(html).toContain(`data-present-pad="${GRADE3_PRESENTS[0]!.pad}"`);
+    const rarePad = GRADE3_PRESENTS.find((p) => p.kind === "squishee" && p.squisheeId === "crystal-axolotl")!.pad;
+    expect(html).toContain(`data-present-pad="${rarePad}"`);
     expect(html).not.toContain("Crystal Axolotl");
     expect(html).not.toContain("crystal-axolotl.png");
     expect(html).toContain('data-path-hopper="peach"');
@@ -307,8 +308,9 @@ describe("CandyPath", () => {
     expect(src).not.toContain("nearestHopDir");
     expect(src).not.toContain("candy-dpad");
     expect(src).not.toContain("onDpadPointerUp");
-    expect(src).toContain("unlockSquishee");
+    expect(src).toContain("landPresentPad");
     expect(src).toContain("landPresent");
+    expect(src).toContain("DressedSquishee");
     expect(src).toContain("MysteryPresent");
     expect(src).toContain("data-present-unwrap");
     expect(src).toContain("padView(unwrap.pad)");

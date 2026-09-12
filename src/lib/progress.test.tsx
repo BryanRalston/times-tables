@@ -526,6 +526,33 @@ describe("progress persist", () => {
     expect(useProgress.getState().coins).toBe(10);
   });
 
+  it("lands mixed presents, heals old rares, and keeps a picked hopper plus hat", async () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        state: seedKid({ squishees: ["crystal-axolotl"], coins: 12 }),
+        version: 0,
+      }),
+    );
+    await hydrateProgress();
+    expect(useProgress.getState().openedPresents).toEqual([12, 17]);
+    expect(useProgress.getState().version).toBe(15);
+    const coins = useProgress.getState().landPresentPad(21);
+    expect(coins.ok).toBe(true);
+    expect(coins.reward).toEqual({ kind: "coins", coins: 10 });
+    expect(useProgress.getState().coins).toBe(22);
+    expect(useProgress.getState().openedPresents).toEqual([12, 17, 21]);
+    expect(useProgress.getState().landPresentPad(21).ok).toBe(false);
+    useProgress.getState().unlockSquishee("frog");
+    useProgress.getState().setHopperId("frog");
+    expect(useProgress.getState().hopperId).toBe("frog");
+    expect(useProgress.getState().buyCosmetic("party-hat")).toEqual({ ok: true, reason: "ok" });
+    expect(useProgress.getState().equipCosmetic("party-hat")).toBe(true);
+    expect(useProgress.getState().equippedCosmetic).toBe("party-hat");
+    useProgress.getState().unequipCosmetic();
+    expect(useProgress.getState().equippedCosmetic).toBe("");
+  });
+
   it("keeps a Guest rare after map unlock and reload", async () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: seedKid(), version: 0 }));
     await hydrateProgress();

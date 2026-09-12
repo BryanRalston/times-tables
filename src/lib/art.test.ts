@@ -38,5 +38,8 @@ describe("asset URLs", () => {
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/cove-water-mask.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/cove-boulder.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/art/home-peek.png"))).toBe(false);
+    expect(existsSync(join(HERE, "../../public/art/mystery-gift.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/cosmetics/peach-party-hat.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/cosmetics/frog-scarf.png"))).toBe(true);
   });
 });
