@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   clampMapCamera,
   clampMapScale,
+  containMapBoard,
   coverMapBoard,
   MAP_ART_ASPECT,
   MAP_PINCH_MAX,
@@ -10,7 +11,16 @@ import {
   REST_MAP_CAMERA,
   zoomMapCamera,
 } from "./map-viewport";
-import { DESK_MAP_BOARD, DESK_MAP_VIEW, PHONE_MAP_BOARD, PHONE_MAP_VIEW } from "./radial-web";
+import {
+  DESK_MAP_BOARD,
+  DESK_MAP_VIEW,
+  DESKTOP_MAP_BOARD,
+  DESKTOP_MAP_VIEW,
+  PHONE_MAP_BOARD,
+  PHONE_MAP_VIEW,
+  TABLET_MAP_BOARD,
+  TABLET_MAP_VIEW,
+} from "./radial-web";
 
 describe("map viewport", () => {
   it("cover-fills the phone column and overflows east/west", () => {
@@ -28,7 +38,7 @@ describe("map viewport", () => {
     expect(board.height).toBe(PHONE_MAP_BOARD.height);
   });
 
-  it("keeps the desk 8/5 card as a whole-island contain", () => {
+  it("keeps the 8/5 board as the phone snap reference", () => {
     expect(DESK_MAP_VIEW.width).toBe(368);
     expect(DESK_MAP_VIEW.height).toBeCloseTo((368 * 5) / 8);
     expect(DESK_MAP_BOARD.height).toBeCloseTo(DESK_MAP_VIEW.height);
@@ -36,6 +46,29 @@ describe("map viewport", () => {
     expect(DESK_MAP_BOARD.width).toBeGreaterThan(DESK_MAP_VIEW.width);
     expect(DESK_MAP_BOARD.height).toBeLessThan(280);
     expect(DESK_MAP_BOARD.height).toBeGreaterThan(207);
+  });
+
+  it("contain-fits the grown tablet leftover and height-fills desktop", () => {
+    expect(TABLET_MAP_VIEW.width).toBe(736);
+    expect(TABLET_MAP_VIEW.height).toBe(620);
+    expect(TABLET_MAP_BOARD.width).toBe(TABLET_MAP_VIEW.width);
+    expect(TABLET_MAP_BOARD.height).toBeCloseTo(TABLET_MAP_VIEW.width / MAP_ART_ASPECT);
+    expect(TABLET_MAP_BOARD.height).toBeLessThan(TABLET_MAP_VIEW.height);
+    expect(TABLET_MAP_BOARD.left).toBe(0);
+    expect(TABLET_MAP_BOARD.top).toBeGreaterThan(0);
+    expect(TABLET_MAP_BOARD.top + TABLET_MAP_BOARD.height).toBeLessThanOrEqual(TABLET_MAP_VIEW.height);
+    const tablet = containMapBoard(TABLET_MAP_VIEW);
+    expect(tablet.width).toBeCloseTo(TABLET_MAP_BOARD.width);
+    expect(tablet.height).toBeCloseTo(TABLET_MAP_BOARD.height);
+
+    expect(DESKTOP_MAP_VIEW.width).toBe(1056);
+    expect(DESKTOP_MAP_VIEW.height).toBe(520);
+    expect(DESKTOP_MAP_BOARD.height).toBe(DESKTOP_MAP_VIEW.height);
+    expect(DESKTOP_MAP_BOARD.width).toBeCloseTo(DESKTOP_MAP_VIEW.height * MAP_ART_ASPECT);
+    expect(DESKTOP_MAP_BOARD.width).toBeLessThan(DESKTOP_MAP_VIEW.width);
+    expect(DESKTOP_MAP_BOARD.top).toBe(0);
+    expect(DESKTOP_MAP_BOARD.left).toBeGreaterThan(0);
+    expect(DESKTOP_MAP_BOARD.left + DESKTOP_MAP_BOARD.width).toBeLessThanOrEqual(DESKTOP_MAP_VIEW.width);
   });
 
   it("clamps pinch-in and keeps the board covering the view", () => {

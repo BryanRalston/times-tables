@@ -20,9 +20,7 @@ export const REST_MAP_CAMERA: MapCamera = { scale: 1, x: 0, y: 0 };
 
 /**
  * Cover-fit the 16:9 board into `view`. Phone columns are taller than 16:9,
- * so this height-fills and overflows east/west. An 8/5 desk card is wider
- * than it is tall relative to the leftover column, so only the art’s white
- * margin crops — the painted island stays whole.
+ * so this height-fills and overflows east/west (pinch-pan shows the rest).
  */
 export function coverMapBoard(view: MapView, artAspect = MAP_ART_ASPECT): MapBoard {
   const width = Math.max(0, view.width);
@@ -35,6 +33,24 @@ export function coverMapBoard(view: MapView, artAspect = MAP_ART_ASPECT): MapBoa
   }
   const w = height * artAspect;
   return { left: (width - w) / 2, top: 0, width: w, height };
+}
+
+/**
+ * Letterbox the 16:9 board into `view`. Tablet / desktop leftover is often
+ * taller than 16:9 after the card grows to the dock — this keeps the rim
+ * and portals on-screen with no pinch-pan.
+ */
+export function containMapBoard(view: MapView, artAspect = MAP_ART_ASPECT): MapBoard {
+  const width = Math.max(0, view.width);
+  const height = Math.max(0, view.height);
+  if (width <= 0 || height <= 0) return { left: 0, top: 0, width: 0, height: 0 };
+  const viewAspect = width / height;
+  if (viewAspect >= artAspect) {
+    const w = height * artAspect;
+    return { left: (width - w) / 2, top: 0, width: w, height };
+  }
+  const h = width / artAspect;
+  return { left: 0, top: (height - h) / 2, width, height: h };
 }
 
 export function clampMapScale(scale: number): number {

@@ -1,5 +1,5 @@
 import { activityById } from "./curriculum";
-import { coverMapBoard } from "./map-viewport";
+import { containMapBoard, coverMapBoard } from "./map-viewport";
 import type { ActivitySave, DaySession } from "./types";
 
 export type RadialPos = { x: number; y: number };
@@ -424,12 +424,28 @@ export const PHONE_MAP_VIEW = { width: 368, height: 510 } as const;
 export const PHONE_MAP_BOARD = coverMapBoard(PHONE_MAP_VIEW);
 
 /**
- * Tablet / desktop card: 8/5 + height-fitted 16:9 so the whole painted
- * island (rim, arches, portals) stays on-screen. No pinch-pan.
+ * Snap / hop-test board: the 8/5 390 cover stage. Phone snap scales from
+ * this width so cover-fill pads stay as fat as they were after #84.
  */
 export const DESK_MAP_VIEW = { width: 368, height: (368 * 5) / 8 } as const;
 
 export const DESK_MAP_BOARD = coverMapBoard(DESK_MAP_VIEW);
+
+/**
+ * Grown leftover on a 768 tablet after the Lessons shell widens. Taller
+ * than 16:9 — contain letterboxes so the whole island stays visible.
+ */
+export const TABLET_MAP_VIEW = { width: 736, height: 620 } as const;
+
+export const TABLET_MAP_BOARD = containMapBoard(TABLET_MAP_VIEW);
+
+/**
+ * Grown leftover on a 1280 desktop (68rem-capped shell). Wider than 16:9
+ * — contain height-fills so chips sit on the dock with no pink plate.
+ */
+export const DESKTOP_MAP_VIEW = { width: 1056, height: 520 } as const;
+
+export const DESKTOP_MAP_BOARD = containMapBoard(DESKTOP_MAP_VIEW);
 
 export type HopBoardRect = {
   left: number;
