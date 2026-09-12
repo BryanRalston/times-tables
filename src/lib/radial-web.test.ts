@@ -14,6 +14,10 @@ import {
   minAdjacentGapPx,
   DESK_MAP_BOARD,
   DESK_MAP_VIEW,
+  DESKTOP_MAP_BOARD,
+  DESKTOP_MAP_VIEW,
+  TABLET_MAP_BOARD,
+  TABLET_MAP_VIEW,
   PHONE_MAP_BOARD,
   PHONE_MAP_VIEW,
   PORTAL_PAIRS,
@@ -281,7 +285,7 @@ describe("radial hop hit testing", () => {
     return { x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t };
   }
 
-  it("cover-fills the 390 phone column and keeps the desk island whole", () => {
+  it("cover-fills the 390 phone column and contain-fits grown desk leftover", () => {
     const pa = padClientPos(a, board);
     const pb = padClientPos(b, board);
     const gap = Math.hypot(pb.x - pa.x, pb.y - pa.y);
@@ -292,14 +296,16 @@ describe("radial hop hit testing", () => {
     expect(DESK_MAP_VIEW.height).toBeCloseTo((368 * 5) / 8);
     expect(DESK_MAP_BOARD.height).toBeGreaterThan(207);
     expect(DESK_MAP_BOARD.height).toBeLessThan(280);
-    const crop = (DESK_MAP_BOARD.width - DESK_MAP_VIEW.width) / 2;
-    const visibleMin = (crop / DESK_MAP_BOARD.width) * 100;
-    const visibleMax = ((crop + DESK_MAP_VIEW.width) / DESK_MAP_BOARD.width) * 100;
+    expect(TABLET_MAP_VIEW.height).toBeGreaterThan(DESK_MAP_VIEW.height);
+    expect(TABLET_MAP_BOARD.width).toBeLessThanOrEqual(TABLET_MAP_VIEW.width);
+    expect(TABLET_MAP_BOARD.height).toBeLessThanOrEqual(TABLET_MAP_VIEW.height);
+    expect(DESKTOP_MAP_BOARD.height).toBe(DESKTOP_MAP_VIEW.height);
+    expect(DESKTOP_MAP_BOARD.width).toBeLessThan(DESKTOP_MAP_VIEW.width);
     const outer = RADIAL_PADS.filter((p) => p.portal && p.ring === 4);
     expect(outer.length).toBeGreaterThan(0);
     for (const p of outer) {
-      expect(p.map.x).toBeGreaterThan(visibleMin + 2);
-      expect(p.map.x).toBeLessThan(visibleMax - 2);
+      expect(p.map.x).toBeGreaterThan(2);
+      expect(p.map.x).toBeLessThan(98);
     }
     expect(HOP_SNAP_MIN_PX).toBe(16);
     expect(HOP_SNAP_PX).toBe(22);
