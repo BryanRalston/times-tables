@@ -1,11 +1,11 @@
 import { BookOpen, ChevronLeft, Home, Library, Settings2, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
-import { MagentaImg } from "@/components/magenta-video";
+import { DressedSquishee } from "@/components/dressed-squishee";
 import { parseLocale, UI } from "@/lib/i18n";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { holdPathGrade } from "@/lib/test-mode";
-import { PEEK_SQUISHEE_IDS, peekTurn, squisheeSrc } from "@/lib/squishees";
+import { pathHopperId, peekTurn } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
 export type SceneKind = "hills" | "play" | "shelf";
@@ -253,22 +253,19 @@ function usePrefersReducedMotion(): boolean {
 function ContinuePeek() {
   const reduce = usePrefersReducedMotion();
   const [index, setIndex] = useState(0);
+  const owned = useProgress((s) => s.squishees);
+  const chosen = useProgress((s) => s.hopperId);
+  const cosmetic = useProgress((s) => s.equippedCosmetic);
+  const hopperId = pathHopperId(owned, chosen);
   const turn = reduce ? peekTurn(0) : peekTurn(index);
-
-  useEffect(() => {
-    if (reduce) return;
-    const next = peekTurn(index + 1);
-    const img = new Image();
-    img.src = squisheeSrc(next.id);
-  }, [index, reduce]);
 
   return (
     <span
       className={cn("continue-peek", `continue-peek-${turn.slot}`)}
       data-continue-peek="1"
-      data-peek-id={turn.id}
+      data-peek-id={hopperId}
       data-peek-slot={turn.slot}
-      data-peek-roster={PEEK_SQUISHEE_IDS.length}
+      data-peek-roster="1"
       aria-hidden
       onAnimationEnd={
         reduce
@@ -280,11 +277,11 @@ function ContinuePeek() {
             }
       }
     >
-      <MagentaImg
-        key={reduce ? turn.id : `${turn.id}-${index}`}
-        src={squisheeSrc(turn.id)}
-        alt=""
-        className="continue-peek-art"
+      <DressedSquishee
+        key={reduce ? hopperId : `${hopperId}-${index}`}
+        id={hopperId}
+        cosmetic={cosmetic}
+        imgClassName="continue-peek-art"
       />
     </span>
   );

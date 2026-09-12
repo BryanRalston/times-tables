@@ -154,13 +154,23 @@ export function squisheeById(id: string): Squishee | undefined {
   return SQUISHEES.find((s) => s.id === id);
 }
 
-/** Last owned shelf toy, else the familiar first peek face. */
-export function pathHopperId(owned: readonly string[]): string {
+/**
+ * Lessons / play / Home face. A kid-picked owned toy wins; otherwise
+ * last owned, else Peach. First visit can stay Peach until they pick.
+ */
+export function pathHopperId(owned: readonly string[], chosen?: string | null): string {
+  if (chosen && squisheeById(chosen) && (owned.includes(chosen) || chosen === "peach")) return chosen;
   for (let i = owned.length - 1; i >= 0; i--) {
     const id = owned[i]!;
     if (squisheeById(id)) return id;
   }
   return PEEK_SQUISHEE_IDS[0] ?? SQUISHEE_IDS[0]!;
+}
+
+export function parseHopperId(raw: unknown, owned: readonly string[]): string {
+  if (typeof raw !== "string" || !squisheeById(raw)) return "";
+  if (owned.includes(raw) || raw === "peach") return raw;
+  return "";
 }
 
 export function squisheeSrc(id: string): string {

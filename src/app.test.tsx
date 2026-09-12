@@ -7,7 +7,6 @@ import { App } from "@/app";
 import { doorRoute } from "@/lib/nav";
 import { resetProgressMemory, useProgress } from "@/lib/progress";
 import { migratePathHopSpent } from "@/lib/radial-web";
-import { SQUISHEE_IDS } from "@/lib/squishees";
 import { HomePage } from "@/pages/home";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -56,7 +55,7 @@ function expectHomeShell(html: string) {
   expect(html).toContain("data-continue-peek");
   expect(html).toContain('data-peek-id="peach"');
   expect(html).toContain('data-peek-slot="center"');
-  expect(html).toContain(`data-peek-roster="${SQUISHEE_IDS.length}"`);
+  expect(html).toContain('data-peek-roster="1"');
   expect(html).toContain("data-walk-mark");
   expect(html).toContain("data-scene-land");
   expect(html).toContain("peach.png");
@@ -422,9 +421,9 @@ describe("first-visit Home door", () => {
     expect(chrome).toContain("walk-spark");
     expect(chrome).toContain("continue-peek");
     expect(chrome).toContain("ContinuePeek");
-    expect(chrome).toContain("PEEK_SQUISHEE_IDS");
+    expect(chrome).toContain("pathHopperId");
     expect(chrome).toContain("peekTurn");
-    expect(chrome).toContain("squisheeSrc");
+    expect(chrome).toContain("DressedSquishee");
     expect(chrome).not.toContain("ART.homePeek");
     expect(chrome).not.toContain("home-peek");
     expect(chrome).not.toContain("lastOwned");
@@ -448,6 +447,10 @@ describe("first-visit Home door", () => {
     expect(shelf).toContain("MysteryPresent");
     expect(shelf).toContain("ui.findOnMap");
     expect(shelf).toContain("ui.rareBlurb");
+    expect(shelf).toContain("data-avatar-picker");
+    expect(shelf).toContain("data-shelf-dress");
+    expect(shelf).toContain("ui.usePiece");
+    expect(shelf).not.toContain("enterPin");
     const css = readFileSync(join(HERE, "styles.css"), "utf8");
     expect(css).toContain(".app-scene");
     expect(css).toContain(".scene-hill");
@@ -456,9 +459,10 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-world-stage");
     expect(css).toContain(".candy-world-art");
     expect(css).toContain(".candy-overlay");
-    expect(css).toContain("aspect-ratio: 6 / 7");
+    expect(css).toContain("aspect-ratio: 8 / 5");
     expect(css).toContain(".candy-scroll[data-lessons-path]");
-    expect(css).toContain("100cqi * 7 / 6");
+    expect(css).toMatch(/\.candy-scroll\[data-lessons-path\]\s*\{[^}]*overflow:\s*hidden/);
+    expect(css).toContain("100cqi * 5 / 8");
     expect(css).toContain("grid-template-rows: minmax(0, 1fr) auto");
     expect(css).toContain("container-name: radial-card");
     expect(css).toMatch(/\.candy-overlay\[data-hop-pick="1"\]\s*\{[^}]*touch-action:\s*none/);
@@ -501,6 +505,10 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-hopper-here");
     expect(css).toContain(".candy-present");
     expect(css).toContain(".mystery-present");
+    expect(css).toContain(".mystery-present-art");
+    expect(css).toContain(".mystery-present-live");
+    expect(css).toContain(".shelf-use");
+    expect(css).toContain(".dressed-squishee");
     expect(css).toContain(".candy-unwrap");
     expect(css).toContain("@keyframes candy-choice-pulse");
     expect(css).toContain("@keyframes candy-portal-swirl");

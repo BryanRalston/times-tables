@@ -348,6 +348,14 @@ export interface LearnerSlice {
   pathHopSpent: number;
   /** Adjacent steps left in the current dice turn. 0 = no active turn. */
   pathStepsLeft: number;
+  /** Mystery-present pads already unwrapped. Empty = none opened. */
+  openedPresents: number[];
+  /** Kid-picked Lessons / play face. Empty = last owned, else Peach. */
+  hopperId: string;
+  /** Owned cheap wearables. Never required to progress. */
+  cosmetics: string[];
+  /** One equipped wearable, or empty. Renders only on fitted v1 faces. */
+  equippedCosmetic: string;
 }
 
 export interface SaveState extends LearnerSlice {

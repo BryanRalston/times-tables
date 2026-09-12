@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type PointerEvent } from "react";
 import { useUi } from "@/components/chrome";
-import { MagentaImg } from "@/components/magenta-video";
+import { DressedSquishee } from "@/components/dressed-squishee";
 import { MysteryPresent } from "@/components/mystery-present";
 import { PokeToy } from "@/components/poke-toy";
 import { asset } from "@/lib/art";
@@ -52,13 +52,14 @@ import {
   UNWRAP_OPEN_MS,
   foundPresentPads,
   landPresent,
+  type LandedPresent,
   visiblePresentPads,
 } from "@/lib/presents";
 import { playDice, playHop, playLand, playStar, playWarp } from "@/lib/sound";
-import { pathHopperId, squisheeById, squisheeSrc } from "@/lib/squishees";
+import { pathHopperId, squisheeById } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
-type UnwrapBeat = { pad: number; id: string; phase: "open" | "reveal" };
+type UnwrapBeat = { pad: number; reward: LandedPresent; phase: "open" | "reveal" };
 
 function padView(id: number) {
   return radialPad(id).map;
@@ -81,6 +82,24 @@ function diePips(face: DieFace): { x: number; y: number }[] {
       ];
     default: {
       const _never: never = face;
+      return _never;
+    }
+  }
+}
+
+function unwrapCopy(
+  reward: LandedPresent,
+  ui: { youFound: (name: string) => string; youFoundCoins: (n: number) => string; surprisePresent: string },
+): { name: string; line: string } {
+  switch (reward.kind) {
+    case "coins":
+      return { name: `+${reward.coins}`, line: ui.youFoundCoins(reward.coins) };
+    case "squishee": {
+      const name = squisheeById(reward.squisheeId)?.name ?? ui.surprisePresent;
+      return { name, line: ui.youFound(name) };
+    }
+    default: {
+      const _never: never = reward;
       return _never;
     }
   }
@@ -123,8 +142,11 @@ export const CandyPath = forwardRef<
 >(function CandyPath({ suggestedId, standFrom, standTo, hopCredits, stepsLeft, freeMove = false, railUnits, onStart, onOpenUnit }, ref) {
   const ui = useUi();
   const locale = parseLocale(useProgress((s) => s.locale));
-  useProgress((s) => s.squishees.join("\0"));
+  useProgress((s) => `${s.squishees.join("\0")}:${s.hopperId}:${s.equippedCosmetic}:${s.openedPresents.join(",")}`);
   const owned = useProgress.getState().squishees;
+  const opened = useProgress.getState().openedPresents ?? [];
+  const chosenHopper = useProgress.getState().hopperId;
+  const equippedCosmetic = useProgress.getState().equippedCosmetic;
   const activities = useProgress((s) => s.activities);
   const hopsSpent = useProgress((s) => s.pathHopSpent);
   const storedSteps = useProgress((s) => s.pathStepsLeft);
@@ -132,11 +154,11 @@ export const CandyPath = forwardRef<
   const setPathHopperAt = useProgress((s) => s.setPathHopperAt);
   const startDiceTurn = useProgress((s) => s.startDiceTurn);
   const spendPathStep = useProgress((s) => s.spendPathStep);
-  const unlockSquishee = useProgress((s) => s.unlockSquishee);
-  const hopperId = pathHopperId(owned);
+  const landPresentPad = useProgress((s) => s.landPresentPad);
+  const hopperId = pathHopperId(owned, chosenHopper);
   const [unwrap, setUnwrap] = useState<UnwrapBeat | null>(null);
-  const boxedPads = visiblePresentPads(owned).filter((id) => unwrap?.pad !== id);
-  const foundPads = foundPresentPads(owned).filter((id) => unwrap?.pad !== id);
+  const boxedPads = visiblePresentPads(owned, opened).filter((id) => unwrap?.pad !== id);
+  const foundPads = foundPresentPads(owned, opened).filter((id) => unwrap?.pad !== id);
   const boxed = new Set(boxedPads);
   const origin = standFrom && standFrom > 0 ? clampPad(standFrom) : START_PAD;
   const requested = standTo && standTo > 0 ? clampPad(standTo) : origin;
@@ -163,12 +185,13 @@ export const CandyPath = forwardRef<
   const tapStart = useRef<{ x: number; y: number } | null>(null);
 
   const maybeUnlock = (pad: number) => {
-    const id = landPresent(pad, useProgress.getState().squishees);
-    if (!id) return;
-    const r = unlockSquishee(id);
-    if (!r.ok) return;
+    const st = useProgress.getState();
+    const reward = landPresent(pad, st.squishees, st.openedPresents);
+    if (!reward) return;
+    const r = landPresentPad(pad);
+    if (!r.ok || !r.reward) return;
     playStar();
-    setUnwrap({ pad, id, phase: "open" });
+    setUnwrap({ pad, reward: r.reward, phase: "open" });
   };
 
   useEffect(() => {
@@ -189,19 +212,24 @@ export const CandyPath = forwardRef<
   useEffect(() => {
     const hopper = document.querySelector<HTMLElement>("[data-path-hopper]");
     const scroller = hopper?.closest(".candy-scroll");
-    if (hopper && scroller instanceof HTMLElement) {
-      const hr = hopper.getBoundingClientRect();
-      const sr = scroller.getBoundingClientRect();
-      const deltaY = hr.top - (sr.top + sr.height * 0.46);
-      const deltaX = hr.left - (sr.left + sr.width * 0.46);
-      if (Math.abs(deltaY) >= 5 || Math.abs(deltaX) >= 5) {
-        if (travel) {
-          scroller.scrollTop += deltaY * 0.28;
-          scroller.scrollLeft += deltaX * 0.28;
-        } else {
-          scroller.scrollTop += deltaY;
-          scroller.scrollLeft += deltaX;
-        }
+    if (!hopper || !(scroller instanceof HTMLElement)) return;
+    // Full island stays in the Lessons card — don't pan the page to the peach.
+    if (scroller.matches("[data-lessons-path]")) {
+      scroller.scrollTop = 0;
+      scroller.scrollLeft = 0;
+      return;
+    }
+    const hr = hopper.getBoundingClientRect();
+    const sr = scroller.getBoundingClientRect();
+    const deltaY = hr.top - (sr.top + sr.height * 0.46);
+    const deltaX = hr.left - (sr.left + sr.width * 0.46);
+    if (Math.abs(deltaY) >= 5 || Math.abs(deltaX) >= 5) {
+      if (travel) {
+        scroller.scrollTop += deltaY * 0.28;
+        scroller.scrollLeft += deltaX * 0.28;
+      } else {
+        scroller.scrollTop += deltaY;
+        scroller.scrollLeft += deltaX;
       }
     }
   }, [pose.y, travel]);
@@ -568,7 +596,7 @@ export const CandyPath = forwardRef<
           data-path-clear-obstacle="0"
         >
           <span className="candy-hopper-fit" aria-hidden>
-            <MagentaImg src={squisheeSrc(hopperId)} alt="" className="candy-hopper-art" />
+            <DressedSquishee id={hopperId} cosmetic={equippedCosmetic} imgClassName="candy-hopper-art" />
           </span>
         </div>
         {unwrap ? (
@@ -577,20 +605,36 @@ export const CandyPath = forwardRef<
             className="candy-unwrap"
             style={{ left: `${padView(unwrap.pad).x}%`, top: `${padView(unwrap.pad).y}%` }}
             data-present-unwrap={unwrap.phase}
-            aria-label={
-              unwrap.phase === "reveal"
-                ? ui.youFound(squisheeById(unwrap.id)?.name ?? ui.surprisePresent)
-                : ui.surprisePresent
-            }
+            aria-label={unwrap.phase === "reveal" ? unwrapCopy(unwrap.reward, ui).line : ui.surprisePresent}
+            data-present-kind={unwrap.reward.kind}
             onClick={() => setUnwrap(null)}
           >
             {unwrap.phase === "open" ? (
               <MysteryPresent opening size="shelf" />
+            ) : unwrap.reward.kind === "coins" ? (
+              <>
+                <img
+                  src={asset("candy-zones/overlays/coin-stack.png")}
+                  alt=""
+                  className="h-20 w-20 object-contain"
+                  data-present-coins={String(unwrap.reward.coins)}
+                  draggable={false}
+                />
+                <span className="candy-unwrap-name">+{unwrap.reward.coins}</span>
+                <span className="candy-unwrap-line">{ui.youFoundCoins(unwrap.reward.coins)}</span>
+              </>
             ) : (
               <>
-                <PokeToy id={unwrap.id} size="sm" cheer className="h-20 w-20 overflow-visible rare-glow" />
-                <span className="candy-unwrap-name">{squisheeById(unwrap.id)?.name}</span>
-                <span className="candy-unwrap-line">{ui.youFound(squisheeById(unwrap.id)?.name ?? "")}</span>
+                <PokeToy
+                  id={unwrap.reward.squisheeId}
+                  size="sm"
+                  cheer
+                  className="h-20 w-20 overflow-visible rare-glow"
+                />
+                <span className="candy-unwrap-name">{squisheeById(unwrap.reward.squisheeId)?.name}</span>
+                <span className="candy-unwrap-line">
+                  {ui.youFound(squisheeById(unwrap.reward.squisheeId)?.name ?? "")}
+                </span>
               </>
             )}
           </button>

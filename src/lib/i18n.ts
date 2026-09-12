@@ -95,6 +95,7 @@ export type Ui = {
   rareBlurb: string;
   findOnMap: string;
   youFound: (name: string) => string;
+  youFoundCoins: (n: number) => string;
   surprisePresent: string;
   coins: string;
   buy: string;
@@ -169,6 +170,16 @@ export type Ui = {
   owned: string;
   commons: string;
   rares: string;
+  yourPiece: string;
+  usePiece: string;
+  playingAs: string;
+  dressUp: string;
+  unequip: string;
+  wearThis: string;
+  partyHat: string;
+  scarf: string;
+  bow: string;
+  shades: string;
   missingSubtrahend: string;
   timesFacts: string;
   practiceToday: string;
@@ -278,6 +289,7 @@ export const UI: Record<Locale, Ui> = {
     rareBlurb: "Find mystery presents on the Lessons map.",
     findOnMap: "Find on Lessons",
     youFound: (name) => `You found ${name}!`,
+    youFoundCoins: (n) => `You found ${n} coins!`,
     surprisePresent: "Surprise present",
     coins: "Coins",
     buy: "Buy",
@@ -355,6 +367,16 @@ export const UI: Record<Locale, Ui> = {
     owned: "Owned",
     commons: "Commons",
     rares: "Rares",
+    yourPiece: "Your piece",
+    usePiece: "Use",
+    playingAs: "Playing",
+    dressUp: "Dress-up",
+    unequip: "Take off",
+    wearThis: "Wear",
+    partyHat: "Party hat",
+    scarf: "Scarf",
+    bow: "Bow",
+    shades: "Shades",
     missingSubtrahend: "Missing subtrahend",
     timesFacts: "Times tables facts",
     practiceToday: "Today",
@@ -462,6 +484,7 @@ export const UI: Record<Locale, Ui> = {
     rareBlurb: "Encuentra regalos misteriosos en el mapa de Lecciones.",
     findOnMap: "Búscalos en Lecciones",
     youFound: (name) => `¡Encontraste a ${name}!`,
+    youFoundCoins: (n) => `¡Encontraste ${n} monedas!`,
     surprisePresent: "Regalo sorpresa",
     coins: "Monedas",
     buy: "Comprar",
@@ -539,6 +562,16 @@ export const UI: Record<Locale, Ui> = {
     owned: "Tuyo",
     commons: "Comunes",
     rares: "Raros",
+    yourPiece: "Tu ficha",
+    usePiece: "Usar",
+    playingAs: "Jugando",
+    dressUp: "Ropa",
+    unequip: "Quitar",
+    wearThis: "Poner",
+    partyHat: "Gorro",
+    scarf: "Bufanda",
+    bow: "Lazo",
+    shades: "Gafas",
     missingSubtrahend: "Sustraendo que falta",
     timesFacts: "Tablas de multiplicar",
     practiceToday: "Hoy",
@@ -646,6 +679,7 @@ export const UI: Record<Locale, Ui> = {
     rareBlurb: "Ache presentes misteriosos no mapa de Lições.",
     findOnMap: "Ache nas Lições",
     youFound: (name) => `Você achou ${name}!`,
+    youFoundCoins: (n) => `Você achou ${n} moedas!`,
     surprisePresent: "Presente surpresa",
     coins: "Moedas",
     buy: "Comprar",
@@ -723,6 +757,16 @@ export const UI: Record<Locale, Ui> = {
     owned: "Seu",
     commons: "Comuns",
     rares: "Raros",
+    yourPiece: "Sua peça",
+    usePiece: "Usar",
+    playingAs: "Jogando",
+    dressUp: "Roupa",
+    unequip: "Tirar",
+    wearThis: "Vestir",
+    partyHat: "Chapéu",
+    scarf: "Cachecol",
+    bow: "Laço",
+    shades: "Óculos",
     missingSubtrahend: "Subtraendo que falta",
     timesFacts: "Tabuada",
     practiceToday: "Hoje",

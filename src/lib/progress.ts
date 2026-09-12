@@ -2,7 +2,14 @@ import { create } from "zustand";
 import { persist, type PersistStorage, type StorageValue } from "zustand/middleware";
 import { todayIso } from "./calendar";
 import { applyBuy, type BuyReason } from "./coins";
-import { applyUnlock } from "./presents";
+import {
+  applyBuyCosmetic,
+  parseCosmeticIds,
+  parseEquippedCosmetic,
+  type CosmeticBuyReason,
+} from "./cosmetics";
+import { applyPresentLand, applyUnlock, healOpenedPresents, type LandedPresent } from "./presents";
+import { parseHopperId } from "./squishees";
 import { GRADE4_SPANS, UNIT_SPANS, UNITS, unitById, unitsFor } from "./curriculum";
 import {
   RADIAL_PAD_COUNT,
@@ -39,7 +46,7 @@ import { parseTestMode } from "./test-mode";
 import type { ActivitySave, DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
 import { parsePathGrade } from "./types";
 
-const SAVE_VERSION = 14;
+const SAVE_VERSION = 15;
 export const STORAGE_KEY = "g3-path-v2";
 export const LEGACY_STORAGE_KEYS = ["g3-path-v1", "times-tables-progress", "times-tables-settings"] as const;
 const DEFAULT_ID = "kid-1";
@@ -128,6 +135,10 @@ export function emptyLearner(name = ""): LearnerSlice {
     pathNowSeen: 0,
     pathHopSpent: 0,
     pathStepsLeft: 0,
+    openedPresents: [],
+    hopperId: "",
+    cosmetics: [],
+    equippedCosmetic: "",
   };
 }
 
@@ -152,6 +163,10 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
     pathNowSeen: clampPathHopperAt(s.pathNowSeen),
     pathHopSpent: clampPathHopSpent(s.pathHopSpent),
     pathStepsLeft: clampPathStepsLeft(s.pathStepsLeft),
+    openedPresents: healOpenedPresents(s.squishees ?? [], s.openedPresents, 15),
+    hopperId: parseHopperId(s.hopperId, s.squishees ?? []),
+    cosmetics: parseCosmeticIds(s.cosmetics),
+    equippedCosmetic: parseEquippedCosmetic(s.equippedCosmetic, parseCosmeticIds(s.cosmetics)),
   };
 }
 
@@ -212,6 +227,7 @@ function sliceOfWithHopHeal(s: LearnerSlice, saveVersion: number): LearnerSlice 
     ...next,
     pathHopSpent: turn.pathHopSpent,
     pathStepsLeft: turn.pathStepsLeft,
+    openedPresents: healOpenedPresents(next.squishees, s.openedPresents, saveVersion),
   };
 }
 
@@ -257,6 +273,10 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
       pathNowSeen: raw.pathNowSeen ?? 0,
       pathHopSpent: raw.pathHopSpent ?? 0,
       pathStepsLeft: raw.pathStepsLeft ?? 0,
+      openedPresents: raw.openedPresents ?? [],
+      hopperId: raw.hopperId ?? "",
+      cosmetics: raw.cosmetics ?? [],
+      equippedCosmetic: raw.equippedCosmetic ?? "",
     },
     saveVersion,
   );
@@ -327,6 +347,11 @@ interface ProgressApi extends SaveState {
   awardCoins: (n: number) => void;
   buySquishee: (id: string) => { ok: boolean; reason: BuyReason };
   unlockSquishee: (id: string) => { ok: boolean; reason: "ok" | "missing" | "owned" };
+  landPresentPad: (pad: number) => { ok: boolean; reward?: LandedPresent };
+  setHopperId: (id: string) => void;
+  buyCosmetic: (id: string) => { ok: boolean; reason: CosmeticBuyReason };
+  equipCosmetic: (id: string) => boolean;
+  unequipCosmetic: () => void;
   switchLearner: (id: string) => void;
   addLearner: (name: string) => string;
   resetAll: () => void;
@@ -361,6 +386,10 @@ function snapshotSave(s: SaveState): SaveState {
     pathNowSeen: s.pathNowSeen,
     pathHopSpent: s.pathHopSpent,
     pathStepsLeft: s.pathStepsLeft,
+    openedPresents: s.openedPresents,
+    hopperId: s.hopperId,
+    cosmetics: s.cosmetics,
+    equippedCosmetic: s.equippedCosmetic,
     learners: s.learners,
   };
 }
@@ -525,6 +554,32 @@ export const useProgress = create<ProgressApi>()(
         const r = applyUnlock(get().squishees, id);
         if (r.ok) commit(get, set, { squishees: r.squishees });
         return { ok: r.ok, reason: r.reason };
+      },
+      landPresentPad: (pad) => {
+        const r = applyPresentLand(get().squishees, get().coins, get().openedPresents, pad);
+        if (r.ok) {
+          commit(get, set, { squishees: r.squishees, coins: r.coins, openedPresents: r.opened });
+        }
+        return { ok: r.ok, reward: r.reward };
+      },
+      setHopperId: (id) => {
+        const hopperId = parseHopperId(id, get().squishees);
+        commit(get, set, { hopperId });
+      },
+      buyCosmetic: (id) => {
+        const r = applyBuyCosmetic(get().coins, get().cosmetics, id);
+        if (r.ok) commit(get, set, { coins: r.coins, cosmetics: r.cosmetics });
+        return { ok: r.ok, reason: r.reason };
+      },
+      equipCosmetic: (id) => {
+        const owned = parseCosmeticIds(get().cosmetics);
+        const equippedCosmetic = parseEquippedCosmetic(id, owned);
+        if (!equippedCosmetic) return false;
+        commit(get, set, { equippedCosmetic });
+        return true;
+      },
+      unequipCosmetic: () => {
+        commit(get, set, { equippedCosmetic: "" });
       },
       switchLearner: (id) => {
         const kid = get().learners[id];

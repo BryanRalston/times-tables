@@ -804,6 +804,42 @@ details > summary::-webkit-details-marker {
 .shelf-plank {
   margin-top: 0.35rem;
 }
+.shelf-avatar {
+  margin: 0.15rem 0 0.55rem;
+}
+.shelf-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.35rem 0.2rem 0.15rem;
+}
+.shelf-use {
+  margin-top: 0.35rem;
+  padding: 0.2rem 0.7rem;
+  border: 0;
+  border-radius: 9999px;
+  background: #fff7fb;
+  color: #4a2d55;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+.shelf-use-on {
+  background: #0e8a86;
+  color: #f4fffe;
+}
+.dressed-squishee {
+  display: block;
+  position: relative;
+}
+.candy-hopper-fit .dressed-squishee {
+  position: absolute;
+  inset: 0;
+}
+.continue-peek .dressed-squishee {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .plank-rail {
   overflow-x: auto;
   padding-bottom: 0.35rem;
@@ -936,7 +972,7 @@ details > summary::-webkit-details-marker {
 .candy-scroll[data-lessons-path] {
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  overflow: hidden;
   padding: 0.1rem 0.35rem 0;
 }
 .candy-map {
@@ -965,15 +1001,13 @@ details > summary::-webkit-details-marker {
   aspect-ratio: 16 / 9;
   overflow: hidden;
 }
-/* Taller card on the phone shell: crop white letterbox, keep the locked
-   16:9 camera. Art + overlay share .candy-world-stage so pad % stay on-art.
-   Height may shrink on short phones; it never grows past 6/7 or E/W
-   portal arches shear off the card. Extra plate is studio white. */
+/* 8/5 card + height-fitted 16:9 stage: the green rim and E/W arches stay
+   inside the white card. Extra plate below is studio white, not a crop. */
 .candy-map[data-radial-web="1"] .candy-world {
-  aspect-ratio: 6 / 7;
+  aspect-ratio: 8 / 5;
   width: 100%;
   height: auto;
-  max-height: min(100%, calc(100cqi * 7 / 6));
+  max-height: min(100%, calc(100cqi * 5 / 8));
   align-self: start;
   justify-self: stretch;
 }
@@ -1608,69 +1642,42 @@ details > summary::-webkit-details-marker {
   width: 100%;
   aspect-ratio: 1;
   pointer-events: none;
-  animation: candy-present-bob 1.8s ease-in-out infinite;
+}
+.mystery-present-live {
+  animation: candy-present-bob 2.4s ease-in-out infinite;
 }
 .mystery-present-shelf {
   width: 4.4rem;
-  animation: none;
 }
 .mystery-present-found {
   animation: none;
-  filter: saturate(0.55) brightness(0.92);
+  filter: saturate(0.45) brightness(0.88);
+  opacity: 0.7;
 }
 .mystery-present-open {
   animation: candy-present-pop 0.64s ease-out forwards;
 }
-.mystery-present-box {
+.mystery-present-glow {
   position: absolute;
-  left: 18%;
-  right: 18%;
-  bottom: 10%;
-  height: 46%;
-  border-radius: 14% 14% 18% 18%;
-  background: linear-gradient(180deg, #ff7a88 0%, #e4455c 100%);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.45),
-    0 2px 0 #9d2a3c;
+  inset: 4%;
+  border-radius: 36%;
+  background: radial-gradient(circle, rgb(255 214 120 / 0.42) 0%, rgb(255 214 120 / 0) 72%);
+  pointer-events: none;
 }
-.mystery-present-ribbon {
-  position: absolute;
-  left: 44%;
-  width: 12%;
-  top: 36%;
-  bottom: 10%;
-  border-radius: 9999px;
-  background: linear-gradient(180deg, #ffe27a 0%, #f0b423 100%);
+.mystery-present-live .mystery-present-glow {
+  animation: candy-present-glow 2.4s ease-in-out infinite;
 }
-.mystery-present-lid {
-  position: absolute;
-  left: 12%;
-  right: 12%;
-  top: 28%;
-  height: 20%;
-  border-radius: 16%;
-  background: linear-gradient(180deg, #ff9aa4 0%, #ef5a6c 100%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5);
+.mystery-present-found .mystery-present-glow,
+.mystery-present-open .mystery-present-glow {
+  display: none;
 }
-.mystery-present-open .mystery-present-lid {
-  transform: translateY(-42%) rotate(-18deg);
-}
-.mystery-present-bow {
-  position: absolute;
-  left: 50%;
-  top: 14%;
-  width: 42%;
-  height: 22%;
-  transform: translateX(-50%);
-  background:
-    radial-gradient(circle at 28% 55%, #ffe27a 0 42%, transparent 43%),
-    radial-gradient(circle at 72% 55%, #ffe27a 0 42%, transparent 43%),
-    radial-gradient(circle at 50% 70%, #f0b423 0 28%, transparent 29%);
-}
-.mystery-present-found .mystery-present-lid {
-  top: 8%;
-  opacity: 0.55;
-  transform: rotate(-28deg);
+.mystery-present-art {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgb(60 30 40 / 0.22));
 }
 .candy-unwrap {
   position: absolute;
@@ -1708,10 +1715,21 @@ details > summary::-webkit-details-marker {
 @keyframes candy-present-bob {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translateY(0) rotate(0deg);
   }
   50% {
-    transform: translateY(-8%);
+    transform: translateY(-7%) rotate(-2.4deg);
+  }
+}
+@keyframes candy-present-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
   }
 }
 @keyframes candy-present-pop {
@@ -1960,6 +1978,8 @@ details > summary::-webkit-details-marker {
   .candy-warp-fx,
   .candy-warp-fx::after,
   .mystery-present,
+  .mystery-present-live,
+  .mystery-present-live .mystery-present-glow,
   .mystery-present-open,
   .mini-peek-face,
   .mini-pad-glow {

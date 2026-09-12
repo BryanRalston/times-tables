@@ -1,52 +1,131 @@
 import { adjacentPadIds, RADIAL_PADS, START_PAD } from "@/lib/radial-web";
 import { RARE_SQUISHEES, squisheeById } from "@/lib/squishees";
 
-export type PresentSpot = {
+export const PRESENT_COIN_PILE = 10;
+
+export type PresentSquisheeSpot = {
   pad: number;
+  kind: "squishee";
   squisheeId: string;
 };
 
+export type PresentCoinSpot = {
+  pad: number;
+  kind: "coins";
+  coins: number;
+};
+
+export type PresentSpot = PresentSquisheeSpot | PresentCoinSpot;
+
+export type LandedPresent =
+  | { kind: "squishee"; squisheeId: string }
+  | { kind: "coins"; coins: number };
+
 /**
- * Grade 3 find-to-unlock rares. Fixed pad ↔ rare pairing, like mystery
- * portals — discoverable, not reshuffled every visit.
+ * Grade 3 mystery boxes. Fixed pad ↔ reward, like mystery portals —
+ * not reshuffled every visit.
  *
- * Four ring-2 corner tiles (NE / SE / SW / NW). Not the plaza, not a
- * portal, and not a gate: the web still connects around them.
- * Remaining rares stay Shelf mysteries until a later grade.
+ * Mix: one unowned common, two find-to-unlock rares, one ~10-coin pile
+ * (one Shelf common). Remaining rares stay Shelf mysteries.
  */
 export const GRADE3_PRESENTS: readonly PresentSpot[] = [
-  { pad: 12, squisheeId: "crystal-axolotl" },
-  { pad: 17, squisheeId: "galaxy-narwhal" },
-  { pad: 21, squisheeId: "golden-dragon" },
-  { pad: 25, squisheeId: "rainbow-cupcake" },
+  { pad: 12, kind: "squishee", squisheeId: "otter" },
+  { pad: 17, kind: "squishee", squisheeId: "crystal-axolotl" },
+  { pad: 21, kind: "coins", coins: PRESENT_COIN_PILE },
+  { pad: 25, kind: "squishee", squisheeId: "galaxy-narwhal" },
 ];
+
+/** Pre-v15 map rares. Heal opened pads so old finds are not re-wrapped. */
+export const LEGACY_PRESENT_SQUISHEES: Readonly<Record<number, string>> = {
+  12: "crystal-axolotl",
+  17: "galaxy-narwhal",
+  21: "golden-dragon",
+  25: "rainbow-cupcake",
+};
 
 export const UNWRAP_OPEN_MS = 640;
 export const UNWRAP_HOLD_MS = 9000;
 
-const presentByPad = new Map(GRADE3_PRESENTS.map((p) => [p.pad, p.squisheeId]));
+const presentByPad = new Map(GRADE3_PRESENTS.map((p) => [p.pad, p]));
+
+export function presentSpotAt(pad: number): PresentSpot | undefined {
+  return presentByPad.get(pad);
+}
 
 export function presentSquisheeAt(pad: number): string | undefined {
-  return presentByPad.get(pad);
+  const spot = presentByPad.get(pad);
+  return spot?.kind === "squishee" ? spot.squisheeId : undefined;
 }
 
 export function isPresentPad(pad: number): boolean {
   return presentByPad.has(pad);
 }
 
-export function visiblePresentPads(owned: readonly string[]): readonly number[] {
-  return GRADE3_PRESENTS.filter((p) => !owned.includes(p.squisheeId)).map((p) => p.pad);
+export function parseOpenedPresents(raw: unknown): number[] {
+  if (!Array.isArray(raw)) return [];
+  const out: number[] = [];
+  const seen = new Set<number>();
+  for (const n of raw) {
+    if (typeof n !== "number" || !Number.isFinite(n)) continue;
+    const pad = Math.round(n);
+    if (!presentByPad.has(pad) || seen.has(pad)) continue;
+    seen.add(pad);
+    out.push(pad);
+  }
+  return out.sort((a, b) => a - b);
 }
 
-export function foundPresentPads(owned: readonly string[]): readonly number[] {
-  return GRADE3_PRESENTS.filter((p) => owned.includes(p.squisheeId)).map((p) => p.pad);
+export function healOpenedPresents(
+  owned: readonly string[],
+  raw: unknown,
+  saveVersion: number,
+): number[] {
+  const opened = new Set(parseOpenedPresents(raw));
+  for (const spot of GRADE3_PRESENTS) {
+    if (spot.kind === "squishee" && owned.includes(spot.squisheeId)) opened.add(spot.pad);
+  }
+  if (saveVersion < 15) {
+    for (const [padRaw, id] of Object.entries(LEGACY_PRESENT_SQUISHEES)) {
+      if (owned.includes(id)) opened.add(Number(padRaw));
+    }
+  }
+  return [...opened].filter((pad) => presentByPad.has(pad)).sort((a, b) => a - b);
 }
 
-/** Rare waiting in that box, if the Guest does not already own it. */
-export function landPresent(pad: number, owned: readonly string[]): string | undefined {
-  const id = presentSquisheeAt(pad);
-  if (!id || owned.includes(id)) return undefined;
-  return squisheeById(id)?.rarity === "rare" ? id : undefined;
+function padSpent(spot: PresentSpot, owned: readonly string[], opened: ReadonlySet<number>): boolean {
+  if (opened.has(spot.pad)) return true;
+  return spot.kind === "squishee" && owned.includes(spot.squisheeId);
+}
+
+export function visiblePresentPads(owned: readonly string[], opened: readonly number[] = []): readonly number[] {
+  const done = new Set(opened);
+  return GRADE3_PRESENTS.filter((p) => !padSpent(p, owned, done)).map((p) => p.pad);
+}
+
+export function foundPresentPads(owned: readonly string[], opened: readonly number[] = []): readonly number[] {
+  const done = new Set(opened);
+  return GRADE3_PRESENTS.filter((p) => padSpent(p, owned, done)).map((p) => p.pad);
+}
+
+export function landPresent(
+  pad: number,
+  owned: readonly string[],
+  opened: readonly number[],
+): LandedPresent | undefined {
+  if (opened.includes(pad)) return undefined;
+  const spot = presentByPad.get(pad);
+  if (!spot) return undefined;
+  switch (spot.kind) {
+    case "coins":
+      return { kind: "coins", coins: spot.coins };
+    case "squishee":
+      if (owned.includes(spot.squisheeId)) return undefined;
+      return squisheeById(spot.squisheeId) ? { kind: "squishee", squisheeId: spot.squisheeId } : undefined;
+    default: {
+      const _never: never = spot;
+      return _never;
+    }
+  }
 }
 
 export function applyUnlock(
@@ -57,6 +136,42 @@ export function applyUnlock(
   if (!s) return { ok: false, reason: "missing", squishees: owned };
   if (owned.includes(id)) return { ok: false, reason: "owned", squishees: owned };
   return { ok: true, reason: "ok", squishees: [...owned, id] };
+}
+
+export function applyPresentLand(
+  owned: string[],
+  coins: number,
+  opened: number[],
+  pad: number,
+): {
+  ok: boolean;
+  squishees: string[];
+  coins: number;
+  opened: number[];
+  reward?: LandedPresent;
+} {
+  const reward = landPresent(pad, owned, opened);
+  if (!reward) return { ok: false, squishees: owned, coins, opened };
+  const nextOpened = opened.includes(pad) ? opened : [...opened, pad].sort((a, b) => a - b);
+  switch (reward.kind) {
+    case "coins":
+      return {
+        ok: true,
+        squishees: owned,
+        coins: coins + reward.coins,
+        opened: nextOpened,
+        reward,
+      };
+    case "squishee": {
+      const grant = applyUnlock(owned, reward.squisheeId);
+      if (!grant.ok) return { ok: false, squishees: owned, coins, opened };
+      return { ok: true, squishees: grant.squishees, coins, opened: nextOpened, reward };
+    }
+    default: {
+      const _never: never = reward;
+      return _never;
+    }
+  }
 }
 
 /** BFS that skips present pads still reaches the outer ring. */
@@ -76,7 +191,15 @@ export function webOpenAroundPresents(): boolean {
 }
 
 export function grade3PresentRares(): readonly string[] {
-  return GRADE3_PRESENTS.map((p) => p.squisheeId);
+  return GRADE3_PRESENTS.filter((p): p is PresentSquisheeSpot => p.kind === "squishee")
+    .map((p) => p.squisheeId)
+    .filter((id) => squisheeById(id)?.rarity === "rare");
+}
+
+export function grade3PresentCommons(): readonly string[] {
+  return GRADE3_PRESENTS.filter((p): p is PresentSquisheeSpot => p.kind === "squishee")
+    .map((p) => p.squisheeId)
+    .filter((id) => squisheeById(id)?.rarity === "common");
 }
 
 export function heldRares(): readonly string[] {

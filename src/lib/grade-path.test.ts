@@ -221,6 +221,8 @@ describe("grade path", () => {
   it("hops the last owned squishee, else the familiar first peek face", () => {
     expect(pathHopperId([])).toBe("peach");
     expect(pathHopperId(["frog", "cat"])).toBe("cat");
+    expect(pathHopperId(["frog", "cat"], "frog")).toBe("frog");
+    expect(pathHopperId(["frog"], "otter")).toBe("frog");
     expect(pathHopperId(["not-a-toy"])).toBe("peach");
   });
 });
