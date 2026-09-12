@@ -298,6 +298,44 @@ def main() -> int:
         if mag > 8:
             fails.append(f"money/{name}: leftover magenta {mag}px")
 
+    gift = PUBLIC / "art" / "mystery-gift.png"
+    if not gift.exists():
+        fails.append("missing art/mystery-gift.png")
+    else:
+        raw = Image.open(gift)
+        if raw.format != "PNG":
+            fails.append(f"mystery-gift.png: must be a PNG with alpha, got {raw.format}")
+        gim = raw.convert("RGBA")
+        gw, gh = gim.size
+        gpx = gim.load()
+        if gw < 256 or gh < 256:
+            fails.append(f"mystery-gift.png: expected a vinyl square, got {gw}x{gh}")
+        corner_a = 0
+        for gx, gy in ((0, 0), (gw - 1, 0), (0, gh - 1), (gw - 1, gh - 1)):
+            corner_a = max(corner_a, gpx[gx, gy][3])
+        if corner_a > 16:
+            fails.append("mystery-gift.png: corners must be transparent (white plate)")
+        # Edge band must be punched out so grass shows around the box.
+        # Interior pale pixels are vinyl highlights / water drops, not a plate.
+        band = max(8, gw // 40)
+        edge_opaque = 0
+        edge_tot = 0
+        gift_opaque = 0
+        for y in range(gh):
+            for x in range(gw):
+                _r, _g, _b, a = gpx[x, y]
+                if a > 16:
+                    gift_opaque += 1
+                on_edge = x < band or y < band or x >= gw - band or y >= gh - band
+                if on_edge:
+                    edge_tot += 1
+                    if a > 16:
+                        edge_opaque += 1
+        if gift_opaque < gw * gh * 0.18:
+            fails.append(f"mystery-gift.png: gift punched out too far ({gift_opaque}px)")
+        if edge_tot and edge_opaque > edge_tot * 0.02:
+            fails.append(f"mystery-gift.png: white plate still on the rim ({edge_opaque}px)")
+
     radial = PUBLIC / "candy-zones" / "radial-web-locked.jpg"
     if not radial.exists():
         fails.append("missing candy-zones/radial-web-locked.jpg")

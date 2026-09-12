@@ -52,7 +52,7 @@ describe("radial web", () => {
     expect(RADIAL_PADS[0]!.id).toBe(START_PAD);
     expect(RADIAL_PADS.every((p) => p.id >= 1 && p.map.x > 8 && p.map.x < 92)).toBe(true);
     expect(RADIAL_PADS.filter((p) => p.ring === 0)).toHaveLength(1);
-    expect(RADIAL_PAD_COUNT).toBe(95);
+    expect(RADIAL_PAD_COUNT).toBe(102);
     expect(RADIAL_PADS.filter((p) => p.ring === 1).length).toBeGreaterThanOrEqual(8);
     expect(RADIAL_PADS.filter((p) => p.ring === 4).length).toBeGreaterThan(40);
     expect(RADIAL_EDGES.length).toBeGreaterThan(RADIAL_PAD_COUNT);
@@ -88,6 +88,43 @@ describe("radial web", () => {
     expect(adjacentPadIds(57)).toEqual(expect.arrayContaining([80, 81]));
     expect(areAdjacent(56, 58)).toBe(true);
     expect(areAdjacent(56, 57)).toBe(false);
+    // Inward cream / pink / purple tiles used to carry the warp flag.
+    for (const id of [15, 23, 59, 65, 85, 89]) {
+      expect(RADIAL_PADS.find((p) => p.id === id)?.portal).toBe(false);
+    }
+    const innerE = RADIAL_PADS.find((p) => p.portal && p.ring === 2 && p.map.x > 60)!;
+    const innerW = RADIAL_PADS.find((p) => p.portal && p.ring === 2 && p.map.x < 40)!;
+    expect(innerE?.id).toBe(96);
+    expect(innerW?.id).toBe(97);
+    expect(innerE!.map.x).toBeGreaterThan(66);
+    expect(innerW!.map.x).toBeLessThan(34);
+    expect(innerE!.map.y).toBeGreaterThan(40);
+    expect(innerE!.map.y).toBeLessThan(43);
+    expect(innerW!.map.y).toBeGreaterThan(40);
+    expect(innerW!.map.y).toBeLessThan(43);
+    expect(adjacentPadIds(96)).toEqual(expect.arrayContaining([15, 34]));
+    expect(adjacentPadIds(97)).toEqual(expect.arrayContaining([23, 47]));
+    const innerNW = RADIAL_PADS.find((p) => p.id === 102)!;
+    expect(innerNW.portal).toBe(false);
+    expect(innerNW.map.x).toBeGreaterThan(38);
+    expect(innerNW.map.x).toBeLessThan(41);
+    expect(innerNW.map.y).toBeGreaterThan(29);
+    expect(innerNW.map.y).toBeLessThan(32);
+    expect(adjacentPadIds(102)).toEqual(expect.arrayContaining([25]));
+    expect(areAdjacent(15, 34)).toBe(false);
+    expect(areAdjacent(23, 47)).toBe(false);
+    const outerNE = RADIAL_PADS.find((p) => p.portal && p.ring === 4 && p.map.x > 70 && p.map.y < 18)!;
+    const outerE = RADIAL_PADS.find((p) => p.portal && p.ring === 4 && p.map.x > 80)!;
+    const outerW = RADIAL_PADS.find((p) => p.portal && p.ring === 4 && p.map.x < 18)!;
+    const outerNW = RADIAL_PADS.find((p) => p.portal && p.ring === 4 && p.map.x < 30 && p.map.y < 18)!;
+    expect(outerNE?.id).toBe(98);
+    expect(outerE?.id).toBe(99);
+    expect(outerW?.id).toBe(100);
+    expect(outerNW?.id).toBe(101);
+    expect(adjacentPadIds(98).length).toBeGreaterThan(0);
+    expect(adjacentPadIds(99)).toEqual(expect.arrayContaining([65]));
+    expect(adjacentPadIds(100)).toEqual(expect.arrayContaining([85]));
+    expect(adjacentPadIds(101).length).toBeGreaterThan(0);
   });
 
   it("hops exactly one adjacent space and never skips pads", () => {
@@ -115,6 +152,12 @@ describe("radial web", () => {
     }
     expect(portalPartner(START_PAD)).toBeUndefined();
     expect(RADIAL_PADS.filter((p) => p.portal)).toHaveLength(12);
+    expect(portalPartner(2)).toBe(19);
+    expect(portalPartner(96)).toBe(97);
+    expect(portalPartner(54)).toBe(75);
+    expect(portalPartner(98)).toBe(57);
+    expect(portalPartner(99)).toBe(100);
+    expect(portalPartner(69)).toBe(101);
   });
 
   it("grants one hop credit per first small lesson, not a whole unit or replay", () => {
@@ -376,12 +419,23 @@ describe("radial hop hit testing", () => {
   });
 
   it("never selects a quiet pad, and still warps from an adjacent portal", () => {
-    const portal = RADIAL_PADS.find((p) => p.portal)!;
+    const portals = RADIAL_PADS.filter((p) => p.portal);
+    expect(portals).toHaveLength(12);
+    for (const portal of portals) {
+      const neighbors = adjacentPadIds(portal.id);
+      expect(neighbors.length).toBeGreaterThan(0);
+      const neighbor = neighbors[0]!;
+      const choices = adjacentPadIds(neighbor);
+      expect(choices).toContain(portal.id);
+      const p = padClientPos(portal.id, board);
+      expect(nearestHopTarget(p.x, p.y, board, choices, neighbor)).toBe(portal.id);
+      const n = padClientPos(neighbor, board);
+      expect(nearestHopTarget(n.x, n.y, board, choices, neighbor)).toBeUndefined();
+    }
+    const portal = portals[0]!;
     const neighbor = adjacentPadIds(portal.id)[0]!;
     const choices = adjacentPadIds(neighbor);
-    expect(choices).toContain(portal.id);
     const p = padClientPos(portal.id, board);
-    expect(nearestHopTarget(p.x, p.y, board, choices, neighbor)).toBe(portal.id);
     const here = padClientPos(neighbor, board);
     const quiet = RADIAL_PADS.filter((pad) => !choices.includes(pad.id) && pad.id !== neighbor).sort((left, right) => {
       const ql = padClientPos(left.id, board);
