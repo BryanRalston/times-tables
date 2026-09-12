@@ -52,7 +52,8 @@ export function MiniGame({
   whoStage?: WhoHidStage;
 }) {
   const ui = useUi();
-  const chosen = useProgress((s) => s.hopperId);
+  useProgress((s) => s.hopperId);
+  const chosen = useProgress.getState().hopperId;
   const hopperId = pathHopperId(owned, chosen);
   const kind = useMemo(() => pickMiniKind(seed, qaMiniKind()), [seed]);
   const deal = useMemo(() => dealMini(kind, owned, rngFromSeed(`${seed}:deal`), hopperId), [hopperId, kind, owned, seed]);

@@ -155,16 +155,12 @@ export function squisheeById(id: string): Squishee | undefined {
 }
 
 /**
- * Lessons / play / Home face. A kid-picked owned toy wins; otherwise
- * last owned, else Peach. First visit can stay Peach until they pick.
+ * Lessons / play / Home face. A kid-picked owned toy (or Peach) wins.
+ * Buying a toy never steals the avatar — empty pick stays Peach.
  */
 export function pathHopperId(owned: readonly string[], chosen?: string | null): string {
   if (chosen && squisheeById(chosen) && (owned.includes(chosen) || chosen === "peach")) return chosen;
-  for (let i = owned.length - 1; i >= 0; i--) {
-    const id = owned[i]!;
-    if (squisheeById(id)) return id;
-  }
-  return PEEK_SQUISHEE_IDS[0] ?? SQUISHEE_IDS[0]!;
+  return "peach";
 }
 
 export function parseHopperId(raw: unknown, owned: readonly string[]): string {

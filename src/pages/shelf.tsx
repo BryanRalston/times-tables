@@ -7,14 +7,12 @@ import { MysteryPresent } from "@/components/mystery-present";
 import { PokeToy } from "@/components/poke-toy";
 import { squisheePrice } from "@/lib/coins";
 import {
-  COSMETIC_FACES,
   COSMETICS,
-  canDressFace,
-  cosmeticCompositeSrc,
   cosmeticLabel,
+  wearList,
   type Cosmetic,
 } from "@/lib/cosmetics";
-import { COMMON_SQUISHEES, RARE_SQUISHEES, pathHopperId, squisheeSrc, type Squishee } from "@/lib/squishees";
+import { COMMON_SQUISHEES, RARE_SQUISHEES, pathHopperId, squisheeById, squisheeSrc, type Squishee } from "@/lib/squishees";
 import { playTap } from "@/lib/sound";
 import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
@@ -72,11 +70,12 @@ function Plank({
 }
 
 export function ShelfPage() {
-  const earned = useProgress((s) => s.squishees);
-  const coins = useProgress((s) => s.coins);
-  const chosen = useProgress((s) => s.hopperId);
-  const cosmetics = useProgress((s) => s.cosmetics);
-  const equipped = useProgress((s) => s.equippedCosmetic);
+  useProgress((s) => `${s.squishees.join("\0")}:${s.hopperId}:${s.coins}:${s.cosmetics.join(",")}:${wearList(s).join(",")}`);
+  const earned = useProgress.getState().squishees;
+  const coins = useProgress.getState().coins;
+  const chosen = useProgress.getState().hopperId;
+  const cosmetics = useProgress.getState().cosmetics;
+  const equipped = wearList(useProgress.getState());
   const buySquishee = useProgress((s) => s.buySquishee);
   const buyCosmetic = useProgress((s) => s.buyCosmetic);
   const setHopperId = useProgress((s) => s.setHopperId);
@@ -86,6 +85,11 @@ export function ShelfPage() {
   const hopperId = pathHopperId(earned, chosen);
   const recent = earned.length ? earned[earned.length - 1] : null;
   const recentToy = [...COMMON_SQUISHEES, ...RARE_SQUISHEES].find((s) => s.id === recent);
+  const peach = squisheeById("peach")!;
+  const pickerToys = [
+    peach,
+    ...[...COMMON_SQUISHEES, ...RARE_SQUISHEES].filter((s) => s.id !== "peach" && earned.includes(s.id)),
+  ];
 
   function buy(id: string) {
     const r = buySquishee(id);
@@ -104,16 +108,43 @@ export function ShelfPage() {
       <div className="flex-1 overflow-y-auto px-3 pb-3">
         <section className="shelf-avatar" data-avatar-picker="1">
           <h2 className="shelf-section">
-            <span aria-hidden>★</span> {ui.yourPiece}
+            <span aria-hidden>★</span> {ui.thatsMe}
           </h2>
-          <div className="shelf-avatar-row">
+          <div className="shelf-avatar-hero" data-avatar-hero={hopperId}>
             <DressedSquishee
               id={hopperId}
               cosmetic={equipped}
-              className="h-24 w-24"
+              className="shelf-avatar-face"
               imgClassName="h-full w-full object-contain"
+              alt={ui.thatsMe}
             />
-            <p className="shelf-blurb">{ui.usePiece}</p>
+            <p className="shelf-avatar-name">{squisheeById(hopperId)?.name ?? peach.name}</p>
+            <p className="shelf-blurb">{ui.thatsMeHint}</p>
+          </div>
+          <div className="shelf-avatar-grid">
+            {pickerToys.map((s) => {
+              const on = hopperId === s.id;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={cn("shelf-avatar-pick", on && "shelf-avatar-pick-on")}
+                  data-avatar-pick={s.id}
+                  data-playing-as={on ? "1" : "0"}
+                  aria-pressed={on}
+                  aria-label={`${ui.thatsMe}, ${s.name}`}
+                  onClick={() => usePiece(s.id)}
+                >
+                  <DressedSquishee
+                    id={s.id}
+                    cosmetic={on ? equipped : ""}
+                    className="shelf-avatar-pick-face"
+                    imgClassName="h-full w-full object-contain"
+                  />
+                  <span>{on ? ui.playingAs : ui.usePiece}</span>
+                </button>
+              );
+            })}
           </div>
         </section>
         {recentToy ? (
@@ -150,9 +181,9 @@ export function ShelfPage() {
                   key={item.id}
                   item={item}
                   got={cosmetics.includes(item.id)}
-                  worn={equipped === item.id}
+                  worn={equipped.includes(item.id)}
                   coins={coins}
-                  previewFace={COSMETIC_FACES.includes(hopperId as (typeof COSMETIC_FACES)[number]) ? hopperId : "peach"}
+                  previewFace={hopperId}
                   onBuy={() => {
                     const r = buyCosmetic(item.id);
                     if (r.ok) playTap();
@@ -162,7 +193,7 @@ export function ShelfPage() {
                     if (equipCosmetic(item.id)) playTap();
                   }}
                   onUnequip={() => {
-                    unequipCosmetic();
+                    unequipCosmetic(item.id);
                     playTap();
                   }}
                 />
@@ -207,17 +238,18 @@ export function ShopCard({
   featured?: boolean;
 }) {
   const ui = useUi();
-  const equipped = useProgress((s) => s.equippedCosmetic);
+  useProgress((s) => wearList(s).join(","));
+  const equipped = wearList(useProgress.getState());
   const [justBought, setJustBought] = useState(cheer);
   const findOnly = s.rarity === "rare";
   const price = squisheePrice(s.id);
   const canBuy = !got && !findOnly && coins >= price;
   const playCheer = justBought;
   const isHopper = got && hopperId === s.id;
-  const dress = isHopper && canDressFace(s.id, equipped) ? equipped : "";
+  const dress = isHopper ? equipped : [];
 
   const toy = got ? (
-    dress ? (
+    dress.length ? (
       <DressedSquishee id={s.id} cosmetic={dress} className="h-20 w-20" imgClassName="h-20 w-20 object-contain" />
     ) : (
       <PokeToy
@@ -328,10 +360,11 @@ function CosmeticCard({
   const canBuy = !got && coins >= item.price;
   return (
     <div className="shelf-slot" data-cosmetic-card={item.id} data-cosmetic-worn={worn ? "1" : "0"}>
-      <MagentaImg
-        src={cosmeticCompositeSrc(previewFace, item.id)}
-        alt=""
-        className="h-20 w-20 object-contain"
+      <DressedSquishee
+        id={previewFace}
+        cosmetic={item.id}
+        className="h-20 w-20"
+        imgClassName="h-20 w-20 object-contain"
       />
       <span className="mt-1 text-center text-xs font-bold text-plum">{name}</span>
       {got ? (

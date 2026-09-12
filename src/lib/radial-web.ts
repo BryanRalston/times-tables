@@ -397,21 +397,19 @@ export const HOP_GLOW_BOARD_WIDTH_PCT = 2.2;
 
 /**
  * Visible radial card on a 390 phone after scroll pad + 4px frame.
- * CSS `.candy-world` is 8/5: a 16:9 stage height-fitted to that card
- * keeps the green rim and E/W arches on-screen (about 5–95% of the art)
- * without letterboxing the island into a postage stamp.
+ * Locked art is 16:9, contained in the card — stage is never wider than
+ * the view, so the green rim, arches, and outer ring stay on-screen.
  */
-export const PHONE_MAP_VIEW = { width: 368, height: (368 * 5) / 8 } as const;
+export const PHONE_MAP_VIEW = { width: 368, height: (368 * 9) / 16 } as const;
 
 /**
- * Overlay / art stage: same 16:9 as radial-web-locked.jpg, height-matched
- * to the 8/5 card. Slightly wider than the card — only the art’s white
- * margin crops, not the painted island.
+ * Overlay / art stage: same 16:9 as radial-web-locked.jpg, width-matched
+ * to the card. Never wider than {@link PHONE_MAP_VIEW}.
  */
 export const PHONE_MAP_BOARD = {
   left: 0,
   top: 0,
-  width: PHONE_MAP_VIEW.height * (RADIAL_MAP_SIZE.w / RADIAL_MAP_SIZE.h),
+  width: PHONE_MAP_VIEW.width,
   height: PHONE_MAP_VIEW.height,
 } as const;
 

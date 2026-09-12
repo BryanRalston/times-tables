@@ -4,8 +4,12 @@ import { todayIso } from "./calendar";
 import { applyBuy, type BuyReason } from "./coins";
 import {
   applyBuyCosmetic,
+  applyEquipCosmetic,
+  applyUnequipCosmetic,
   parseCosmeticIds,
   parseEquippedCosmetic,
+  parseEquippedCosmetics,
+  wearList,
   type CosmeticBuyReason,
 } from "./cosmetics";
 import { applyPresentLand, applyUnlock, healOpenedPresents, type LandedPresent } from "./presents";
@@ -139,6 +143,7 @@ export function emptyLearner(name = ""): LearnerSlice {
     hopperId: "",
     cosmetics: [],
     equippedCosmetic: "",
+    equippedCosmetics: [],
   };
 }
 
@@ -166,7 +171,14 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
     openedPresents: healOpenedPresents(s.squishees ?? [], s.openedPresents, 15),
     hopperId: parseHopperId(s.hopperId, s.squishees ?? []),
     cosmetics: parseCosmeticIds(s.cosmetics),
-    equippedCosmetic: parseEquippedCosmetic(s.equippedCosmetic, parseCosmeticIds(s.cosmetics)),
+    equippedCosmetics: parseEquippedCosmetics(
+      s.equippedCosmetics?.length ? s.equippedCosmetics : s.equippedCosmetic,
+      parseCosmeticIds(s.cosmetics),
+    ),
+    equippedCosmetic: parseEquippedCosmetic(
+      s.equippedCosmetics?.length ? s.equippedCosmetics : s.equippedCosmetic,
+      parseCosmeticIds(s.cosmetics),
+    ),
   };
 }
 
@@ -277,6 +289,7 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
       hopperId: raw.hopperId ?? "",
       cosmetics: raw.cosmetics ?? [],
       equippedCosmetic: raw.equippedCosmetic ?? "",
+      equippedCosmetics: raw.equippedCosmetics ?? [],
     },
     saveVersion,
   );
@@ -351,7 +364,7 @@ interface ProgressApi extends SaveState {
   setHopperId: (id: string) => void;
   buyCosmetic: (id: string) => { ok: boolean; reason: CosmeticBuyReason };
   equipCosmetic: (id: string) => boolean;
-  unequipCosmetic: () => void;
+  unequipCosmetic: (id?: string) => void;
   switchLearner: (id: string) => void;
   addLearner: (name: string) => string;
   resetAll: () => void;
@@ -390,6 +403,7 @@ function snapshotSave(s: SaveState): SaveState {
     hopperId: s.hopperId,
     cosmetics: s.cosmetics,
     equippedCosmetic: s.equippedCosmetic,
+    equippedCosmetics: s.equippedCosmetics,
     learners: s.learners,
   };
 }
@@ -573,13 +587,14 @@ export const useProgress = create<ProgressApi>()(
       },
       equipCosmetic: (id) => {
         const owned = parseCosmeticIds(get().cosmetics);
-        const equippedCosmetic = parseEquippedCosmetic(id, owned);
-        if (!equippedCosmetic) return false;
-        commit(get, set, { equippedCosmetic });
+        const next = applyEquipCosmetic(owned, wearList(get()), id);
+        if (!next.includes(id)) return false;
+        commit(get, set, { equippedCosmetics: next, equippedCosmetic: id });
         return true;
       },
-      unequipCosmetic: () => {
-        commit(get, set, { equippedCosmetic: "" });
+      unequipCosmetic: (id) => {
+        const next = applyUnequipCosmetic(wearList(get()), id);
+        commit(get, set, { equippedCosmetics: next, equippedCosmetic: next[next.length - 1] ?? "" });
       },
       switchLearner: (id) => {
         const kid = get().learners[id];

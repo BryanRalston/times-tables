@@ -551,6 +551,22 @@ describe("progress persist", () => {
     expect(useProgress.getState().equippedCosmetic).toBe("party-hat");
     useProgress.getState().unequipCosmetic();
     expect(useProgress.getState().equippedCosmetic).toBe("");
+    expect(useProgress.getState().equippedCosmetics).toEqual([]);
+  });
+
+  it("does not steal the avatar when Guest buys a toy", async () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: seedKid({ coins: 20 }), version: 0 }));
+    await hydrateProgress();
+    expect(useProgress.getState().hopperId).toBe("");
+    expect(useProgress.getState().buySquishee("frog")).toEqual({ ok: true, reason: "ok" });
+    expect(useProgress.getState().squishees).toEqual(["frog"]);
+    expect(useProgress.getState().hopperId).toBe("");
+    const { pathHopperId } = await import("./squishees");
+    expect(pathHopperId(useProgress.getState().squishees, useProgress.getState().hopperId)).toBe("peach");
+    useProgress.getState().setHopperId("frog");
+    expect(useProgress.getState().hopperId).toBe("frog");
+    expect(useProgress.getState().buySquishee("cat")).toEqual({ ok: true, reason: "ok" });
+    expect(useProgress.getState().hopperId).toBe("frog");
   });
 
   it("keeps a Guest rare after map unlock and reload", async () => {

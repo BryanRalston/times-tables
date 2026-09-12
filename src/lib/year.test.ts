@@ -451,6 +451,9 @@ describe("locale", () => {
     expect(UI.en.youFound("Peach")).toBe("You found Peach!");
     expect(UI.en.youFoundCoins(10)).toBe("You found 10 coins!");
     expect(UI.en.yourPiece).toBe("Your piece");
+    expect(UI.en.thatsMe).toBe("That's me!");
+    expect(UI.es.thatsMe).toBe("¡Este soy yo!");
+    expect(UI["pt-BR"].thatsMe).toBe("Esse sou eu!");
     expect(UI.en.usePiece).toBe("Use");
     expect(UI.en.surprisePresent).toBe("Surprise present");
     expect(UI.es.surprisePresent).toBe("Regalo sorpresa");

@@ -350,12 +350,14 @@ export interface LearnerSlice {
   pathStepsLeft: number;
   /** Mystery-present pads already unwrapped. Empty = none opened. */
   openedPresents: number[];
-  /** Kid-picked Lessons / play face. Empty = last owned, else Peach. */
+  /** Kid-picked Lessons / play face. Empty = Peach. Buying a toy does not steal it. */
   hopperId: string;
   /** Owned cheap wearables. Never required to progress. */
   cosmetics: string[];
-  /** One equipped wearable, or empty. Renders only on fitted v1 faces. */
+  /** Last tapped wearable, or empty. Heal into equippedCosmetics. */
   equippedCosmetic: string;
+  /** Equipped wearables, one per slot (hat / neck / face). */
+  equippedCosmetics: string[];
 }
 
 export interface SaveState extends LearnerSlice {

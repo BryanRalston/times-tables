@@ -448,7 +448,9 @@ describe("first-visit Home door", () => {
     expect(shelf).toContain("ui.findOnMap");
     expect(shelf).toContain("ui.rareBlurb");
     expect(shelf).toContain("data-avatar-picker");
+    expect(shelf).toContain("data-avatar-pick");
     expect(shelf).toContain("data-shelf-dress");
+    expect(shelf).toContain("ui.thatsMe");
     expect(shelf).toContain("ui.usePiece");
     expect(shelf).not.toContain("enterPin");
     const css = readFileSync(join(HERE, "styles.css"), "utf8");
@@ -459,10 +461,10 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".candy-world-stage");
     expect(css).toContain(".candy-world-art");
     expect(css).toContain(".candy-overlay");
-    expect(css).toContain("aspect-ratio: 8 / 5");
+    expect(css).not.toContain("aspect-ratio: 8 / 5");
     expect(css).toContain(".candy-scroll[data-lessons-path]");
     expect(css).toMatch(/\.candy-scroll\[data-lessons-path\]\s*\{[^}]*overflow:\s*hidden/);
-    expect(css).toContain("100cqi * 5 / 8");
+    expect(css).toContain("100cqi * 9 / 16");
     expect(css).toContain("grid-template-rows: minmax(0, 1fr) auto");
     expect(css).toContain("container-name: radial-card");
     expect(css).toMatch(/\.candy-overlay\[data-hop-pick="1"\]\s*\{[^}]*touch-action:\s*none/);
@@ -508,7 +510,10 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".mystery-present-art");
     expect(css).toContain(".mystery-present-live");
     expect(css).toContain(".shelf-use");
+    expect(css).toContain(".shelf-avatar-hero");
     expect(css).toContain(".dressed-squishee");
+    expect(css).toContain(".cosmetic-overlay");
+    expect(css).toContain(".cosmetic-overlay-hat");
     expect(css).toContain(".candy-unwrap");
     expect(css).toContain("@keyframes candy-choice-pulse");
     expect(css).toContain("@keyframes candy-portal-swirl");
@@ -516,7 +521,8 @@ describe("first-visit Home door", () => {
     expect(css).toContain("@keyframes candy-warp-ring");
     expect(css).toContain("aspect-ratio: 16 / 9");
     expect(css).toContain("width: max(100%, 68rem)");
-    expect(css).toContain("object-fit: cover");
+    expect(css).toMatch(/\.candy-world-art\s*\{[^}]*object-fit:\s*contain/);
+    expect(css).not.toMatch(/\.candy-world-art\s*\{[^}]*object-fit:\s*cover/);
     expect(css).toContain("mask-image");
     expect(css).not.toContain(".candy-plate");
     expect(css).not.toContain("--candy-plate-overlap");

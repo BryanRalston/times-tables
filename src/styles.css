@@ -805,7 +805,11 @@ details > summary::-webkit-details-marker {
   margin-top: 0.35rem;
 }
 .shelf-avatar {
-  margin: 0.15rem 0 0.55rem;
+  margin: 0.15rem 0 0.7rem;
+  padding: 0.65rem 0.7rem 0.75rem;
+  border-radius: 1.2rem;
+  background: rgb(255 247 251 / 0.94);
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.88);
 }
 .shelf-avatar-row {
   display: flex;
@@ -813,14 +817,62 @@ details > summary::-webkit-details-marker {
   gap: 0.85rem;
   padding: 0.35rem 0.2rem 0.15rem;
 }
+.shelf-avatar-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.12rem;
+  padding: 0.15rem 0 0.35rem;
+}
+.shelf-avatar-face {
+  width: 7.6rem;
+  height: 7.6rem;
+  overflow: visible;
+}
+.shelf-avatar-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #4a2d55;
+}
+.shelf-avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+.shelf-avatar-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.12rem;
+  padding: 0.28rem 0.12rem 0.32rem;
+  border: 0;
+  border-radius: 0.9rem;
+  background: #fff;
+  color: #4a2d55;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+.shelf-avatar-pick-face {
+  width: 3.35rem;
+  height: 3.35rem;
+  overflow: visible;
+}
+.shelf-avatar-pick-on {
+  background: #0e8a86;
+  color: #f4fffe;
+  box-shadow: 0 0 0 3px rgb(14 138 134 / 0.35);
+}
 .shelf-use {
   margin-top: 0.35rem;
-  padding: 0.2rem 0.7rem;
+  padding: 0.32rem 0.85rem;
   border: 0;
   border-radius: 9999px;
   background: #fff7fb;
   color: #4a2d55;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 800;
 }
 .shelf-use-on {
@@ -830,10 +882,53 @@ details > summary::-webkit-details-marker {
 .dressed-squishee {
   display: block;
   position: relative;
+  overflow: visible;
+}
+.dressed-stack {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.dressed-face {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.cosmetic-overlay {
+  position: absolute;
+  left: 50%;
+  pointer-events: none;
+  object-fit: contain;
+}
+.cosmetic-overlay-hat {
+  width: 64%;
+  top: -14%;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+.cosmetic-overlay-face {
+  width: 56%;
+  top: 26%;
+  transform: translateX(-50%);
+  z-index: 4;
+}
+.cosmetic-overlay-neck {
+  width: 78%;
+  top: 46%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+.cosmetic-overlay[data-cosmetic-hat="bow"] {
+  width: 48%;
+  top: 2%;
 }
 .candy-hopper-fit .dressed-squishee {
   position: absolute;
   inset: 0;
+  overflow: visible;
 }
 .continue-peek .dressed-squishee {
   display: block;
@@ -1001,13 +1096,13 @@ details > summary::-webkit-details-marker {
   aspect-ratio: 16 / 9;
   overflow: hidden;
 }
-/* 8/5 card + height-fitted 16:9 stage: the green rim and E/W arches stay
-   inside the white card. Extra plate below is studio white, not a crop. */
+/* Contained 16:9 island: stage is never wider than the card, so the green
+   rim, portal arches, and outer ring stay on-screen. */
 .candy-map[data-radial-web="1"] .candy-world {
-  aspect-ratio: 8 / 5;
+  aspect-ratio: 16 / 9;
   width: 100%;
   height: auto;
-  max-height: min(100%, calc(100cqi * 5 / 8));
+  max-height: min(100%, calc(100cqi * 9 / 16));
   align-self: start;
   justify-self: stretch;
 }
@@ -1016,13 +1111,13 @@ details > summary::-webkit-details-marker {
   inset: 0;
 }
 .candy-map[data-radial-web="1"] .candy-world-stage {
-  inset: auto;
+  inset: 0;
   height: 100%;
-  width: auto;
+  width: 100%;
   aspect-ratio: 16 / 9;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  left: 0;
+  top: 0;
+  transform: none;
 }
 .candy-world-art {
   position: absolute;
@@ -1030,7 +1125,7 @@ details > summary::-webkit-details-marker {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
 }
 .candy-water {
@@ -1579,6 +1674,7 @@ details > summary::-webkit-details-marker {
   width: var(--hop-tile, 3.2%);
   aspect-ratio: 1;
   height: auto;
+  overflow: visible;
   transform: translate(-50%, -50%);
   transform-origin: 50% 70%;
   pointer-events: none;
@@ -1589,8 +1685,7 @@ details > summary::-webkit-details-marker {
   display: block;
   width: 100%;
   aspect-ratio: 1;
-  overflow: hidden;
-  border-radius: 28%;
+  overflow: visible;
 }
 .candy-hopper-art {
   position: absolute;

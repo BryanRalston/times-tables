@@ -171,6 +171,8 @@ export type Ui = {
   commons: string;
   rares: string;
   yourPiece: string;
+  thatsMe: string;
+  thatsMeHint: string;
   usePiece: string;
   playingAs: string;
   dressUp: string;
@@ -368,6 +370,8 @@ export const UI: Record<Locale, Ui> = {
     commons: "Commons",
     rares: "Rares",
     yourPiece: "Your piece",
+    thatsMe: "That's me!",
+    thatsMeHint: "Tap a toy. That's you on the map and in lessons.",
     usePiece: "Use",
     playingAs: "Playing",
     dressUp: "Dress-up",
@@ -563,6 +567,8 @@ export const UI: Record<Locale, Ui> = {
     commons: "Comunes",
     rares: "Raros",
     yourPiece: "Tu ficha",
+    thatsMe: "¡Este soy yo!",
+    thatsMeHint: "Toca un juguete. Eres tú en el mapa y en las lecciones.",
     usePiece: "Usar",
     playingAs: "Jugando",
     dressUp: "Ropa",
@@ -758,6 +764,8 @@ export const UI: Record<Locale, Ui> = {
     commons: "Comuns",
     rares: "Raros",
     yourPiece: "Sua peça",
+    thatsMe: "Esse sou eu!",
+    thatsMeHint: "Toque um brinquedo. É você no mapa e nas lições.",
     usePiece: "Usar",
     playingAs: "Jogando",
     dressUp: "Roupa",

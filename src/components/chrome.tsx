@@ -5,6 +5,7 @@ import { parseLocale, UI } from "@/lib/i18n";
 import { navigate } from "@/lib/nav";
 import { useProgress } from "@/lib/progress";
 import { holdPathGrade } from "@/lib/test-mode";
+import { wearList } from "@/lib/cosmetics";
 import { pathHopperId, peekTurn } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
@@ -253,9 +254,10 @@ function usePrefersReducedMotion(): boolean {
 function ContinuePeek() {
   const reduce = usePrefersReducedMotion();
   const [index, setIndex] = useState(0);
-  const owned = useProgress((s) => s.squishees);
-  const chosen = useProgress((s) => s.hopperId);
-  const cosmetic = useProgress((s) => s.equippedCosmetic);
+  useProgress((s) => `${s.squishees.join("\0")}:${s.hopperId}:${wearList(s).join(",")}`);
+  const owned = useProgress.getState().squishees;
+  const chosen = useProgress.getState().hopperId;
+  const cosmetic = wearList(useProgress.getState());
   const hopperId = pathHopperId(owned, chosen);
   const turn = reduce ? peekTurn(0) : peekTurn(index);
 

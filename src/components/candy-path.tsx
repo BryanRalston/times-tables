@@ -56,6 +56,7 @@ import {
   visiblePresentPads,
 } from "@/lib/presents";
 import { playDice, playHop, playLand, playStar, playWarp } from "@/lib/sound";
+import { wearList } from "@/lib/cosmetics";
 import { pathHopperId, squisheeById } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
@@ -142,11 +143,11 @@ export const CandyPath = forwardRef<
 >(function CandyPath({ suggestedId, standFrom, standTo, hopCredits, stepsLeft, freeMove = false, railUnits, onStart, onOpenUnit }, ref) {
   const ui = useUi();
   const locale = parseLocale(useProgress((s) => s.locale));
-  useProgress((s) => `${s.squishees.join("\0")}:${s.hopperId}:${s.equippedCosmetic}:${s.openedPresents.join(",")}`);
+  useProgress((s) => `${s.squishees.join("\0")}:${s.hopperId}:${wearList(s).join(",")}:${s.openedPresents.join(",")}`);
   const owned = useProgress.getState().squishees;
   const opened = useProgress.getState().openedPresents ?? [];
   const chosenHopper = useProgress.getState().hopperId;
-  const equippedCosmetic = useProgress.getState().equippedCosmetic;
+  const equippedCosmetic = wearList(useProgress.getState());
   const activities = useProgress((s) => s.activities);
   const hopsSpent = useProgress((s) => s.pathHopSpent);
   const storedSteps = useProgress((s) => s.pathStepsLeft);

@@ -1,4 +1,5 @@
 import { DressedSquishee } from "@/components/dressed-squishee";
+import { wearList } from "@/lib/cosmetics";
 import { pathHopperId } from "@/lib/squishees";
 import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
@@ -18,9 +19,10 @@ export function Mascot({
   size?: "sm" | "md" | "lg";
   className?: string;
 }) {
-  const owned = useProgress((s) => s.squishees);
-  const chosen = useProgress((s) => s.hopperId);
-  const cosmetic = useProgress((s) => s.equippedCosmetic);
+  useProgress((s) => `${s.squishees.join("\0")}:${s.hopperId}:${wearList(s).join(",")}`);
+  const owned = useProgress.getState().squishees;
+  const chosen = useProgress.getState().hopperId;
+  const cosmetic = wearList(useProgress.getState());
   const id = who === "rem" ? "owl" : pathHopperId(owned, chosen);
   const squash = hop || pose === "celebrate" || pose === "star";
   return (

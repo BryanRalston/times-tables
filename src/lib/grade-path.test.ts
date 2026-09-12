@@ -218,11 +218,11 @@ describe("grade path", () => {
     expect(fogCoverPercent(13)).toBe(0);
   });
 
-  it("hops the last owned squishee, else the familiar first peek face", () => {
+  it("hops the kid-picked face, else Peach", () => {
     expect(pathHopperId([])).toBe("peach");
-    expect(pathHopperId(["frog", "cat"])).toBe("cat");
+    expect(pathHopperId(["frog", "cat"])).toBe("peach");
     expect(pathHopperId(["frog", "cat"], "frog")).toBe("frog");
-    expect(pathHopperId(["frog"], "otter")).toBe("frog");
+    expect(pathHopperId(["frog"], "otter")).toBe("peach");
     expect(pathHopperId(["not-a-toy"])).toBe("peach");
   });
 });

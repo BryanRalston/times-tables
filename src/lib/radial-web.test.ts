@@ -284,18 +284,18 @@ describe("radial hop hit testing", () => {
     const pb = padClientPos(b, board);
     const gap = Math.hypot(pb.x - pa.x, pb.y - pa.y);
     expect(PHONE_MAP_VIEW.width).toBe(368);
-    expect(PHONE_MAP_VIEW.height).toBeCloseTo((368 * 5) / 8);
-    expect(PHONE_MAP_BOARD.width).toBeGreaterThan(368);
-    expect(PHONE_MAP_BOARD.height).toBeGreaterThan(207);
+    expect(PHONE_MAP_VIEW.height).toBeCloseTo((368 * 9) / 16);
+    expect(PHONE_MAP_BOARD.width).toBe(PHONE_MAP_VIEW.width);
+    expect(PHONE_MAP_BOARD.width).toBeLessThanOrEqual(368);
+    expect(PHONE_MAP_BOARD.height).toBeCloseTo(207);
     expect(PHONE_MAP_BOARD.height).toBeLessThan(280);
-    const crop = (PHONE_MAP_BOARD.width - PHONE_MAP_VIEW.width) / 2;
-    const visibleMin = (crop / PHONE_MAP_BOARD.width) * 100;
-    const visibleMax = ((crop + PHONE_MAP_VIEW.width) / PHONE_MAP_BOARD.width) * 100;
     const outer = RADIAL_PADS.filter((p) => p.portal && p.ring === 4);
     expect(outer.length).toBeGreaterThan(0);
     for (const p of outer) {
-      expect(p.map.x).toBeGreaterThan(visibleMin + 2);
-      expect(p.map.x).toBeLessThan(visibleMax - 2);
+      expect(p.map.x).toBeGreaterThan(4);
+      expect(p.map.x).toBeLessThan(96);
+      expect(p.map.y).toBeGreaterThan(4);
+      expect(p.map.y).toBeLessThan(96);
     }
     expect(HOP_SNAP_MIN_PX).toBe(16);
     expect(HOP_SNAP_PX).toBe(22);
@@ -311,9 +311,9 @@ describe("radial hop hit testing", () => {
     const glow = hopGlowBoardPx(board);
     expect(HOPPER_SIT_TRANSLATE).toBe("translate(-50%, -50%)");
     expect(HOPPER_ART_ZOOM_PCT).toBeGreaterThan(100);
-    expect(hopper).toBeGreaterThan(12);
+    expect(hopper).toBeGreaterThan(10);
     expect(hopper).toBeLessThan(gap);
-    expect(glow).toBeGreaterThan(8);
+    expect(glow).toBeGreaterThan(7);
     expect(glow).toBeLessThan(hopper);
     expect(glow + 5).toBeLessThan(gap);
     expect(HOPPER_BOARD_WIDTH_PCT).toBe(3.2);

@@ -116,11 +116,12 @@ describe("home peek roster", () => {
     expect(peekTurn(PEEK_SQUISHEE_IDS.length).id).toBe("peach");
   });
 
-  it("keeps a kid-picked owned face, else last owned, else Peach", () => {
+  it("keeps a kid-picked owned face, else Peach — buying never steals it", () => {
     expect(pathHopperId([])).toBe("peach");
-    expect(pathHopperId(["frog", "cat"])).toBe("cat");
+    expect(pathHopperId(["frog", "cat"])).toBe("peach");
     expect(pathHopperId(["frog", "cat"], "frog")).toBe("frog");
     expect(pathHopperId(["frog"], "peach")).toBe("peach");
+    expect(pathHopperId(["frog"], "otter")).toBe("peach");
   });
 
   it("picks a trail peek face that is not the hopper", () => {

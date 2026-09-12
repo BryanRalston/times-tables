@@ -31,10 +31,11 @@ describe("shop tiles", () => {
     expect(html).not.toContain("crystal-axolotl.png");
     expect(html).not.toContain("Crystal Axolotl");
     expect(html).toContain("data-avatar-picker");
-    expect(html).toContain("Your piece");
+    expect(html).toContain("That&#x27;s me!");
+    expect(html).toContain('data-avatar-pick="peach"');
+    expect(html).toContain("data-avatar-hero");
     expect(html).toContain("data-shelf-dress");
     expect(html).toContain("Dress-up");
-    expect(html).toContain("peach-party-hat.png");
     expect(html).toContain("data-buy-cosmetic=\"party-hat\"");
   });
 
