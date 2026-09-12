@@ -12,6 +12,7 @@ import {
   cosmeticCompositeFile,
   cosmeticLabel,
   dressedSquisheeSrc,
+  wearForFace,
   parseCosmeticIds,
   parseEquippedCosmetic,
 } from "./cosmetics";
@@ -49,6 +50,9 @@ describe("catalog dress-up", () => {
     expect(dressedSquisheeSrc("otter", "scarf")).toMatch(/cosmetics\/otter-scarf\.png$/);
     expect(dressedSquisheeSrc("avocado", "party-hat")).toMatch(/cosmetics\/avocado-party-hat\.png$/);
     expect(dressedSquisheeSrc("not-a-toy", "scarf")).toMatch(/squishees\/peach\.png$/);
+    expect(wearForFace("otter", "otter", "party-hat")).toBe("party-hat");
+    expect(wearForFace("avocado", "otter", "party-hat")).toBe("");
+    expect(wearForFace("otter", "otter", "")).toBe("");
   });
 
   it("buys once, equips only owned ids, and labels in the kid tongue", () => {

@@ -49,6 +49,17 @@ describe("shop tiles", () => {
     expect(html).not.toContain("Grown-up");
   });
 
+  it("dressed hopper tile stays a poke button on the fitted composite", () => {
+    const otter = squisheeById("otter")!;
+    const html = renderToStaticMarkup(
+      <ShopCard s={otter} got coins={0} hopperId="otter" onBuy={() => {}} onUse={() => {}} />,
+    );
+    expect(html).toContain("Poke Otter");
+    expect(html).toContain("data-owned-poke");
+    expect(html).toContain("<button");
+    expect(html).toContain("data-squash");
+  });
+
   it("owned avocado tile is a poke button with squash machinery", () => {
     const avocado = squisheeById("avocado")!;
     const html = renderToStaticMarkup(<ShopCard s={avocado} got coins={0} onBuy={() => {}} />);

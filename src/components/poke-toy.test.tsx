@@ -12,6 +12,18 @@ describe("PokeToy", () => {
     expect(html).not.toMatch(/<button[^>]*pointer-events-none/);
   });
 
+  it("keeps poke hit-target when a fitted hat is on", () => {
+    const html = renderToStaticMarkup(<PokeToy id="otter" cosmetic="party-hat" size="sm" />);
+    expect(html).toContain("Poke Otter");
+    expect(html).toContain("data-owned-poke");
+    expect(html).toContain('data-cosmetic="party-hat"');
+    expect(html).toContain("otter-party-hat.png");
+    expect(html).toContain("<button");
+    expect(html).toContain("data-squash");
+    expect(html).not.toMatch(/<button[^>]*pointer-events-none/);
+    expect(html).not.toMatch(/squishees\/otter\.png/);
+  });
+
   it("renders catalog toys used on home", () => {
     expect(renderToStaticMarkup(<PokeToy id="cat" />)).toContain("Poke Cat");
     expect(renderToStaticMarkup(<PokeToy id="panda" />)).toContain("Poke Panda");

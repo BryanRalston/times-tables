@@ -18,6 +18,7 @@ import {
 import { rngFromSeed } from "@/lib/rng";
 import { useProgress } from "@/lib/progress";
 import { playCorrect, playHop, playLand, playPeek, playTap, playWrong } from "@/lib/sound";
+import { dressedSquisheeSrc, wearForFace } from "@/lib/cosmetics";
 import { pathHopperId, squisheeById, squisheeSrc } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
 
@@ -96,9 +97,13 @@ export function MiniGame({
 }
 
 function ToyFace({ id, className, onLoad }: { id: string; className?: string; onLoad?: () => void }) {
+  const owned = useProgress((s) => s.squishees);
+  const chosen = useProgress((s) => s.hopperId);
+  const equipped = useProgress((s) => s.equippedCosmetic);
+  const wear = wearForFace(id, pathHopperId(owned, chosen), equipped);
   return (
-    <span className={cn("mini-face", className)}>
-      <MagentaImg src={squisheeSrc(id)} alt="" className="h-full w-full object-contain" onLoad={onLoad} />
+    <span className={cn("mini-face", className)} data-dressed={id} data-cosmetic={wear || undefined}>
+      <MagentaImg src={dressedSquisheeSrc(id, wear)} alt="" className="h-full w-full object-contain" onLoad={onLoad} />
     </span>
   );
 }

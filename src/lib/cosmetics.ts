@@ -62,6 +62,11 @@ export function dressedSquisheeSrc(face: string, cosmeticId?: string | null): st
   return squisheeById(face) ? squisheeSrc(face) : squisheeSrc("peach");
 }
 
+/** Outfit on the chosen hopper only. Other catalog faces stay bare. */
+export function wearForFace(face: string, hopperId: string, equipped?: string | null): string {
+  return face === hopperId && canDressFace(face, equipped) ? equipped! : "";
+}
+
 export type CosmeticBuyReason = "ok" | "missing" | "owned" | "poor";
 
 export function applyBuyCosmetic(

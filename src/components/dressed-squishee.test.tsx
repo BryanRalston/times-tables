@@ -31,5 +31,14 @@ describe("fitted dress-up surfaces", () => {
     const shelf = readFileSync(join(HERE, "../pages/shelf.tsx"), "utf8");
     expect(shelf).toContain("isCosmeticFace(hopperId)");
     expect(shelf).toContain("canDressFace");
+    expect(shelf).toContain("PokeToy");
+    expect(shelf).toContain("cosmetic={equipped}");
+    expect(shelf).toContain("cosmetic={dress}");
+    const poke = readFileSync(join(HERE, "poke-toy.tsx"), "utf8");
+    expect(poke).toContain("dressedSquisheeSrc");
+    expect(poke).toContain("data-owned-poke");
+    const mini = readFileSync(join(HERE, "minigame.tsx"), "utf8");
+    expect(mini).toContain("dressedSquisheeSrc");
+    expect(mini).toContain("wearForFace");
   });
 });

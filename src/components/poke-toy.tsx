@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState, type AnimationEvent, type ReactNode } from "react";
 import { MagentaImg, MagentaVideo, skipPokeVideo } from "@/components/magenta-video";
+import { canDressFace, dressedSquisheeSrc, wearForFace } from "@/lib/cosmetics";
+import { useProgress } from "@/lib/progress";
 import { playTap } from "@/lib/sound";
 import {
+  pathHopperId,
   squisheeById,
   squisheeCheerSrc,
   squisheeCheerStrip,
   squisheePokeSrc,
   squisheePokeStrip,
-  squisheeSrc,
   type PokeStripMeta,
 } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
@@ -92,6 +94,7 @@ export function PokeToy({
   bob = false,
   className,
   cheer = false,
+  cosmetic,
   onCheerEnd,
 }: {
   id: string;
@@ -100,10 +103,18 @@ export function PokeToy({
   className?: string;
   /** Autoplay hop once (buy). Never squash, never the poke clip. */
   cheer?: boolean;
+  /** Fitted wearable; omit to follow the chosen hopper's Shelf outfit. */
+  cosmetic?: string | null;
   onCheerEnd?: () => void;
 }) {
   const onCheerEndRef = useRef(onCheerEnd);
   onCheerEndRef.current = onCheerEnd;
+  useProgress((s) => `${s.squishees.join("\0")}:${s.hopperId}:${s.equippedCosmetic}`);
+  const live = useProgress.getState();
+  const hopperId = pathHopperId(live.squishees, live.hopperId);
+  const wear = cosmetic !== undefined ? cosmetic : wearForFace(id, hopperId, live.equippedCosmetic);
+  const fitted = canDressFace(id, wear);
+  const still = dressedSquisheeSrc(id, wear);
   const s = squisheeById(id);
   const pokeClip = squisheePokeSrc(id);
   const pokeStrip = squisheePokeStrip(id);
@@ -166,6 +177,8 @@ export function PokeToy({
       )}
       aria-label={s ? `Poke ${s.name}` : "Poke"}
       data-owned-poke="1"
+      data-dressed={id}
+      data-cosmetic={fitted ? wear : undefined}
       onClick={() => {
         if (cheer) onCheerEndRef.current?.();
         playTap();
@@ -190,7 +203,7 @@ export function PokeToy({
         onPopEnd={() => onCheerEndRef.current?.()}
       >
         <MagentaImg
-          src={squisheeSrc(id)}
+          src={still}
           alt=""
           className={cn("pointer-events-none h-full w-full", (clipReady || stripOn) && "invisible")}
         />
