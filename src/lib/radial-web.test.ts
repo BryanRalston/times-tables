@@ -196,6 +196,8 @@ describe("radial web", () => {
       ),
     ).toBe(1);
     expect(hopCreditsOf({ "u1-leftover": leftover }, 0)).toBe(1);
+    expect(hopCreditsOf({}, 0, undefined, 2)).toBe(2);
+    expect(hopCreditsOf({ "u1-leftover": leftover }, 0, undefined, 2)).toBe(3);
     expect(hopCreditsOf({ "daily:u1": leftover }, 0)).toBe(1);
     expect(hopCreditsOf({ "u1-leftover": leftover }, 1)).toBe(0);
     expect(hopCreditsOf({ "u1-leftover": leftover, "u1-friends": leftover }, 1)).toBe(1);

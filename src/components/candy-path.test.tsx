@@ -4,7 +4,6 @@ import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { resetProgressMemory, useProgress } from "@/lib/progress";
-import { GRADE3_PRESENTS } from "@/lib/presents";
 import { unitsFor } from "@/lib/curriculum";
 import {
   HOPPER_ART_ZOOM_PCT,
@@ -124,16 +123,19 @@ describe("CandyPath", () => {
     expect(html).toContain('data-present-art="vinyl"');
   });
 
-  it("drops a found present without naming the rare on the map", () => {
-    useProgress.setState({ squishees: ["crystal-axolotl", "peach"], openedPresents: [17] });
+  it("keeps live boxes anonymous after a find, with no leftover husk", () => {
+    useProgress.setState({
+      squishees: ["crystal-axolotl", "peach"],
+      openedPresents: [17],
+      livePresentPads: [12, 21, 25, 13],
+    });
     const html = renderToStaticMarkup(
       <CandyPath suggestedId="u2" standFrom={1} standTo={1} onStart={() => {}} onOpenUnit={() => {}} />,
     );
-    expect(html).toContain('data-present-count="3"');
-    expect((html.match(/data-pad-present="1"/g) ?? []).length).toBe(3);
-    expect((html.match(/data-pad-present-found="1"/g) ?? []).length).toBe(1);
-    const rarePad = GRADE3_PRESENTS.find((p) => p.kind === "squishee" && p.squisheeId === "crystal-axolotl")!.pad;
-    expect(html).toContain(`data-present-pad="${rarePad}"`);
+    expect(html).toContain('data-present-count="4"');
+    expect((html.match(/data-pad-present="1"/g) ?? []).length).toBe(4);
+    expect(html).not.toContain("data-pad-present-found");
+    expect(html).not.toContain(`data-present-pad="17"`);
     expect(html).not.toContain("Crystal Axolotl");
     expect(html).not.toContain("crystal-axolotl.png");
     expect(html).toContain('data-path-hopper="peach"');
@@ -348,6 +350,9 @@ describe("CandyPath", () => {
     expect(src).not.toContain("onDpadPointerUp");
     expect(src).toContain("landPresentPad");
     expect(src).toContain("landPresent");
+    expect(src).toContain("youFoundRolls");
+    expect(src).toContain("livePresentPads");
+    expect(src).not.toContain("foundPresentPads");
     expect(src).toContain("DressedSquishee");
     expect(src).toContain('scroller.matches("[data-lessons-path]")');
     expect(src).toContain("MysteryPresent");

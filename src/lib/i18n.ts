@@ -96,6 +96,7 @@ export type Ui = {
   findOnMap: string;
   youFound: (name: string) => string;
   youFoundCoins: (n: number) => string;
+  youFoundRolls: (n: number) => string;
   surprisePresent: string;
   coins: string;
   buy: string;
@@ -290,6 +291,7 @@ export const UI: Record<Locale, Ui> = {
     findOnMap: "Find on Lessons",
     youFound: (name) => `You found ${name}!`,
     youFoundCoins: (n) => `You found ${n} coins!`,
+    youFoundRolls: (n) => (n === 1 ? "You found 1 extra roll!" : `You found ${n} extra rolls!`),
     surprisePresent: "Surprise present",
     coins: "Coins",
     buy: "Buy",
@@ -485,6 +487,7 @@ export const UI: Record<Locale, Ui> = {
     findOnMap: "Búscalos en Lecciones",
     youFound: (name) => `¡Encontraste a ${name}!`,
     youFoundCoins: (n) => `¡Encontraste ${n} monedas!`,
+    youFoundRolls: (n) => (n === 1 ? "¡Encontraste 1 tirada extra!" : `¡Encontraste ${n} tiradas extra!`),
     surprisePresent: "Regalo sorpresa",
     coins: "Monedas",
     buy: "Comprar",
@@ -680,6 +683,7 @@ export const UI: Record<Locale, Ui> = {
     findOnMap: "Ache nas Lições",
     youFound: (name) => `Você achou ${name}!`,
     youFoundCoins: (n) => `Você achou ${n} moedas!`,
+    youFoundRolls: (n) => (n === 1 ? "Você achou 1 lançamento extra!" : `Você achou ${n} lançamentos extra!`),
     surprisePresent: "Presente surpresa",
     coins: "Moedas",
     buy: "Comprar",

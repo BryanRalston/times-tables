@@ -631,13 +631,15 @@ export function hopLessonsCompleted(
   return n;
 }
 
-/** Banked dice rolls. Same earn rules as the old hop-credit ledger. */
+/** Banked dice rolls. Lesson earns plus gift rolls, minus spent turns. */
 export function hopCreditsOf(
   activities: Record<string, ActivitySave>,
   hopsSpent: number,
   sessions?: Record<string, DaySession>,
+  giftRolls = 0,
 ): number {
-  return Math.max(0, hopLessonsCompleted(activities, sessions) - Math.max(0, Math.round(hopsSpent)));
+  const gifts = typeof giftRolls === "number" && Number.isFinite(giftRolls) ? Math.max(0, Math.round(giftRolls)) : 0;
+  return Math.max(0, hopLessonsCompleted(activities, sessions) + gifts - Math.max(0, Math.round(hopsSpent)));
 }
 
 export const diceRollsOf = hopCreditsOf;

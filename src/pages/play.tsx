@@ -399,7 +399,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     const streak = schoolStreak(sessions, pack.date);
     const st = useProgress.getState();
     const shop = canAffordAnything(st.coins, st.squishees);
-    const rollsNow = hopCreditsOf(st.activities, st.pathHopSpent, st.sessions);
+    const rollsNow = hopCreditsOf(st.activities, st.pathHopSpent, st.sessions, st.pathGiftRolls);
     const stepsNow = activePathStepsLeft(st.pathHopSpent, st.pathStepsLeft);
     const toLessons = kind === "activity" || rollsNow > 0 || stepsNow > 0;
     return (

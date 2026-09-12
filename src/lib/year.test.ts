@@ -450,6 +450,10 @@ describe("locale", () => {
     expect(UI.en.findOnMap).toBe("Find on Lessons");
     expect(UI.en.youFound("Peach")).toBe("You found Peach!");
     expect(UI.en.youFoundCoins(10)).toBe("You found 10 coins!");
+    expect(UI.en.youFoundRolls(1)).toBe("You found 1 extra roll!");
+    expect(UI.en.youFoundRolls(2)).toBe("You found 2 extra rolls!");
+    expect(UI.es.youFoundRolls(2)).toMatch(/tiradas/);
+    expect(UI["pt-BR"].youFoundRolls(1)).toMatch(/lançamento/);
     expect(UI.en.yourPiece).toBe("Your piece");
     expect(UI.en.usePiece).toBe("Use");
     expect(UI.en.surprisePresent).toBe("Surprise present");

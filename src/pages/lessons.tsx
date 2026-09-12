@@ -12,7 +12,7 @@ import { holdPathGrade, isTestMode, testFreeMove } from "@/lib/test-mode";
 export function LessonsPage() {
   useProgress(
     (s) =>
-      `${s.classUnitId}:${s.pathHopperAt}:${s.pathHopSpent}:${s.pathStepsLeft}:${s.testMode}:${Object.keys(s.sessions).sort().join(",")}:${Object.keys(s.activities).sort().join(",")}`,
+      `${s.classUnitId}:${s.pathHopperAt}:${s.pathHopSpent}:${s.pathStepsLeft}:${s.pathGiftRolls}:${s.livePresentPads.join(",")}:${s.testMode}:${Object.keys(s.sessions).sort().join(",")}:${Object.keys(s.activities).sort().join(",")}`,
   );
   const st = useProgress.getState();
   const ui = useUi();
@@ -22,7 +22,7 @@ export function LessonsPage() {
   const pathSuggested = pathNowUnitId(calendarId, st.sessions, st.activities);
   const standFrom = lessonsHopFrom(st.pathHopperAt);
   const standTo = lessonsHopTo(st.pathHopperAt);
-  const rolls = hopCreditsOf(st.activities, st.pathHopSpent, st.sessions);
+  const rolls = hopCreditsOf(st.activities, st.pathHopSpent, st.sessions, st.pathGiftRolls);
   const steps = activePathStepsLeft(st.pathHopSpent, st.pathStepsLeft);
   const freeMove = testFreeMove(st.testMode);
   const inviting = !freeMove && canStartDiceTurn(rolls, steps);

@@ -61,8 +61,6 @@ import {
 import {
   UNWRAP_HOLD_MS,
   UNWRAP_OPEN_MS,
-  foundPresentPads,
-  landPresent,
   type LandedPresent,
   visiblePresentPads,
 } from "@/lib/presents";
@@ -100,11 +98,18 @@ function diePips(face: DieFace): { x: number; y: number }[] {
 
 function unwrapCopy(
   reward: LandedPresent,
-  ui: { youFound: (name: string) => string; youFoundCoins: (n: number) => string; surprisePresent: string },
+  ui: {
+    youFound: (name: string) => string;
+    youFoundCoins: (n: number) => string;
+    youFoundRolls: (n: number) => string;
+    surprisePresent: string;
+  },
 ): { name: string; line: string } {
   switch (reward.kind) {
     case "coins":
       return { name: `+${reward.coins}`, line: ui.youFoundCoins(reward.coins) };
+    case "rolls":
+      return { name: `+${reward.rolls}`, line: ui.youFoundRolls(reward.rolls) };
     case "squishee": {
       const name = squisheeById(reward.squisheeId)?.name ?? ui.surprisePresent;
       return { name, line: ui.youFound(name) };
@@ -153,13 +158,18 @@ export const CandyPath = forwardRef<
 >(function CandyPath({ suggestedId, standFrom, standTo, hopCredits, stepsLeft, freeMove = false, railUnits, onStart, onOpenUnit }, ref) {
   const ui = useUi();
   const locale = parseLocale(useProgress((s) => s.locale));
-  useProgress((s) => `${s.squishees.join("\0")}:${s.hopperId}:${s.equippedCosmetic}:${s.openedPresents.join(",")}`);
+  useProgress(
+    (s) =>
+      `${s.squishees.join("\0")}:${s.hopperId}:${s.equippedCosmetic}:${s.openedPresents.join(",")}:${s.livePresentPads.join(",")}:${s.pathGiftRolls}`,
+  );
   const owned = useProgress.getState().squishees;
   const opened = useProgress.getState().openedPresents ?? [];
+  const livePads = useProgress.getState().livePresentPads ?? [];
   const chosenHopper = useProgress.getState().hopperId;
   const equippedCosmetic = useProgress.getState().equippedCosmetic;
   const activities = useProgress((s) => s.activities);
   const hopsSpent = useProgress((s) => s.pathHopSpent);
+  const giftRolls = useProgress((s) => s.pathGiftRolls);
   const storedSteps = useProgress((s) => s.pathStepsLeft);
   const sessions = useProgress((s) => s.sessions);
   const setPathHopperAt = useProgress((s) => s.setPathHopperAt);
@@ -168,8 +178,7 @@ export const CandyPath = forwardRef<
   const landPresentPad = useProgress((s) => s.landPresentPad);
   const hopperId = pathHopperId(owned, chosenHopper);
   const [unwrap, setUnwrap] = useState<UnwrapBeat | null>(null);
-  const boxedPads = visiblePresentPads(owned, opened).filter((id) => unwrap?.pad !== id);
-  const foundPads = foundPresentPads(owned, opened).filter((id) => unwrap?.pad !== id);
+  const boxedPads = visiblePresentPads(owned, opened, livePads).filter((id) => unwrap?.pad !== id);
   const boxed = new Set(boxedPads);
   const origin = standFrom && standFrom > 0 ? clampPad(standFrom) : START_PAD;
   const requested = standTo && standTo > 0 ? clampPad(standTo) : origin;
@@ -185,7 +194,7 @@ export const CandyPath = forwardRef<
   const [hopperOpacity, setHopperOpacity] = useState(1);
   const warpRef = useRef<{ from: number; to: number } | null>(null);
   const destPos = padView(dest);
-  const credits = hopCredits ?? hopCreditsOf(activities, hopsSpent, sessions);
+  const credits = hopCredits ?? hopCreditsOf(activities, hopsSpent, sessions, giftRolls);
   const steps = stepsLeft ?? activePathStepsLeft(hopsSpent, storedSteps);
   const [rolling, setRolling] = useState<DieFace | null>(null);
   const [tumbleFace, setTumbleFace] = useState<DieFace>(1);
@@ -205,9 +214,6 @@ export const CandyPath = forwardRef<
   camRef.current = cam;
 
   const maybeUnlock = (pad: number) => {
-    const st = useProgress.getState();
-    const reward = landPresent(pad, st.squishees, st.openedPresents);
-    if (!reward) return;
     const r = landPresentPad(pad);
     if (!r.ok || !r.reward) return;
     playStar();
@@ -638,21 +644,6 @@ export const CandyPath = forwardRef<
             </span>
           );
         })}
-        {foundPads.map((id) => {
-          const view = padView(id);
-          return (
-            <span
-              key={`found-${id}`}
-              className="candy-present candy-present-found"
-              style={{ left: `${view.x}%`, top: `${view.y}%` }}
-              data-pad-present-found="1"
-              data-present-pad={String(id)}
-              aria-hidden
-            >
-              <MysteryPresent found />
-            </span>
-          );
-        })}
         {RADIAL_PADS.map((pad) => {
           const view = pad.map;
           const choice = choices.includes(pad.id);
@@ -765,6 +756,12 @@ export const CandyPath = forwardRef<
                 />
                 <span className="candy-unwrap-name">+{unwrap.reward.coins}</span>
                 <span className="candy-unwrap-line">{ui.youFoundCoins(unwrap.reward.coins)}</span>
+              </>
+            ) : unwrap.reward.kind === "rolls" ? (
+              <>
+                <KidDie face={unwrap.reward.rolls === 2 ? 2 : 1} tumbling={false} />
+                <span className="candy-unwrap-name">+{unwrap.reward.rolls}</span>
+                <span className="candy-unwrap-line">{ui.youFoundRolls(unwrap.reward.rolls)}</span>
               </>
             ) : (
               <>
