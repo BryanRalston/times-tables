@@ -52,7 +52,7 @@ describe("radial web", () => {
     expect(RADIAL_PADS[0]!.id).toBe(START_PAD);
     expect(RADIAL_PADS.every((p) => p.id >= 1 && p.map.x > 8 && p.map.x < 92)).toBe(true);
     expect(RADIAL_PADS.filter((p) => p.ring === 0)).toHaveLength(1);
-    expect(RADIAL_PAD_COUNT).toBe(101);
+    expect(RADIAL_PAD_COUNT).toBe(102);
     expect(RADIAL_PADS.filter((p) => p.ring === 1).length).toBeGreaterThanOrEqual(8);
     expect(RADIAL_PADS.filter((p) => p.ring === 4).length).toBeGreaterThan(40);
     expect(RADIAL_EDGES.length).toBeGreaterThan(RADIAL_PAD_COUNT);
@@ -98,8 +98,19 @@ describe("radial web", () => {
     expect(innerW?.id).toBe(97);
     expect(innerE!.map.x).toBeGreaterThan(66);
     expect(innerW!.map.x).toBeLessThan(34);
+    expect(innerE!.map.y).toBeGreaterThan(40);
+    expect(innerE!.map.y).toBeLessThan(43);
+    expect(innerW!.map.y).toBeGreaterThan(40);
+    expect(innerW!.map.y).toBeLessThan(43);
     expect(adjacentPadIds(96)).toEqual(expect.arrayContaining([15, 34]));
     expect(adjacentPadIds(97)).toEqual(expect.arrayContaining([23, 47]));
+    const innerNW = RADIAL_PADS.find((p) => p.id === 102)!;
+    expect(innerNW.portal).toBe(false);
+    expect(innerNW.map.x).toBeGreaterThan(38);
+    expect(innerNW.map.x).toBeLessThan(41);
+    expect(innerNW.map.y).toBeGreaterThan(29);
+    expect(innerNW.map.y).toBeLessThan(32);
+    expect(adjacentPadIds(102)).toEqual(expect.arrayContaining([25]));
     expect(areAdjacent(15, 34)).toBe(false);
     expect(areAdjacent(23, 47)).toBe(false);
     const outerNE = RADIAL_PADS.find((p) => p.portal && p.ring === 4 && p.map.x > 70 && p.map.y < 18)!;

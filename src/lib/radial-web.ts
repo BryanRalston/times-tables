@@ -33,7 +33,8 @@ export const RADIAL_PLAZA = { x: 49.682, y: 46.272 } as const;
  * north-spoke polar node that sat between plaza and the inner-N pad).
  * Painted portals (inner swirl / arch openings and the eight rim arches)
  * are their own hop pads, centered on the portal art — not the inward
- * cream / pink / purple neighbor.
+ * cream / pink / purple neighbor. Mid-spoke / inner-corner swirls that
+ * are walkable path (27, 12, 102) still get a pad on the swirl.
  */
 type PadSpot = { x: number; y: number; ring: RadialRing; angle: number; portal?: boolean };
 
@@ -134,12 +135,15 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 45.811, y: 15.157, ring: 4, angle: 347.5 },
   { x: 49.838, y: 14.935, ring: 4, angle: 0.5 },
   // Portal art that had no hop node — flags used to sit on the inward neighbor.
-  { x: 67.550, y: 43.850, ring: 2, angle: 85.6, portal: true },
-  { x: 32.400, y: 43.850, ring: 2, angle: 274.5, portal: true },
-  { x: 73.200, y: 14.200, ring: 4, angle: 52.5, portal: true },
-  { x: 83.700, y: 42.300, ring: 4, angle: 86.2, portal: true },
-  { x: 16.500, y: 42.300, ring: 4, angle: 273.9, portal: true },
-  { x: 26.500, y: 14.200, ring: 4, angle: 307.9, portal: true },
+  // Inner E/W sit in the purple arch opening, not on the cream row at y≈44.
+  { x: 67.400, y: 41.200, ring: 2, angle: 85.6, portal: true },
+  { x: 32.400, y: 41.200, ring: 2, angle: 274.5, portal: true },
+  { x: 73.450, y: 15.080, ring: 4, angle: 52.5, portal: true },
+  { x: 84.030, y: 42.210, ring: 4, angle: 86.2, portal: true },
+  { x: 16.930, y: 40.970, ring: 4, angle: 273.9, portal: true },
+  { x: 27.350, y: 14.190, ring: 4, angle: 307.9, portal: true },
+  // Inner-NW swirl arch (pair of present pad 12). Walkable path, not a warp.
+  { x: 39.590, y: 30.710, ring: 2, angle: 327.0 },
 ];
 
 function buildPads(): RadialPad[] {
@@ -202,6 +206,7 @@ const PAD_EDGES: readonly (readonly [number, number])[] = [
   [16, 17], [21, 22], [25, 26], [68, 69], [69, 71],
   [59, 98], [60, 98], [64, 99], [65, 99], [66, 99],
   [84, 100], [85, 100], [86, 100], [89, 101], [90, 101],
+  [25, 102], [50, 102], [52, 102],
 ];
 
 function buildEdges(): readonly (readonly [number, number])[] {
@@ -238,8 +243,9 @@ export function radialHopStops(fromId: number, toId: number): number[] {
 /**
  * Fixed mystery-portal pairs. Opposite gates on the inner swirl / arch
  * openings and the eight rim arches. Not labeled in UI. Center plaza is
- * the start pad, not a warp. Mid-spoke cream tiles with an arch hood
- * (pads 27 / 41) stay walkable path, not extra warps.
+ * the start pad, not a warp. Mid-spoke / inner-corner swirls (pads 27,
+ * 12, 102) and the mid-south cream hood (41) stay walkable path, not
+ * extra warps.
  *
  * Inner N↔S, E↔W. Outer N↔S, NE↔SW, E↔W, SE↔NW.
  */
