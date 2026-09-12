@@ -7,11 +7,11 @@ import { MysteryPresent } from "@/components/mystery-present";
 import { PokeToy } from "@/components/poke-toy";
 import { squisheePrice } from "@/lib/coins";
 import {
-  COSMETIC_FACES,
   COSMETICS,
   canDressFace,
   cosmeticCompositeSrc,
   cosmeticLabel,
+  isCosmeticFace,
   type Cosmetic,
 } from "@/lib/cosmetics";
 import { COMMON_SQUISHEES, RARE_SQUISHEES, pathHopperId, squisheeSrc, type Squishee } from "@/lib/squishees";
@@ -152,7 +152,7 @@ export function ShelfPage() {
                   got={cosmetics.includes(item.id)}
                   worn={equipped === item.id}
                   coins={coins}
-                  previewFace={COSMETIC_FACES.includes(hopperId as (typeof COSMETIC_FACES)[number]) ? hopperId : "peach"}
+                  previewFace={isCosmeticFace(hopperId) ? hopperId : "peach"}
                   onBuy={() => {
                     const r = buyCosmetic(item.id);
                     if (r.ok) playTap();

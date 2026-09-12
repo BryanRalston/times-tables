@@ -1,6 +1,6 @@
 import { asset } from "@/lib/art";
 import type { Ui } from "@/lib/i18n";
-import { squisheeById, squisheeSrc } from "@/lib/squishees";
+import { SQUISHEE_IDS, squisheeById, squisheeSrc } from "@/lib/squishees";
 
 export type CosmeticId = "party-hat" | "scarf" | "bow" | "shades";
 export type CosmeticSlot = "hat" | "neck" | "face";
@@ -12,8 +12,8 @@ export type Cosmetic = {
   file: string;
 };
 
-/** v1 faces with Imagine-fitted composites. Never slap a generic hat on other toys. */
-export const COSMETIC_FACES = ["peach", "frog", "cat", "bunny"] as const;
+/** Every catalog face has Imagine-fitted composites. Never slap a generic hat on a missing toy. */
+export const COSMETIC_FACES = SQUISHEE_IDS;
 export type CosmeticFace = (typeof COSMETIC_FACES)[number];
 
 export const COSMETICS: readonly Cosmetic[] = [

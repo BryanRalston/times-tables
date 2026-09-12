@@ -41,5 +41,7 @@ describe("asset URLs", () => {
     expect(existsSync(join(HERE, "../../public/art/mystery-gift.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/cosmetics/peach-party-hat.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/cosmetics/frog-scarf.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/cosmetics/otter-party-hat.png"))).toBe(true);
+    expect(existsSync(join(HERE, "../../public/cosmetics/avocado-bow.png"))).toBe(true);
   });
 });
