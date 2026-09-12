@@ -212,19 +212,24 @@ export const CandyPath = forwardRef<
   useEffect(() => {
     const hopper = document.querySelector<HTMLElement>("[data-path-hopper]");
     const scroller = hopper?.closest(".candy-scroll");
-    if (hopper && scroller instanceof HTMLElement) {
-      const hr = hopper.getBoundingClientRect();
-      const sr = scroller.getBoundingClientRect();
-      const deltaY = hr.top - (sr.top + sr.height * 0.46);
-      const deltaX = hr.left - (sr.left + sr.width * 0.46);
-      if (Math.abs(deltaY) >= 5 || Math.abs(deltaX) >= 5) {
-        if (travel) {
-          scroller.scrollTop += deltaY * 0.28;
-          scroller.scrollLeft += deltaX * 0.28;
-        } else {
-          scroller.scrollTop += deltaY;
-          scroller.scrollLeft += deltaX;
-        }
+    if (!hopper || !(scroller instanceof HTMLElement)) return;
+    // Full island stays in the Lessons card — don't pan the page to the peach.
+    if (scroller.matches("[data-lessons-path]")) {
+      scroller.scrollTop = 0;
+      scroller.scrollLeft = 0;
+      return;
+    }
+    const hr = hopper.getBoundingClientRect();
+    const sr = scroller.getBoundingClientRect();
+    const deltaY = hr.top - (sr.top + sr.height * 0.46);
+    const deltaX = hr.left - (sr.left + sr.width * 0.46);
+    if (Math.abs(deltaY) >= 5 || Math.abs(deltaX) >= 5) {
+      if (travel) {
+        scroller.scrollTop += deltaY * 0.28;
+        scroller.scrollLeft += deltaX * 0.28;
+      } else {
+        scroller.scrollTop += deltaY;
+        scroller.scrollLeft += deltaX;
       }
     }
   }, [pose.y, travel]);

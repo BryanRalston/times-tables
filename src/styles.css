@@ -972,7 +972,7 @@ details > summary::-webkit-details-marker {
 .candy-scroll[data-lessons-path] {
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  overflow: hidden;
   padding: 0.1rem 0.35rem 0;
 }
 .candy-map {

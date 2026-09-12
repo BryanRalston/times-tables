@@ -311,6 +311,7 @@ describe("CandyPath", () => {
     expect(src).toContain("landPresentPad");
     expect(src).toContain("landPresent");
     expect(src).toContain("DressedSquishee");
+    expect(src).toContain('scroller.matches("[data-lessons-path]")');
     expect(src).toContain("MysteryPresent");
     expect(src).toContain("data-present-unwrap");
     expect(src).toContain("padView(unwrap.pad)");
