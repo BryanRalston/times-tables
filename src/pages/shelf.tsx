@@ -1,17 +1,16 @@
 import { Check } from "lucide-react";
 import { useState } from "react";
 import { AppHeader, AppScene, AppTabs, useUi } from "@/components/chrome";
-import { DressedSquishee } from "@/components/dressed-squishee";
 import { MagentaImg } from "@/components/magenta-video";
 import { MysteryPresent } from "@/components/mystery-present";
 import { PokeToy } from "@/components/poke-toy";
 import { squisheePrice } from "@/lib/coins";
 import {
-  COSMETIC_FACES,
   COSMETICS,
   canDressFace,
   cosmeticCompositeSrc,
   cosmeticLabel,
+  isCosmeticFace,
   type Cosmetic,
 } from "@/lib/cosmetics";
 import { COMMON_SQUISHEES, RARE_SQUISHEES, pathHopperId, squisheeSrc, type Squishee } from "@/lib/squishees";
@@ -107,11 +106,11 @@ export function ShelfPage() {
             <span aria-hidden>★</span> {ui.yourPiece}
           </h2>
           <div className="shelf-avatar-row">
-            <DressedSquishee
+            <PokeToy
               id={hopperId}
               cosmetic={equipped}
+              size="md"
               className="h-24 w-24"
-              imgClassName="h-full w-full object-contain"
             />
             <p className="shelf-blurb">{ui.usePiece}</p>
           </div>
@@ -152,7 +151,7 @@ export function ShelfPage() {
                   got={cosmetics.includes(item.id)}
                   worn={equipped === item.id}
                   coins={coins}
-                  previewFace={COSMETIC_FACES.includes(hopperId as (typeof COSMETIC_FACES)[number]) ? hopperId : "peach"}
+                  previewFace={isCosmeticFace(hopperId) ? hopperId : "peach"}
                   onBuy={() => {
                     const r = buyCosmetic(item.id);
                     if (r.ok) playTap();
@@ -217,17 +216,14 @@ export function ShopCard({
   const dress = isHopper && canDressFace(s.id, equipped) ? equipped : "";
 
   const toy = got ? (
-    dress ? (
-      <DressedSquishee id={s.id} cosmetic={dress} className="h-20 w-20" imgClassName="h-20 w-20 object-contain" />
-    ) : (
-      <PokeToy
-        id={s.id}
-        size="sm"
-        cheer={playCheer}
-        onCheerEnd={() => setJustBought(false)}
-        className={cn("h-20 w-20 overflow-visible", s.rarity === "rare" && "rare-glow")}
-      />
-    )
+    <PokeToy
+      id={s.id}
+      cosmetic={dress}
+      size="sm"
+      cheer={playCheer}
+      onCheerEnd={() => setJustBought(false)}
+      className={cn("h-20 w-20 overflow-visible", s.rarity === "rare" && "rare-glow")}
+    />
   ) : findOnly ? (
     <span data-rare-find="1" className="grid h-20 w-20 place-items-center" aria-hidden>
       <MysteryPresent size="shelf" />

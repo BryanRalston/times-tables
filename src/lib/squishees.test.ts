@@ -141,6 +141,37 @@ describe("auto-rare", () => {
 });
 
 describe("new shop toys", () => {
+  it("registers later catalog waves, including the dress-up commons and find-only rares", () => {
+    expect(SQUISHEE_IDS).toEqual(
+      expect.arrayContaining([
+        "kiwi",
+        "fox",
+        "sushi",
+        "koala",
+        "pretzel",
+        "hedgehog",
+        "nebula-fox",
+        "opal-otter",
+        "comet-turtle",
+        "ice-phoenix",
+        "midnight-cat",
+        "sugar-comet",
+        "prism-bunny",
+        "lava-panda",
+        "mint-dragon",
+        "pearl-whale",
+        "sunset-sloth",
+        "frost-bun",
+      ]),
+    );
+    expect(squisheeById("kiwi")?.rarity).toBe("common");
+    expect(squisheeById("hedgehog")?.rarity).toBe("common");
+    expect(squisheeById("nebula-fox")?.rarity).toBe("rare");
+    expect(squisheeById("frost-bun")?.rarity).toBe("rare");
+    expect(squisheePrice("nebula-fox")).toBe(RARE_PRICE);
+    expect(squisheePrice("kiwi")).toBe(squisheePrice("frog"));
+  });
+
   it("registers the twelve new squishees", () => {
     expect(SQUISHEE_IDS).toEqual(
       expect.arrayContaining([
