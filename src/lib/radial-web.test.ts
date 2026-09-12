@@ -20,6 +20,7 @@ import {
   PHONE_MAP_VIEW,
   TABLET_MAP_BOARD,
   TABLET_MAP_VIEW,
+  PATH_ONLY_PADS,
   PATH_SWIRL_PADS,
   PORTAL_PAIRS,
   RADIAL_EDGES,
@@ -57,7 +58,7 @@ describe("radial web", () => {
     expect(RADIAL_PADS[0]!.id).toBe(START_PAD);
     expect(RADIAL_PADS.every((p) => p.id >= 1 && p.map.x > 8 && p.map.x < 92)).toBe(true);
     expect(RADIAL_PADS.filter((p) => p.ring === 0)).toHaveLength(1);
-    expect(RADIAL_PAD_COUNT).toBe(106);
+    expect(RADIAL_PAD_COUNT).toBe(107);
     expect(RADIAL_PADS.filter((p) => p.ring === 1).length).toBeGreaterThanOrEqual(8);
     expect(RADIAL_PADS.filter((p) => p.ring === 4).length).toBeGreaterThan(40);
     expect(RADIAL_EDGES.length).toBeGreaterThan(RADIAL_PAD_COUNT);
@@ -94,7 +95,7 @@ describe("radial web", () => {
     expect(areAdjacent(56, 58)).toBe(true);
     expect(areAdjacent(56, 57)).toBe(false);
     // Inward cream / pink / purple tiles used to carry the warp flag.
-    for (const id of [15, 23, 59, 65, 85, 89]) {
+    for (const id of [15, 23, 38, 41, 59, 65, 85, 89, 105]) {
       expect(RADIAL_PADS.find((p) => p.id === id)?.portal).toBe(false);
     }
     const innerE = RADIAL_PADS.find((p) => p.portal && p.ring === 2 && p.map.x > 60)!;
@@ -116,10 +117,29 @@ describe("radial web", () => {
     expect(midNW.map.y).toBeGreaterThan(29);
     expect(midNW.map.y).toBeLessThan(32);
     expect(adjacentPadIds(102)).toEqual(expect.arrayContaining([25]));
+    const midSE = RADIAL_PADS.find((p) => p.id === 107)!;
+    expect(midSE.portal).toBe(true);
+    expect(midSE.map.x).toBeGreaterThan(60);
+    expect(midSE.map.x).toBeLessThan(63);
+    expect(midSE.map.y).toBeGreaterThan(53);
+    expect(midSE.map.y).toBeLessThan(57);
+    expect(adjacentPadIds(107)).toEqual(expect.arrayContaining([16, 38]));
+    expect(areAdjacent(37, 38)).toBe(true);
+    expect(areAdjacent(37, 107)).toBe(false);
+    const midSW = RADIAL_PADS.find((p) => p.id === 106)!;
+    expect(midSW.portal).toBe(true);
+    expect(midSW.map.x).toBeGreaterThan(37);
+    expect(midSW.map.x).toBeLessThan(41);
+    expect(midSW.map.y).toBeGreaterThan(54);
+    expect(midSW.map.y).toBeLessThan(58);
+    expect(adjacentPadIds(106)).toEqual(expect.arrayContaining([22, 43]));
+    expect(areAdjacent(42, 106)).toBe(false);
     expect(PATH_SWIRL_PADS).toEqual([12, 27]);
-    for (const id of PATH_SWIRL_PADS) {
+    expect(PATH_ONLY_PADS).toEqual([12, 27, 38, 41, 105]);
+    for (const id of PATH_ONLY_PADS) {
       expect(RADIAL_PADS.find((p) => p.id === id)?.portal).toBe(false);
     }
+    expect(RADIAL_PADS.find((p) => p.id === 103)?.portal).toBe(false);
     expect(RADIAL_PADS.find((p) => p.id === 12)!.map.y).toBeGreaterThan(32);
     expect(RADIAL_PADS.find((p) => p.id === 27)!.map.y).toBeLessThan(23);
     expect(areAdjacent(15, 34)).toBe(false);
@@ -150,7 +170,7 @@ describe("radial web", () => {
   });
 
   it("pairs portals as a hidden involution without self-warps", () => {
-    expect(PORTAL_PAIRS).toHaveLength(9);
+    expect(PORTAL_PAIRS).toHaveLength(8);
     const seen = new Set<number>();
     for (const [a, b] of PORTAL_PAIRS) {
       expect(a).not.toBe(b);
@@ -164,17 +184,19 @@ describe("radial web", () => {
       seen.add(b);
     }
     expect(portalPartner(START_PAD)).toBeUndefined();
-    expect(RADIAL_PADS.filter((p) => p.portal)).toHaveLength(18);
-    expect(seen.size).toBe(18);
+    expect(RADIAL_PADS.filter((p) => p.portal)).toHaveLength(16);
+    expect(seen.size).toBe(16);
     expect(portalPartner(2)).toBe(19);
     expect(portalPartner(96)).toBe(97);
     expect(portalPartner(54)).toBe(75);
     expect(portalPartner(98)).toBe(57);
     expect(portalPartner(99)).toBe(100);
     expect(portalPartner(69)).toBe(101);
-    expect(portalPartner(103)).toBe(105);
+    expect(portalPartner(103)).toBeUndefined();
     expect(portalPartner(104)).toBe(106);
-    expect(portalPartner(38)).toBe(102);
+    expect(portalPartner(107)).toBe(102);
+    expect(portalPartner(38)).toBeUndefined();
+    expect(portalPartner(105)).toBeUndefined();
     expect(portalPartner(12)).toBeUndefined();
     expect(portalPartner(27)).toBeUndefined();
     expect(portalPartner(41)).toBeUndefined();
@@ -444,7 +466,7 @@ describe("radial hop hit testing", () => {
 
   it("never selects a quiet pad, and still warps from an adjacent portal", () => {
     const portals = RADIAL_PADS.filter((p) => p.portal);
-    expect(portals).toHaveLength(18);
+    expect(portals).toHaveLength(16);
     for (const portal of portals) {
       const neighbors = adjacentPadIds(portal.id);
       expect(neighbors.length).toBeGreaterThan(0);
