@@ -286,8 +286,8 @@ describe("radial hop hit testing", () => {
     const pb = padClientPos(b, board);
     const gap = Math.hypot(pb.x - pa.x, pb.y - pa.y);
     expect(PHONE_MAP_VIEW.width).toBe(368);
-    expect(PHONE_MAP_VIEW.height).toBe(520);
-    expect(PHONE_MAP_BOARD.height).toBe(520);
+    expect(PHONE_MAP_VIEW.height).toBe(510);
+    expect(PHONE_MAP_BOARD.height).toBe(510);
     expect(PHONE_MAP_BOARD.width).toBeGreaterThan(PHONE_MAP_VIEW.width);
     expect(DESK_MAP_VIEW.height).toBeCloseTo((368 * 5) / 8);
     expect(DESK_MAP_BOARD.height).toBeGreaterThan(207);

@@ -400,7 +400,7 @@ export const HOP_GLOW_BOARD_WIDTH_PCT = 2.2;
  * Visible Lessons world on a 390×844 phone after header, chips, dock,
  * and tabs. Taller than the 8/5 contain card so grass sits on the rail.
  */
-export const PHONE_MAP_VIEW = { width: 368, height: 520 } as const;
+export const PHONE_MAP_VIEW = { width: 368, height: 510 } as const;
 
 /**
  * Cover-fitted 16:9 stage for that phone column. Wider than the view —

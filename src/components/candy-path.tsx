@@ -450,9 +450,35 @@ export const CandyPath = forwardRef<
     return clamped;
   };
 
+  const holdPointer = (el: HTMLDivElement, id: number) => {
+    try {
+      el.setPointerCapture?.(id);
+    } catch {
+      /* pointer already gone */
+    }
+  };
+
+  const dropPointer = (el: HTMLDivElement, id: number) => {
+    try {
+      if (el.hasPointerCapture?.(id)) el.releasePointerCapture(id);
+    } catch {
+      /* pointer already gone */
+    }
+  };
+
+  const markFingers = () => {
+    worldRef.current?.setAttribute("data-map-fingers", String(pointers.current.size));
+  };
+
   const onBoardPointerDown = (e: PointerEvent<HTMLDivElement>) => {
+    if (e.isPrimary) {
+      pointers.current.clear();
+      pinch.current = null;
+      drag.current = null;
+    }
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
+    holdPointer(e.currentTarget, e.pointerId);
+    markFingers();
     if (phone && pointers.current.size >= 2) {
       const pts = [...pointers.current.values()];
       const a = pts[0]!;
@@ -497,8 +523,9 @@ export const CandyPath = forwardRef<
   };
 
   const onBoardPointerUp = (e: PointerEvent<HTMLDivElement>) => {
-    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
+    dropPointer(e.currentTarget, e.pointerId);
     pointers.current.delete(e.pointerId);
+    markFingers();
     if (pointers.current.size < 2) pinch.current = null;
     if (pointers.current.size === 0) drag.current = null;
     const start = tapStart.current;
@@ -518,8 +545,9 @@ export const CandyPath = forwardRef<
   };
 
   const onBoardPointerCancel = (e: PointerEvent<HTMLDivElement>) => {
-    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
+    dropPointer(e.currentTarget, e.pointerId);
     pointers.current.delete(e.pointerId);
+    markFingers();
     if (pointers.current.size < 2) pinch.current = null;
     if (pointers.current.size === 0) {
       drag.current = null;

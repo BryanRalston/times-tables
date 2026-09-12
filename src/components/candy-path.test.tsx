@@ -309,6 +309,8 @@ describe("CandyPath", () => {
     expect(src).toContain("zoomMapCamera");
     expect(src).toContain("usePhoneDoor");
     expect(src).toContain("coverMapBoard");
+    expect(src).toContain("data-map-fingers");
+    expect(src).toContain("holdPointer");
     expect(src).toContain("board.getBoundingClientRect()");
     expect(src).toContain("rollDie");
     expect(src).toContain("startDiceTurn");

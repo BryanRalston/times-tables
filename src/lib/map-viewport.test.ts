@@ -16,7 +16,7 @@ describe("map viewport", () => {
   it("cover-fills the phone column and overflows east/west", () => {
     expect(MAP_ART_ASPECT).toBeCloseTo(16 / 9);
     expect(PHONE_MAP_VIEW.width).toBe(368);
-    expect(PHONE_MAP_VIEW.height).toBe(520);
+    expect(PHONE_MAP_VIEW.height).toBe(510);
     expect(PHONE_MAP_VIEW.height).toBeGreaterThan(DESK_MAP_VIEW.height);
     expect(PHONE_MAP_BOARD.height).toBe(PHONE_MAP_VIEW.height);
     expect(PHONE_MAP_BOARD.width).toBeCloseTo(PHONE_MAP_VIEW.height * MAP_ART_ASPECT);
