@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -39,6 +39,7 @@ describe("asset URLs", () => {
     expect(existsSync(join(HERE, "../../public/candy-zones/overlays/cove-boulder.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/art/home-peek.png"))).toBe(false);
     expect(existsSync(join(HERE, "../../public/art/mystery-gift.png"))).toBe(true);
+    expect(readFileSync(join(HERE, "../../public/art/mystery-gift.png")).subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))).toBe(true);
     expect(existsSync(join(HERE, "../../public/cosmetics/peach-party-hat.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/cosmetics/frog-scarf.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/cosmetics/otter-party-hat.png"))).toBe(true);

@@ -31,6 +31,9 @@ export const RADIAL_PLAZA = { x: 49.682, y: 46.272 } as const;
  * so every hop lands in the middle of a walkable square — not on the
  * #70 grass gaps (plaza 49.88/45.15, r=85 NE at ~54.58/36.80, and the
  * north-spoke polar node that sat between plaza and the inner-N pad).
+ * Painted portals (inner swirl / arch openings and the eight rim arches)
+ * are their own hop pads, centered on the portal art — not the inward
+ * cream / pink / purple neighbor.
  */
 type PadSpot = { x: number; y: number; ring: RadialRing; angle: number; portal?: boolean };
 
@@ -49,7 +52,7 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 60.727, y: 30.655, ring: 2, angle: 51.5 },
   { x: 58.268, y: 35.018, ring: 2, angle: 53.6 },
   { x: 61.059, y: 44.163, ring: 2, angle: 84.0 },
-  { x: 64.752, y: 44.149, ring: 2, angle: 85.5, portal: true },
+  { x: 64.752, y: 44.149, ring: 2, angle: 85.5 },
   { x: 58.269, y: 53.704, ring: 2, angle: 116.0 },
   { x: 58.867, y: 63.751, ring: 2, angle: 136.9 },
   { x: 54.946, y: 65.274, ring: 2, angle: 153.8 },
@@ -57,7 +60,7 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 44.799, y: 65.367, ring: 2, angle: 204.4 },
   { x: 40.889, y: 63.766, ring: 2, angle: 221.8 },
   { x: 41.806, y: 53.740, ring: 2, angle: 241.9 },
-  { x: 35.454, y: 44.072, ring: 2, angle: 275.0, portal: true },
+  { x: 35.454, y: 44.072, ring: 2, angle: 275.0 },
   { x: 38.683, y: 44.163, ring: 2, angle: 276.2 },
   { x: 41.635, y: 35.194, ring: 2, angle: 307.8 },
   { x: 49.833, y: 29.619, ring: 2, angle: 0.9 },
@@ -93,13 +96,13 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 57.767, y: 15.993, ring: 4, angle: 25.4 },
   { x: 25.629, y: 70.821, ring: 4, angle: 240.1, portal: true },
   { x: 61.522, y: 17.408, ring: 4, angle: 36.1 },
-  { x: 65.171, y: 19.572, ring: 4, angle: 45.9, portal: true },
+  { x: 65.171, y: 19.572, ring: 4, angle: 45.9 },
   { x: 68.573, y: 22.357, ring: 4, angle: 54.5 },
   { x: 71.529, y: 25.765, ring: 4, angle: 62.2 },
   { x: 73.933, y: 29.586, ring: 4, angle: 68.8 },
   { x: 75.823, y: 34.089, ring: 4, angle: 75.3 },
   { x: 77.098, y: 38.927, ring: 4, angle: 81.4 },
-  { x: 77.721, y: 44.072, ring: 4, angle: 87.5, portal: true },
+  { x: 77.721, y: 44.072, ring: 4, angle: 87.5 },
   { x: 77.835, y: 49.483, ring: 4, angle: 93.7 },
   { x: 77.169, y: 54.724, ring: 4, angle: 99.8 },
   { x: 75.667, y: 59.838, ring: 4, angle: 106.4 },
@@ -119,17 +122,24 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 24.107, y: 59.683, ring: 4, angle: 253.6 },
   { x: 22.618, y: 54.725, ring: 4, angle: 260.0 },
   { x: 21.920, y: 49.383, ring: 4, angle: 266.4 },
-  { x: 22.073, y: 44.001, ring: 4, angle: 272.6, portal: true },
+  { x: 22.073, y: 44.001, ring: 4, angle: 272.6 },
   { x: 22.640, y: 38.858, ring: 4, angle: 278.8 },
   { x: 23.969, y: 34.096, ring: 4, angle: 284.9 },
   { x: 25.910, y: 29.581, ring: 4, angle: 291.6 },
-  { x: 28.311, y: 25.754, ring: 4, angle: 298.4, portal: true },
+  { x: 28.311, y: 25.754, ring: 4, angle: 298.4 },
   { x: 31.250, y: 22.305, ring: 4, angle: 306.2 },
   { x: 34.628, y: 19.502, ring: 4, angle: 315.0 },
   { x: 38.217, y: 17.364, ring: 4, angle: 324.8 },
   { x: 41.961, y: 15.941, ring: 4, angle: 335.7 },
   { x: 45.811, y: 15.157, ring: 4, angle: 347.5 },
   { x: 49.838, y: 14.935, ring: 4, angle: 0.5 },
+  // Portal art that had no hop node — flags used to sit on the inward neighbor.
+  { x: 67.550, y: 43.850, ring: 2, angle: 85.6, portal: true },
+  { x: 32.400, y: 43.850, ring: 2, angle: 274.5, portal: true },
+  { x: 73.200, y: 14.200, ring: 4, angle: 52.5, portal: true },
+  { x: 83.700, y: 42.300, ring: 4, angle: 86.2, portal: true },
+  { x: 16.500, y: 42.300, ring: 4, angle: 273.9, portal: true },
+  { x: 26.500, y: 14.200, ring: 4, angle: 307.9, portal: true },
 ];
 
 function buildPads(): RadialPad[] {
@@ -169,10 +179,10 @@ const PAD_EDGES: readonly (readonly [number, number])[] = [
   [3, 11], [3, 13], [3, 14], [4, 5], [4, 14], [5, 7],
   [5, 16], [6, 7], [6, 19], [7, 8], [8, 9], [8, 22],
   [9, 10], [9, 24], [10, 11], [10, 25], [11, 26], [12, 13],
-  [12, 29], [12, 31], [14, 15], [15, 33], [15, 34], [15, 36],
+  [12, 29], [12, 31], [14, 15], [15, 96], [96, 33], [96, 34], [96, 36],
   [17, 18], [17, 38], [18, 19], [18, 40], [19, 20], [19, 40],
-  [20, 21], [20, 40], [21, 43], [23, 24], [23, 45], [23, 47],
-  [23, 48],   [26, 27], [26, 28], [26, 53], [27, 28], [27, 53],
+  [20, 21], [20, 40], [21, 43],   [23, 24], [23, 97], [97, 45], [97, 47],
+  [97, 48], [26, 27], [26, 28], [26, 53], [27, 28], [27, 53],
   [27, 95], [28, 29], [29, 31], [30, 31], [30, 32], [30, 59],
   [30, 60], [30, 61], [31, 32], [32, 33], [33, 34], [33, 35],
   [34, 35], [34, 36], [35, 36], [35, 64], [35, 65], [35, 66],
@@ -190,6 +200,8 @@ const PAD_EDGES: readonly (readonly [number, number])[] = [
   [86, 87], [87, 88], [88, 89], [89, 90], [90, 91], [91, 92],
   [92, 93], [93, 94], [94, 95],
   [16, 17], [21, 22], [25, 26], [68, 69], [69, 71],
+  [59, 98], [60, 98], [64, 99], [65, 99], [66, 99],
+  [84, 100], [85, 100], [86, 100], [89, 101], [90, 101],
 ];
 
 function buildEdges(): readonly (readonly [number, number])[] {
@@ -224,8 +236,10 @@ export function radialHopStops(fromId: number, toId: number): number[] {
 }
 
 /**
- * Fixed mystery-portal pairs. Opposite gates on the inner swirl ring and
- * the outer ring. Not labeled in UI. Center plaza is the start pad, not a warp.
+ * Fixed mystery-portal pairs. Opposite gates on the inner swirl / arch
+ * openings and the eight rim arches. Not labeled in UI. Center plaza is
+ * the start pad, not a warp. Mid-spoke cream tiles with an arch hood
+ * (pads 27 / 41) stay walkable path, not extra warps.
  *
  * Inner N↔S, E↔W. Outer N↔S, NE↔SW, E↔W, SE↔NW.
  */
