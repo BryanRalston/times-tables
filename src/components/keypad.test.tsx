@@ -5,7 +5,7 @@ import { makeQuestion, welcomeFirst } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
 import { interactGatesSubmit } from "@/lib/leftover";
 import { AnswerPanel } from "./answer-panel";
-import { AnswerReadout, ClockKeys, CompareKeys, FractionKeys, Keypad, applyKeypadKey } from "./keypad";
+import { AnswerReadout, ClockKeys, CompareKeys, FractionKeys, Keypad, applyKeypadKey, fractionReady } from "./keypad";
 
 describe("answer readout", () => {
   it("shows typed digits in a Your answer box", () => {
@@ -95,6 +95,24 @@ describe("fraction keys", () => {
     );
     expect(html).toContain("data-frac-empty");
     expect(html).toContain("border-2");
+  });
+
+  it("Check stays off until numerator and denominator are both there", () => {
+    expect(fractionReady("")).toBe(false);
+    expect(fractionReady("3")).toBe(false);
+    expect(fractionReady("3/")).toBe(false);
+    expect(fractionReady("3/4")).toBe(true);
+    expect(fractionReady("1 3/", true)).toBe(false);
+    expect(fractionReady("3/4", true)).toBe(false);
+    expect(fractionReady("1 3/4", true)).toBe(true);
+    const half = renderToStaticMarkup(
+      <FractionKeys value="3/" onChange={() => undefined} onCheck={() => undefined} />,
+    );
+    expect(half).toMatch(/data-frac-check="1"[^>]*disabled/);
+    const full = renderToStaticMarkup(
+      <FractionKeys value="3/4" onChange={() => undefined} onCheck={() => undefined} />,
+    );
+    expect(full).not.toMatch(/data-frac-check="1"[^>]*disabled/);
   });
 });
 

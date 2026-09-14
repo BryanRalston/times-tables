@@ -573,6 +573,14 @@ describe("progress persist", () => {
     expect(useProgress.getState().unlockSquishee("galaxy-narwhal").ok).toBe(false);
   });
 
+  it("buying a common toy puts it on the hopper", () => {
+    expect(useProgress.getState().hopperId).toBe("");
+    useProgress.getState().awardCoins(10);
+    expect(useProgress.getState().buySquishee("frog")).toEqual({ ok: true, reason: "ok" });
+    expect(useProgress.getState().hopperId).toBe("frog");
+    expect(useProgress.getState().squishees).toContain("frog");
+  });
+
   it("does not call resetAll from main boot", () => {
     const main = readFileSync(join(HERE, "../main.tsx"), "utf8");
     expect(main).toContain("hydrateProgress");

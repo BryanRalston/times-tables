@@ -49,8 +49,7 @@ export function leftoverSpeechOpen(args: {
     return args.status === "wrong" || Boolean(args.reveal);
   }
   if (args.status === "correct") return false;
-  if (args.status === "wrong" || args.reveal) return true;
-  return !args.interacted;
+  return true;
 }
 
 export function leftoverSkipOpen(args: {

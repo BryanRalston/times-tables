@@ -116,6 +116,9 @@ describe("daily walk", () => {
     expect(fluency).toBe(2);
     expect(w.fresh).toBe(fresh);
     expect(w.review).toBe(review);
+    expect(w.items.length).toBe(fresh + review + fluency);
+    expect(UI.en.walkCards(w.items.length, w.fresh, w.review)).toMatch(/cards/);
+    expect(UI.en.walkCards(11, 6, 5)).toBe("11 cards · 6 new · 5 review");
   });
 
   it("every activity can mint a question", () => {
@@ -178,9 +181,13 @@ describe("answers", () => {
       data: {},
     };
     expect(pandaLine(leftover, "en", "idle")).not.toMatch(/n is leftover/i);
+    expect(pandaLine(leftover, "en", "idle")).toBe("Take the dots you can see. Then name n.");
+    expect(pandaLine(leftover, "en", "idle", true)).toBe(UI.en.leftoverTypeN);
+    expect(pandaLine(leftover, "en", "idle", true)).not.toMatch(/n is leftover/i);
     expect(pandaLine(leftover, "en", "correct")).not.toMatch(/n is leftover/i);
     expect(pandaLine(leftover, "en", "correct")).not.toMatch(/n is 4/);
     expect(pandaLine(leftover, "en", "wrong")).toBe("Try again.");
+    expect(UI.en.nIs("4")).toBe("n is 4.");
     expect(qCopy("en").changeHint).toBe("How much change?");
     expect(qCopy("en").changeHint).not.toMatch(/n is leftover/i);
     expect(qCopy("es").changeHint).not.toMatch(/n es/i);
@@ -436,6 +443,8 @@ describe("locale", () => {
     expect(UI.es.testMode).toBe("Modo de prueba");
     expect(UI["pt-BR"].testMode).toBe("Modo de teste");
     expect(UI.en.testModeFreeMove).toBe("Test mode · free move");
+    expect(UI.en.leftoverTypeN).toBe("Now type how many are hiding.");
+    expect(UI.en.yourPieceBlurb.length).toBeGreaterThan(8);
     expect(UI.en.rollDie).toBe("Roll");
     expect(UI.en.rollInvite).toBe("Roll the die");
     expect(UI.en.stepsLeftN(2)).toBe("2 left");

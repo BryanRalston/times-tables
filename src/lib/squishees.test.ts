@@ -6,6 +6,7 @@ import {
   cheerStripJsonFile,
   parsePokeStripJson,
   PEEK_SQUISHEE_IDS,
+  ownsSquishee,
   pathHopperId,
   peekTurn,
   trailPeekFace,
@@ -19,6 +20,15 @@ import {
   squisheePokeStrip,
   SQUISHEE_IDS,
 } from "./squishees";
+
+describe("guest peach", () => {
+  it("counts Peach as owned even when the save list is empty", () => {
+    expect(ownsSquishee([], "peach")).toBe(true);
+    expect(ownsSquishee([], "frog")).toBe(false);
+    expect(ownsSquishee(["frog"], "peach")).toBe(true);
+    expect(pathHopperId([], "")).toBe("peach");
+  });
+});
 
 describe("poke clips", () => {
   it("is frog, cat, and bunny", () => {

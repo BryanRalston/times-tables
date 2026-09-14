@@ -305,6 +305,20 @@ describe("CandyPath", () => {
     expect(html).not.toContain('data-path-unit="u13"');
   });
 
+  it("unit rail chips show the short name next to the number", () => {
+    const html = renderToStaticMarkup(
+      <CandyPath suggestedId="u2" standFrom={1} standTo={1} onStart={() => {}} onOpenUnit={() => {}} />,
+    );
+    expect(html).toContain("candy-unit-short");
+    expect(html).toContain('data-unit-short="Place value"');
+    expect(html).toContain("Place value");
+    expect(html).toContain('data-unit-short="Measurement"');
+    expect(html).toContain("Measurement");
+    const src = readFileSync(join(HERE, "candy-path.tsx"), "utf8");
+    expect(src).toContain("candy-unit-short");
+    expect(src).not.toMatch(/\{unit\.number\}\s*<\/button>/);
+  });
+
   it("lets a Guest with 1 step left tap the board without a d-pad or Test mode", () => {
     const next = adjacentPadIds(START_PAD);
     const html = renderToStaticMarkup(

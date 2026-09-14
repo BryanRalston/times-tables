@@ -116,6 +116,8 @@ export type Ui = {
   toShelf: string;
   schoolDaysLeft: (n: number) => string;
   newReview: (fresh: number, review: number, remain: number) => string;
+  walkCards: (total: number, fresh: number, review: number) => string;
+  leftoverTypeN: string;
   hourPlus: string;
   hourMinus: string;
   plus5min: string;
@@ -174,6 +176,7 @@ export type Ui = {
   yourPiece: string;
   usePiece: string;
   playingAs: string;
+  yourPieceBlurb: string;
   dressUp: string;
   unequip: string;
   wearThis: string;
@@ -311,6 +314,8 @@ export const UI: Record<Locale, Ui> = {
     toShelf: "Shelf",
     schoolDaysLeft: (n) => `${n} school days left in this unit`,
     newReview: (fresh, review, remain) => `${fresh} new · ${review} review · ${remain} school days left in this unit`,
+    walkCards: (total, fresh, review) => `${total} cards · ${fresh} new · ${review} review`,
+    leftoverTypeN: "Now type how many are hiding.",
     hourPlus: "Hour +",
     hourMinus: "Hour −",
     plus5min: "+5 min",
@@ -372,6 +377,7 @@ export const UI: Record<Locale, Ui> = {
     yourPiece: "Your piece",
     usePiece: "Use",
     playingAs: "Playing",
+    yourPieceBlurb: "This buddy hops on Lessons.",
     dressUp: "Dress-up",
     unequip: "Take off",
     wearThis: "Wear",
@@ -507,6 +513,8 @@ export const UI: Record<Locale, Ui> = {
     toShelf: "Estante",
     schoolDaysLeft: (n) => `${n} días escolares en esta unidad`,
     newReview: (fresh, review, remain) => `${fresh} nuevas · ${review} repaso · ${remain} días escolares en esta unidad`,
+    walkCards: (total, fresh, review) => `${total} cartas · ${fresh} nuevas · ${review} repaso`,
+    leftoverTypeN: "Ahora escribe cuántos se esconden.",
     hourPlus: "Hora +",
     hourMinus: "Hora −",
     plus5min: "+5 min",
@@ -568,6 +576,7 @@ export const UI: Record<Locale, Ui> = {
     yourPiece: "Tu ficha",
     usePiece: "Usar",
     playingAs: "Jugando",
+    yourPieceBlurb: "Este amigo salta en Lecciones.",
     dressUp: "Ropa",
     unequip: "Quitar",
     wearThis: "Poner",
@@ -703,6 +712,8 @@ export const UI: Record<Locale, Ui> = {
     toShelf: "Estante",
     schoolDaysLeft: (n) => `${n} dias letivos nesta unidade`,
     newReview: (fresh, review, remain) => `${fresh} novas · ${review} revisão · ${remain} dias letivos nesta unidade`,
+    walkCards: (total, fresh, review) => `${total} cartas · ${fresh} novas · ${review} revisão`,
+    leftoverTypeN: "Agora escreve quantos estão escondidos.",
     hourPlus: "Hora +",
     hourMinus: "Hora −",
     plus5min: "+5 min",
@@ -764,6 +775,7 @@ export const UI: Record<Locale, Ui> = {
     yourPiece: "Sua peça",
     usePiece: "Usar",
     playingAs: "Jogando",
+    yourPieceBlurb: "Este amigo pula em Lições.",
     dressUp: "Roupa",
     unequip: "Tirar",
     wearThis: "Vestir",

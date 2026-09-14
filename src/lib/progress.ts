@@ -132,7 +132,7 @@ export function emptyLearner(name = ""): LearnerSlice {
     badges: [],
     shaky: {},
     sessions: {},
-    squishees: [],
+    squishees: ["peach"],
     coins: 0,
     attempts: {},
     perfectWalks: 0,
@@ -589,7 +589,10 @@ export const useProgress = create<ProgressApi>()(
       },
       buySquishee: (id) => {
         const r = applyBuy(get().coins, get().squishees, id);
-        if (r.ok) commit(get, set, { coins: r.coins, squishees: r.squishees });
+        if (r.ok) {
+          const hopperId = parseHopperId(id, r.squishees);
+          commit(get, set, { coins: r.coins, squishees: r.squishees, hopperId });
+        }
         return { ok: r.ok, reason: r.reason };
       },
       unlockSquishee: (id) => {

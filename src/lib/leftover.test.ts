@@ -31,7 +31,8 @@ describe("leftover why-move gates", () => {
     expect(leftoverSpeechOpen(waiting)).toBe(true);
     const ready = { ...waiting, interacted: true };
     expect(leftoverPanelOpen(ready)).toBe(true);
-    expect(leftoverSpeechOpen(ready)).toBe(false);
+    expect(leftoverSpeechOpen(ready)).toBe(true);
+    expect(leftoverSpeechOpen({ ...ready, reveal: true })).toBe(true);
     expect(leftoverPanelOpen({ ...ready, status: "correct" as const })).toBe(false);
   });
 
@@ -42,6 +43,7 @@ describe("leftover why-move gates", () => {
     expect(play).toContain("leftoverPanelOpen");
     expect(play).toContain("data-play-progress");
     expect(play).toContain("max-w-[22.5rem]");
+    expect(play).toContain("ui.nIs");
   });
 
   it("keeps leftover compact and shows a Your-answer readout", () => {

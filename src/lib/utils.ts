@@ -207,7 +207,10 @@ export function pandaLine(
 ): string {
   const ui = UI[locale];
   if (status === "wrong") return ui.tryAgain;
-  if (q.kind === "tenframe") return q.hint ?? ui.takeWhatYouSee;
+  if (q.kind === "tenframe") {
+    if (interacted) return ui.leftoverTypeN;
+    return q.hint ?? ui.takeWhatYouSee;
+  }
   if (status === "correct") return correctSpeech(q, locale);
   if (q.kind === "graph") {
     const d = (q.data ?? {}) as { collect?: boolean };

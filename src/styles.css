@@ -1389,8 +1389,13 @@ details > summary::-webkit-details-marker {
   pointer-events: auto;
 }
 .candy-unit-chip {
-  width: 1.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+  width: auto;
+  max-width: 7.2rem;
   height: 1.7rem;
+  padding: 0 0.45rem;
   border-radius: 9999px;
   border: 2px solid #f3b3c8;
   background: #fff8fb;
@@ -1398,6 +1403,22 @@ details > summary::-webkit-details-marker {
   font-family: var(--font-display);
   font-size: 0.78rem;
   font-weight: 800;
+}
+.candy-unit-short {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+@media (max-width: 767px) {
+  .candy-unit-chip {
+    max-width: 4.4rem;
+    padding: 0 0.32rem;
+  }
+  .candy-unit-short {
+    font-size: 0.52rem;
+  }
 }
 .candy-unit-chip-now {
   border-color: #3cd2ff;

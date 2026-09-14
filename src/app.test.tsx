@@ -74,6 +74,8 @@ function expectHomeShell(html: string) {
   expect(html).not.toMatch(/Score\s*\/\s*Streak/);
   expect(html).not.toContain("School-day streak");
   expect(html).not.toContain("1/20");
+  expect(html).toMatch(/\d+ cards · \d+ new · \d+ review/);
+  expect(html).toContain("data-walk-cards");
 }
 
 function expectLessonsPath(html: string) {
@@ -568,6 +570,7 @@ describe("first-visit Home door", () => {
     expect(css).toContain("max-width: 22.5rem");
     expect(css).toContain("[data-leftover-board] .leftover-n");
     expect(css).toContain(".play-meter");
+    expect(css).toContain(".candy-unit-short");
     expect(css).toContain("top: 6.75rem");
     expect(css).not.toContain("[data-welcome-leftover]");
     const models = readFileSync(join(HERE, "components/models.tsx"), "utf8");

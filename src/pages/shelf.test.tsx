@@ -38,6 +38,12 @@ describe("shop tiles", () => {
     expect(html).toContain("peach-party-hat.png");
     expect(html).toContain("data-buy-cosmetic=\"party-hat\"");
     expect(html).toContain('data-preview-face="peach"');
+    expect(html).toContain("Peach");
+    expect(html).toContain("Playing");
+    expect(html).toContain('data-playing-as="1"');
+    expect(html).toContain('data-use-piece="peach"');
+    expect(html).toContain("This buddy hops on Lessons.");
+    expect(html).not.toMatch(/data-use-piece="peach"[\s\S]{0,200}\?\?\?/);
   });
 
   it("dress-up tiles preview the Playing hopper, not a hardcoded Peach", () => {

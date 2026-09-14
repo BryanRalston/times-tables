@@ -447,7 +447,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const showSkip = leftoverSkipOpen(gate);
   const speech = reveal
     ? leftover
-      ? ui.tryAgain
+      ? ui.nIs(q.answer)
       : correctSpeech(q, locale)
     : pandaLine(q, locale, pose === "oops" ? "wrong" : status, interacted);
   const showSpeech = leftover

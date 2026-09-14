@@ -795,10 +795,12 @@ export const CandyPath = forwardRef<
               className={cn("candy-unit-chip", status === "now" && "candy-unit-chip-now")}
               data-path-unit={unit.id}
               data-path-status={chipStatus}
+              data-unit-short={short}
               aria-label={`${ui.unitN(unit.number)}. ${short}${status === "now" ? `, ${ui.now}` : ""}`}
               onClick={() => (status === "now" ? onStart() : onOpenUnit(unit.id))}
             >
-              {unit.number}
+              <span className="candy-unit-n">{unit.number}</span>
+              <span className="candy-unit-short">{short}</span>
             </button>
           );
         })}

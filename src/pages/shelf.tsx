@@ -13,7 +13,7 @@ import {
   dressPreviewFace,
   type Cosmetic,
 } from "@/lib/cosmetics";
-import { COMMON_SQUISHEES, RARE_SQUISHEES, pathHopperId, squisheeSrc, type Squishee } from "@/lib/squishees";
+import { COMMON_SQUISHEES, RARE_SQUISHEES, ownsSquishee, pathHopperId, squisheeSrc, type Squishee } from "@/lib/squishees";
 import { playTap } from "@/lib/sound";
 import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
@@ -55,7 +55,7 @@ function Plank({
             <ShopCard
               key={s.id}
               s={s}
-              got={earned.includes(s.id)}
+              got={ownsSquishee(earned, s.id)}
               coins={coins}
               hopperId={hopperId}
               onBuy={onBuy}
@@ -112,7 +112,7 @@ export function ShelfPage() {
               size="md"
               className="h-24 w-24"
             />
-            <p className="shelf-blurb">{ui.usePiece}</p>
+            <p className="shelf-blurb">{ui.yourPieceBlurb}</p>
           </div>
         </section>
         {recentToy ? (
@@ -210,12 +210,13 @@ export function ShopCard({
   const [justBought, setJustBought] = useState(cheer);
   const findOnly = s.rarity === "rare";
   const price = squisheePrice(s.id);
-  const canBuy = !got && !findOnly && coins >= price;
+  const ownedFace = got || s.id === "peach";
+  const canBuy = !ownedFace && !findOnly && coins >= price;
   const playCheer = justBought;
-  const isHopper = got && hopperId === s.id;
+  const isHopper = ownedFace && hopperId === s.id;
   const dress = isHopper && canDressFace(s.id, equipped) ? equipped : "";
 
-  const toy = got ? (
+  const toy = ownedFace ? (
     <PokeToy
       id={s.id}
       cosmetic={dress}
@@ -235,7 +236,7 @@ export function ShopCard({
   );
 
   const useBtn =
-    got && onUse ? (
+    ownedFace && onUse ? (
       <button
         type="button"
         className={cn("shelf-use", isHopper && "shelf-use-on")}
@@ -247,7 +248,7 @@ export function ShopCard({
       </button>
     ) : null;
 
-  const meta = got ? (
+  const meta = ownedFace ? (
     <>
       <span className="mt-1 text-center text-xs font-bold text-plum">{s.name}</span>
       <span className="owned-pill">
@@ -271,11 +272,11 @@ export function ShopCard({
     </>
   );
 
-  if (got || findOnly) {
+  if (ownedFace || findOnly) {
     return (
       <div
-        className={cn("shelf-slot", featured && "shelf-slot-featured", got && s.rarity === "rare" && "rare-glow")}
-        data-rare-locked={findOnly && !got ? "1" : undefined}
+        className={cn("shelf-slot", featured && "shelf-slot-featured", ownedFace && s.rarity === "rare" && "rare-glow")}
+        data-rare-locked={findOnly && !ownedFace ? "1" : undefined}
       >
         {toy}
         {meta}

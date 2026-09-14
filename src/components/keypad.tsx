@@ -231,6 +231,16 @@ export function CompareKeys({
   );
 }
 
+export function fractionReady(value: string, mixed = false): boolean {
+  const parts = value.trim().split(" ");
+  const mixedWhole = mixed ? (parts.length > 1 ? parts[0] : parts[0]?.includes("/") ? "" : (parts[0] ?? "")) : "";
+  const frac = mixed ? (parts.length > 1 ? parts[1] : parts[0]?.includes("/") ? parts[0] : "") : value;
+  const [num = "", den = ""] = (frac ?? "").split("/");
+  if (!num || !den) return false;
+  if (mixed && !mixedWhole) return false;
+  return true;
+}
+
 export function FractionKeys({
   value,
   onChange,
@@ -301,7 +311,13 @@ export function FractionKeys({
           /
         </Button>
       </div>
-      <Button className="w-full" size="lg" onClick={onCheck} disabled={disabled || value.length === 0}>
+      <Button
+        className="w-full"
+        size="lg"
+        data-frac-check="1"
+        onClick={onCheck}
+        disabled={disabled || !fractionReady(value, mixed)}
+      >
         {ui.check}
       </Button>
     </div>

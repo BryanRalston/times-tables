@@ -53,8 +53,8 @@ export function HomePage() {
         <section className="continue-card" data-continue-card="1">
           <WalkMark />
           <h2 className="font-display text-[1.65rem] font-semibold leading-tight text-ink">{ui.todaysWalk}</h2>
-          <p className="mt-1 text-sm font-semibold text-muted">
-            {unitShort} · {walk.fresh} {ui.fresh.toLowerCase()}
+          <p className="mt-1 text-sm font-semibold text-muted" data-walk-cards={String(walk.items.length)}>
+            {unitShort} · {ui.walkCards(walk.items.length, walk.fresh, walk.review)}
           </p>
           <p className="sr-only">{ui.newReview(walk.fresh, walk.review, remain)}</p>
           <button

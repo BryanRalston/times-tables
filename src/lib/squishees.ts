@@ -176,8 +176,15 @@ export function squisheeById(id: string): Squishee | undefined {
  * Lessons / play / Home face. A kid-picked owned toy wins; otherwise
  * last owned, else Peach. First visit can stay Peach until they pick.
  */
+/** Guest Peach is always a real toy, never a mystery for sale. */
+export const GUEST_SQUISHEE = "peach";
+
+export function ownsSquishee(owned: readonly string[], id: string): boolean {
+  return id === GUEST_SQUISHEE || owned.includes(id);
+}
+
 export function pathHopperId(owned: readonly string[], chosen?: string | null): string {
-  if (chosen && squisheeById(chosen) && (owned.includes(chosen) || chosen === "peach")) return chosen;
+  if (chosen && squisheeById(chosen) && ownsSquishee(owned, chosen)) return chosen;
   for (let i = owned.length - 1; i >= 0; i--) {
     const id = owned[i]!;
     if (squisheeById(id)) return id;
@@ -187,7 +194,7 @@ export function pathHopperId(owned: readonly string[], chosen?: string | null): 
 
 export function parseHopperId(raw: unknown, owned: readonly string[]): string {
   if (typeof raw !== "string" || !squisheeById(raw)) return "";
-  if (owned.includes(raw) || raw === "peach") return raw;
+  if (ownsSquishee(owned, raw)) return raw;
   return "";
 }
 
