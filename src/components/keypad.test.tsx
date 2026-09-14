@@ -5,7 +5,7 @@ import { makeQuestion, welcomeFirst } from "@/lib/questions";
 import { rngFromSeed } from "@/lib/rng";
 import { interactGatesSubmit } from "@/lib/leftover";
 import { AnswerPanel } from "./answer-panel";
-import { AnswerReadout, ClockKeys, CompareKeys, Keypad, applyKeypadKey } from "./keypad";
+import { AnswerReadout, ClockKeys, CompareKeys, FractionKeys, Keypad, applyKeypadKey } from "./keypad";
 
 describe("answer readout", () => {
   it("shows typed digits in a Your answer box", () => {
@@ -55,6 +55,11 @@ describe("leftover keypad", () => {
     expect(html).not.toContain('aria-label="."');
     expect(html).toContain("Check");
     expect(html).not.toContain("Your answer");
+    const leftoverReadout = renderToStaticMarkup(
+      <AnswerPanel question={welcomeFirst(rngFromSeed("dot:left"))} value="3" setValue={() => undefined} onCheck={() => undefined} />,
+    );
+    expect(leftoverReadout).toContain("Your answer");
+    expect(leftoverReadout).toContain("3");
     const full = renderToStaticMarkup(
       <Keypad value="12" onChange={() => undefined} onCheck={() => undefined} />,
     );
@@ -74,7 +79,22 @@ describe("clock keys", () => {
     expect(html).toContain("+1 min");
     expect(html).not.toContain("+5 min");
     expect(html).toContain("Check");
-    expect(html).not.toMatch(/ disabled(=""|>)/);
+    expect(html).toContain("data-clock-check");
+    expect(html).toMatch(/disabled/);
+    const moved = renderToStaticMarkup(
+      <ClockKeys value="3:15" onChange={() => undefined} onCheck={() => undefined} avoid="12:00" />,
+    );
+    expect(moved).not.toMatch(/data-clock-check="1"[^>]*disabled/);
+  });
+});
+
+describe("fraction keys", () => {
+  it("empty fraction shows numerator and denominator boxes", () => {
+    const html = renderToStaticMarkup(
+      <FractionKeys value="" onChange={() => undefined} onCheck={() => undefined} />,
+    );
+    expect(html).toContain("data-frac-empty");
+    expect(html).toContain("border-2");
   });
 });
 
@@ -98,7 +118,7 @@ describe("answer panel keypad", () => {
       <AnswerPanel question={leftover} value="" setValue={() => undefined} onCheck={() => undefined} />,
     );
     expect(leftHtml).not.toContain('aria-label="."');
-    expect(leftHtml).not.toContain("Your answer");
+    expect(leftHtml).toContain("Your answer");
 
     const fluency = makeQuestion(activityById("u9-mix")!.activity, rngFromSeed("dot:flu"));
     const fluHtml = renderToStaticMarkup(
@@ -112,11 +132,11 @@ describe("answer panel keypad", () => {
     );
     expect(chgHtml).toContain('aria-label="."');
 
-    const count = makeQuestion(activityById("u11-count")!.activity, rngFromSeed("dot:cnt"));
-    const cntHtml = renderToStaticMarkup(
-      <AnswerPanel question={count} value="" setValue={() => undefined} onCheck={() => undefined} />,
+    const cents = makeQuestion(activityById("u1-coins")!.activity, rngFromSeed("dot:cnt"));
+    const centsHtml = renderToStaticMarkup(
+      <AnswerPanel question={cents} value="" setValue={() => undefined} onCheck={() => undefined} />,
     );
-    expect(cntHtml).toContain('aria-label="."');
+    expect(centsHtml).not.toContain('aria-label="."');
   });
 
   it("prefixes $ on count-with-bills, not leftover or coin-only", () => {

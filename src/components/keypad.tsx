@@ -270,10 +270,19 @@ export function FractionKeys({
   return (
     <div className="space-y-3">
       <div className="flex items-end justify-center gap-3 font-display text-3xl tabular-nums">
-        {mixed ? <span className="min-w-10 border-b-2 border-ink pb-1 text-center">{mixedWhole || " "}</span> : null}
-        <span className="flex flex-col items-center">
-          <span className="min-w-12 border-b-2 border-ink pb-1 text-center">{num || " "}</span>
-          <span className="min-w-12 pt-1 text-center">{den || " "}</span>
+        {mixed ? (
+          <span className="grid min-h-12 min-w-12 place-items-center rounded-[12px] border-2 border-ink bg-white px-2 py-1 text-center">
+            {mixedWhole || ""}
+          </span>
+        ) : null}
+        <span className="flex flex-col items-center gap-1" data-frac-empty="1">
+          <span className="grid min-h-12 min-w-14 place-items-center rounded-[12px] border-2 border-ink bg-white px-2 py-1 text-center">
+            {num || ""}
+          </span>
+          <span className="h-0.5 w-12 rounded-full bg-ink" aria-hidden />
+          <span className="grid min-h-12 min-w-14 place-items-center rounded-[12px] border-2 border-ink bg-white px-2 py-1 text-center">
+            {den || ""}
+          </span>
         </span>
       </div>
       <div className="grid grid-cols-3 gap-2">
@@ -323,7 +332,7 @@ export function ClockKeys({
   return (
     <div className="space-y-3">
       <div className="flex justify-center">
-        <InteractiveClock hours={hours} minutes={minutes} onChange={onChange} disabled={disabled} size="size-36 sm:size-40" />
+        <InteractiveClock hours={hours} minutes={minutes} onChange={onChange} disabled={disabled} size="size-40 sm:size-48 md:size-56" />
       </div>
       <p className="text-center font-display text-3xl tabular-nums">
         {hours}:{pad2(minutes)}
@@ -342,7 +351,13 @@ export function ClockKeys({
           {ui.plus1min}
         </Button>
       </div>
-      <Button className="w-full" size="lg" onClick={() => onCheck(formatClockTime(hours, minutes))} disabled={disabled}>
+      <Button
+        className="w-full"
+        size="lg"
+        data-clock-check="1"
+        onClick={() => onCheck(formatClockTime(hours, minutes))}
+        disabled={disabled || !value}
+      >
         {ui.check}
       </Button>
     </div>

@@ -287,7 +287,9 @@ describe("first-visit Home door", () => {
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
     expect(html).toContain('data-test-free-move="1"');
-    expect(html).toContain("Test mode · free move");
+    expect(html).toContain("Pick a space");
+    expect(html).not.toContain("Test mode");
+    expect(html).not.toContain("Test mode · free move");
     expect(html).toContain('data-hop-pick="1"');
     expect(html).toContain('data-dice-invite="0"');
     expect(html).toContain('data-pad-choice="1"');
@@ -406,6 +408,8 @@ describe("first-visit Home door", () => {
     expect(play).not.toContain("data-welcome-leftover");
     expect(play).toContain("data-play-page");
     expect(play).toContain("data-play-keys");
+    expect(play).toContain("data-play-progress");
+    expect(play).toContain("data-play-stage");
     expect(play).toContain("AppTabs");
     expect(play).toContain("REVEAL_AFTER_MISSES");
     expect(play).toContain("holdMsFor");
@@ -561,6 +565,10 @@ describe("first-visit Home door", () => {
     expect(css).toContain(".mini-pad-glow");
     expect(css).toContain("min-width: 4.75rem");
     expect(css).toContain("[data-leftover-board] .leftover-dot");
+    expect(css).toContain("max-width: 22.5rem");
+    expect(css).toContain("[data-leftover-board] .leftover-n");
+    expect(css).toContain(".play-meter");
+    expect(css).toContain("top: 6.75rem");
     expect(css).not.toContain("[data-welcome-leftover]");
     const models = readFileSync(join(HERE, "components/models.tsx"), "utf8");
     expect(models).not.toContain("md:min-h-72");

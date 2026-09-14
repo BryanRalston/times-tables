@@ -198,6 +198,8 @@ describe("boards", () => {
     expect(html).toContain("data-known-group");
     expect(html).toContain("known group");
     expect(html).toContain("data-leftover-board");
+    expect(html).toContain("data-leftover-compact");
+    expect(html).toContain("leftover-n");
     expect(html).toContain("known-glow");
     expect(html).not.toContain('aria-label="empty"');
     expect(html).not.toContain("takeable");
@@ -218,6 +220,9 @@ describe("boards", () => {
     expect(src).toContain("leftover-eq");
     expect(src).toContain("onClick={takeGroup}");
     expect(src).toContain("grid-cols-5");
+    expect(src).toContain("isolate={knownGone}");
+    expect(src).toContain("data-leftover-compact");
+    expect(src).toContain("leftover-n");
   });
 
   it("18 − n = 10 still has a takeable known group and four leftover rows", () => {

@@ -15,6 +15,8 @@ import {
   preferParams,
   recordToday,
   REVEAL_AFTER_MISSES,
+  WRONG_REVEAL_MS,
+  WRONG_RETRY_MS,
   todayView,
   timesKey,
   weakKeys,
@@ -100,6 +102,8 @@ describe("practice facts", () => {
     expect(bests.accuracy).toBeCloseTo(5 / 6);
     expect(formatAvgSeconds(4200)).toBe("4.2");
     expect(REVEAL_AFTER_MISSES).toBe(2);
+    expect(WRONG_RETRY_MS).toBeGreaterThanOrEqual(900);
+    expect(WRONG_REVEAL_MS).toBeGreaterThanOrEqual(1100);
     expect(holdMsFor("fluency", 2000, false)).toBeLessThan(800);
     expect(holdMsFor("tenframe", 2000, false)).toBe(2000);
     expect(weakness({ ok: 1, miss: 4, ms: 0 })).toBeGreaterThan(weakness({ ok: 4, miss: 1, ms: 0 }));

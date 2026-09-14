@@ -40,6 +40,20 @@ describe("leftover why-move gates", () => {
     expect(play).toContain("leftoverSpeechOpen");
     expect(play).toContain("overflow-y-auto");
     expect(play).toContain("leftoverPanelOpen");
+    expect(play).toContain("data-play-progress");
+    expect(play).toContain("max-w-[22.5rem]");
+  });
+
+  it("keeps leftover compact and shows a Your-answer readout", () => {
+    const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+    expect(css).toContain("max-width: 22.5rem");
+    expect(css).toContain("[data-leftover-board] .leftover-n");
+    expect(css).toContain("width: max-content");
+    const panel = readFileSync(new URL("../components/answer-panel.tsx", import.meta.url), "utf8");
+    expect(panel).not.toMatch(/quiet=\{leftover\}/);
+    expect(panel).toContain("replace={leftover}");
+    const lessons = readFileSync(new URL("../pages/lessons.tsx", import.meta.url), "utf8");
+    expect(lessons).not.toContain("testModeFreeMove");
   });
 
   it("holds leftover about two seconds", () => {

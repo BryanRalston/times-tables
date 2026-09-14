@@ -130,16 +130,18 @@ function Frame({
       className={cn(
         leftover
           ? "flex w-full flex-col justify-center"
-          : "frost rounded-[24px] border p-4 shadow-soft sm:p-5",
+          : "frost rounded-[24px] border p-4 shadow-soft sm:p-5 md:p-7",
         !leftover && status === "correct" && "border-good bg-good-soft",
         leftover && status === "correct" && "ring-2 ring-good",
         status === "wrong" && "shake",
-        !leftover && status === "wrong" && "border-bad",
+        leftover && status === "wrong" && "ring-4 ring-bad bg-bad-soft",
+        !leftover && status === "wrong" && "border-bad bg-bad-soft",
         !leftover && status === "idle" && "border-line",
       )}
       {...(leftover
         ? {
             "data-leftover-board": "",
+            "data-leftover-compact": "",
             "data-leftover-rows": leftoverRows ?? 0,
           }
         : {})}
@@ -172,7 +174,7 @@ function Dot({
     "leftover-dot size-11 min-h-11 min-w-11 rounded-full border-2 sm:size-12",
     extra,
     filled && !gone && "border-teal bg-teal token-glow",
-    (!filled || gone) && "border-[#e8a0b8] bg-transparent",
+    (!filled || gone) && "border-[#c47a92] bg-transparent",
     leftover && isolate && "border-dashed border-star bg-star-soft",
     gone && "take-out",
     onClick && filled && !gone && "known-glow",
@@ -205,7 +207,8 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
   const whyRef = useRef(0);
   const cells = Math.min(20, Math.max(data.total, data.shown));
   const perRow = 5;
-  const rows = Math.ceil(Math.max(cells, 10) / perRow);
+  const tenFrame = data.total === 10;
+  const rows = Math.ceil((tenFrame ? Math.max(cells, 10) : cells) / perRow);
   const knownGone = taken || status === "correct";
   const lastLeftoverRow = Math.floor(Math.max(0, data.total - 1) / perRow);
 
@@ -270,9 +273,9 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
           return (
             <div
               key={r}
-              className="leftover-row grid w-full grid-cols-5 items-center justify-items-center"
+              className="leftover-row grid grid-cols-5 items-center justify-items-center"
             >
-              {known.length ? (
+              {known.length && !(knownGone && !tenFrame) ? (
                 <div
                   data-known-group=""
                   role="group"
@@ -282,7 +285,13 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
                   onClick={takeGroup}
                 >
                   {known.map((i) => (
-                    <Dot key={i} filled gone={knownGone} onClick={takeGroup} onPointerDown={bindTake} />
+                    <Dot
+                      key={i}
+                      filled={!knownGone}
+                      gone={knownGone && tenFrame}
+                      onClick={takeGroup}
+                      onPointerDown={bindTake}
+                    />
                   ))}
                 </div>
               ) : null}
@@ -293,7 +302,7 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
                 >
                   {hiding.map((i) => (
                     <span key={i} className="flex flex-col items-center">
-                      <Dot filled={false} leftover isolate={status === "correct"} />
+                      <Dot filled={false} leftover isolate={knownGone} className="leftover-n" />
                     </span>
                   ))}
                 </div>
@@ -348,7 +357,7 @@ function Groups({ question, onInteract, status, shake }: BoardProps) {
             {size === 0 ? (
               <span className="px-1 text-[10px] text-faint">0</span>
             ) : (
-              Array.from({ length: size }, (_, i) => <span key={i} className="size-4 rounded-full bg-teal sm:size-5" />)
+              Array.from({ length: size }, (_, i) => <span key={i} className="size-5 rounded-full bg-teal sm:size-6 md:size-8" />)
             )}
           </button>
         ))}
@@ -366,7 +375,7 @@ function ArrayGrid({ question, status, shake }: BoardProps) {
         {Array.from({ length: data.rows }, (_, r) => (
           <div key={r} className="flex gap-1">
             {Array.from({ length: data.cols }, (_, c) => (
-              <span key={c} className="size-5 rounded-[4px] bg-teal sm:size-6" />
+              <span key={c} className="size-6 rounded-[5px] bg-teal sm:size-8 md:size-10" />
             ))}
           </div>
         ))}
@@ -488,7 +497,7 @@ function TallyGroups({
               Array.from({ length: size }, (_, i) => (
                 <span
                   key={i}
-                  className={cn("rounded-full bg-teal", groups * size > 40 ? "size-2" : "size-3 sm:size-4")}
+                  className={cn("rounded-full bg-teal", groups * size > 40 ? "size-2.5 sm:size-3" : "size-4 sm:size-5 md:size-6")}
                 />
               ))
             )}
@@ -842,11 +851,11 @@ function ChoiceVisual({ question, status, shake }: BoardProps) {
       return (
         <Frame shake={shake} status={status}>
           <div className="flex items-center justify-center gap-2">
-            <ShapePoly shape={parts[0]} sizeClass="size-16 sm:size-20" />
+            <ShapePoly shape={parts[0]} sizeClass="size-20 sm:size-24 md:size-28" />
             <span className="text-xl text-muted">+</span>
-            <ShapePoly shape={parts[1] ?? parts[0]} sizeClass="size-16 sm:size-20" />
+            <ShapePoly shape={parts[1] ?? parts[0]} sizeClass="size-20 sm:size-24 md:size-28" />
             <span className="text-xl text-muted">→</span>
-            <span className="grid size-16 place-items-center rounded-[16px] border border-dashed border-line font-display text-2xl text-muted sm:size-20">
+            <span className="grid size-20 place-items-center rounded-[16px] border border-dashed border-line font-display text-2xl text-muted sm:size-24 md:size-28">
               ?
             </span>
           </div>
@@ -857,7 +866,7 @@ function ChoiceVisual({ question, status, shake }: BoardProps) {
       return (
         <Frame shake={shake} status={status}>
           <div className="flex justify-center">
-            <ShapePoly shape={data.shape} sides={data.sides} split sizeClass="mx-auto size-40" />
+            <ShapePoly shape={data.shape} sides={data.sides} split sizeClass="mx-auto size-44 sm:size-52 md:size-60" />
           </div>
         </Frame>
       );
@@ -1020,7 +1029,7 @@ function AnalogClock({ question, status, shake }: BoardProps) {
       return (
         <Frame shake={shake} status={status}>
           <div className="flex justify-center" data-elapsed-start="">
-            <ClockFace hours={data.hours} minutes={data.minutes} size="size-36 sm:size-44" />
+            <ClockFace hours={data.hours} minutes={data.minutes} size="size-44 sm:size-56 md:size-64" />
           </div>
         </Frame>
       );
@@ -1029,11 +1038,11 @@ function AnalogClock({ question, status, shake }: BoardProps) {
       <Frame shake={shake} status={status}>
         <div className="flex justify-center gap-4">
           <div className="text-center">
-            <ClockFace hours={data.hours} minutes={data.minutes} size="size-36 sm:size-44" />
+            <ClockFace hours={data.hours} minutes={data.minutes} size="size-40 sm:size-52 md:size-60" />
             <p className="mt-1 text-xs text-muted">{data.hours}:{pad2(data.minutes)}</p>
           </div>
           <div className="text-center">
-            <ClockFace hours={end.hours} minutes={end.minutes} size="size-36 sm:size-44" />
+            <ClockFace hours={end.hours} minutes={end.minutes} size="size-40 sm:size-52 md:size-60" />
             <p className="mt-1 text-xs text-muted">{end.hours}:{pad2(end.minutes)}</p>
           </div>
         </div>
@@ -1043,7 +1052,7 @@ function AnalogClock({ question, status, shake }: BoardProps) {
   return (
     <Frame shake={shake} status={status}>
       <div className="flex justify-center">
-        <ClockFace hours={data.hours} minutes={data.minutes} size="size-36 sm:size-40" />
+        <ClockFace hours={data.hours} minutes={data.minutes} size="size-44 sm:size-56 md:size-64" />
       </div>
       <p className="mt-2 text-center text-sm text-muted">
         {data.find === "time" ? ui.readTheHands : ui.startClock(`${data.hours}:${pad2(data.minutes)}`)}
@@ -1411,8 +1420,9 @@ function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
     <Frame shake={shake + sortShake} status={sortMiss && status === "idle" ? "wrong" : status}>
       <p className="mb-2 text-center text-sm font-medium">{data.title}</p>
       {data.collect && tray.length ? (
-        <div className="mb-3 rounded-[12px] border border-dashed border-line bg-bg-warm p-2">
-          <p className="mb-1 text-xs text-muted">{sortMiss ? ui.sortWrong : ui.tapPicture}</p>
+        <div className="mb-3">
+          <p className="mb-2 text-center text-sm font-medium">{sortMiss ? ui.sortWrong : ui.tapPicture}</p>
+          <div className="rounded-[12px] border border-dashed border-line bg-bg-warm p-2">
           <div className="flex flex-wrap gap-1">
             {tray.map((t) => (
               <button
@@ -1428,6 +1438,7 @@ function GraphBoard({ question, onInteract, status, shake }: BoardProps) {
                 <GraphIcon id={t.symbol ?? data.symbol} />
               </button>
             ))}
+          </div>
           </div>
         </div>
       ) : null}
@@ -1627,7 +1638,7 @@ function NumberLine({ question, status, shake }: BoardProps) {
   return (
     <Frame shake={shake} status={status}>
       <p className="mb-2 text-center font-display text-xl">{question.prompt}</p>
-      <svg viewBox="0 0 100 42" className="h-24 w-full">
+      <svg viewBox="0 0 100 42" className="h-28 w-full sm:h-36 md:h-44">
         <line x1="8" y1="24" x2="92" y2="24" stroke="#1f1a14" strokeWidth="1.5" />
         {Array.from({ length: data.jumps + 1 }, (_, i) => {
           const n = i * data.size;

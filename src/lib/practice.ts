@@ -3,9 +3,9 @@ import type { Rng } from "./rng";
 
 export type { FactStat, HonestRun, PersonalBests, TodayPractice };
 
-export const CORRECT_HOLD_MS = 520;
-export const WRONG_RETRY_MS = 420;
-export const WRONG_REVEAL_MS = 900;
+export const CORRECT_HOLD_MS = 700;
+export const WRONG_RETRY_MS = 1100;
+export const WRONG_REVEAL_MS = 1400;
 export const REVEAL_AFTER_MISSES = 2;
 export const HONEST_MS_MIN = 400;
 export const HONEST_MS_MAX = 30_000;

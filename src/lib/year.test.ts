@@ -192,7 +192,8 @@ describe("answers", () => {
     expect(keypadAllowsDot({ kind: "fluency", data: {} })).toBe(false);
     expect(keypadAllowsDot({ kind: "clock", data: { mode: "elapsed" } })).toBe(false);
     expect(keypadAllowsDot({ kind: "area", data: {} })).toBe(false);
-    expect(keypadAllowsDot({ kind: "money", data: { mode: "count" } })).toBe(true);
+    expect(keypadAllowsDot({ kind: "money", data: { mode: "count" } })).toBe(false);
+    expect(keypadAllowsDot({ kind: "money", data: { mode: "count", coins: { dollar: 1 } } })).toBe(true);
     expect(keypadAllowsDot({ kind: "money", data: { mode: "change" } })).toBe(true);
     expect(keypadAllowsDot({ kind: "money", data: { mode: "make" } })).toBe(true);
     expect(keypadAllowsDot({ kind: "money", data: { mode: "compare" } })).toBe(false);

@@ -31,7 +31,9 @@ export function keypadAllowsDot(q: { kind: string; data?: unknown }): boolean {
   }
   if (q.kind !== "money") return false;
   const mode = (q.data as { mode?: string } | undefined)?.mode;
-  return mode === "count" || mode === "change" || mode === "make";
+  if (mode === "change" || mode === "make") return true;
+  if (mode === "count") return moneyCountHasBill(q);
+  return false;
 }
 
 /** Count-with-bills keypad shows $; leftover/fluency/coin-only do not. */

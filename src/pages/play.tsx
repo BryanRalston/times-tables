@@ -24,7 +24,7 @@ import { canAffordAnything, coinsForResult } from "@/lib/coins";
 import { playCorrect, playStar, playStreak, playWrong, unlockAudio } from "@/lib/sound";
 import { schoolStreak } from "@/lib/streak";
 import type { Locale, Question } from "@/lib/types";
-import { correctSpeech, keypadAllowsDot, pandaLine, questionCorrect } from "@/lib/utils";
+import { cn, correctSpeech, keypadAllowsDot, pandaLine, questionCorrect } from "@/lib/utils";
 
 type Kind = "welcome" | "daily" | "activity";
 
@@ -496,23 +496,37 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     />
   ) : null;
 
+  const oops = status === "wrong" || pose === "oops";
+  const total = pack.items.length;
+
   return (
     <AppScene scene="play" tabs={<AppTabs active="play" />} className="overflow-x-hidden">
       <div className="flex min-h-0 flex-1 flex-col" data-play-page="1">
         <AppHeader variant="play" />
-        <div className="flex min-h-0 flex-1 flex-col px-3">
+        <div className="play-meter" data-play-progress="1">
+          <span className="play-meter-n">{`${i + 1}/${total}`}</span>
+          <span className="play-meter-track" aria-hidden>
+            <i style={{ width: `${Math.round(((i + (status === "correct" ? 1 : 0)) / Math.max(1, total)) * 100)}%` }} />
+          </span>
+        </div>
+        <div className="flex min-h-0 flex-1 flex-col px-3" data-play-stage="1">
           {showSpeech ? (
-            <p className="mx-auto mb-1 max-w-[14rem] rounded-[18px] bg-white/80 px-3 py-1.5 text-center text-sm">
+            <p
+              className={cn(
+                "mx-auto mb-1 max-w-[16rem] rounded-[18px] px-3 py-1.5 text-center text-sm font-semibold",
+                oops ? "bg-bad-soft text-bad ring-2 ring-bad" : "bg-white/90 text-ink",
+              )}
+            >
               {speech}
             </p>
           ) : null}
           {!hideHeading ? (
-            <h2 className="mb-2 text-center font-display text-xl leading-tight sm:text-2xl">
+            <h2 className="mb-2 text-center font-display text-xl leading-tight sm:text-2xl md:text-3xl">
               {cardHeading(q, interacted)}
             </h2>
           ) : null}
           <div className={leftover ? "mx-auto flex min-h-0 w-full flex-1 items-center overflow-y-auto" : "min-h-0 flex-1 overflow-y-auto"}>
-            <div className={leftover ? "w-full" : undefined}>{board}</div>
+            <div className={leftover ? "mx-auto w-full max-w-[22.5rem]" : "mx-auto w-full max-w-3xl"}>{board}</div>
             {q.kind === "word" || q.prompt.length > 70 ? (
               <div className="mt-3">
                 <ScratchPad />

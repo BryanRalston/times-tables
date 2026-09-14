@@ -30,7 +30,7 @@ export function LessonsPage() {
   const pathRef = useRef<CandyPathHandle>(null);
 
   let caption = ui.grade3Path;
-  if (freeMove) caption = ui.testModeFreeMove;
+  if (freeMove) caption = ui.hopPick;
   else if (picking) caption = `${ui.hopPick} · ${ui.stepsLeftN(steps)}`;
   else if (inviting) caption = ui.rollInvite;
 
