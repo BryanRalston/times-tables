@@ -44,6 +44,7 @@ describe("leftover why-move gates", () => {
     expect(play).toContain("data-play-progress");
     expect(play).toContain("max-w-[22.5rem]");
     expect(play).toContain("ui.nIs");
+    expect(play).toContain("ui.nice");
     expect(play).toContain("data-leftover-next");
     expect(play).toContain("ui.next");
   });

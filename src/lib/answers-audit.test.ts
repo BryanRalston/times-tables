@@ -429,7 +429,7 @@ describe("answer audit", () => {
       const families = new Set(
         round.map((q) => {
           const eq = (q.data as TenFrameData).equation;
-          return eq.includes("− n =") ? "sub" : "add";
+          return eq.includes("− ? =") ? "sub" : "add";
         }),
       );
       expect(families.size, `round ${i}`).toBe(1);
@@ -441,9 +441,9 @@ describe("answer audit", () => {
     for (let i = 0; i < 30; i++) {
       const q = makeQuestion(found.activity, rngFromSeed(`lo:${i}`));
       const d = q.data as TenFrameData;
-      expect(d.equation).toMatch(/\+ n =/);
+      expect(d.equation).toMatch(/\+ \? =/);
       expect(d.total).toBeLessThanOrEqual(10);
-      expect(d.equation).not.toMatch(/− n =/);
+      expect(d.equation).not.toMatch(/− \? =/);
     }
   });
 
@@ -472,7 +472,7 @@ describe("answer audit", () => {
   it("board copy is not hardcoded English in models or generators", () => {
     const models = readFileSync(join(HERE, "../components/models.tsx"), "utf8");
     expect(models).not.toContain("Count them all.");
-    expect(models).not.toContain("Tap a group to isolate it, then name n.");
+    expect(models).not.toContain("Tap a group to isolate it, then name what's hiding.");
     expect(models).not.toContain("Read the hands.");
     expect(models).not.toContain("Nearest hundred");
     expect(models).not.toContain("Nearest thousand");

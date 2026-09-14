@@ -195,7 +195,7 @@ describe("boards", () => {
     const q = welcomeFirst(rngFromSeed(1));
     const html = renderToStaticMarkup(<Board {...stub(q)} status="idle" value="5" />);
     expect(html).not.toContain(`n is ${q.answer}`);
-    expect(html).toContain("6 + n = 10");
+    expect(html).toContain("6 + ? = 10");
     expect(html).toContain('aria-label="dot"');
     expect(html).toContain("data-known-group");
     expect(html).toContain("known group");
@@ -205,7 +205,7 @@ describe("boards", () => {
     expect(html).toContain("known-glow");
     expect(html).not.toContain('aria-label="empty"');
     expect(html).not.toContain("takeable");
-    expect(html).toContain("6 + n = 10");
+    expect(html).toContain("6 + ? = 10");
     expect(html).not.toContain(">5<");
     expect((html.match(/aria-label="dot"/g) ?? []).length).toBe(6);
     const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "models.tsx"), "utf8");
@@ -234,11 +234,11 @@ describe("boards", () => {
       id: "q-2n8",
       kind: "tenframe",
       input: "keypad",
-      prompt: "2 + n = 8",
-      hint: "Tap the dots you can see. Then name n.",
+      prompt: "2 + ? = 8",
+      hint: "Tap the dots you can see. Then name what's hiding.",
       answer: "6",
       needsInteract: true,
-      data: { total: 8, shown: 2, equation: "2 + n = 8" },
+      data: { total: 8, shown: 2, equation: "2 + ? = 8" },
     };
     const html = renderToStaticMarkup(<Board {...stub(q)} status="correct" interacted />);
     expect(html).toContain("data-known-group");
@@ -254,14 +254,14 @@ describe("boards", () => {
       id: "q-18n10",
       kind: "tenframe",
       input: "keypad",
-      prompt: "18 − n = 10",
-      hint: "Tap the dots you can see. Then name n.",
+      prompt: "18 − ? = 10",
+      hint: "Tap the dots you can see. Then name what's hiding.",
       answer: "8",
       needsInteract: true,
-      data: { total: 18, shown: 10, equation: "18 − n = 10" },
+      data: { total: 18, shown: 10, equation: "18 − ? = 10" },
     };
     const html = renderToStaticMarkup(<Board {...stub(q)} status="idle" />);
-    expect(html).toContain("18 − n = 10");
+    expect(html).toContain("18 − ? = 10");
     expect(html).toContain("data-leftover-board");
     expect(html).toContain('data-leftover-rows="4"');
     expect(html).toContain("data-why-take");
@@ -441,10 +441,10 @@ describe("boards", () => {
     expect(d.hide).toBe("size");
     expect(q.needsInteract).toBeFalsy();
     const html = renderToStaticMarkup(<Board {...stub(q)} />);
-    expect(html).toContain(`n × ${d.groups} = ${d.groups * d.size}`);
+    expect(html).toContain(`? × ${d.groups} = ${d.groups * d.size}`);
     expect(html).toContain("<button");
     expect(html).toContain('aria-label="group 1"');
-    expect(html).toContain("Tap a group to isolate it, then name n.");
+    expect(html).toContain("Tap a group to isolate it, then name what");
   });
 
   it("related-facts boards show equal groups that match the prompt, not a second question", () => {
@@ -478,7 +478,7 @@ describe("boards", () => {
     expect((html.match(/data-equal-group/g) ?? []).length).toBe(d.groups);
     expect((html.match(/data-group-tally/g) ?? []).length).toBe(d.groups);
     expect(html).toContain("Count them all.");
-    expect(html).not.toContain("Tap a group to isolate it, then name n.");
+    expect(html).not.toContain("Tap a group to isolate it, then name what's hiding.");
   });
 
   it("place-value chart keeps the comma the prompt used", () => {
@@ -577,7 +577,7 @@ describe("boards", () => {
       const html = renderToStaticMarkup(<Board {...stub(q)} />);
       expect(html).toContain("data-group-tally");
       expect(html).toContain(d.equation);
-      expect(html).not.toContain("Tap a group to isolate it, then name n.");
+      expect(html).not.toContain("Tap a group to isolate it, then name what's hiding.");
       expect((html.match(/data-equal-group/g) ?? []).length).toBe(d.groups);
     }
     expect(found).toBe(true);

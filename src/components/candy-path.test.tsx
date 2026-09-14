@@ -317,8 +317,11 @@ describe("CandyPath", () => {
     expect(html).toContain("candy-unit-short");
     expect(html).toContain('data-unit-short="Place value"');
     expect(html).toContain("Place value");
-    expect(html).toContain('data-unit-short="Measurement"');
-    expect(html).toContain("Measurement");
+    expect(html).toContain('data-unit-short="Measure"');
+    expect(html).toContain("Measure");
+    expect(html).toContain('data-unit-short="Graphs"');
+    expect(html).toContain("Graphs");
+    expect(html).toContain('data-unit-short="Groups"');
     const src = readFileSync(join(HERE, "candy-path.tsx"), "utf8");
     expect(src).toContain("candy-unit-short");
     expect(src).not.toMatch(/\{unit\.number\}\s*<\/button>/);

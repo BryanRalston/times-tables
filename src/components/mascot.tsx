@@ -44,7 +44,7 @@ export function Mascot({
 export function StarPop({ show }: { show: boolean }) {
   if (!show) return null;
   return (
-    <span className="star-pop pointer-events-none absolute -right-4 -top-4 text-5xl text-star drop-shadow" aria-hidden data-star-pop="1">
+    <span className="star-pop pointer-events-none absolute -right-6 -top-7 text-7xl text-star drop-shadow" aria-hidden data-star-pop="1">
       ★
     </span>
   );

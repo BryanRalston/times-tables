@@ -413,6 +413,7 @@ describe("first-visit Home door", () => {
     expect(play).toContain("data-play-keys");
     expect(play).toContain("data-play-progress");
     expect(play).toContain("data-leftover-next");
+    expect(play).toContain("ui.nice");
     expect(play).toContain("data-play-stage");
     expect(play).toContain("AppTabs");
     expect(play).toContain("REVEAL_AFTER_MISSES");

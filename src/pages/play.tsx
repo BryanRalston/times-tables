@@ -455,19 +455,22 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   const gate = { kind: q.kind, needsInteract: q.needsInteract, interacted, status };
   const showPanel = leftoverReveal ? false : leftoverPanelOpen(gate);
   const showSkip = leftoverReveal ? false : leftoverSkipOpen(gate);
-  const speech = reveal
-    ? leftover
-      ? ui.nIs(q.answer)
-      : correctSpeech(q, locale)
-    : pandaLine(q, locale, pose === "oops" ? "wrong" : status, interacted);
+  const speech =
+    status === "correct"
+      ? ui.nice
+      : reveal
+        ? leftover
+          ? ui.nIs(q.answer)
+          : correctSpeech(q, locale)
+        : pandaLine(q, locale, pose === "oops" ? "wrong" : status, interacted);
   const showSpeech = leftover
     ? leftoverSpeechOpen({
         kind: q.kind,
         interacted,
         status: pose === "oops" ? "wrong" : status,
         reveal,
-      })
-    : moneyWait || status === "wrong" || pose === "oops" || reveal;
+      }) || status === "correct"
+    : moneyWait || status === "wrong" || pose === "oops" || reveal || status === "correct";
   const shownAnswer =
     reveal && !leftover ? (
       <p className="mt-2 text-center text-sm text-good" data-show-correct="1">
@@ -525,7 +528,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
             <p
               className={cn(
                 "mx-auto mb-1 max-w-[16rem] rounded-[18px] px-3 py-1.5 text-center text-sm font-semibold",
-                leftoverReveal
+                leftoverReveal || status === "correct"
                   ? "bg-good-soft text-good ring-2 ring-good"
                   : oops
                     ? "bg-bad-soft text-bad ring-2 ring-bad"

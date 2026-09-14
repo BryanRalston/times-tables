@@ -83,9 +83,9 @@ describe("curriculum", () => {
 });
 
 describe("welcome leftover", () => {
-  it("starts on 6 + n = 10", () => {
+  it("starts on 6 + ? = 10", () => {
     const q = welcomeFirst(rngFromSeed(1));
-    expect(q.prompt).toBe("6 + n = 10");
+    expect(q.prompt).toBe("6 + ? = 10");
     expect(q.answer).toBe("4");
     expect(q.kind).toBe("tenframe");
     expect(q.needsInteract).toBe(true);
@@ -95,7 +95,7 @@ describe("welcome leftover", () => {
   it("is a short leftover run", () => {
     const round = makeWelcomeRound(rngFromSeed(7));
     expect(round).toHaveLength(4);
-    expect(round[0]?.prompt).toBe("6 + n = 10");
+    expect(round[0]?.prompt).toBe("6 + ? = 10");
     expect(WELCOME_ACTIVITY.rounds).toBe(4);
   });
 });
@@ -177,21 +177,23 @@ describe("answers", () => {
     const leftover = {
       kind: "tenframe",
       answer: "4",
-      hint: "Tap the dots you can see. Then name n.",
+      hint: "Tap the dots you can see. Then name what's hiding.",
       data: {},
     };
     expect(pandaLine(leftover, "en", "idle")).not.toMatch(/n is leftover/i);
-    expect(pandaLine(leftover, "en", "idle")).toBe("Tap the dots you can see. Then name n.");
+    expect(pandaLine(leftover, "en", "idle")).toBe("Tap the dots you can see. Then name what's hiding.");
     expect(UI.en.takeWhatYouSee).toBe("Tap the dots you can see.");
     expect(UI.en.next).toBe("Next");
     expect(UI.en.portal).toBe("Portal!");
-    expect(qCopy("en").leftoverHint).toBe("Tap the dots you can see. Then name n.");
+    expect(qCopy("en").leftoverHint).toBe("Tap the dots you can see. Then name what's hiding.");
     expect(pandaLine(leftover, "en", "idle", true)).toBe(UI.en.leftoverTypeN);
     expect(pandaLine(leftover, "en", "idle", true)).not.toMatch(/n is leftover/i);
     expect(pandaLine(leftover, "en", "correct")).not.toMatch(/n is leftover/i);
     expect(pandaLine(leftover, "en", "correct")).not.toMatch(/n is 4/);
+    expect(pandaLine(leftover, "en", "correct")).not.toMatch(/\bn is\b/);
     expect(pandaLine(leftover, "en", "wrong")).toBe("Try again.");
-    expect(UI.en.nIs("4")).toBe("n is 4.");
+    expect(UI.en.nIs("4")).toBe("4 is hiding.");
+    expect(UI.en.nice).toBe("Nice!");
     expect(qCopy("en").changeHint).toBe("How much change?");
     expect(qCopy("en").changeHint).not.toMatch(/n is leftover/i);
     expect(qCopy("es").changeHint).not.toMatch(/n es/i);

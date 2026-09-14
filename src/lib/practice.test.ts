@@ -63,7 +63,7 @@ describe("practice facts", () => {
     const prefer = preferParams(found!.activity, facts, rngFromSeed("prefer"));
     expect(prefer).toEqual({ preferShown: 6 });
     const round = makeActivityRound(found!.activity, rng, 8, "en", facts);
-    const six = round.filter((q) => q.factKey === "friends:6" || q.prompt.startsWith("6 + n"));
+    const six = round.filter((q) => q.factKey === "friends:6" || q.prompt.startsWith("6 + ?"));
     expect(six.length).toBeGreaterThan(0);
   });
 
@@ -104,7 +104,8 @@ describe("practice facts", () => {
     expect(REVEAL_AFTER_MISSES).toBe(2);
     expect(WRONG_RETRY_MS).toBeGreaterThanOrEqual(900);
     expect(WRONG_REVEAL_MS).toBeGreaterThanOrEqual(1100);
-    expect(holdMsFor("fluency", 2000, false)).toBeLessThan(800);
+    expect(holdMsFor("fluency", 2000, false)).toBeGreaterThanOrEqual(600);
+    expect(holdMsFor("fluency", 2000, false)).toBeLessThanOrEqual(900);
     expect(holdMsFor("tenframe", 2000, false)).toBe(2000);
     expect(weakness({ ok: 1, miss: 4, ms: 0 })).toBeGreaterThan(weakness({ ok: 4, miss: 1, ms: 0 }));
   });

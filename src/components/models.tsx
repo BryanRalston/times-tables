@@ -570,7 +570,7 @@ function PlaceValue({ question, status, shake }: BoardProps) {
     const ones = data.digit;
     return (
       <Frame shake={shake} status={status}>
-        <p className="mb-3 text-center font-display text-2xl sm:text-3xl">{tens} + n = {data.number}</p>
+        <p className="mb-3 text-center font-display text-2xl sm:text-3xl">{tens} + ? = {data.number}</p>
         <div className="flex flex-wrap items-end justify-center gap-6 text-center text-xs text-muted">
           <div>
             <div className="flex gap-0.5">

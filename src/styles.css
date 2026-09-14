@@ -281,11 +281,15 @@
 
 @keyframes star-pop {
   0% {
-    transform: scale(0) rotate(-18deg);
+    transform: scale(0) rotate(-24deg);
     opacity: 0;
   }
-  55% {
-    transform: scale(1.22) rotate(8deg);
+  40% {
+    transform: scale(1.55) rotate(12deg);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(1.15) rotate(-6deg);
     opacity: 1;
   }
   100% {
@@ -294,8 +298,8 @@
   }
 }
 .star-pop {
-  animation: star-pop 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  filter: drop-shadow(0 2px 0 rgb(196 92 38 / 0.35));
+  animation: star-pop 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  filter: drop-shadow(0 3px 0 rgb(196 92 38 / 0.4));
 }
 
 @keyframes node-pulse {

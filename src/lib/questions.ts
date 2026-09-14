@@ -85,12 +85,12 @@ function ensureChoices(rng: Rng, answer: string, pool: string[]): string[] {
 export function welcomeFirst(rng: Rng): Question {
   return keypadQ(rng, {
     kind: "tenframe",
-    prompt: "6 + n = 10",
+    prompt: "6 + ? = 10",
     hint: t().leftoverHint,
     answer: "4",
     needsInteract: true,
     factKey: leftoverKey(6, 4, 10, false),
-    data: { total: 10, shown: 6, equation: "6 + n = 10" } satisfies TenFrameData,
+    data: { total: 10, shown: 6, equation: "6 + ? = 10" } satisfies TenFrameData,
   });
 }
 
@@ -102,7 +102,7 @@ function tenframeQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   shown = maybePreferShown(shown, params.preferShown, rng, total);
   const n = total - shown;
   const sub = params.mode === "sub" || (params.mode !== "add" && total >= 12 && rng.next() < 0.45);
-  const equation = sub ? `${total} − n = ${shown}` : `${shown} + n = ${total}`;
+  const equation = sub ? `${total} − ? = ${shown}` : `${shown} + ? = ${total}`;
   return keypadQ(rng, {
     kind: "tenframe",
     prompt: equation,
@@ -134,15 +134,15 @@ function groupsQ(rng: Rng, params: Record<string, unknown> = {}): Question {
   let answer = "";
   let equation = "";
   if (hide === "product") {
-    equation = `${groups} × ${size} = n`;
+    equation = `${groups} × ${size} = ?`;
     prompt = t().groupsOf(groups, size);
     answer = String(product);
   } else if (hide === "groups") {
-    equation = `${size} × n = ${product}`;
-    prompt = `${size} × n = ${product}`;
+    equation = `${size} × ? = ${product}`;
+    prompt = `${size} × ? = ${product}`;
     answer = String(groups);
   } else {
-    equation = `n × ${groups} = ${product}`;
+    equation = `? × ${groups} = ${product}`;
     prompt = t().groupsEach(groups, product);
     answer = String(size);
   }
@@ -192,7 +192,7 @@ function placeValueQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     const total = tens + ones;
     return keypadQ(rng, {
       kind: "placevalue",
-      prompt: `${tens} + n = ${total}`,
+      prompt: `${tens} + ? = ${total}`,
       hint: t().tensHint,
       answer: String(ones),
       data: { number: total, digit: ones, place: "ones", mode: "expanded" } satisfies PlaceValueData,
@@ -1224,7 +1224,7 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       prompt: t().wordBags(name, groups, size, thing),
       answer: String(groups * size),
       factKey: timesKey(groups, size),
-      data: { groups, size, hide: "product", equation: `${groups} × ${size} = n` },
+      data: { groups, size, hide: "product", equation: `${groups} × ${size} = ?` },
     });
   }
   if (mode === "take") {
@@ -1237,7 +1237,7 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
       answer: String(total - shown),
       needsInteract: true,
       factKey: leftoverKey(shown, total - shown, total, true),
-      data: { total, shown, equation: `${total} − n = ${shown}` },
+      data: { total, shown, equation: `${total} − ? = ${shown}` },
     });
   }
   if (mode === "compare") {
@@ -1277,7 +1277,7 @@ function wordQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     answer: String(n),
     needsInteract: true,
     factKey: leftoverKey(shown, n, shown + n, false),
-    data: { total: shown + n, shown, equation: `${shown} + n = ${shown + n}` },
+    data: { total: shown + n, shown, equation: `${shown} + ? = ${shown + n}` },
   });
 }
 
