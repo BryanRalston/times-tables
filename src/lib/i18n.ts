@@ -31,6 +31,7 @@ export type Ui = {
   check: string;
   yourAnswer: string;
   skip: string;
+  next: string;
   play: string;
   playLeftover: string;
   numberSense: string;
@@ -223,6 +224,7 @@ export const UI: Record<Locale, Ui> = {
     check: "Check",
     yourAnswer: "Your answer",
     skip: "Skip",
+    next: "Next",
     play: "Play",
     playLeftover: "Play leftover",
     numberSense: "Number sense",
@@ -234,7 +236,7 @@ export const UI: Record<Locale, Ui> = {
     todaysWalk: "Today's walk",
     niceWalk: "Nice walk",
     tryAgain: "Try again.",
-    takeWhatYouSee: "Take what you can see.",
+    takeWhatYouSee: "Tap the dots you can see.",
     nIs: (n) => `n is ${n}.`,
     itsClock: (t) => `It's ${t}.`,
     thats: (n) => `That's ${n}.`,
@@ -422,6 +424,7 @@ export const UI: Record<Locale, Ui> = {
     check: "Comprobar",
     yourAnswer: "Tu respuesta",
     skip: "Saltar",
+    next: "Siguiente",
     play: "Jugar",
     playLeftover: "Jugar a lo que se esconde",
     numberSense: "Sentido numérico",
@@ -433,7 +436,7 @@ export const UI: Record<Locale, Ui> = {
     todaysWalk: "Paseo de hoy",
     niceWalk: "Buen paseo",
     tryAgain: "Otra vez.",
-    takeWhatYouSee: "Toma lo que ves.",
+    takeWhatYouSee: "Toca los puntos que ves.",
     nIs: (n) => `n es ${n}.`,
     itsClock: (t) => `Son las ${t}.`,
     thats: (n) => `Eso es ${n}.`,
@@ -621,6 +624,7 @@ export const UI: Record<Locale, Ui> = {
     check: "Conferir",
     yourAnswer: "Sua resposta",
     skip: "Pular",
+    next: "Seguinte",
     play: "Jogar",
     playLeftover: "Jogar o que está escondido",
     numberSense: "Sentido numérico",
@@ -632,7 +636,7 @@ export const UI: Record<Locale, Ui> = {
     todaysWalk: "Passeio de hoje",
     niceWalk: "Bom passeio",
     tryAgain: "Tenta de novo.",
-    takeWhatYouSee: "Pegue o que você vê.",
+    takeWhatYouSee: "Toque os pontos que você vê.",
     nIs: (n) => `n é ${n}.`,
     itsClock: (t) => `São ${t}.`,
     thats: (n) => `Isso é ${n}.`,
@@ -1193,9 +1197,9 @@ function measureEn(): QCopy["measureUnits"] {
 export function qCopy(locale: Locale): QCopy {
   if (locale === "es") {
     return {
-      leftoverHint: "Toma los puntos que ves. Luego nombra n.",
+      leftoverHint: "Toca los puntos que ves. Luego nombra n.",
       leftoverPieces: (shown, den) => `${shown}/${den} + n = 1. ¿Qué fracción se esconde?`,
-      leftoverPiecesHint: "Toma las piezas que ves.",
+      leftoverPiecesHint: "Toca las piezas que ves.",
       tensHint: "Decenas que ves. n son las unidades que faltan.",
       groupsHint: "Cuenta un grupo, luego cuenta los grupos.",
       groupsOf: (g, s) => `${g} grupos de ${s}. ¿Cuántos en total?`,
@@ -1324,9 +1328,9 @@ export function qCopy(locale: Locale): QCopy {
   }
   if (locale === "pt-BR") {
     return {
-      leftoverHint: "Pegue os pontos que você vê. Depois nomeie n.",
+      leftoverHint: "Toque os pontos que você vê. Depois nomeie n.",
       leftoverPieces: (shown, den) => `${shown}/${den} + n = 1. Que fração está escondida?`,
-      leftoverPiecesHint: "Pegue as peças que você vê.",
+      leftoverPiecesHint: "Toque as peças que você vê.",
       tensHint: "Dezenas que você vê. n são as unidades que faltam.",
       groupsHint: "Conte um grupo, depois conte os grupos.",
       groupsOf: (g, s) => `${g} grupos de ${s}. Quantos no total?`,
@@ -1454,9 +1458,9 @@ export function qCopy(locale: Locale): QCopy {
     };
   }
   return {
-    leftoverHint: "Take the dots you can see. Then name n.",
+    leftoverHint: "Tap the dots you can see. Then name n.",
     leftoverPieces: (shown, den) => `${shown}/${den} + n = 1. What fraction is hiding?`,
-    leftoverPiecesHint: "Take the pieces you can see.",
+    leftoverPiecesHint: "Tap the pieces you can see.",
     tensHint: "Tens you can see. n is the leftover ones.",
     groupsHint: "Count one group, then count the groups.",
     groupsOf: (g, s) => `${g} groups of ${s}. How many in all?`,

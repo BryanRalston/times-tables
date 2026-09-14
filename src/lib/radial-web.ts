@@ -413,6 +413,9 @@ export const HOP_SNAP_PX = 22;
  */
 export const HOPPER_BOARD_WIDTH_PCT = 3.2;
 
+/** Minimum tappable pad box. Art stays --hop-tile; choice discs grow the hit. */
+export const HOP_HIT_MIN_PX = 44;
+
 /** Zoom the 1024 sprite so the opaque peach/body fills the pad box. */
 export const HOPPER_ART_ZOOM_PCT = 140;
 

@@ -86,6 +86,7 @@ describe("CandyPath", () => {
     expect(html).toContain('data-hopper-fit="pad"');
     expect(html).toContain("candy-hopper-fit");
     expect(html).toContain(`--hop-tile:${HOPPER_BOARD_WIDTH_PCT}%`);
+    expect(html).toContain('data-hop-hit="44"');
     expect(html).toContain(`--hop-art-zoom:${HOPPER_ART_ZOOM_PCT}%`);
     expect(html).toContain(`--hop-glow:${HOP_GLOW_BOARD_WIDTH_PCT}%`);
     expect(html).toContain(`--hop-glow-fill:${(HOP_GLOW_BOARD_WIDTH_PCT / HOPPER_BOARD_WIDTH_PCT) * 100}%`);

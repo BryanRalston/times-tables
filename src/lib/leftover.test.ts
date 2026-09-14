@@ -44,12 +44,15 @@ describe("leftover why-move gates", () => {
     expect(play).toContain("data-play-progress");
     expect(play).toContain("max-w-[22.5rem]");
     expect(play).toContain("ui.nIs");
+    expect(play).toContain("data-leftover-next");
+    expect(play).toContain("ui.next");
   });
 
   it("keeps leftover compact and shows a Your-answer readout", () => {
     const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
     expect(css).toContain("max-width: 22.5rem");
     expect(css).toContain("[data-leftover-board] .leftover-n");
+    expect(css).toContain("[data-leftover-board] .leftover-hole");
     expect(css).toContain("width: max-content");
     const panel = readFileSync(new URL("../components/answer-panel.tsx", import.meta.url), "utf8");
     expect(panel).not.toMatch(/quiet=\{leftover\}/);

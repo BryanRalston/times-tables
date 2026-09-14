@@ -304,6 +304,14 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
     resetCard();
   }
 
+  function tapNext() {
+    if (holdRef.current) {
+      window.clearTimeout(holdRef.current);
+      holdRef.current = 0;
+    }
+    goNext(correct, misses);
+  }
+
   function check(override?: string) {
     if (!q || status !== "idle") return;
     if (interactGatesSubmit(q.kind, q.needsInteract) && !interacted) {
@@ -442,9 +450,10 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
   if (!q) return null;
 
   const leftover = q.kind === "tenframe";
+  const leftoverReveal = leftover && reveal;
   const gate = { kind: q.kind, needsInteract: q.needsInteract, interacted, status };
-  const showPanel = leftoverPanelOpen(gate);
-  const showSkip = leftoverSkipOpen(gate);
+  const showPanel = leftoverReveal ? false : leftoverPanelOpen(gate);
+  const showSkip = leftoverReveal ? false : leftoverSkipOpen(gate);
   const speech = reveal
     ? leftover
       ? ui.nIs(q.answer)
@@ -514,7 +523,11 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
             <p
               className={cn(
                 "mx-auto mb-1 max-w-[16rem] rounded-[18px] px-3 py-1.5 text-center text-sm font-semibold",
-                oops ? "bg-bad-soft text-bad ring-2 ring-bad" : "bg-white/90 text-ink",
+                leftoverReveal
+                  ? "bg-good-soft text-good ring-2 ring-good"
+                  : oops
+                    ? "bg-bad-soft text-bad ring-2 ring-bad"
+                    : "bg-white/90 text-ink",
               )}
             >
               {speech}
@@ -534,21 +547,29 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
             ) : null}
           </div>
         </div>
-        {showPanel || shownAnswer || showSkip ? (
+        {showPanel || shownAnswer || showSkip || leftoverReveal ? (
           <div className="keypad-dock shrink-0" data-play-keys="1">
-            {showPanel ? (
+            {showPanel || leftoverReveal ? (
               <div className="mascot-dock">
                 <Mascot who={who} pose={pose} hop={hop} size="sm" className="!h-full !w-full" />
                 <StarPop show={star} />
               </div>
             ) : null}
-            {panel}
-            {shownAnswer}
-            {showSkip ? (
-              <button type="button" className="skip-quiet" onClick={skip}>
-                {ui.skip}
-              </button>
-            ) : null}
+            {leftoverReveal ? (
+              <Button className="w-full" size="lg" data-leftover-next="1" onClick={tapNext}>
+                {ui.next}
+              </Button>
+            ) : (
+              <>
+                {panel}
+                {shownAnswer}
+                {showSkip ? (
+                  <button type="button" className="skip-quiet" onClick={skip}>
+                    {ui.skip}
+                  </button>
+                ) : null}
+              </>
+            )}
           </div>
         ) : (
           <div className="relative mx-auto mb-1 h-16 w-16">

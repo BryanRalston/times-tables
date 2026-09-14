@@ -177,11 +177,14 @@ describe("answers", () => {
     const leftover = {
       kind: "tenframe",
       answer: "4",
-      hint: "Take the dots you can see. Then name n.",
+      hint: "Tap the dots you can see. Then name n.",
       data: {},
     };
     expect(pandaLine(leftover, "en", "idle")).not.toMatch(/n is leftover/i);
-    expect(pandaLine(leftover, "en", "idle")).toBe("Take the dots you can see. Then name n.");
+    expect(pandaLine(leftover, "en", "idle")).toBe("Tap the dots you can see. Then name n.");
+    expect(UI.en.takeWhatYouSee).toBe("Tap the dots you can see.");
+    expect(UI.en.next).toBe("Next");
+    expect(qCopy("en").leftoverHint).toBe("Tap the dots you can see. Then name n.");
     expect(pandaLine(leftover, "en", "idle", true)).toBe(UI.en.leftoverTypeN);
     expect(pandaLine(leftover, "en", "idle", true)).not.toMatch(/n is leftover/i);
     expect(pandaLine(leftover, "en", "correct")).not.toMatch(/n is leftover/i);
@@ -477,8 +480,8 @@ describe("locale", () => {
     const q = makeQuestion(activityById("u7-add")!.activity, rngFromSeed(4), "es");
     expect(q.prompt).toMatch(/tiene|cuántos|bolsas|paquetes|ve /i);
     expect(q.prompt).not.toMatch(/\bhas \d+ (apples|stickers|marbles)\b/i);
-    expect(q.prompt).not.toMatch(/Take the dots/);
-    expect(q.hint ?? "").not.toMatch(/Take the dots/);
+    expect(q.prompt).not.toMatch(/Take the dots|Tap the dots/);
+    expect(q.hint ?? "").not.toMatch(/Take the dots|Tap the dots/);
   });
 });
 

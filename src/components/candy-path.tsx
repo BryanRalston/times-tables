@@ -40,6 +40,7 @@ import {
   HOPPER_BOARD_WIDTH_PCT,
   HOPPER_SIT_TRANSLATE,
   HOP_GLOW_BOARD_WIDTH_PCT,
+  HOP_HIT_MIN_PX,
   HOP_SNAP_MIN_PX,
   HOP_SNAP_PX,
   hopSnapPx,
@@ -617,6 +618,7 @@ export const CandyPath = forwardRef<
           data-dice-steps={String(steps)}
           data-hop-snap={String(HOP_SNAP_PX)}
           data-hop-snap-min={String(HOP_SNAP_MIN_PX)}
+          data-hop-hit={String(HOP_HIT_MIN_PX)}
           data-hopper-fit="pad"
           style={{
             ["--hop-tile" as string]: `${HOPPER_BOARD_WIDTH_PCT}%`,

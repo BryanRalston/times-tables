@@ -23,7 +23,7 @@ import type {
   Question,
 } from "@/lib/types";
 import { moneyFmt } from "@/lib/utils";
-import { BEAKER_FACE, Board, beakerMeniscusY, comparePlaceCols, jumpTickLabel, moneyBox, rulerPointerX, scaleNeedleDeg, type BoardProps } from "./models";
+import { BEAKER_FACE, Board, beakerMeniscusY, comparePlaceCols, jumpTickLabel, moneyBox, placeChartGlyphs, rulerPointerX, scaleNeedleDeg, type BoardProps } from "./models";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -221,8 +221,30 @@ describe("boards", () => {
     expect(src).toContain("onClick={takeGroup}");
     expect(src).toContain("grid-cols-5");
     expect(src).toContain("isolate={knownGone}");
+    expect(src).toContain("hole={knownGone}");
+    expect(src).not.toContain("knownGone && !tenFrame");
     expect(src).toContain("data-leftover-compact");
     expect(src).toContain("leftover-n");
+  });
+
+  it("after leftover take, empty holes stay in the original frame", () => {
+    const q: Question = {
+      id: "q-2n8",
+      kind: "tenframe",
+      input: "keypad",
+      prompt: "2 + n = 8",
+      hint: "Tap the dots you can see. Then name n.",
+      answer: "6",
+      needsInteract: true,
+      data: { total: 8, shown: 2, equation: "2 + n = 8" },
+    };
+    const html = renderToStaticMarkup(<Board {...stub(q)} status="correct" interacted />);
+    expect(html).toContain("data-known-group");
+    expect((html.match(/aria-label="empty"/g) ?? []).length).toBe(2);
+    expect((html.match(/aria-label="leftover"/g) ?? []).length).toBe(6);
+    expect(html).toContain("leftover-hole");
+    expect(html).toContain("grid-cols-5");
+    expect(html).not.toContain("take-out");
   });
 
   it("18 − n = 10 still has a takeable known group and four leftover rows", () => {
@@ -231,7 +253,7 @@ describe("boards", () => {
       kind: "tenframe",
       input: "keypad",
       prompt: "18 − n = 10",
-      hint: "Take the dots you can see. Then name n.",
+      hint: "Tap the dots you can see. Then name n.",
       answer: "8",
       needsInteract: true,
       data: { total: 18, shown: 10, equation: "18 − n = 10" },
@@ -447,10 +469,31 @@ describe("boards", () => {
     const q = makeQuestion(activityById("u3-factor")!.activity, rngFromSeed("factor:groups"));
     const d = q.data as GroupsData;
     expect(d.hide).toBe("groups");
+    expect(Number(q.answer)).toBe(d.groups);
     expect(q.needsInteract).toBeFalsy();
     const html = renderToStaticMarkup(<Board {...stub(q)} />);
     expect(html).toContain("<button");
-    expect(html).toContain("Tap a group to isolate it, then name n.");
+    expect((html.match(/data-equal-group/g) ?? []).length).toBe(d.groups);
+    expect((html.match(/data-group-tally/g) ?? []).length).toBe(d.groups);
+    expect(html).toContain("Count them all.");
+    expect(html).not.toContain("Tap a group to isolate it, then name n.");
+  });
+
+  it("place-value chart keeps the comma the prompt used", () => {
+    expect(placeChartGlyphs("486073").join("")).toBe("486,073");
+    expect(placeChartGlyphs("67576").join("")).toBe("67,576");
+    const q: Question = {
+      id: "q-place-comma",
+      kind: "placevalue",
+      input: "keypad",
+      prompt: "In 486,073, what is the value of the 8 in the ten thousands?",
+      answer: "80000",
+      data: { number: 486073, digit: 8, place: "ten thousands", mode: "value" },
+    };
+    const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(html).toContain("data-place-chart");
+    expect(html.replace(/<[^>]+>/g, "")).toContain("486,073");
+    expect(html.replace(/<[^>]+>/g, "")).not.toContain("486073");
   });
 
   it("fluency 40 ÷ 4 groups are tappable tallies and do not gate Check", () => {

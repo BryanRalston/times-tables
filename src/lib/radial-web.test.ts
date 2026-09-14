@@ -3,6 +3,7 @@ import { UNITS } from "./curriculum";
 import {
   HOP_DIR_SNAP_DEG,
   HOPPER_ART_ZOOM_PCT,
+  HOP_HIT_MIN_PX,
   HOPPER_BOARD_WIDTH_PCT,
   HOPPER_SIT_TRANSLATE,
   HOP_GLOW_BOARD_WIDTH_PCT,
@@ -412,6 +413,7 @@ describe("radial hop hit testing", () => {
     expect(glow + 5).toBeLessThan(gap);
     expect(HOPPER_BOARD_WIDTH_PCT).toBe(3.2);
     expect(HOP_GLOW_BOARD_WIDTH_PCT).toBe(2.2);
+    expect(HOP_HIT_MIN_PX).toBe(44);
     expect(adjacentPadIds(START_PAD)).toHaveLength(8);
     const phoneGap = minAdjacentGapPx(START_PAD, PHONE_MAP_BOARD);
     expect(hopperBoardPx(PHONE_MAP_BOARD)).toBeLessThan(phoneGap);

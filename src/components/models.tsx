@@ -45,6 +45,25 @@ import type {
 
 import { cn, moneyFmt, pad2 } from "@/lib/utils";
 
+/** Digit string with US grouping commas so the chart matches the prompt. */
+export function placeChartGlyphs(digits: string): string[] {
+  const out: string[] = [];
+  const len = digits.length;
+  for (let i = 0; i < len; i++) {
+    if (i > 0 && (len - i) % 3 === 0) out.push(",");
+    out.push(digits[i]!);
+  }
+  return out;
+}
+
+function glyphDigitIndex(glyphs: string[], glyphIndex: number): number {
+  let n = 0;
+  for (let i = 0; i <= glyphIndex; i++) {
+    if (glyphs[i] !== ",") n += 1;
+  }
+  return n - 1;
+}
+
 export interface BoardProps {
   question: Question;
   value: string;
@@ -158,6 +177,7 @@ function Dot({
   gone,
   leftover,
   isolate,
+  hole,
   onClick,
   onPointerDown,
   className: extra,
@@ -166,6 +186,7 @@ function Dot({
   gone?: boolean;
   leftover?: boolean;
   isolate?: boolean;
+  hole?: boolean;
   onClick?: () => void;
   onPointerDown?: (e: { clientX: number; clientY: number; pointerId: number; button: number }) => void;
   className?: string;
@@ -173,13 +194,14 @@ function Dot({
   const className = cn(
     "leftover-dot size-11 min-h-11 min-w-11 rounded-full border-2 sm:size-12",
     extra,
-    filled && !gone && "border-teal bg-teal token-glow",
-    (!filled || gone) && "border-[#c47a92] bg-transparent",
+    filled && !gone && !hole && "border-teal bg-teal token-glow",
+    (!filled || gone || hole) && "border-[#c47a92] bg-transparent",
     leftover && isolate && "border-dashed border-star bg-star-soft",
+    hole && "leftover-hole",
     gone && "take-out",
-    onClick && filled && !gone && "known-glow",
+    onClick && filled && !gone && !hole && "known-glow",
   );
-  if (filled && !gone && onClick) {
+  if (filled && !gone && !hole && onClick) {
     return (
       <button
         type="button"
@@ -194,8 +216,8 @@ function Dot({
   return (
     <span
       className={className}
-      aria-hidden={!leftover}
-      aria-label={leftover ? "leftover" : undefined}
+      aria-hidden={!leftover && !hole}
+      aria-label={leftover ? "leftover" : hole ? "empty" : undefined}
     />
   );
 }
@@ -275,7 +297,7 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
               key={r}
               className="leftover-row grid grid-cols-5 items-center justify-items-center"
             >
-              {known.length && !(knownGone && !tenFrame) ? (
+              {known.length ? (
                 <div
                   data-known-group=""
                   role="group"
@@ -288,7 +310,7 @@ function TenFrame({ question, onInteract, status, shake }: BoardProps) {
                     <Dot
                       key={i}
                       filled={!knownGone}
-                      gone={knownGone && tenFrame}
+                      hole={knownGone}
                       onClick={takeGroup}
                       onPointerDown={bindTake}
                     />
@@ -327,8 +349,15 @@ function Groups({ question, onInteract, status, shake }: BoardProps) {
   const groups = data.hide === "product" ? Math.max(0, data.groups) : Math.max(1, data.groups);
   const size = Math.max(0, data.size);
 
-  if (data.hide === "product") {
-    const why = groups === 0 ? copy.zeroGroupsWhy : size === 0 ? copy.emptyEachWhy(groups) : undefined;
+  if (data.hide === "product" || data.hide === "groups") {
+    const why =
+      data.hide === "groups"
+        ? ui.countThemAll
+        : groups === 0
+          ? copy.zeroGroupsWhy
+          : size === 0
+            ? copy.emptyEachWhy(groups)
+            : undefined;
     return <TallyGroups groups={groups} size={size} prompt={data.equation} why={why} status={status} shake={shake} />;
   }
 
@@ -570,14 +599,21 @@ function PlaceValue({ question, status, shake }: BoardProps) {
     return { ch, placeEn: enPlaces[fromRight] ?? "ones", label: locLabels[fromRight] ?? "" };
   });
   const found = status === "correct";
+  const glyphs = placeChartGlyphs(s);
   return (
     <Frame shake={shake} status={status}>
-      <p className="mb-3 text-center font-display text-3xl tabular-nums sm:text-4xl">
-        {cols.map((col, i) => (
-          <span key={i} className={cn("px-0.5", found && col.placeEn === data.place && "text-teal underline")}>
-            {col.ch}
-          </span>
-        ))}
+      <p className="mb-3 text-center font-display text-3xl tabular-nums sm:text-4xl" data-place-chart="">
+        {glyphs.map((ch, i) => {
+          const digitIdx = ch === "," ? -1 : glyphDigitIndex(glyphs, i);
+          return (
+            <span
+              key={i}
+              className={cn("px-0.5", ch !== "," && found && cols[digitIdx]?.placeEn === data.place && "text-teal underline")}
+            >
+              {ch}
+            </span>
+          );
+        })}
       </p>
       <div
         className={cn(

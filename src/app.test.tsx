@@ -411,6 +411,7 @@ describe("first-visit Home door", () => {
     expect(play).toContain("data-play-page");
     expect(play).toContain("data-play-keys");
     expect(play).toContain("data-play-progress");
+    expect(play).toContain("data-leftover-next");
     expect(play).toContain("data-play-stage");
     expect(play).toContain("AppTabs");
     expect(play).toContain("REVEAL_AFTER_MISSES");
@@ -504,6 +505,9 @@ describe("first-visit Home door", () => {
     expect(css).not.toContain(".candy-dpad-chevron");
     expect(css).toContain(".candy-node-choice");
     expect(css).toContain("width: var(--hop-tile, 3.2%)");
+    expect(css).toContain("min-width: 44px");
+    expect(css).toContain("[data-leftover-board] .leftover-hole");
+    expect(css).toContain("[data-cosmetic-card].shelf-slot");
     expect(css).toContain("width: var(--hop-art-zoom, 140%)");
     expect(css).toContain(".candy-hopper-fit");
     expect(css).not.toContain("width: 2.5rem");

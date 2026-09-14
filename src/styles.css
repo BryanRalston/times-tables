@@ -264,6 +264,11 @@
   min-width: 36px;
   min-height: 36px;
 }
+[data-leftover-board] .leftover-hole {
+  border-color: #c47a92;
+  background: transparent;
+  opacity: 1;
+}
 [data-leftover-board] .leftover-n {
   border-width: 3px;
   border-color: #c47a92;
@@ -894,8 +899,13 @@ details > summary::-webkit-details-marker {
   background: #0e8a86;
   color: #f4fffe;
 }
+[data-cosmetic-card].shelf-slot {
+  background: transparent;
+  border-color: rgb(255 255 255 / 0.2);
+}
 [data-cosmetic-card] img {
   mix-blend-mode: multiply;
+  background: transparent;
 }
 .dressed-squishee {
   display: block;
@@ -1268,6 +1278,11 @@ details > summary::-webkit-details-marker {
 }
 .candy-node-radial {
   width: var(--hop-tile, 3.2%);
+}
+.candy-node-radial.candy-node-choice,
+.candy-node-radial.candy-node-enterable {
+  min-width: 44px;
+  min-height: 44px;
 }
 .candy-node-radial .candy-node-disc {
   width: var(--hop-glow-fill, 69%);
