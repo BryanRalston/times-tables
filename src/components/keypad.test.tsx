@@ -191,6 +191,23 @@ describe("answer panel keypad", () => {
     expect(emptyBill).not.toContain("$?");
   });
 
+  it("coin count Check waits until the tray is done", () => {
+    const q = makeQuestion(activityById("u1-coins")!.activity, rngFromSeed("coins:gate"));
+    expect(q.needsInteract).toBe(true);
+    expect(interactGatesSubmit(q.kind, q.needsInteract)).toBe(true);
+    const gated = renderToStaticMarkup(
+      <AnswerPanel question={q} value="89" setValue={() => undefined} onCheck={() => undefined} checkDisabled />,
+    );
+    expect(gated).toContain("data-keypad");
+    expect(gated).toContain("Your answer");
+    expect(gated).toMatch(/check-loud[^>]*disabled/);
+    expect(gated).not.toMatch(/aria-label="8"[^>]*disabled/);
+    const ready = renderToStaticMarkup(
+      <AnswerPanel question={q} value="89" setValue={() => undefined} onCheck={() => undefined} />,
+    );
+    expect(ready).not.toMatch(/check-loud[^>]*disabled/);
+  });
+
   it("missing-side perimeter digits stay enabled before any board tap", () => {
     const q = makeQuestion(activityById("u8-missing")!.activity, rngFromSeed("peri:keys"));
     expect(q.needsInteract).toBe(true);

@@ -555,7 +555,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -566,7 +566,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -577,7 +577,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -588,7 +588,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -599,7 +599,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -610,7 +610,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -621,7 +621,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -632,7 +632,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -643,7 +643,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -654,7 +654,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -665,7 +665,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -676,7 +676,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -687,7 +687,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -698,7 +698,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -709,7 +709,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -720,7 +720,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -731,7 +731,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -742,7 +742,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -753,7 +753,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -764,7 +764,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     }
   ],
   "u1-tally": [
@@ -13168,7 +13168,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13179,7 +13179,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13190,7 +13190,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13201,7 +13201,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13212,7 +13212,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13223,7 +13223,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13234,7 +13234,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13245,7 +13245,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13256,7 +13256,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13267,7 +13267,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13278,7 +13278,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13289,7 +13289,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13300,7 +13300,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13311,7 +13311,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13322,7 +13322,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13333,7 +13333,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How many cents?",
@@ -13344,7 +13344,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13355,7 +13355,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13366,7 +13366,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     },
     {
       "prompt": "How much money?",
@@ -13377,7 +13377,7 @@
       "choices": null,
       "kind": "money",
       "input": "keypad",
-      "needsInteract": false
+      "needsInteract": true
     }
   ],
   "u11-compare": [

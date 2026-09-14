@@ -11,12 +11,14 @@ export function AnswerPanel({
   setValue,
   onCheck,
   disabled,
+  checkDisabled,
 }: {
   question: Question;
   value: string;
   setValue: (v: string) => void;
   onCheck: (override?: string) => void;
   disabled?: boolean;
+  checkDisabled?: boolean;
 }) {
   const ui = UI[parseLocale(useProgress((s) => s.locale))];
   if (question.input === "choice") {
@@ -63,6 +65,7 @@ export function AnswerPanel({
       onChange={setValue}
       onCheck={() => onCheck()}
       disabled={disabled}
+      checkDisabled={checkDisabled}
       replace={leftover}
       docked
       allowDot={keypadAllowsDot(question)}

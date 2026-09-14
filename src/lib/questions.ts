@@ -736,6 +736,7 @@ function moneyQ(rng: Rng, params: Record<string, unknown> = {}): Question {
     hint: hasBill ? t().tapMoneyIn : t().tapCoinsIn,
     answer: hasBill ? moneyFmt(purse.cents) : String(purse.cents),
     alts: [hasBill ? String(purse.cents) : moneyFmt(purse.cents)],
+    needsInteract: true,
     data: { coins: purse.coins, mode: "count" } satisfies MoneyData,
   });
 }

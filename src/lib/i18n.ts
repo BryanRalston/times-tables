@@ -161,6 +161,7 @@ export type Ui = {
   allUnits: string;
   grade3Path: string;
   hopPick: string;
+  portal: string;
   hopOne: string;
   hopCreditsN: (n: number) => string;
   rollDie: string;
@@ -363,6 +364,7 @@ export const UI: Record<Locale, Ui> = {
     allUnits: "All units",
     grade3Path: "Grade 3 Path",
     hopPick: "Pick a space",
+    portal: "Portal!",
     hopOne: "Hop one space",
     hopCreditsN: (n) => (n === 1 ? "1 hop" : `${n} hops`),
     rollDie: "Roll",
@@ -563,6 +565,7 @@ export const UI: Record<Locale, Ui> = {
     allUnits: "Todas las unidades",
     grade3Path: "Sendero de 3.º",
     hopPick: "Elige un espacio",
+    portal: "¡Portal!",
     hopOne: "Salta un espacio",
     hopCreditsN: (n) => (n === 1 ? "1 salto" : `${n} saltos`),
     rollDie: "Tirar",
@@ -763,6 +766,7 @@ export const UI: Record<Locale, Ui> = {
     allUnits: "Todas as unidades",
     grade3Path: "Trilha do 3.º ano",
     hopPick: "Escolha um espaço",
+    portal: "Portal!",
     hopOne: "Pule um espaço",
     hopCreditsN: (n) => (n === 1 ? "1 pulo" : `${n} pulos`),
     rollDie: "Lançar",

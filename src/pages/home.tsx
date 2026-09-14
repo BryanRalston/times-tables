@@ -56,7 +56,7 @@ export function HomePage() {
           <p className="mt-1 text-sm font-semibold text-muted" data-walk-cards={String(walk.items.length)}>
             {unitShort} · {ui.walkCards(walk.items.length, walk.fresh, walk.review)}
           </p>
-          <p className="sr-only">{ui.newReview(walk.fresh, walk.review, remain)}</p>
+          <p className="sr-only">{ui.schoolDaysLeft(remain)}</p>
           <button
             type="button"
             className="start-loud"

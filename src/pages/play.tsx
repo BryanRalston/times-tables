@@ -451,6 +451,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
 
   const leftover = q.kind === "tenframe";
   const leftoverReveal = leftover && reveal;
+  const moneyWait = q.kind === "money" && Boolean(interactGatesSubmit(q.kind, q.needsInteract) && !interacted);
   const gate = { kind: q.kind, needsInteract: q.needsInteract, interacted, status };
   const showPanel = leftoverReveal ? false : leftoverPanelOpen(gate);
   const showSkip = leftoverReveal ? false : leftoverSkipOpen(gate);
@@ -466,7 +467,7 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
         status: pose === "oops" ? "wrong" : status,
         reveal,
       })
-    : status === "wrong" || pose === "oops" || reveal;
+    : moneyWait || status === "wrong" || pose === "oops" || reveal;
   const shownAnswer =
     reveal && !leftover ? (
       <p className="mt-2 text-center text-sm text-good" data-show-correct="1">
@@ -501,7 +502,8 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
       value={value}
       setValue={setValue}
       onCheck={check}
-      disabled={status !== "idle" || Boolean(interactGatesSubmit(q.kind, q.needsInteract) && !interacted)}
+      disabled={status !== "idle"}
+      checkDisabled={status !== "idle" || Boolean(interactGatesSubmit(q.kind, q.needsInteract) && !interacted)}
     />
   ) : null;
 

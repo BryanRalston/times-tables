@@ -184,6 +184,7 @@ describe("answers", () => {
     expect(pandaLine(leftover, "en", "idle")).toBe("Tap the dots you can see. Then name n.");
     expect(UI.en.takeWhatYouSee).toBe("Tap the dots you can see.");
     expect(UI.en.next).toBe("Next");
+    expect(UI.en.portal).toBe("Portal!");
     expect(qCopy("en").leftoverHint).toBe("Tap the dots you can see. Then name n.");
     expect(pandaLine(leftover, "en", "idle", true)).toBe(UI.en.leftoverTypeN);
     expect(pandaLine(leftover, "en", "idle", true)).not.toMatch(/n is leftover/i);

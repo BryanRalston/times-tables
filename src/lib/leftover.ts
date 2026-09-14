@@ -12,13 +12,13 @@ export function leftoverWhyMoveMs(): number {
 }
 
 /**
- * Only leftover take-out and graph-collect why-moves may gate Check.
- * Numeric boards (perimeter, area, money, fraction leftover, …) stay usable.
+ * Leftover take-out, graph-collect, and coin-count trays may gate Check.
+ * Perimeter / area / fraction / compute stay typeable without a why-move.
  * Group / fluency tallies never gate.
  */
 export function interactGatesSubmit(kind: string, needsInteract?: boolean): boolean {
   if (!needsInteract) return false;
-  return kind === "tenframe" || kind === "graph";
+  return kind === "tenframe" || kind === "graph" || kind === "money";
 }
 
 export function leftoverPanelOpen(args: {

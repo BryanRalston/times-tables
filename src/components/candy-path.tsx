@@ -700,6 +700,9 @@ export const CandyPath = forwardRef<
               data-path-warp-fx="to"
               aria-hidden
             />
+            <p className="candy-portal-call" data-portal-call="1">
+              {ui.portal}
+            </p>
           </>
         ) : null}
 

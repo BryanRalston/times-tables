@@ -818,6 +818,7 @@ function assertKind(activityId: string, q: Question) {
         if (activityId === "u1-coins") {
           expect(hasBill).toBe(false);
           expect(q.prompt).toBe("How many cents?");
+          expect(q.needsInteract).toBe(true);
         }
       }
       if (d.mode === "change") expect(Number(q.answer)).toBe((d.pay ?? 0) - (d.cost ?? 0));

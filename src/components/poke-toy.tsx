@@ -30,7 +30,7 @@ export function SquashOnPoke({
   return (
     <span
       data-squash={active ? "1" : "0"}
-      className={cn("block overflow-visible", active && "squash", className)}
+      className={cn("block overflow-visible", active && "squash poke-bounce", className)}
       onAnimationEnd={(e: AnimationEvent<HTMLSpanElement>) => {
         if (e.animationName === "squash") onRest?.();
         if (e.animationName === "unlock-pop") onPopEnd?.();
@@ -177,6 +177,7 @@ export function PokeToy({
       )}
       aria-label={s ? `Poke ${s.name}` : "Poke"}
       data-owned-poke="1"
+      data-poke-bounce={poking && !cheer ? "1" : "0"}
       data-dressed={id}
       data-cosmetic={fitted ? wear : undefined}
       onClick={() => {

@@ -255,6 +255,10 @@ describe("CandyPath", () => {
     expect(html).not.toContain("data-portal-to");
     expect(html).toContain('data-path-warp="0"');
     expect(html).not.toContain("data-path-warp-fx");
+    expect(html).not.toContain("data-portal-call");
+    const src = readFileSync(join(HERE, "candy-path.tsx"), "utf8");
+    expect(src).toContain("data-portal-call");
+    expect(src).toContain("ui.portal");
   });
 
   it("never starts a multi-pad travel even if standTo is far away", () => {

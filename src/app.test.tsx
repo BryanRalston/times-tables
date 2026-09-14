@@ -75,6 +75,7 @@ function expectHomeShell(html: string) {
   expect(html).not.toContain("School-day streak");
   expect(html).not.toContain("1/20");
   expect(html).toMatch(/\d+ cards · \d+ new · \d+ review/);
+  expect((html.match(/\d+ new · \d+ review/g) ?? []).length).toBe(1);
   expect(html).toContain("data-walk-cards");
 }
 
@@ -507,6 +508,9 @@ describe("first-visit Home door", () => {
     expect(css).toContain("width: var(--hop-tile, 3.2%)");
     expect(css).toContain("min-width: 44px");
     expect(css).toContain("[data-leftover-board] .leftover-hole");
+    expect(css).toContain("@keyframes poke-bounce");
+    expect(css).toContain(".candy-portal-call");
+    expect(css).toContain("height: 2.2rem");
     expect(css).toContain("[data-cosmetic-card].shelf-slot");
     expect(css).toContain("width: var(--hop-art-zoom, 140%)");
     expect(css).toContain(".candy-hopper-fit");

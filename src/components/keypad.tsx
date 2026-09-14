@@ -69,6 +69,7 @@ export function Keypad({
   onChange,
   onCheck,
   disabled,
+  checkDisabled,
   replace,
   allowDot = true,
   quiet,
@@ -80,6 +81,7 @@ export function Keypad({
   onChange: (v: string) => void;
   onCheck: () => void;
   disabled?: boolean;
+  checkDisabled?: boolean;
   replace?: boolean;
   allowDot?: boolean;
   quiet?: boolean;
@@ -133,11 +135,11 @@ export function Keypad({
             size="lg"
             onPointerDown={(e) => {
               if (e.button !== 0) return;
-              if (disabled || value.length === 0) return;
+              if (disabled || checkDisabled || value.length === 0) return;
               onCheck();
             }}
             onClick={onCheck}
-            disabled={disabled || value.length === 0}
+            disabled={disabled || checkDisabled || value.length === 0}
           >
             {ui.check}
           </Button>
@@ -176,11 +178,11 @@ export function Keypad({
           size="lg"
           onPointerDown={(e) => {
             if (e.button !== 0) return;
-            if (disabled || value.length === 0) return;
+            if (disabled || checkDisabled || value.length === 0) return;
             onCheck();
           }}
           onClick={onCheck}
-          disabled={disabled || value.length === 0}
+          disabled={disabled || checkDisabled || value.length === 0}
         >
           {ui.check}
         </Button>

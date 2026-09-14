@@ -87,12 +87,17 @@ describe("leftover why-move gates", () => {
   });
 
   it("does not invent keypad gates on numeric boards that set needsInteract", () => {
-    for (const kind of ["perimeter", "area", "money", "fraction", "compute"] as const) {
+    for (const kind of ["perimeter", "area", "fraction", "compute"] as const) {
       const waiting = { kind, needsInteract: true, interacted: false, status: "idle" as const };
       expect(interactGatesSubmit(kind, true)).toBe(false);
       expect(leftoverPanelOpen(waiting)).toBe(true);
       expect(leftoverSkipOpen(waiting)).toBe(true);
     }
+    const coins = { kind: "money", needsInteract: true, interacted: false, status: "idle" as const };
+    expect(interactGatesSubmit("money", true)).toBe(true);
+    expect(leftoverPanelOpen(coins)).toBe(true);
+    expect(leftoverSkipOpen(coins)).toBe(false);
+    expect(leftoverSkipOpen({ ...coins, interacted: true })).toBe(true);
     const missing = makeQuestion(activityById("u8-missing")!.activity, rngFromSeed("peri:gate"));
     expect(missing.kind).toBe("perimeter");
     expect(missing.needsInteract).toBe(true);

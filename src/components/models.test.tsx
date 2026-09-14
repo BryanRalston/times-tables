@@ -48,7 +48,9 @@ describe("boards", () => {
       return n + v * (c ?? 0);
     }, 0);
     const html = renderToStaticMarkup(<Board {...stub(q)} />);
+    expect(q.needsInteract).toBe(true);
     expect(html).toContain("Count the coins");
+    expect(html).not.toContain(">Counted<");
     expect(html).toContain("money/");
     expect(html).toContain("<img");
     expect(html).not.toContain("25¢");

@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { PokeStrip, PokeToy } from "./poke-toy";
@@ -37,6 +38,9 @@ describe("PokeToy", () => {
     expect(html).toContain("overflow-visible");
     expect(html).toContain("data-squash");
     expect(html).toContain("data-owned-poke");
+    expect(html).toContain("data-poke-bounce");
+    const src = readFileSync(new URL("./poke-toy.tsx", import.meta.url), "utf8");
+    expect(src).toContain("poke-bounce");
     expect(html).not.toMatch(/<button[^>]*pointer-events-none/);
   });
 

@@ -1264,9 +1264,12 @@ function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProp
                 data-count-coin={c.id}
                 data-counted="0"
                 onClick={() => {
-                  setCounted((g) => ({ ...g, [c.key]: true }));
+                  setCounted((g) => {
+                    const next = { ...g, [c.key]: true };
+                    if (coins.every((x) => next[x.key])) onInteract();
+                    return next;
+                  });
                   playTap();
-                  onInteract();
                 }}
                 className="rounded-full bg-transparent p-0"
                 aria-label={meta.label}
@@ -1276,7 +1279,7 @@ function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProp
             );
           })}
         </div>
-        <p className="mt-2 text-center text-xs font-medium text-muted">{ui.countedTray}</p>
+        <p className="mt-2 text-center text-xs font-medium text-muted">{hasBill ? ui.countMoney : ui.countCoins}</p>
         <div
           data-count-row="pile"
           className="mt-1 flex min-h-14 flex-wrap justify-center gap-2 rounded-[16px] border border-dashed border-line bg-bg-warm p-2"
@@ -1294,7 +1297,6 @@ function MoneyBoard({ question, onInteract, status, shake, setValue }: BoardProp
             <span className="self-center text-xs text-faint">{hasBill ? ui.tapMoneyIn : ui.tapCoinsIn}</span>
           )}
         </div>
-        <p className="mt-3 text-center text-sm text-muted">{hasBill ? ui.countMoney : ui.countCoins}</p>
         <button
           type="button"
           className="mx-auto mt-2 block text-sm text-muted"
