@@ -34,8 +34,8 @@ export const RADIAL_PLAZA = { x: 49.682, y: 46.272 } as const;
  * Painted portals (inner swirl / hoop openings, mid-spoke arches, and
  * the eight rim arches) are their own hop pads, centered on the portal
  * art — not the inward cream / pink / purple neighbor. Cream mid-spoke
- * tiles 12, 27, 38, and 105 stay walkable path (no warp). Mid-N arch
- * pad 103 is hop-only — the south spoke has no painted opposite.
+ * tiles 12, 27, 38, and 105 stay walkable path (no warp). Mid-N vortex
+ * 103 warps to south-spoke counterpart 108.
  */
 type PadSpot = { x: number; y: number; ring: RadialRing; angle: number; portal?: boolean };
 
@@ -146,9 +146,8 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 26.480, y: 14.233, ring: 4, angle: 308.4, portal: true },
   // Mid-NW spoke arch. Warp (pair of mid-SE arch pad 107).
   { x: 39.140, y: 30.230, ring: 2, angle: 326.6, portal: true },
-  // Mid-N painted arch. Hoppable floor — no painted opposite on the
-  // south spoke (cream 40 / 105 / 41), so this is not a warp.
-  { x: 49.860, y: 24.220, ring: 3, angle: 0.5 },
+  // Mid-N painted vortex. Warp (pair of south-spoke counterpart 108).
+  { x: 49.860, y: 24.220, ring: 3, angle: 0.5, portal: true },
   { x: 60.480, y: 30.600, ring: 2, angle: 34.6, portal: true },
   // South-spoke cream path. No mid-S arch is painted here.
   { x: 49.850, y: 71.150, ring: 3, angle: 179.6 },
@@ -156,6 +155,10 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 38.947, y: 56.392, ring: 3, angle: 242.1, portal: true },
   // Mid-SE spoke arch. Warp (pair of mid-NW pad 102). Flag moved off cream 38.
   { x: 61.442, y: 55.056, ring: 3, angle: 112.8, portal: true },
+  // South counterpart of mid-N vortex 103. The JPEG has no mid-S swirl
+  // (cream 40 / 105 / 41 stay path). 108 is a west spur off cream 40 so
+  // the south through-path does not warp, and 103 still has an involutive pair.
+  { x: 46.40, y: 66.20, ring: 3, angle: 196.4, portal: true },
 ];
 
 function buildPads(): RadialPad[] {
@@ -221,6 +224,7 @@ const PAD_EDGES: readonly (readonly [number, number])[] = [
   [25, 102], [50, 102], [52, 102],
   [13, 104], [29, 104], [31, 104], [28, 103], [53, 103],
   [16, 107], [38, 107], [22, 106],
+  [40, 108], [19, 108],
 ];
 
 function buildEdges(): readonly (readonly [number, number])[] {
@@ -261,10 +265,11 @@ export function radialHopStops(fromId: number, toId: number): number[] {
  * Cream tiles 12 and 27 are documented mid-spoke path swirls — walkable,
  * not warps. The purple arches those pads used to sit on warp via 104
  * (mid-NE). Pad 41 is the cream south of outer-S. Cream 38 is the path
- * south of the mid-SE arch (warp is 107). Cream 105 is south-spoke path;
- * there is no painted mid-S arch, so mid-N pad 103 is hop-only.
+ * south of the mid-SE arch (warp is 107). Cream 105 is south-spoke path.
+ * Mid-N vortex 103 warps to south-spoke spur 108 (no mid-S vortex is
+ * painted; 108 is off the through-path so 40/105/41 stay ordinary hops).
  *
- * Inner N↔S, E↔W. Mid-spoke NE↔SW, SE↔NW.
+ * Inner N↔S, E↔W. Mid-spoke NE↔SW, SE↔NW. Mid-N↔south counterpart.
  * Outer N↔S, NE↔SW, E↔W, SE↔NW.
  *
  * Hardcoded so a new portal flag cannot steal a pair from nearest-angle
@@ -279,6 +284,7 @@ export const PORTAL_PAIRS: readonly (readonly [number, number])[] = [
   [98, 57],
   [99, 100],
   [69, 101],
+  [103, 108],
 ];
 
 /** Cream mid-spoke tiles beside portal arches. Walkable path, not warps. */
@@ -536,6 +542,8 @@ export function nearestHopTarget(
   }
   let bestId: number | undefined;
   let bestD = Infinity;
+  let portalId: number | undefined;
+  let portalD = Infinity;
   for (const id of candidates) {
     const p = padClientPos(id, board);
     const d = Math.hypot(clientX - p.x, clientY - p.y);
@@ -543,10 +551,22 @@ export function nearestHopTarget(
       bestD = d;
       bestId = id;
     }
+    if (radialPad(id).portal && (d < portalD || (d === portalD && id < (portalId ?? Infinity)))) {
+      portalD = d;
+      portalId = id;
+    }
   }
   if (bestId == null || bestD > snapPx) return undefined;
-  if (hereId != null && bestId === clampPad(hereId)) return undefined;
-  return choiceIds.some((id) => clampPad(id) === bestId) ? bestId : undefined;
+  const here = hereId != null ? clampPad(hereId) : undefined;
+  if (here != null && bestId === here) return undefined;
+  const prefer =
+    portalId != null &&
+    portalId !== here &&
+    portalD <= snapPx &&
+    portalD <= bestD + 10
+      ? portalId
+      : bestId;
+  return choiceIds.some((id) => clampPad(id) === prefer) ? prefer : undefined;
 }
 
 export function smallLessonsCompleted(activities: Record<string, ActivitySave>): number {

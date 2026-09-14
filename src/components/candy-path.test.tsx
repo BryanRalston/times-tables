@@ -346,6 +346,9 @@ describe("CandyPath", () => {
     expect(html).toContain(`data-hop-snap="${HOP_SNAP_PX}"`);
     expect(html).toContain(`data-hop-snap-min="${HOP_SNAP_MIN_PX}"`);
     expect((html.match(/data-pad-choice="1"/g) ?? []).length).toBe(next.length);
+    expect(next).toContain(2);
+    expect(html).toContain('data-pad-id="2"');
+    expect(html).toContain('data-pad-enterable="1"');
     expect(html).not.toContain("data-hop-dpad");
     expect(html).not.toContain("g4-");
   });

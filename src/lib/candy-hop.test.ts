@@ -41,6 +41,11 @@ describe("candy hop", () => {
     const portal = 2;
     const neighbor = adjacentPadIds(portal)[0]!;
     expect(instantHopLand(neighbor, portal)).toEqual({ pad: portal, entered: true });
+    expect(adjacentPadIds(START_PAD)).toContain(2);
+    expect(instantHopLand(START_PAD, 2)).toEqual({ pad: 2, entered: true });
+    const midN = 103;
+    const midNFrom = adjacentPadIds(midN)[0]!;
+    expect(instantHopLand(midNFrom, midN)).toEqual({ pad: midN, entered: true });
   });
 
   it("times multi-hop travel with a land settle after every hop", () => {
