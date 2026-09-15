@@ -41,6 +41,9 @@ describe("asset URLs", () => {
     expect(existsSync(join(HERE, "../../public/art/mystery-gift.png"))).toBe(true);
     expect(readFileSync(join(HERE, "../../public/art/mystery-gift.png")).subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))).toBe(true);
     expect(existsSync(join(HERE, "../../public/cosmetics/peach-party-hat.png"))).toBe(true);
+    const hat = readFileSync(join(HERE, "../../public/cosmetics/peach-party-hat.png"));
+    expect(hat.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))).toBe(true);
+    expect(hat[25]).toBe(6);
     expect(existsSync(join(HERE, "../../public/cosmetics/frog-scarf.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/cosmetics/otter-party-hat.png"))).toBe(true);
     expect(existsSync(join(HERE, "../../public/cosmetics/avocado-bow.png"))).toBe(true);

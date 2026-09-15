@@ -571,6 +571,8 @@ describe("first-visit Home door", () => {
     expect(css).toContain("animation: peek-bob 5.5s 1");
     expect(css).toContain("animation: none !important");
     expect(css).toContain(".keypad-dock");
+    expect(css).toContain("width: min(100%, 26rem)");
+    expect(css).not.toContain("minmax(17rem, 22rem)");
     expect(css).toContain(".squishee-silhouette");
     expect(css).toContain(".mini-tap");
     expect(css).toContain(".mini-hole");

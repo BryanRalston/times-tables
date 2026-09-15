@@ -7,6 +7,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1] / "public" / "squishees"
+COS = Path(__file__).resolve().parents[1] / "public" / "cosmetics"
 
 
 STRICT_FILES = {"aurora-jelly.png", "crystal-axolotl.png", "rainbow-cupcake.png", "donut.png"}
@@ -117,6 +118,63 @@ def key_image(im: Image.Image, strict: bool = False) -> Image.Image:
     return im
 
 
+def is_white(r: int, g: int, b: int) -> bool:
+    """Studio white and warm cream drop-shadow. Leaves peach/hat color."""
+    sat = max(r, g, b) - min(r, g, b)
+    luma = 0.299 * r + 0.587 * g + 0.114 * b
+    if luma >= 220 and sat <= 40:
+        return True
+    if luma >= 188 and sat <= 28:
+        return True
+    return False
+
+
+def key_white_image(im: Image.Image) -> Image.Image:
+    im = im.convert("RGBA").copy()
+    px = im.load()
+    w, h = im.size
+    seen = [[False] * h for _ in range(w)]
+    q: deque[tuple[int, int]] = deque()
+
+    def consider(x: int, y: int) -> None:
+        if x < 0 or y < 0 or x >= w or y >= h or seen[x][y]:
+            return
+        r, g, b, a = px[x, y]
+        if a < 16 or is_white(r, g, b):
+            seen[x][y] = True
+            q.append((x, y))
+
+    for x in range(w):
+        consider(x, 0)
+        consider(x, h - 1)
+    for y in range(h):
+        consider(0, y)
+        consider(w - 1, y)
+
+    while q:
+        x, y = q.popleft()
+        px[x, y] = (0, 0, 0, 0)
+        consider(x - 1, y)
+        consider(x + 1, y)
+        consider(x, y - 1)
+        consider(x, y + 1)
+
+    for _ in range(2):
+        choke: list[tuple[int, int]] = []
+        for x in range(w):
+            for y in range(h):
+                r, g, b, a = px[x, y]
+                if a < 16 or not is_white(r, g, b):
+                    continue
+                for nx, ny in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
+                    if 0 <= nx < w and 0 <= ny < h and px[nx, ny][3] < 16:
+                        choke.append((x, y))
+                        break
+        for x, y in choke:
+            px[x, y] = (0, 0, 0, 0)
+    return im
+
+
 def key_file(path: Path, strict: bool = False) -> None:
     im = key_image(Image.open(path), strict=strict)
     im.save(path, "PNG")
@@ -124,12 +182,26 @@ def key_file(path: Path, strict: bool = False) -> None:
     print(f"keyed {path.name} {w}x{h}{' strict' if strict else ''}")
 
 
+def key_white_file(path: Path) -> None:
+    im = key_white_image(Image.open(path))
+    im.save(path, "PNG", optimize=True, compress_level=9)
+    w, h = im.size
+    print(f"white-keyed {path.name} {w}x{h}")
+
+
 def main() -> None:
     import sys
 
     args = [a for a in sys.argv[1:] if not a.startswith("-")]
     force_strict = "--strict" in sys.argv[1:]
+    cosmetics = "--cosmetics" in sys.argv[1:]
     files = []
+    if cosmetics and not args:
+        files = sorted(COS.glob("*.png"))
+        for path in files:
+            if path.exists():
+                key_white_file(path)
+        return
     if args:
         for n in args:
             p = Path(n)
@@ -140,7 +212,10 @@ def main() -> None:
     for path in files:
         if path.name in skip or not path.exists():
             continue
-        key_file(path, strict=force_strict or path.name in STRICT_FILES)
+        if path.parent == COS or cosmetics:
+            key_white_file(path)
+        else:
+            key_file(path, strict=force_strict or path.name in STRICT_FILES)
 
 
 if __name__ == "__main__":

@@ -2449,38 +2449,22 @@ details > summary::-webkit-details-marker {
     margin-right: auto;
   }
   [data-play-page] {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(17rem, 22rem);
-    grid-template-rows: auto auto minmax(0, 1fr);
     min-height: 0;
     flex: 1;
   }
-  [data-play-page] .play-head {
-    grid-column: 1 / -1;
-    grid-row: 1;
-  }
-  [data-play-page] .play-meter {
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
   [data-play-stage] {
-    grid-column: 1;
-    grid-row: 3;
-    min-height: 0;
-  }
-  [data-play-page]:not(:has([data-play-keys])) [data-play-stage] {
-    grid-column: 1 / -1;
+    flex: 0 1 auto;
   }
   [data-play-keys] {
-    grid-column: 2;
-    grid-row: 3;
-    margin-top: 0;
-    align-self: stretch;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    border-radius: 28px 0 0 0;
-    max-height: 100%;
+    width: min(100%, 26rem);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0.35rem;
+    border-radius: 28px;
+    align-self: center;
+  }
+  .keypad-dock {
+    margin-top: 0.35rem;
   }
   .plank-rail {
     overflow-x: visible;
