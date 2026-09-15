@@ -39,9 +39,11 @@ The old single-file leftover page lives in `legacy/`.
 
 ## Play
 
-1. First visit: **Home** — today's walk Start, quiet All units, bottom tabs. Leftover `6 + n = 10` is a playable board from Start / Lessons, not a first-visit trap.
-2. **Lessons** lists every unit. Calendar marks **Now**. It does not lock.
-3. **Start today's walk** — 8–12 new plus 3–5 review. Grown-ups set **class is on unit N** to change that suggestion only.
+1. First visit: **Home** — name, pick Peach / Frog / Cat, then today's walk. Leftover `What's hiding` is a lesson, not a first-visit trap.
+2. **Lessons** is the candy map. Calendar marks **Now**. Units never lock.
+3. **Start today's walk** — mixed cards from the calendar unit (or the class unit Grown-ups set).
 4. Sort pictures, then read the graph you made. Take leftover dots you can see. Check is gated until that work is done.
+
+Feature map: [`docs/FEATURE-MAP.md`](docs/FEATURE-MAP.md).
 
 Progress stays on this device.
