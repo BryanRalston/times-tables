@@ -47,20 +47,12 @@ function stubViewport(width: number) {
 
 function expectHomeShell(html: string) {
   expect(html).toContain("Squishee Math");
-  expect(html).toMatch(/Today(?:'|&#x27;)s walk/);
-  expect(html).toContain("Start");
-  expect(html).toContain("All units");
   expect(html).toContain("Home, lessons, and shelf");
   expect(html).toContain("data-continue-card");
-  expect(html).toContain("data-continue-peek");
-  expect(html).toContain('data-peek-id="peach"');
-  expect(html).toContain('data-peek-slot="center"');
-  expect(html).toContain('data-peek-roster="1"');
-  expect(html).toContain("data-walk-mark");
+  expect(html).toContain("data-setup-name");
   expect(html).toContain("data-scene-land");
   expect(html).toContain("peach.png");
   expect(html).not.toContain("home-peek.png");
-  expect(html).not.toMatch(/avocado\.png|mushroom\.png/);
   expect(html).not.toContain("data-grade-path");
   expect(html).not.toContain("Ten-Frame Meadow");
   expect(html).toContain("data-app-shell");
@@ -74,9 +66,8 @@ function expectHomeShell(html: string) {
   expect(html).not.toMatch(/Score\s*\/\s*Streak/);
   expect(html).not.toContain("School-day streak");
   expect(html).not.toContain("1/20");
-  expect(html).toMatch(/\d+ cards · \d+ new · \d+ review/);
-  expect((html.match(/\d+ new · \d+ review/g) ?? []).length).toBe(1);
-  expect(html).toContain("data-walk-cards");
+  expect(html).not.toContain("All units");
+  expect(html).not.toContain("data-home-ready");
 }
 
 function expectLessonsPath(html: string) {
@@ -85,7 +76,7 @@ function expectLessonsPath(html: string) {
     expect(html).toContain("data-grade-path");
     expect(html).toContain("data-radial-web");
     expect(html).toContain("data-radial-fill");
-  expect(html).toContain("Grade 3 Path");
+  expect(html).toContain("Finish a walk to roll");
   expect(html).toContain("candy-zones/radial-web-locked.jpg");
   expect(html).toContain('data-path-hopper="peach"');
   expect(html).toContain('data-path-unit="u1"');
@@ -275,7 +266,7 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-pad-choice="1"');
     expect(html).toContain("candy-node-choice");
     expect(html).not.toContain("data-hop-dpad");
-    expect(html).toContain("Start");
+    expect(html).not.toContain('data-dock-start="1"');
     expect(html).not.toContain("Roll the die");
   });
 
@@ -298,7 +289,7 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-pad-choice="1"');
     expect(html).toContain("candy-node-choice");
     expect(html).not.toContain("data-hop-dpad");
-    expect(html).toContain("Start");
+    expect(html).not.toContain('data-dock-start="1"');
     expect(html).not.toContain("Roll the die");
     expect(html).not.toContain("data-test-mode-toggle");
   });
@@ -326,7 +317,7 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-hop-credits="0"');
     expect(html).toContain('data-hop-pick="0"');
     expect(html).toContain('data-dice-invite="0"');
-    expect(html).toContain("Grade 3 Path");
+    expect(html).toContain("Finish a walk to roll");
     expect(html).not.toContain("Pick a space");
     expect(html).not.toContain("Roll the die");
     expect(html).not.toContain('data-pad-choice="1"');
@@ -384,7 +375,16 @@ describe("first-visit Home door", () => {
 
   it("return visits keep Home as one Continue card, not leftover or Score/Streak", () => {
     expect(doorRoute(true, { id: "home" })).toEqual({ id: "home" });
-    expectHomeShell(renderToStaticMarkup(<HomePage />));
+    expect(useProgress.getState().completeSetup("Maya", "peach")).toBe(true);
+    expect(useProgress.getState().setupDone).toBe(true);
+    stubHash("#/");
+    const html = renderToStaticMarkup(<App />);
+    expect(html).toContain("data-home-ready");
+    expect(html).toContain("Start");
+    expect(html).toContain("data-walk-cards");
+    expect(html).not.toContain("All units");
+    expect(html).not.toContain("data-welcome-leftover");
+    expect(html).not.toContain(">Score<");
   });
 
   it("Home is the door; leftover kiosk is gone; Play keeps tabs", () => {
@@ -392,11 +392,11 @@ describe("first-visit Home door", () => {
     expect(src).not.toContain("playLeftover");
     expect(src).not.toContain('kind: "welcome"');
     expect(src).toContain("ui.start");
-    expect(src).toContain("allUnits");
+    expect(src).toContain("completeSetup");
+    expect(src).not.toContain("allUnits");
     expect(src).not.toContain("CandyPath");
     expect(src).not.toContain("YearPath");
     expect(src).not.toContain("year-beads");
-    expect(src).not.toContain("peach");
     expect(src).not.toContain("avocado");
     expect(src).not.toContain("mushroom");
     const app = readFileSync(join(HERE, "app.tsx"), "utf8");
@@ -482,6 +482,7 @@ describe("first-visit Home door", () => {
     expect(css).toContain("--map-scale");
     expect(css).toContain("@media (max-width: 767px)");
     expect(css).not.toContain("flex: 0 0 auto");
+    expect(css).toContain("flex: none");
     expect(css).toContain("max-width: min(100%, 68rem)");
     expect(css).not.toContain(".app-scene:has([data-lessons-path]) .app-phone");
     expect(css).toMatch(

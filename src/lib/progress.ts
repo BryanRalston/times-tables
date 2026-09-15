@@ -18,7 +18,7 @@ import {
   SEED_PRESENT_PADS,
   type LandedPresent,
 } from "./presents";
-import { parseHopperId } from "./squishees";
+import { isStarterSquishee, parseHopperId } from "./squishees";
 import { GRADE4_SPANS, UNIT_SPANS, UNITS, unitById, unitsFor } from "./curriculum";
 import {
   RADIAL_PAD_COUNT,
@@ -55,7 +55,7 @@ import { parseTestMode } from "./test-mode";
 import type { ActivitySave, DaySession, LearnerSlice, Locale, PathGrade, SaveState } from "./types";
 import { parsePathGrade } from "./types";
 
-const SAVE_VERSION = 16;
+const SAVE_VERSION = 17;
 export const STORAGE_KEY = "g3-path-v2";
 export const LEGACY_STORAGE_KEYS = ["g3-path-v1", "times-tables-progress", "times-tables-settings"] as const;
 const DEFAULT_ID = "kid-1";
@@ -128,11 +128,12 @@ export function emptyLearner(name = ""): LearnerSlice {
     name,
     stars: 0,
     seenWelcome: false,
+    setupDone: false,
     activities: {},
     badges: [],
     shaky: {},
     sessions: {},
-    squishees: ["peach"],
+    squishees: [],
     coins: 0,
     attempts: {},
     perfectWalks: 0,
@@ -159,6 +160,7 @@ function sliceOf(s: LearnerSlice): LearnerSlice {
     name: s.name,
     stars: s.stars,
     seenWelcome: s.seenWelcome,
+    setupDone: Boolean(s.setupDone),
     activities: s.activities,
     badges: s.badges,
     shaky: s.shaky,
@@ -244,19 +246,38 @@ function sliceOfWithHopHeal(s: LearnerSlice, saveVersion: number): LearnerSlice 
     pathStepsLeft,
     saveVersion,
   });
+  let setupDone = next.setupDone;
+  let squishees = next.squishees;
+  let hopperId = next.hopperId;
+  if (saveVersion < 17) {
+    const returning =
+      squishees.length > 0 ||
+      next.coins > 0 ||
+      Object.keys(next.activities).length > 0 ||
+      next.pathHopperAt > 0 ||
+      Boolean(hopperId);
+    if (returning) {
+      setupDone = true;
+      if (!squishees.includes("peach")) squishees = ["peach", ...squishees];
+      if (!hopperId) hopperId = parseHopperId("peach", squishees);
+    }
+  }
   return {
     ...next,
+    setupDone,
+    squishees,
+    hopperId,
     pathHopSpent: turn.pathHopSpent,
     pathStepsLeft: turn.pathStepsLeft,
-    openedPresents: healOpenedPresents(next.squishees, s.openedPresents, saveVersion),
+    openedPresents: healOpenedPresents(squishees, s.openedPresents, saveVersion),
     livePresentPads: healLivePresentPads({
-      owned: next.squishees,
+      owned: squishees,
       rawLive: s.livePresentPads,
       rawOpened: s.openedPresents,
       saveVersion,
       hopperAt: next.pathHopperAt,
     }),
-    presentGrantedIds: healPresentGrantedIds(next.squishees, s.presentGrantedIds),
+    presentGrantedIds: healPresentGrantedIds(squishees, s.presentGrantedIds),
     pathGiftRolls: clampGiftRolls(s.pathGiftRolls),
   };
 }
@@ -287,6 +308,7 @@ function migrate(raw: Partial<SaveState> | null | undefined): SaveState {
       name: raw.name ?? "",
       stars: typeof raw.stars === "number" ? raw.stars : 0,
       seenWelcome: Boolean(raw.seenWelcome),
+      setupDone: Boolean(raw.setupDone),
       activities: raw.activities ?? {},
       badges: raw.badges ?? [],
       shaky: raw.shaky ?? {},
@@ -360,6 +382,7 @@ interface ProgressApi extends SaveState {
   setHydrated: (v: boolean) => void;
   setName: (name: string) => void;
   markWelcome: () => void;
+  completeSetup: (name: string, starterId: string) => boolean;
   setClassUnit: (id: string) => void;
   setPathHopperAt: (n: number) => void;
   setPathNowSeen: (n: number) => void;
@@ -403,6 +426,7 @@ function snapshotSave(s: SaveState): SaveState {
     name: s.name,
     stars: s.stars,
     seenWelcome: s.seenWelcome,
+    setupDone: s.setupDone,
     classUnitId: s.classUnitId,
     pathGrade: s.pathGrade,
     skipWeekend: s.skipWeekend,
@@ -473,6 +497,20 @@ export const useProgress = create<ProgressApi>()(
       setHydrated: (v) => set({ hydrated: v }),
       setName: (name) => commit(get, set, { name: name.trim().slice(0, 24) }),
       markWelcome: () => commit(get, set, { seenWelcome: true }),
+      completeSetup: (name, starterId) => {
+        if (!isStarterSquishee(starterId)) return false;
+        const n = name.trim().slice(0, 24);
+        if (!n) return false;
+        const owned = get().squishees.includes(starterId) ? get().squishees : [...get().squishees, starterId];
+        commit(get, set, {
+          name: n,
+          squishees: owned,
+          hopperId: starterId,
+          setupDone: true,
+          seenWelcome: true,
+        });
+        return true;
+      },
       setClassUnit: (id) => set({ classUnitId: id }),
       setPathHopperAt: (n) => commit(get, set, { pathHopperAt: clampPathHopperAt(n) }),
       setPathNowSeen: (n) =>

@@ -59,7 +59,7 @@ describe("radial web", () => {
     expect(RADIAL_PADS[0]!.id).toBe(START_PAD);
     expect(RADIAL_PADS.every((p) => p.id >= 1 && p.map.x > 8 && p.map.x < 92)).toBe(true);
     expect(RADIAL_PADS.filter((p) => p.ring === 0)).toHaveLength(1);
-    expect(RADIAL_PAD_COUNT).toBe(108);
+    expect(RADIAL_PAD_COUNT).toBe(107);
     expect(RADIAL_PADS.filter((p) => p.ring === 1).length).toBeGreaterThanOrEqual(8);
     expect(RADIAL_PADS.filter((p) => p.ring === 4).length).toBeGreaterThan(40);
     expect(RADIAL_EDGES.length).toBeGreaterThan(RADIAL_PAD_COUNT);
@@ -76,12 +76,14 @@ describe("radial web", () => {
     const grassNE = { x: 54.58, y: 36.8 };
     const betweenOuterTiles = { x: 59.033, y: 16.408 };
     const northGrass = { x: 48.923, y: 18.515 };
+    const southGrassSpur = { x: 46.4, y: 66.2 };
     const artDist = (a: { x: number; y: number }, b: { x: number; y: number }) =>
       Math.hypot(((a.x - b.x) / 100) * 1280, ((a.y - b.y) / 100) * 720);
     for (const pad of RADIAL_PADS) {
       expect(artDist(pad.map, grassNE)).toBeGreaterThan(10);
       expect(artDist(pad.map, betweenOuterTiles)).toBeGreaterThan(8);
       expect(artDist(pad.map, northGrass)).toBeGreaterThan(8);
+      expect(artDist(pad.map, southGrassSpur)).toBeGreaterThan(12);
     }
     const ne = RADIAL_PADS.find((p) => p.id === 3)!;
     expect(ne.map.x).toBeGreaterThan(54.9);
@@ -105,18 +107,18 @@ describe("radial web", () => {
     expect(innerW?.id).toBe(97);
     expect(innerE!.map.x).toBeGreaterThan(66);
     expect(innerW!.map.x).toBeLessThan(34);
-    expect(innerE!.map.y).toBeGreaterThan(40);
-    expect(innerE!.map.y).toBeLessThan(43);
-    expect(innerW!.map.y).toBeGreaterThan(40);
-    expect(innerW!.map.y).toBeLessThan(43);
+    expect(innerE!.map.y).toBeGreaterThan(42);
+    expect(innerE!.map.y).toBeLessThan(46);
+    expect(innerW!.map.y).toBeGreaterThan(42);
+    expect(innerW!.map.y).toBeLessThan(46);
     expect(adjacentPadIds(96)).toEqual(expect.arrayContaining([15, 34]));
     expect(adjacentPadIds(97)).toEqual(expect.arrayContaining([23, 47]));
     const midNW = RADIAL_PADS.find((p) => p.id === 102)!;
     expect(midNW.portal).toBe(true);
     expect(midNW.map.x).toBeGreaterThan(38);
     expect(midNW.map.x).toBeLessThan(41);
-    expect(midNW.map.y).toBeGreaterThan(29);
-    expect(midNW.map.y).toBeLessThan(32);
+    expect(midNW.map.y).toBeGreaterThan(30);
+    expect(midNW.map.y).toBeLessThan(34);
     expect(adjacentPadIds(102)).toEqual(expect.arrayContaining([25]));
     const midSE = RADIAL_PADS.find((p) => p.id === 107)!;
     expect(midSE.portal).toBe(true);
@@ -126,7 +128,7 @@ describe("radial web", () => {
     expect(midSE.map.y).toBeLessThan(57);
     expect(adjacentPadIds(107)).toEqual(expect.arrayContaining([16, 38]));
     expect(adjacentPadIds(103)).toEqual(expect.arrayContaining([26, 27]));
-    expect(adjacentPadIds(108)).toEqual(expect.arrayContaining([40, 19]));
+    expect(RADIAL_PADS.find((p) => p.id === 108)).toBeUndefined();
     expect(areAdjacent(37, 38)).toBe(true);
     expect(areAdjacent(37, 107)).toBe(false);
     const midSW = RADIAL_PADS.find((p) => p.id === 106)!;
@@ -137,13 +139,12 @@ describe("radial web", () => {
     expect(midSW.map.y).toBeLessThan(58);
     expect(adjacentPadIds(106)).toEqual(expect.arrayContaining([22, 43]));
     expect(areAdjacent(42, 106)).toBe(false);
-    expect(PATH_SWIRL_PADS).toEqual([12, 27]);
-    expect(PATH_ONLY_PADS).toEqual([12, 27, 38, 41, 105]);
+    expect(PATH_SWIRL_PADS).toEqual([12, 27, 103]);
+    expect(PATH_ONLY_PADS).toEqual([12, 27, 38, 41, 103, 105]);
     for (const id of PATH_ONLY_PADS) {
       expect(RADIAL_PADS.find((p) => p.id === id)?.portal).toBe(false);
     }
-    expect(RADIAL_PADS.find((p) => p.id === 103)?.portal).toBe(true);
-    expect(RADIAL_PADS.find((p) => p.id === 108)?.portal).toBe(true);
+    expect(RADIAL_PADS.find((p) => p.id === 103)?.portal).toBe(false);
     expect(RADIAL_PADS.find((p) => p.id === 12)!.map.y).toBeGreaterThan(32);
     expect(RADIAL_PADS.find((p) => p.id === 27)!.map.y).toBeLessThan(23);
     expect(areAdjacent(15, 34)).toBe(false);
@@ -174,7 +175,7 @@ describe("radial web", () => {
   });
 
   it("pairs portals as a hidden involution without self-warps", () => {
-    expect(PORTAL_PAIRS).toHaveLength(9);
+    expect(PORTAL_PAIRS).toHaveLength(8);
     const seen = new Set<number>();
     for (const [a, b] of PORTAL_PAIRS) {
       expect(a).not.toBe(b);
@@ -190,8 +191,8 @@ describe("radial web", () => {
     }
     expect(portalPartner(START_PAD)).toBeUndefined();
     const vortexes = RADIAL_PADS.filter((p) => p.portal);
-    expect(vortexes).toHaveLength(18);
-    expect(seen.size).toBe(18);
+    expect(vortexes).toHaveLength(16);
+    expect(seen.size).toBe(16);
     expect(vortexes.every((p) => portalPartner(p.id) != null)).toBe(true);
     expect(portalPartner(2)).toBe(19);
     expect(portalPartner(96)).toBe(97);
@@ -199,8 +200,7 @@ describe("radial web", () => {
     expect(portalPartner(98)).toBe(57);
     expect(portalPartner(99)).toBe(100);
     expect(portalPartner(69)).toBe(101);
-    expect(portalPartner(103)).toBe(108);
-    expect(portalPartner(108)).toBe(103);
+    expect(portalPartner(103)).toBeUndefined();
     expect(portalPartner(104)).toBe(106);
     expect(portalPartner(107)).toBe(102);
     expect(portalPartner(38)).toBeUndefined();
@@ -493,7 +493,7 @@ describe("radial hop hit testing", () => {
 
   it("never selects a quiet pad, and still warps from an adjacent portal", () => {
     const portals = RADIAL_PADS.filter((p) => p.portal);
-    expect(portals).toHaveLength(18);
+    expect(portals).toHaveLength(16);
     for (const portal of portals) {
       const neighbors = adjacentPadIds(portal.id);
       expect(neighbors.length).toBeGreaterThan(0);

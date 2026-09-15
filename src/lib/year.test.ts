@@ -453,6 +453,9 @@ describe("locale", () => {
     expect(UI.en.yourPieceBlurb.length).toBeGreaterThan(8);
     expect(UI.en.rollDie).toBe("Roll");
     expect(UI.en.rollInvite).toBe("Roll the die");
+    expect(UI.en.rollAfterWalk).toBe("Finish a walk to roll");
+    expect(UI.en.setupPick).toBe("Pick your buddy.");
+    expect(UI.en.hiName("Maya")).toBe("Hi, Maya.");
     expect(UI.en.stepsLeftN(2)).toBe("2 left");
     expect(UI.es.rollInvite).toBe("Tira el dado");
     expect(UI["pt-BR"].rollInvite).toBe("Lance o dado");

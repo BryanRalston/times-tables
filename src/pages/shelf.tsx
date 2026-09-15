@@ -210,7 +210,7 @@ export function ShopCard({
   const [justBought, setJustBought] = useState(cheer);
   const findOnly = s.rarity === "rare";
   const price = squisheePrice(s.id);
-  const ownedFace = got || s.id === "peach";
+  const ownedFace = got;
   const canBuy = !ownedFace && !findOnly && coins >= price;
   const playCheer = justBought;
   const isHopper = ownedFace && hopperId === s.id;

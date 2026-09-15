@@ -82,13 +82,13 @@ describe("migrate", () => {
         } as unknown as LearnerSlice,
       },
     });
-    expect(next.squishees).toEqual(["frog", "cat"]);
+    expect(next.squishees).toEqual(["peach", "frog", "cat"]);
     expect(next.coins).toBe(0);
-    expect(next.version).toBe(16);
+    expect(next.version).toBe(17);
     expect(next.pathHopSpent).toBe(0);
     expect(next.pathNowSeen).toBe(0);
     expect(next.pathGrade).toBe(3);
-    expect(next.learners["kid-1"]?.squishees).toEqual(["frog", "cat"]);
+    expect(next.learners["kid-1"]?.squishees).toEqual(["peach", "frog", "cat"]);
     expect(next.learners["kid-1"]?.coins).toBe(0);
   });
 });

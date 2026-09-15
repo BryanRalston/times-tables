@@ -536,7 +536,7 @@ describe("progress persist", () => {
     );
     await hydrateProgress();
     expect(useProgress.getState().openedPresents).toEqual([12, 17]);
-    expect(useProgress.getState().version).toBe(16);
+    expect(useProgress.getState().version).toBe(17);
     expect(useProgress.getState().livePresentPads).toHaveLength(4);
     expect(useProgress.getState().livePresentPads).not.toContain(17);
     const before = useProgress.getState().livePresentPads;
@@ -562,14 +562,14 @@ describe("progress persist", () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: seedKid(), version: 0 }));
     await hydrateProgress();
     expect(useProgress.getState().buySquishee("aurora-jelly")).toEqual({ ok: false, reason: "find" });
-    expect(useProgress.getState().squishees).toEqual([]);
+    expect(useProgress.getState().squishees).toEqual(["peach"]);
     expect(useProgress.getState().unlockSquishee("galaxy-narwhal")).toEqual({ ok: true, reason: "ok" });
-    expect(useProgress.getState().squishees).toEqual(["galaxy-narwhal"]);
+    expect(useProgress.getState().squishees).toEqual(["peach", "galaxy-narwhal"]);
     const raw = localStorage.getItem(STORAGE_KEY);
     expect(raw).toContain("galaxy-narwhal");
     resetProgressMemory();
     await hydrateProgress();
-    expect(useProgress.getState().squishees).toEqual(["galaxy-narwhal"]);
+    expect(useProgress.getState().squishees).toEqual(["peach", "galaxy-narwhal"]);
     expect(useProgress.getState().unlockSquishee("galaxy-narwhal").ok).toBe(false);
   });
 

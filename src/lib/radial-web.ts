@@ -31,17 +31,16 @@ export const RADIAL_PLAZA = { x: 49.682, y: 46.272 } as const;
  * so every hop lands in the middle of a walkable square — not on the
  * #70 grass gaps (plaza 49.88/45.15, r=85 NE at ~54.58/36.80, and the
  * north-spoke polar node that sat between plaza and the inner-N pad).
- * Painted portals (inner swirl / hoop openings, mid-spoke arches, and
- * the eight rim arches) are their own hop pads, centered on the portal
- * art — not the inward cream / pink / purple neighbor. Cream mid-spoke
- * tiles 12, 27, 38, and 105 stay walkable path (no warp). Mid-N vortex
- * 103 warps to south-spoke counterpart 108.
+ * Painted portals sit on the walkable floor of the gate (cream / pink /
+ * purple square at the mouth), not on the swirl in the arch. Cream
+ * mid-spoke tiles 12, 27, 38, 103, and 105 stay walkable path (no warp).
+ * Mid-N vortex 103 has no painted south pair, so it does not warp.
  */
 type PadSpot = { x: number; y: number; ring: RadialRing; angle: number; portal?: boolean };
 
 const PAD_SPOTS: readonly PadSpot[] = [
   { x: 49.682, y: 46.272, ring: 0, angle: 0 },
-  { x: 50.350, y: 39.633, ring: 2, angle: 10.1, portal: true },
+  { x: 49.850, y: 40.000, ring: 2, angle: 10.1, portal: true },
   { x: 55.468, y: 38.333, ring: 1, angle: 52.3 },
   { x: 57.254, y: 44.062, ring: 1, angle: 80.7 },
   { x: 55.378, y: 50.202, ring: 1, angle: 111.2 },
@@ -58,7 +57,7 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 58.269, y: 53.704, ring: 2, angle: 116.0 },
   { x: 58.867, y: 63.751, ring: 2, angle: 136.9 },
   { x: 54.946, y: 65.274, ring: 2, angle: 153.8 },
-  { x: 50.209, y: 62.699, ring: 2, angle: 176.7, portal: true },
+  { x: 49.850, y: 60.950, ring: 2, angle: 176.7, portal: true },
   { x: 44.799, y: 65.367, ring: 2, angle: 204.4 },
   { x: 40.889, y: 63.766, ring: 2, angle: 221.8 },
   { x: 41.806, y: 53.740, ring: 2, angle: 241.9 },
@@ -136,29 +135,24 @@ const PAD_SPOTS: readonly PadSpot[] = [
   { x: 41.961, y: 15.941, ring: 4, angle: 335.7 },
   { x: 45.811, y: 15.157, ring: 4, angle: 347.5 },
   { x: 49.838, y: 14.935, ring: 4, angle: 0.5 },
-  // Portal art that had no hop node — flags used to sit on the inward neighbor.
-  // Inner E/W sit in the purple arch opening, not on the cream row at y≈44.
-  { x: 67.400, y: 41.200, ring: 2, angle: 85.6, portal: true },
-  { x: 32.400, y: 41.200, ring: 2, angle: 274.5, portal: true },
+  // Inner E/W sit on the cream/purple floor of that spoke, y≈44, not the pillar swirl.
+  { x: 67.350, y: 44.080, ring: 2, angle: 85.6, portal: true },
+  { x: 32.550, y: 44.080, ring: 2, angle: 274.5, portal: true },
   { x: 72.860, y: 14.698, ring: 4, angle: 51.8, portal: true },
   { x: 83.514, y: 41.744, ring: 4, angle: 86.5, portal: true },
   { x: 16.090, y: 41.315, ring: 4, angle: 274.6, portal: true },
   { x: 26.480, y: 14.233, ring: 4, angle: 308.4, portal: true },
-  // Mid-NW spoke arch. Warp (pair of mid-SE arch pad 107).
-  { x: 39.140, y: 30.230, ring: 2, angle: 326.6, portal: true },
-  // Mid-N painted vortex. Warp (pair of south-spoke counterpart 108).
-  { x: 49.860, y: 24.220, ring: 3, angle: 0.5, portal: true },
-  { x: 60.480, y: 30.600, ring: 2, angle: 34.6, portal: true },
+  // Mid-NW spoke arch floor (pair of mid-SE arch pad 107).
+  { x: 40.050, y: 31.900, ring: 2, angle: 326.6, portal: true },
+  // Mid-N painted vortex floor. Path only — no south swirl is painted.
+  { x: 49.850, y: 26.400, ring: 3, angle: 0.5 },
+  { x: 60.150, y: 32.400, ring: 2, angle: 34.6, portal: true },
   // South-spoke cream path. No mid-S arch is painted here.
   { x: 49.850, y: 71.150, ring: 3, angle: 179.6 },
-  // Mid-SW spoke arch. Warp (pair of mid-NE pad 104).
-  { x: 38.947, y: 56.392, ring: 3, angle: 242.1, portal: true },
-  // Mid-SE spoke arch. Warp (pair of mid-NW pad 102). Flag moved off cream 38.
-  { x: 61.442, y: 55.056, ring: 3, angle: 112.8, portal: true },
-  // South counterpart of mid-N vortex 103. The JPEG has no mid-S swirl
-  // (cream 40 / 105 / 41 stay path). 108 is a west spur off cream 40 so
-  // the south through-path does not warp, and 103 still has an involutive pair.
-  { x: 46.40, y: 66.20, ring: 3, angle: 196.4, portal: true },
+  // Mid-SW spoke arch floor (pair of mid-NE pad 104).
+  { x: 39.850, y: 54.900, ring: 3, angle: 242.1, portal: true },
+  // Mid-SE spoke arch floor (pair of mid-NW pad 102). Flag stays off cream 38.
+  { x: 61.200, y: 56.400, ring: 3, angle: 112.8, portal: true },
 ];
 
 function buildPads(): RadialPad[] {
@@ -224,7 +218,6 @@ const PAD_EDGES: readonly (readonly [number, number])[] = [
   [25, 102], [50, 102], [52, 102],
   [13, 104], [29, 104], [31, 104], [28, 103], [53, 103],
   [16, 107], [38, 107], [22, 106],
-  [40, 108], [19, 108],
 ];
 
 function buildEdges(): readonly (readonly [number, number])[] {
@@ -266,8 +259,7 @@ export function radialHopStops(fromId: number, toId: number): number[] {
  * not warps. The purple arches those pads used to sit on warp via 104
  * (mid-NE). Pad 41 is the cream south of outer-S. Cream 38 is the path
  * south of the mid-SE arch (warp is 107). Cream 105 is south-spoke path.
- * Mid-N vortex 103 warps to south-spoke spur 108 (no mid-S vortex is
- * painted; 108 is off the through-path so 40/105/41 stay ordinary hops).
+ * Mid-N vortex 103 is a path swirl (no south pair is painted).
  *
  * Inner N↔S, E↔W. Mid-spoke NE↔SW, SE↔NW. Mid-N↔south counterpart.
  * Outer N↔S, NE↔SW, E↔W, SE↔NW.
@@ -284,14 +276,13 @@ export const PORTAL_PAIRS: readonly (readonly [number, number])[] = [
   [98, 57],
   [99, 100],
   [69, 101],
-  [103, 108],
 ];
 
 /** Cream mid-spoke tiles beside portal arches. Walkable path, not warps. */
-export const PATH_SWIRL_PADS: readonly number[] = [12, 27];
+export const PATH_SWIRL_PADS: readonly number[] = [12, 27, 103];
 
 /** Path tiles that must never warp (cream / pink / purple neighbors + mid-S cream). */
-export const PATH_ONLY_PADS: readonly number[] = [12, 27, 38, 41, 105];
+export const PATH_ONLY_PADS: readonly number[] = [12, 27, 38, 41, 103, 105];
 
 const portalExit = new Map<number, number>();
 for (const [a, b] of PORTAL_PAIRS) {

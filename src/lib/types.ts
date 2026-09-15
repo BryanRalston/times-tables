@@ -328,6 +328,8 @@ export interface LearnerSlice {
   name: string;
   stars: number;
   seenWelcome: boolean;
+  /** Name + starter pick finished. Old saves heal to true. */
+  setupDone: boolean;
   activities: Record<string, ActivitySave>;
   badges: string[];
   shaky: Record<string, number>;

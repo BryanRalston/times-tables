@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { RARE_PRICE, squisheePrice } from "./coins";
 import {
+  STARTER_SQUISHEE_IDS,
   cheerFile,
   cheerStripFile,
   cheerStripJsonFile,
@@ -22,11 +23,13 @@ import {
 } from "./squishees";
 
 describe("guest peach", () => {
-  it("counts Peach as owned even when the save list is empty", () => {
-    expect(ownsSquishee([], "peach")).toBe(true);
+  it("owns only toys on the save list; Peach is a preview until they pick a starter", () => {
+    expect(ownsSquishee([], "peach")).toBe(false);
     expect(ownsSquishee([], "frog")).toBe(false);
-    expect(ownsSquishee(["frog"], "peach")).toBe(true);
+    expect(ownsSquishee(["frog"], "peach")).toBe(false);
+    expect(ownsSquishee(["frog"], "frog")).toBe(true);
     expect(pathHopperId([], "")).toBe("peach");
+    expect(STARTER_SQUISHEE_IDS).toEqual(["peach", "frog", "cat"]);
   });
 });
 
@@ -130,7 +133,7 @@ describe("home peek roster", () => {
     expect(pathHopperId([])).toBe("peach");
     expect(pathHopperId(["frog", "cat"])).toBe("cat");
     expect(pathHopperId(["frog", "cat"], "frog")).toBe("frog");
-    expect(pathHopperId(["frog"], "peach")).toBe("peach");
+    expect(pathHopperId(["frog"], "peach")).toBe("frog");
   });
 
   it("picks a trail peek face that is not the hopper", () => {

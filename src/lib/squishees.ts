@@ -172,15 +172,17 @@ export function squisheeById(id: string): Squishee | undefined {
   return SQUISHEES.find((s) => s.id === id);
 }
 
-/**
- * Lessons / play / Home face. A kid-picked owned toy wins; otherwise
- * last owned, else Peach. First visit can stay Peach until they pick.
- */
-/** Guest Peach is always a real toy, never a mystery for sale. */
+/** First-run pick: Peach, Frog, Cat. The rest unlock on Shelf / presents. */
+export const STARTER_SQUISHEE_IDS = ["peach", "frog", "cat"] as const;
+export type StarterId = (typeof STARTER_SQUISHEE_IDS)[number];
 export const GUEST_SQUISHEE = "peach";
 
+export function isStarterSquishee(id: string): id is StarterId {
+  return (STARTER_SQUISHEE_IDS as readonly string[]).includes(id);
+}
+
 export function ownsSquishee(owned: readonly string[], id: string): boolean {
-  return id === GUEST_SQUISHEE || owned.includes(id);
+  return owned.includes(id);
 }
 
 export function pathHopperId(owned: readonly string[], chosen?: string | null): string {

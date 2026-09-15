@@ -119,6 +119,16 @@ export type Ui = {
   schoolDaysLeft: (n: number) => string;
   newReview: (fresh: number, review: number, remain: number) => string;
   walkCards: (total: number, fresh: number, review: number) => string;
+  walkCardsShort: (n: number) => string;
+  setupHi: string;
+  setupBlurb: string;
+  setupNameAsk: string;
+  setupNameNext: string;
+  setupPick: string;
+  setupLetsGo: string;
+  setupBack: string;
+  hiName: (name: string) => string;
+  homeLoop: string;
   leftoverTypeN: string;
   hourPlus: string;
   hourMinus: string;
@@ -167,6 +177,7 @@ export type Ui = {
   hopCreditsN: (n: number) => string;
   rollDie: string;
   rollInvite: string;
+  rollAfterWalk: string;
   stepsLeftN: (n: number) => string;
   zoneMeadow: string;
   zoneCove: string;
@@ -320,6 +331,16 @@ export const UI: Record<Locale, Ui> = {
     schoolDaysLeft: (n) => `${n} school days left in this unit`,
     newReview: (fresh, review, remain) => `${fresh} new · ${review} review · ${remain} school days left in this unit`,
     walkCards: (total, fresh, review) => `${total} cards · ${fresh} new · ${review} review`,
+    walkCardsShort: (n) => (n === 1 ? "1 card" : `${n} cards`),
+    setupHi: "Hi. I'm a Squishee.",
+    setupBlurb: "This is Grade 3 math. We play a few cards — then we hop.",
+    setupNameAsk: "What's your name?",
+    setupNameNext: "Next",
+    setupPick: "Pick your buddy.",
+    setupLetsGo: "Let's go",
+    setupBack: "Back",
+    hiName: (name) => `Hi, ${name}.`,
+    homeLoop: "Finish, then hop on Lessons.",
     leftoverTypeN: "Now type how many are hiding.",
     hourPlus: "Hour +",
     hourMinus: "Hour −",
@@ -371,6 +392,7 @@ export const UI: Record<Locale, Ui> = {
     hopCreditsN: (n) => (n === 1 ? "1 hop" : `${n} hops`),
     rollDie: "Roll",
     rollInvite: "Roll the die",
+    rollAfterWalk: "Finish a walk to roll",
     stepsLeftN: (n) => (n === 1 ? "1 left" : `${n} left`),
     zoneMeadow: "Ten-Frame Meadow",
     zoneCove: "Coin Cove",
@@ -522,6 +544,16 @@ export const UI: Record<Locale, Ui> = {
     schoolDaysLeft: (n) => `${n} días escolares en esta unidad`,
     newReview: (fresh, review, remain) => `${fresh} nuevas · ${review} repaso · ${remain} días escolares en esta unidad`,
     walkCards: (total, fresh, review) => `${total} cartas · ${fresh} nuevas · ${review} repaso`,
+    walkCardsShort: (n) => (n === 1 ? "1 carta" : `${n} cartas`),
+    setupHi: "Hola. Soy un Squishee.",
+    setupBlurb: "Esto es mate de 3.º. Jugamos unas cartas — y luego saltamos.",
+    setupNameAsk: "¿Cómo te llamas?",
+    setupNameNext: "Siguiente",
+    setupPick: "Elige tu amigo.",
+    setupLetsGo: "Vamos",
+    setupBack: "Atrás",
+    hiName: (name) => `Hola, ${name}.`,
+    homeLoop: "Termina, y luego salta en Lecciones.",
     leftoverTypeN: "Ahora escribe cuántos se esconden.",
     hourPlus: "Hora +",
     hourMinus: "Hora −",
@@ -573,6 +605,7 @@ export const UI: Record<Locale, Ui> = {
     hopCreditsN: (n) => (n === 1 ? "1 salto" : `${n} saltos`),
     rollDie: "Tirar",
     rollInvite: "Tira el dado",
+    rollAfterWalk: "Termina el paseo de hoy para tirar",
     stepsLeftN: (n) => (n === 1 ? "1 queda" : `${n} quedan`),
     zoneMeadow: "Prado de decenas",
     zoneCove: "Cala de monedas",
@@ -724,6 +757,16 @@ export const UI: Record<Locale, Ui> = {
     schoolDaysLeft: (n) => `${n} dias letivos nesta unidade`,
     newReview: (fresh, review, remain) => `${fresh} novas · ${review} revisão · ${remain} dias letivos nesta unidade`,
     walkCards: (total, fresh, review) => `${total} cartas · ${fresh} novas · ${review} revisão`,
+    walkCardsShort: (n) => (n === 1 ? "1 carta" : `${n} cartas`),
+    setupHi: "Oi. Eu sou um Squishee.",
+    setupBlurb: "Isto é matemática do 3.º ano. Jogamos umas cartas — e depois pulamos.",
+    setupNameAsk: "Qual é o seu nome?",
+    setupNameNext: "Seguir",
+    setupPick: "Escolha seu amigo.",
+    setupLetsGo: "Vamos",
+    setupBack: "Voltar",
+    hiName: (name) => `Oi, ${name}.`,
+    homeLoop: "Termine, depois pule nas Lições.",
     leftoverTypeN: "Agora escreve quantos estão escondidos.",
     hourPlus: "Hora +",
     hourMinus: "Hora −",
@@ -775,6 +818,7 @@ export const UI: Record<Locale, Ui> = {
     hopCreditsN: (n) => (n === 1 ? "1 pulo" : `${n} pulos`),
     rollDie: "Lançar",
     rollInvite: "Lance o dado",
+    rollAfterWalk: "Termine o passeio de hoje para lançar",
     stepsLeftN: (n) => (n === 1 ? "1 restante" : `${n} restantes`),
     zoneMeadow: "Prado das dezenas",
     zoneCove: "Enseada das moedas",

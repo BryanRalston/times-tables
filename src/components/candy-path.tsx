@@ -199,6 +199,8 @@ export const CandyPath = forwardRef<
   const steps = stepsLeft ?? activePathStepsLeft(hopsSpent, storedSteps);
   const [rolling, setRolling] = useState<DieFace | null>(null);
   const [tumbleFace, setTumbleFace] = useState<DieFace>(1);
+  const rollingRef = useRef(false);
+  const [artReady, setArtReady] = useState(false);
   const inviting = !freeMove && canStartDiceTurn(credits, steps) && !travel && !warp && rolling == null;
   const picking = (freeMove || steps > 0) && !travel && !warp && rolling == null;
   const choices = picking ? adjacentPadIds(dest) : [];
@@ -412,7 +414,11 @@ export const CandyPath = forwardRef<
       setTumbleFace(faces[Math.min(i, faces.length - 1)]!);
       if (i >= faces.length - 1) window.clearInterval(tick);
     }, 90);
-    const done = window.setTimeout(() => setRolling(null), DICE_TUMBLE_MS);
+    const done = window.setTimeout(() => {
+      startDiceTurn(rolling);
+      rollingRef.current = false;
+      setRolling(null);
+    }, DICE_TUMBLE_MS);
     return () => {
       window.clearInterval(tick);
       window.clearTimeout(done);
@@ -420,12 +426,15 @@ export const CandyPath = forwardRef<
   }, [rolling]);
 
   const beginRoll = () => {
-    if (freeMove || rolling != null || travel || warp || !canStartDiceTurn(credits, steps)) return;
+    if (freeMove || rollingRef.current || travel || warp || !canStartDiceTurn(credits, steps)) return;
     const face = rollDieFace();
-    if (!startDiceTurn(face)) return;
     playDice();
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
+    if (reduce) {
+      startDiceTurn(face);
+      return;
+    }
+    rollingRef.current = true;
     setRolling(face);
     setTumbleFace(1);
   };
@@ -586,6 +595,7 @@ export const CandyPath = forwardRef<
       data-map-fit={phone ? "cover" : "contain"}
       data-map-pan={phone ? "1" : "0"}
       data-map-scale={String(cam.scale)}
+      data-die-tumble={rolling != null ? "1" : "0"}
     >
       <div
         ref={worldRef}
@@ -607,7 +617,13 @@ export const CandyPath = forwardRef<
           alt=""
           decoding="async"
           data-candy-radial-map-art="1"
+          data-map-art-ready={artReady ? "1" : "0"}
           aria-hidden
+          onLoad={() => setArtReady(true)}
+          onError={() => setArtReady(true)}
+          ref={(el) => {
+            if (el?.complete && el.naturalWidth > 0) setArtReady(true);
+          }}
         />
         <div
           ref={boardRef}
@@ -620,6 +636,7 @@ export const CandyPath = forwardRef<
           data-hop-snap-min={String(HOP_SNAP_MIN_PX)}
           data-hop-hit={String(HOP_HIT_MIN_PX)}
           data-hopper-fit="pad"
+          data-map-art-ready={artReady ? "1" : "0"}
           style={{
             ["--hop-tile" as string]: `${HOPPER_BOARD_WIDTH_PCT}%`,
             ["--hop-art-zoom" as string]: `${HOPPER_ART_ZOOM_PCT}%`,
@@ -700,7 +717,11 @@ export const CandyPath = forwardRef<
               data-path-warp-fx="to"
               aria-hidden
             />
-            <p className="candy-portal-call" data-portal-call="1">
+            <p
+              className="candy-portal-call"
+              data-portal-call="1"
+              style={{ left: `${padView(warp.from).x}%`, top: `${padView(warp.from).y}%` }}
+            >
               {ui.portal}
             </p>
           </>
@@ -764,7 +785,9 @@ export const CandyPath = forwardRef<
               </>
             ) : unwrap.reward.kind === "rolls" ? (
               <>
-                <KidDie face={unwrap.reward.rolls === 2 ? 2 : 1} tumbling={false} />
+                <span className="candy-unwrap-die" aria-hidden>
+                  <KidDie face={unwrap.reward.rolls === 2 ? 2 : 1} tumbling={false} />
+                </span>
                 <span className="candy-unwrap-name">+{unwrap.reward.rolls}</span>
                 <span className="candy-unwrap-line">{ui.youFoundRolls(unwrap.reward.rolls)}</span>
               </>
@@ -802,7 +825,7 @@ export const CandyPath = forwardRef<
               data-path-status={chipStatus}
               data-unit-short={short}
               aria-label={`${ui.unitN(unit.number)}. ${short}${status === "now" ? `, ${ui.now}` : ""}`}
-              onClick={() => (status === "now" ? onStart() : onOpenUnit(unit.id))}
+              onClick={() => onOpenUnit(unit.id)}
             >
               <span className="candy-unit-n">{unit.number}</span>
               <span className="candy-unit-short">{short}</span>

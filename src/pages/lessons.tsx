@@ -33,6 +33,7 @@ export function LessonsPage() {
   if (freeMove) caption = ui.hopPick;
   else if (picking) caption = `${ui.hopPick} · ${ui.stepsLeftN(steps)}`;
   else if (inviting) caption = ui.rollInvite;
+  else if (rolls === 0 && steps === 0) caption = ui.rollAfterWalk;
 
   return (
     <AppScene scene="hills" tabs={<AppTabs active="lessons" />}>
@@ -73,7 +74,7 @@ export function LessonsPage() {
           >
             {ui.rollDie}
           </button>
-        ) : (
+        ) : picking ? null : (
           <button type="button" className="candy-dock-start" data-dock-start="1" onClick={() => pathRef.current?.playNow()}>
             {ui.start}
           </button>
