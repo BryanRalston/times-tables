@@ -35,6 +35,8 @@ import { usePhoneDoor } from "@/lib/nav";
 import { unitStatus } from "@/lib/path";
 import { useProgress } from "@/lib/progress";
 import {
+  DICE_HOLD_MS,
+  DICE_LOCK_MS,
   DICE_TUMBLE_MS,
   HOPPER_ART_ZOOM_PCT,
   HOPPER_BOARD_WIDTH_PCT,
@@ -65,6 +67,7 @@ import {
   type LandedPresent,
   visiblePresentPads,
 } from "@/lib/presents";
+import { KidDie } from "@/components/candy-die";
 import { playDice, playHop, playLand, playStar, playWarp } from "@/lib/sound";
 import { pathHopperId, squisheeById } from "@/lib/squishees";
 import { cn } from "@/lib/utils";
@@ -73,28 +76,6 @@ type UnwrapBeat = { pad: number; reward: LandedPresent; phase: "open" | "reveal"
 
 function padView(id: number) {
   return radialPad(id).map;
-}
-
-function diePips(face: DieFace): { x: number; y: number }[] {
-  switch (face) {
-    case 1:
-      return [{ x: 50, y: 50 }];
-    case 2:
-      return [
-        { x: 30, y: 30 },
-        { x: 70, y: 70 },
-      ];
-    case 3:
-      return [
-        { x: 28, y: 28 },
-        { x: 50, y: 50 },
-        { x: 72, y: 72 },
-      ];
-    default: {
-      const _never: never = face;
-      return _never;
-    }
-  }
 }
 
 function unwrapCopy(
@@ -122,22 +103,6 @@ function unwrapCopy(
   }
 }
 
-function KidDie({ face, tumbling }: { face: DieFace; tumbling: boolean }) {
-  return (
-    <div
-      className={cn("candy-die", tumbling && "candy-die-tumble")}
-      data-path-die="1"
-      data-die-face={String(face)}
-      data-die-tumble={tumbling ? "1" : "0"}
-      aria-hidden
-    >
-      {diePips(face).map((p, i) => (
-        <span key={i} className="candy-die-pip" style={{ left: `${p.x}%`, top: `${p.y}%` }} />
-      ))}
-    </div>
-  );
-}
-
 export type CandyPathHandle = {
   playNow: () => void;
   rollDie: () => void;
@@ -155,8 +120,25 @@ export const CandyPath = forwardRef<
     railUnits?: typeof UNITS;
     onStart: () => void;
     onOpenUnit: (id: string) => void;
+    onBusyChange?: (busy: boolean) => void;
+    onDieFace?: (face: DieFace, motion: "tumble" | "hold" | "done") => void;
   }
->(function CandyPath({ suggestedId, standFrom, standTo, hopCredits, stepsLeft, freeMove = false, railUnits, onStart, onOpenUnit }, ref) {
+>(function CandyPath(
+  {
+    suggestedId,
+    standFrom,
+    standTo,
+    hopCredits,
+    stepsLeft,
+    freeMove = false,
+    railUnits,
+    onStart,
+    onOpenUnit,
+    onBusyChange,
+    onDieFace,
+  },
+  ref,
+) {
   const ui = useUi();
   const locale = parseLocale(useProgress((s) => s.locale));
   useProgress(
@@ -198,10 +180,14 @@ export const CandyPath = forwardRef<
   const credits = hopCredits ?? hopCreditsOf(activities, hopsSpent, sessions, giftRolls);
   const steps = stepsLeft ?? activePathStepsLeft(hopsSpent, storedSteps);
   const [rolling, setRolling] = useState<DieFace | null>(null);
-  const [tumbleFace, setTumbleFace] = useState<DieFace>(1);
   const rollingRef = useRef(false);
   const [artReady, setArtReady] = useState(false);
-  const inviting = !freeMove && canStartDiceTurn(credits, steps) && !travel && !warp && rolling == null;
+  const busyCb = useRef(onBusyChange);
+  const dieCb = useRef(onDieFace);
+  busyCb.current = onBusyChange;
+  dieCb.current = onDieFace;
+  const inviting = !freeMove && canStartDiceTurn(credits, steps) && !travel && !warp && rolling == null && !unwrap;
+  const mapBusy = travel || warp != null || rolling != null || unwrap != null;
   const picking = (freeMove || steps > 0) && !travel && !warp && rolling == null;
   const choices = picking ? adjacentPadIds(dest) : [];
   const phone = usePhoneDoor();
@@ -405,28 +391,43 @@ export const CandyPath = forwardRef<
   }, [phone]);
 
   useEffect(() => {
+    busyCb.current?.(mapBusy);
+  }, [mapBusy]);
+
+  useEffect(() => {
     if (rolling == null) return;
-    const faces: DieFace[] = [1, 2, 3, 2, 1, 3, rolling];
+    const flash: DieFace[] = [1, 2, 3, 2, 1];
     let i = 0;
-    setTumbleFace(faces[0]!);
+    dieCb.current?.(1, "tumble");
     const tick = window.setInterval(() => {
       i += 1;
-      setTumbleFace(faces[Math.min(i, faces.length - 1)]!);
-      if (i >= faces.length - 1) window.clearInterval(tick);
+      const elapsed = i * 90;
+      if (elapsed >= DICE_LOCK_MS) {
+        dieCb.current?.(rolling, "tumble");
+        window.clearInterval(tick);
+        return;
+      }
+      const face = flash[i % flash.length]!;
+      dieCb.current?.(face, "tumble");
     }, 90);
+    const hold = window.setTimeout(() => {
+      dieCb.current?.(rolling, "hold");
+    }, DICE_TUMBLE_MS);
     const done = window.setTimeout(() => {
       startDiceTurn(rolling);
       rollingRef.current = false;
       setRolling(null);
-    }, DICE_TUMBLE_MS);
+      dieCb.current?.(rolling, "done");
+    }, DICE_TUMBLE_MS + DICE_HOLD_MS);
     return () => {
       window.clearInterval(tick);
+      window.clearTimeout(hold);
       window.clearTimeout(done);
     };
   }, [rolling]);
 
   const beginRoll = () => {
-    if (freeMove || rollingRef.current || travel || warp || !canStartDiceTurn(credits, steps)) return;
+    if (freeMove || rollingRef.current || travel || warp || unwrap || !canStartDiceTurn(credits, steps)) return;
     const face = rollDieFace();
     playDice();
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -436,7 +437,6 @@ export const CandyPath = forwardRef<
     }
     rollingRef.current = true;
     setRolling(face);
-    setTumbleFace(1);
   };
 
   const chooseHop = (to: number) => {
@@ -596,6 +596,7 @@ export const CandyPath = forwardRef<
       data-map-pan={phone ? "1" : "0"}
       data-map-scale={String(cam.scale)}
       data-die-tumble={rolling != null ? "1" : "0"}
+      data-map-busy={mapBusy ? "1" : "0"}
     >
       <div
         ref={worldRef}
@@ -700,8 +701,6 @@ export const CandyPath = forwardRef<
             </button>
           );
         })}
-
-        {rolling != null ? <KidDie face={tumbleFace} tumbling /> : null}
 
         {warp ? (
           <>

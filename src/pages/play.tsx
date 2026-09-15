@@ -424,6 +424,12 @@ export function PlayPage({ kind, activityId }: { kind: Kind; activityId?: string
           </p>
           {kind === "daily" ? <p className="mt-1 text-sm text-star">{ui.streak(streak)}</p> : null}
           <p className="mt-4 text-sm text-teal">{ui.youEarnedCoins(coinsEarned)}</p>
+          {(kind === "activity" && pack.activityId && st.activities[pack.activityId]?.plays === 1) ||
+          (kind === "daily" && st.activities[dailyWalkActivityId(pack.date)]?.plays === 1) ? (
+            <p className="mt-1 text-sm text-teal" data-got-roll="1">
+              {ui.youGotARoll}
+            </p>
+          ) : null}
           <Button
             className="mt-6 w-full"
             size="lg"

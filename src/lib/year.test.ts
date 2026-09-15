@@ -456,7 +456,8 @@ describe("locale", () => {
     expect(UI.en.rollAfterWalk).toBe("Finish a walk to roll");
     expect(UI.en.setupPick).toBe("Pick your buddy.");
     expect(UI.en.hiName("Maya")).toBe("Hi, Maya.");
-    expect(UI.en.stepsLeftN(2)).toBe("2 left");
+    expect(UI.en.stepsLeftN(2)).toBe("2 hops");
+    expect(UI.en.youGotARoll).toBe("You got a roll.");
     expect(UI.es.rollInvite).toBe("Tira el dado");
     expect(UI["pt-BR"].rollInvite).toBe("Lance o dado");
     expect(UI.es.zoneMeadow).toBe("Prado de decenas");

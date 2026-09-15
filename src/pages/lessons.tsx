@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { DiePocket, KidDie } from "@/components/candy-die";
 import { CandyPath, type CandyPathHandle } from "@/components/candy-path";
 import { AppHeader, AppScene, AppTabs, useUi } from "@/components/chrome";
 import { todayIso } from "@/lib/calendar";
@@ -6,7 +7,7 @@ import { UNITS, suggestedUnitId, unitsFor } from "@/lib/curriculum";
 import { navigate } from "@/lib/nav";
 import { lessonsHopFrom, lessonsHopTo, pathNowUnitId } from "@/lib/path";
 import { useProgress } from "@/lib/progress";
-import { activePathStepsLeft, canStartDiceTurn, hopCreditsOf } from "@/lib/radial-web";
+import { activePathStepsLeft, canStartDiceTurn, DICE_POCKET_MAX, hopCreditsOf, type DieFace } from "@/lib/radial-web";
 import { holdPathGrade, isTestMode, testFreeMove } from "@/lib/test-mode";
 
 export function LessonsPage() {
@@ -25,15 +26,24 @@ export function LessonsPage() {
   const rolls = hopCreditsOf(st.activities, st.pathHopSpent, st.sessions, st.pathGiftRolls);
   const steps = activePathStepsLeft(st.pathHopSpent, st.pathStepsLeft);
   const freeMove = testFreeMove(st.testMode);
-  const inviting = !freeMove && canStartDiceTurn(rolls, steps);
+  const [busy, setBusy] = useState(false);
+  const [dieFace, setDieFace] = useState<DieFace>(1);
+  const [dieMotion, setDieMotion] = useState<"rest" | "tumble" | "hold" | "spent">("rest");
+  const tumbling = dieMotion === "tumble" || dieMotion === "hold";
+  const inviting = !freeMove && canStartDiceTurn(rolls, steps) && !busy && !tumbling;
   const picking = freeMove || steps > 0;
   const pathRef = useRef<CandyPathHandle>(null);
 
   let caption = ui.grade3Path;
   if (freeMove) caption = ui.hopPick;
-  else if (picking) caption = `${ui.hopPick} · ${ui.stepsLeftN(steps)}`;
+  else if (tumbling) caption = ui.rollInvite;
+  else if (picking) caption = `${ui.hopPick} · ${ui.hopCreditsN(steps)}`;
+  else if (busy) caption = ui.hopPick;
   else if (inviting) caption = ui.rollInvite;
   else if (rolls === 0 && steps === 0) caption = ui.rollAfterWalk;
+
+  const showStart = !freeMove && !picking && !tumbling && !busy && !inviting;
+  const showDie = !freeMove;
 
   return (
     <AppScene scene="hills" tabs={<AppTabs active="lessons" />}>
@@ -50,6 +60,11 @@ export function LessonsPage() {
           railUnits={isTestMode(st.testMode) ? unitsFor(holdPathGrade(st.testMode, st.pathGrade)) : undefined}
           onStart={() => navigate({ id: "play", kind: "daily" })}
           onOpenUnit={(id) => navigate({ id: "unit", unitId: id })}
+          onBusyChange={setBusy}
+          onDieFace={(face, motion) => {
+            setDieFace(face);
+            setDieMotion(motion === "done" ? "spent" : motion);
+          }}
         />
       </div>
       <div className="candy-dock">
@@ -65,20 +80,24 @@ export function LessonsPage() {
           {caption}
           <span aria-hidden>★</span>
         </p>
-        {inviting ? (
-          <button
-            type="button"
-            className="candy-dock-start"
-            data-dock-roll="1"
-            onClick={() => pathRef.current?.rollDie()}
-          >
-            {ui.rollDie}
-          </button>
-        ) : picking ? null : (
+        {showDie ? (
+          <div className="candy-die-row">
+            <DiePocket filled={rolls} max={DICE_POCKET_MAX} />
+            <KidDie
+              face={inviting ? 1 : dieFace}
+              tumbling={dieMotion === "tumble"}
+              empty={!inviting && !tumbling && !picking && !busy && rolls <= 0}
+              dock
+              label={ui.rollDie}
+              onRoll={inviting ? () => pathRef.current?.rollDie() : undefined}
+            />
+          </div>
+        ) : null}
+        {showStart ? (
           <button type="button" className="candy-dock-start" data-dock-start="1" onClick={() => pathRef.current?.playNow()}>
             {ui.start}
           </button>
-        )}
+        ) : null}
       </div>
     </AppScene>
   );

@@ -178,6 +178,7 @@ export type Ui = {
   rollDie: string;
   rollInvite: string;
   rollAfterWalk: string;
+  youGotARoll: string;
   stepsLeftN: (n: number) => string;
   zoneMeadow: string;
   zoneCove: string;
@@ -393,7 +394,8 @@ export const UI: Record<Locale, Ui> = {
     rollDie: "Roll",
     rollInvite: "Roll the die",
     rollAfterWalk: "Finish a walk to roll",
-    stepsLeftN: (n) => (n === 1 ? "1 left" : `${n} left`),
+    youGotARoll: "You got a roll.",
+    stepsLeftN: (n) => (n === 1 ? "1 hop" : `${n} hops`),
     zoneMeadow: "Ten-Frame Meadow",
     zoneCove: "Coin Cove",
     zoneForest: "Fraction Forest",
@@ -606,7 +608,8 @@ export const UI: Record<Locale, Ui> = {
     rollDie: "Tirar",
     rollInvite: "Tira el dado",
     rollAfterWalk: "Termina el paseo de hoy para tirar",
-    stepsLeftN: (n) => (n === 1 ? "1 queda" : `${n} quedan`),
+    youGotARoll: "Conseguiste un dado.",
+    stepsLeftN: (n) => (n === 1 ? "1 salto" : `${n} saltos`),
     zoneMeadow: "Prado de decenas",
     zoneCove: "Cala de monedas",
     zoneForest: "Bosque de fracciones",
@@ -819,7 +822,8 @@ export const UI: Record<Locale, Ui> = {
     rollDie: "Lançar",
     rollInvite: "Lance o dado",
     rollAfterWalk: "Termine o passeio de hoje para lançar",
-    stepsLeftN: (n) => (n === 1 ? "1 restante" : `${n} restantes`),
+    youGotARoll: "Você ganhou um dado.",
+    stepsLeftN: (n) => (n === 1 ? "1 pulo" : `${n} pulos`),
     zoneMeadow: "Prado das dezenas",
     zoneCove: "Enseada das moedas",
     zoneForest: "Floresta das frações",

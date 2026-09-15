@@ -139,7 +139,8 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-hop-pick="0"');
     expect(html).toContain("Roll the die");
     expect(html).toContain("Roll");
-    expect(html).toContain('data-dock-roll="1"');
+    expect(html).toContain('data-dock-die="1"');
+    expect(html).toContain('data-die-pocket="1"');
     expect(html).not.toContain('data-pad-choice="1"');
     expect(html).not.toContain("Pick a space");
     expect(html).toMatch(/data-path-unit="u2"[^>]*data-path-status="now"/);
@@ -229,7 +230,7 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-hop-pick="0"');
     expect(html).toContain('data-dice-steps="0"');
     expect(html).toContain("Roll the die");
-    expect(html).toContain('data-dock-roll="1"');
+    expect(html).toContain('data-dock-die="1"');
     expect(html).not.toContain("Pick a space");
     expect(html).not.toContain("2 left");
     expect(html).not.toContain('data-pad-choice="1"');
@@ -262,7 +263,7 @@ describe("first-visit Home door", () => {
     expect(html).toContain('data-dice-steps-ui="2"');
     expect(html).toContain('data-hop-pick="1"');
     expect(html).toContain("Pick a space");
-    expect(html).toContain("2 left");
+    expect(html).toContain("2 hops");
     expect(html).toContain('data-pad-choice="1"');
     expect(html).toContain("candy-node-choice");
     expect(html).not.toContain("data-hop-dpad");

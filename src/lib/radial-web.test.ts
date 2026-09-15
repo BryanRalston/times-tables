@@ -39,6 +39,8 @@ import {
   clampDieFace,
   clampPathStepsLeft,
   dailyWalkActivityId,
+  DICE_HOLD_MS,
+  DICE_POCKET_MAX,
   hopCreditsOf,
   hopLessonsCompleted,
   migrateDiceTurnState,
@@ -307,6 +309,8 @@ describe("radial web", () => {
     expect(clampDieFace(0)).toBe(1);
     expect(clampDieFace(2)).toBe(2);
     expect(clampDieFace(9)).toBe(3);
+    expect(DICE_HOLD_MS).toBe(600);
+    expect(DICE_POCKET_MAX).toBe(3);
     expect(rollDieFace(() => 0)).toBe(1);
     expect(rollDieFace(() => 0.34)).toBe(2);
     expect(rollDieFace(() => 0.99)).toBe(3);

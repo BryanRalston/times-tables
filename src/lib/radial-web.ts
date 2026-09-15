@@ -575,6 +575,11 @@ export const DIE_MIN = 1;
 export const DIE_MAX = 3;
 export type DieFace = 1 | 2 | 3;
 export const DICE_TUMBLE_MS = 720;
+/** After this, pips lock to the real face. */
+export const DICE_LOCK_MS = 400;
+/** Hold the real face on the dock before hops light up. */
+export const DICE_HOLD_MS = 600;
+export const DICE_POCKET_MAX = 3;
 
 export function clampDieFace(n: unknown): DieFace {
   if (typeof n !== "number" || !Number.isFinite(n)) return DIE_MIN;
