@@ -52,7 +52,7 @@ export function KidDie({
     tumbling && (dock ? "candy-die-dock-tumble" : "candy-die-tumble"),
     empty && "candy-die-empty",
   );
-  if (onRoll) {
+  if (dock) {
     return (
       <button
         type="button"
@@ -63,8 +63,13 @@ export function KidDie({
         data-die-tumble={tumbling ? "1" : "0"}
         data-die-empty={empty ? "1" : "0"}
         aria-label={label}
-        disabled={empty}
-        onClick={onRoll}
+        disabled={empty || !onRoll}
+        onPointerUp={(e) => {
+          if (empty || !onRoll) return;
+          e.preventDefault();
+          e.stopPropagation();
+          onRoll();
+        }}
       >
         {body}
       </button>

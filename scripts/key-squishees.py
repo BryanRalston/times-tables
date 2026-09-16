@@ -182,8 +182,50 @@ def key_file(path: Path, strict: bool = False) -> None:
     print(f"keyed {path.name} {w}x{h}{' strict' if strict else ''}")
 
 
+SUFFIXES = ("-party-hat", "-scarf", "-bow", "-shades")
+
+
+def composite_base_id(name: str) -> str:
+    stem = name[:-4] if name.endswith(".png") else name
+    for suffix in SUFFIXES:
+        if stem.endswith(suffix):
+            return stem[: -len(suffix)]
+    return ""
+
+
+def is_studio_white(r: int, g: int, b: int) -> bool:
+    sat = max(r, g, b) - min(r, g, b)
+    luma = 0.299 * r + 0.587 * g + 0.114 * b
+    return luma >= 242 and sat <= 16
+
+
+def key_composite_with_base(comp: Image.Image, base: Image.Image) -> Image.Image:
+    """Punch studio white. Keep the bare toy (even pale highlights) and colorful clothes."""
+    import numpy as np
+
+    c = comp.convert("RGBA")
+    b = base.convert("RGBA").resize(c.size, Image.Resampling.LANCZOS)
+    arr = np.array(c)
+    protect = np.array(b.split()[3]) > 40
+    r, g, bch, a = arr[:, :, 0], arr[:, :, 1], arr[:, :, 2], arr[:, :, 3]
+    mx = np.maximum(np.maximum(r, g), bch)
+    mn = np.minimum(np.minimum(r, g), bch)
+    luma = 0.299 * r + 0.587 * g + 0.114 * bch
+    sat = mx - mn
+    studio = ((luma >= 235) & (sat <= 22)) | ((luma >= 205) & (sat <= 18))
+    punch = (studio | (a < 16)) & ~protect
+    arr[punch] = (0, 0, 0, 0)
+    return Image.fromarray(arr, "RGBA")
+
+
 def key_white_file(path: Path) -> None:
-    im = key_white_image(Image.open(path))
+    base_id = composite_base_id(path.name)
+    base_path = ROOT / f"{base_id}.png"
+    im = Image.open(path)
+    if base_id and base_path.exists():
+        im = key_composite_with_base(im, Image.open(base_path))
+    else:
+        im = key_white_image(im.convert("RGBA"))
     im.save(path, "PNG", optimize=True, compress_level=9)
     w, h = im.size
     print(f"white-keyed {path.name} {w}x{h}")

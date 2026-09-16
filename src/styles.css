@@ -990,7 +990,6 @@ details > summary::-webkit-details-marker {
   border-color: rgb(255 255 255 / 0.2);
 }
 [data-cosmetic-card] img {
-  mix-blend-mode: multiply;
   background: transparent;
 }
 .dressed-squishee {
@@ -2010,11 +2009,14 @@ details > summary::-webkit-details-marker {
   opacity: 0.48;
 }
 .candy-dock {
+  position: relative;
+  z-index: 40;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.15rem 0.75rem 0.2rem;
+  padding: 0.15rem 0.75rem max(0.35rem, env(safe-area-inset-bottom, 0px));
+  pointer-events: auto;
 }
 .candy-caption {
   display: inline-flex;
@@ -2029,6 +2031,7 @@ details > summary::-webkit-details-marker {
   font-size: 0.95rem;
   font-weight: 750;
   box-shadow: 0 5px 0 #d46a90;
+  pointer-events: none;
 }
 .candy-dock-start {
   height: 2.15rem;
@@ -2045,18 +2048,8 @@ details > summary::-webkit-details-marker {
   justify-content: center;
   gap: 0.55rem;
   pointer-events: auto;
-}
-.candy-die.candy-die-dock {
   position: relative;
-  left: auto;
-  top: auto;
-  width: 3.2rem;
-  height: 3.2rem;
-  transform: none;
-  z-index: 2;
-  pointer-events: auto;
-  border: 0;
-  cursor: pointer;
+  z-index: 41;
 }
 .candy-die-empty {
   cursor: default;
@@ -2137,6 +2130,25 @@ details > summary::-webkit-details-marker {
     0 12px 16px rgb(80 40 40 / 0.18);
   transform: translate(-50%, -50%);
   pointer-events: none;
+}
+.candy-die.candy-die-dock {
+  position: relative;
+  left: auto;
+  top: auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 44px;
+  min-height: 44px;
+  transform: none;
+  z-index: 41;
+  pointer-events: auto;
+  touch-action: manipulation;
+  border: 0;
+  cursor: pointer;
+}
+.candy-die.candy-die-dock .candy-die-pip {
+  width: 0.48rem;
+  height: 0.48rem;
 }
 .candy-die-tumble {
   animation: candy-die-tumble 0.72s ease-out;
