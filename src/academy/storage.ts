@@ -3,7 +3,8 @@ import { squisheeById } from "@/lib/squishees";
 import { hostIdFor } from "./buddy/hosts";
 import { ownedIds, palOwned } from "./buddy/unlock";
 import { defaultLevels, gameById, GAMES, isGameId } from "./games/registry";
-import { blankJourney, parseJourney } from "./journey";
+import { levelAllowed } from "./grade-map";
+import { blankJourney, normalizeJourney, parseJourney } from "./journey";
 import {
   DAILY_GOAL,
   MAX_CHILDREN,
@@ -62,7 +63,7 @@ export function blankChild(opts: { id?: string; name?: string; grade?: Grade; av
     cosmetics: [],
     equipped: "",
     gifted: [],
-    journey: blankJourney(),
+    journey: normalizeJourney(blankJourney(), grade),
     dailyDate: null,
     dailyRounds: 0,
     dailyGift: "none",
@@ -70,6 +71,7 @@ export function blankChild(opts: { id?: string; name?: string; grade?: Grade; av
     hatched: [],
     egg: "none",
     words: {},
+    challengeAhead: false,
   };
 }
 
@@ -179,12 +181,15 @@ function clampInt(v: unknown, min: number, max: number, fallback = min): number 
   return Math.max(min, Math.min(max, Math.floor(n)));
 }
 
-function parseLevels(raw: unknown, grade: Grade): Record<string, string> {
+function parseLevels(raw: unknown, grade: Grade, challengeAhead: boolean): Record<string, string> {
   const out: Record<string, string> = { ...defaultLevels(grade) };
   if (!raw || typeof raw !== "object") return out;
   const o = raw as Record<string, unknown>;
   for (const game of GAMES) {
-    if (game.isLevel(o[game.id])) out[game.id] = String(o[game.id]);
+    if (!game.isLevel(o[game.id])) continue;
+    const level = String(o[game.id]);
+    const ids = game.levels.map((row) => row.id);
+    if (levelAllowed(ids, game.id, grade, level, challengeAhead)) out[game.id] = level;
   }
   return out;
 }
@@ -267,7 +272,8 @@ export function parseChild(raw: unknown): Child | null {
   const lastPlayed = typeof o.lastPlayed === "string" && DATE_KEY.test(o.lastPlayed) ? o.lastPlayed : null;
   const cosmetics = parseCosmeticIds(o.cosmetics);
   const dailyDate = typeof o.dailyDate === "string" && DATE_KEY.test(o.dailyDate) ? o.dailyDate : null;
-  const journey = parseJourney(o.journey);
+  const challengeAhead = o.challengeAhead === true;
+  const journey = parseJourney(o.journey, grade);
   const friends = parseSquisheeIds(o.friends);
   for (const boss of journey.bosses) {
     const host = hostIdFor(boss);
@@ -297,7 +303,7 @@ export function parseChild(raw: unknown): Child | null {
     secondsByDay: parseSeconds(o.secondsByDay),
     bestStars: parseBest(o.bestStars),
     rounds: clampInt(o.rounds, 0, 100000),
-    levels: parseLevels(o.levels, grade),
+    levels: parseLevels(o.levels, grade, challengeAhead),
     coins: clampInt(o.coins, 0, 1_000_000),
     cosmetics,
     equipped: parseEquippedCosmetic(o.equipped, cosmetics),
@@ -310,6 +316,7 @@ export function parseChild(raw: unknown): Child | null {
     hatched,
     egg: parseGiftState(o.egg),
     words: parseWords(o.words),
+    challengeAhead,
   };
 }
 
@@ -334,12 +341,19 @@ export function mapActive(save: Save, fn: (child: Child) => Child): Save {
 }
 
 export function withGrade(child: Child, grade: Grade): Child {
-  return { ...child, grade, levels: defaultLevels(grade) };
+  return {
+    ...child,
+    grade,
+    levels: defaultLevels(grade),
+    journey: normalizeJourney(child.journey, grade),
+  };
 }
 
 export function withLevel(child: Child, gameId: string, level: string): Child {
   const game = gameById(gameId);
   if (!game || !isGameId(game.id) || !game.isLevel(level)) return child;
+  const ids = game.levels.map((row) => row.id);
+  if (!levelAllowed(ids, game.id, child.grade, level, child.challengeAhead)) return child;
   return { ...child, levels: { ...child.levels, [game.id]: level } };
 }
 

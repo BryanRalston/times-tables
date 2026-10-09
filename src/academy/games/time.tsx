@@ -1,5 +1,6 @@
 import { formatClockTime } from "@/lib/clock";
 import type { Rng } from "@/lib/rng";
+import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { AnalogClock, SquisheeImg, cx } from "../ui/bits";
 import { qid } from "./choices";
@@ -45,6 +46,8 @@ export function isTimeLevel(v: unknown): v is TimeLevel {
 }
 
 function defaultLevel(grade: Grade): TimeLevel {
+  const start = bandFor("time", grade)?.start;
+  if (isTimeLevel(start)) return start;
   switch (grade) {
     case "K":
       return "hour";

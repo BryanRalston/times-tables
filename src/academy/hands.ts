@@ -138,9 +138,10 @@ export function makeClockTask(level: string, rng: Rng, avoid?: string): ClockTas
 
 const PAY_PLANS: Record<string, { cents: number; bank: CoinKind[] }[]> = {
   name: [
-    { cents: 5, bank: ["penny", "nickel"] },
-    { cents: 10, bank: ["penny", "nickel", "dime"] },
-    { cents: 25, bank: ["nickel", "dime", "quarter"] },
+    { cents: 1, bank: ["penny"] },
+    { cents: 5, bank: ["nickel"] },
+    { cents: 10, bank: ["dime"] },
+    { cents: 25, bank: ["quarter"] },
   ],
   count: [
     { cents: 5, bank: ["penny", "nickel"] },

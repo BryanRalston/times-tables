@@ -81,7 +81,8 @@ describe("sight word lists", () => {
       }
     }
     expect(hear).toBeGreaterThan(90);
-    expect(modes).toEqual(new Set(["hear", "match", "fill"]));
+    expect(modes.has("fill")).toBe(false);
+    expect(modes).toEqual(new Set(["hear", "match"]));
 
     const boss = makeBossRound("sight", "preprimer", rngFromSeed("sight-boss"));
     expect(boss.some((q) => q.skill === "sight:primer")).toBe(true);

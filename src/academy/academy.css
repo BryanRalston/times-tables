@@ -171,6 +171,7 @@ button.ac-go:disabled { opacity: 0.45; }
 .ac-card.is-gold { background: #fff1c9; }
 .ac-card.is-lav { background: #efe4fb; }
 .ac-card.is-soon { opacity: 0.92; }
+button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inherit; }
 .ac-soon {
   display: inline-flex;
   align-items: center;

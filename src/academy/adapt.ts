@@ -19,19 +19,28 @@ export function startLadder(index: number): Ladder {
  * A brand-new kid starts one level under the grade default so the first
  * round feels easy. Later rounds, and boss rounds, start where they left off.
  */
-export function openingIndex(levelIndex: number, roundsPlayed: number, boss: boolean): number {
-  const index = Math.max(0, levelIndex);
+export function openingIndex(
+  levelIndex: number,
+  roundsPlayed: number,
+  boss: boolean,
+  bounds?: { min: number; max: number },
+): number {
+  const min = Math.max(0, bounds?.min ?? 0);
+  const max = bounds?.max ?? Number.POSITIVE_INFINITY;
+  const index = Math.max(min, Math.min(max, Math.max(0, levelIndex)));
   if (boss || roundsPlayed > 0) return index;
-  return Math.max(0, index - 1);
+  return Math.max(min, index - 1);
 }
 
 /** Step up after a clean streak. Step down after a miss. Stay inside the ladder. */
-export function stepLadder(ladder: Ladder, levelCount: number, ok: boolean): Ladder {
+export function stepLadder(ladder: Ladder, levelCount: number, ok: boolean, bounds?: { min: number; max: number }): Ladder {
   const count = Math.max(1, levelCount);
-  const index = Math.max(0, Math.min(count - 1, ladder.index));
-  if (!ok) return { index: Math.max(0, index - 1), streak: 0 };
+  const min = Math.max(0, Math.min(count - 1, bounds?.min ?? 0));
+  const max = Math.max(min, Math.min(count - 1, bounds?.max ?? count - 1));
+  const index = Math.max(min, Math.min(max, ladder.index));
+  if (!ok) return { index: Math.max(min, index - 1), streak: 0 };
   const streak = ladder.streak + 1;
-  if (streak >= STEP_UP_AT && index < count - 1) return { index: index + 1, streak: 0 };
+  if (streak >= STEP_UP_AT && index < max) return { index: index + 1, streak: 0 };
   return { index, streak };
 }
 
@@ -57,12 +66,16 @@ export function pickServeIndex(opts: {
   levelCount: number;
   heats: readonly SkillHeat[];
   roll: number;
+  minIndex?: number;
+  maxIndex?: number;
 }): { index: number; reason: ServeReason } {
   const count = Math.max(1, opts.levelCount);
-  const ladder = Math.max(0, Math.min(count - 1, opts.ladderIndex));
+  const min = Math.max(0, Math.min(count - 1, opts.minIndex ?? 0));
+  const max = Math.max(min, Math.min(count - 1, opts.maxIndex ?? count - 1));
+  const ladder = Math.max(min, Math.min(max, opts.ladderIndex));
   const roll = Math.min(0.999, Math.max(0, opts.roll));
   const seenBelow: number[] = [];
-  for (let i = 0; i < ladder; i++) {
+  for (let i = min; i < ladder; i++) {
     const heat = opts.heats[i] ?? "new";
     if (heat !== "new") seenBelow.push(i);
   }
@@ -79,7 +92,7 @@ export function pickServeIndex(opts: {
     return { index: pick, reason: "review" };
   }
   const here = opts.heats[ladder] ?? "new";
-  if (here === "mastered" && ladder < count - 1 && roll < 0.75) {
+  if (here === "mastered" && ladder < max && roll < 0.75) {
     return { index: ladder + 1, reason: "stretch" };
   }
   return { index: ladder, reason: "stay" };

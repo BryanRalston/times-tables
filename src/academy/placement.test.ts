@@ -20,11 +20,11 @@ describe("next play", () => {
   });
 
   it("steps up when the saved skill is mastered", () => {
-    const child = blankChild({ name: "Pal", grade: "1" });
+    const child = blankChild({ name: "Pal", grade: "2" });
     child.rounds = 3;
-    child.levels.times = "twos";
-    child.skills = { "times:twos": { ok: 8, miss: 0 } };
-    expect(nextPlacement(child)).toEqual({ game: "times", level: "mix", reason: "stretch" });
+    child.levels.add = "within20";
+    child.skills = { "add:within20": { ok: 8, miss: 0 } };
+    expect(nextPlacement(child)).toEqual({ game: "add", level: "tens", reason: "stretch" });
   });
 
   it("reviews a mastered skill when there is nowhere higher to go", () => {

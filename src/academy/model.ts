@@ -62,6 +62,8 @@ export interface Child {
   egg: DailyGiftState;
   /** Sight-word and spelling cards, keyed `sw:` or `sp:`. */
   words: Record<string, WordCard>;
+  /** A grown-up opened levels past this grade. Adaptive play stays in band until this is on. */
+  challengeAhead: boolean;
 }
 
 export interface AnswerMark {

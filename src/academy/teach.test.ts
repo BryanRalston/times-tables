@@ -154,7 +154,7 @@ describe("worked examples", () => {
 
   it("gives every live question a hint and a worked example", () => {
     const rng = rngFromSeed("teach");
-    const addLevels: AddLevel[] = ["within5", "within10", "within20", "within100"];
+    const addLevels: AddLevel[] = ["within5", "within10", "within20", "tens", "within100"];
     const timesLevels: TimesLevel[] = ["count", "twos", "mix", "toTen"];
     const timeLevels: TimeLevel[] = ["hour", "half", "quarter", "fives"];
     const moneyLevels: MoneyLevel[] = ["name", "count", "make", "change", "dollars"];

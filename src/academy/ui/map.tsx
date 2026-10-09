@@ -5,6 +5,7 @@ import { hatchPick } from "../buddy/egg";
 import { hostIdFor } from "../buddy/hosts";
 import { ownedIds } from "../buddy/unlock";
 import { GAMES, gameById } from "../games/registry";
+import { bandFor } from "../grade-map";
 import { areaIndex, areaOpen, bossReady, normalizeJourney } from "../journey";
 import { DAILY_GOAL, STOPS_PER_AREA, todayIso, type Child } from "../model";
 import { AcademyPal, BackLink, Foot, LockIcon, Logo, cx } from "./bits";
@@ -13,7 +14,7 @@ import { EggIcon } from "./buddy-view";
 const STOP_NAME = ["Start", "Hop", "Skip", "Boss"];
 
 export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () => void }) {
-  const journey = normalizeJourney(child.journey);
+  const journey = normalizeJourney(child.journey, child.grade);
   const here = areaIndex(journey);
   const today = todayIso();
   const eggReady = child.dailyDate === today && child.egg === "closed";
@@ -50,7 +51,9 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
       </div>
       <ol className="ac-islands" data-area={journey.areaId} data-stop={journey.stop}>
         {GAMES.map((game, index) => {
-          const open = areaOpen(journey, index);
+          const open = areaOpen(journey, index, child.grade);
+          const offer = bandFor(game.id, child.grade)?.offer ?? "play";
+          const later = offer === "later" && !child.challengeAhead;
           const current = index === here;
           const beaten = journey.bosses.includes(game.id);
           const host = hostIdFor(game.id);
@@ -61,8 +64,20 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
                 <AcademyPal id={host} className={cx(!open && "ac-sil")} label={open ? hostName : ""} />
                 <div>
                   <h2>{game.title}</h2>
-                  {open ? <p className="ac-bubble">{catchphrase(host)}</p> : null}
-                  <p>{!open ? "Locked" : beaten ? `${hostName} is your friend` : current ? "You are here" : `${hostName} says hi`}</p>
+                  {open && !later ? <p className="ac-bubble">{catchphrase(host)}</p> : null}
+                  <p>
+                    {later
+                      ? "Coming later"
+                      : !open
+                        ? "Locked"
+                        : beaten
+                          ? `${hostName} is your friend`
+                          : current
+                            ? "You are here"
+                            : offer === "intro"
+                              ? "Gentle intro"
+                              : `${hostName} says hi`}
+                  </p>
                 </div>
               </div>
               <div className="ac-stops" aria-hidden="true">
@@ -81,9 +96,11 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
                   );
                 })}
               </div>
-              {open ? (
+              {later ? (
+                <p className="ac-hint">Coming later for this grade.</p>
+              ) : open ? (
                 <a className="ac-quiet" href={`#/play/${game.id}`}>
-                  {current && bossReady(journey, game.id) ? "Boss round" : current ? "Play" : "Practice"}
+                  {current && bossReady(journey, game.id, child.grade) ? "Boss round" : current ? "Play" : offer === "intro" ? "Gentle intro" : "Practice"}
                 </a>
               ) : (
                 <p className="ac-hint">

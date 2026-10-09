@@ -2,6 +2,7 @@ import { parseTimesKey, timesKey } from "@/lib/practice";
 import { makeFluencyItem } from "@/lib/questions";
 import type { Rng } from "@/lib/rng";
 import type { FluencyData, Question } from "@/lib/types";
+import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { Equation, Groups, SquisheeImg, cx } from "../ui/bits";
 import { fourChoices, qid } from "./choices";
@@ -16,6 +17,9 @@ export const TIMES_SPEC: Record<TimesLevel, { factors: number[]; max: number }> 
   mix: { factors: [2, 3, 4, 5, 10], max: 10 },
   toTen: { factors: [2, 3, 4, 5, 6, 7, 8, 9, 10], max: 10 },
 };
+
+/** 6, 7, 8, and 9 are grade 3 facts (3.OA). Earlier levels may still use 10. */
+const LATER_FACTORS = [6, 7, 8, 9];
 
 const LEVELS = [
   { id: "count", label: "2s, 5s, 10s · small", num: 1 },
@@ -32,13 +36,15 @@ export function isTimesLevel(v: unknown): v is TimesLevel {
 }
 
 function defaultLevel(grade: Grade): TimesLevel {
+  const start = bandFor("times", grade)?.start;
+  if (isTimesLevel(start)) return start;
   switch (grade) {
     case "K":
       return "count";
     case "1":
-      return "twos";
+      return "count";
     case "2":
-      return "mix";
+      return "twos";
     case "3":
       return "toTen";
     default: {
@@ -58,40 +64,64 @@ function fluencyTimes(q: Question): { a: number; b: number } | null {
   return { a: row.a, b: row.b };
 }
 
+function partnerOk(level: TimesLevel, partner: number, spec: { max: number }): boolean {
+  if (partner < 1 || partner > spec.max) return false;
+  if (level === "toTen") return true;
+  return !LATER_FACTORS.includes(partner);
+}
+
+function partnersFor(level: TimesLevel, spec: { max: number }): number[] {
+  const partners: number[] = [];
+  for (let n = 1; n <= spec.max; n++) {
+    if (partnerOk(level, n, spec)) partners.push(n);
+  }
+  return partners;
+}
+
 function orientFactors(
+  level: TimesLevel,
   a: number,
   b: number,
   spec: { factors: number[]; max: number },
 ): { a: number; b: number } | null {
-  const aOk = spec.factors.includes(a) && b >= 1 && b <= spec.max;
-  const bOk = spec.factors.includes(b) && a >= 1 && a <= spec.max;
+  const aOk = spec.factors.includes(a) && partnerOk(level, b, spec);
+  const bOk = spec.factors.includes(b) && partnerOk(level, a, spec);
   if (aOk) return { a, b };
   if (bOk) return { a: b, b: a };
   return null;
 }
 
-function preferInLevel(keys: string[], spec: { factors: number[]; max: number }): string[] {
+function preferInLevel(keys: string[], level: TimesLevel, spec: { factors: number[]; max: number }): string[] {
   return keys.filter((key) => {
     const parsed = parseTimesKey(key);
     if (!parsed) return false;
-    const aOk = spec.factors.includes(parsed.a) && parsed.b >= 1 && parsed.b <= spec.max;
-    const bOk = spec.factors.includes(parsed.b) && parsed.a >= 1 && parsed.a <= spec.max;
-    return aOk || bOk;
+    return orientFactors(level, parsed.a, parsed.b, spec) !== null;
   });
+}
+
+/** Equal groups of 2, 5, or 10 stay small enough to count. */
+function countFactOk(level: TimesLevel, fact: { a: number; b: number }): boolean {
+  if (level !== "count") return true;
+  return fact.a * fact.b <= 20;
 }
 
 /** Multiplication fact from Squishee Math's fluency engine, kept inside the level. */
 export function nextTimesFact(rng: Rng, level: TimesLevel, prefer: string[] = []): { a: number; b: number } {
   const spec = TIMES_SPEC[level];
-  const usable = preferInLevel(prefer, spec);
+  const usable = preferInLevel(prefer, level, spec);
   for (let i = 0; i < 8; i++) {
     const q = makeFluencyItem(rng, spec.factors, i === 0 && usable.length ? usable : undefined);
     const fact = fluencyTimes(q);
     if (!fact) continue;
-    const oriented = orientFactors(fact.a, fact.b, spec);
-    if (oriented) return oriented;
+    const oriented = orientFactors(level, fact.a, fact.b, spec);
+    if (oriented && countFactOk(level, oriented)) return oriented;
   }
-  return { a: rng.pick(spec.factors), b: rng.int(1, spec.max) };
+  const partners = partnersFor(level, spec);
+  for (let i = 0; i < 20; i++) {
+    const fact = { a: rng.pick(spec.factors), b: rng.pick(partners) };
+    if (countFactOk(level, fact)) return fact;
+  }
+  return { a: 2, b: 2 };
 }
 
 function tableTags(a: number, b: number): string[] {

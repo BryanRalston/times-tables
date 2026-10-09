@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Rng } from "@/lib/rng";
+import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { SquisheeImg, cx } from "../ui/bits";
 import { qid } from "./choices";
@@ -46,6 +47,7 @@ export function makeSpellingQuestion(rng: Rng, level: SpellLevel, prefer: string
   const tiles = buildTiles(word.word, extraLetters(word.word, rng), rng);
   const choices = rng.shuffle([word.word, ...decoyWords(word.word)]);
   const sentence = blankOut(word.sentence, word.word);
+  const showSentence = level === "patterns";
   return {
     id: qid(rng),
     game: "spelling",
@@ -70,6 +72,7 @@ export function makeSpellingQuestion(rng: Rng, level: SpellLevel, prefer: string
       fallback: word.word,
       caption: "No speaker. Spell this word:",
       bigFallback: true,
+      showSentence,
     },
   };
 }
@@ -92,6 +95,8 @@ function labelFor(rows: { key: string; label: string }[], key: string): string |
 }
 
 function defaultLevel(grade: Grade): SpellLevel {
+  const start = bandFor("spelling", grade)?.start;
+  if (isSpellLevel(start)) return start;
   switch (grade) {
     case "K":
       return "cvc";
@@ -132,7 +137,7 @@ export function SpellingPrompt({
         large={visual.bigFallback}
         label="Hear the word and the sentence"
       />
-      <p className="ac-fill-sentence">{visual.sentence}</p>
+      {visual.showSentence ? <p className="ac-fill-sentence">{visual.sentence}</p> : null}
       <p className="ac-hint">{question.hint}</p>
     </section>
   );
