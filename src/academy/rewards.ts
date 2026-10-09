@@ -2,7 +2,9 @@ import { applyBuyCosmetic, COSMETICS, isCosmeticId } from "@/lib/cosmetics";
 import { hashSeed } from "@/lib/rng";
 import { noteMark, skillHeat } from "./adapt";
 import { GAMES, barKeys, chipKeys, chipLabel as chipText, skillLabel as skillText, type GameId } from "./games/registry";
-import { advanceJourney, withDailyRound } from "./journey";
+import { syncEgg } from "./buddy/egg";
+import { friendFromBoss } from "./buddy/hosts";
+import { advanceJourney, bossWon, withDailyRound } from "./journey";
 import { noteRoundWords } from "./games/words";
 import { SQUAD_IDS, addDays, weekDates, type Child, type RoundResult, type SkillStat } from "./model";
 
@@ -147,6 +149,7 @@ export function applyRound(child: Child, result: RoundResult, today: string): Ch
   const bestCombo = Math.max(0, Math.floor(result.bestCombo ?? 0));
   const boss = result.boss === true;
   const daily = withDailyRound(child, today);
+  const befriended = boss && bossWon(result.correct, result.total);
   return {
     ...child,
     stars: child.stars + stars,
@@ -167,7 +170,9 @@ export function applyRound(child: Child, result: RoundResult, today: string): Ch
       total: result.total,
       boss,
     }),
+    friends: friendFromBoss(child.friends, result.game, befriended),
     ...daily,
+    egg: syncEgg(child, daily),
   };
 }
 

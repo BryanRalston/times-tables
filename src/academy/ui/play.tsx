@@ -12,6 +12,9 @@ import {
   stepLadder,
   type Ladder,
 } from "../adapt";
+import { hostIdFor } from "../buddy/hosts";
+import { buddyReaction } from "../buddy/react";
+import { slotStory } from "../buddy/story";
 import { gameById, pillLabel } from "../games/registry";
 import { makeClockTask, makePayTask } from "../hands";
 import { bossReady, bossWon } from "../journey";
@@ -40,7 +43,9 @@ import {
 import { blip, chime, teachTone } from "../sound";
 import { hintCue } from "../teach";
 import { silence, speak } from "../voice";
+import { CoinShare, HostGreet, RoundBuddy } from "./buddy-view";
 import { Flame, SpeakerIcon, SquisheeImg, Stars, cx, fmtSeconds } from "./bits";
+import { RoundCastProvider } from "./round-cast";
 import { CoinRow } from "./coins";
 import { ClockBoard, PayBoard } from "./hands";
 import { WorkedExample } from "./teach-view";
@@ -541,6 +546,9 @@ export function PlayScreen({
   const asking = phase === "ask" || phase === "practice";
   const ok = phase === "feedback";
   const reaction = phase === "feedback" ? (combo >= 3 ? "★" : "✓") : phase === "teach" ? "…" : null;
+  const hostId = hostIdFor(game);
+  const host = squisheeById(hostId);
+  const buddyCue = buddyReaction({ phase, ok, stars: liveStars, hintOn });
   const choice = slot?.kind === "choice" ? slot.question : null;
   const filled = dots.filter((dot) => dot != null).length;
 
@@ -615,13 +623,16 @@ export function PlayScreen({
             {correct} of {total} · {liveStars} {liveStars === 1 ? "star" : "stars"} · +
             {coinsForRound(correct, total, bestCombo, boss)} coins
           </p>
-          {boss ? (
-            <p className="ac-hint">
-              {bossWon(correct, total)
-                ? "The next island is open."
-                : "The boss is still there. You can try again."}
-            </p>
+          {boss && bossWon(correct, total) && host ? (
+            <div className="ac-unlock" data-befriend={host.id}>
+              <SquisheeImg id={host.id} className="ac-done-pal" label={host.name} />
+              <p>{host.name} is your friend!</p>
+              <h2>{host.name}</h2>
+            </div>
+          ) : boss ? (
+            <p className="ac-hint">The boss is still there. You can try again.</p>
           ) : null}
+          <RoundBuddy id={child.avatarId} cosmetic={child.equipped} reaction={buddyCue} />
           {friend && !met ? (
             <div className="ac-unlock">
               <p>New friend!</p>
@@ -692,6 +703,11 @@ export function PlayScreen({
             ) : null}
             <Stars value={liveStars} />
           </div>
+          <div className="ac-buddy-row">
+            <RoundBuddy id={child.avatarId} cosmetic={child.equipped} reaction={buddyCue} />
+          </div>
+          {boss ? <HostGreet id={hostId} /> : null}
+          <RoundCastProvider buddyId={child.avatarId} hostId={hostId} equipped={child.equipped}>
           <div
             className={cx(
               "ac-stage",
@@ -719,14 +735,21 @@ export function PlayScreen({
               </div>
             ) : (
               <div className="ac-stage-main" key={slotFact(slot) + phase}>
-                {slot.kind === "clock" ? (
-                  <ClockBoard task={slot} onAnswer={(good) => answer(good)} />
-                ) : slot.kind === "pay" ? (
-                  <PayBoard task={slot} onAnswer={(good) => answer(good)} />
+                {slot.kind === "clock" || slot.kind === "pay" ? (
+                  <>
+                    <p className="ac-story">{slotStory(slot, child.avatarId, hostId)}</p>
+                    {slot.kind === "clock" ? (
+                      <ClockBoard task={slot} onAnswer={(good) => answer(good)} />
+                    ) : (
+                      <PayBoard task={slot} onAnswer={(good) => answer(good)} />
+                    )}
+                  </>
                 ) : choice ? (
                   <>
                     {spec?.Aside ? <spec.Aside question={choice} /> : null}
                     <div className="ac-stage-copy">
+                      <p className="ac-story">{slotStory(slot, child.avatarId, hostId)}</p>
+                      {choice.visual.kind === "money" ? <CoinShare buddyId={child.avatarId} hostId={hostId} /> : null}
                       {spec ? (
                         <spec.Prompt question={choice} reveal={false} mascot={mascot} happy={ok} />
                       ) : null}
@@ -769,6 +792,7 @@ export function PlayScreen({
               </div>
             )}
           </div>
+          </RoundCastProvider>
           <div
             className="ac-progress"
             role="progressbar"

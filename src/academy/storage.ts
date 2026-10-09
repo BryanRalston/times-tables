@@ -1,7 +1,11 @@
 import { parseCosmeticIds, parseEquippedCosmetic } from "@/lib/cosmetics";
+import { squisheeById } from "@/lib/squishees";
+import { hostIdFor } from "./buddy/hosts";
+import { ownedIds, palOwned } from "./buddy/unlock";
 import { defaultLevels, gameById, GAMES, isGameId } from "./games/registry";
 import { blankJourney, parseJourney } from "./journey";
 import {
+  DAILY_GOAL,
   MAX_CHILDREN,
   SQUAD_IDS,
   cleanName,
@@ -16,7 +20,7 @@ import {
 
 /** Stable key. The schema version lives on the save, not in the key name. */
 export const STORAGE_KEY = "squishee-academy-v1";
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 
 /**
  * Migrations run from the save's version up to SAVE_VERSION.
@@ -26,6 +30,7 @@ const MIGRATIONS: Record<number, (raw: Record<string, unknown>) => Record<string
   1: migrateV1toV2,
   2: migrateV2toV3,
   3: migrateV3toV4,
+  4: migrateV4toV5,
 };
 
 /** A newer app wrote this disk. Don't replace it with an older schema. */
@@ -61,6 +66,9 @@ export function blankChild(opts: { id?: string; name?: string; grade?: Grade; av
     dailyDate: null,
     dailyRounds: 0,
     dailyGift: "none",
+    friends: [],
+    hatched: [],
+    egg: "none",
     words: {},
   };
 }
@@ -119,6 +127,33 @@ function migrateV3toV4(raw: Record<string, unknown>): Record<string, unknown> {
       })
     : raw.children;
   return { ...raw, version: 4, children };
+}
+
+/** Version 4 had word cards, and no buddy book, boss friends, or island egg. */
+function migrateV4toV5(raw: Record<string, unknown>): Record<string, unknown> {
+  const children = Array.isArray(raw.children)
+    ? raw.children.map((row) => {
+        if (!row || typeof row !== "object" || Array.isArray(row)) return row;
+        const child = row as Record<string, unknown>;
+        const journey = asRecord(child.journey);
+        const bosses = Array.isArray(journey.bosses) ? journey.bosses.filter((id): id is string => typeof id === "string") : [];
+        const friends = Array.isArray(child.friends) ? child.friends : bosses.map((id) => hostIdFor(id));
+        const rounds = typeof child.dailyRounds === "number" ? child.dailyRounds : 0;
+        const egg =
+          child.egg === "open" || child.egg === "closed" || child.egg === "none"
+            ? child.egg
+            : rounds >= DAILY_GOAL
+              ? "closed"
+              : "none";
+        return {
+          ...child,
+          friends,
+          hatched: Array.isArray(child.hatched) ? child.hatched : [],
+          egg,
+        };
+      })
+    : raw.children;
+  return { ...raw, version: 5, children };
 }
 
 function migrateRaw(raw: unknown): unknown {
@@ -207,6 +242,16 @@ function parseGifted(raw: unknown): string[] {
   return out;
 }
 
+function parseSquisheeIds(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const out: string[] = [];
+  for (const id of raw) {
+    if (typeof id !== "string" || !squisheeById(id) || out.includes(id)) continue;
+    out.push(id);
+  }
+  return out;
+}
+
 function parseBest(raw: unknown): Record<string, number> {
   const o = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
   const out: Record<string, number> = {};
@@ -219,16 +264,32 @@ export function parseChild(raw: unknown): Child | null {
   const o = raw as Record<string, unknown>;
   if (typeof o.id !== "string" || !o.id || o.id.length > 40) return null;
   const grade = isGrade(o.grade) ? o.grade : "K";
-  const avatarId = isSquadId(o.avatarId) ? o.avatarId : SQUAD_IDS[0];
   const lastPlayed = typeof o.lastPlayed === "string" && DATE_KEY.test(o.lastPlayed) ? o.lastPlayed : null;
   const cosmetics = parseCosmeticIds(o.cosmetics);
   const dailyDate = typeof o.dailyDate === "string" && DATE_KEY.test(o.dailyDate) ? o.dailyDate : null;
+  const journey = parseJourney(o.journey);
+  const friends = parseSquisheeIds(o.friends);
+  for (const boss of journey.bosses) {
+    const host = hostIdFor(boss);
+    if (host && !friends.includes(host)) friends.push(host);
+  }
+  const hatched = parseSquisheeIds(o.hatched);
+  const gifted = parseGifted(o.gifted);
+  const stars = clampInt(o.stars, 0, 100000);
+  const draft = {
+    stars,
+    gifted,
+    friends,
+    hatched,
+  };
+  const avatarRaw = typeof o.avatarId === "string" && squisheeById(o.avatarId) ? o.avatarId : SQUAD_IDS[0];
+  const avatarId = palOwned(draft, avatarRaw) ? avatarRaw : (ownedIds(draft)[0] ?? SQUAD_IDS[0]);
   return {
     id: o.id,
     name: typeof o.name === "string" ? cleanName(o.name) : "",
     grade,
     avatarId,
-    stars: clampInt(o.stars, 0, 100000),
+    stars,
     streak: clampInt(o.streak, 0, 9999),
     lastPlayed,
     opened: clampInt(o.opened, 0, SQUAD_IDS.length, 3),
@@ -240,11 +301,14 @@ export function parseChild(raw: unknown): Child | null {
     coins: clampInt(o.coins, 0, 1_000_000),
     cosmetics,
     equipped: parseEquippedCosmetic(o.equipped, cosmetics),
-    gifted: parseGifted(o.gifted),
-    journey: parseJourney(o.journey),
+    gifted,
+    journey,
     dailyDate,
     dailyRounds: clampInt(o.dailyRounds, 0, 100),
     dailyGift: parseGiftState(o.dailyGift),
+    friends,
+    hatched,
+    egg: parseGiftState(o.egg),
     words: parseWords(o.words),
   };
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { gameForScreen, isGameId, type GameId } from "./games/registry";
 import { todayIso, type RoundResult, type Save } from "./model";
+import { openEgg } from "./buddy/unlock";
 import { acknowledgeUnlocks, applyRound, claimDailyGift } from "./rewards";
 import { activeChild, loadSave, mapActive, withLevel, writeSave } from "./storage";
 import { warmVoices } from "./voice";
@@ -115,7 +116,12 @@ function AcademyApp() {
   } else if (route.name === "sheets") {
     body = <SheetsScreen />;
   } else if (route.name === "map") {
-    body = <MapScreen child={child} />;
+    body = (
+      <MapScreen
+        child={child}
+        onOpenEgg={() => setSave((current) => mapActive(current, (row) => openEgg(row, todayIso())))}
+      />
+    );
   } else {
     body = (
       <HomeScreen
