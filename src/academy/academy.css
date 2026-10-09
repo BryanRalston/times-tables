@@ -563,7 +563,7 @@ button.ac-go:disabled { opacity: 0.45; }
 }
 .ac-gift:disabled { opacity: 0.55; }
 .ac-gift.is-open:disabled { opacity: 1; }
-.ac-gift.is-ready { animation: ac-hop 0.9s ease infinite; }
+.ac-gift.is-ready { animation: ac-hop 0.8s ease 3; }
 .ac-gift-ico { width: 100%; height: 100%; }
 .ac-map-link {
   display: inline-block;
