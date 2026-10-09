@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
+import { TRIANGLE_POINTS } from "./scene-ui";
 import { SHAPE_LEVELS, makeShapeQuestion, shapesGame } from "./shapes";
 import type { ChoiceQ } from "./types";
 
@@ -39,6 +40,8 @@ describe("shape questions", () => {
           case "parts":
             expect(q.visual.hands).toBe(true);
             expect(["halves", "thirds", "fourths", "unequal"]).toContain(q.answer);
+            expect(q.visual.pictures?.[q.answer]).toBe(`shape:${q.answer}`);
+            expect(q.visual.labels[q.answer]).toBe("");
             break;
           default: {
             const neverBoard: never = board;
@@ -59,6 +62,14 @@ describe("shape questions", () => {
         }
         if (level.id === "parts") expect(["halves", "thirds", "fourths", "not equal"]).toContain(row.answer);
       }
+      const points = TRIANGLE_POINTS.split(/[\s,]+/).map(Number);
+      const corners: Array<[number, number]> = [];
+      for (let i = 0; i < points.length; i += 2) corners.push([points[i]!, points[i + 1]!]);
+      const lengths = corners.map((corner, index) => {
+        const next = corners[(index + 1) % corners.length]!;
+        return Math.hypot(corner[0] - next[0], corner[1] - next[1]);
+      });
+      expect(Math.max(...lengths) - Math.min(...lengths)).toBeLessThan(0.2);
     }
   });
 });

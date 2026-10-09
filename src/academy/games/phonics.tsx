@@ -82,14 +82,14 @@ export const PHONEME: Record<string, string> = {
 export const RHYME_FAMILIES = [
   { family: "at", words: ["cat", "bat", "hat", "mat", "rat", "sat"] },
   { family: "an", words: ["can", "man", "pan", "ran", "van", "fan"] },
-  { family: "ig", words: ["pig", "dig", "wig", "big", "fig", "rig"] },
-  { family: "op", words: ["hop", "mop", "top", "pop", "cop", "bop"] },
+  { family: "ig", words: ["pig", "dig", "wig", "big", "fig"] },
+  { family: "op", words: ["hop", "mop", "top", "pop"] },
   { family: "ug", words: ["bug", "hug", "mug", "rug", "jug", "tug"] },
-  { family: "ed", words: ["bed", "red", "fed", "wed", "led", "ned"] },
-  { family: "in", words: ["pin", "bin", "fin", "win", "tin", "kin"] },
+  { family: "ed", words: ["bed", "red", "fed", "led"] },
+  { family: "in", words: ["pin", "bin", "fin", "win", "tin"] },
   { family: "ot", words: ["hot", "pot", "cot", "dot", "lot", "not"] },
   { family: "ap", words: ["cap", "map", "nap", "tap", "gap", "lap"] },
-  { family: "un", words: ["sun", "run", "fun", "bun", "nun", "pun"] },
+  { family: "un", words: ["sun", "run", "fun", "bun"] },
 ] as const;
 
 const CVC_WORDS = RHYME_FAMILIES.flatMap((row) => row.words);
@@ -403,13 +403,13 @@ export const phonicsGame = sceneModule({
   id: "phonics",
   title: "Phonics",
   short: "Phonics",
-  audience: "K–2",
+  audience: "K–3",
   tint: "lilac",
   mascot: "bunny",
   sheetSlug: "phonics",
   sheetScreen: "sheet-phonics",
   blurb:
-    "Free phonics practice for grades K–2. Letter sounds, beginning sounds with pictures, rhyming words, and CVC blending. A speaker reads the sound, with the sound written out when a voice is not available.",
+    "Free phonics practice for kindergarten through grade 3. Letter sounds, beginning sounds with pictures, rhyming words, and CVC blending. A speaker reads the sound, with the sound written out when a voice is not available.",
   levels: [...LEVELS],
   defaultLevel,
   sheetDefaultLevel: "sounds",

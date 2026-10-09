@@ -15,6 +15,14 @@ function bankWord(word: string) {
 }
 
 describe("phonics questions", () => {
+  it("keeps rhyme families to words a child is likely to know", () => {
+    const avoid = ["wed", "ned", "rig", "bop", "cop", "nun", "pun", "kin"];
+    for (const family of RHYME_FAMILIES) {
+      expect(family.words.length).toBeGreaterThanOrEqual(4);
+      for (const word of family.words) expect(avoid).not.toContain(word);
+    }
+  });
+
   it("matches letter sounds, rhymes, and CVC blends", () => {
     for (let seed = 0; seed < 24; seed += 1) {
       for (const level of PHONICS_LEVELS) {

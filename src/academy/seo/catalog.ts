@@ -441,8 +441,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   ),
   {
     slug: "counting-to-20",
-    title: "Free Counting to 20 Worksheet (Pre-K–K) | Squishee Academy",
-    description: "Print a free counting worksheet for Pre-K and kindergarten. Count to 20, compare more and less, and find the number before and after. Answer key included. No signup.",
+    title: "Free Counting to 20 Worksheet (K–3) | Squishee Academy",
+    description: "Print a free counting worksheet for kindergarten through grade 3. Count to 20, compare more and less, and find the number before and after. Answer key included. No signup.",
     h1: "Counting to 20",
     game: "count",
     items: [
@@ -517,8 +517,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "measuring-length",
-    title: "Free Measurement Worksheet (Grades 1–3) | Squishee Academy",
-    description: "Print a free measurement worksheet for grades 1–3. Compare length, read a ruler, and read a graph. Answer key included. No signup.",
+    title: "Free Measurement Worksheet (K–3) | Squishee Academy",
+    description: "Print a free measurement worksheet for kindergarten through grade 3. Compare length, read a ruler, and read a graph. Answer key included. No signup.",
     h1: "Measuring length",
     game: "measure",
     items: [
@@ -536,8 +536,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "phonics-beginning-sounds",
-    title: "Free Phonics Worksheet (K–2) | Squishee Academy",
-    description: "Print a free phonics worksheet for grades K–2. Beginning sounds, rhymes, and CVC blending. Answer key included. No signup.",
+    title: "Free Phonics Worksheet (K–3) | Squishee Academy",
+    description: "Print a free phonics worksheet for kindergarten through grade 3. Beginning sounds, rhymes, and CVC blending. Answer key included. No signup.",
     h1: "Beginning sounds",
     game: "phonics",
     items: [
@@ -555,14 +555,14 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "addition-word-problems",
-    title: "Free Word Problems Worksheet (Grades 1–3) | Squishee Academy",
-    description: "Print a free word problem worksheet for grades 1–3. Add, subtract, multiply, and share stories with an answer key. No signup.",
+    title: "Free Word Problems Worksheet (K–3) | Squishee Academy",
+    description: "Print a free word problem worksheet for kindergarten through grade 3. Add, subtract, multiply, and share stories with an answer key. No signup.",
     h1: "Addition word problems",
     game: "problems",
     items: [
       { prompt: "Sam has 3 apples. Jo gives Sam 2 more. How many apples?", answer: "5" },
       { prompt: "Sam has 4 apples. Jo gives Sam 4 more. How many apples?", answer: "8" },
-      { prompt: "Sam has 0 apples. Jo gives Sam 6 more. How many apples?", answer: "6" },
+      { prompt: "Sam has 2 apples. Jo gives Sam 5 more. How many apples?", answer: "7" },
       { prompt: "Max has 8 fish and gives away 3. How many fish are left?", answer: "5" },
       { prompt: "Max has 12 fish and gives away 4. How many fish are left?", answer: "8" },
       { prompt: "Ana has 3 bags with 4 stars in each bag. How many stars?", answer: "12" },

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
 import { PROBLEM_LEVELS, makeProblemQuestion, problemsGame } from "./problems";
+import { pictureAlt } from "./scene-ui";
 import type { ChoiceQ } from "./types";
 
 function expectChoices(q: ChoiceQ) {
@@ -39,12 +40,13 @@ describe("word problem questions", () => {
         switch (board.mode) {
           case "add":
             expect(board.a + board.b).toBeLessThanOrEqual(10);
-            expect(board.a).toBeGreaterThanOrEqual(0);
-            expect(board.b).toBeGreaterThanOrEqual(0);
+            expect(board.a).toBeGreaterThanOrEqual(1);
+            expect(board.b).toBeGreaterThanOrEqual(1);
             expect(q.answer).toBe(String(storyAnswer(board.op, board.a, board.b)));
             break;
           case "sub":
             expect(board.a).toBeLessThanOrEqual(12);
+            expect(board.b).toBeGreaterThanOrEqual(1);
             expect(board.b).toBeLessThanOrEqual(board.a);
             expect(q.answer).toBe(String(storyAnswer(board.op, board.a, board.b)));
             break;
@@ -73,6 +75,7 @@ describe("word problem questions", () => {
             const groups = shown.split(" ").filter((part) => part.length > 0);
             expect(groups).toHaveLength(board.a);
             expect(groups.every((part) => part === board.emoji.repeat(board.b))).toBe(true);
+            for (const choice of q.choices) expect(q.visual.labels[choice]).toBe("");
             break;
           }
           default: {
@@ -90,12 +93,15 @@ describe("word problem questions", () => {
         const row = problemsGame.makeSheetItem(rngFromSeed(`problems-sheet-${seed}-${level.id}`), level.id);
         const add = row.prompt.match(/^Sam has (\d+) apples?\. Jo gives Sam (\d+) more\. How many apples\?$/);
         if (add) {
+          expect(Number(add[1])).toBeGreaterThanOrEqual(1);
+          expect(Number(add[2])).toBeGreaterThanOrEqual(1);
           expect(Number(add[1]) + Number(add[2])).toBeLessThanOrEqual(10);
           expect(row.answer).toBe(String(Number(add[1]) + Number(add[2])));
           continue;
         }
         const sub = row.prompt.match(/^Max has (\d+) fish and gives away (\d+)\. How many fish are left\?$/);
         if (sub) {
+          expect(Number(sub[2])).toBeGreaterThanOrEqual(1);
           expect(Number(sub[1])).toBeLessThanOrEqual(12);
           expect(row.answer).toBe(String(Number(sub[1]) - Number(sub[2])));
           continue;
@@ -116,5 +122,13 @@ describe("word problem questions", () => {
         expect(row.answer).toBe(String(Number(picture?.[1]) * Number(picture?.[2])));
       }
     }
+  });
+
+  it("names a single picture by its word and a shared story by its groups", () => {
+    expect(pictureAlt("", "cat", "🐱")).toBe("cat");
+    expect(pictureAlt("", "moon", "🌙")).toBe("moon");
+    expect(pictureAlt("", "p0", "🐸🐸 🐸🐸")).toBe("2 groups of 2");
+    expect(pictureAlt("", "p1", "⭐⭐⭐")).toBe("1 group of 3");
+    expect(pictureAlt("", "halves", "shape:halves")).toBe("Two equal parts");
   });
 });

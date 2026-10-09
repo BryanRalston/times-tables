@@ -1,7 +1,7 @@
 import type { Rng } from "@/lib/rng";
 import type { Grade } from "../model";
 import { blockPhrase, expandedForm, roundHalfUp, type PlaceBoard } from "./boards";
-import { nearChoices, sceneQuestion, uniqueChoices } from "./pick";
+import { extremeChoices, nearChoices, sceneQuestion, uniqueChoices } from "./pick";
 import { BaseTen, SceneCard, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
@@ -111,22 +111,27 @@ function makeCompare(rng: Rng): ChoiceQ {
   const wide = rng.next() < 0.45;
   const lo = 10;
   const hi = wide ? 999 : 99;
-  const left = rng.int(lo, hi);
-  const right = different(rng, left, lo, hi);
-  const askGreater = rng.next() < 0.5;
-  const answer = askGreater ? Math.max(left, right) : Math.min(left, right);
+  let left = rng.int(lo, hi);
+  let right = different(rng, left, lo, hi);
+  let askGreater = rng.next() < 0.5;
+  let answer = askGreater ? Math.max(left, right) : Math.min(left, right);
+  let other = answer === left ? right : left;
+  let choices = extremeChoices(rng, answer, other, askGreater, 0, 999);
+  if (choices.some((choice) => choice.startsWith("no "))) {
+    askGreater = true;
+    left = rng.int(lo, hi - 1);
+    right = different(rng, left, lo, hi);
+    answer = Math.max(left, right);
+    other = Math.min(left, right);
+    choices = extremeChoices(rng, answer, other, true, 0, 999);
+  }
   const board: PlaceBoard = { game: "place", mode: "compare", left, right, ask: askGreater ? "greater" : "less" };
   return sceneQuestion(rng, {
     game: "place",
     title: askGreater ? "Which number is greater?" : "Which number is less?",
     hint: "Look at the hundreds, then the tens",
     answer: String(answer),
-    choices: uniqueChoices(
-      rng,
-      String(answer),
-      [String(left + 1), String(Math.max(0, right - 1)), String(left + 10), String(Math.max(0, right - 10))],
-      [String(left), String(right)],
-    ),
+    choices,
     skill: "place:compare",
     tags: ["compare"],
     solved: `${answer} is ${askGreater ? "greater" : "less"}`,

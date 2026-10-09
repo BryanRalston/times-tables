@@ -65,8 +65,45 @@ const HALF_FOURTHS = ["1/2", "2/2", "1/4", "2/4", "3/4", "4/4"];
 const THROUGH_FOURTHS = ["1/2", "2/2", "1/3", "2/3", "1/4", "2/4", "3/4", "4/4"];
 const THROUGH_EIGHTHS = ["1/2", "1/3", "1/4", "2/3", "2/4", "3/4", "1/6", "2/6", "3/6", "1/8", "2/8", "3/8", "4/8", "6/8"];
 
+function fractionValue(text: string): number | null {
+  if (text === "0") return 0;
+  if (text === "1") return 1;
+  const match = /^(\d+)\/(\d+)$/.exec(text);
+  if (!match) return null;
+  return Number(match[1]) / Number(match[2]);
+}
+
+function notEquivalent(answer: string, items: readonly string[]): string[] {
+  const target = fractionValue(answer);
+  const seen = new Set<number>();
+  if (target != null) seen.add(target);
+  const out: string[] = [];
+  for (const item of items) {
+    if (!item || item === answer || out.includes(item)) continue;
+    const value = fractionValue(item);
+    if (value == null || seen.has(value)) continue;
+    const parts = /^(\d+)\/(\d+)$/.exec(item);
+    if (parts && Number(parts[1]) > Number(parts[2])) continue;
+    seen.add(value);
+    out.push(item);
+  }
+  return out;
+}
+
 function fracChoices(rng: Rng, answer: string, extras: string[], pool: readonly string[]): string[] {
-  return uniqueChoices(rng, answer, pool, extras);
+  return uniqueChoices(rng, answer, notEquivalent(answer, pool), notEquivalent(answer, extras));
+}
+
+const COMPARE_POOL = ["1/4", "1/3", "1/2", "2/3", "3/4", "1"];
+
+function compareFractionChoices(rng: Rng, left: string, right: string, answer: string, askGreater: boolean): string[] {
+  const answerValue = fractionValue(answer) ?? 0;
+  const pool = notEquivalent(answer, COMPARE_POOL).filter((item) => {
+    if (item === left || item === right) return false;
+    const value = fractionValue(item) ?? 0;
+    return askGreater ? value < answerValue : value > answerValue;
+  });
+  return uniqueChoices(rng, answer, pool, [left, right].filter((item) => item !== answer));
 }
 
 function makeParts(rng: Rng): ChoiceQ {
@@ -127,7 +164,7 @@ function makeLine(rng: Rng): ChoiceQ {
     title: "Which fraction is the dot?",
     hint: "Read the tick under the dot",
     answer,
-    choices: uniqueChoices(rng, answer, [...ticks, "1/2", "3/4"]),
+    choices: uniqueChoices(rng, answer, notEquivalent(answer, [...ticks, "1/2", "3/4"])),
     skill: "fractions:line",
     tags: ["line"],
     solved: `The dot is at ${answer}`,
@@ -145,30 +182,44 @@ function value(num: number, den: number): number {
 }
 
 function makeCompare(rng: Rng): ChoiceQ {
-  const sameDen = rng.next() < 0.5;
+  const dens = [2, 3, 4];
+  let sameDen = true;
   let num = 1;
   let den = 2;
   let num2 = 1;
-  let den2 = 3;
-  const dens = [2, 3, 4];
-  if (sameDen) {
-    den = rng.pick(dens.filter((item) => item >= 3));
-    den2 = den;
-    num = rng.int(1, den - 1);
-    num2 = rng.int(1, den - 1);
-    if (num2 === num) num2 = num === 1 ? 2 : num - 1;
-  } else {
-    num = rng.pick([1, 2]);
-    num2 = num;
-    const wider = dens.filter((item) => item > num);
-    den = rng.pick(wider);
-    den2 = rng.pick(wider.filter((item) => item !== den));
+  let den2 = 4;
+  let askGreater = true;
+  let left = "1/2";
+  let right = "1/4";
+  let answer = "1/2";
+  let choices = compareFractionChoices(rng, left, right, answer, true);
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    sameDen = rng.next() < 0.5;
+    if (sameDen) {
+      den = rng.pick(dens.filter((item) => item >= 3));
+      den2 = den;
+      num = rng.int(1, den - 1);
+      num2 = rng.int(1, den - 1);
+      if (num2 === num) num2 = num === 1 ? 2 : num - 1;
+    } else {
+      num = rng.pick([1, 2]);
+      num2 = num;
+      const wider = dens.filter((item) => item > num);
+      den = rng.pick(wider);
+      den2 = rng.pick(wider.filter((item) => item !== den));
+    }
+    askGreater = rng.next() < 0.5;
+    left = `${num}/${den}`;
+    right = `${num2}/${den2}`;
+    const leftBigger = value(num, den) > value(num2, den2);
+    answer = askGreater ? (leftBigger ? left : right) : leftBigger ? right : left;
+    choices = compareFractionChoices(rng, left, right, answer, askGreater);
+    if (!choices.some((choice) => choice.startsWith("no "))) break;
+    askGreater = !askGreater;
+    answer = askGreater ? (leftBigger ? left : right) : leftBigger ? right : left;
+    choices = compareFractionChoices(rng, left, right, answer, askGreater);
+    if (!choices.some((choice) => choice.startsWith("no "))) break;
   }
-  const askGreater = rng.next() < 0.5;
-  const left = `${num}/${den}`;
-  const right = `${num2}/${den2}`;
-  const leftBigger = value(num, den) > value(num2, den2);
-  const answer = askGreater ? (leftBigger ? left : right) : leftBigger ? right : left;
   const board: FractionBoard = {
     game: "fractions",
     mode: "compare",
@@ -180,10 +231,10 @@ function makeCompare(rng: Rng): ChoiceQ {
   };
   return sceneQuestion(rng, {
     game: "fractions",
-    title: askGreater ? "Which fraction is greater?" : "Which fraction is less?",
-    hint: sameDen ? "Same denominator. More parts is greater." : "Same numerator. Bigger pieces is greater.",
+    title: askGreater ? "Which shaded fraction is greater?" : "Which shaded fraction is less?",
+    hint: sameDen ? "Same denominator. More parts are greater." : "Same numerator. Bigger pieces are greater.",
     answer,
-    choices: fracChoices(rng, answer, [left, right], THROUGH_FOURTHS),
+    choices,
     skill: "fractions:compare",
     tags: ["compare"],
     solved: `${answer} is ${askGreater ? "greater" : "less"}`,
@@ -205,7 +256,11 @@ function makeEquivalent(rng: Rng): ChoiceQ {
     title: `Which fraction matches ${num}/${den}?`,
     hint: "Same amount, different parts",
     answer,
-    choices: fracChoices(rng, answer, [`${num}/${den}`, `${num2}/${den}`, `1/${den2}`], THROUGH_EIGHTHS),
+    choices: uniqueChoices(
+      rng,
+      answer,
+      notEquivalent(answer, THROUGH_EIGHTHS).filter((item) => item !== `${num}/${den}`),
+    ),
     skill: "fractions:equivalent",
     tags: ["equivalent"],
     solved: `${num}/${den} = ${answer}`,
@@ -272,7 +327,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       return { prompt: `${num} of ${den} equal parts are shaded. What fraction?`, answer: `${num}/${den}` };
     }
     case "unit": {
-      const den = rng.pick([2, 3, 4, 6, 8]);
+      const den = rng.pick([2, 3, 4]);
       return { prompt: `1 of ${den} equal parts is shaded. What unit fraction?`, answer: `1/${den}` };
     }
     case "line": {
@@ -281,7 +336,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       return { prompt: `A number line from 0 to 1 has ${den} equal jumps. The dot is on jump ${num}. What fraction?`, answer: fractionText(num, den) };
     }
     case "compare": {
-      const den = rng.int(2, 8);
+      const den = rng.pick([2, 3, 4]);
       const num = rng.int(1, den - 1);
       let num2 = rng.int(1, den - 1);
       if (num2 === num) num2 = num === 1 ? 2 : num - 1;
@@ -327,14 +382,20 @@ function FractionArt({ board }: { board: FractionBoard }) {
     case "compare":
       return (
         <div className="ac-frac-pair">
-          <FractionBar num={board.num} den={board.den} />
-          <FractionBar num={board.num2} den={board.den2} />
+          <div>
+            <FractionBar num={board.num} den={board.den} />
+            <p className="ac-frac-name">{fractionText(board.num, board.den)}</p>
+          </div>
+          <div>
+            <FractionBar num={board.num2} den={board.den2} />
+            <p className="ac-frac-name">{fractionText(board.num2, board.den2)}</p>
+          </div>
         </div>
       );
     case "equivalent":
       return <FractionBar num={board.num} den={board.den} />;
     case "shade":
-      return <p className="ac-big-num">{board.num}/{board.den}</p>;
+      return null;
     default: {
       const neverBoard: never = board;
       return neverBoard;

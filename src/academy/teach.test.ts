@@ -181,6 +181,13 @@ describe("worked examples", () => {
     }
   });
 
+  it("speaks a fraction as words", () => {
+    expect(speakable("1/2")).toBe("one half");
+    expect(speakable("3/4")).toBe("three fourths");
+    expect(speakable("2/8")).toBe("two eighths");
+    expect(speakable("Shade 1/2 of it")).toBe("Shade one half of it");
+  });
+
   it("speaks the question and every choice", () => {
     const line = promptSpeech(addQ());
     expect(line.toLowerCase()).toContain("missing number");

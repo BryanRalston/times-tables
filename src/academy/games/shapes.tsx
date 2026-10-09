@@ -28,10 +28,10 @@ const FLAT: ShapeName[] = ["circle", "triangle", "square", "rectangle"];
 const SOLID: ShapeName[] = ["cube", "sphere", "cone", "cylinder"];
 const POLYGONS: ShapeName[] = ["triangle", "square", "rectangle", "pentagon", "hexagon"];
 const PARTS = [
-  { id: "halves", label: "halves", picture: "🟦🟦" },
-  { id: "thirds", label: "thirds", picture: "🟦🟦🟦" },
-  { id: "fourths", label: "fourths", picture: "🟦🟦🟦🟦" },
-  { id: "unequal", label: "not equal", picture: "🟦🟨🟨" },
+  { id: "halves", label: "halves", picture: "shape:halves" },
+  { id: "thirds", label: "thirds", picture: "shape:thirds" },
+  { id: "fourths", label: "fourths", picture: "shape:fourths" },
+  { id: "unequal", label: "not equal", picture: "shape:unequal" },
 ] as const;
 
 export function isShapeLevel(value: unknown): value is ShapeLevel {
@@ -126,7 +126,7 @@ function makeParts(rng: Rng): ChoiceQ {
   const labels: Record<string, string> = {};
   for (const row of PARTS) {
     pictures[row.id] = row.picture;
-    labels[row.id] = row.label;
+    labels[row.id] = "";
   }
   const board: ShapeBoard = { game: "shapes", mode: "parts", parts: part.id };
   return sceneQuestion(rng, {
@@ -213,7 +213,13 @@ function sheetItem(rng: Rng, level: string): SheetItem {
     }
     case "parts": {
       const part = rng.pick(PARTS);
-      return { prompt: `A shape split into ${part.picture} shows`, answer: part.label };
+      const equal = part.id === "halves" ? "2" : part.id === "thirds" ? "3" : part.id === "fourths" ? "4" : "";
+      return {
+        prompt: equal
+          ? `A shape is split into ${equal} equal parts. What are the parts called?`
+          : "A shape is split into parts that are not the same size. What do you call those parts?",
+        answer: part.label,
+      };
     }
     default: {
       const neverLevel: never = safe;

@@ -49,6 +49,26 @@ export function nearChoices(rng: Rng, answer: number, lo: number, hi: number, ex
   return uniqueChoices(rng, String(answer), pool.map(String));
 }
 
+/** The keyed answer is the greatest or least choice, so a bigger distractor cannot be "more right". */
+export function extremeChoices(
+  rng: Rng,
+  answer: number,
+  other: number,
+  askGreater: boolean,
+  lo: number,
+  hi: number,
+): string[] {
+  const pool: string[] = [];
+  const add = (n: number) => {
+    if (!Number.isInteger(n) || n < lo || n > hi || n === answer || n === other) return;
+    if (askGreater ? n >= answer : n <= answer) return;
+    const text = String(n);
+    if (!pool.includes(text)) pool.push(text);
+  };
+  for (let step = 1; step <= 40; step += 1) add(askGreater ? answer - step : answer + step);
+  return uniqueChoices(rng, String(answer), pool, [String(other)]);
+}
+
 export function distinctInts(rng: Rng, count: number, lo: number, hi: number): number[] {
   const span = hi - lo + 1;
   const bag = rng.shuffle(Array.from({ length: Math.max(0, span) }, (_, i) => lo + i));

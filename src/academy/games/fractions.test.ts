@@ -56,12 +56,26 @@ describe("fraction questions", () => {
             expect(q.answer).toBe(board.ask === "greater" ? greater : lesser);
             expect(q.choices).toContain(`${board.num}/${board.den}`);
             expect(q.choices).toContain(`${board.num2}/${board.den2}`);
+            expect(q.choices).not.toContain("0");
+            const amounts = q.choices.map((choice) => {
+              if (choice === "0") return 0;
+              if (choice === "1") return 1;
+              const [n, d] = choice.split("/").map(Number);
+              return n! / d!;
+            });
+            const keyed = board.ask === "greater" ? Math.max(...amounts) : Math.min(...amounts);
+            expect(amounts.filter((amount) => amount === keyed)).toHaveLength(1);
             break;
           }
           case "equivalent":
             expect(board.num * board.den2).toBe(board.num2 * board.den);
             expect(q.answer).toBe(`${board.num2}/${board.den2}`);
-            expect(`${board.num}/${board.den}`).not.toBe(q.answer);
+            expect(q.choices).not.toContain(`${board.num}/${board.den}`);
+            for (const choice of q.choices) {
+              const [n, d] = choice.split("/").map(Number);
+              expect(n).toBeLessThan(d!);
+              if (choice !== q.answer) expect(n! * board.den).not.toBe(d! * board.num);
+            }
             break;
           case "shade":
             expect(q.visual.hands).toBe(true);
@@ -82,6 +96,11 @@ describe("fraction questions", () => {
     for (let seed = 0; seed < 10; seed += 1) {
       for (const level of fractionsGame.levels) {
         const row = fractionsGame.makeSheetItem(rngFromSeed(`fractions-sheet-${seed}-${level.id}`), level.id);
+        const dens = [...`${row.prompt} ${row.answer}`.matchAll(/\/(\d+)/g)].map((found) => Number(found[1]));
+        for (const found of dens) expect([2, 3, 4, 6, 8]).toContain(found);
+        if (level.id !== "equivalent") {
+          for (const found of dens) expect([2, 3, 4]).toContain(found);
+        }
         const parts = row.prompt.match(/^(\d+) of (\d+) equal parts are shaded\. What fraction\?$/);
         if (parts) {
           expect(row.answer).toBe(`${parts[1]}/${parts[2]}`);

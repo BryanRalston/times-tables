@@ -33,6 +33,12 @@ const THINGS = [
   { name: "bug", emoji: "🐛" },
 ] as const;
 
+function pluralName(name: string): string {
+  if (name === "candy") return "candies";
+  if (name.endsWith("s")) return name;
+  return `${name}s`;
+}
+
 export function isMeasureLevel(value: unknown): value is MeasureLevel {
   return typeof value === "string" && (MEASURE_LEVELS as readonly string[]).includes(value);
 }
@@ -68,13 +74,13 @@ function makeCompare(rng: Rng): ChoiceQ {
   const board: MeasureBoard = { game: "measure", mode: "compare", items, ask: askLong ? "longest" : "shortest" };
   return sceneQuestion(rng, {
     game: "measure",
-    title: askLong ? "Which is longer?" : "Which is shorter?",
+    title: askLong ? "Which is the longest?" : "Which is the shortest?",
     hint: "Look at the bars",
     answer,
     choices: uniqueChoices(rng, answer, [], items.map((item) => item.name)),
     skill: "measure:compare",
     tags: ["compare"],
-    solved: `The ${answer} is ${askLong ? "longer" : "shorter"}`,
+    solved: `The ${answer} is the ${askLong ? "longest" : "shortest"}`,
     picture: items.find((item) => item.name === answer)?.emoji ?? "📏",
     hands: true,
     quietChoices: false,
@@ -116,7 +122,7 @@ function makeGraph(rng: Rng, mode: "picture" | "bar"): ChoiceQ {
   const graph = mode === "picture" ? "picture graph" : "bar graph";
   return sceneQuestion(rng, {
     game: "measure",
-    title: askMost ? `Which has the most on the ${graph}?` : `How many ${focusItem.name}s are on the ${graph}?`,
+    title: askMost ? `Which has the most on the ${graph}?` : `How many ${pluralName(focusItem.name)} are on the ${graph}?`,
     hint: askMost ? "Find the tallest or fullest row" : "Count that row",
     answer,
     choices: askMost
@@ -124,7 +130,7 @@ function makeGraph(rng: Rng, mode: "picture" | "bar"): ChoiceQ {
       : nearChoices(rng, focusItem.value, 0, 10),
     skill: `measure:${mode}`,
     tags: [mode],
-    solved: askMost ? `${answer} has the most` : `${focusItem.value} ${focusItem.name}s`,
+    solved: askMost ? `${answer} has the most` : `${focusItem.value} ${pluralName(focusItem.name)}`,
     picture: focusItem.emoji.repeat(focusItem.value),
     hands: false,
     quietChoices: false,
@@ -142,7 +148,7 @@ function makeMore(rng: Rng): ChoiceQ {
   const answer = high - low;
   return sceneQuestion(rng, {
     game: "measure",
-    title: `How many more ${items[0]!.name}s than ${items[1]!.name}s?`,
+    title: `How many more ${pluralName(items[0]!.name)} than ${pluralName(items[1]!.name)}?`,
     hint: "Subtract the smaller number",
     answer: String(answer),
     choices: nearChoices(rng, answer, 0, 8),
@@ -233,7 +239,7 @@ export function MeasurePrompt({ question, reveal, mascot, happy }: PromptProps) 
 function MeasureArt({ board }: { board: MeasureBoard }) {
   switch (board.mode) {
     case "compare":
-      return <p className="ac-big-num">{board.ask === "longest" ? "Longer" : "Shorter"}</p>;
+      return <p className="ac-big-num">{board.ask === "longest" ? "Longest" : "Shortest"}</p>;
     case "ruler":
       return <Ruler inches={board.inches} />;
     case "picture":
@@ -253,13 +259,13 @@ export const measureGame = sceneModule({
   id: "measure",
   title: "Measurement",
   short: "Measurement",
-  audience: "1–3",
+  audience: "K–3",
   tint: "aqua",
   mascot: "penguin",
   sheetSlug: "measurement",
   sheetScreen: "sheet-measure",
   blurb:
-    "Free measurement and data practice for grades 1–3. Compare longer and shorter, measure inches on a ruler, and read picture graphs and bar graphs.",
+    "Free measurement and data practice for kindergarten through grade 3. Compare longer and shorter, measure inches on a ruler, and read picture graphs and bar graphs.",
   levels: [...LEVELS],
   defaultLevel,
   sheetDefaultLevel: "compare",

@@ -80,13 +80,13 @@ function makeStory(rng: Rng, level: Exclude<ProblemLevel, "picture">): ChoiceQ {
   let op: ProblemBoard["op"] = "+";
   let title = "";
   if (level === "add") {
-    a = rng.int(0, 9);
-    b = rng.int(0, 10 - a);
+    a = rng.int(1, 9);
+    b = rng.int(1, 10 - a);
     op = "+";
     title = `${who} has ${a} ${countName(thing.name, a)}. A friend gives ${who} ${b} more. How many ${thing.name} now?`;
   } else if (level === "sub") {
     a = rng.int(1, 12);
-    b = rng.int(0, a);
+    b = rng.int(1, a);
     op = "-";
     title = `${who} has ${a} ${countName(thing.name, a)} and gives away ${b}. How many ${thing.name} are left?`;
   } else if (level === "mult") {
@@ -162,7 +162,7 @@ function makePicture(rng: Rng): ChoiceQ {
   const labels: Record<string, string> = {};
   options.forEach((row, i) => {
     pictures[ids[i]!] = groupPicture(thing.emoji, row.groups, row.size);
-    labels[ids[i]!] = `${row.groups} groups of ${row.size}`;
+    labels[ids[i]!] = "";
   });
   const board: ProblemBoard = {
     game: "problems",
@@ -215,8 +215,8 @@ function sheetItem(rng: Rng, level: string): SheetItem {
   const safe: ProblemLevel = isProblemLevel(level) ? level : "add";
   switch (safe) {
     case "add": {
-      const a = rng.int(0, 9);
-      const b = rng.int(0, 10 - a);
+      const a = rng.int(1, 9);
+      const b = rng.int(1, 10 - a);
       return {
         prompt: `Sam has ${a} ${countName("apples", a)}. Jo gives Sam ${b} more. How many apples?`,
         answer: String(a + b),
@@ -224,7 +224,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
     }
     case "sub": {
       const a = rng.int(1, 12);
-      const b = rng.int(0, a);
+      const b = rng.int(1, a);
       return {
         prompt: `Max has ${a} fish and gives away ${b}. How many fish are left?`,
         answer: String(a - b),
@@ -299,13 +299,13 @@ export const problemsGame = sceneModule({
   id: "problems",
   title: "Word Problems",
   short: "Word Problems",
-  audience: "1–3",
+  audience: "K–3",
   tint: "rose",
   mascot: "fox",
   sheetSlug: "word-problems",
   sheetScreen: "sheet-problems",
   blurb:
-    "Free word problems for grades 1–3. Short add, subtract, multiply, and share stories with a picture, read aloud for children who are still learning to read.",
+    "Free word problems for kindergarten through grade 3. Short add, subtract, multiply, and share stories with a picture, read aloud for children who are still learning to read.",
   levels: [...LEVELS],
   defaultLevel,
   sheetDefaultLevel: "add",

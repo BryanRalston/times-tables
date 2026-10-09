@@ -38,14 +38,17 @@ describe("place value questions", () => {
             expect(board.n).toBeLessThanOrEqual(999);
             expect(expandSum(q.answer)).toBe(board.n);
             break;
-          case "compare":
+          case "compare": {
             expect(board.left).not.toBe(board.right);
             expect(q.choices).toContain(String(board.left));
             expect(q.choices).toContain(String(board.right));
             expect(q.answer).toBe(String(board.ask === "greater" ? Math.max(board.left, board.right) : Math.min(board.left, board.right)));
+            const nums = q.choices.map(Number);
+            expect(Number(q.answer)).toBe(board.ask === "greater" ? Math.max(...nums) : Math.min(...nums));
             expect(board.left).toBeGreaterThanOrEqual(10);
             expect(board.right).toBeLessThanOrEqual(999);
             break;
+          }
           case "round10":
             expect(board.n).toBeGreaterThanOrEqual(10);
             expect(board.n).toBeLessThanOrEqual(999);

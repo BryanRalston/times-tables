@@ -60,8 +60,29 @@ export interface WorkedExample {
 
 const COIN_ORDER: CoinKind[] = ["dollar", "quarter", "dime", "nickel", "penny"];
 
+const NUMBER_WORD = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+
+const FRACTION_WORD: Record<string, [string, string]> = {
+  "2": ["half", "halves"],
+  "3": ["third", "thirds"],
+  "4": ["fourth", "fourths"],
+  "6": ["sixth", "sixths"],
+  "8": ["eighth", "eighths"],
+};
+
+/** "1/2" is spoken as "one half", so a voice does not say "slash". */
+function speakFractions(text: string): string {
+  return text.replace(/\b(\d+)\/(\d+)\b/g, (full, numText: string, denText: string) => {
+    const pair = FRACTION_WORD[denText];
+    if (!pair) return full;
+    const num = Number(numText);
+    const numWord = NUMBER_WORD[num] ?? numText;
+    return `${numWord} ${num === 1 ? pair[0] : pair[1]}`;
+  });
+}
+
 export function speakable(text: string): string {
-  return text
+  return speakFractions(text)
     .replace(/×/g, " times ")
     .replace(/−/g, " minus ")
     .replace(/\+/g, " plus ")

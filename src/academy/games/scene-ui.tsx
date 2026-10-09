@@ -115,7 +115,7 @@ export function ShapeFig({ name }: { name: ShapeName }) {
     case "triangle":
       return (
         <svg className="ac-shape" viewBox="0 0 120 100" role="img" aria-label={label}>
-          <polygon points="60,10 110,90 10,90" />
+          <polygon points={TRIANGLE_POINTS} />
         </svg>
       );
     case "square":
@@ -179,6 +179,12 @@ export function ShapeFig({ name }: { name: ShapeName }) {
   }
 }
 
+/** Equilateral, so the picture has three lines of symmetry. */
+export const TRIANGLE_POINTS = "60,17.09 98,82.91 22,82.91";
+
+export const RULER_INCH = 18;
+const RULER_SPAN = 12;
+
 export function FractionBar({ num, den }: { num: number; den: number }) {
   return (
     <div className="ac-frac" aria-label={`${num} of ${den}`}>
@@ -214,11 +220,15 @@ export function FractionLine({ den, mark }: { den: number; mark: number }) {
 export function Ruler({ inches }: { inches: number }) {
   return (
     <div className="ac-ruler-wrap">
-      <div className="ac-ruler-obj" style={{ width: inches * 22 }} />
-      <div className="ac-ruler" aria-hidden="true">
-        {Array.from({ length: 13 }, (_, i) => (
-          <span key={i}>{i}</span>
-        ))}
+      <div className="ac-ruler-scale">
+        <div className="ac-ruler-obj" style={{ width: inches * RULER_INCH }} />
+        <div className="ac-ruler" aria-hidden="true" style={{ width: RULER_SPAN * RULER_INCH }}>
+          {Array.from({ length: RULER_SPAN + 1 }, (_, i) => (
+            <span key={i} style={{ left: i * RULER_INCH }}>
+              {i}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -294,7 +304,16 @@ export function StoryGroups({
       </div>
     );
   }
-  return <EmojiRow emoji={emoji} n={a} name="things" />;
+  const each = b > 0 ? Math.floor(a / b) : 0;
+  return (
+    <div className="ac-groups" aria-label={`${b} equal groups`}>
+      {Array.from({ length: b }, (_, i) => (
+        <span key={i} className="ac-group">
+          {emoji.repeat(each)}
+        </span>
+      ))}
+    </div>
+  );
 }
 
 function TextChoices({ question, onChoose }: { question: ChoiceQ; onChoose: ChoiceProps["onChoose"] }) {
@@ -315,13 +334,93 @@ function choiceCaption(label: string | undefined, choice: string): string {
   return label;
 }
 
-function pictureName(label: string | undefined, choice: string, picture: string): string {
+type PartKind = "halves" | "thirds" | "fourths" | "unequal";
+
+function isPartKind(value: string): value is PartKind {
+  return value === "halves" || value === "thirds" || value === "fourths" || value === "unequal";
+}
+
+function partAlt(kind: PartKind): string {
+  switch (kind) {
+    case "halves":
+      return "Two equal parts";
+    case "thirds":
+      return "Three equal parts";
+    case "fourths":
+      return "Four equal parts";
+    case "unequal":
+      return "Parts that are not equal";
+    default: {
+      const neverKind: never = kind;
+      return neverKind;
+    }
+  }
+}
+
+/** Screen-reader name for a picture button. A lone emoji keeps its word. Repeated emoji are groups. */
+export function pictureAlt(label: string | undefined, choice: string, picture: string): string {
   if (picture.startsWith("sq:")) {
     const n = Number(picture.slice(3));
-    return Number.isFinite(n) ? `${n} squishees` : "A group of squishees";
+    if (!Number.isFinite(n)) return "A group of squishees";
+    return `${n} ${n === 1 ? "squishee" : "squishees"}`;
+  }
+  if (picture.startsWith("shape:")) {
+    const kind = picture.slice(6);
+    return isPartKind(kind) ? partAlt(kind) : "A shape split into parts";
+  }
+  const groups = picture.split(" ").filter((part) => part.length > 0);
+  const token = groups[0] ?? "";
+  const units = [...token];
+  const repeated = groups.length > 0 && groups.every((part) => part === token) && units.length > 0 && units.every((unit) => unit === units[0]);
+  if (repeated && (groups.length > 1 || units.length > 1)) {
+    const size = units.length;
+    const count = groups.length;
+    return `${count} ${count === 1 ? "group" : "groups"} of ${size}`;
   }
   if (label) return label;
   return choice;
+}
+
+function PartFig({ kind }: { kind: PartKind }) {
+  const fill = "#7ad7c8";
+  const line = "#0e7d72";
+  switch (kind) {
+    case "halves":
+      return (
+        <svg className="ac-part" viewBox="0 0 80 48" role="img" aria-hidden="true">
+          <rect x="1" y="1" width="38" height="46" fill={fill} stroke={line} strokeWidth="2" />
+          <rect x="41" y="1" width="38" height="46" fill={fill} stroke={line} strokeWidth="2" />
+        </svg>
+      );
+    case "thirds":
+      return (
+        <svg className="ac-part" viewBox="0 0 80 48" role="img" aria-hidden="true">
+          <rect x="1" y="1" width="24" height="46" fill={fill} stroke={line} strokeWidth="2" />
+          <rect x="28" y="1" width="24" height="46" fill={fill} stroke={line} strokeWidth="2" />
+          <rect x="55" y="1" width="24" height="46" fill={fill} stroke={line} strokeWidth="2" />
+        </svg>
+      );
+    case "fourths":
+      return (
+        <svg className="ac-part" viewBox="0 0 80 48" role="img" aria-hidden="true">
+          <rect x="1" y="1" width="38" height="22" fill={fill} stroke={line} strokeWidth="2" />
+          <rect x="41" y="1" width="38" height="22" fill={fill} stroke={line} strokeWidth="2" />
+          <rect x="1" y="25" width="38" height="22" fill={fill} stroke={line} strokeWidth="2" />
+          <rect x="41" y="25" width="38" height="22" fill={fill} stroke={line} strokeWidth="2" />
+        </svg>
+      );
+    case "unequal":
+      return (
+        <svg className="ac-part" viewBox="0 0 80 48" role="img" aria-hidden="true">
+          <rect x="1" y="1" width="22" height="46" fill={fill} stroke={line} strokeWidth="2" />
+          <rect x="25" y="1" width="54" height="46" fill="#f8d7ea" stroke={line} strokeWidth="2" />
+        </svg>
+      );
+    default: {
+      const neverKind: never = kind;
+      return neverKind;
+    }
+  }
 }
 
 function PictureFace({ picture }: { picture: string }) {
@@ -334,6 +433,10 @@ function PictureFace({ picture }: { picture: string }) {
         </span>
       );
     }
+  }
+  if (picture.startsWith("shape:")) {
+    const kind = picture.slice(6);
+    if (isPartKind(kind)) return <PartFig kind={kind} />;
   }
   return (
     <span className="ac-pic-emoji" aria-hidden="true">
@@ -355,7 +458,7 @@ function PictureChoices({ question, onChoose }: { question: ChoiceQ; onChoose: C
             key={choice}
             type="button"
             className="ac-choice is-card"
-            aria-label={pictureName(labels[choice], choice, pictures[choice] ?? "")}
+            aria-label={pictureAlt(labels[choice], choice, pictures[choice] ?? "")}
             onClick={() => onChoose(choice)}
           >
             <PictureFace picture={pictures[choice] ?? ""} />

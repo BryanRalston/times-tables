@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
+import { RULER_INCH } from "./scene-ui";
 import { MEASURE_LEVELS, makeMeasureQuestion, measureGame } from "./measure";
 import type { ChoiceQ } from "./types";
 
@@ -16,6 +17,7 @@ describe("measurement questions", () => {
       for (const level of MEASURE_LEVELS) {
         const q = makeMeasureQuestion(rngFromSeed(`measure-${seed}-${level}`), level);
         expectChoices(q);
+        expect(q.title).not.toContain("candys");
         if (q.visual.kind !== "scene" || q.visual.board.game !== "measure") throw new Error(level);
         const board = q.visual.board;
         switch (board.mode) {
@@ -28,6 +30,7 @@ describe("measurement questions", () => {
               expect(value).toBeGreaterThanOrEqual(2);
               expect(value).toBeLessThanOrEqual(9);
             }
+            expect(q.title).toMatch(board.ask === "longest" ? /longest/ : /shortest/);
             const target = board.ask === "longest" ? Math.max(...values) : Math.min(...values);
             expect(board.items.find((item) => item.name === q.answer)?.value).toBe(target);
             break;
@@ -36,6 +39,7 @@ describe("measurement questions", () => {
             expect(board.inches).toBeGreaterThanOrEqual(1);
             expect(board.inches).toBeLessThanOrEqual(12);
             expect(q.answer).toBe(String(board.inches));
+            expect(board.inches * RULER_INCH).toBe(board.inches * 18);
             for (const choice of q.choices) {
               const n = Number(choice);
               expect(n).toBeGreaterThanOrEqual(1);

@@ -40,6 +40,7 @@ describe("counting questions", () => {
               expect(n).toBeGreaterThanOrEqual(1);
               expect(n).toBeLessThanOrEqual(6);
             }
+            expect(q.title).toMatch(board.ask === "more" ? /most/ : /fewest/);
             const target = board.ask === "more" ? Math.max(...board.groups) : Math.min(...board.groups);
             const index = Number(q.answer.slice(1));
             expect(board.groups[index]).toBe(target);
