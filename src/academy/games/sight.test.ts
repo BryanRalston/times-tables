@@ -56,7 +56,8 @@ describe("sight word lists", () => {
     expect(game?.defaultLevel("1")).toBe("primer");
     expect(game?.defaultLevel("2")).toBe("second");
     expect(game?.defaultLevel("3")).toBe("third");
-    expect(GAMES.map((item) => item.id).slice(-2)).toEqual(["sight", "spelling"]);
+    const ids = GAMES.map((item) => item.id);
+    expect(ids.indexOf("spelling")).toBe(ids.indexOf("sight") + 1);
 
     let hear = 0;
     const modes = new Set<string>();

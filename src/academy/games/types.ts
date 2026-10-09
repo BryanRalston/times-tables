@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Rng } from "@/lib/rng";
 import type { Grade, WordCard } from "../model";
+import type { Board } from "./boards";
 
 export const MINUS = "−";
 export const TIMES = "×";
@@ -92,7 +93,18 @@ export interface MoneyVisual {
   labels?: Record<string, string>;
 }
 
-export type Visual = AddVisual | TimesVisual | TimeVisual | MoneyVisual | SightVisual | SpellVisual;
+export interface SceneVisual {
+  kind: "scene";
+  picture: string;
+  hands: boolean;
+  /** When set, the spoken prompt is the title only, so a builder is not a list of answers. */
+  quietChoices: boolean;
+  labels: Record<string, string>;
+  pictures?: Record<string, string>;
+  board: Board;
+}
+
+export type Visual = AddVisual | TimesVisual | TimeVisual | MoneyVisual | SightVisual | SpellVisual | SceneVisual;
 
 export interface ChoiceQ {
   id: string;

@@ -169,7 +169,21 @@ export function worksheetIndexHtml(): string {
     (sheet) =>
       `<a class="card" href="${sheet.slug}/"><strong>${escapeHtml(sheet.h1)}</strong><small>${escapeHtml(sheet.description)}</small></a>`,
   ).join("");
-  const practice = ["times-tables", "add-subtract", "telling-time", "money"]
+  const practice = [
+    "times-tables",
+    "add-subtract",
+    "telling-time",
+    "money",
+    "sight-words",
+    "spelling",
+    "counting",
+    "place-value",
+    "shapes",
+    "fractions",
+    "measurement",
+    "phonics",
+    "word-problems",
+  ]
     .map((slug) => `<a href="${slug}/">${slug}</a>`)
     .join(" · ");
   return documentPage({
@@ -216,6 +230,15 @@ export function sitemapXml(): string {
     "worksheets/add-subtract",
     "worksheets/telling-time",
     "worksheets/money",
+    "worksheets/sight-words",
+    "worksheets/spelling",
+    "worksheets/counting",
+    "worksheets/place-value",
+    "worksheets/shapes",
+    "worksheets/fractions",
+    "worksheets/measurement",
+    "worksheets/phonics",
+    "worksheets/word-problems",
   ];
   const urls = paths
     .map((path) => `  <url><loc>${canonicalUrl(path)}</loc></url>`)

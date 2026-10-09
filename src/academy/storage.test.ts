@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
 import { STORAGE_KEY as MATH_KEY } from "@/lib/progress";
-import { defaultLevels } from "./games/registry";
+import { GAMES, defaultLevels } from "./games/registry";
 import { MAX_CHILDREN } from "./model";
 import { SAVE_VERSION, STORAGE_KEY, addChild, blankChild, freshSave, loadSave, mapActive, parseSave, withGrade, withLevel, writeSave } from "./storage";
 
@@ -90,12 +90,8 @@ describe("academy save", () => {
     expect(migrated.children[0]?.levels.times).toBe("mix");
     expect(migrated.children[0]?.levels.time).toBe(defaultLevels("3").time);
     expect(migrated.children[0]?.bestStars).toEqual({
+      ...Object.fromEntries(GAMES.map((game) => [game.id, 0])),
       times: 2,
-      add: 0,
-      time: 0,
-      money: 0,
-      sight: 0,
-      spelling: 0,
     });
     expect(migrated.children[0]?.words).toEqual({});
     expect(migrated.children[0]?.coins).toBe(0);
@@ -158,6 +154,28 @@ describe("academy save", () => {
     expect(fromV3.children[0]?.journey).toEqual({ areaId: "add", stop: 1, bosses: ["times"] });
     expect(fromV3.children[0]?.levels.sight).toBe(defaultLevels("2").sight);
     expect(fromV3.children[0]?.levels.spelling).toBe(defaultLevels("2").spelling);
+
+    const fromV4 = parseSave({
+      version: 4,
+      activeId: "maya",
+      sound: true,
+      children: [
+        {
+          id: "maya",
+          name: "Maya",
+          grade: "1",
+          levels: { times: "mix" },
+          bestStars: { times: 1 },
+          words: { "sw:the": { box: 2, ok: 3, miss: 1, streak: 2 } },
+        },
+      ],
+    });
+    expect(fromV4.version).toBe(SAVE_VERSION);
+    expect(fromV4.children[0]?.words["sw:the"]).toEqual({ box: 2, ok: 3, miss: 1, streak: 2 });
+    expect(fromV4.children[0]?.levels.times).toBe("mix");
+    expect(fromV4.children[0]?.levels.count).toBe(defaultLevels("1").count);
+    expect(fromV4.children[0]?.bestStars.times).toBe(1);
+    expect(fromV4.children[0]?.bestStars.count).toBe(0);
 
     const mem = new Map<string, string>();
     const disk = {

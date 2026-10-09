@@ -30,6 +30,8 @@ export function choiceFact(question: ChoiceQ): string {
     case "sight":
     case "spell":
       return visual.word;
+    case "scene":
+      return question.factKey ?? `${question.skill}:${question.answer}`;
     default: {
       const neverVisual: never = visual;
       return neverVisual;

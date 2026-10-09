@@ -1,7 +1,14 @@
 import { sheetHref as sheetPath } from "../paths";
 import type { Grade } from "../model";
 import { addGame } from "./add";
+import { countGame } from "./count";
+import { fractionsGame } from "./fractions";
+import { measureGame } from "./measure";
 import { moneyGame } from "./money";
+import { phonicsGame } from "./phonics";
+import { placeGame } from "./place";
+import { problemsGame } from "./problems";
+import { shapesGame } from "./shapes";
 import { sightGame } from "./sight";
 import { spellingGame } from "./spelling";
 import { timeGame } from "./time";
@@ -12,7 +19,21 @@ import type { GameModule, LevelDef } from "./types";
  * Home-card order is also the island order. Append a game; do not insert one
  * in front, or saved journey positions shift. See docs/ADDING_A_GAME.md.
  */
-export const GAMES = [timesGame, addGame, timeGame, moneyGame, sightGame, spellingGame] as const;
+export const GAMES = [
+  timesGame,
+  addGame,
+  timeGame,
+  moneyGame,
+  sightGame,
+  spellingGame,
+  countGame,
+  placeGame,
+  shapesGame,
+  fractionsGame,
+  measureGame,
+  phonicsGame,
+  problemsGame,
+] as const;
 
 export type GameId = (typeof GAMES)[number]["id"];
 

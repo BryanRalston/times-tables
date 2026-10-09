@@ -60,6 +60,8 @@ function TeachArt({ frame }: { frame: TeachFrame }) {
     case "sight":
     case "spell":
       return <p className="ac-sight-word">{frame.show}</p>;
+    case "scene":
+      return <p className="ac-teach-pic">{frame.show}</p>;
     default: {
       const neverFrame: never = frame;
       return neverFrame;

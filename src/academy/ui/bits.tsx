@@ -352,7 +352,7 @@ export function Equation({
   reveal: boolean;
   answer: string;
 }) {
-  if (visual.kind === "time" || visual.kind === "money" || visual.kind === "sight" || visual.kind === "spell") return null;
+  if (visual.kind === "time" || visual.kind === "money" || visual.kind === "sight" || visual.kind === "spell" || visual.kind === "scene") return null;
   if (visual.kind === "times") {
     return (
       <p className="ac-eq">

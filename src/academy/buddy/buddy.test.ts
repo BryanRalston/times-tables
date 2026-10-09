@@ -144,7 +144,9 @@ describe("buddy save migration", () => {
       ],
     });
     expect(save.version).toBe(SAVE_VERSION);
-    expect(SAVE_VERSION).toBe(5);
+    expect(SAVE_VERSION).toBe(6);
+    expect(save.children[0]?.levels.count).toBeTruthy();
+    expect(save.children[0]?.bestStars.count).toBe(0);
     const maya = save.children[0];
     expect(maya?.words["sw:the"]).toEqual({ box: 1, ok: 2, miss: 0, streak: 2 });
     expect(maya?.journey.bosses).toEqual(["times"]);

@@ -44,7 +44,13 @@ export interface WordFrame {
   caption: string;
 }
 
-export type TeachFrame = AddFrame | TimesFrame | TimeFrame | MoneyFrame | WordFrame;
+export interface SceneFrame {
+  kind: "scene";
+  show: string;
+  caption: string;
+}
+
+export type TeachFrame = AddFrame | TimesFrame | TimeFrame | MoneyFrame | WordFrame | SceneFrame;
 
 export interface WorkedExample {
   speech: string;
@@ -71,15 +77,22 @@ export function hintCue(question: ChoiceQ): { speech: string; caption: string } 
 
 export function choiceSpoken(question: ChoiceQ, choice: string): string {
   if (question.visual.kind === "money" && question.visual.labels?.[choice]) return question.visual.labels[choice];
+  if (question.visual.kind === "scene") {
+    if (question.visual.quietChoices) return "";
+    return question.visual.labels[choice] ?? choice;
+  }
   return choice;
 }
 
 /** Title plus each choice, so a child who cannot read can still pick by ear. */
 export function promptSpeech(question: ChoiceQ): string {
   const title = speakable(question.title).trim();
-  if (question.choices.length === 0) return title;
-  const heard = question.choices.map((choice) => speakable(choiceSpoken(question, choice)).trim());
   const lead = /[.!?]$/.test(title) ? title : `${title}.`;
+  if (question.choices.length === 0) return lead;
+  const heard = question.choices
+    .map((choice) => speakable(choiceSpoken(question, choice)).trim())
+    .filter((line) => line.length > 0);
+  if (heard.length === 0) return lead;
   return `${lead} ${heard.join(". ")}`;
 }
 
@@ -114,6 +127,14 @@ function framesFor(question: ChoiceQ): TeachFrame[] {
           kind: "spell",
           show: visual.word,
           caption: visual.sentence ? `${visual.word}. ${visual.sentence}` : visual.word,
+        },
+      ];
+    case "scene":
+      return [
+        {
+          kind: "scene",
+          show: visual.picture,
+          caption: question.almost.replace(/^Almost!\s*/, ""),
         },
       ];
     default: {
