@@ -115,6 +115,14 @@ export function LockIcon() {
   );
 }
 
+function IconShield() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3 5 6v6c0 4.2 2.8 7.2 7 8.5 4.2-1.3 7-4.3 7-8.5V6Z" />
+    </svg>
+  );
+}
+
 function IconPeople() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -161,6 +169,9 @@ export function Foot() {
         </a>
         <a href="#/settings">
           <IconGear /> Settings
+        </a>
+        <a href={`${import.meta.env.BASE_URL}privacy/`}>
+          <IconShield /> Privacy
         </a>
       </nav>
       <FreeNote />

@@ -12,6 +12,8 @@ import {
   TIMES_SPEC,
   fourChoices,
   fourTimeChoices,
+  GROWNUP_HOLD_MS,
+  gateAnswerMatches,
   grownupGate,
   makeAddQuestion,
   makeRound,
@@ -165,13 +167,19 @@ describe("academy question generators", () => {
     }
   });
 
-  it("asks a grown-up a sum they can answer", () => {
-    for (let seed = 1; seed <= 10; seed++) {
+  it("asks a grown-up to multiply two 2-digit numbers", () => {
+    expect(GROWNUP_HOLD_MS).toBeGreaterThanOrEqual(1000);
+    for (let seed = 1; seed <= 40; seed++) {
       const gate = grownupGate(rngFromSeed(seed));
-      expect(gate.answer).toBe(gate.a + gate.b);
-      expect(gate.a).toBeGreaterThanOrEqual(6);
-      expect(gate.a).toBeLessThanOrEqual(12);
-      expect(gate.b).toBeGreaterThanOrEqual(5);
+      expect(gate.a).toBeGreaterThanOrEqual(12);
+      expect(gate.a).toBeLessThanOrEqual(48);
+      expect(gate.b).toBeGreaterThanOrEqual(12);
+      expect(gate.b).toBeLessThanOrEqual(48);
+      expect(gate.answer).toBe(gate.a * gate.b);
+      expect(gate.answer).not.toBe(gate.a + gate.b);
+      expect(gateAnswerMatches(gate, String(gate.answer))).toBe(true);
+      expect(gateAnswerMatches(gate, String(gate.a + gate.b))).toBe(false);
+      expect(gateAnswerMatches(gate, "")).toBe(false);
     }
   });
 

@@ -223,6 +223,12 @@ export function SheetsScreen() {
             </span>
           </a>
         ))}
+        <a className="ac-panel ac-sheet-link" href={`${import.meta.env.BASE_URL}worksheets/`}>
+          <span>
+            <strong>All printable worksheets</strong>
+            <small>Times, clocks, coins, and more</small>
+          </span>
+        </a>
       </div>
       <BackLink>Back to games</BackLink>
       <FreeNote />

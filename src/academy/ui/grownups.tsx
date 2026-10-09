@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { rngRandom } from "@/lib/rng";
 import {
   WEEKDAY_LETTERS,
@@ -11,7 +11,8 @@ import {
   type Grade,
   type Save,
 } from "../model";
-import { grownupGate } from "../questions";
+import { GROWNUP_HOLD_MS, gateAnswerMatches, grownupGate } from "../questions";
+import { weeklyCard } from "../progress-card";
 import { sheetHref } from "../games/registry";
 import {
   formatMinutes,
@@ -21,7 +22,9 @@ import {
   skillBars,
 } from "../rewards";
 import { activeChild, addChild } from "../storage";
-import { BackLink, Flame, FreeNote, Logo, SquisheeImg, cx } from "./bits";
+import { BackupPanel } from "./backup-panel";
+import { BackLink, Flame, Foot, Logo, SquisheeImg, cx } from "./bits";
+import { InstallTip } from "./install-tip";
 
 const GATE_KEY = "squishee-academy-gate";
 
@@ -41,6 +44,33 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
   const [grade, setGrade] = useState<Grade>("K");
+  const [armed, setArmed] = useState(false);
+  const [holding, setHolding] = useState(false);
+  const timer = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timer.current != null) window.clearTimeout(timer.current);
+    };
+  }, []);
+
+  function clearHold() {
+    if (timer.current != null) window.clearTimeout(timer.current);
+    timer.current = null;
+    setHolding(false);
+  }
+
+  function beginHold() {
+    if (armed) return;
+    clearHold();
+    setHolding(true);
+    setMiss(false);
+    timer.current = window.setTimeout(() => {
+      timer.current = null;
+      setHolding(false);
+      setArmed(true);
+    }, GROWNUP_HOLD_MS);
+  }
 
   if (!open) {
     return (
@@ -52,7 +82,8 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
           className="ac-gate"
           onSubmit={(e) => {
             e.preventDefault();
-            if (Number(guess) === gate.answer) {
+            if (!armed || !guess) return;
+            if (gateAnswerMatches(gate, guess)) {
               try {
                 sessionStorage.setItem(GATE_KEY, "ok");
               } catch {
@@ -63,25 +94,56 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
             }
             setMiss(true);
             setGuess("");
+            setArmed(false);
             setGate(grownupGate(rngRandom()));
           }}
         >
           <h1>Grown-ups</h1>
-          <p>Ask a grown-up to answer. This keeps the charts for families.</p>
-          <p className="ac-gate-q">
-            What is {gate.a} + {gate.b}?
-          </p>
-          <input
-            inputMode="numeric"
-            autoComplete="off"
-            value={guess}
-            onChange={(e) => setGuess(e.target.value.replace(/\D/g, "").slice(0, 3))}
-            aria-label="Answer"
-          />
-          <button type="submit" className="ac-go">
-            Continue
-          </button>
-          {miss ? <p className="ac-hint">Try again.</p> : null}
+          <p>Press and hold, then multiply. This keeps the charts for families.</p>
+          {armed ? (
+            <>
+              <p className="ac-gate-q">
+                What is {gate.a} × {gate.b}?
+              </p>
+              <input
+                inputMode="numeric"
+                autoComplete="off"
+                autoFocus
+                value={guess}
+                onChange={(e) => setGuess(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                aria-label="Answer"
+              />
+              <button type="submit" className="ac-go">
+                Continue
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              className={cx("ac-hold", holding && "is-on")}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                beginHold();
+              }}
+              onPointerUp={clearHold}
+              onPointerCancel={clearHold}
+              onPointerLeave={clearHold}
+              onContextMenu={(e) => e.preventDefault()}
+              onKeyDown={(e) => {
+                if (e.repeat) return;
+                if (e.key === " " || e.key === "Enter") {
+                  e.preventDefault();
+                  beginHold();
+                }
+              }}
+              onKeyUp={(e) => {
+                if (e.key === " " || e.key === "Enter") clearHold();
+              }}
+            >
+              {holding ? "Keep holding..." : "Press and hold"}
+            </button>
+          )}
+          {miss ? <p className="ac-hint">That answer is not right.</p> : null}
           <BackLink>Back to games</BackLink>
         </form>
       </div>
@@ -98,6 +160,7 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
   const chips = masteredChips(child.skills);
   const tip = practiceTip(child.name, child.skills);
   const weekSeconds = secondsThisWeek(child.secondsByDay, today);
+  const card = weeklyCard(child, today);
   const sheet =
     tip.factor != null ? sheetHref("times", `?factor=${tip.factor}`) : sheetHref("times");
 
@@ -106,6 +169,7 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
       <header className="ac-parent-top">
         <h1>Grown-ups</h1>
       </header>
+      <InstallTip />
 
       <div className="ac-kids">
         {save.children.map((kid) => (
@@ -170,6 +234,14 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
         </article>
       </div>
 
+      <section className="ac-panel ac-week-card">
+        <h2>Progress card</h2>
+        <p>{card.line}</p>
+        <p className="ac-hint">
+          Streak {card.streak} · {card.mastered} skills mastered
+        </p>
+      </section>
+
       <section className="ac-panel">
         <h2>This week</h2>
         <div className="ac-bars">
@@ -221,8 +293,9 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
         </div>
       </section>
 
+      <BackupPanel save={save} onSave={onSave} />
       <BackLink>Back to games</BackLink>
-      <FreeNote />
+      <Foot />
     </div>
   );
 }

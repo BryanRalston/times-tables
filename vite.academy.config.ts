@@ -1,9 +1,11 @@
 import react from "@vitejs/plugin-react";
-import { cpSync, createReadStream, existsSync, readdirSync, rmSync, statSync } from "node:fs";
+import { cpSync, createReadStream, existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { join, normalize, resolve, sep } from "node:path";
+import { dirname, join, normalize, resolve, sep } from "node:path";
 import { defineConfig } from "vite";
+import { academySeoFiles } from "./src/academy/seo/html";
 import { academyDomainPlugins } from "./scripts/academy-domain-plugin.mjs";
+import { academyPrecachePlugin } from "./scripts/academy-precache.mjs";
 
 const domain = process.env.ACADEMY_DOMAIN === "1";
 const outDir = domain ? "dist-domain" : "dist/academy";
@@ -67,10 +69,33 @@ function sharedPublic() {
   };
 }
 
+function academySeoPlugin(dir: string) {
+  return {
+    name: "academy-seo-pages",
+    writeBundle() {
+      const root = resolve(dir);
+      for (const file of academySeoFiles()) {
+        const dest = join(root, file.path);
+        mkdirSync(dirname(dest), { recursive: true });
+        writeFileSync(dest, file.body);
+      }
+    },
+  };
+}
+
 export default defineConfig({
   base: domain ? "/" : "/times-tables/academy/",
   publicDir: "academy/public",
-  plugins: [react(), sharedPublic(), ...(domain ? academyDomainPlugins(outDir) : [hoistAcademyHtml(outDir)])],
+  plugins: [
+    react(),
+    sharedPublic(),
+    ...(domain ? academyDomainPlugins(outDir) : [hoistAcademyHtml(outDir)]),
+    academySeoPlugin(outDir),
+    academyPrecachePlugin(outDir, {
+      appPrefix: domain ? "" : "/times-tables/academy",
+      artPrefix: domain ? "" : "/times-tables",
+    }),
+  ],
   resolve: {
     alias: {
       "@": resolve("src"),

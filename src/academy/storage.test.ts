@@ -163,6 +163,7 @@ describe("academy save", () => {
     const main = readFileSync("src/academy/main.tsx", "utf8");
     expect(sw).toContain("/times-tables/academy");
     expect(sw).toContain("/times-tables/index.html");
+    expect(sw).toContain("precache-manifest.json");
     expect(main).toContain('scope: "/times-tables/academy/"');
     expect(main).not.toContain('scope: "/times-tables/"');
   });

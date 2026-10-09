@@ -208,6 +208,7 @@ button.ac-go:disabled { opacity: 0.45; }
 
 .ac-foot {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 8px;
   margin-top: 14px;
@@ -417,6 +418,28 @@ button.ac-go:disabled { opacity: 0.45; }
 .ac-gate { text-align: center; }
 .ac-gate-q { margin: 12px 0; font-family: Fredoka, sans-serif; font-size: 32px; }
 .ac-gate .ac-go { margin-top: 12px; }
+.ac-hold {
+  width: 100%;
+  min-height: 64px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 4px 0 var(--ac-line);
+}
+.ac-hold.is-on { background: #baf3e8; }
+.ac-week-card p { margin-top: 8px; }
+.ac-backup textarea, .ac-backup .ac-field textarea {
+  width: 100%;
+  min-height: 72px;
+  margin-top: 8px;
+  border-radius: 12px;
+  border: 2px solid var(--ac-line);
+  padding: 8px;
+  resize: vertical;
+}
+.ac-qr svg { width: min(220px, 100%); height: auto; margin-top: 10px; }
+.ac-install p + p { margin-top: 8px; }
 
 .ac-kids { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
 .ac-kid {

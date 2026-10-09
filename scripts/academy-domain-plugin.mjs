@@ -1,76 +1,9 @@
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, extname, join, resolve } from "node:path";
+import { artPaths, domainServiceWorker } from "./academy-precache.mjs";
 import { rewriteDomainSource } from "./academy-domain-rewrite.mjs";
 
 const TEXT_EXT = new Set([".html", ".js", ".css", ".webmanifest", ".svg", ".json", ".txt"]);
-
-/** Network-first cache. The script lives at /academy-sw.js so its max scope is /. */
-export const ROOT_SW = `/* Squishee Academy offline cache. Served from the domain root so scope is /. */
-const CACHE = "squishee-academy-root-v1";
-
-async function precacheShell() {
-  const cache = await caches.open(CACHE);
-  const index = await fetch("/index.html");
-  if (!index.ok) throw new Error("index.html");
-  const html = await index.text();
-  const page = new Response(html, { headers: { "Content-Type": "text/html" } });
-  await cache.put("/index.html", page.clone());
-  await cache.put("/", page);
-  const urls = new Set(["/manifest.webmanifest", "/favicon.svg"]);
-  const attr = new RegExp('(?:src|href)="(/[^"]+)"', "g");
-  for (const match of html.matchAll(attr)) urls.add(match[1]);
-  await Promise.all(
-    [...urls].map(async (url) => {
-      const res = await fetch(url);
-      if (res.ok) await cache.put(url, res);
-    }),
-  );
-}
-
-self.addEventListener("install", (event) => {
-  event.waitUntil(precacheShell().then(() => self.skipWaiting()));
-});
-
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(
-          keys.filter((key) => key.startsWith("squishee-academy-") && key !== CACHE).map((key) => caches.delete(key)),
-        ),
-      )
-      .then(() => self.clients.claim()),
-  );
-});
-
-self.addEventListener("fetch", (event) => {
-  const req = event.request;
-  if (req.method !== "GET") return;
-  const url = new URL(req.url);
-  if (url.origin !== self.location.origin) return;
-
-  event.respondWith(
-    fetch(req)
-      .then((res) => {
-        if (res.ok) {
-          const copy = res.clone();
-          caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => {});
-        }
-        return res;
-      })
-      .catch(async () => {
-        const hit = await caches.match(req);
-        if (hit) return hit;
-        if (req.mode === "navigate") {
-          const page = (await caches.match("/index.html")) || (await caches.match("/"));
-          if (page) return page;
-        }
-        return new Response("Offline", { status: 503, headers: { "Content-Type": "text/plain" } });
-      }),
-  );
-});
-`;
 
 function isAcademyModule(id) {
   const file = (id.split("?")[0] ?? "").replaceAll("\\", "/");
@@ -146,8 +79,10 @@ function publishRoot(outDir) {
   const money = resolve("public/money");
   if (existsSync(money)) cpSync(money, join(root, "money"), { recursive: true });
   copyIfExists(resolve("public/favicon.svg"), join(root, "favicon.svg"));
+  const publicRoot = resolve("public");
+  for (const rel of artPaths()) copyIfExists(join(publicRoot, rel), join(root, rel));
   copyReferencedPublic(root);
-  writeFileSync(join(root, "academy-sw.js"), ROOT_SW);
+  writeFileSync(join(root, "academy-sw.js"), domainServiceWorker());
   writeFileSync(join(root, "CNAME"), "squisheeacademy.com\n");
   writeFileSync(join(root, ".nojekyll"), "");
   const index = join(root, "index.html");

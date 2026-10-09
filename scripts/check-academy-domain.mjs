@@ -89,6 +89,75 @@ for (const sheet of ["times-tables", "add-subtract", "telling-time"]) {
 }
 
 if (readFileSync(resolve(root, "CNAME"), "utf8").trim() !== "squisheeacademy.com") fail("CNAME");
+
+const robots = readFileSync(resolve(root, "robots.txt"), "utf8");
+if (!robots.includes("Sitemap: https://squisheeacademy.com/sitemap.xml")) fail("robots.txt sitemap");
+const sitemap = readFileSync(resolve(root, "sitemap.xml"), "utf8");
+for (const loc of [
+  "https://squisheeacademy.com/worksheets/",
+  "https://squisheeacademy.com/worksheets/telling-time-quarter-hour/",
+  "https://squisheeacademy.com/worksheets/counting-coins/",
+  "https://squisheeacademy.com/worksheets/multiplication-7s/",
+  "https://squisheeacademy.com/privacy/",
+]) {
+  if (!sitemap.includes(`<loc>${loc}</loc>`)) fail(`sitemap missing ${loc}`);
+}
+
+const sheetDir = resolve(root, "worksheets");
+let staticSheets = 0;
+for (const name of readdirSync(sheetDir)) {
+  const file = join(sheetDir, name, "index.html");
+  if (!existsSync(file)) continue;
+  const sheetHtml = readFileSync(file, "utf8");
+  if (sheetHtml.includes("<script")) continue;
+  staticSheets += 1;
+  if (!sheetHtml.includes("<h1>")) fail(`${name} missing h1`);
+  if (!sheetHtml.includes("Answer key")) fail(`${name} missing answer key`);
+  if (!sheetHtml.includes("Play the game")) fail(`${name} missing play link`);
+  if (!sheetHtml.includes('property="og:description"')) fail(`${name} missing open graph`);
+  if (!sheetHtml.includes(`<link rel="canonical" href="https://squisheeacademy.com/worksheets/${name}/"`)) {
+    fail(`${name} canonical`);
+  }
+  if (sheetHtml.includes('id="app"')) fail(`${name} is the SPA shell`);
+  if (/<script/i.test(sheetHtml)) fail(`${name} needs JavaScript to render`);
+}
+if (staticSheets < 15 || staticSheets > 25) fail(`expected 15–25 static worksheets, found ${staticSheets}`);
+
+const privacy = readFileSync(resolve(root, "privacy/index.html"), "utf8");
+if (!privacy.includes("does not collect") && !privacy.includes("do not collect")) fail("privacy page");
+if (!privacy.includes("COPPA")) fail("privacy COPPA");
+if (!privacy.includes("[Bryan — add the email families should use]")) fail("privacy contact placeholder");
+if (privacy.includes("<script")) fail("privacy page needs JavaScript");
+
+const manifestList = JSON.parse(readFileSync(resolve(root, "precache-manifest.json"), "utf8"));
+if (!Array.isArray(manifestList) || manifestList.length < 20) fail("precache manifest");
+for (const needed of [
+  "/",
+  "/index.html",
+  "/privacy/",
+  "/worksheets/multiplication-7s/",
+  "/worksheets/telling-time-quarter-hour/index.html",
+  "/squishees/peach.png",
+  "/cosmetics/peach-bow.png",
+  "/money/penny.png",
+  "/favicon.svg",
+]) {
+  if (!manifestList.includes(needed)) fail(`precache missing ${needed}`);
+}
+if (!manifestList.some((url) => typeof url === "string" && url.startsWith("/assets/") && url.endsWith(".js"))) {
+  fail("precache missing app js");
+}
+if (!manifestList.some((url) => typeof url === "string" && url.startsWith("/assets/") && url.endsWith(".css"))) {
+  fail("precache missing app css");
+}
+for (const url of manifestList) {
+  if (typeof url !== "string" || !url.startsWith("/")) fail(`bad precache url ${url}`);
+  let rel = url.slice(1);
+  if (rel === "" || rel.endsWith("/")) rel += "index.html";
+  if (!existsSync(join(root, rel))) fail(`precache file missing for ${url}`);
+}
+if (!sw.includes("precache-manifest.json")) fail("service worker does not precache");
+if (!sw.includes('caches.match("/index.html")')) fail("service worker missing root index fallback");
 if (!existsSync(resolve(root, ".nojekyll"))) fail(".nojekyll missing");
 if (!existsSync(resolve(root, "404.html"))) fail("404.html missing");
 if (!existsSync(resolve(root, "squishees/frog.png"))) fail("squishees/frog.png missing");
