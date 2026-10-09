@@ -152,17 +152,24 @@ describe("stars, streak, and unlocks", () => {
     expect(fresh.map((row) => row.next).every((line) => line.length > 8)).toBe(true);
   });
 
-  it("counts a worked-example miss separately from the retry", () => {
+  it("keeps the star when a miss is taught and the retry is right", () => {
     const today = "2026-10-09";
+    const start = child();
     const next = applyRound(
-      child(),
+      start,
       round({
-        answers: [{ skill: "add:within5", tags: ["doubles"], ok: true, taught: true }],
+        correct: 10,
+        total: 10,
+        answers: [
+          { skill: "add:within5", tags: ["doubles"], ok: false, unscored: true },
+          { skill: "add:within5", tags: ["doubles"], ok: true, taught: true },
+        ],
       }),
       today,
     );
     expect(next.skills["add:within5"]).toEqual({ ok: 1, miss: 1 });
     expect(next.skills.doubles).toEqual({ ok: 1, miss: 1 });
+    expect(next.stars).toBe(start.stars + starsForRound(10, 10));
   });
 
   it("pays coins for stars, a combo, and a beaten boss", () => {

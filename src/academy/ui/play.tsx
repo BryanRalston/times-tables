@@ -13,12 +13,14 @@ import {
   type Ladder,
 } from "../adapt";
 import { gameById, pillLabel } from "../games/registry";
-import { insertReplay } from "../games/words";
+import { makeClockTask, makePayTask } from "../hands";
 import { bossReady, bossWon } from "../journey";
 import {
+  autoSpeakGrade,
   BOSS_LENGTH,
   ROUND_LENGTH,
   ROUND_SECONDS,
+  speedRoundGrade,
   type AnswerMark,
   type Child,
   type RoundResult,
@@ -26,11 +28,21 @@ import {
 } from "../model";
 import { makeBossRound, makeQuestion, type ChoiceQ } from "../questions";
 import { coinsForRound, newestUnlock, starsForRound, weakTimesFacts } from "../rewards";
+import {
+  exampleFor,
+  handsOnSlots,
+  planReturn,
+  similarSlot,
+  slotFact,
+  speechFor,
+  type RoundSlot,
+} from "../round-flow";
 import { blip, chime, teachTone } from "../sound";
-import { hintCue, workedExample } from "../teach";
+import { hintCue } from "../teach";
 import { silence, speak } from "../voice";
 import { Flame, SpeakerIcon, SquisheeImg, Stars, cx, fmtSeconds } from "./bits";
 import { CoinRow } from "./coins";
+import { ClockBoard, PayBoard } from "./hands";
 import { WorkedExample } from "./teach-view";
 
 function Confetti() {
@@ -43,13 +55,46 @@ function Confetti() {
   );
 }
 
-function servedPill(gameId: string, question: ChoiceQ | undefined, fallbackLevel: string): string {
+type Dot = "ok" | "helped" | "miss";
+type Phase = "ask" | "teach" | "practice" | "feedback" | "done";
+
+interface Served {
+  slot: RoundSlot;
+  returning: boolean;
+}
+
+function blankDots(n: number): (Dot | null)[] {
+  return Array.from({ length: n }, () => null);
+}
+
+function servedPill(gameId: string, slot: RoundSlot | undefined, fallbackLevel: string): string {
   const spec = gameById(gameId);
-  if (!spec || !question) return pillLabel(gameId, fallbackLevel);
+  if (!spec || !slot) return pillLabel(gameId, fallbackLevel);
+  const skill = slot.kind === "choice" ? slot.question.skill : slot.skill;
   const prefix = `${gameId}:`;
-  const levelId = question.skill.startsWith(prefix) ? question.skill.slice(prefix.length) : "";
+  const levelId = skill.startsWith(prefix) ? skill.slice(prefix.length) : "";
   const row = spec.levels.find((level) => level.id === levelId);
   return row ? spec.pill(row) : pillLabel(gameId, fallbackLevel);
+}
+
+function markOf(slot: RoundSlot, ok: boolean, unscored = false): AnswerMark {
+  if (slot.kind === "choice") {
+    const question = slot.question;
+    return {
+      skill: question.skill,
+      tags: question.tags,
+      factKey: question.factKey ?? slotFact(slot),
+      ok,
+      unscored: unscored || undefined,
+    };
+  }
+  return { skill: slot.skill, tags: [], factKey: slot.factKey, ok, unscored: unscored || undefined };
+}
+
+function praiseLine(slot: RoundSlot): string {
+  if (slot.kind === "choice") return slot.question.praise;
+  if (slot.kind === "clock") return "Yes! The hands show it.";
+  return "Yes! That pays the price.";
 }
 
 export function PlayScreen({
@@ -74,33 +119,41 @@ export function PlayScreen({
   const level = child.levels[game];
   const spec = gameById(game);
   const baseIndex = Math.max(0, spec?.levels.findIndex((row) => row.id === level) ?? 0);
+  const calm = autoSpeakGrade(child.grade);
+  const canSpeed = speedRoundGrade(child.grade);
   const [roundId, setRoundId] = useState(0);
   const [index, setIndex] = useState(0);
-  const [phase, setPhase] = useState<"ask" | "teach" | "retry" | "feedback" | "done">("ask");
-  const [picked, setPicked] = useState<string | null>(null);
-  const [results, setResults] = useState<RoundResult["answers"]>([]);
+  const [phase, setPhase] = useState<Phase>("ask");
+  const [dots, setDots] = useState<(Dot | null)[]>(() => blankDots(ROUND_LENGTH));
   const [combo, setCombo] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
   const [left, setLeft] = useState(ROUND_SECONDS);
+  const [speed, setSpeed] = useState(false);
   const [menu, setMenu] = useState(false);
   const [unlockId, setUnlockId] = useState<string | null>(null);
   const [met, setMet] = useState(false);
   const [hintOn, setHintOn] = useState(false);
   const [nudge, setNudge] = useState<"up" | "down" | null>(null);
+  const [practice, setPractice] = useState<RoundSlot | null>(null);
+  const [teachSlot, setTeachSlot] = useState<RoundSlot | null>(null);
 
   const startStarsRef = useRef(child.stars);
-  const resultsRef = useRef(results);
   const finishedRef = useRef(false);
   const startedRef = useRef(Date.now());
   const waitRef = useRef<number | null>(null);
   const menuRef = useRef(false);
   const phaseRef = useRef(phase);
   const onRoundRef = useRef(onRound);
-  const chooseRef = useRef<(value: string) => void>(() => {});
+  const answerRef = useRef<(ok: boolean, hint?: boolean) => void>(() => {});
   const bestRef = useRef(0);
   const soundRef = useRef(sound);
-  const taughtRef = useRef(false);
   const retryFocusRef = useRef<HTMLButtonElement | null>(null);
+  const teachSourceRef = useRef<"scored" | "practice">("scored");
+  const practiceTaughtRef = useRef(false);
+  const replayHereRef = useRef(false);
+  const answersRef = useRef<AnswerMark[]>([]);
+  const dotsRef = useRef<(Dot | null)[]>(blankDots(ROUND_LENGTH));
+  const indexRef = useRef(0);
   const bossSnap = useRef<{ roundId: number; boss: boolean }>({ roundId: -1, boss: false });
   if (bossSnap.current.roundId !== roundId) {
     bossSnap.current = { roundId, boss: bossReady(child.journey, game) };
@@ -108,11 +161,19 @@ export function PlayScreen({
   const boss = bossSnap.current.boss;
   const skillsRef = useRef<Record<string, SkillStat>>(cloneSkills(child.skills));
   const ladderRef = useRef<Ladder>(startLadder(openingIndex(baseIndex, child.rounds, boss)));
+  const handsRef = useRef<Set<number>>(new Set());
+  const returnsRef = useRef<Map<number, RoundSlot>>(new Map());
   menuRef.current = menu;
   phaseRef.current = phase;
   onRoundRef.current = onRound;
-  resultsRef.current = results;
   soundRef.current = sound;
+  indexRef.current = index;
+
+  function levelNow(): string {
+    const levels = spec?.levels ?? [];
+    const at = Math.max(0, Math.min(Math.max(0, levels.length - 1), ladderRef.current.index));
+    return levels[at]?.id ?? level;
+  }
 
   function nextQuestion(): ChoiceQ {
     const levels = spec?.levels ?? [];
@@ -133,11 +194,42 @@ export function PlayScreen({
     return game === "times" ? weakTimesFacts(skillsRef.current) : [];
   }
 
-  const [questions, setQuestions] = useState<ChoiceQ[]>(() =>
-    boss ? makeBossRound(game, level, rngRandom(), preferIds()) : [nextQuestion()],
-  );
+  function buildSlot(i: number): Served {
+    const queued = returnsRef.current.get(i);
+    if (queued) return { slot: queued, returning: true };
+    const handsOn = handsRef.current.has(i);
+    const lvl = levelNow();
+    if (handsOn && game === "time") return { slot: makeClockTask(lvl, rngRandom()), returning: false };
+    if (handsOn && game === "money") return { slot: makePayTask(lvl, rngRandom()), returning: false };
+    return { slot: { kind: "choice", question: nextQuestion() }, returning: false };
+  }
+
+  const [questions, setQuestions] = useState<Served[]>(() => {
+    handsRef.current = new Set(boss || (game !== "time" && game !== "money") ? [] : handsOnSlots(ROUND_LENGTH));
+    if (boss) {
+      return makeBossRound(game, level, rngRandom(), preferIds()).map((question) => ({
+        slot: { kind: "choice" as const, question },
+        returning: false,
+      }));
+    }
+    return [buildSlot(0)];
+  });
   const questionsRef = useRef(questions);
   questionsRef.current = questions;
+  const practiceRef = useRef(practice);
+  practiceRef.current = practice;
+
+  function roundTotal() {
+    return boss ? questionsRef.current.length || BOSS_LENGTH : ROUND_LENGTH;
+  }
+
+  function paint(i: number, dot: Dot) {
+    const next = dotsRef.current.slice();
+    while (next.length < roundTotal()) next.push(null);
+    next[i] = dot;
+    dotsRef.current = next;
+    setDots(next);
+  }
 
   function restart(nextLevel = level) {
     if (waitRef.current) window.clearTimeout(waitRef.current);
@@ -146,43 +238,51 @@ export function PlayScreen({
     const nextBoss = bossReady(child.journey, game);
     skillsRef.current = cloneSkills(child.skills);
     ladderRef.current = startLadder(openingIndex(nextBase, child.rounds, nextBoss));
+    handsRef.current = new Set(nextBoss || (game !== "time" && game !== "money") ? [] : handsOnSlots(ROUND_LENGTH));
+    returnsRef.current = new Map();
+    replayHereRef.current = false;
+    practiceTaughtRef.current = false;
+    answersRef.current = [];
+    dotsRef.current = blankDots(nextBoss ? BOSS_LENGTH : ROUND_LENGTH);
     startStarsRef.current = child.stars;
     finishedRef.current = false;
-    taughtRef.current = false;
     phaseRef.current = "ask";
-    resultsRef.current = [];
+    indexRef.current = 0;
     startedRef.current = Date.now();
+    const prefer = nextSpec?.reviewKeys?.(child.words) ?? (game === "times" ? weakTimesFacts(skillsRef.current) : []);
     const opening = nextBoss
-      ? makeBossRound(game, nextLevel, rngRandom(), nextSpec?.reviewKeys?.(child.words) ?? (game === "times" ? weakTimesFacts(skillsRef.current) : []))
-      : [nextQuestion()];
+      ? makeBossRound(game, nextLevel, rngRandom(), prefer).map((question) => ({
+          slot: { kind: "choice" as const, question },
+          returning: false,
+        }))
+      : [buildSlot(0)];
     questionsRef.current = opening;
     setQuestions(opening);
     setRoundId((n) => n + 1);
     setIndex(0);
     setPhase("ask");
-    setPicked(null);
-    setResults([]);
+    setDots(dotsRef.current);
     setCombo(0);
     setBestCombo(0);
     bestRef.current = 0;
     setLeft(ROUND_SECONDS);
+    setSpeed(false);
     setMenu(false);
     setUnlockId(null);
     setMet(false);
     setHintOn(false);
     setNudge(null);
+    setPractice(null);
+    setTeachSlot(null);
   }
-
-  const total = boss ? questions.length || BOSS_LENGTH : ROUND_LENGTH;
 
   function finish() {
     if (finishedRef.current) return;
     finishedRef.current = true;
     if (waitRef.current) window.clearTimeout(waitRef.current);
-    const answers = resultsRef.current;
-    const correct = answers.filter((mark) => mark.ok).length;
-    const roundTotal = boss ? questionsRef.current.length || BOSS_LENGTH : ROUND_LENGTH;
-    const earned = starsForRound(correct, roundTotal);
+    const total = roundTotal();
+    const correct = dotsRef.current.filter((dot) => dot === "ok" || dot === "helped").length;
+    const earned = starsForRound(correct, total);
     setUnlockId(newestUnlock(startStarsRef.current, startStarsRef.current + earned));
     setBestCombo(bestRef.current);
     setPhase("done");
@@ -190,9 +290,9 @@ export function PlayScreen({
     onRoundRef.current({
       game,
       correct,
-      total: roundTotal,
+      total,
       seconds,
-      answers,
+      answers: answersRef.current,
       bestCombo: bestRef.current,
       boss,
     });
@@ -203,89 +303,143 @@ export function PlayScreen({
 
   function advance(fromIndex: number) {
     phaseRef.current = "ask";
-    taughtRef.current = false;
-    const roundTotal = boss ? questionsRef.current.length || BOSS_LENGTH : ROUND_LENGTH;
-    if (fromIndex + 1 >= roundTotal) {
+    const total = roundTotal();
+    if (fromIndex + 1 >= total) {
       finishRef.current();
       return;
     }
-    if (!boss && !questionsRef.current[fromIndex + 1]) {
-      const extra = nextQuestion();
+    if (!questionsRef.current[fromIndex + 1]) {
+      const extra = buildSlot(fromIndex + 1);
       questionsRef.current = [...questionsRef.current, extra];
       setQuestions(questionsRef.current);
     }
+    indexRef.current = fromIndex + 1;
     setIndex(fromIndex + 1);
     setPhase("ask");
-    setPicked(null);
+    setHintOn(false);
+    setPractice(null);
+    setTeachSlot(null);
+  }
+
+  function easeLadder() {
+    if (boss || !spec) return;
+    const before = ladderRef.current.index;
+    ladderRef.current = stepLadder(ladderRef.current, spec.levels.length, false);
+    const after = ladderRef.current.index;
+    setNudge(after < before ? "down" : null);
+  }
+
+  function scoreClean(served: Served, fromIndex: number, fromCombo: number, hint = false) {
+    const mark = markOf(served.slot, true);
+    if (hint) mark.hint = true;
+    noteMark(skillsRef.current, mark);
+    answersRef.current = [...answersRef.current, mark];
+    paint(fromIndex, "ok");
+    if (!boss && spec && !served.returning) {
+      const before = ladderRef.current.index;
+      ladderRef.current = stepLadder(ladderRef.current, spec.levels.length, true);
+      const after = ladderRef.current.index;
+      setNudge(after > before ? "up" : null);
+    }
+    const nextCombo = served.returning ? 0 : fromCombo + 1;
+    if (!served.returning) bestRef.current = Math.max(bestRef.current, nextCombo);
+    setCombo(nextCombo);
+    blip(true, soundRef.current, nextCombo);
+    phaseRef.current = "feedback";
+    setPhase("feedback");
+    waitRef.current = window.setTimeout(() => advance(fromIndex), 620);
+  }
+
+  function beginTeach(slot: RoundSlot, source: "scored" | "practice") {
+    teachSourceRef.current = source;
+    setTeachSlot(slot);
+    phaseRef.current = "teach";
+    setPhase("teach");
     setHintOn(false);
   }
 
-  function settle(mark: AnswerMark, fromIndex: number, fromCombo: number) {
-    noteMark(skillsRef.current, mark);
-    const nextResults = [...resultsRef.current, mark];
-    resultsRef.current = nextResults;
-    setResults(nextResults);
-    if (!boss && spec) {
-      const before = ladderRef.current.index;
-      const clean = mark.ok && !mark.taught;
-      ladderRef.current = stepLadder(ladderRef.current, spec.levels.length, clean);
-      const after = ladderRef.current.index;
-      setNudge(after > before ? "up" : after < before ? "down" : null);
+  function missScored(served: Served, fromIndex: number) {
+    if (!served.returning) {
+      const taken = [...returnsRef.current.keys()];
+      const at = planReturn(fromIndex, roundTotal(), taken, [...handsRef.current]);
+      if (at === fromIndex) replayHereRef.current = true;
+      else returnsRef.current.set(at, served.slot);
+      const miss = markOf(served.slot, false, true);
+      noteMark(skillsRef.current, miss);
+      answersRef.current = [...answersRef.current, miss];
+      paint(fromIndex, "helped");
+      easeLadder();
     }
-    const nextCombo = mark.ok && !mark.taught ? fromCombo + 1 : 0;
-    if (mark.ok && !mark.taught) bestRef.current = Math.max(bestRef.current, nextCombo);
-    setCombo(nextCombo);
-    blip(mark.ok, sound, nextCombo);
-    waitRef.current = window.setTimeout(() => advance(fromIndex), mark.ok ? 620 : 760);
+    setCombo(0);
+    blip(false, soundRef.current, 0);
+    beginTeach(served.slot, "scored");
   }
 
-  function choose(value: string, hint = false) {
-    if (!value || menuRef.current || finishedRef.current) return;
-    const asking = phaseRef.current === "ask" || phaseRef.current === "retry";
-    if (!asking) return;
-    const q = questionsRef.current[index];
-    if (!q) return;
-    const ok = value === q.answer;
-    if (!ok && phaseRef.current === "ask" && !taughtRef.current) {
-      const replayed = insertReplay(questionsRef.current, index, q);
-      if (replayed !== questionsRef.current) {
-        questionsRef.current = replayed;
-        setQuestions(replayed);
+  function continueAfterPractice(fromIndex: number) {
+    practiceTaughtRef.current = false;
+    setPractice(null);
+    if (replayHereRef.current) {
+      replayHereRef.current = false;
+      const current = questionsRef.current[fromIndex];
+      if (current) {
+        const again: Served = { slot: current.slot, returning: true };
+        const copy = questionsRef.current.slice();
+        copy[fromIndex] = again;
+        questionsRef.current = copy;
+        setQuestions(copy);
       }
-      phaseRef.current = "teach";
-      taughtRef.current = true;
-      setPicked(value);
-      setCombo(0);
-      setHintOn(false);
-      setPhase("teach");
-      blip(false, sound, 0);
+      phaseRef.current = "ask";
+      setPhase("ask");
+      setTeachSlot(null);
       return;
     }
-    phaseRef.current = "feedback";
-    setPicked(value);
-    setPhase("feedback");
-    setHintOn(false);
-    if (!ok) {
-      const replayed = insertReplay(questionsRef.current, index, q);
-      if (replayed !== questionsRef.current) {
-        questionsRef.current = replayed;
-        setQuestions(replayed);
-      }
-    }
-    settle(
-      { skill: q.skill, tags: q.tags, factKey: q.factKey, ok, taught: taughtRef.current, hint: hint || undefined },
-      index,
-      combo,
-    );
+    const served = questionsRef.current[fromIndex];
+    if (served?.returning && dotsRef.current[fromIndex] !== "helped") paint(fromIndex, "miss");
+    advance(fromIndex);
   }
-  chooseRef.current = choose;
 
-  function beginRetry() {
+  function answer(ok: boolean, hint = false) {
+    if (menuRef.current || finishedRef.current) return;
+    const mode = phaseRef.current;
+    if (mode === "practice") {
+      if (!ok && !practiceTaughtRef.current) {
+        const slot = practiceRef.current;
+        if (!slot) return;
+        practiceTaughtRef.current = true;
+        blip(false, soundRef.current, 0);
+        beginTeach(slot, "practice");
+        return;
+      }
+      if (ok) blip(true, soundRef.current, 0);
+      continueAfterPractice(indexRef.current);
+      return;
+    }
+    if (mode !== "ask") return;
+    const served = questionsRef.current[indexRef.current];
+    if (!served) return;
+    if (!ok) {
+      missScored(served, indexRef.current);
+      return;
+    }
+    scoreClean(served, indexRef.current, combo, hint);
+  }
+  answerRef.current = answer;
+
+  function afterTeach() {
     if (phaseRef.current !== "teach") return;
-    phaseRef.current = "retry";
-    setPicked(null);
-    setPhase("retry");
-    speak("Your turn!", soundRef.current);
+    if (teachSourceRef.current === "practice") {
+      continueAfterPractice(indexRef.current);
+      return;
+    }
+    const served = questionsRef.current[indexRef.current];
+    if (!served) return;
+    const next = similarSlot(game, served.slot, rngRandom());
+    practiceTaughtRef.current = false;
+    practiceRef.current = next;
+    setPractice(next);
+    phaseRef.current = "practice";
+    setPhase("practice");
+    setTeachSlot(null);
   }
 
   function close() {
@@ -294,36 +448,54 @@ export function PlayScreen({
       onExit();
       return;
     }
-    if (resultsRef.current.length > 0) finish();
+    if (dotsRef.current.some((dot) => dot != null)) finish();
     else onExit();
   }
 
-  const q: ChoiceQ | undefined = questions[index];
-  const example = useMemo(() => (phase === "teach" && q ? workedExample(q) : null), [phase, q]);
+  const served = questions[index];
+  const slot = phase === "practice" && practice ? practice : served?.slot;
+  const example = useMemo(() => (phase === "teach" && teachSlot ? exampleFor(teachSlot) : null), [phase, teachSlot]);
+  const speech =
+    phase === "teach" && example
+      ? example.speech
+      : slot
+        ? phase === "practice"
+          ? `Your turn. ${speechFor(slot)}`
+          : speechFor(slot)
+        : "";
+  const total = boss ? questions.length || BOSS_LENGTH : ROUND_LENGTH;
+  const showSpeed = canSpeed && speed;
 
   useEffect(() => {
+    if (!showSpeed) return;
     const id = window.setInterval(() => {
-      if (phaseRef.current === "done") return;
+      const now = phaseRef.current;
+      if (now === "done" || now === "teach" || now === "practice") return;
       setLeft((s) => (s <= 1 ? 0 : s - 1));
     }, 1000);
     return () => window.clearInterval(id);
-  }, [roundId]);
+  }, [roundId, showSpeed]);
 
   useEffect(() => {
-    if (left === 0 && phase !== "done") finishRef.current();
-  }, [left, phase]);
+    if (showSpeed && left === 0 && phase !== "done" && phase !== "teach" && phase !== "practice") finishRef.current();
+  }, [left, phase, showSpeed]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (menuRef.current || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (phaseRef.current !== "ask" && phaseRef.current !== "retry") return;
-      if (questionsRef.current[index]?.visual.kind === "spell") return;
+      const now = phaseRef.current;
+      if (now !== "ask" && now !== "practice") return;
+      const current = now === "practice" ? practiceRef.current : questionsRef.current[indexRef.current]?.slot;
+      if (!current || current.kind !== "choice" || current.question.visual.kind === "spell") return;
       const n = Number(e.key);
-      if (n >= 1 && n <= 4) chooseRef.current(questionsRef.current[index]?.choices[n - 1] ?? "");
+      if (n >= 1 && n <= 4) {
+        const choice = current.question.choices[n - 1] ?? "";
+        answerRef.current(choice === current.question.answer);
+      }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [index]);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -337,38 +509,43 @@ export function PlayScreen({
   }, [sound]);
 
   useEffect(() => {
-    if (phase !== "ask" || !q) return;
-    speak(q.title, sound);
-  }, [phase, q, sound]);
+    if ((phase !== "ask" && phase !== "practice") || !speech) return;
+    if (!autoSpeakGrade(child.grade)) return;
+    speak(speech, sound);
+  }, [phase, speech, sound, child.grade]);
 
   useEffect(() => {
     if (phase !== "teach" || !example) return;
     teachTone(sound);
-    speak(example.speech, sound);
-  }, [phase, example, sound]);
+    if (autoSpeakGrade(child.grade)) speak(example.speech, sound);
+  }, [phase, example, sound, child.grade]);
 
   useEffect(() => {
     if (phase !== "done") return;
-    const stars = starsForRound(resultsRef.current.filter((mark) => mark.ok).length, total);
+    const stars = starsForRound(
+      dotsRef.current.filter((dot) => dot === "ok" || dot === "helped").length,
+      total,
+    );
     chime(stars === 3 ? "cheer" : "coin", soundRef.current);
   }, [phase, total, roundId]);
 
   useEffect(() => {
-    if (phase === "retry") retryFocusRef.current?.focus();
-  }, [phase, index]);
+    if (phase === "ask" || phase === "practice") retryFocusRef.current?.focus();
+  }, [phase, index, practice]);
 
-  const correct = results.filter((mark) => mark.ok).length;
+  const correct = dots.filter((dot) => dot === "ok" || dot === "helped").length;
   const liveStars = starsForRound(correct, total);
   const mascot = spec?.mascot ?? "peach";
   const ChoiceView = spec?.Choices;
   const friend = unlockId ? squisheeById(unlockId) : undefined;
-  const reveal = phase === "feedback";
-  const ok = reveal && picked === q?.answer;
-  const asking = phase === "ask" || phase === "retry";
-  const reaction = phase === "feedback" && ok ? (combo >= 3 ? "★" : "✓") : phase === "teach" ? "…" : phase === "feedback" ? "·" : null;
+  const asking = phase === "ask" || phase === "practice";
+  const ok = phase === "feedback";
+  const reaction = phase === "feedback" ? (combo >= 3 ? "★" : "✓") : phase === "teach" ? "…" : null;
+  const choice = slot?.kind === "choice" ? slot.question : null;
+  const filled = dots.filter((dot) => dot != null).length;
 
   return (
-    <div className={cx("ac-shell", spec?.layout === "wide" && "ac-wide")}>
+    <div className={cx("ac-shell", spec?.layout === "wide" && "ac-wide")} data-phase={phase}>
       <header className="ac-play-top">
         <button type="button" className="ac-x" onClick={close} aria-label="Close">
           ×
@@ -382,17 +559,38 @@ export function PlayScreen({
         >
           <SpeakerIcon muted={!sound} />
         </button>
-        <div
-          className={cx("ac-timer", `is-${game}`)}
-          role="progressbar"
-          aria-valuemin={0}
-          aria-valuemax={ROUND_SECONDS}
-          aria-valuenow={left}
-          aria-label="Time left"
-        >
-          <span style={{ width: `${(left / ROUND_SECONDS) * 100}%` }} />
-        </div>
-        <div className="ac-clock-read">{fmtSeconds(left)}</div>
+        {canSpeed ? (
+          <button
+            type="button"
+            className={cx("ac-speed", speed && "is-on")}
+            aria-pressed={speed}
+            onClick={() => {
+              setSpeed((on) => {
+                if (!on) setLeft(ROUND_SECONDS);
+                return !on;
+              });
+            }}
+          >
+            Speed
+          </button>
+        ) : (
+          <span className="ac-speed-gap" />
+        )}
+        {showSpeed ? (
+          <>
+            <div
+              className={cx("ac-timer", `is-${game}`)}
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={ROUND_SECONDS}
+              aria-valuenow={left}
+              aria-label="Time left"
+            >
+              <span style={{ width: `${(left / ROUND_SECONDS) * 100}%` }} />
+            </div>
+            <div className="ac-clock-read">{fmtSeconds(left)}</div>
+          </>
+        ) : null}
       </header>
 
       {phase === "done" ? (
@@ -452,21 +650,33 @@ export function PlayScreen({
             </button>
           </div>
         </section>
-      ) : q ? (
+      ) : slot ? (
         <>
           <div className="ac-play-meta">
-            {results.length === 0 && !boss ? (
+            {filled === 0 && !boss ? (
               <button type="button" className="ac-pill" onClick={() => setMenu(true)}>
-                {servedPill(game, q, level)}
+                {servedPill(game, served?.slot, level)}
               </button>
             ) : (
-              <span className="ac-pill">{boss ? "Boss round" : servedPill(game, q, level)}</span>
+              <span className="ac-pill">{boss ? "Boss round" : servedPill(game, served?.slot, level)}</span>
             )}
             <span className="ac-nudge-slot" aria-live="polite">
               {nudge === "up" ? <span className="ac-nudge">Harder</span> : null}
               {nudge === "down" ? <span className="ac-nudge is-down">Easier</span> : null}
             </span>
-            {asking && phase === "ask" ? (
+            {phase !== "feedback" ? (
+              <button
+                type="button"
+                className="ac-hear"
+                aria-label="Hear it again"
+                onClick={() => speak(speech, sound)}
+              >
+                <SpeakerIcon />
+              </button>
+            ) : (
+              <span className="ac-hint-spacer" />
+            )}
+            {asking && phase === "ask" && choice ? (
               <button
                 type="button"
                 className="ac-hint-btn"
@@ -474,22 +684,20 @@ export function PlayScreen({
                 aria-label="Hint"
                 onClick={() => {
                   setHintOn(true);
-                  speak(hintCue(q).speech, sound);
+                  speak(hintCue(choice).speech, sound);
                 }}
               >
                 ?
               </button>
-            ) : (
-              <span className="ac-hint-spacer" />
-            )}
+            ) : null}
             <Stars value={liveStars} />
           </div>
           <div
             className={cx(
               "ac-stage",
-              spec?.layout === "wide" && phase !== "teach" && "is-time",
-              reveal && (ok ? "is-yes" : "is-try"),
-              reveal && ok && combo >= 3 && "is-streak",
+              spec?.layout === "wide" && phase !== "teach" && slot.kind !== "clock" && slot.kind !== "pay" && "is-time",
+              phase === "feedback" && "is-yes",
+              phase === "feedback" && combo >= 3 && "is-streak",
               phase === "teach" && "is-teach",
               hintOn && asking && "is-hint",
             )}
@@ -500,50 +708,64 @@ export function PlayScreen({
               </span>
             ) : null}
             {phase === "teach" && example ? (
-              <div className="ac-stage-main" key={`${q.id}-teach`}>
+              <div className="ac-stage-main" key={`${slotFact(teachSlot ?? slot)}-teach`}>
                 <SquisheeImg id={mascot} className="ac-mascot" label="" />
-                <WorkedExample example={example} onDone={beginRetry} />
+                <WorkedExample example={example} onDone={afterTeach} />
+              </div>
+            ) : phase === "feedback" ? (
+              <div className="ac-stage-main">
+                <SquisheeImg id={mascot} className="ac-mascot is-happy" label="" />
+                <p className="ac-banner is-yes">{served ? praiseLine(served.slot) : "Yes!"}</p>
               </div>
             ) : (
-              <div className="ac-stage-main" key={q.id}>
-                {spec?.Aside ? <spec.Aside question={q} /> : null}
-                <div className="ac-stage-copy">
-                  {spec ? <spec.Prompt question={q} reveal={reveal} mascot={mascot} happy={ok} /> : null}
-                  {ChoiceView ? (
-                    <ChoiceView question={q} reveal={reveal} picked={picked} onChoose={choose} />
-                  ) : (
-                    <div className="ac-choices">
-                      {q.choices.map((choice, choiceIndex) => {
-                        const cls =
-                          phase !== "feedback"
-                            ? ""
-                            : choice === q.answer
-                              ? "is-yes"
-                              : choice === picked
-                                ? "is-no"
-                                : "is-dim";
-                        const pile = q.visual.kind === "money" ? q.visual.piles?.[choice] : undefined;
-                        const label =
-                          q.visual.kind === "money" && q.visual.labels?.[choice] ? q.visual.labels[choice] : choice;
-                        return (
-                          <button
-                            key={choice}
-                            ref={choiceIndex === 0 ? retryFocusRef : undefined}
-                            type="button"
-                            className={cx("ac-choice", pile && "is-coins", cls)}
-                            aria-label={label}
-                            onClick={() => choose(choice)}
-                          >
-                            {pile ? <CoinRow pile={pile} label={label} /> : choice}
-                          </button>
-                        );
-                      })}
+              <div className="ac-stage-main" key={slotFact(slot) + phase}>
+                {slot.kind === "clock" ? (
+                  <ClockBoard task={slot} onAnswer={(good) => answer(good)} />
+                ) : slot.kind === "pay" ? (
+                  <PayBoard task={slot} onAnswer={(good) => answer(good)} />
+                ) : choice ? (
+                  <>
+                    {spec?.Aside ? <spec.Aside question={choice} /> : null}
+                    <div className="ac-stage-copy">
+                      {spec ? (
+                        <spec.Prompt question={choice} reveal={false} mascot={mascot} happy={ok} />
+                      ) : null}
+                      {ChoiceView ? (
+                        <ChoiceView
+                          question={choice}
+                          reveal={false}
+                          picked={null}
+                          onChoose={(value, hinted) => answer(value === choice.answer, hinted === true)}
+                        />
+                      ) : (
+                        <div className="ac-choices">
+                          {choice.choices.map((option, choiceIndex) => {
+                            const pile = choice.visual.kind === "money" ? choice.visual.piles?.[option] : undefined;
+                            const label =
+                              choice.visual.kind === "money" && choice.visual.labels?.[option]
+                                ? choice.visual.labels[option]
+                                : option;
+                            return (
+                              <button
+                                key={option}
+                                ref={choiceIndex === 0 ? retryFocusRef : undefined}
+                                type="button"
+                                className={cx("ac-choice", pile && "is-coins")}
+                                aria-label={label}
+                                onClick={() => answer(option === choice.answer)}
+                              >
+                                {pile ? <CoinRow pile={pile} label={label} /> : option}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                      <div className={cx("ac-banner", hintOn && "is-hint")} aria-live="polite">
+                        {hintOn ? hintCue(choice).caption : phase === "practice" ? "Try one like it" : ""}
+                      </div>
                     </div>
-                  )}
-                  <div className={cx("ac-banner", reveal && (ok ? "is-yes" : "is-no"), hintOn && !reveal && "is-hint")} aria-live="polite">
-                    {reveal ? (ok ? q.praise : q.almost) : hintOn ? hintCue(q).caption : ""}
-                  </div>
-                </div>
+                  </>
+                ) : null}
               </div>
             )}
           </div>
@@ -552,35 +774,37 @@ export function PlayScreen({
             role="progressbar"
             aria-valuemin={0}
             aria-valuemax={total}
-            aria-valuenow={results.length}
+            aria-valuenow={filled}
             aria-label={`Question ${Math.min(total, index + 1)} of ${total}`}
           >
-            <span style={{ width: `${(results.length / total) * 100}%` }} />
+            <span style={{ width: `${(filled / total) * 100}%` }} />
           </div>
-          <div className="ac-combo-row">
-            <div
-              className="ac-combo"
-              data-combo={combo}
-              role="meter"
-              aria-valuemin={0}
-              aria-valuemax={5}
-              aria-valuenow={Math.min(5, combo)}
-              aria-label={combo >= 2 ? `Combo ${combo}` : "Combo"}
-            >
-              <span style={{ width: `${Math.min(100, (combo / 5) * 100)}%` }} />
+          {calm ? null : (
+            <div className="ac-combo-row">
+              <div
+                className="ac-combo"
+                data-combo={combo}
+                role="meter"
+                aria-valuemin={0}
+                aria-valuemax={5}
+                aria-valuenow={Math.min(5, combo)}
+                aria-label={combo >= 2 ? `Combo ${combo}` : "Combo"}
+              >
+                <span style={{ width: `${Math.min(100, (combo / 5) * 100)}%` }} />
+              </div>
+              <small>{combo >= 2 ? `Combo ×${combo}` : "Combo"}</small>
             </div>
-            <small>{combo >= 2 ? `Combo ×${combo}` : "Combo"}</small>
-          </div>
+          )}
           <div className="ac-qdots" aria-hidden="true">
             {Array.from({ length: total }, (_, i) => {
-              const mark = results[i];
-              const cls = mark ? (mark.ok ? "is-ok" : "is-miss") : i === index ? "is-now" : "";
-              return <i key={questions[i]?.id ?? i} className={cls} />;
+              const dot = dots[i];
+              const cls = dot === "ok" ? "is-ok" : dot === "helped" ? "is-helped" : dot === "miss" ? "is-miss" : i === index ? "is-now" : "";
+              return <i key={i} className={cls} />;
             })}
           </div>
           <p className="ac-qmeta">
             Question {Math.min(total, index + 1)} of {total}
-            {combo >= 2 ? (
+            {!calm && combo >= 2 ? (
               <>
                 {" "}
                 · <Flame /> nice streak

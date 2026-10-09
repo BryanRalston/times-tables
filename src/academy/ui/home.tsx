@@ -1,21 +1,32 @@
 import { useState } from "react";
 import { squisheeById } from "@/lib/squishees";
-import { GAMES, gameById } from "../games/registry";
-import { bossReady, dailySnapshot, normalizeJourney } from "../journey";
+import { GAMES } from "../games/registry";
+import { dailySnapshot, normalizeJourney } from "../journey";
 import { gradeLabel, todayIso, type Child } from "../model";
+import { nextPlacement } from "../placement";
 import { gameOfDay, rollGift, unlockedCount, type GiftRoll } from "../rewards";
 import { chime } from "../sound";
-import { AcademyPal, Flame, Foot, GiftBox, Logo, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
+import { WeekStickers } from "./stickers";
+import { AcademyPal, Foot, GiftBox, Logo, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
 
-export function HomeScreen({ child, sound, onClaim }: { child: Child; sound: boolean; onClaim: () => void }) {
+export function HomeScreen({
+  child,
+  sound,
+  onClaim,
+  onPlay,
+}: {
+  child: Child;
+  sound: boolean;
+  onClaim: () => void;
+  onPlay: (game: string, level: string) => void;
+}) {
   const [prize, setPrize] = useState<GiftRoll | null>(null);
   const todayId = todayIso();
   const today = gameOfDay(todayId);
   const daily = dailySnapshot(child, todayId);
   const journey = normalizeJourney(child.journey);
-  const here = gameById(journey.areaId) ?? GAMES[0];
-  const boss = here ? bossReady(journey, here.id) : false;
   const pals = ["frog", "peach", "bunny"];
+  const place = nextPlacement(child);
 
   return (
     <div className="ac-shell">
@@ -36,9 +47,6 @@ export function HomeScreen({ child, sound, onClaim }: { child: Child; sound: boo
         <p className="ac-lede">2-minute games · hop the island · collect squishees</p>
         <div className="ac-daily" data-daily-rounds={daily.rounds} data-daily-goal={daily.goal} data-gift={daily.ready ? "closed" : daily.claimed ? "open" : "none"}>
           <ProgressRing value={daily.rounds} max={daily.goal} label={`${daily.rounds} of ${daily.goal} rounds today`} />
-          <div className="ac-streak" aria-label={child.streak > 0 ? `${child.streak} day streak` : "No streak yet"}>
-            <Flame /> {child.streak > 0 ? `${child.streak}-day streak` : "Start a streak"}
-          </div>
           <button
             type="button"
             className={cx("ac-gift", daily.ready && "is-ready", (daily.claimed || prize != null) && "is-open")}
@@ -54,9 +62,10 @@ export function HomeScreen({ child, sound, onClaim }: { child: Child; sound: boo
             <GiftBox open={daily.claimed || prize != null} />
           </button>
         </div>
-        <a className="ac-go" href={here ? `#/play/${here.id}` : "#/map"}>
-          <span className="ac-play-tri" aria-hidden="true" /> {boss ? "Boss round" : "Play the island"}
-        </a>
+        <WeekStickers secondsByDay={child.secondsByDay} today={todayId} />
+        <button type="button" className="ac-go ac-play-main" data-placement={place.reason} onClick={() => onPlay(place.game, place.level)}>
+          <span className="ac-play-tri" aria-hidden="true" /> Play
+        </button>
         <a className="ac-map-link" href="#/map">
           Island map
         </a>

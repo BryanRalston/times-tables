@@ -5,7 +5,7 @@ import { makeMoneyQuestion, type MoneyLevel } from "./games/money";
 import { makeTimeQuestion, type TimeLevel } from "./games/time";
 import { makeTimesQuestion, type TimesLevel } from "./games/times";
 import type { AddVisual, ChoiceQ } from "./games/types";
-import { greedyCoins, hintCue, workedExample, type AddFrame, type MoneyFrame, type TimeFrame, type TimesFrame } from "./teach";
+import { greedyCoins, hintCue, promptSpeech, speakable, workedExample, type AddFrame, type MoneyFrame, type TimeFrame, type TimesFrame } from "./teach";
 
 function addQ(partial: Partial<AddVisual> = {}): ChoiceQ {
   const visual: AddVisual = {
@@ -171,6 +171,21 @@ describe("worked examples", () => {
       expect(example.frames[0]?.kind).toBe(question.visual.kind);
       expect(example.caption.length).toBeGreaterThan(0);
       expect(hintCue(question).caption.length).toBeGreaterThan(0);
+      const line = promptSpeech(question);
+      expect(line.length).toBeGreaterThan(8);
+      if (question.choices.length > 0) {
+        const labels = question.visual.kind === "money" ? question.visual.labels : undefined;
+        const heard = question.choices.some((choice) => line.includes(speakable(labels?.[choice] ?? choice)));
+        expect(heard).toBe(true);
+      }
     }
+  });
+
+  it("speaks the question and every choice", () => {
+    const line = promptSpeech(addQ());
+    expect(line.toLowerCase()).toContain("missing number");
+    expect(line).toContain("3");
+    expect(line).toContain("5");
+    expect(line).toContain("6");
   });
 });

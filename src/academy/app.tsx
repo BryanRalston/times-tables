@@ -3,6 +3,7 @@ import { gameForScreen, isGameId, type GameId } from "./games/registry";
 import { todayIso, type RoundResult, type Save } from "./model";
 import { acknowledgeUnlocks, applyRound, claimDailyGift } from "./rewards";
 import { activeChild, loadSave, mapActive, withLevel, writeSave } from "./storage";
+import { warmVoices } from "./voice";
 import { HelloScreen, SettingsScreen, SheetsScreen, ShelfScreen } from "./ui/extra";
 import { GrownupsScreen } from "./ui/grownups";
 import { HomeScreen } from "./ui/home";
@@ -65,6 +66,10 @@ function AcademyApp() {
   }, [save]);
 
   useEffect(() => {
+    warmVoices();
+  }, []);
+
+  useEffect(() => {
     const titles: Record<Route["name"], string> = {
       home: "Squishee Academy",
       play: "Play · Squishee Academy",
@@ -117,6 +122,11 @@ function AcademyApp() {
         child={child}
         sound={save.sound}
         onClaim={() => setSave((current) => mapActive(current, (row) => claimDailyGift(row, todayIso())))}
+        onPlay={(gameId, nextLevel) => {
+          if (!isGameId(gameId)) return;
+          setSave((current) => mapActive(current, (row) => withLevel(row, gameId, nextLevel)));
+          window.location.hash = `#/play/${gameId}`;
+        }}
       />
     );
   }

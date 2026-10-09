@@ -67,6 +67,21 @@ export interface AnswerMark {
   taught?: boolean;
   /** The try was finished with a letter hint. Counted correct, and the word stays due. */
   hint?: boolean;
+  /**
+   * A learning miss. It brings the skill back later, and it does not fail the card.
+   * Stars use the scored `correct` count, not these marks.
+   */
+  unscored?: boolean;
+}
+
+/** Kindergarten and grade 1 hear each prompt. Older grades tap the speaker. */
+export function autoSpeakGrade(grade: Grade): boolean {
+  return grade === "K" || grade === "1";
+}
+
+/** A countdown is opt-in, and only from grade 2 up. */
+export function speedRoundGrade(grade: Grade): boolean {
+  return grade === "2" || grade === "3";
 }
 
 export interface RoundResult {

@@ -69,6 +69,20 @@ export function hintCue(question: ChoiceQ): { speech: string; caption: string } 
   return { speech: speakable(caption), caption };
 }
 
+export function choiceSpoken(question: ChoiceQ, choice: string): string {
+  if (question.visual.kind === "money" && question.visual.labels?.[choice]) return question.visual.labels[choice];
+  return choice;
+}
+
+/** Title plus each choice, so a child who cannot read can still pick by ear. */
+export function promptSpeech(question: ChoiceQ): string {
+  const title = speakable(question.title).trim();
+  if (question.choices.length === 0) return title;
+  const heard = question.choices.map((choice) => speakable(choiceSpoken(question, choice)).trim());
+  const lead = /[.!?]$/.test(title) ? title : `${title}.`;
+  return `${lead} ${heard.join(". ")}`;
+}
+
 export function workedExample(question: ChoiceQ): WorkedExample {
   const frames = framesFor(question);
   const caption = frames[frames.length - 1]?.caption ?? question.almost;

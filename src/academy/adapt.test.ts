@@ -78,16 +78,17 @@ describe("mastery mix", () => {
     expect(plan[3]?.reason).toBe("review");
   });
 
-  it("treats five strong tries as mastered and counts a taught miss", () => {
+  it("treats five strong tries as mastered and records one outcome per mark", () => {
     expect(skillHeat(undefined)).toBe("new");
     expect(skillHeat({ ok: 4, miss: 0 })).toBe("learning");
     expect(skillHeat({ ok: 4, miss: 1 })).toBe("mastered");
     const skills: Record<string, { ok: number; miss: number }> = {};
+    noteMark(skills, { skill: "add:within5", tags: ["doubles"], ok: false, unscored: true });
     noteMark(skills, { skill: "add:within5", tags: ["doubles"], ok: true, taught: true });
     expect(skills["add:within5"]).toEqual({ ok: 1, miss: 1 });
     expect(skills.doubles).toEqual({ ok: 1, miss: 1 });
-    noteMark(skills, { skill: "add:within5", tags: [], factKey: "2×3", ok: false, taught: true });
-    expect(skills["add:within5"]).toEqual({ ok: 1, miss: 3 });
-    expect(skills["fact:2×3"]).toEqual({ ok: 0, miss: 2 });
+    noteMark(skills, { skill: "add:within5", tags: [], factKey: "2×3", ok: false });
+    expect(skills["add:within5"]).toEqual({ ok: 1, miss: 2 });
+    expect(skills["fact:2×3"]).toEqual({ ok: 0, miss: 1 });
   });
 });

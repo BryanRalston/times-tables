@@ -141,12 +141,13 @@ function bump(skills: Record<string, SkillStat>, key: string, ok: boolean) {
   skills[key] = { ok: prev.ok + (ok ? 1 : 0), miss: prev.miss + (ok ? 0 : 1) };
 }
 
-/** Record a mark. A taught retry also counts the miss that opened the example. */
+/**
+ * Record one outcome. An unscored learning miss is a single miss so the skill
+ * can return. It does not also count as a failed try.
+ */
 export function noteMark(skills: Record<string, SkillStat>, mark: AnswerMark): void {
   const keys = [mark.skill, ...mark.tags];
   if (mark.factKey) keys.push(`fact:${mark.factKey}`);
-  for (const key of keys) {
-    if (mark.taught) bump(skills, key, false);
-    bump(skills, key, mark.ok);
-  }
+  const ok = mark.unscored === true ? false : mark.ok;
+  for (const key of keys) bump(skills, key, ok);
 }
