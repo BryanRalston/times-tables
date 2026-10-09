@@ -20,7 +20,7 @@ Do not put a half-built game in the registry. A locked “coming soon” card ca
 
 ## 2. Add a worksheet URL
 
-Add `academy/worksheets/<slug>/index.html` with `<body data-screen="sheet-<id>">` matching `sheetScreen`, and add that HTML file to `rollupOptions.input` in `vite.academy.config.ts`. The page is real HTML so it can be linked and printed. The app renders it from the module.
+Add `academy/worksheets/<slug>/index.html` with `<body data-screen="sheet-<id>">` matching `sheetScreen`, and add that HTML file to `rollupOptions.input` in `vite.academy.config.ts`. The page is real HTML so it can be linked and printed. The app renders it from the module. The squisheeacademy.com build uses that same input list.
 
 ## 3. Add tests
 

@@ -3,6 +3,7 @@ Thumbs.db
 *.log
 node_modules
 dist
+dist-domain
 .vite
 *.local
 scripts/playtest-out/

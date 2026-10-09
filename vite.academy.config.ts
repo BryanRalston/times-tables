@@ -3,6 +3,10 @@ import { cpSync, createReadStream, existsSync, readdirSync, rmSync, statSync } f
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { join, normalize, resolve, sep } from "node:path";
 import { defineConfig } from "vite";
+import { academyDomainPlugins } from "./scripts/academy-domain-plugin.mjs";
+
+const domain = process.env.ACADEMY_DOMAIN === "1";
+const outDir = domain ? "dist-domain" : "dist/academy";
 
 function contentType(file: string): string {
   if (file.endsWith(".png")) return "image/png";
@@ -15,13 +19,13 @@ function contentType(file: string): string {
   return "application/octet-stream";
 }
 
-/** Vite keeps the `academy/` folder name in the HTML output. Pages needs those files at dist/academy/. */
-function hoistAcademyHtml() {
+/** Vite keeps the `academy/` folder name in the HTML output. Hoist those files to outDir. */
+function hoistAcademyHtml(dir: string) {
   return {
     name: "hoist-academy-html",
-    closeBundle() {
-      const nested = resolve("dist/academy/academy");
-      const out = resolve("dist/academy");
+    writeBundle() {
+      const out = resolve(dir);
+      const nested = join(out, "academy");
       if (!existsSync(nested)) return;
       for (const name of readdirSync(nested)) {
         cpSync(join(nested, name), join(out, name), { recursive: true });
@@ -64,16 +68,16 @@ function sharedPublic() {
 }
 
 export default defineConfig({
-  base: "/times-tables/academy/",
+  base: domain ? "/" : "/times-tables/academy/",
   publicDir: "academy/public",
-  plugins: [react(), sharedPublic(), hoistAcademyHtml()],
+  plugins: [react(), sharedPublic(), ...(domain ? academyDomainPlugins(outDir) : [hoistAcademyHtml(outDir)])],
   resolve: {
     alias: {
       "@": resolve("src"),
     },
   },
   build: {
-    outDir: "dist/academy",
+    outDir,
     emptyOutDir: true,
     rollupOptions: {
       input: {
@@ -88,6 +92,6 @@ export default defineConfig({
   server: {
     port: 5174,
     host: true,
-    open: "/times-tables/academy/",
+    open: domain ? "/" : "/times-tables/academy/",
   },
 });
