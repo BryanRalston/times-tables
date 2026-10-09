@@ -1,5 +1,11 @@
 export type Grade = "K" | "1" | "2" | "3";
 
+/**
+ * Grade the hello screen starts on. The middle of K–3 is still gentle,
+ * and the first round drops one level so a new kid wins quickly.
+ */
+export const DEFAULT_START_GRADE: Grade = "1";
+
 export interface SkillStat {
   ok: number;
   miss: number;
@@ -47,6 +53,8 @@ export interface AnswerMark {
   tags: string[];
   factKey?: string;
   ok: boolean;
+  /** The child missed once and saw a worked example before this mark. */
+  taught?: boolean;
 }
 
 export interface RoundResult {

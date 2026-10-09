@@ -86,7 +86,7 @@ function AcademyApp() {
 
   let body: ReactNode;
   if (!child.name) {
-    body = <HelloScreen save={save} onSave={setSave} />;
+    body = <HelloScreen save={save} onSave={setSave} sound={save.sound} />;
   } else if (route.name === "play") {
     body = (
       <PlayScreen

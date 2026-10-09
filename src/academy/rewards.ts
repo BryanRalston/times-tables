@@ -1,5 +1,6 @@
 import { applyBuyCosmetic, COSMETICS, isCosmeticId } from "@/lib/cosmetics";
 import { hashSeed } from "@/lib/rng";
+import { noteMark, skillHeat } from "./adapt";
 import { GAMES, barKeys, chipKeys, chipLabel as chipText, skillLabel as skillText, type GameId } from "./games/registry";
 import { advanceJourney, withDailyRound } from "./journey";
 import { SQUAD_IDS, addDays, weekDates, type Child, type RoundResult, type SkillStat } from "./model";
@@ -132,26 +133,13 @@ export function gameOfDay(today: string): GameId {
   return games[hashSeed(today) % games.length]!;
 }
 
-function bump(skills: Record<string, SkillStat>, key: string, ok: boolean) {
-  if (!key) return;
-  const prev = skills[key] ?? { ok: 0, miss: 0 };
-  skills[key] = {
-    ok: prev.ok + (ok ? 1 : 0),
-    miss: prev.miss + (ok ? 0 : 1),
-  };
-}
-
 const DAY_CAP_SECONDS = 4 * 60 * 60;
 
 export function applyRound(child: Child, result: RoundResult, today: string): Child {
   const stars = starsForRound(result.correct, result.total);
   const streak = nextStreak({ count: child.streak, lastPlayed: child.lastPlayed }, today);
   const skills: Record<string, SkillStat> = { ...child.skills };
-  for (const mark of result.answers) {
-    bump(skills, mark.skill, mark.ok);
-    for (const tag of mark.tags) bump(skills, tag, mark.ok);
-    if (mark.factKey) bump(skills, `fact:${mark.factKey}`, mark.ok);
-  }
+  for (const mark of result.answers) noteMark(skills, mark);
   const secondsByDay = { ...child.secondsByDay };
   const add = Math.max(0, Math.min(180, Math.round(result.seconds)));
   secondsByDay[today] = Math.min(DAY_CAP_SECONDS, (secondsByDay[today] ?? 0) + add);
@@ -278,4 +266,111 @@ export function practiceTip(
     text: `${who} can print a free worksheet and play it together tonight.`,
     factor: null,
   };
+}
+
+export interface SkillLesson {
+  key: string;
+  label: string;
+  learning: string;
+  next: string;
+}
+
+const PRACTICE_NEXT: Record<string, string> = {
+  "add:within5": "Count on from the bigger number, up to 10.",
+  "add:within10": "Try doubles and making 10, then sums up to 20.",
+  "add:within20": "Add and subtract up to 20 until it feels quick, then try tens and ones.",
+  "add:within100": "Break numbers into tens and ones, then play another short round.",
+  "table:2": "Keep the 2s easy, then mix in 5s and 10s.",
+  "table:5": "Count by fives, then mix the 2s and 10s.",
+  "table:10": "Count by tens, then try the 3s and 4s.",
+  "table:3": "Practice the 3s, then mix in the 4s.",
+  "table:4": "Practice the 4s, then try tables up through 10.",
+  "table:6": "A few 6s at a time. Skip-count if one sticks.",
+  "table:7": "The 7s take the longest. One row of the table is enough tonight.",
+  "table:8": "Double the 4s to get the 8s.",
+  "table:9": "The 9s: the digits add up to 9. Try a short round.",
+  "time:hour": "Look for the long hand on the 6. That is half past.",
+  "time:half": "Find quarter past and quarter to.",
+  "time:quarter": "Count the long hand by fives.",
+  "time:fives": "Keep reading clocks to five minutes. Say the time out loud.",
+  "money:name": "Count a few coins, starting with pennies and nickels.",
+  "money:count": "Make a small amount, like 25¢ or 40¢, with coins.",
+  "money:make": "Pay with a quarter or a dollar and figure the change.",
+  "money:change": "Count dollars and cents. Say the dollars first.",
+  "money:dollars": "Keep mixing dollars and cents in a short round.",
+  doubles: "Use doubles to add near-doubles, like 6 + 7.",
+  make10: "Make 10, then add within 20.",
+  oclock: "Find half past. The long hand points at 6.",
+  halfpast: "Find quarter past and quarter to.",
+  quarterpast: "Find quarter to, then count by fives.",
+  quarterto: "Count the long hand by fives all the way around.",
+};
+
+function lessonCopy(who: string, label: string, key: string, stat: SkillStat): { learning: string; next: string } {
+  const n = stat.ok + stat.miss;
+  const heat = skillHeat(stat);
+  const ratio = n > 0 ? stat.ok / n : 0;
+  if (n < 3) {
+    return {
+      learning: `${who} just started ${label}.`,
+      next: `Play ${label} a couple more times this week.`,
+    };
+  }
+  if (heat === "mastered") {
+    return {
+      learning: `${who} can do ${label}.`,
+      next: PRACTICE_NEXT[key] ?? `Come back to ${label} in a few days so it stays easy.`,
+    };
+  }
+  if (ratio < 0.6) {
+    return {
+      learning: `${who} is learning ${label}, and some answers still slip.`,
+      next: "Use the pictures and count it out loud together.",
+    };
+  }
+  return {
+    learning: `${who} is learning ${label} and getting most of them right.`,
+    next: `One more short game of ${label} should lock it in.`,
+  };
+}
+
+/** Plain-language notes for skills the child has actually played. */
+export function skillLessons(name: string, skills: Record<string, SkillStat>): SkillLesson[] {
+  const who = name.trim() || "Your child";
+  const keys = [...new Set([...barKeys(), ...chipKeys()])];
+  const rows: { key: string; n: number; stat: SkillStat }[] = [];
+  for (const key of keys) {
+    const stat = skills[key];
+    if (!stat || stat.ok + stat.miss <= 0) continue;
+    rows.push({ key, n: stat.ok + stat.miss, stat });
+  }
+  rows.sort((a, b) => b.n - a.n || a.key.localeCompare(b.key));
+  return rows.slice(0, 8).map((row) => {
+    const label = skillLabel(row.key);
+    return { key: row.key, label, ...lessonCopy(who, label, row.key, row.stat) };
+  });
+}
+
+/** Practiced skills, plus a starting note for any game with no marks yet. */
+export function parentBrief(child: Pick<Child, "name" | "skills" | "levels">): SkillLesson[] {
+  const who = child.name.trim() || "Your child";
+  const lessons = skillLessons(who, child.skills);
+  for (const game of GAMES) {
+    const touched = [...game.bars, ...game.chips].some((row) => {
+      const stat = child.skills[row.key];
+      return !!stat && stat.ok + stat.miss > 0;
+    });
+    if (touched) continue;
+    const levelId = child.levels[game.id] ?? game.levels[0]?.id ?? "";
+    const level = game.levels.find((row) => row.id === levelId);
+    const key = `${game.id}:${levelId}`;
+    const label = game.skillLabel(key) ?? level?.label ?? game.title;
+    lessons.push({
+      key,
+      label,
+      learning: `${who} has not played ${game.title} yet.`,
+      next: `Start with ${label}. It matches this grade.`,
+    });
+  }
+  return lessons;
 }

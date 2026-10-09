@@ -13,6 +13,7 @@ import {
   masteredChips,
   newestUnlock,
   nextStreak,
+  parentBrief,
   practiceTip,
   rollGift,
   skillBars,
@@ -130,6 +131,38 @@ describe("stars, streak, and unlocks", () => {
     const bars = skillBars(skills);
     expect(bars.some((row) => row.key === "add:within20" && row.pct === 80)).toBe(true);
     expect(bars.find((row) => row.key === "table:2")?.pct).toBe(100);
+  });
+
+  it("says what she is learning and what to practice next", () => {
+    const learning = child({
+      skills: {
+        "add:within5": { ok: 1, miss: 4 },
+        "table:7": { ok: 5, miss: 0 },
+      },
+    });
+    const lessons = parentBrief(learning);
+    const adding = lessons.find((row) => row.key === "add:within5");
+    const sevens = lessons.find((row) => row.key === "table:7");
+    expect(adding?.learning).toContain("Maya is learning");
+    expect(adding?.next.toLowerCase()).toContain("picture");
+    expect(sevens?.learning).toContain("Maya can do");
+    expect(sevens?.next.length).toBeGreaterThan(8);
+    const fresh = parentBrief(child({ skills: {} }));
+    expect(fresh.some((row) => row.learning.includes("has not played"))).toBe(true);
+    expect(fresh.map((row) => row.next).every((line) => line.length > 8)).toBe(true);
+  });
+
+  it("counts a worked-example miss separately from the retry", () => {
+    const today = "2026-10-09";
+    const next = applyRound(
+      child(),
+      round({
+        answers: [{ skill: "add:within5", tags: ["doubles"], ok: true, taught: true }],
+      }),
+      today,
+    );
+    expect(next.skills["add:within5"]).toEqual({ ok: 1, miss: 1 });
+    expect(next.skills.doubles).toEqual({ ok: 1, miss: 1 });
   });
 
   it("pays coins for stars, a combo, and a beaten boss", () => {

@@ -28,14 +28,24 @@ function withAudio(enabled: boolean, play: () => void) {
   }
 }
 
-export function blip(ok: boolean, enabled: boolean) {
+export function blip(ok: boolean, enabled: boolean, streak = 0) {
   withAudio(enabled, () => {
     if (ok) {
-      tone(660, 0.08, 0, "sine", 0.03);
-      tone(880, 0.1, 0.08, "sine", 0.03);
+      tone(660, 0.07, 0, "sine", 0.04);
+      tone(880, 0.09, 0.06, "sine", 0.04);
+      if (streak >= 3) tone(1174, 0.12, 0.14, "triangle", 0.035);
       return;
     }
-    tone(320, 0.14, 0, "triangle", 0.02);
+    tone(294, 0.1, 0, "triangle", 0.018);
+    tone(262, 0.12, 0.08, "triangle", 0.014);
+  });
+}
+
+/** A soft “watch this” before a worked example. */
+export function teachTone(enabled: boolean) {
+  withAudio(enabled, () => {
+    tone(523, 0.08, 0, "sine", 0.025);
+    tone(659, 0.1, 0.09, "sine", 0.025);
   });
 }
 

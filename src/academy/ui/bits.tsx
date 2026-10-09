@@ -198,9 +198,21 @@ export function clockAria(hours: number, minutes: number): string {
   return `Analog clock. Short hand just after ${short}. Long hand on ${longN}.`;
 }
 
-export function AnalogClock({ hours, minutes, className }: { hours: number; minutes: number; className?: string }) {
-  const minuteDeg = minutes * 6;
-  const hourDeg = (hours % 12) * 30 + minutes * 0.5;
+export function AnalogClock({
+  hours,
+  minutes,
+  className,
+  handMinutes,
+}: {
+  hours: number;
+  minutes: number;
+  className?: string;
+  /** Minute-hand position while a worked example moves the hands. */
+  handMinutes?: number;
+}) {
+  const shown = handMinutes ?? minutes;
+  const minuteDeg = shown * 6;
+  const hourDeg = (hours % 12) * 30 + shown * 0.5;
   const point = (deg: number, len: number) => {
     const r = (deg * Math.PI) / 180;
     return { x: 100 + Math.sin(r) * len, y: 100 - Math.cos(r) * len };
@@ -212,9 +224,9 @@ export function AnalogClock({ hours, minutes, className }: { hours: number; minu
       className={cx("ac-clock", className)}
       viewBox="0 0 200 200"
       role="img"
-      aria-label={clockAria(hours, minutes)}
+      aria-label={clockAria(hours, shown)}
       data-hours={hours}
-      data-minutes={minutes}
+      data-minutes={shown}
     >
       <circle cx="100" cy="100" r="94" fill="#fffdfb" stroke="#f7b7d2" strokeWidth="10" />
       {Array.from({ length: 12 }, (_, i) => {

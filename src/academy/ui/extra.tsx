@@ -1,17 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { COSMETICS, cosmeticPrice, type CosmeticId } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
 import { GAMES, sheetHref } from "../games/registry";
-import { SQUAD_IDS, cleanName, isGrade, type Grade, type Save } from "../model";
+import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type Grade, type Save } from "../model";
 import { buyOutfit, giftCount, palUnlocked, starsNeeded, unlockedCount, wearOutfit } from "../rewards";
 import { activeChild, mapActive, withGrade, withLevel } from "../storage";
+import { silence, speak } from "../voice";
 import { AcademyPal, BackLink, Foot, FreeNote, Logo, SquisheeImg, cx } from "./bits";
 import { GradeChips } from "./grownups";
 
-export function HelloScreen({ save, onSave }: { save: Save; onSave: (save: Save) => void }) {
+export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save: Save) => void; sound: boolean }) {
   const [name, setName] = useState("");
-  const [grade, setGrade] = useState<Grade>("K");
-  const ready = cleanName(name).length > 0;
+  const [grade, setGrade] = useState<Grade>(DEFAULT_START_GRADE);
+
+  useEffect(() => {
+    speak("Tap play!", sound);
+    return () => silence();
+  }, [sound]);
 
   return (
     <div className="ac-shell">
@@ -19,29 +24,35 @@ export function HelloScreen({ save, onSave }: { save: Save; onSave: (save: Save)
         <Logo />
       </header>
       <form
-        className="ac-hero"
+        className="ac-hero ac-hello"
         onSubmit={(e) => {
           e.preventDefault();
-          const cleaned = cleanName(name);
-          if (!cleaned) return;
+          const cleaned = cleanName(name) || "Pal";
           onSave(mapActive(save, (child) => withGrade({ ...child, name: cleaned, avatarId: "peach" }, grade)));
+          window.location.hash = "#/play/add";
         }}
       >
         <div className="ac-pals">
           <SquisheeImg id="frog" />
-          <SquisheeImg id="peach" className="is-mid" />
           <SquisheeImg id="bunny" />
         </div>
-        <h1>Hi! Ready to play?</h1>
-        <p className="ac-lede">2-minute games · earn stars · unlock squishees</p>
-        <label className="ac-field">
-          Your name
-          <input value={name} maxLength={12} autoComplete="off" onChange={(e) => setName(e.target.value)} />
-        </label>
-        <GradeChips grade={grade} onGrade={setGrade} />
-        <button type="submit" className="ac-go" disabled={!ready}>
-          Let&apos;s play
+        <h1 className="ac-sr">Ready to play?</h1>
+        <GradeChips grade={grade} onGrade={setGrade} className="ac-hello-grades" />
+        <button type="submit" className="ac-pal-play" aria-label="Play">
+          <SquisheeImg id="peach" />
+          <span className="ac-play-tri" aria-hidden="true" />
         </button>
+        <label className="ac-field ac-name-opt">
+          Name
+          <input
+            value={name}
+            maxLength={12}
+            autoComplete="off"
+            aria-label="Your name"
+            placeholder="You can skip this"
+            onChange={(e) => setName(e.target.value)}
+          />
+        </label>
         <FreeNote />
       </form>
     </div>

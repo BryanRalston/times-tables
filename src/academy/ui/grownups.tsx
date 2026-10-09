@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { rngRandom } from "@/lib/rng";
 import {
+  DEFAULT_START_GRADE,
   WEEKDAY_LETTERS,
   WEEKDAY_NAMES,
   cleanName,
@@ -17,6 +18,7 @@ import { sheetHref } from "../games/registry";
 import {
   formatMinutes,
   masteredChips,
+  parentBrief,
   practiceTip,
   secondsThisWeek,
   skillBars,
@@ -43,7 +45,7 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
   const [miss, setMiss] = useState(false);
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
-  const [grade, setGrade] = useState<Grade>("K");
+  const [grade, setGrade] = useState<Grade>(DEFAULT_START_GRADE);
   const [armed, setArmed] = useState(false);
   const [holding, setHolding] = useState(false);
   const timer = useRef<number | null>(null);
@@ -158,6 +160,7 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
   const todayIndex = mondayIndex(today);
   const bars = skillBars(child.skills);
   const chips = masteredChips(child.skills);
+  const lessons = parentBrief(child);
   const tip = practiceTip(child.name, child.skills);
   const weekSeconds = secondsThisWeek(child.secondsByDay, today);
   const card = weeklyCard(child, today);
@@ -262,6 +265,17 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
       </section>
 
       <section className="ac-panel">
+        <h2>What {child.name || "your child"} is learning</h2>
+        {lessons.map((row) => (
+          <article key={row.key} className="ac-lesson">
+            <h3>{row.label}</h3>
+            <p>{row.learning}</p>
+            <p className="ac-next">Practice next: {row.next}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="ac-panel">
         <h2>Skills</h2>
         {bars.length === 0 ? (
           <p className="ac-hint">Play a few rounds and this fills in.</p>
@@ -300,10 +314,18 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
   );
 }
 
-export function GradeChips({ grade, onGrade }: { grade: Grade; onGrade: (grade: Grade) => void }) {
+export function GradeChips({
+  grade,
+  onGrade,
+  className,
+}: {
+  grade: Grade;
+  onGrade: (grade: Grade) => void;
+  className?: string;
+}) {
   const grades: Grade[] = ["K", "1", "2", "3"];
   return (
-    <div className="ac-grades" role="group" aria-label="Grade">
+    <div className={cx("ac-grades", className)} role="group" aria-label="Grade">
       {grades.map((g) => (
         <button key={g} type="button" className={cx("ac-grade", grade === g && "is-on")} onClick={() => onGrade(g)}>
           {g === "K" ? "K" : g}
