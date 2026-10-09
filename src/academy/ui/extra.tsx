@@ -5,7 +5,7 @@ import { GAMES, sheetHref } from "../games/registry";
 import { SQUAD_IDS, cleanName, isGrade, type Grade, type Save } from "../model";
 import { buyOutfit, giftCount, palUnlocked, starsNeeded, unlockedCount, wearOutfit } from "../rewards";
 import { activeChild, mapActive, withGrade, withLevel } from "../storage";
-import { AcademyPal, BackLink, Foot, Logo, SquisheeImg, cx } from "./bits";
+import { AcademyPal, BackLink, Foot, FreeNote, Logo, SquisheeImg, cx } from "./bits";
 import { GradeChips } from "./grownups";
 
 export function HelloScreen({ save, onSave }: { save: Save; onSave: (save: Save) => void }) {
@@ -42,6 +42,7 @@ export function HelloScreen({ save, onSave }: { save: Save; onSave: (save: Save)
         <button type="submit" className="ac-go" disabled={!ready}>
           Let&apos;s play
         </button>
+        <FreeNote />
       </form>
     </div>
   );
@@ -182,6 +183,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
         })}
       </div>
       <BackLink>Back to games</BackLink>
+      <FreeNote />
     </div>
   );
 }
@@ -223,6 +225,7 @@ export function SheetsScreen() {
         ))}
       </div>
       <BackLink>Back to games</BackLink>
+      <FreeNote />
     </div>
   );
 }

@@ -68,7 +68,7 @@ p { margin: 0; }
 .ac-logo b { color: var(--ac-pink); font-weight: 700; }
 .ac-logo i { color: var(--ac-teal); font-style: normal; font-weight: 700; }
 
-.ac-streak, .ac-pill, .ac-soon-pill, .ac-kid, .ac-x {
+.ac-streak, .ac-pill, .ac-kid, .ac-x {
   background: #fff;
   border: 0;
   border-radius: 999px;
@@ -163,7 +163,7 @@ button.ac-go:disabled { opacity: 0.45; }
 .ac-card.is-gold { background: #fff1c9; }
 .ac-card.is-lav { background: #efe4fb; }
 .ac-card.is-soon { opacity: 0.92; }
-.ac-soon, .ac-soon-pill {
+.ac-soon {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -179,7 +179,7 @@ button.ac-go:disabled { opacity: 0.45; }
   background: #fff;
   color: #7a6880;
 }
-.ac-soon svg, .ac-soon-pill svg, .ac-foot svg {
+.ac-soon svg, .ac-foot svg {
   width: 16px;
   height: 16px;
   fill: none;
@@ -188,8 +188,6 @@ button.ac-go:disabled { opacity: 0.45; }
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.ac-soon-pill { padding: 8px 12px; color: var(--ac-ink); }
-
 .ac-meters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
 .ac-meter {
   display: flex;
@@ -223,6 +221,13 @@ button.ac-go:disabled { opacity: 0.45; }
   font-size: 13px;
   font-weight: 800;
   text-decoration: none;
+}
+.ac-free {
+  margin: 12px 0 0;
+  text-align: center;
+  color: var(--ac-muted);
+  font-size: 13px;
+  font-weight: 700;
 }
 .ac-back {
   display: inline-block;

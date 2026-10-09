@@ -145,19 +145,26 @@ function IconGear() {
   );
 }
 
+export function FreeNote() {
+  return <p className="ac-free">Free for every family. No ads, no accounts.</p>;
+}
+
 export function Foot() {
   return (
-    <nav className="ac-foot" aria-label="More">
-      <a href="#/grownups">
-        <IconPeople /> Grown-ups
-      </a>
-      <a href="#/sheets">
-        <IconPrint /> Free worksheets
-      </a>
-      <a href="#/settings">
-        <IconGear /> Settings
-      </a>
-    </nav>
+    <>
+      <nav className="ac-foot" aria-label="More">
+        <a href="#/grownups">
+          <IconPeople /> Grown-ups
+        </a>
+        <a href="#/sheets">
+          <IconPrint /> Free worksheets
+        </a>
+        <a href="#/settings">
+          <IconGear /> Settings
+        </a>
+      </nav>
+      <FreeNote />
+    </>
   );
 }
 

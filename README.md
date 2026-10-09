@@ -41,6 +41,8 @@ K–3 games (times tables, add & subtract, telling time, money) live on the same
 
 https://bryanralston.github.io/times-tables/academy/
 
+Squishee Academy is free for every family. No ads, no accounts, no payment. Unlocks come from playing.
+
 `npm run build` emits that app into `dist/academy/` after the Squishee Math build. Academy keeps its own `localStorage` key and does not change Squishee Math. Worksheets: `/academy/worksheets/times-tables/`, `/academy/worksheets/add-subtract/`, `/academy/worksheets/telling-time/`, `/academy/worksheets/money/`. Adding a game is one module: [`docs/ADDING_A_GAME.md`](docs/ADDING_A_GAME.md).
 
 The old single-file leftover page lives in `legacy/`.
