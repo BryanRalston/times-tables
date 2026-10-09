@@ -1,5 +1,5 @@
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 
 export const SQUAD_IDS = [
   "peach",
@@ -32,11 +32,46 @@ export const COSMETIC_IDS = ["party-hat", "scarf", "bow", "shades"];
 
 export const COIN_FILES = ["penny.png", "nickel.png", "dime.png", "quarter.png", "dollar.png", "five.png"];
 
-const PRECACHE_EXT = /\.(?:html|js|css|svg|png|webp|woff2?|webmanifest|mp3|wav|ogg|m4a)$/i;
+const PRECACHE_EXT = /\.(?:html|js|css|svg|png|webp|woff2?|webmanifest|mp3|wav|ogg|m4a|mp4)$/i;
+const POKE_NAME = /[a-z0-9]+(?:-[a-z0-9]+)*-poke(?:-strip)?\.(?:mp4|png)/g;
 const SKIP_COPY = /^(?:squishees|cosmetics|money)\//;
 
 /** Share card. Left out of the offline cache so the worker never answers it. */
 export const SHARE_IMAGE_PATH = "/og/squishee-academy.png";
+
+export function isPokeMediaName(name) {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*-poke\.mp4$/.test(name) || /^[a-z0-9]+(?:-[a-z0-9]+)*-poke-strip\.png$/.test(name);
+}
+
+/** Poke clips and coarse-pointer strips. Cheer hops are not poke media. */
+export function pokeMediaFiles() {
+  const dir = resolve("public/squishees");
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((name) => isPokeMediaName(name))
+    .sort()
+    .map((name) => `squishees/${name}`);
+}
+
+export function referencedPokeNames(text) {
+  return [...new Set(String(text).match(POKE_NAME) ?? [])].sort();
+}
+
+export function copyPokeMedia(outDir) {
+  const root = resolve(outDir);
+  const srcDir = resolve("public/squishees");
+  const copied = [];
+  for (const rel of pokeMediaFiles()) {
+    const name = rel.slice("squishees/".length);
+    const src = join(srcDir, name);
+    if (!existsSync(src)) continue;
+    const dest = join(root, rel);
+    mkdirSync(dirname(dest), { recursive: true });
+    cpSync(src, dest);
+    copied.push(rel);
+  }
+  return copied;
+}
 
 export function artPaths() {
   const out = ["favicon.svg"];
@@ -74,7 +109,7 @@ export function referencedUrls(text) {
   return [...out];
 }
 
-export function buildPrecacheList({ appPrefix, artPrefix, files, texts }) {
+export function buildPrecacheList({ appPrefix, artPrefix, mediaPrefix, files, texts }) {
   const urls = new Set();
   for (const rel of files) {
     if (!isPrecacheFile(rel)) continue;
@@ -84,6 +119,9 @@ export function buildPrecacheList({ appPrefix, artPrefix, files, texts }) {
     if (rel.endsWith("/index.html")) urls.add(url.slice(0, -"index.html".length));
   }
   for (const rel of artPaths()) urls.add(joinUrl(artPrefix, rel));
+  if (mediaPrefix !== undefined) {
+    for (const rel of pokeMediaFiles()) urls.add(joinUrl(mediaPrefix, rel));
+  }
   for (const text of texts ?? []) {
     for (const url of referencedUrls(text)) urls.add(url);
   }
@@ -121,14 +159,14 @@ export function fileForPrecacheUrl(url, { outDir, publicDir, appPrefix, artPrefi
   return candidates.find((file) => existsSync(file) && statSync(file).isFile()) ?? null;
 }
 
-export function writePrecacheManifest(outDir, { appPrefix, artPrefix, publicDir = resolve("public") }) {
+export function writePrecacheManifest(outDir, { appPrefix, artPrefix, mediaPrefix, publicDir = resolve("public") }) {
   const root = resolve(outDir);
   const files = listBuildFiles(root);
   const texts = [];
   for (const rel of files) {
     if (/\.(?:js|css|html|webmanifest)$/.test(rel)) texts.push(readFileSync(join(root, rel), "utf8"));
   }
-  const list = buildPrecacheList({ appPrefix, artPrefix, files, texts }).filter((url) =>
+  const list = buildPrecacheList({ appPrefix, artPrefix, mediaPrefix, files, texts }).filter((url) =>
     fileForPrecacheUrl(url, { outDir: root, publicDir, appPrefix, artPrefix }),
   );
   writeFileSync(join(root, "precache-manifest.json"), `${JSON.stringify(list)}\n`);
@@ -174,7 +212,7 @@ self.addEventListener("activate", (event) => {
 
 export function subpathServiceWorker() {
   return `/* Academy-only offline cache. Registered with scope /times-tables/academy/ so Squishee Math is not controlled. */
-const CACHE = "squishee-academy-v3";
+const CACHE = "squishee-academy-v4";
 ${PRECACHE_RUNTIME}
 function isMathShell(pathname) {
   return pathname === "/times-tables" || pathname === "/times-tables/" || pathname === "/times-tables/index.html";
@@ -214,7 +252,7 @@ self.addEventListener("fetch", (event) => {
 
 export function domainServiceWorker() {
   return `/* Squishee Academy offline cache. Served from the domain root so scope is /. */
-const CACHE = "squishee-academy-root-v3";
+const CACHE = "squishee-academy-root-v4";
 const SHARE_IMAGE = ${JSON.stringify(SHARE_IMAGE_PATH)};
 ${PRECACHE_RUNTIME}
 self.addEventListener("fetch", (event) => {
@@ -256,6 +294,9 @@ self.addEventListener("fetch", (event) => {
 export function academyPrecachePlugin(outDir, options) {
   return {
     name: "academy-precache-manifest",
+    writeBundle() {
+      copyPokeMedia(outDir);
+    },
     closeBundle() {
       writePrecacheManifest(outDir, options);
     },

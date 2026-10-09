@@ -1,5 +1,5 @@
 /* Academy-only offline cache. Registered with scope /times-tables/academy/ so Squishee Math is not controlled. */
-const CACHE = "squishee-academy-v3";
+const CACHE = "squishee-academy-v4";
 
 async function precacheAll() {
   const cache = await caches.open(CACHE);

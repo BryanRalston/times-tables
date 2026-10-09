@@ -5,7 +5,7 @@ import { dirname, join, normalize, resolve, sep } from "node:path";
 import { defineConfig } from "vite";
 import { academySeoFiles, withOpenGraph } from "./src/academy/seo/html";
 import { academyDomainPlugins } from "./scripts/academy-domain-plugin.mjs";
-import { academyPrecachePlugin } from "./scripts/academy-precache.mjs";
+import { academyPrecachePlugin, isPokeMediaName } from "./scripts/academy-precache.mjs";
 
 const domain = process.env.ACADEMY_DOMAIN === "1";
 const outDir = domain ? "dist-domain" : "dist/academy";
@@ -42,6 +42,14 @@ function sharedPublic() {
   const serve = (req: IncomingMessage, res: ServerResponse, next: () => void) => {
     const pathOnly = decodeURIComponent((req.url ?? "/").split("?")[0] ?? "/");
     if (pathOnly === "/academy" || pathOnly.startsWith("/academy/")) {
+      const under = pathOnly.replace(/^\/academy\/?/, "");
+      const name = under.startsWith("squishees/") ? under.slice("squishees/".length) : "";
+      const shared = name && isPokeMediaName(name) ? join(root, "squishees", name) : "";
+      if (shared && shared.startsWith(root + sep) && existsSync(shared) && statSync(shared).isFile()) {
+        res.setHeader("Content-Type", contentType(shared));
+        createReadStream(shared).pipe(res);
+        return;
+      }
       next();
       return;
     }
@@ -104,6 +112,7 @@ export default defineConfig({
     academyPrecachePlugin(outDir, {
       appPrefix: domain ? "" : "/times-tables/academy",
       artPrefix: domain ? "" : "/times-tables",
+      mediaPrefix: domain ? "" : "/times-tables/academy",
     }),
   ],
   resolve: {

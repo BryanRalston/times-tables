@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { hasRootTimesTablesPath, rewriteDomainSource } from "./academy-domain-rewrite.mjs";
+import { pokeMediaFiles, referencedPokeNames } from "./academy-precache.mjs";
 
 function fail(msg) {
   console.error(`check-academy-domain FAIL: ${msg}`);
@@ -235,6 +236,21 @@ if (image.readUInt32BE(16) !== 1200 || image.readUInt32BE(20) !== 630) {
   fail(`share image is ${image.readUInt32BE(16)}x${image.readUInt32BE(20)}`);
 }
 if (manifestList.includes("/og/squishee-academy.png")) fail("service worker precaches the share image");
+
+const pokeNames = referencedPokeNames(bundle);
+const shippedPoke = new Set(pokeMediaFiles().map((rel) => rel.slice("squishees/".length)));
+if (pokeNames.length === 0) fail("bundle does not reference poke clips or strips");
+for (const name of pokeNames) {
+  if (!shippedPoke.has(name)) fail(`referenced poke asset is not a shipped poke file: ${name}`);
+  const rel = `squishees/${name}`;
+  if (!existsSync(join(root, rel))) fail(`poke asset missing from dist-domain: ${rel}`);
+  if (!manifestList.includes(`/${rel}`)) fail(`precache missing /${rel}`);
+}
+for (const rel of pokeMediaFiles()) {
+  if (!existsSync(join(root, rel))) fail(`poke asset missing from dist-domain: ${rel}`);
+  if (!pokeNames.includes(rel.slice("squishees/".length))) fail(`bundle does not reference ${rel}`);
+  if (!manifestList.includes(`/${rel}`)) fail(`precache missing /${rel}`);
+}
 for (const rel of [
   "favicon.ico",
   "favicon-16.png",

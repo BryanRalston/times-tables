@@ -1,6 +1,6 @@
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, extname, join, resolve } from "node:path";
-import { artPaths, domainServiceWorker } from "./academy-precache.mjs";
+import { artPaths, copyPokeMedia, domainServiceWorker } from "./academy-precache.mjs";
 import { rewriteDomainSource } from "./academy-domain-rewrite.mjs";
 
 const TEXT_EXT = new Set([".html", ".js", ".css", ".webmanifest", ".svg", ".json", ".txt"]);
@@ -76,6 +76,7 @@ function publishRoot(outDir) {
   hoistIfNeeded(root);
   rewriteTree(root);
   copyPortraits(root);
+  copyPokeMedia(root);
   const money = resolve("public/money");
   if (existsSync(money)) cpSync(money, join(root, "money"), { recursive: true });
   copyIfExists(resolve("public/favicon.svg"), join(root, "favicon.svg"));

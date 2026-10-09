@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { COSMETIC_IDS } from "@/lib/cosmetics";
 import { SQUAD_IDS } from "../model";
-import { artPaths, buildPrecacheList, domainServiceWorker, isPrecacheFile, referencedUrls, SHARE_IMAGE_PATH, subpathServiceWorker } from "../../../scripts/academy-precache.mjs";
+import { artPaths, buildPrecacheList, domainServiceWorker, isPrecacheFile, pokeMediaFiles, referencedPokeNames, referencedUrls, SHARE_IMAGE_PATH, subpathServiceWorker } from "../../../scripts/academy-precache.mjs";
 import { SHARE_IMAGE_PATH as htmlShareImage } from "../seo/html";
 
 describe("offline precache", () => {
@@ -35,6 +35,41 @@ describe("offline precache", () => {
     expect(list).toContain("/times-tables/squishees/frog.png");
     expect(list).toContain("/sounds/cheer.wav");
     expect(referencedUrls('src="/assets/index-abc123.js"')).toContain("/assets/index-abc123.js");
+
+    const poke = pokeMediaFiles();
+    expect(poke).toEqual([
+      "squishees/bunny-poke-strip.png",
+      "squishees/bunny-poke.mp4",
+      "squishees/cat-poke-strip.png",
+      "squishees/cat-poke.mp4",
+      "squishees/frog-poke-strip.png",
+      "squishees/frog-poke.mp4",
+    ]);
+    expect(poke.some((rel) => rel.includes("cheer"))).toBe(false);
+    const withMedia = buildPrecacheList({
+      appPrefix: "/times-tables/academy",
+      artPrefix: "/times-tables",
+      mediaPrefix: "/times-tables/academy",
+      files: ["index.html"],
+      texts: [],
+    });
+    expect(withMedia).toContain("/times-tables/academy/squishees/frog-poke.mp4");
+    expect(withMedia).toContain("/times-tables/academy/squishees/frog-poke-strip.png");
+    expect(withMedia).not.toContain("/times-tables/squishees/frog-poke.mp4");
+    const domainList = buildPrecacheList({
+      appPrefix: "",
+      artPrefix: "",
+      mediaPrefix: "",
+      files: ["index.html"],
+      texts: ['clip:"/squishees/frog-poke.mp4"'],
+    });
+    expect(domainList).toContain("/squishees/frog-poke.mp4");
+    expect(domainList).toContain("/squishees/cat-poke-strip.png");
+    expect(domainList).toContain("/squishees/bunny-poke.mp4");
+    expect(referencedPokeNames('poke:"frog-poke.mp4",strip:"frog-poke-strip.png",cheer:"frog-cheer.mp4"')).toEqual([
+      "frog-poke-strip.png",
+      "frog-poke.mp4",
+    ]);
 
     const sound = readFileSync("src/academy/sound.ts", "utf8");
     expect(sound).not.toMatch(/\.(mp3|wav|ogg|m4a)/);

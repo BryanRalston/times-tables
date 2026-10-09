@@ -102,8 +102,13 @@ describe("math poke art", () => {
     expect(frogStrip.strip?.src).toMatch(/frog-poke-strip\.png$/);
     expect(pokePlayback("bunny", true).strip?.src).toMatch(/bunny-poke-strip\.png$/);
     expect(pokePlayback("cat", true).strip?.src).toMatch(/cat-poke-strip\.png$/);
-    expect(squisheeMediaUrl("/times-tables/academy/squishees/frog-poke.mp4")).toBe("/times-tables/squishees/frog-poke.mp4");
-    expect(squisheeMediaUrl(pokePlayback("frog", true).strip?.src ?? "")).toBe("/times-tables/squishees/frog-poke-strip.png");
+    const base = import.meta.env.BASE_URL || "/";
+    expect(squisheeMediaUrl("/times-tables/academy/squishees/frog-poke.mp4")).toBe(`${base}squishees/frog-poke.mp4`);
+    expect(squisheeMediaUrl(pokePlayback("frog", true).strip?.src ?? "")).toBe(`${base}squishees/frog-poke-strip.png`);
+    const media = readFileSync(new URL("../paths.ts", import.meta.url), "utf8");
+    const mediaFn = media.slice(media.indexOf("function squisheeMediaUrl"), media.indexOf("function cosmeticCompositeUrl"));
+    expect(mediaFn).toContain("import.meta.env.BASE_URL");
+    expect(mediaFn).not.toContain("/times-tables/");
   });
 
   it("keeps every other squishee on the still, squashed with the same CSS", () => {

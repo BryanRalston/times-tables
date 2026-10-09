@@ -7,10 +7,12 @@ export function squisheeUrl(file: string): string {
   return `/times-tables/squishees/${file}`;
 }
 
-/** Poke clips and strips sit beside the portraits. Academy's base URL does not host them. */
+/** Poke clips and strips ship inside this build, under its base URL. */
 export function squisheeMediaUrl(src: string): string {
   const file = src.split("?")[0]?.split("#")[0]?.split("/").pop() ?? "";
-  return squisheeUrl(file);
+  const base = import.meta.env.BASE_URL || "/";
+  const prefix = base.endsWith("/") ? base : `${base}/`;
+  return `${prefix}squishees/${file}`;
 }
 
 /** Fitted outfit art lives with Squishee Math, not under the academy base URL. */

@@ -38,6 +38,22 @@ for (const sheet of ["times-tables", "add-subtract", "telling-time", "money", "s
   if (!sheetHtml.includes("<title>")) fail(`worksheet ${sheet} missing title`);
 }
 if (!existsSync(resolve("dist/academy-sw.js"))) fail("dist/academy-sw.js missing");
+const academyManifestPath = resolve("dist/academy/precache-manifest.json");
+if (!existsSync(academyManifestPath)) fail("dist/academy/precache-manifest.json missing");
+const academyManifest = JSON.parse(readFileSync(academyManifestPath, "utf8"));
+for (const rel of [
+  "squishees/frog-poke.mp4",
+  "squishees/cat-poke.mp4",
+  "squishees/bunny-poke.mp4",
+  "squishees/frog-poke-strip.png",
+  "squishees/cat-poke-strip.png",
+  "squishees/bunny-poke-strip.png",
+]) {
+  if (!existsSync(resolve("dist/academy", rel))) fail(`dist/academy/${rel} missing`);
+  const url = `/times-tables/academy/${rel}`;
+  if (!academyManifest.includes(url)) fail(`academy precache missing ${url}`);
+}
+if (!existsSync(resolve("dist/squishees/frog-poke.mp4"))) fail("dist/squishees/frog-poke.mp4 missing");
 
 console.log("check-pages OK dist/index.html");
 
