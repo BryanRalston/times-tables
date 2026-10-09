@@ -45,7 +45,7 @@ https://squisheeacademy.com/
 
 Squishee Academy is free for every family. No ads, no accounts, no payment. Unlocks come from playing.
 
-`npm run build` emits the subpath app into `dist/academy/`. `npm run build:academy-domain` emits the root site (`base: /`, service worker and manifest scope `/`, `CNAME`) into `dist-domain/`. The domain is served by the Pages site of [`BryanRalston/squishee-academy`](https://github.com/BryanRalston/squishee-academy). Its workflow checks out this repo's `main`, runs `npm run build:academy-domain`, and deploys `dist-domain/`. It polls `main` hourly and redeploys only when `main` changed; run it by hand with `gh workflow run deploy.yml -R BryanRalston/squishee-academy`. No secrets are involved. `.github/workflows/academy-domain.yml` here only checks that the root build still works.
+`npm run build` emits the subpath app into `dist/academy/`. `npm run build:academy-domain` emits the root site (`base: /`, service worker and manifest scope `/`, `CNAME`) into `dist-domain/`. The domain is served by the Pages site of [`BryanRalston/squishee-academy`](https://github.com/BryanRalston/squishee-academy) (branch `gh-pages`), built from this repo's `main` with `npm run build:academy-domain`. No secrets live here; `scripts/publish-academy-domain.mjs` is a no-op.
 
 Academy keeps its own `localStorage` key. Worksheets: `/academy/worksheets/times-tables/`, `/academy/worksheets/add-subtract/`, `/academy/worksheets/telling-time/`, `/academy/worksheets/money/` (at the domain root: `/worksheets/...`). Adding a game is one module: [`docs/ADDING_A_GAME.md`](docs/ADDING_A_GAME.md). The domain build reads the same worksheet inputs.
 
