@@ -52,7 +52,10 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
         const place = board.mode === "round10" ? 10 : 100;
         expect(question.answer).toBe(String(Math.floor(board.n / place + 0.5) * place));
       }
-      if (grade === "1") expect(board.mode).not.toBe("round100");
+      if (grade === "1" || grade === "2") {
+        expect(board.mode).not.toBe("round10");
+        expect(board.mode).not.toBe("round100");
+      }
       break;
     }
     case "shapes":
@@ -60,28 +63,46 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if (grade === "K") expect(board.mode).not.toBe("parts");
       break;
     case "fractions": {
-      const dens = board.mode === "compare" ? [board.den, board.den2] : board.mode === "equivalent" ? [board.den, board.den2] : [board.den];
+      const dens = board.mode === "compare" || board.mode === "equivalent" ? [board.den, board.den2] : [board.den];
       for (const den of dens) expect(FRACTION_DENOMINATORS).toContain(den);
       if (board.mode === "equivalent") expect(board.num * board.den2).toBe(board.num2 * board.den);
-      if (grade === "1") expect(board.mode).not.toBe("equivalent");
+      if (grade === "1") {
+        expect(board.mode).toBe("parts");
+        for (const den of dens) expect([2, 4]).toContain(den);
+      }
+      if (grade === "2") {
+        expect(board.mode).not.toBe("equivalent");
+        for (const den of dens) expect([2, 3, 4]).toContain(den);
+      }
       break;
     }
     case "measure":
       if (board.mode === "ruler") expect(board.inches).toBeLessThanOrEqual(12);
       if (board.mode === "compare") expect(new Set(board.items.map((item) => item.value)).size).toBe(board.items.length);
       if (grade === "K") expect(board.mode).toBe("compare");
+      if (grade === "1") expect(board.mode).not.toBe("ruler");
       break;
     case "phonics":
       if (board.mode === "cvc") expect(question.answer).toMatch(/^[a-z]{3}$/);
       if (board.mode === "rhyme") expect(question.answer.endsWith(board.family)).toBe(true);
-      if (grade === "K") expect(board.mode).not.toBe("cvc");
+      if (grade === "K" || grade === "1") {
+        expect(board.mode === "sounds" || board.mode === "begin").toBe(true);
+        expect(question.visual.kind).toBe("scene");
+        if (question.visual.kind === "scene") {
+          expect(question.visual.pictures?.[question.answer]).toBeTruthy();
+          expect(question.visual.labels[question.answer]).toBe("");
+        }
+      }
       break;
     case "problems":
       if (board.mode === "add") expect(board.a + board.b).toBeLessThanOrEqual(10);
       if (board.mode === "sub") expect(board.b).toBeLessThanOrEqual(board.a);
       if (board.mode === "mult") expect(board.a * board.b).toBeLessThanOrEqual(25);
       if (board.mode === "div") expect(board.a % board.b).toBe(0);
-      if (grade === "K" || grade === "1") expect(board.mode).not.toBe("mult");
+      if (grade === "K" || grade === "1") {
+        expect(board.mode === "add" || board.mode === "sub").toBe(true);
+        expect(board.emoji.length).toBeGreaterThan(0);
+      }
       break;
     default: {
       const neverBoard: never = board;

@@ -90,7 +90,7 @@ function makeParts(rng: Rng): ChoiceQ {
 }
 
 function makeUnit(rng: Rng): ChoiceQ {
-  const dens = [2, 3, 4, 6, 8];
+  const dens = [2, 3, 4];
   const den = rng.pick(dens);
   const answer = `1/${den}`;
   const other = rng.pick(dens.filter((item) => item !== den));
@@ -147,7 +147,7 @@ function makeCompare(rng: Rng): ChoiceQ {
   let den = 2;
   let num2 = 1;
   let den2 = 3;
-  const dens = [2, 3, 4, 6, 8];
+  const dens = [2, 3, 4];
   if (sameDen) {
     den = rng.pick(dens.filter((item) => item >= 3));
     den2 = den;
@@ -155,7 +155,7 @@ function makeCompare(rng: Rng): ChoiceQ {
     num2 = rng.int(1, den - 1);
     if (num2 === num) num2 = num === 1 ? 2 : num - 1;
   } else {
-    num = rng.pick([1, 2, 3]);
+    num = rng.pick([1, 2]);
     num2 = num;
     const wider = dens.filter((item) => item > num);
     den = rng.pick(wider);
@@ -216,7 +216,7 @@ function makeEquivalent(rng: Rng): ChoiceQ {
 }
 
 function makeShade(rng: Rng): ChoiceQ {
-  const den = rng.pick([2, 3, 4]);
+  const den = rng.pick([2, 3, 4, 6, 8]);
   const num = rng.int(1, den);
   const answer = `${num}/${den}`;
   const board: FractionBoard = { game: "fractions", mode: "shade", num, den };

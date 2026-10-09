@@ -29,6 +29,8 @@ describe("phonics questions", () => {
             const answer = bankWord(q.answer);
             expect(answer?.letter).toBe(board.letter);
             expect(answer?.phoneme).toBe(board.phoneme);
+            expect(q.visual.pictures?.[q.answer]).toBe(answer?.emoji);
+            expect(q.visual.labels[q.answer]).toBe("");
             const phonemes = q.choices.map((choice) => bankWord(choice)?.phoneme);
             expect(new Set(phonemes).size).toBe(4);
             if (board.mode === "begin") expect(q.title).toContain(board.phoneme);

@@ -110,18 +110,105 @@ CVC, digraphs, blends, and long-vowel words are spoken. The sentence is not prin
 | 2 | Long vowels | Blends, long vowels, patterns | Patterns | RF.2.3.A, RF.2.3.B, RF.2.3.F |
 | 3 | Patterns | Long vowels, patterns | Patterns | RF.3.3.A, RF.3.3.C |
 
-## Games not in the registry yet
+## Counting
 
-When counting, place value, shapes, fractions, measurement, phonics, or word problems land, add a band in `src/academy/grade-map.ts` and extend `grade-guard.test.ts`. The guard test already fails typecheck if a question uses a new visual kind.
+Levels: count squishees to 10, count to 20, more or less, before and after, dot patterns, ten-frames, build a ten-frame.
 
-| Game | Kindergarten | Grade 1 | Grade 2 | Grade 3 |
+Counted groups and ten-frames use the child's squishee. Dot patterns stay dots, because that is the subitizing model. This game stops at 20. Skip-counting by 5s, 10s, and 100s is not a level yet.
+
+| Grade | Offer | Start | Core levels | Standards |
 |---|---|---|---|---|
-| Counting | Count objects to 20. K.CC | Count to 120. 1.NBT.A.1 | Skip-count by 5s, 10s, and 100s. 2.NBT.A.2 | Review |
-| Place value | Teen numbers. K.NBT.A.1 | Tens and ones. 1.NBT.B | Hundreds. 2.NBT.A.1 | Round to 10 and 100. 3.NBT.A.1 |
-| Shapes | Name shapes. K.G | Halves and fourths of shapes. 1.G.A.3 | Halves, thirds, fourths. 2.G.A.3 | Categories. 3.G |
-| Fractions | Coming later | Gentle intro: halves and fourths only. 1.G.A.3 | Halves, thirds, fourths. 2.G.A.3 | Denominators 2, 3, 4, 6, and 8 only. 3.NF |
-| Measurement and data | Compare length. K.MD | Length, hours and half hours. 1.MD | Length, 5-minute time, money, line plots. 2.MD | Graphs, area, perimeter. Nearest minute when that level exists. 3.MD |
-| Phonics | Same band as Spelling | Same band as Spelling | Same band as Spelling | Same band as Spelling |
-| Word problems | One step, within 10, spoken with a picture. K.OA.A.2 | One step, within 20. 1.OA.A.1 | One or two steps, within 100. 2.OA.A.1 | Two steps, all four operations. 3.OA.D.8 |
+| K | Play | Count to 10 | Count to 10, count to 20, more or less | K.CC.A.2, K.CC.B.4, K.CC.B.5, K.CC.C.6 |
+| 1 | Play | Count to 20 | Count to 20, more or less, before and after | 1.NBT.A.1, 1.NBT.B.3 |
+| 2 | Play | Ten-frames | Ten-frames, build a ten-frame | 2.NBT.A.1 |
+| 3 | Play | Before and after | Before and after | 1.NBT.A.1 |
 
-Fraction questions must not use fifths, tenths, or any denominator outside 2, 3, 4, 6, and 8.
+Kindergarten can drift to before and after. Ten-frames wait until grade 2 unless challenge ahead is on. Grade 3 is a review of the count sequence, not a new skill.
+
+## Place Value
+
+Levels: tens and ones with base-ten blocks, expanded form, compare, round to 10, round to 100, build a number.
+
+Numbers in this game stay below 100. Hundreds flats are not a level yet.
+
+| Grade | Offer | Start | Core levels | Standards |
+|---|---|---|---|---|
+| K | Coming later | — | — | 1.NBT.B.2 is the first tens-and-ones standard |
+| 1 | Play | Tens and ones | Tens and ones only | 1.NBT.B.2 |
+| 2 | Play | Expanded form | Expanded form, compare | 2.NBT.A.1, 2.NBT.A.3, 2.NBT.A.4 |
+| 3 | Play | Round to 10 | Round to 10, round to 100 | 3.NBT.A.1 |
+
+Grade 1 does not climb into expanded form. Grade 2 can drift back to the blocks and does not round. Rounding to 10 or 100 starts at grade 3. Build-a-number is the one-level drift above rounding.
+
+## Shapes
+
+Levels: flat shapes, solid shapes, sides and corners, symmetry, halves thirds and fourths.
+
+Halves and fourths of a shape for grade 1 live in Fractions. This game's partition level is the grade 3 shape partition (3.G.A.2).
+
+| Grade | Offer | Start | Core levels | Standards |
+|---|---|---|---|---|
+| K | Play | Flat shapes | Flat shapes, solid shapes | K.G.A.2, K.G.B.4 |
+| 1 | Play | Solid shapes | Solid shapes, sides and corners | 1.G.A.1 |
+| 2 | Play | Sides and corners | Sides and corners, symmetry | 2.G.A.1 |
+| 3 | Play | Halves, thirds, fourths | That level | 3.G.A.2 |
+
+Kindergarten can drift to sides and corners. They do not partition shapes unless challenge ahead is on.
+
+## Fractions
+
+Levels: parts of a whole, unit fractions, number line, compare, equivalent fractions, shade a fraction.
+
+Denominators are only 2, 3, 4, 6, and 8. Fifths, tenths, and smaller parts are not choices.
+
+| Grade | Offer | Start | Core levels | Standards |
+|---|---|---|---|---|
+| K | Coming later | — | — | 1.G.A.3 is the first fraction standard |
+| 1 | Gentle intro | Parts of a whole | Halves and fourths only | 1.G.A.3 |
+| 2 | Play | Number line | Unit fractions, number line, compare | 2.G.A.3 |
+| 3 | Play | Equivalent fractions | Equivalent fractions, shade a fraction | 3.NF.A.1, 3.NF.A.2, 3.NF.A.3 |
+
+Grade 1 does not climb. Grade 2 uses halves, thirds, and fourths, and the cap stops them before equivalent fractions. Sixths and eighths start at grade 3.
+
+## Measurement and Data
+
+Levels: longer or shorter, picture graph, bar graph, measure with a ruler, how many more.
+
+Clocks and coins stay in Telling Time and Money. Line plots, area, and perimeter are not levels yet.
+
+| Grade | Offer | Start | Core levels | Standards |
+|---|---|---|---|---|
+| K | Play | Longer or shorter | Longer or shorter only | K.MD.A.1, K.MD.A.2 |
+| 1 | Play | Picture graph | Picture graph, bar graph | 1.MD.C.4 |
+| 2 | Play | Measure with a ruler | That level | 2.MD.A.1 |
+| 3 | Play | Bar graph | Bar graph, how many more | 3.MD.B.3 |
+
+The ruler sits after the graphs, so grade 1 can drift down to longer or shorter and cannot reach the ruler. Grade 2 can drift into the graphs and into how many more.
+
+## Phonics
+
+Levels: letter sounds, beginning sounds, rhyming words, CVC blending, ending sounds.
+
+Kindergarten and grade 1 hear the sound and tap a picture. The word is not printed on those choices. Rhyming words and CVC blending, which show the letters, start at grade 2. A speaker reads the sound, and the sound is written out when the device has no voice.
+
+| Grade | Offer | Start | Core levels | Cap without challenge | Standards |
+|---|---|---|---|---|---|
+| K | Play | Letter sounds | Letter sounds, beginning sounds | Beginning sounds | RF.K.2.A, RF.K.3.A |
+| 1 | Play | Beginning sounds | Beginning sounds | Beginning sounds | RF.1.2.B, RF.1.2.C |
+| 2 | Play | CVC blending | Rhyming words, CVC blending | CVC blending | RF.2.3.A, RF.2.3.B |
+| 3 | Play | CVC blending | CVC blending, ending sounds | Ending sounds | RF.3.3.A, RF.3.3.C |
+
+## Word Problems
+
+Levels: add stories, subtract stories, multiply stories, share stories, picture stories.
+
+Every story has a picture. Kindergarten and grade 1 hear the story as well as see it. Add stories stay within 10. Subtract stories take away no more than the start amount. Multiply stories use factors 1–5. Share stories divide evenly.
+
+| Grade | Offer | Start | Core levels | Cap without challenge | Standards |
+|---|---|---|---|---|---|
+| K | Play | Add stories | Add stories | Add stories | K.OA.A.2 |
+| 1 | Play | Add stories | Add stories, subtract stories | Subtract stories | 1.OA.A.1 |
+| 2 | Play | Subtract stories | Subtract stories, multiply stories | Multiply stories | 2.OA.A.1 |
+| 3 | Play | Picture stories | Share stories, picture stories | Picture stories | 3.OA.A.3 |
+
+Two-step problems and sums within 100 are not levels yet. Kindergarten and grade 1 do not see multiply or share stories.

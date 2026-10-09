@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import type { Grade } from "../model";
 import { SquisheeImg, cx } from "../ui/bits";
+import { CountToken } from "../ui/count-token";
 import type { MeasureItem, ShapeName } from "./boards";
 import { labelFor } from "./pick";
 import type { ChoiceProps, ChoiceQ, GameModule, LevelDef, SheetItem, SkillRow } from "./types";
@@ -32,6 +33,16 @@ export function SceneCard({
   );
 }
 
+export function SquisheeRow({ n, name }: { n: number; name: string }) {
+  return (
+    <div className="ac-emoji-row" aria-label={`${n} ${name}`}>
+      {Array.from({ length: n }, (_, i) => (
+        <CountToken key={i} />
+      ))}
+    </div>
+  );
+}
+
 export function EmojiRow({ emoji, n, name }: { emoji: string; n: number; name: string }) {
   return (
     <div className="ac-emoji-row" aria-label={`${n} ${name}`}>
@@ -47,9 +58,9 @@ export function TenFrames({ frames }: { frames: number[] }) {
     <div className="ac-frames">
       {frames.map((filled, frame) => (
         <div key={frame} className="ac-ten" aria-hidden="true">
-          {Array.from({ length: 10 }, (_, cell) => (
-            <i key={cell} className={cell < filled ? "is-on" : ""} />
-          ))}
+          {Array.from({ length: 10 }, (_, cell) =>
+            cell < filled ? <CountToken key={cell} /> : <i key={cell} />,
+          )}
         </div>
       ))}
     </div>
@@ -299,26 +310,59 @@ function TextChoices({ question, onChoose }: { question: ChoiceQ; onChoose: Choi
   );
 }
 
+function choiceCaption(label: string | undefined, choice: string): string {
+  if (label === undefined) return choice;
+  return label;
+}
+
+function pictureName(label: string | undefined, choice: string, picture: string): string {
+  if (picture.startsWith("sq:")) {
+    const n = Number(picture.slice(3));
+    return Number.isFinite(n) ? `${n} squishees` : "A group of squishees";
+  }
+  if (label) return label;
+  return choice;
+}
+
+function PictureFace({ picture }: { picture: string }) {
+  if (picture.startsWith("sq:")) {
+    const n = Number(picture.slice(3));
+    if (Number.isFinite(n) && n > 0) {
+      return (
+        <span aria-hidden="true">
+          <SquisheeRow n={n} name="squishees" />
+        </span>
+      );
+    }
+  }
+  return (
+    <span className="ac-pic-emoji" aria-hidden="true">
+      {picture}
+    </span>
+  );
+}
+
 function PictureChoices({ question, onChoose }: { question: ChoiceQ; onChoose: ChoiceProps["onChoose"] }) {
   const visual = question.visual.kind === "scene" ? question.visual : null;
   const pictures = visual?.pictures ?? {};
   const labels = visual?.labels ?? {};
   return (
     <div className="ac-choices">
-      {question.choices.map((choice) => (
-        <button
-          key={choice}
-          type="button"
-          className="ac-choice is-card"
-          aria-label={labels[choice] ?? choice}
-          onClick={() => onChoose(choice)}
-        >
-          <span className="ac-pic-emoji" aria-hidden="true">
-            {pictures[choice]}
-          </span>
-          <small>{labels[choice] ?? choice}</small>
-        </button>
-      ))}
+      {question.choices.map((choice) => {
+        const caption = choiceCaption(labels[choice], choice);
+        return (
+          <button
+            key={choice}
+            type="button"
+            className="ac-choice is-card"
+            aria-label={pictureName(labels[choice], choice, pictures[choice] ?? "")}
+            onClick={() => onChoose(choice)}
+          >
+            <PictureFace picture={pictures[choice] ?? ""} />
+            {caption ? <small>{caption}</small> : null}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -351,7 +395,7 @@ function TenBuilder({
     }
     if (tries === 0) {
       setTries(1);
-      setNote(filled === 0 ? "Tap a dot for each one." : "Count the pink dots and try again.");
+      setNote(filled === 0 ? "Tap a spot for each squishee." : "Count the squishees and try again.");
       return;
     }
     onChoose(String(filled));
@@ -365,10 +409,12 @@ function TenBuilder({
             key={i}
             type="button"
             className={cx("ac-cell", filledCell && "is-on")}
-            aria-label={filledCell ? "Filled" : "Empty"}
+            aria-label={filledCell ? "Squishee" : "Empty"}
             aria-pressed={filledCell}
             onClick={() => setOn((rows) => rows.map((cell, n) => (n === i ? !cell : cell)))}
-          />
+          >
+            {filledCell ? <CountToken /> : null}
+          </button>
         ))}
       </div>
       <p className="ac-tile-note">{note}</p>

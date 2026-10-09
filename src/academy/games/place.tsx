@@ -38,7 +38,7 @@ function defaultLevel(grade: Grade): PlaceLevel {
     case "2":
       return "expanded";
     case "3":
-      return "round100";
+      return "round10";
     default: {
       const neverGrade: never = grade;
       return neverGrade;

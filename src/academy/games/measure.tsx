@@ -5,14 +5,14 @@ import { distinctInts, nearChoices, sceneQuestion, uniqueChoices } from "./pick"
 import { BarGraph, PictureGraph, Ruler, SceneCard, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
-export const MEASURE_LEVELS = ["compare", "ruler", "picture", "bar", "more"] as const;
+export const MEASURE_LEVELS = ["compare", "picture", "bar", "ruler", "more"] as const;
 export type MeasureLevel = (typeof MEASURE_LEVELS)[number];
 
 const LEVELS = [
   { id: "compare", label: "Longer or shorter", num: 1 },
-  { id: "ruler", label: "Measure with a ruler", num: 2 },
-  { id: "picture", label: "Picture graph", num: 3 },
-  { id: "bar", label: "Bar graph", num: 4 },
+  { id: "picture", label: "Picture graph", num: 2 },
+  { id: "bar", label: "Bar graph", num: 3 },
+  { id: "ruler", label: "Measure with a ruler", num: 4 },
   { id: "more", label: "How many more", num: 5 },
 ] as const;
 

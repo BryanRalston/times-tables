@@ -33,7 +33,7 @@ describe("fraction questions", () => {
             break;
           case "unit":
             expect(board.num).toBe(1);
-            expect([2, 3, 4, 6, 8]).toContain(board.den);
+            expect([2, 3, 4]).toContain(board.den);
             expect(q.answer).toBe(`1/${board.den}`);
             break;
           case "line":
@@ -46,6 +46,8 @@ describe("fraction questions", () => {
             const sameDen = board.den === board.den2;
             const sameNum = board.num === board.num2;
             expect(sameDen || sameNum).toBe(true);
+            expect([2, 3, 4]).toContain(board.den);
+            expect([2, 3, 4]).toContain(board.den2);
             const left = board.num * board.den2;
             const right = board.num2 * board.den;
             expect(left).not.toBe(right);
@@ -64,7 +66,7 @@ describe("fraction questions", () => {
           case "shade":
             expect(q.visual.hands).toBe(true);
             expect(q.visual.quietChoices).toBe(true);
-            expect([2, 3, 4]).toContain(board.den);
+            expect([2, 3, 4, 6, 8]).toContain(board.den);
             expect(q.answer).toBe(`${board.num}/${board.den}`);
             break;
           default: {

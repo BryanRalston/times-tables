@@ -110,7 +110,7 @@ function defaultLevel(grade: Grade): PhonicsLevel {
     case "2":
       return "cvc";
     case "3":
-      return "rhyme";
+      return "cvc";
     default: {
       const neverGrade: never = grade;
       return neverGrade;
@@ -135,7 +135,7 @@ function pictureMaps(rows: SoundRow[]): { pictures: Record<string, string>; labe
   const labels: Record<string, string> = {};
   for (const row of rows) {
     pictures[row.word] = row.emoji;
-    labels[row.word] = row.word;
+    labels[row.word] = "";
   }
   return { pictures, labels };
 }

@@ -2,7 +2,7 @@ import type { Rng } from "@/lib/rng";
 import type { Grade } from "../model";
 import { countName, type CountBoard } from "./boards";
 import { distinctInts, nearChoices, sceneQuestion } from "./pick";
-import { DotClusters, EmojiRow, SceneCard, TenFrames, sceneModule } from "./scene-ui";
+import { DotClusters, SceneCard, SquisheeRow, TenFrames, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
 export const COUNT_LEVELS = ["objects", "to20", "compare", "neighbor", "subitize", "tenframe", "build"] as const;
@@ -27,15 +27,6 @@ const BARS = [
   { key: "count:tenframe", label: "Ten-frames" },
   { key: "count:build", label: "Build a ten-frame" },
 ];
-
-const THINGS = [
-  { name: "stars", emoji: "⭐" },
-  { name: "fish", emoji: "🐟" },
-  { name: "apples", emoji: "🍎" },
-  { name: "balls", emoji: "⚽" },
-  { name: "flowers", emoji: "🌸" },
-  { name: "frogs", emoji: "🐸" },
-] as const;
 
 const DOTS: number[][][] = [
   [[1]],
@@ -72,30 +63,28 @@ function ask(rng: Rng, spec: Parameters<typeof sceneQuestion>[1]): ChoiceQ {
 }
 
 function makeObjects(rng: Rng, max: number, level: "objects" | "to20"): ChoiceQ {
-  const thing = rng.pick(THINGS);
   const lo = level === "to20" ? 8 : 1;
   const n = rng.int(lo, max);
-  const board: CountBoard = { game: "count", mode: level, emoji: thing.emoji, name: thing.name, n };
+  const board: CountBoard = { game: "count", mode: level, emoji: "", name: "squishees", n };
   return ask(rng, {
     game: "count",
-    title: `How many ${thing.name}?`,
+    title: "How many squishees?",
     hint: "Count each one",
     answer: String(n),
     choices: nearChoices(rng, n, 0, max),
     skill: `count:${level}`,
     tags: [level],
-    solved: `${n} ${countName(thing.name, n)}`,
-    picture: thing.emoji,
+    solved: `${n} ${countName("squishees", n)}`,
+    picture: "sq",
     hands: false,
     quietChoices: false,
     labels: {},
     board,
-    factKey: `${level}:${thing.name}:${n}`,
+    factKey: `${level}:squishees:${n}`,
   });
 }
 
 function makeCompare(rng: Rng): ChoiceQ {
-  const thing = rng.pick(THINGS);
   const groups = distinctInts(rng, 4, 1, 6);
   const askMore = rng.next() < 0.5;
   const target = askMore ? Math.max(...groups) : Math.min(...groups);
@@ -104,14 +93,14 @@ function makeCompare(rng: Rng): ChoiceQ {
   const pictures: Record<string, string> = {};
   const labels: Record<string, string> = {};
   groups.forEach((n, i) => {
-    pictures[ids[i]!] = thing.emoji.repeat(n);
-    labels[ids[i]!] = `${n} ${thing.name}`;
+    pictures[ids[i]!] = `sq:${n}`;
+    labels[ids[i]!] = "";
   });
   const board: CountBoard = {
     game: "count",
     mode: "compare",
-    emoji: thing.emoji,
-    name: thing.name,
+    emoji: "",
+    name: "squishees",
     groups,
     ask: askMore ? "more" : "less",
   };
@@ -124,7 +113,7 @@ function makeCompare(rng: Rng): ChoiceQ {
     skill: "count:compare",
     tags: ["compare"],
     solved: `${target} is ${askMore ? "more" : "less"}`,
-    picture: thing.emoji.repeat(target),
+    picture: `sq:${target}`,
     hands: true,
     quietChoices: false,
     labels,
@@ -188,7 +177,7 @@ function makeTen(rng: Rng): ChoiceQ {
   return ask(rng, {
     game: "count",
     title: "How many dots in the ten-frame?",
-    hint: n > 10 ? "A full frame is 10" : "Count the pink dots",
+    hint: n > 10 ? "A full frame is 10" : "Count the squishees",
     answer: String(n),
     choices: nearChoices(rng, n, 0, 20),
     skill: "count:tenframe",
@@ -209,7 +198,7 @@ function makeBuild(rng: Rng): ChoiceQ {
   return ask(rng, {
     game: "count",
     title: `Show ${n} on the ten-frame`,
-    hint: "Tap a dot for each one",
+    hint: "Tap a spot for each squishee",
     answer: String(n),
     choices: nearChoices(rng, n, 0, 10),
     skill: "count:build",
@@ -310,7 +299,7 @@ function CountArt({ board }: { board: CountBoard }) {
   switch (board.mode) {
     case "objects":
     case "to20":
-      return <EmojiRow emoji={board.emoji} n={board.n} name={board.name} />;
+      return <SquisheeRow n={board.n} name={board.name} />;
     case "compare":
       return <p className="ac-big-num">{board.ask === "more" ? "More" : "Less"}</p>;
     case "neighbor":
