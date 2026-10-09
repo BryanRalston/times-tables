@@ -163,7 +163,7 @@ describe("academy save", () => {
         {
           id: "maya",
           name: "Maya",
-          grade: "1",
+          grade: "2",
           levels: { times: "mix" },
           bestStars: { times: 1 },
           words: { "sw:the": { box: 2, ok: 3, miss: 1, streak: 2 } },
@@ -173,7 +173,7 @@ describe("academy save", () => {
     expect(fromV4.version).toBe(SAVE_VERSION);
     expect(fromV4.children[0]?.words["sw:the"]).toEqual({ box: 2, ok: 3, miss: 1, streak: 2 });
     expect(fromV4.children[0]?.levels.times).toBe("mix");
-    expect(fromV4.children[0]?.levels.count).toBe(defaultLevels("1").count);
+    expect(fromV4.children[0]?.levels.count).toBe(defaultLevels("2").count);
     expect(fromV4.children[0]?.bestStars.times).toBe(1);
     expect(fromV4.children[0]?.bestStars.count).toBe(0);
 

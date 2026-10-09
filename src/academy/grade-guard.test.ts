@@ -12,6 +12,7 @@ import { makeClockTask, makePayTask } from "./hands";
 import type { Grade } from "./model";
 import { nextPlacement } from "./placement";
 import { blankChild } from "./storage";
+import type { Board } from "./games/boards";
 import type { ChoiceQ } from "./games/types";
 
 const GRADES: Grade[] = ["K", "1", "2", "3"];
@@ -21,6 +22,72 @@ const FIVES_ONLY = [5, 10, 20, 25, 35, 40, 50, 55];
 function skillLevel(question: ChoiceQ): string {
   const cut = question.skill.lastIndexOf(":");
   return cut < 0 ? question.skill : question.skill.slice(cut + 1);
+}
+
+function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
+  switch (board.game) {
+    case "count": {
+      if (board.mode === "objects") expect(Number(question.answer)).toBeLessThanOrEqual(10);
+      if (board.mode === "to20") expect(Number(question.answer)).toBeGreaterThanOrEqual(8);
+      if (board.mode === "compare") expect(board.groups.every((n) => n >= 1 && n <= 6)).toBe(true);
+      if (board.mode === "subitize") expect(Number(question.answer)).toBeLessThanOrEqual(6);
+      if (board.mode === "build") expect(Number(question.answer)).toBeLessThanOrEqual(10);
+      if (grade === "K") expect(["round100", "equivalent"]).not.toContain(board.mode);
+      break;
+    }
+    case "place": {
+      if (board.mode === "blocks" || board.mode === "build") {
+        expect(board.n).toBeGreaterThanOrEqual(10);
+        expect(board.n).toBeLessThanOrEqual(99);
+      }
+      if (board.mode === "expanded") {
+        const sum = question.answer.split(" + ").reduce((total, part) => total + Number(part), 0);
+        expect(sum).toBe(board.n);
+      }
+      if (board.mode === "compare") {
+        expect(question.choices).toContain(String(board.left));
+        expect(question.choices).toContain(String(board.right));
+      }
+      if (board.mode === "round10" || board.mode === "round100") {
+        const place = board.mode === "round10" ? 10 : 100;
+        expect(question.answer).toBe(String(Math.floor(board.n / place + 0.5) * place));
+      }
+      if (grade === "1") expect(board.mode).not.toBe("round100");
+      break;
+    }
+    case "shapes":
+      if (board.mode === "sides") expect(Number(question.answer)).toBeGreaterThanOrEqual(3);
+      if (grade === "K") expect(board.mode).not.toBe("parts");
+      break;
+    case "fractions": {
+      const dens = board.mode === "compare" ? [board.den, board.den2] : board.mode === "equivalent" ? [board.den, board.den2] : [board.den];
+      for (const den of dens) expect(FRACTION_DENOMINATORS).toContain(den);
+      if (board.mode === "equivalent") expect(board.num * board.den2).toBe(board.num2 * board.den);
+      if (grade === "1") expect(board.mode).not.toBe("equivalent");
+      break;
+    }
+    case "measure":
+      if (board.mode === "ruler") expect(board.inches).toBeLessThanOrEqual(12);
+      if (board.mode === "compare") expect(new Set(board.items.map((item) => item.value)).size).toBe(board.items.length);
+      if (grade === "K") expect(board.mode).toBe("compare");
+      break;
+    case "phonics":
+      if (board.mode === "cvc") expect(question.answer).toMatch(/^[a-z]{3}$/);
+      if (board.mode === "rhyme") expect(question.answer.endsWith(board.family)).toBe(true);
+      if (grade === "K") expect(board.mode).not.toBe("cvc");
+      break;
+    case "problems":
+      if (board.mode === "add") expect(board.a + board.b).toBeLessThanOrEqual(10);
+      if (board.mode === "sub") expect(board.b).toBeLessThanOrEqual(board.a);
+      if (board.mode === "mult") expect(board.a * board.b).toBeLessThanOrEqual(25);
+      if (board.mode === "div") expect(board.a % board.b).toBe(0);
+      if (grade === "K" || grade === "1") expect(board.mode).not.toBe("mult");
+      break;
+    default: {
+      const neverBoard: never = board;
+      throw new Error(String(neverBoard));
+    }
+  }
 }
 
 function assertQuestion(grade: Grade, level: string, question: ChoiceQ): void {
@@ -119,6 +186,13 @@ function assertQuestion(grade: Grade, level: string, question: ChoiceQ): void {
       if (level === "patterns") expect(visual.showSentence).toBe(true);
       else expect(visual.showSentence).toBe(false);
       if (grade === "K" || grade === "1") expect(visual.showSentence).toBe(false);
+      break;
+    }
+    case "scene": {
+      expect(visual.board.game).toBe(question.game);
+      expect(visual.board.mode).toBe(level);
+      for (const choice of question.choices) expect(choice.startsWith("no ")).toBe(false);
+      assertScene(grade, visual.board, question);
       break;
     }
     default: {

@@ -195,6 +195,196 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["RF.3.3.A", "RF.3.3.C"],
     }),
   },
+  count: {
+    K: band({
+      levels: ["objects", "to20", "compare"],
+      start: "objects",
+      offer: "play",
+      standards: ["K.CC.A.2", "K.CC.B.4", "K.CC.B.5", "K.CC.C.6"],
+    }),
+    "1": band({
+      levels: ["to20", "compare", "neighbor"],
+      start: "to20",
+      offer: "play",
+      standards: ["1.NBT.A.1", "1.NBT.B.3"],
+    }),
+    "2": band({
+      levels: ["tenframe", "build"],
+      start: "tenframe",
+      offer: "play",
+      standards: ["2.NBT.A.1"],
+    }),
+    "3": band({
+      levels: ["neighbor"],
+      start: "neighbor",
+      offer: "play",
+      standards: ["3.NBT.A.1"],
+    }),
+  },
+  place: {
+    K: band({
+      levels: ["blocks"],
+      start: "blocks",
+      offer: "later",
+      standards: ["1.NBT.B.2"],
+    }),
+    "1": band({
+      levels: ["blocks"],
+      start: "blocks",
+      offer: "play",
+      cap: "blocks",
+      standards: ["1.NBT.B.2"],
+    }),
+    "2": band({
+      levels: ["expanded", "compare", "round10"],
+      start: "expanded",
+      offer: "play",
+      cap: "round10",
+      standards: ["2.NBT.A.1", "2.NBT.A.3", "2.NBT.A.4"],
+    }),
+    "3": band({
+      levels: ["round100", "build"],
+      start: "round100",
+      offer: "play",
+      standards: ["3.NBT.A.1"],
+    }),
+  },
+  shapes: {
+    K: band({
+      levels: ["flat", "solid"],
+      start: "flat",
+      offer: "play",
+      standards: ["K.G.A.2", "K.G.B.4"],
+    }),
+    "1": band({
+      levels: ["solid", "sides"],
+      start: "solid",
+      offer: "play",
+      standards: ["1.G.A.1"],
+    }),
+    "2": band({
+      levels: ["sides", "symmetry"],
+      start: "sides",
+      offer: "play",
+      standards: ["2.G.A.1"],
+    }),
+    "3": band({
+      levels: ["parts"],
+      start: "parts",
+      offer: "play",
+      standards: ["3.G.A.2"],
+    }),
+  },
+  fractions: {
+    K: band({
+      levels: ["parts"],
+      start: "parts",
+      offer: "later",
+      standards: ["1.G.A.3"],
+    }),
+    "1": band({
+      levels: ["parts", "unit"],
+      start: "parts",
+      offer: "play",
+      cap: "unit",
+      standards: ["1.G.A.3"],
+    }),
+    "2": band({
+      levels: ["line", "compare"],
+      start: "line",
+      offer: "play",
+      standards: ["2.G.A.3"],
+    }),
+    "3": band({
+      levels: ["equivalent", "shade"],
+      start: "equivalent",
+      offer: "play",
+      standards: ["3.NF.A.1", "3.NF.A.2", "3.NF.A.3"],
+    }),
+  },
+  measure: {
+    K: band({
+      levels: ["compare"],
+      start: "compare",
+      offer: "play",
+      cap: "compare",
+      standards: ["K.MD.A.1", "K.MD.A.2"],
+    }),
+    "1": band({
+      levels: ["picture", "bar"],
+      start: "picture",
+      offer: "play",
+      standards: ["1.MD.C.4"],
+    }),
+    "2": band({
+      levels: ["ruler"],
+      start: "ruler",
+      offer: "play",
+      standards: ["2.MD.A.1"],
+    }),
+    "3": band({
+      levels: ["bar", "more"],
+      start: "bar",
+      offer: "play",
+      standards: ["3.MD.B.3"],
+    }),
+  },
+  phonics: {
+    K: band({
+      levels: ["sounds", "begin"],
+      start: "sounds",
+      offer: "play",
+      standards: ["RF.K.2.A", "RF.K.3.A"],
+    }),
+    "1": band({
+      levels: ["begin", "rhyme"],
+      start: "begin",
+      offer: "play",
+      standards: ["RF.1.2.B", "RF.1.2.C"],
+    }),
+    "2": band({
+      levels: ["cvc"],
+      start: "cvc",
+      offer: "play",
+      cap: "cvc",
+      standards: ["RF.2.3.A"],
+    }),
+    "3": band({
+      levels: ["rhyme", "cvc"],
+      start: "rhyme",
+      offer: "play",
+      standards: ["RF.3.3.C"],
+    }),
+  },
+  problems: {
+    K: band({
+      levels: ["add"],
+      start: "add",
+      offer: "play",
+      cap: "add",
+      standards: ["K.OA.A.2"],
+    }),
+    "1": band({
+      levels: ["add", "sub"],
+      start: "add",
+      offer: "play",
+      cap: "sub",
+      standards: ["1.OA.A.1"],
+    }),
+    "2": band({
+      levels: ["sub", "mult"],
+      start: "sub",
+      offer: "play",
+      cap: "mult",
+      standards: ["2.OA.A.1"],
+    }),
+    "3": band({
+      levels: ["div", "picture"],
+      start: "picture",
+      offer: "play",
+      standards: ["3.OA.A.3"],
+    }),
+  },
 };
 
 export function bandFor(gameId: string, grade: Grade): GradeBand | undefined {

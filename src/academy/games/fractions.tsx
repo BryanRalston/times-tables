@@ -145,18 +145,19 @@ function makeCompare(rng: Rng): ChoiceQ {
   let den = 2;
   let num2 = 1;
   let den2 = 3;
+  const dens = [2, 3, 4, 6, 8];
   if (sameDen) {
-    den = rng.int(3, 8);
+    den = rng.pick(dens.filter((item) => item >= 3));
     den2 = den;
     num = rng.int(1, den - 1);
     num2 = rng.int(1, den - 1);
     if (num2 === num) num2 = num === 1 ? 2 : num - 1;
   } else {
-    num = rng.int(1, 3);
+    num = rng.pick([1, 2, 3]);
     num2 = num;
-    den = rng.int(num + 1, 8);
-    den2 = rng.int(num + 1, 8);
-    if (den2 === den) den2 = den === 8 ? den - 1 : den + 1;
+    const wider = dens.filter((item) => item > num);
+    den = rng.pick(wider);
+    den2 = rng.pick(wider.filter((item) => item !== den));
   }
   const askGreater = rng.next() < 0.5;
   const left = `${num}/${den}`;
