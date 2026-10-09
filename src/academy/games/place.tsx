@@ -265,6 +265,7 @@ export function PlacePrompt({ question, reveal, mascot, happy }: PromptProps) {
 function PlaceArt({ board }: { board: PlaceBoard }) {
   switch (board.mode) {
     case "blocks":
+      return <BaseTen n={board.n} />;
     case "expanded":
       return (
         <>

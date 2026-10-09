@@ -1,6 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import type { Grade } from "../model";
-import type { CountBoard } from "./boards";
+import { countName, type CountBoard } from "./boards";
 import { distinctInts, nearChoices, sceneQuestion } from "./pick";
 import { DotClusters, EmojiRow, SceneCard, TenFrames, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
@@ -84,7 +84,7 @@ function makeObjects(rng: Rng, max: number, level: "objects" | "to20"): ChoiceQ 
     choices: nearChoices(rng, n, 0, max),
     skill: `count:${level}`,
     tags: [level],
-    solved: `${n} ${thing.name}`,
+    solved: `${n} ${countName(thing.name, n)}`,
     picture: thing.emoji,
     hands: false,
     quietChoices: false,

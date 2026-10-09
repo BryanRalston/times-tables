@@ -72,6 +72,11 @@ export interface ProblemBoard {
 
 export type Board = CountBoard | PlaceBoard | ShapeBoard | FractionBoard | MeasureBoard | PhonicsBoard | ProblemBoard;
 
+export function countName(name: string, n: number): string {
+  if (n === 1 && name.endsWith("s")) return name.slice(0, -1);
+  return name;
+}
+
 export function roundHalfUp(n: number, place: 10 | 100): number {
   return Math.floor(n / place + 0.5) * place;
 }

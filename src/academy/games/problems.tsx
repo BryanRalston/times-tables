@@ -1,6 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import type { Grade } from "../model";
-import type { ProblemBoard } from "./boards";
+import { countName, type ProblemBoard } from "./boards";
 import { nearChoices, sceneQuestion, uniqueChoices } from "./pick";
 import { SceneCard, StoryGroups, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
@@ -83,23 +83,23 @@ function makeStory(rng: Rng, level: Exclude<ProblemLevel, "picture">): ChoiceQ {
     a = rng.int(0, 9);
     b = rng.int(0, 10 - a);
     op = "+";
-    title = `${who} has ${a} ${thing.name}. A friend gives ${who} ${b} more. How many ${thing.name} now?`;
+    title = `${who} has ${a} ${countName(thing.name, a)}. A friend gives ${who} ${b} more. How many ${thing.name} now?`;
   } else if (level === "sub") {
     a = rng.int(1, 12);
     b = rng.int(0, a);
     op = "-";
-    title = `${who} has ${a} ${thing.name} and gives away ${b}. How many ${thing.name} are left?`;
+    title = `${who} has ${a} ${countName(thing.name, a)} and gives away ${b}. How many ${thing.name} are left?`;
   } else if (level === "mult") {
     a = rng.int(1, 5);
     b = rng.int(1, 5);
     op = "×";
-    title = `${who} has ${a} bags with ${b} ${thing.name} in each bag. How many ${thing.name}?`;
+    title = `${who} has ${a} ${countName("bags", a)} with ${b} ${countName(thing.name, b)} in each bag. How many ${thing.name}?`;
   } else {
     b = rng.int(2, 5);
     const quotient = rng.int(1, 5);
     a = b * quotient;
     op = "÷";
-    title = `${who} has ${a} ${thing.name} shared into ${b} equal groups. How many ${thing.name} are in each group?`;
+    title = `${who} has ${a} ${countName(thing.name, a)} shared into ${b} equal groups. How many ${thing.name} are in each group?`;
   }
   const answer = storyValue(op, a, b);
   const board: ProblemBoard = { game: "problems", mode: level, op, a, b, emoji: thing.emoji, thing: thing.name };
@@ -175,7 +175,7 @@ function makePicture(rng: Rng): ChoiceQ {
   };
   return sceneQuestion(rng, {
     game: "problems",
-    title: `${who} needs ${groups} groups of ${size} ${thing.name}. Which picture shows that?`,
+    title: `${who} needs ${groups} groups of ${size} ${countName(thing.name, size)}. Which picture shows that?`,
     hint: "Count the groups and how many are in each group",
     answer: "p0",
     choices: uniqueChoices(rng, "p0", [], ids),
@@ -218,7 +218,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const a = rng.int(0, 9);
       const b = rng.int(0, 10 - a);
       return {
-        prompt: `Sam has ${a} apples. Jo gives Sam ${b} more. How many apples?`,
+        prompt: `Sam has ${a} ${countName("apples", a)}. Jo gives Sam ${b} more. How many apples?`,
         answer: String(a + b),
       };
     }

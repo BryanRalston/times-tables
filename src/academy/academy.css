@@ -1361,6 +1361,7 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   margin: 8px 0;
 }
 .ac-flat { width: 36px; height: 36px; border-radius: 6px; background: #7ad7c8; display: block; }
+.ac-base .ac-rod { background: #5aaa45; }
 .ac-ones { display: flex; flex-wrap: wrap; gap: 3px; max-width: 90px; }
 .ac-shape { width: min(180px, 60vw); height: auto; display: block; margin: 8px auto; }
 .ac-shape polygon, .ac-shape rect, .ac-shape circle, .ac-shape ellipse, .ac-shape path {

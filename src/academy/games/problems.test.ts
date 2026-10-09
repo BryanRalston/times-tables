@@ -88,7 +88,7 @@ describe("word problem questions", () => {
     for (let seed = 0; seed < 10; seed += 1) {
       for (const level of problemsGame.levels) {
         const row = problemsGame.makeSheetItem(rngFromSeed(`problems-sheet-${seed}-${level.id}`), level.id);
-        const add = row.prompt.match(/^Sam has (\d+) apples\. Jo gives Sam (\d+) more\. How many apples\?$/);
+        const add = row.prompt.match(/^Sam has (\d+) apples?\. Jo gives Sam (\d+) more\. How many apples\?$/);
         if (add) {
           expect(Number(add[1]) + Number(add[2])).toBeLessThanOrEqual(10);
           expect(row.answer).toBe(String(Number(add[1]) + Number(add[2])));
