@@ -1,5 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import type { Grade } from "../model";
+import { buddyName, pickLine } from "./flavor";
 import { fractionText, type FractionBoard } from "./boards";
 import { sceneQuestion, uniqueChoices } from "./pick";
 import { FractionBar, FractionLine, SceneCard, sceneModule } from "./scene-ui";
@@ -113,7 +114,7 @@ function makeParts(rng: Rng): ChoiceQ {
   const board: FractionBoard = { game: "fractions", mode: "parts", num, den };
   return sceneQuestion(rng, {
     game: "fractions",
-    title: "What fraction is shaded?",
+    title: pickLine(rng, ["What fraction is shaded?", `${buddyName(rng)} shares a snack. What fraction is shaded?`]),
     hint: "Count the shaded parts and the equal parts",
     answer,
     choices: fracChoices(rng, answer, [`${Math.max(1, num - 1)}/${den}`, `${Math.min(den, num + 1)}/${den}`], HALF_FOURTHS),
@@ -137,7 +138,7 @@ function makeUnit(rng: Rng): ChoiceQ {
   const board: FractionBoard = { game: "fractions", mode: "unit", num: 1, den };
   return sceneQuestion(rng, {
     game: "fractions",
-    title: "What unit fraction is shaded?",
+    title: pickLine(rng, ["What unit fraction is shaded?", `${buddyName(rng)} shades one part. What unit fraction is that?`]),
     hint: "One shaded part",
     answer,
     choices: fracChoices(rng, answer, [`2/${den}`, `1/${other}`], THROUGH_FOURTHS),
@@ -161,7 +162,7 @@ function makeLine(rng: Rng): ChoiceQ {
   const board: FractionBoard = { game: "fractions", mode: "line", num, den };
   return sceneQuestion(rng, {
     game: "fractions",
-    title: "Which fraction is the dot?",
+    title: pickLine(rng, ["Which fraction is the dot?", `${buddyName(rng)} stands on the line. Which fraction is the dot?`]),
     hint: "Read the tick under the dot",
     answer,
     choices: uniqueChoices(rng, answer, notEquivalent(answer, [...ticks, "1/2", "3/4"])),
@@ -231,7 +232,9 @@ function makeCompare(rng: Rng): ChoiceQ {
   };
   return sceneQuestion(rng, {
     game: "fractions",
-    title: askGreater ? "Which shaded fraction is greater?" : "Which shaded fraction is less?",
+    title: askGreater
+      ? pickLine(rng, ["Which shaded fraction is greater?", `${buddyName(rng)} asks which shaded fraction is greater`])
+      : pickLine(rng, ["Which shaded fraction is less?", `${buddyName(rng)} asks which shaded fraction is less`]),
     hint: sameDen ? "Same denominator. More parts are greater." : "Same numerator. Bigger pieces are greater.",
     answer,
     choices,
@@ -253,7 +256,10 @@ function makeEquivalent(rng: Rng): ChoiceQ {
   const board: FractionBoard = { game: "fractions", mode: "equivalent", num, den, num2, den2 };
   return sceneQuestion(rng, {
     game: "fractions",
-    title: `Which fraction matches ${num}/${den}?`,
+    title: pickLine(rng, [
+      `Which fraction matches ${num}/${den}?`,
+      `${buddyName(rng)} has ${num}/${den}. Which fraction matches?`,
+    ]),
     hint: "Same amount, different parts",
     answer,
     choices: uniqueChoices(
@@ -280,7 +286,7 @@ function makeShade(rng: Rng): ChoiceQ {
   const board: FractionBoard = { game: "fractions", mode: "shade", num, den };
   return sceneQuestion(rng, {
     game: "fractions",
-    title: `Shade ${num} of the ${den} parts`,
+    title: pickLine(rng, [`Shade ${num} of the ${den} parts`, `${buddyName(rng)} says shade ${num} of the ${den} parts`]),
     hint: "Tap a part to shade it",
     answer,
     choices: fracChoices(rng, answer, [], THROUGH_EIGHTHS),

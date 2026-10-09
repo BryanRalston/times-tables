@@ -22,7 +22,7 @@ import {
 
 /** Stable key. The schema version lives on the save, not in the key name. */
 export const STORAGE_KEY = "squishee-academy-v1";
-export const SAVE_VERSION = 7;
+export const SAVE_VERSION = 8;
 
 /**
  * Migrations run from the save's version up to SAVE_VERSION.
@@ -35,6 +35,7 @@ const MIGRATIONS: Record<number, (raw: Record<string, unknown>) => Record<string
   4: migrateV4toV5,
   5: migrateV5toV6,
   6: migrateV6toV7,
+  7: migrateV7toV8,
 };
 
 /** A newer app wrote this disk. Don't replace it with an older schema. */
@@ -73,6 +74,7 @@ export function blankChild(opts: { id?: string; name?: string; grade?: Grade; av
     friends: [],
     hatched: [],
     egg: "none",
+    bonds: {},
     words: {},
     challengeAhead: false,
     trophies: [],
@@ -196,6 +198,18 @@ function migrateV6toV7(raw: Record<string, unknown>): Record<string, unknown> {
   return { ...raw, version: 7, children };
 }
 
+/** Version 7 had boss looks. Friendship bonds start at zero. */
+function migrateV7toV8(raw: Record<string, unknown>): Record<string, unknown> {
+  const children = Array.isArray(raw.children)
+    ? raw.children.map((row) => {
+        if (!row || typeof row !== "object" || Array.isArray(row)) return row;
+        const child = row as Record<string, unknown>;
+        return { ...child, bonds: asRecord(child.bonds) };
+      })
+    : raw.children;
+  return { ...raw, version: 8, children };
+}
+
 function migrateRaw(raw: unknown): unknown {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return raw;
   let current = raw as Record<string, unknown>;
@@ -317,6 +331,16 @@ function parseGameList(raw: unknown): string[] {
   return out;
 }
 
+function parseBonds(raw: unknown): Record<string, number> {
+  if (!raw || typeof raw !== "object") return {};
+  const out: Record<string, number> = {};
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (!squisheeById(key)) continue;
+    out[key] = clampInt(value, 0, 9999);
+  }
+  return out;
+}
+
 function parseBest(raw: unknown): Record<string, number> {
   const o = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
   const out: Record<string, number> = {};
@@ -342,11 +366,13 @@ export function parseChild(raw: unknown): Child | null {
   const hatched = parseSquisheeIds(o.hatched);
   const gifted = parseGifted(o.gifted);
   const stars = clampInt(o.stars, 0, 100000);
+  const bestStars = parseBest(o.bestStars);
   const draft = {
     stars,
     gifted,
     friends,
     hatched,
+    bestStars,
   };
   const avatarRaw = typeof o.avatarId === "string" && squisheeById(o.avatarId) ? o.avatarId : SQUAD_IDS[0];
   const avatarId = palOwned(draft, avatarRaw) ? avatarRaw : (ownedIds(draft)[0] ?? SQUAD_IDS[0]);
@@ -365,7 +391,7 @@ export function parseChild(raw: unknown): Child | null {
     opened: clampInt(o.opened, 0, SQUAD_IDS.length, 3),
     skills: parseSkills(o.skills),
     secondsByDay: parseSeconds(o.secondsByDay),
-    bestStars: parseBest(o.bestStars),
+    bestStars,
     rounds: clampInt(o.rounds, 0, 100000),
     levels: parseLevels(o.levels, grade, challengeAhead),
     coins: clampInt(o.coins, 0, 1_000_000),
@@ -379,6 +405,7 @@ export function parseChild(raw: unknown): Child | null {
     friends,
     hatched,
     egg: parseGiftState(o.egg),
+    bonds: parseBonds(o.bonds),
     words: parseWords(o.words),
     challengeAhead,
     trophies,

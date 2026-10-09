@@ -1,4 +1,5 @@
 import type { Rng } from "@/lib/rng";
+import { buddyName, pickLine } from "./flavor";
 import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { CoinRow } from "../ui/coins";
@@ -123,7 +124,7 @@ function makeName(rng: Rng): ChoiceQ {
   return {
     id: qid(rng),
     game: "money",
-    title: "What coin is this?",
+    title: pickLine(rng, ["What coin is this?", `${buddyName(rng)} holds up a coin. What coin is it?`]),
     hint: hintFor(kind),
     praise: `Yes! That is a ${name.toLowerCase()}.`,
     almost: `Almost! That one is a ${name.toLowerCase()}.`,
@@ -141,7 +142,7 @@ function makeCount(rng: Rng): ChoiceQ {
   return {
     id: qid(rng),
     game: "money",
-    title: "How much money?",
+    title: pickLine(rng, ["How much money?", `${buddyName(rng)} counts the coins. How much?`]),
     hint: "Add the coins",
     praise: `Yes! ${describePile(coins)} is ${formatCents(total)}.`,
     almost: `Almost! ${describePile(coins)} is ${formatCents(total)}.`,
@@ -174,7 +175,10 @@ function makeMake(rng: Rng): ChoiceQ {
   return {
     id: qid(rng),
     game: "money",
-    title: `Which coins make ${formatCents(target)}?`,
+    title: pickLine(rng, [
+      `Which coins make ${formatCents(target)}?`,
+      `${buddyName(rng)} needs ${formatCents(target)}. Which coins make it?`,
+    ]),
     hint: "Count each group",
     praise: `Yes! ${labels[answer]} makes ${formatCents(target)}.`,
     almost: `Almost! ${labels[answer]} makes ${formatCents(target)}.`,
@@ -196,7 +200,7 @@ function makeChange(rng: Rng): ChoiceQ {
   return {
     id: qid(rng),
     game: "money",
-    title: "How much change?",
+    title: pickLine(rng, ["How much change?", `${buddyName(rng)} pays. How much change is left?`]),
     hint: `You pay ${formatCents(paidCents)}. The price is ${formatCents(price)}.`,
     praise: `Yes! The change is ${formatCents(change)}.`,
     almost: `Almost! The change is ${formatCents(change)}.`,
@@ -217,7 +221,7 @@ function makeDollars(rng: Rng): ChoiceQ {
   return {
     id: qid(rng),
     game: "money",
-    title: "How much money?",
+    title: pickLine(rng, ["How many dollars and cents?", `${buddyName(rng)} has dollars and coins. How much?`]),
     hint: "Dollars, then cents",
     praise: `Yes! That is ${formatCents(total)}.`,
     almost: `Almost! That is ${formatCents(total)}.`,

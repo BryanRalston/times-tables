@@ -1,4 +1,5 @@
 import type { Rng } from "@/lib/rng";
+import { buddyName, pickLine } from "./flavor";
 import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { DotModel, Equation, SquisheeImg, cx } from "../ui/bits";
@@ -148,7 +149,7 @@ export function makeAddQuestion(rng: Rng, level: AddLevel): ChoiceQ {
   return {
     id: qid(rng),
     game: "add",
-    title: "Tap the missing number!",
+    title: addTitle(rng, op),
     hint: max <= 20 ? "Count the dots" : "Count the tens and the ones",
     praise: `Yes! ${solved}`,
     almost: `Almost! ${solved}`,
@@ -158,6 +159,14 @@ export function makeAddQuestion(rng: Rng, level: AddLevel): ChoiceQ {
     tags,
     visual: { kind: "add", op, left, right, result, pink, teal, max, hidden, solved },
   };
+}
+
+function addTitle(rng: Rng, op: "+" | "-"): string {
+  const who = buddyName(rng);
+  if (op === "+") {
+    return pickLine(rng, ["Tap the missing number!", `${who} adds some more. What is missing?`, "Count on. Tap the missing number!"]);
+  }
+  return pickLine(rng, ["Tap the missing number!", `${who} takes some away. What is missing?`, "What number is hiding?"]);
 }
 
 function makeTensQuestion(rng: Rng): ChoiceQ {
@@ -210,7 +219,7 @@ function makeTensQuestion(rng: Rng): ChoiceQ {
   return {
     id: qid(rng),
     game: "add",
-    title: "Tap the missing number!",
+    title: addTitle(rng, op),
     hint: "Count the tens and the ones",
     praise: `Yes! ${solved}`,
     almost: `Almost! ${solved}`,

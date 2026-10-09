@@ -2,8 +2,9 @@ import { squisheeById } from "@/lib/squishees";
 import { SQUAD_IDS, type Child } from "../model";
 import { unlockedCount } from "../rewards";
 import { hatchPick } from "./egg";
+import { STUDY_PALS } from "./persona";
 
-export function ownedIds(child: Pick<Child, "stars" | "gifted" | "friends" | "hatched">): string[] {
+export function ownedIds(child: Pick<Child, "stars" | "gifted" | "friends" | "hatched"> & { bestStars?: Record<string, number> }): string[] {
   const ids: string[] = [];
   const push = (id: string) => {
     if (!id || ids.includes(id) || !squisheeById(id)) return;
@@ -13,10 +14,17 @@ export function ownedIds(child: Pick<Child, "stars" | "gifted" | "friends" | "ha
   for (const id of child.gifted) push(id);
   for (const id of child.friends) push(id);
   for (const id of child.hatched) push(id);
+  const best = child.bestStars ?? {};
+  for (const [game, id] of Object.entries(STUDY_PALS)) {
+    if ((best[game] ?? 0) >= 3) push(id);
+  }
   return ids;
 }
 
-export function palOwned(child: Pick<Child, "stars" | "gifted" | "friends" | "hatched">, id: string): boolean {
+export function palOwned(
+  child: Pick<Child, "stars" | "gifted" | "friends" | "hatched"> & { bestStars?: Record<string, number> },
+  id: string,
+): boolean {
   return ownedIds(child).includes(id);
 }
 

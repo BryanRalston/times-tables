@@ -186,23 +186,23 @@ function expectFresh(item: StaticItem) {
     expect(item.answer).toBe(`${blend[1]}${blend[2]}${blend[3]}`);
     return;
   }
-  const add = item.prompt.match(/^Sam has (\d+) apples\. Jo gives Sam (\d+) more\. How many apples\?$/);
+  const add = item.prompt.match(/^Peach has (\d+) apples\. Frog brings (\d+) more\. How many apples\?$/);
   if (add) {
     expect(Number(add[1]) + Number(add[2])).toBeLessThanOrEqual(10);
     expect(item.answer).toBe(String(Number(add[1]) + Number(add[2])));
     return;
   }
-  const sub = item.prompt.match(/^Max has (\d+) fish and gives away (\d+)\. How many fish are left\?$/);
+  const sub = item.prompt.match(/^Bear has (\d+) fish and gives (\d+) to Panda\. How many fish are left\?$/);
   if (sub) {
     expect(item.answer).toBe(String(Number(sub[1]) - Number(sub[2])));
     return;
   }
-  const bags = item.prompt.match(/^Ana has (\d+) bags with (\d+) stars in each bag\. How many stars\?$/);
+  const bags = item.prompt.match(/^Panda has (\d+) bags with (\d+) stars in each bag\. How many stars\?$/);
   if (bags) {
     expect(item.answer).toBe(String(Number(bags[1]) * Number(bags[2])));
     return;
   }
-  const boxes = item.prompt.match(/^Lee has (\d+) cookies in (\d+) equal boxes\. How many cookies are in each box\?$/);
+  const boxes = item.prompt.match(/^Fox has (\d+) cookies shared with (\d+) friends\. How many cookies does each friend get\?$/);
   if (boxes) {
     expect(Number(boxes[1]) % Number(boxes[2])).toBe(0);
     expect(item.answer).toBe(String(Number(boxes[1]) / Number(boxes[2])));

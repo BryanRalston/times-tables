@@ -68,6 +68,8 @@ export interface Child {
   hatched: string[];
   /** Mystery egg on the map. Ready after the daily goal. */
   egg: DailyGiftState;
+  /** Practice rounds with each buddy. Friendship grows from playing. */
+  bonds: Record<string, number>;
   /** Sight-word and spelling cards, keyed `sw:` or `sp:`. */
   words: Record<string, WordCard>;
   /** A grown-up opened levels past this grade. Adaptive play stays in band until this is on. */

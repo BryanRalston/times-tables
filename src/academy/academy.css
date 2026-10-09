@@ -765,6 +765,26 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   100% { transform: scale(1); }
 }
 
+@keyframes ac-wiggle {
+  0%, 100% { transform: rotate(0); }
+  30% { transform: rotate(-8deg); }
+  70% { transform: rotate(8deg); }
+}
+
+@keyframes ac-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes ac-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-6px) scale(1.06); }
+}
+
+@keyframes ac-sway {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(-6deg); }
+}
+
 @keyframes ac-fall {
   to { transform: translateY(100vh) rotate(160deg); opacity: 0.15; }
 }
@@ -997,8 +1017,21 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
 .ac-buddy.is-dance .ac-buddy-img { animation: ac-hop 0.4s ease; }
 .ac-buddy.is-dance .ac-buddy-img { animation-iteration-count: 3; }
 .ac-buddy.is-oops .ac-buddy-img { animation: ac-settle 0.35s ease; }
+.ac-buddy[data-move="wiggle"].is-cheer .ac-buddy-img,
+.ac-buddy[data-move="wiggle"].is-dance .ac-buddy-img { animation-name: ac-wiggle; }
+.ac-buddy[data-move="spin"].is-cheer .ac-buddy-img,
+.ac-buddy[data-move="spin"].is-dance .ac-buddy-img { animation-name: ac-spin; }
+.ac-buddy[data-move="bounce"].is-cheer .ac-buddy-img,
+.ac-buddy[data-move="bounce"].is-dance .ac-buddy-img { animation-name: ac-bounce; }
+.ac-buddy[data-move="sway"].is-cheer .ac-buddy-img,
+.ac-buddy[data-move="sway"].is-dance .ac-buddy-img { animation-name: ac-sway; }
 .ac-buddy[data-motion="reduce"] .ac-buddy-img,
-.ac-buddy[data-motion="reduce"] .ac-buddy-point { animation: none; }
+.ac-buddy[data-motion="reduce"] .ac-buddy-point,
+.ac-buddy[data-motion="reduce"].is-cheer .ac-buddy-img,
+.ac-buddy[data-motion="reduce"].is-dance .ac-buddy-img,
+.ac-buddy[data-motion="reduce"].is-oops .ac-buddy-img { animation: none; }
+.ac-bond { margin: 4px 0; font-size: 14px; font-weight: 800; color: #e21870; }
+.ac-bond-pips { color: #e21870; letter-spacing: 1px; }
 .ac-done .ac-buddy { position: static; width: auto; align-items: center; margin: 8px auto; }
 .ac-bubble {
   display: inline-block;
@@ -1068,6 +1101,10 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   .ac-buddy.is-cheer .ac-buddy-img,
   .ac-buddy.is-dance .ac-buddy-img,
   .ac-buddy.is-oops .ac-buddy-img,
+  .ac-buddy[data-move="wiggle"] .ac-buddy-img,
+  .ac-buddy[data-move="spin"] .ac-buddy-img,
+  .ac-buddy[data-move="bounce"] .ac-buddy-img,
+  .ac-buddy[data-move="sway"] .ac-buddy-img,
   .ac-egg.is-ready,
   .ac-boss.is-arrive,
   .ac-boss.is-idle,

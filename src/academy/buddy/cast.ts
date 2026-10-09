@@ -4,52 +4,23 @@ import { SQUAD_IDS } from "../model";
 import { starsNeeded } from "../rewards";
 import { EGG_IDS } from "./egg";
 import { hostIdFor } from "./hosts";
+import { personaOf, STUDY_PALS, studyGame } from "./persona";
 
-/** One short line. Shown in a speech bubble and on the book. */
-const LINES: Record<string, string> = {
-  peach: "Sweet and ready!",
-  frog: "Hop to it!",
-  bunny: "Boing! Let's count.",
-  melon: "Cool and juicy!",
-  grape: "A bunch of fun!",
-  bear: "We can count them.",
-  cat: "Purr-fect try!",
-  panda: "Groups are my favorite.",
-  owl: "Hoot! Sound it out.",
-  chick: "Peep! You can do it.",
-  duck: "Waddle with me!",
-  pig: "Oink! Nice work.",
-  penguin: "Watch the long hand.",
-  whale: "A big splash of math!",
-  avocado: "Guac and roll!",
-  donut: "Hole-y moly!",
-  corn: "A-maize-ing!",
-  lemon: "Sweet, not sour.",
-  strawberry: "Berry proud of you!",
-  cookie: "You are a smart cookie!",
-  boba: "Sip, sip, hooray!",
-  fox: "Let's share the coins.",
-  otter: "Hold paws and count.",
-  capybara: "Calm and clever.",
-  "crystal-axolotl": "Sparkle and count!",
-  "rainbow-cupcake": "A sprinkle of luck!",
-  "star-mochi": "Wish on a star!",
-  "galaxy-narwhal": "Out of this world!",
-};
-
-export type FindKind = "starter" | "boss" | "stars" | "egg";
+export type FindKind = "starter" | "boss" | "stars" | "egg" | "study";
 
 export interface BookEntry {
   id: string;
   name: string;
   rarity: "common" | "rare";
   line: string;
+  fact: string;
+  favorite: string;
   find: string;
   findKind: FindKind;
 }
 
 export function catchphrase(id: string): string {
-  return LINES[id] ?? "Let's play!";
+  return personaOf(id).line;
 }
 
 export function findBlurb(id: string, games: readonly { id: string; title: string }[] = GAMES): { kind: FindKind; text: string } {
@@ -58,6 +29,11 @@ export function findBlurb(id: string, games: readonly { id: string; title: strin
   const hostGame = games.find((game) => hostIdFor(game.id, games) === id);
   if (hostGame) return { kind: "boss", text: `Beat the ${hostGame.title} boss.` };
   if ((EGG_IDS as readonly string[]).includes(id)) return { kind: "egg", text: "Hatch the island egg." };
+  const studied = studyGame(id);
+  if (studied) {
+    const title = games.find((game) => game.id === studied)?.title ?? "a game";
+    return { kind: "study", text: `Earn 3 stars in ${title}.` };
+  }
   if (index >= 0) return { kind: "stars", text: `Earn ${starsNeeded(index)} stars.` };
   return { kind: "egg", text: "Hatch the island egg." };
 }
@@ -74,14 +50,19 @@ export function bookEntries(games: readonly { id: string; title: string }[] = GA
   for (const game of games) push(hostIdFor(game.id, games));
   for (const id of SQUAD_IDS) push(id);
   for (const id of EGG_IDS) push(id);
+  for (const id of Object.values(STUDY_PALS)) push(id);
   return ids.map((id) => {
     const meta = squisheeById(id)!;
     const find = findBlurb(id, games);
+    const persona = personaOf(id);
+    const favorite = games.find((game) => game.id === persona.game)?.title ?? "Counting";
     return {
       id,
       name: meta.name,
       rarity: meta.rarity,
-      line: catchphrase(id),
+      line: persona.line,
+      fact: persona.fact,
+      favorite,
       find: find.text,
       findKind: find.kind,
     };

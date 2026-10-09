@@ -2,6 +2,7 @@ import { squisheeById } from "@/lib/squishees";
 import type { Board } from "../games/boards";
 import type { Visual } from "../games/types";
 import type { RoundSlot } from "../round-flow";
+import { personaOf } from "./persona";
 
 function nameOf(id: string, fallback: string): string {
   return squisheeById(id)?.name ?? fallback;
@@ -15,9 +16,9 @@ export function storyLine(visual: Visual, buddyId: string, hostId: string): stri
       return `${host} sets out ${visual.a} groups of ${visual.b} squishees. How many?`;
     case "add":
       if (visual.op === "+") {
-        return `${buddy} has ${visual.pink} squishees. ${host} brings ${visual.teal} more. How many in all?`;
+        return `${buddy} the ${personaOf(buddyId).trait} has ${visual.pink} squishees. ${host} brings ${visual.teal} more. How many in all?`;
       }
-      return `${buddy} has ${visual.pink + visual.teal} squishees and shares ${visual.teal} with ${host}. How many are left?`;
+      return `${buddy} the ${personaOf(buddyId).trait} has ${visual.pink + visual.teal} squishees and shares ${visual.teal} with ${host}. How many are left?`;
     case "time":
       return `${host} checks the clock. What time is it?`;
     case "money":
@@ -30,7 +31,7 @@ export function storyLine(visual: Visual, buddyId: string, hostId: string): stri
     case "spell":
       return `${buddy} helps ${host} spell the word.`;
     case "scene":
-      return sceneStory(visual.board, buddy, host);
+      return sceneStory(visual.board, buddy, host, personaOf(buddyId).trait);
     default: {
       const neverVisual: never = visual;
       return neverVisual;
@@ -38,10 +39,10 @@ export function storyLine(visual: Visual, buddyId: string, hostId: string): stri
   }
 }
 
-function sceneStory(board: Board, buddy: string, host: string): string {
+function sceneStory(board: Board, buddy: string, host: string, trait: string): string {
   switch (board.game) {
     case "count":
-      return `${buddy} and ${host} count together.`;
+      return `${buddy} the ${trait} and ${host} count together.`;
     case "place":
       return `${host} sets out base-ten blocks. What number is that?`;
     case "shapes":
@@ -53,7 +54,7 @@ function sceneStory(board: Board, buddy: string, host: string): string {
     case "phonics":
       return `${host} says a sound for ${buddy}. What do you hear?`;
     case "problems":
-      return `${buddy} and ${host} solve a story.`;
+      return `${buddy} the ${trait} and ${host} solve a story.`;
     default: {
       const neverBoard: never = board;
       return neverBoard;

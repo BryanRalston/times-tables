@@ -1,5 +1,6 @@
 import { formatClockTime } from "@/lib/clock";
 import type { Rng } from "@/lib/rng";
+import { buddyName, pickLine } from "./flavor";
 import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { AnalogClock, SquisheeImg, cx } from "../ui/bits";
@@ -137,7 +138,7 @@ export function makeTimeQuestion(rng: Rng, level: TimeLevel): ChoiceQ {
   return {
     id: qid(rng),
     game: "time",
-    title: "What time is it?",
+    title: pickLine(rng, ["What time is it?", `${buddyName(rng)} checks the clock. What time is it?`]),
     hint: timeHint(hours, minutes),
     praise: `Yes! ${capPhrase(phrase)}`,
     almost: `Almost! It is ${phrase}.`,
