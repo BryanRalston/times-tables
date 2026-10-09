@@ -4,6 +4,7 @@ import { squisheeById } from "@/lib/squishees";
 import { bookEntries, catchphrase } from "../buddy/cast";
 import { palOwned, withBuddy } from "../buddy/unlock";
 import { GAMES, sheetHref } from "../games/registry";
+import { playWindow } from "../grade-map";
 import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type Grade, type Save } from "../model";
 import { buyOutfit, wearOutfit } from "../rewards";
 import { activeChild, mapActive, withGrade, withLevel } from "../storage";
@@ -107,7 +108,7 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
       </form>
       <section className="ac-panel">
         <h2>Grade</h2>
-        <p className="ac-hint">This sets the starting level for each game.</p>
+        <p className="ac-hint">This sets the starting level and the levels each game can use.</p>
         <GradeChips
           grade={child.grade}
           onGrade={(grade) => {
@@ -117,28 +118,72 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
         />
       </section>
       <section className="ac-panel">
+        <h2>Challenge ahead</h2>
+        <p className="ac-hint">A grown-up can open levels past this grade. Games still start in the grade band.</p>
+        <button
+          type="button"
+          className={cx("ac-grade", child.challengeAhead && "is-on")}
+          aria-pressed={child.challengeAhead}
+          onClick={() =>
+            onSave(
+              mapActive(save, (row) => {
+                const challengeAhead = !row.challengeAhead;
+                const next = { ...row, challengeAhead };
+                const levels = { ...next.levels };
+                for (const game of GAMES) {
+                  const allowed = playWindow(
+                    game.levels.map((level) => level.id),
+                    game.id,
+                    next.grade,
+                    challengeAhead,
+                  );
+                  if (!allowed.ids.includes(levels[game.id] ?? "")) levels[game.id] = allowed.start || game.defaultLevel(next.grade);
+                }
+                return { ...next, levels };
+              }),
+            )
+          }
+        >
+          {child.challengeAhead ? "On" : "Off"}
+        </button>
+      </section>
+      <section className="ac-panel">
         <h2>Sound</h2>
         <button type="button" className={cx("ac-grade", save.sound && "is-on")} onClick={() => onSave({ ...save, sound: !save.sound })}>
           {save.sound ? "On" : "Off"}
         </button>
       </section>
-      {GAMES.map((game) => (
-        <section key={game.id} className="ac-panel">
-          <h2>{game.title}</h2>
-          <div className="ac-levels">
-            {game.levels.map((row) => (
-              <button
-                key={row.id}
-                type="button"
-                className={cx("ac-grade", child.levels[game.id] === row.id && "is-on")}
-                onClick={() => onSave(mapActive(save, (kid) => withLevel(kid, game.id, row.id)))}
-              >
-                {row.label}
-              </button>
-            ))}
-          </div>
-        </section>
-      ))}
+      {GAMES.map((game) => {
+        const allowed = playWindow(
+          game.levels.map((row) => row.id),
+          game.id,
+          child.grade,
+          child.challengeAhead,
+        );
+        return (
+          <section key={game.id} className="ac-panel">
+            <h2>{game.title}</h2>
+            {allowed.ids.length === 0 ? (
+              <p className="ac-hint">Coming later for this grade.</p>
+            ) : (
+              <div className="ac-levels">
+                {game.levels
+                  .filter((row) => allowed.ids.includes(row.id))
+                  .map((row) => (
+                    <button
+                      key={row.id}
+                      type="button"
+                      className={cx("ac-grade", child.levels[game.id] === row.id && "is-on")}
+                      onClick={() => onSave(mapActive(save, (kid) => withLevel(kid, game.id, row.id)))}
+                    >
+                      {row.label}
+                    </button>
+                  ))}
+              </div>
+            )}
+          </section>
+        );
+      })}
       <BackLink>Back to games</BackLink>
       <Foot />
     </div>

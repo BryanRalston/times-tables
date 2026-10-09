@@ -1,4 +1,5 @@
 import type { Rng } from "@/lib/rng";
+import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { CoinRow } from "../ui/coins";
 import { SquisheeImg, cx } from "../ui/bits";
@@ -60,6 +61,8 @@ export function isMoneyLevel(value: unknown): value is MoneyLevel {
 }
 
 function defaultLevel(grade: Grade): MoneyLevel {
+  const start = bandFor("money", grade)?.start;
+  if (isMoneyLevel(start)) return start;
   switch (grade) {
     case "K":
       return "name";
@@ -102,13 +105,14 @@ function hintFor(kind: CoinKind): string {
 function countPile(rng: Rng): CoinPile {
   const kinds: CoinKind[] = ["penny", "nickel", "dime", "quarter"];
   const pile = emptyPile();
-  const n = rng.int(1, 4);
+  const n = rng.int(1, 3);
   for (let i = 0; i < n; i++) {
     const kind = rng.pick(kinds);
-    if (pileCents(pile) + COIN_CENTS[kind] > 100) continue;
+    if (kind === "quarter" && pile.quarter >= 1) continue;
+    if (pileCents(pile) + COIN_CENTS[kind] > 50) continue;
     pile[kind] += 1;
   }
-  if (pileCents(pile) === 0) pile.penny = 1;
+  if (pileCents(pile) === 0) pile.penny = rng.int(1, 5);
   return pile;
 }
 

@@ -1,4 +1,5 @@
 import type { Rng } from "@/lib/rng";
+import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { SquisheeImg, cx } from "../ui/bits";
 import { qid } from "./choices";
@@ -37,17 +38,9 @@ export function pickSightMode(rng: Rng, level: SightList): SightMode {
   const roll = rng.next();
   switch (level) {
     case "preprimer":
-      if (roll < 0.62) return "hear";
-      if (roll < 0.9) return "match";
-      return "fill";
     case "primer":
-      if (roll < 0.48) return "hear";
-      if (roll < 0.78) return "match";
-      return "fill";
     case "first":
-      if (roll < 0.34) return "hear";
-      if (roll < 0.6) return "match";
-      return "fill";
+      return roll < 0.58 ? "hear" : "match";
     case "second":
       if (roll < 0.28) return "hear";
       if (roll < 0.48) return "match";
@@ -161,6 +154,8 @@ function labelFor(rows: { key: string; label: string }[], key: string): string |
 }
 
 function defaultLevel(grade: Grade): SightList {
+  const start = bandFor("sight", grade)?.start;
+  if (isSightList(start)) return start;
   switch (grade) {
     case "K":
       return "preprimer";

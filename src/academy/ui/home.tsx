@@ -3,13 +3,14 @@ import { squisheeById } from "@/lib/squishees";
 import { bookEntries, catchphrase } from "../buddy/cast";
 import { ownedIds } from "../buddy/unlock";
 import { GAMES } from "../games/registry";
+import { bandFor } from "../grade-map";
 import { dailySnapshot, normalizeJourney } from "../journey";
 import { gradeLabel, todayIso, type Child } from "../model";
 import { nextPlacement } from "../placement";
 import { gameOfDay, rollGift, type GiftRoll } from "../rewards";
 import { chime } from "../sound";
 import { WeekStickers } from "./stickers";
-import { AcademyPal, Foot, GiftBox, Logo, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
+import { AcademyPal, Foot, GiftBox, LockIcon, Logo, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
 
 export function HomeScreen({
   child,
@@ -23,10 +24,11 @@ export function HomeScreen({
   onPlay: (game: string, level: string) => void;
 }) {
   const [prize, setPrize] = useState<GiftRoll | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
   const todayId = todayIso();
   const today = gameOfDay(todayId);
   const daily = dailySnapshot(child, todayId);
-  const journey = normalizeJourney(child.journey);
+  const journey = normalizeJourney(child.journey, child.grade);
   const place = nextPlacement(child);
   const book = bookEntries();
 
@@ -73,15 +75,44 @@ export function HomeScreen({
       </section>
 
       <div className="ac-grid">
-        {GAMES.map((game) => (
-          <a key={game.id} className={`ac-card is-${game.tint}`} href={`#/play/${game.id}`}>
-            {journey.areaId === game.id ? <span className="ac-soon">Here</span> : null}
-            <SquisheeImg id={game.mascot} />
-            <h2>{game.title}</h2>
-            <p>{game.audience}</p>
-            <Stars value={child.bestStars[game.id] ?? 0} />
-          </a>
-        ))}
+        {GAMES.map((game) => {
+          const offer = bandFor(game.id, child.grade)?.offer ?? "play";
+          const open = offer !== "later" || child.challengeAhead;
+          if (!open) {
+            return (
+              <button
+                key={game.id}
+                type="button"
+                className={`ac-card is-${game.tint} is-soon`}
+                data-offer="later"
+                onClick={() => {
+                  setToast(`${game.title} is coming later for this grade.`);
+                  window.setTimeout(() => setToast(null), 1800);
+                }}
+              >
+                <span className="ac-soon">
+                  <LockIcon /> Later
+                </span>
+                <SquisheeImg id={game.mascot} />
+                <h2>{game.title}</h2>
+                <p>Coming later</p>
+              </button>
+            );
+          }
+          return (
+            <a key={game.id} className={`ac-card is-${game.tint}`} data-offer={offer} href={`#/play/${game.id}`}>
+              {journey.areaId === game.id ? (
+                <span className="ac-soon">Here</span>
+              ) : offer === "intro" ? (
+                <span className="ac-soon">Intro</span>
+              ) : null}
+              <SquisheeImg id={game.mascot} />
+              <h2>{game.title}</h2>
+              <p>{offer === "intro" ? "Gentle intro" : game.audience}</p>
+              <Stars value={child.bestStars[game.id] ?? 0} />
+            </a>
+          );
+        })}
       </div>
 
       <div className="ac-meters">
@@ -118,6 +149,11 @@ export function HomeScreen({
         Today: {GAMES.find((game) => game.id === today)?.title ?? today} · {gradeLabel(child.grade)}
       </p>
       <Foot />
+      {toast ? (
+        <div className="ac-toast" role="status">
+          {toast}
+        </div>
+      ) : null}
       {prize ? (
         <div className="ac-modal" role="dialog" aria-label="Daily gift">
           <div className="ac-modal-card ac-prize">

@@ -27,7 +27,7 @@ import {
 } from "./questions";
 import type { AddLevel, TimeLevel, TimesLevel } from "./questions";
 
-const ADD_LEVELS: AddLevel[] = ["within5", "within10", "within20", "within100"];
+const ADD_LEVELS: AddLevel[] = ["within5", "within10", "within20", "tens", "within100"];
 const TIME_LEVELS: TimeLevel[] = ["hour", "half", "quarter", "fives"];
 const TIMES_LEVELS: TimesLevel[] = ["count", "twos", "mix", "toTen"];
 
@@ -55,6 +55,14 @@ function assertAdd(q: ChoiceQ, level: AddLevel) {
     expect(result).toBeGreaterThanOrEqual(0);
     expect(visual.pink).toBe(result);
     expect(visual.teal).toBe(right);
+  }
+  if (level === "tens") {
+    expect(Math.max(visual.pink, visual.teal, visual.op === "+" ? visual.pink + visual.teal : visual.pink + visual.teal)).toBeGreaterThanOrEqual(10);
+    if (visual.op === "+") {
+      expect(visual.pink < 10 || visual.teal < 10 || visual.pink % 10 === 0 || visual.teal % 10 === 0).toBe(true);
+    } else {
+      expect(visual.teal < 10 || visual.teal % 10 === 0).toBe(true);
+    }
   }
   expect(visual.solved).toContain(q.answer);
   expect(q.praise.startsWith("Yes!")).toBe(true);

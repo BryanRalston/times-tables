@@ -78,6 +78,8 @@ export interface SpellVisual {
   fallback: string;
   caption: string;
   bigFallback: boolean;
+  /** Grade 2–3 patterns show the sentence. Earlier lists are spoken. */
+  showSentence: boolean;
 }
 
 export interface MoneyVisual {
