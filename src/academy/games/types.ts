@@ -39,7 +39,29 @@ export interface TimeVisual {
   level: string;
 }
 
-export type Visual = AddVisual | TimesVisual | TimeVisual;
+export type CoinKind = "penny" | "nickel" | "dime" | "quarter" | "dollar";
+
+export interface CoinPile {
+  penny: number;
+  nickel: number;
+  dime: number;
+  quarter: number;
+  dollar: number;
+}
+
+export type MoneyMode = "name" | "count" | "make" | "change" | "dollars";
+
+export interface MoneyVisual {
+  kind: "money";
+  mode: MoneyMode;
+  /** Coins on the table. For "make", the target is `priceCents` and choices are `piles`. */
+  coins: CoinPile;
+  priceCents?: number;
+  piles?: Record<string, CoinPile>;
+  labels?: Record<string, string>;
+}
+
+export type Visual = AddVisual | TimesVisual | TimeVisual | MoneyVisual;
 
 export interface ChoiceQ {
   id: string;

@@ -89,7 +89,10 @@ describe("academy save", () => {
     expect(migrated.version).toBe(SAVE_VERSION);
     expect(migrated.children[0]?.levels.times).toBe("mix");
     expect(migrated.children[0]?.levels.time).toBe(defaultLevels("3").time);
-    expect(migrated.children[0]?.bestStars).toEqual({ times: 2, add: 0, time: 0 });
+    expect(migrated.children[0]?.bestStars).toEqual({ times: 2, add: 0, time: 0, money: 0 });
+    expect(migrated.children[0]?.coins).toBe(0);
+    expect(migrated.children[0]?.journey).toEqual({ areaId: "times", stop: 0, bosses: [] });
+    expect(migrated.children[0]?.dailyGift).toBe("none");
 
     const repaired = parseSave({
       version: 1,
@@ -97,6 +100,32 @@ describe("academy save", () => {
       children: [{ id: "ava", name: "Ava", grade: "1", levels: "nope" }],
     });
     expect(repaired.children[0]?.levels).toEqual(defaultLevels("1"));
+
+    const fromV2 = parseSave({
+      version: 2,
+      activeId: "maya",
+      sound: true,
+      children: [
+        {
+          id: "maya",
+          name: "Maya",
+          grade: "2",
+          stars: 11,
+          streak: 3,
+          lastPlayed: "2026-10-08",
+          levels: { times: "twos", add: "within10", time: "half" },
+          bestStars: { times: 2, add: 1, time: 3 },
+        },
+      ],
+    });
+    expect(fromV2.version).toBe(SAVE_VERSION);
+    expect(fromV2.children[0]?.stars).toBe(11);
+    expect(fromV2.children[0]?.streak).toBe(3);
+    expect(fromV2.children[0]?.levels.time).toBe("half");
+    expect(fromV2.children[0]?.levels.money).toBe(defaultLevels("2").money);
+    expect(fromV2.children[0]?.bestStars.money).toBe(0);
+    expect(fromV2.children[0]?.coins).toBe(0);
+    expect(fromV2.children[0]?.journey.areaId).toBe("times");
 
     const mem = new Map<string, string>();
     const disk = {

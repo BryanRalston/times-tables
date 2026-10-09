@@ -31,7 +31,7 @@ if (!/\/times-tables\/academy\/assets\/[^"']+\.js/.test(academyHtml)) {
   fail("dist/academy/index.html must contain hashed /times-tables/academy/assets/*.js");
 }
 if (/src\/academy\/main\.tsx/.test(academyHtml)) fail("dist/academy/index.html still points at source");
-for (const sheet of ["times-tables", "add-subtract", "telling-time"]) {
+for (const sheet of ["times-tables", "add-subtract", "telling-time", "money"]) {
   const sheetPath = resolve(`dist/academy/worksheets/${sheet}/index.html`);
   if (!existsSync(sheetPath)) fail(`missing worksheet ${sheet}`);
   const sheetHtml = readFileSync(sheetPath, "utf8");
