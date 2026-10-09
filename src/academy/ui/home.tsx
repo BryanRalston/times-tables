@@ -110,7 +110,7 @@ export function HomeScreen({ child }: { child: Child }) {
           </span>
           <span>
             <strong>{gifts}</strong>
-            <small>gifts</small>
+            <small>{gifts === 1 ? "gift" : "gifts"}</small>
           </span>
         </a>
       </div>

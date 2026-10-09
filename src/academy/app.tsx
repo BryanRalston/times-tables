@@ -88,6 +88,7 @@ function AcademyApp() {
   } else if (route.name === "play") {
     body = (
       <PlayScreen
+        key={route.game}
         child={child}
         game={route.game}
         sound={save.sound}
