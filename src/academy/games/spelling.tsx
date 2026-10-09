@@ -121,7 +121,7 @@ export function SpellingPrompt({
   if (question.visual.kind !== "spell") return null;
   const visual = question.visual;
   return (
-    <section className="ac-qcard" data-mode="spell" data-answer={visual.word}>
+    <section className="ac-qcard" data-mode="spell" data-answer={visual.word} data-solution={question.answer}>
       <h1>{question.title}</h1>
       <SquisheeImg id={mascot} className={cx("ac-mascot", happy && "is-happy")} />
       <p className="ac-pattern">{visual.patternLabel}</p>

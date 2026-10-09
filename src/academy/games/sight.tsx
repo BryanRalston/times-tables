@@ -205,7 +205,7 @@ export function SightPrompt({
   if (question.visual.kind !== "sight") return null;
   const visual = question.visual;
   return (
-    <section className="ac-qcard" data-mode={visual.mode} data-answer={visual.word}>
+    <section className="ac-qcard" data-mode={visual.mode} data-answer={visual.word} data-solution={question.answer}>
       <h1>{question.title}</h1>
       <SquisheeImg id={mascot} className={cx("ac-mascot", happy && "is-happy")} />
       <SpeakerBar
@@ -237,6 +237,7 @@ export function SightChoices({ question, reveal, picked, onChoose }: ChoiceProps
             key={choice}
             type="button"
             className={cx("ac-choice", emoji ? "is-picture" : stack ? "is-sentence" : "is-word", cls)}
+            data-choice={choice}
             aria-label={emoji ? `${emoji} ${choice}` : choice}
             onClick={() => onChoose(choice)}
           >
