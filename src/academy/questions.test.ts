@@ -23,7 +23,7 @@ import {
   type AddVisual,
   type ChoiceQ,
 } from "./questions";
-import type { AddLevel, TimeLevel, TimesLevel } from "./model";
+import type { AddLevel, TimeLevel, TimesLevel } from "./questions";
 
 const ADD_LEVELS: AddLevel[] = ["within5", "within10", "within20", "within100"];
 const TIME_LEVELS: TimeLevel[] = ["hour", "half", "quarter", "fives"];

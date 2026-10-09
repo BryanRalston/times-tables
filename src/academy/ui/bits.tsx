@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { squisheeById } from "@/lib/squishees";
-import { MINUS, TIMES, type AddVisual, type TimeVisual, type TimesVisual } from "../questions";
+import { MINUS, TIMES, type AddVisual, type TimeVisual, type TimesVisual } from "../games/types";
 import { squisheeUrl } from "../paths";
 
 export function cx(...parts: Array<string | false | null | undefined>): string {

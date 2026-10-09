@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { STORAGE_KEY as MATH_KEY } from "@/lib/progress";
-import { MAX_CHILDREN, defaultLevels } from "./model";
-import { STORAGE_KEY, addChild, blankChild, freshSave, mapActive, parseSave, withGrade, withLevel } from "./storage";
+import { defaultLevels } from "./games/registry";
+import { MAX_CHILDREN } from "./model";
+import { SAVE_VERSION, STORAGE_KEY, addChild, blankChild, freshSave, loadSave, mapActive, parseSave, withGrade, withLevel, writeSave } from "./storage";
 
 describe("academy save", () => {
   it("keeps a separate localStorage key from Squishee Math", () => {
@@ -14,7 +15,7 @@ describe("academy save", () => {
     const fresh = parseSave("nope");
     expect(fresh.children).toHaveLength(1);
     expect(fresh.children[0]?.name).toBe("");
-    expect(fresh.version).toBe(1);
+    expect(fresh.version).toBe(SAVE_VERSION);
 
     const parsed = parseSave({
       version: 1,
@@ -69,6 +70,63 @@ describe("academy save", () => {
     );
     expect(save.children[0]?.stars).toBe(4);
     expect(save.children[1]?.stars).toBe(0);
+  });
+
+  it("migrates version 1 saves and leaves a newer schema on disk", () => {
+    const migrated = parseSave({
+      version: 1,
+      activeId: "maya",
+      children: [
+        {
+          id: "maya",
+          name: "Maya",
+          grade: "3",
+          levels: { times: "mix", add: "within20" },
+          bestStars: { times: 2 },
+        },
+      ],
+    });
+    expect(migrated.version).toBe(SAVE_VERSION);
+    expect(migrated.children[0]?.levels.times).toBe("mix");
+    expect(migrated.children[0]?.levels.time).toBe(defaultLevels("3").time);
+    expect(migrated.children[0]?.bestStars).toEqual({ times: 2, add: 0, time: 0 });
+
+    const repaired = parseSave({
+      version: 1,
+      activeId: "ava",
+      children: [{ id: "ava", name: "Ava", grade: "1", levels: "nope" }],
+    });
+    expect(repaired.children[0]?.levels).toEqual(defaultLevels("1"));
+
+    const mem = new Map<string, string>();
+    const disk = {
+      version: 9,
+      activeId: "maya",
+      sound: true,
+      children: [{ id: "maya", name: "Maya", grade: "2", stars: 4 }],
+    };
+    vi.stubGlobal("localStorage", {
+      getItem: (key: string) => mem.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        mem.set(key, value);
+      },
+      removeItem: (key: string) => {
+        mem.delete(key);
+      },
+    });
+    mem.set(STORAGE_KEY, JSON.stringify(disk));
+    const loaded = loadSave();
+    expect(loaded.children[0]?.stars).toBe(4);
+    writeSave({
+      ...loaded,
+      children: loaded.children.map((child) => ({ ...child, stars: 99 })),
+    });
+    const kept = JSON.parse(mem.get(STORAGE_KEY) ?? "{}") as { version: number; children: { stars: number }[] };
+    expect(kept.version).toBe(9);
+    expect(kept.children[0]?.stars).toBe(4);
+    mem.delete(STORAGE_KEY);
+    loadSave();
+    vi.unstubAllGlobals();
   });
 
   it("keeps the offline worker on the academy path", () => {

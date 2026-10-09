@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { isGameId, todayIso, type GameId, type RoundResult, type Save } from "./model";
+import { gameForScreen, isGameId, type GameId } from "./games/registry";
+import { todayIso, type RoundResult, type Save } from "./model";
 import { applyRound, acknowledgeUnlocks } from "./rewards";
 import { activeChild, loadSave, mapActive, withLevel, writeSave } from "./storage";
 import { HelloScreen, SettingsScreen, SheetsScreen, ShelfScreen } from "./ui/extra";
@@ -42,11 +43,8 @@ function goHome() {
 }
 
 function screenGame(): GameId | null {
-  const screen = document.body.dataset.screen;
-  if (screen === "sheet-times") return "times";
-  if (screen === "sheet-add") return "add";
-  if (screen === "sheet-time") return "time";
-  return null;
+  const game = gameForScreen(document.body.dataset.screen);
+  return game && isGameId(game.id) ? game.id : null;
 }
 
 export function AcademyRoot() {

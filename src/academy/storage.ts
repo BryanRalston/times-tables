@@ -1,23 +1,30 @@
+import { defaultLevels, gameById, GAMES, isGameId } from "./games/registry";
 import {
   MAX_CHILDREN,
   SQUAD_IDS,
   cleanName,
-  defaultLevels,
-  isAddLevel,
-  isGameId,
   isGrade,
   isSquadId,
-  isTimeLevel,
-  isTimesLevel,
   type Child,
-  type GameId,
   type Grade,
-  type Levels,
   type Save,
   type SkillStat,
 } from "./model";
 
+/** Stable key. The schema version lives on the save, not in the key name. */
 export const STORAGE_KEY = "squishee-academy-v1";
+export const SAVE_VERSION = 2;
+
+/**
+ * Migrations run from the save's version up to SAVE_VERSION.
+ * Keyed by the version being left behind. Each step must set version to key + 1.
+ */
+const MIGRATIONS: Record<number, (raw: Record<string, unknown>) => Record<string, unknown>> = {
+  1: migrateV1toV2,
+};
+
+/** A newer app wrote this disk. Don't replace it with an older schema. */
+let holdDisk = false;
 const DATE_KEY = /^\d{4}-\d{2}-\d{2}$/;
 
 export function newId(): string {
@@ -38,7 +45,7 @@ export function blankChild(opts: { id?: string; name?: string; grade?: Grade; av
     opened: 3,
     skills: {},
     secondsByDay: {},
-    bestStars: { times: 0, add: 0, time: 0 },
+    bestStars: Object.fromEntries(GAMES.map((game) => [game.id, 0])),
     rounds: 0,
     levels: defaultLevels(grade),
   };
@@ -46,7 +53,41 @@ export function blankChild(opts: { id?: string; name?: string; grade?: Grade; av
 
 export function freshSave(): Save {
   const child = blankChild();
-  return { version: 1, activeId: child.id, sound: true, children: [child] };
+  return { version: SAVE_VERSION, activeId: child.id, sound: true, children: [child] };
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return value as Record<string, unknown>;
+}
+
+/** Version 1 stored levels for the launch games only. Open those maps for later games. */
+function migrateV1toV2(raw: Record<string, unknown>): Record<string, unknown> {
+  const children = Array.isArray(raw.children)
+    ? raw.children.map((row) => {
+        if (!row || typeof row !== "object" || Array.isArray(row)) return row;
+        const child = row as Record<string, unknown>;
+        return { ...child, levels: asRecord(child.levels), bestStars: asRecord(child.bestStars) };
+      })
+    : raw.children;
+  return { ...raw, version: 2, children };
+}
+
+function migrateRaw(raw: unknown): unknown {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return raw;
+  let current = raw as Record<string, unknown>;
+  const initial = current.version;
+  if (typeof initial !== "number" || initial > SAVE_VERSION || initial < 1) return raw;
+  let version = initial;
+  while (version < SAVE_VERSION) {
+    const step = MIGRATIONS[version];
+    if (!step) return raw;
+    const next = step(current);
+    if (typeof next.version !== "number" || next.version !== version + 1) return raw;
+    current = next;
+    version = next.version;
+  }
+  return current;
 }
 
 function clampInt(v: unknown, min: number, max: number, fallback = min): number {
@@ -55,15 +96,14 @@ function clampInt(v: unknown, min: number, max: number, fallback = min): number 
   return Math.max(min, Math.min(max, Math.floor(n)));
 }
 
-function parseLevels(raw: unknown, grade: Grade): Levels {
-  const base = defaultLevels(grade);
-  if (!raw || typeof raw !== "object") return base;
+function parseLevels(raw: unknown, grade: Grade): Record<string, string> {
+  const out: Record<string, string> = { ...defaultLevels(grade) };
+  if (!raw || typeof raw !== "object") return out;
   const o = raw as Record<string, unknown>;
-  return {
-    times: isTimesLevel(o.times) ? o.times : base.times,
-    add: isAddLevel(o.add) ? o.add : base.add,
-    time: isTimeLevel(o.time) ? o.time : base.time,
-  };
+  for (const game of GAMES) {
+    if (game.isLevel(o[game.id])) out[game.id] = String(o[game.id]);
+  }
+  return out;
 }
 
 function parseSkills(raw: unknown): Record<string, SkillStat> {
@@ -87,15 +127,11 @@ function parseSeconds(raw: unknown): Record<string, number> {
   return out;
 }
 
-function parseBest(raw: unknown): Record<GameId, number> {
-  const base = { times: 0, add: 0, time: 0 };
-  if (!raw || typeof raw !== "object") return base;
-  const o = raw as Record<string, unknown>;
-  return {
-    times: clampInt(o.times, 0, 3),
-    add: clampInt(o.add, 0, 3),
-    time: clampInt(o.time, 0, 3),
-  };
+function parseBest(raw: unknown): Record<string, number> {
+  const o = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const out: Record<string, number> = {};
+  for (const game of GAMES) out[game.id] = clampInt(o[game.id], 0, 3);
+  return out;
 }
 
 export function parseChild(raw: unknown): Child | null {
@@ -123,13 +159,14 @@ export function parseChild(raw: unknown): Child | null {
 }
 
 export function parseSave(raw: unknown): Save {
-  if (!raw || typeof raw !== "object") return freshSave();
-  const o = raw as Record<string, unknown>;
-  if (o.version !== 1 || !Array.isArray(o.children)) return freshSave();
+  const migrated = migrateRaw(raw);
+  if (!migrated || typeof migrated !== "object") return freshSave();
+  const o = migrated as Record<string, unknown>;
+  if (o.version !== SAVE_VERSION || !Array.isArray(o.children)) return freshSave();
   const children = o.children.map(parseChild).filter((child): child is Child => child != null).slice(0, MAX_CHILDREN);
   if (!children.length) return freshSave();
   const activeId = children.some((child) => child.id === o.activeId) ? String(o.activeId) : children[0]!.id;
-  return { version: 1, activeId, sound: o.sound !== false, children };
+  return { version: SAVE_VERSION, activeId, sound: o.sound !== false, children };
 }
 
 export function activeChild(save: Save): Child {
@@ -145,20 +182,10 @@ export function withGrade(child: Child, grade: Grade): Child {
   return { ...child, grade, levels: defaultLevels(grade) };
 }
 
-export function withLevel(child: Child, game: GameId, level: string): Child {
-  if (!isGameId(game)) return child;
-  switch (game) {
-    case "times":
-      return isTimesLevel(level) ? { ...child, levels: { ...child.levels, times: level } } : child;
-    case "add":
-      return isAddLevel(level) ? { ...child, levels: { ...child.levels, add: level } } : child;
-    case "time":
-      return isTimeLevel(level) ? { ...child, levels: { ...child.levels, time: level } } : child;
-    default: {
-      const neverGame: never = game;
-      return neverGame;
-    }
-  }
+export function withLevel(child: Child, gameId: string, level: string): Child {
+  const game = gameById(gameId);
+  if (!game || !isGameId(game.id) || !game.isLevel(level)) return child;
+  return { ...child, levels: { ...child.levels, [game.id]: level } };
 }
 
 export function addChild(save: Save, name: string, grade: Grade): Save {
@@ -171,16 +198,28 @@ export function addChild(save: Save, name: string, grade: Grade): Save {
 }
 
 export function loadSave(): Save {
+  holdDisk = false;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return freshSave();
-    return parseSave(JSON.parse(raw) as unknown);
+    const rawText = localStorage.getItem(STORAGE_KEY);
+    if (!rawText) return freshSave();
+    const raw = JSON.parse(rawText) as unknown;
+    const version =
+      raw && typeof raw === "object" && typeof (raw as { version?: unknown }).version === "number"
+        ? (raw as { version: number }).version
+        : 0;
+    if (version > SAVE_VERSION) {
+      holdDisk = true;
+      const played = parseSave({ ...(raw as Record<string, unknown>), version: SAVE_VERSION });
+      return played;
+    }
+    return parseSave(raw);
   } catch {
     return freshSave();
   }
 }
 
 export function writeSave(save: Save): void {
+  if (holdDisk) return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(save));
   } catch {

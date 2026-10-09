@@ -1,13 +1,6 @@
 import { hashSeed } from "@/lib/rng";
-import {
-  SQUAD_IDS,
-  addDays,
-  weekDates,
-  type Child,
-  type GameId,
-  type RoundResult,
-  type SkillStat,
-} from "./model";
+import { GAMES, barKeys, chipKeys, chipLabel as chipText, skillLabel as skillText, type GameId } from "./games/registry";
+import { SQUAD_IDS, addDays, weekDates, type Child, type RoundResult, type SkillStat } from "./model";
 
 /** Finishing a round always earns a star. 6 right earns 2. 9 right earns 3. */
 export function starsForRound(correct: number, _total = 10): 1 | 2 | 3 {
@@ -62,8 +55,8 @@ export function acknowledgeUnlocks(child: Child): Child {
 }
 
 export function gameOfDay(today: string): GameId {
-  const games: GameId[] = ["times", "add", "time"];
-  return games[hashSeed(today) % 3]!;
+  const games = GAMES.map((game) => game.id);
+  return games[hashSeed(today) % games.length]!;
 }
 
 function bump(skills: Record<string, SkillStat>, key: string, ok: boolean) {
@@ -128,109 +121,12 @@ export function skillPercent(stat: SkillStat | undefined): number | null {
   return Math.round((stat.ok / n) * 100);
 }
 
-const BAR_KEYS = [
-  "table:2",
-  "table:5",
-  "table:10",
-  "table:3",
-  "table:4",
-  "table:6",
-  "table:7",
-  "table:8",
-  "table:9",
-  "add:within5",
-  "add:within10",
-  "add:within20",
-  "add:within100",
-  "time:hour",
-  "time:half",
-  "time:quarter",
-  "time:fives",
-] as const;
-
-const CHIP_KEYS = [
-  "table:2",
-  "table:3",
-  "table:4",
-  "table:5",
-  "table:6",
-  "table:7",
-  "table:8",
-  "table:9",
-  "table:10",
-  "doubles",
-  "make10",
-  "oclock",
-  "halfpast",
-  "quarterpast",
-  "quarterto",
-  "add:within5",
-  "add:within10",
-  "add:within20",
-  "add:within100",
-  "time:hour",
-  "time:half",
-  "time:quarter",
-  "time:fives",
-] as const;
-
 export function skillLabel(key: string): string {
-  if (key.startsWith("table:")) return `×${key.slice(6)}`;
-  switch (key) {
-    case "add:within5":
-      return "Add within 5";
-    case "add:within10":
-      return "Add within 10";
-    case "add:within20":
-      return "Add within 20";
-    case "add:within100":
-      return "Add within 100";
-    case "time:hour":
-      return "Time: hours";
-    case "time:half":
-      return "Time: half hour";
-    case "time:quarter":
-      return "Time: quarter hour";
-    case "time:fives":
-      return "Time: 5 minutes";
-    case "doubles":
-      return "Doubles";
-    case "make10":
-      return "Make 10";
-    case "oclock":
-      return "O'clock";
-    case "halfpast":
-      return "Half past";
-    case "quarterpast":
-      return "Quarter past";
-    case "quarterto":
-      return "Quarter to";
-    default:
-      return key;
-  }
+  return skillText(key);
 }
 
 export function chipLabel(key: string): string {
-  switch (key) {
-    case "add:within5":
-      return "Within 5";
-    case "add:within10":
-      return "Within 10";
-    case "add:within20":
-      return "Within 20";
-    case "add:within100":
-      return "Within 100";
-    case "time:hour":
-      return "Hours";
-    case "time:half":
-      return "Half hours";
-    case "time:quarter":
-      return "Quarter hours";
-    case "time:fives":
-      return "5 minutes";
-    default:
-      return skillLabel(key);
-  }
+  return chipText(key);
 }
 
 export interface SkillBar {
@@ -241,7 +137,7 @@ export interface SkillBar {
 
 export function skillBars(skills: Record<string, SkillStat>): SkillBar[] {
   const rows: { key: string; pct: number; n: number }[] = [];
-  for (const key of BAR_KEYS) {
+  for (const key of barKeys()) {
     const stat = skills[key];
     const pct = skillPercent(stat);
     if (pct == null || !stat) continue;
@@ -253,7 +149,7 @@ export function skillBars(skills: Record<string, SkillStat>): SkillBar[] {
 
 export function masteredChips(skills: Record<string, SkillStat>): string[] {
   const chips: string[] = [];
-  for (const key of CHIP_KEYS) {
+  for (const key of chipKeys()) {
     if (isMastered(skills[key])) chips.push(chipLabel(key));
   }
   return chips;

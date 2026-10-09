@@ -12,7 +12,7 @@ import {
   type Save,
 } from "../model";
 import { grownupGate } from "../questions";
-import { sheetHref } from "../paths";
+import { sheetHref } from "../games/registry";
 import {
   formatMinutes,
   masteredChips,

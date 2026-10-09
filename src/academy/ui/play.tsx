@@ -1,30 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { squisheeById } from "@/lib/squishees";
 import { rngRandom } from "@/lib/rng";
+import { gameById, pillLabel } from "../games/registry";
 import {
   ROUND_LENGTH,
   ROUND_SECONDS,
-  mascotFor,
-  pillLabel,
-  levelsFor,
   type Child,
-  type GameId,
   type RoundResult,
 } from "../model";
 import { makeRound, type ChoiceQ } from "../questions";
 import { newestUnlock, starsForRound, weakTimesFacts } from "../rewards";
 import { blip } from "../sound";
-import {
-  AnalogClock,
-  DotModel,
-  Equation,
-  Flame,
-  Groups,
-  SquisheeImg,
-  Stars,
-  cx,
-  fmtSeconds,
-} from "./bits";
+import { Flame, SquisheeImg, Stars, cx, fmtSeconds } from "./bits";
 
 export function PlayScreen({
   child,
@@ -36,7 +23,7 @@ export function PlayScreen({
   onAck,
 }: {
   child: Child;
-  game: GameId;
+  game: string;
   sound: boolean;
   onExit: () => void;
   onRound: (result: RoundResult) => void;
@@ -176,13 +163,14 @@ export function PlayScreen({
   const correct = results.filter((mark) => mark.ok).length;
   const liveStars = starsForRound(correct, questions.length);
   const q: ChoiceQ | undefined = questions[index];
-  const mascot = mascotFor(game);
+  const spec = gameById(game);
+  const mascot = spec?.mascot ?? "peach";
   const friend = unlockId ? squisheeById(unlockId) : undefined;
   const reveal = phase === "feedback";
   const ok = reveal && picked === q?.answer;
 
   return (
-    <div className={cx("ac-shell", game === "time" && "ac-wide")}>
+    <div className={cx("ac-shell", spec?.layout === "wide" && "ac-wide")}>
       <header className="ac-play-top">
         <button type="button" className="ac-x" onClick={close} aria-label="Close">
           ×
@@ -245,27 +233,10 @@ export function PlayScreen({
             )}
             <Stars value={liveStars} />
           </div>
-          <div className={cx("ac-stage", game === "time" && "is-time")}>
-            {q.visual.kind === "time" ? <AnalogClock hours={q.visual.hours} minutes={q.visual.minutes} /> : null}
+          <div className={cx("ac-stage", spec?.layout === "wide" && "is-time")}>
+            {spec?.Aside ? <spec.Aside question={q} /> : null}
             <div className="ac-stage-main">
-              {q.visual.kind === "time" ? (
-                <div className="ac-time-copy">
-                  <div>
-                    <h1>{q.title}</h1>
-                    <p className="ac-hint">{q.hint}</p>
-                  </div>
-                  <SquisheeImg id={mascot} className={cx("ac-mascot", ok && "is-happy")} />
-                </div>
-              ) : (
-                <section className="ac-qcard">
-                  <h1>{q.title}</h1>
-                  <SquisheeImg id={mascot} className={cx("ac-mascot", ok && "is-happy")} />
-                  <Equation visual={q.visual} reveal={reveal} answer={q.answer} />
-                  {q.visual.kind === "add" ? <DotModel visual={q.visual} /> : null}
-                  {q.visual.kind === "times" ? <Groups a={q.visual.a} b={q.visual.b} /> : null}
-                  <p className="ac-hint">{q.hint}</p>
-                </section>
-              )}
+              {spec ? <spec.Prompt question={q} reveal={reveal} mascot={mascot} happy={ok} /> : null}
               <div className="ac-choices">
                 {q.choices.map((choice) => {
                   const cls =
@@ -312,7 +283,7 @@ export function PlayScreen({
           <div className="ac-modal-card">
             <h2>Pick a level</h2>
             <p className="ac-hint">Starts a new round.</p>
-            {levelsFor(game).map((row) => (
+            {(spec?.levels ?? []).map((row) => (
               <button
                 key={row.id}
                 type="button"

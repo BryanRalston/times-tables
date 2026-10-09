@@ -1,16 +1,7 @@
 import { useState } from "react";
 import { squisheeById } from "@/lib/squishees";
-import {
-  SQUAD_IDS,
-  cleanName,
-  gameTitle,
-  isGrade,
-  levelsFor,
-  type GameId,
-  type Grade,
-  type Save,
-} from "../model";
-import { sheetHref } from "../paths";
+import { GAMES, sheetHref } from "../games/registry";
+import { SQUAD_IDS, cleanName, isGrade, type Grade, type Save } from "../model";
 import { giftCount, starsNeeded, unlockedCount } from "../rewards";
 import { activeChild, mapActive, withGrade, withLevel } from "../storage";
 import { BackLink, Foot, Logo, SquisheeImg, cx } from "./bits";
@@ -58,7 +49,6 @@ export function HelloScreen({ save, onSave }: { save: Save; onSave: (save: Save)
 export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Save) => void }) {
   const child = activeChild(save);
   const [name, setName] = useState(child.name);
-  const games: GameId[] = ["times", "add", "time"];
 
   return (
     <div className="ac-shell">
@@ -100,16 +90,16 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
           {save.sound ? "On" : "Off"}
         </button>
       </section>
-      {games.map((game) => (
-        <section key={game} className="ac-panel">
-          <h2>{gameTitle(game)}</h2>
+      {GAMES.map((game) => (
+        <section key={game.id} className="ac-panel">
+          <h2>{game.title}</h2>
           <div className="ac-levels">
-            {levelsFor(game).map((row) => (
+            {game.levels.map((row) => (
               <button
                 key={row.id}
                 type="button"
-                className={cx("ac-grade", child.levels[game] === row.id && "is-on")}
-                onClick={() => onSave(mapActive(save, (kid) => withLevel(kid, game, row.id)))}
+                className={cx("ac-grade", child.levels[game.id] === row.id && "is-on")}
+                onClick={() => onSave(mapActive(save, (kid) => withLevel(kid, game.id, row.id)))}
               >
                 {row.label}
               </button>
@@ -162,7 +152,6 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
 }
 
 export function SheetsScreen() {
-  const games: GameId[] = ["times", "add", "time"];
   return (
     <div className="ac-shell">
       <header className="ac-top">
@@ -171,11 +160,11 @@ export function SheetsScreen() {
       <h1>Free worksheets</h1>
       <p className="ac-lede">Print a page, or shuffle a new set. No signup.</p>
       <div className="ac-sheet-list">
-        {games.map((game) => (
-          <a key={game} className="ac-panel ac-sheet-link" href={sheetHref(game)}>
-            <SquisheeImg id={game === "times" ? "peach" : game === "add" ? "frog" : "melon"} />
+        {GAMES.map((game) => (
+          <a key={game.id} className="ac-panel ac-sheet-link" href={sheetHref(game.id)}>
+            <SquisheeImg id={game.mascot} />
             <span>
-              <strong>{gameTitle(game)}</strong>
+              <strong>{game.title}</strong>
               <small>Printable + answer key</small>
             </span>
           </a>

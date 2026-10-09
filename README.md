@@ -41,7 +41,7 @@ K–3 games (times tables, add & subtract, telling time) live on the same Pages 
 
 https://bryanralston.github.io/times-tables/academy/
 
-`npm run build` emits that app into `dist/academy/` after the Squishee Math build. Academy keeps its own `localStorage` key and does not change Squishee Math. Worksheets: `/academy/worksheets/times-tables/`, `/academy/worksheets/add-subtract/`, `/academy/worksheets/telling-time/`.
+`npm run build` emits that app into `dist/academy/` after the Squishee Math build. Academy keeps its own `localStorage` key and does not change Squishee Math. Worksheets: `/academy/worksheets/times-tables/`, `/academy/worksheets/add-subtract/`, `/academy/worksheets/telling-time/`. Adding a game is one module: [`docs/ADDING_A_GAME.md`](docs/ADDING_A_GAME.md).
 
 The old single-file leftover page lives in `legacy/`.
 

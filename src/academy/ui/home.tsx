@@ -1,21 +1,11 @@
 import { useState } from "react";
-import {
-  gameTitle,
-  gradeLabel,
-  mascotFor,
-  todayIso,
-  type Child,
-  type GameId,
-} from "../model";
+import { GAMES } from "../games/registry";
+import { gradeLabel, todayIso, type Child } from "../model";
 import { gameOfDay, giftCount, unlockedCount } from "../rewards";
 import { Flame, Foot, LockIcon, Logo, SquisheeImg, Stars } from "./bits";
 
-const CARDS: { id: GameId | "words"; title: string; audience: string; tint: string; mascot: string }[] = [
-  { id: "times", title: "Times Tables", audience: "Grade 2–3", tint: "pink", mascot: "peach" },
-  { id: "add", title: "Add & Subtract", audience: "K–2", tint: "mint", mascot: "frog" },
-  { id: "time", title: "Telling Time", audience: "Grade 1–3", tint: "sun", mascot: "melon" },
-  { id: "words", title: "Sight Words", audience: "K–1", tint: "lav", mascot: "grape" },
-];
+/** Not a game yet. A real game is a registry module, not a locked card. */
+const COMING_SOON = { title: "Sight Words", audience: "K–1", tint: "lav", mascot: "grape" };
 
 export function HomeScreen({ child }: { child: Child }) {
   const [toast, setToast] = useState<string | null>(null);
@@ -52,37 +42,29 @@ export function HomeScreen({ child }: { child: Child }) {
       </section>
 
       <div className="ac-grid">
-        {CARDS.map((card) => {
-          if (card.id === "words") {
-            return (
-              <button
-                key={card.id}
-                type="button"
-                className={`ac-card is-${card.tint} is-soon`}
-                onClick={() => {
-                  setToast("Sight words are coming soon.");
-                  window.setTimeout(() => setToast(null), 1800);
-                }}
-              >
-                <span className="ac-soon">
-                  <LockIcon /> Soon
-                </span>
-                <SquisheeImg id={card.mascot} />
-                <h2>{card.title}</h2>
-                <p>{card.audience}</p>
-              </button>
-            );
-          }
-          const game = card.id;
-          return (
-            <a key={game} className={`ac-card is-${card.tint}`} href={`#/play/${game}`}>
-              <SquisheeImg id={mascotFor(game)} />
-              <h2>{card.title}</h2>
-              <p>{card.audience}</p>
-              <Stars value={child.bestStars[game]} />
-            </a>
-          );
-        })}
+        {GAMES.map((game) => (
+          <a key={game.id} className={`ac-card is-${game.tint}`} href={`#/play/${game.id}`}>
+            <SquisheeImg id={game.mascot} />
+            <h2>{game.title}</h2>
+            <p>{game.audience}</p>
+            <Stars value={child.bestStars[game.id] ?? 0} />
+          </a>
+        ))}
+        <button
+          type="button"
+          className={`ac-card is-${COMING_SOON.tint} is-soon`}
+          onClick={() => {
+            setToast("Sight words are coming soon.");
+            window.setTimeout(() => setToast(null), 1800);
+          }}
+        >
+          <span className="ac-soon">
+            <LockIcon /> Soon
+          </span>
+          <SquisheeImg id={COMING_SOON.mascot} />
+          <h2>{COMING_SOON.title}</h2>
+          <p>{COMING_SOON.audience}</p>
+        </button>
       </div>
 
       <div className="ac-meters">
@@ -116,7 +98,7 @@ export function HomeScreen({ child }: { child: Child }) {
       </div>
 
       <p className="ac-today-note">
-        Today: {gameTitle(today)} · {gradeLabel(child.grade)}
+        Today: {GAMES.find((game) => game.id === today)?.title ?? today} · {gradeLabel(child.grade)}
       </p>
       <Foot />
       {toast ? (
