@@ -14,7 +14,7 @@ import { WorksheetPage } from "./ui/worksheet";
 
 type Route =
   | { name: "home" }
-  | { name: "play"; game: GameId }
+  | { name: "play"; game: GameId; crown: boolean }
   | { name: "grownups" }
   | { name: "settings" }
   | { name: "shelf" }
@@ -23,8 +23,8 @@ type Route =
 
 function parseRoute(hash: string): Route {
   const path = hash.replace(/^#/, "").replace(/^\//, "");
-  const [head, tail] = path.split("/");
-  if (head === "play" && isGameId(tail)) return { name: "play", game: tail };
+  const [head, tail, extra] = path.split("/");
+  if (head === "play" && isGameId(tail)) return { name: "play", game: tail, crown: extra === "crown" };
   if (head === "grownups") return { name: "grownups" };
   if (head === "settings") return { name: "settings" };
   if (head === "shelf") return { name: "shelf" };
@@ -96,9 +96,10 @@ function AcademyApp() {
   } else if (route.name === "play") {
     body = (
       <PlayScreen
-        key={route.game}
+        key={`${route.game}-${route.crown ? "crown" : "round"}`}
         child={child}
         game={route.game}
+        crown={route.crown}
         sound={save.sound}
         onExit={goHome}
         onRound={onRound}

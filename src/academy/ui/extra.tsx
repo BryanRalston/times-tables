@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { COSMETICS, cosmeticPrice, type CosmeticId } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
+import { wearBossLook } from "../boss-battle";
+import { bossCosmeticName, bossForGame } from "../bosses";
 import { bookEntries, catchphrase } from "../buddy/cast";
 import { palOwned, withBuddy } from "../buddy/unlock";
 import { GAMES, sheetHref } from "../games/registry";
@@ -10,6 +12,7 @@ import { buyOutfit, wearOutfit } from "../rewards";
 import { activeChild, mapActive, withGrade, withLevel } from "../storage";
 import { silence, speak } from "../voice";
 import { AcademyPal, BackLink, Foot, FreeNote, Logo, SquisheeImg, cx } from "./bits";
+import { BossFigure, PalWithLook } from "./boss-figure";
 import { GradeChips } from "./grownups";
 
 const STARTERS = SQUAD_IDS.slice(0, 3);
@@ -204,7 +207,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
       <p className="ac-lede">
         {found} of {book.length} found · {child.coins} coins
       </p>
-      <AcademyPal id={child.avatarId} cosmetic={child.equipped} className="ac-shelf-you" label="You" />
+      <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="ac-shelf-you" label="You" />
       <h2>Outfit shop</h2>
       <p className="ac-hint">Spend coins you earn. Never real money.</p>
       <div className="ac-shelf">
@@ -235,6 +238,37 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
                 {have ? "" : ` · ${price}`}
               </small>
             </button>
+          );
+        })}
+      </div>
+      <h2>Boss cards</h2>
+      <div className="ac-book" data-book="bosses">
+        {GAMES.map((game) => {
+          const boss = bossForGame(game.id);
+          const friend = child.journey.bosses.includes(game.id);
+          const gold = child.goldCrowns.includes(game.id);
+          const wearing = child.equippedLook === boss.cosmeticId;
+          return (
+            <article key={game.id} className={cx("ac-book-card", !friend && "is-locked")} data-boss-card={game.id} data-friend={friend ? "yes" : "no"}>
+              {friend ? (
+                <BossFigure face={boss.face} look={boss.look} mood="friendly" crown={gold} name={boss.name} size="fight" />
+              ) : (
+                <p className="ac-hint">???</p>
+              )}
+              <h3>{friend ? boss.name : "Boss"}</h3>
+              <p>{friend ? boss.friendly : "Beat this boss to meet them."}</p>
+              {friend ? <p className="ac-trophy" data-trophy={boss.trophyId}>{boss.trophyName}</p> : null}
+              {gold ? <p className="ac-trophy is-gold">Gold Crown</p> : null}
+              {friend ? (
+                <button
+                  type="button"
+                  className="ac-quiet"
+                  onClick={() => onSave(mapActive(save, (row) => wearBossLook(row, wearing ? "" : boss.cosmeticId)))}
+                >
+                  {wearing ? `Take off ${bossCosmeticName(boss.cosmeticId)}` : `Wear ${bossCosmeticName(boss.cosmeticId)}`}
+                </button>
+              ) : null}
+            </article>
           );
         })}
       </div>

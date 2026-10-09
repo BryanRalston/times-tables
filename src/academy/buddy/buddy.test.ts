@@ -144,7 +144,7 @@ describe("buddy save migration", () => {
       ],
     });
     expect(save.version).toBe(SAVE_VERSION);
-    expect(SAVE_VERSION).toBe(6);
+    expect(SAVE_VERSION).toBe(7);
     expect(save.children[0]?.levels.count).toBeTruthy();
     expect(save.children[0]?.bestStars.count).toBe(0);
     const maya = save.children[0];

@@ -50,6 +50,14 @@ export interface Child {
   equipped: string;
   /** Squishees granted by a daily gift, in addition to star unlocks. */
   gifted: string[];
+  /** Trophy ids from befriended bosses. */
+  trophies: string[];
+  /** Boss looks the child can wear. Separate from shop outfits. */
+  bossLooks: string[];
+  /** Equipped boss look, or empty. */
+  equippedLook: string;
+  /** Island ids whose Gold Crown rematch was won. */
+  goldCrowns: string[];
   journey: Journey;
   dailyDate: string | null;
   dailyRounds: number;
@@ -102,6 +110,8 @@ export interface RoundResult {
   bestCombo?: number;
   /** True when this round was the area boss. */
   boss?: boolean;
+  /** Gold Crown rematch. Harder questions, still inside the grade band. */
+  crown?: boolean;
 }
 
 export interface Save {

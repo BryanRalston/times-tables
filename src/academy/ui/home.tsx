@@ -2,15 +2,17 @@ import { useState } from "react";
 import { squisheeById } from "@/lib/squishees";
 import { bookEntries, catchphrase } from "../buddy/cast";
 import { ownedIds } from "../buddy/unlock";
+import { bossForGame } from "../bosses";
 import { GAMES } from "../games/registry";
 import { bandFor } from "../grade-map";
-import { dailySnapshot, normalizeJourney } from "../journey";
+import { bossReady, dailySnapshot, normalizeJourney } from "../journey";
 import { gradeLabel, todayIso, type Child } from "../model";
 import { nextPlacement } from "../placement";
 import { gameOfDay, rollGift, type GiftRoll } from "../rewards";
 import { chime } from "../sound";
 import { WeekStickers } from "./stickers";
 import { AcademyPal, Foot, GiftBox, LockIcon, Logo, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
+import { PalWithLook } from "./boss-figure";
 
 export function HomeScreen({
   child,
@@ -31,6 +33,7 @@ export function HomeScreen({
   const journey = normalizeJourney(child.journey, child.grade);
   const place = nextPlacement(child);
   const book = bookEntries();
+  const bossHere = bossReady(journey, journey.areaId, child.grade);
 
   return (
     <div className="ac-shell">
@@ -43,7 +46,7 @@ export function HomeScreen({
 
       <section className="ac-hero">
         <div className="ac-pals">
-          <AcademyPal id={child.avatarId} cosmetic={child.equipped} className="is-mid" label={child.name} />
+          <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="is-mid" label={child.name} />
         </div>
         <p className="ac-bubble">{catchphrase(child.avatarId)}</p>
         <h1>Hi {child.name}! Ready to play?</h1>
@@ -66,8 +69,13 @@ export function HomeScreen({
           </button>
         </div>
         <WeekStickers secondsByDay={child.secondsByDay} today={todayId} />
-        <button type="button" className="ac-go ac-play-main" data-placement={place.reason} onClick={() => onPlay(place.game, place.level)}>
-          <span className="ac-play-tri" aria-hidden="true" /> Play
+        <button
+          type="button"
+          className="ac-go ac-play-main"
+          data-placement={place.reason}
+          onClick={() => onPlay(bossHere ? journey.areaId : place.game, bossHere ? (child.levels[journey.areaId] ?? place.level) : place.level)}
+        >
+          <span className="ac-play-tri" aria-hidden="true" /> {bossHere ? `Face ${bossForGame(journey.areaId).name}` : "Play"}
         </button>
         <a className="ac-map-link" href="#/map">
           Island map

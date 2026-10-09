@@ -1,7 +1,14 @@
 import type { Rng } from "@/lib/rng";
-import { BOSS_LENGTH, ROUND_LENGTH } from "../model";
+import { bossQuestionLevels } from "../boss-battle";
+import { BOSS_LENGTH, ROUND_LENGTH, type Grade } from "../model";
 import { gameById } from "./registry";
 import type { ChoiceQ, LevelDef, SheetItem } from "./types";
+
+export interface BossRoundOpts {
+  grade?: Grade;
+  crown?: boolean;
+  challengeAhead?: boolean;
+}
 
 /** The next level up, or the top level when the child is already there. */
 export function harderLevel(levels: readonly LevelDef[], level: string): string {
@@ -14,9 +21,20 @@ export function harderLevel(levels: readonly LevelDef[], level: string): string 
  * Five questions. Most use the next level. The rest stay on the current level
  * so the boss is mixed, and a step harder than a normal round.
  */
-export function makeBossRound(gameId: string, level: string, rng: Rng, prefer: string[] = [], ceiling?: string): ChoiceQ[] {
+export function makeBossRound(
+  gameId: string,
+  level: string,
+  rng: Rng,
+  prefer: string[] = [],
+  ceiling?: string,
+  opts?: BossRoundOpts,
+): ChoiceQ[] {
   const game = gameById(gameId);
   if (!game) return [];
+  if (opts?.grade) {
+    const plan = bossQuestionLevels(gameId, level, opts.grade, opts.crown === true, BOSS_LENGTH, opts.challengeAhead === true);
+    return plan.map((use) => game.makeQuestion(rng, use, prefer));
+  }
   let safe = game.isLevel(level) ? level : game.defaultLevel("K");
   let hard = harderLevel(game.levels, safe);
   if (ceiling && game.isLevel(ceiling)) {

@@ -15,6 +15,8 @@ import {
 import { hostIdFor } from "../buddy/hosts";
 import { buddyReaction } from "../buddy/react";
 import { slotStory } from "../buddy/story";
+import { bossEnergyAfterHit, bossIsTimed, bossMaxEnergy, phaseForIndex } from "../boss-battle";
+import { bossForGame } from "../bosses";
 import { playWindow } from "../grade-map";
 import { gameById, pillLabel } from "../games/registry";
 import { makeClockTask, makePayTask } from "../hands";
@@ -27,6 +29,7 @@ import {
   speedRoundGrade,
   type AnswerMark,
   type Child,
+  type Grade,
   type RoundResult,
   type SkillStat,
 } from "../model";
@@ -41,10 +44,12 @@ import {
   speechFor,
   type RoundSlot,
 } from "../round-flow";
-import { blip, chime, teachTone } from "../sound";
+import { blip, bossFanfare, bossRaspberry, bossStrike, chime, startBossMusic, stopBossMusic, teachTone } from "../sound";
 import { hintCue } from "../teach";
 import { silence, speak } from "../voice";
-import { CoinShare, HostGreet, RoundBuddy } from "./buddy-view";
+import { CoinShare, RoundBuddy } from "./buddy-view";
+import { BossFigure, type BossMood } from "./boss-figure";
+import { BossHud, BossIntro } from "./boss-stage";
 import { Flame, SpeakerIcon, SquisheeImg, Stars, cx, fmtSeconds } from "./bits";
 import { RoundCastProvider } from "./round-cast";
 import { CoinRow } from "./coins";
@@ -62,7 +67,25 @@ function Confetti() {
 }
 
 type Dot = "ok" | "helped" | "miss";
-type Phase = "ask" | "teach" | "practice" | "feedback" | "done";
+type Phase = "intro" | "ask" | "teach" | "practice" | "feedback" | "done";
+
+function bossOpening(
+  game: string,
+  level: string,
+  prefer: string[],
+  grade: Grade,
+  crown: boolean,
+  challengeAhead: boolean,
+): Served[] {
+  const questions = makeBossRound(game, level, rngRandom(), prefer, undefined, { grade, crown, challengeAhead });
+  return questions.map((question, i) => {
+    const twist = phaseForIndex(i, questions.length);
+    const skillLevel = question.skill.split(":")[1] ?? level;
+    if (twist === "cards" && game === "time") return { slot: makeClockTask(skillLevel, rngRandom()), returning: false };
+    if (twist === "cards" && game === "money") return { slot: makePayTask(skillLevel, rngRandom()), returning: false };
+    return { slot: { kind: "choice", question }, returning: false };
+  });
+}
 
 interface Served {
   slot: RoundSlot;
@@ -106,6 +129,7 @@ function praiseLine(slot: RoundSlot): string {
 export function PlayScreen({
   child,
   game,
+  crown = false,
   sound,
   onExit,
   onRound,
@@ -115,6 +139,7 @@ export function PlayScreen({
 }: {
   child: Child;
   game: string;
+  crown?: boolean;
   sound: boolean;
   onExit: () => void;
   onRound: (result: RoundResult) => void;
@@ -137,9 +162,14 @@ export function PlayScreen({
   const bounds = { min: Math.max(0, gradeWindow.min), max: Math.max(0, gradeWindow.max) };
   const calm = autoSpeakGrade(child.grade);
   const canSpeed = speedRoundGrade(child.grade);
+  const crownFight = crown && child.journey.bosses.includes(game);
+  const openingBoss = crownFight || bossReady(child.journey, game, child.grade);
+  const bossDef = bossForGame(game);
   const [roundId, setRoundId] = useState(0);
   const [index, setIndex] = useState(0);
-  const [phase, setPhase] = useState<Phase>("ask");
+  const [phase, setPhase] = useState<Phase>(openingBoss ? "intro" : "ask");
+  const [energy, setEnergy] = useState(() => bossMaxEnergy(BOSS_LENGTH, crownFight));
+  const [mood, setMood] = useState<BossMood>("arrive");
   const [dots, setDots] = useState<(Dot | null)[]>(() => blankDots(ROUND_LENGTH));
   const [combo, setCombo] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
@@ -172,7 +202,7 @@ export function PlayScreen({
   const indexRef = useRef(0);
   const bossSnap = useRef<{ roundId: number; boss: boolean }>({ roundId: -1, boss: false });
   if (bossSnap.current.roundId !== roundId) {
-    bossSnap.current = { roundId, boss: bossReady(child.journey, game, child.grade) };
+    bossSnap.current = { roundId, boss: crownFight || bossReady(child.journey, game, child.grade) };
   }
   const boss = bossSnap.current.boss;
   const skillsRef = useRef<Record<string, SkillStat>>(cloneSkills(child.skills));
@@ -226,15 +256,11 @@ export function PlayScreen({
     return { slot: { kind: "choice", question: nextQuestion() }, returning: false };
   }
 
-  const ceiling = spec?.levels[gradeWindow.max]?.id;
   const [questions, setQuestions] = useState<Served[]>(() => {
     if (blocked) return [];
     handsRef.current = new Set(boss || (game !== "time" && game !== "money") ? [] : handsOnSlots(ROUND_LENGTH));
     if (boss) {
-      return makeBossRound(game, level, rngRandom(), preferIds(), ceiling).map((question) => ({
-        slot: { kind: "choice" as const, question },
-        returning: false,
-      }));
+      return bossOpening(game, level, preferIds(), child.grade, crownFight, child.challengeAhead);
     }
     return [buildSlot(0)];
   });
@@ -259,7 +285,7 @@ export function PlayScreen({
     if (waitRef.current) window.clearTimeout(waitRef.current);
     const nextSpec = gameById(game);
     const nextBase = Math.max(boundsRef.current.min, nextSpec?.levels.findIndex((row) => row.id === nextLevel) ?? boundsRef.current.min);
-    const nextBoss = bossReady(child.journey, game, child.grade);
+    const nextBoss = crownFight || bossReady(child.journey, game, child.grade);
     skillsRef.current = cloneSkills(child.skills);
     ladderRef.current = startLadder(openingIndex(nextBase, child.rounds, nextBoss, boundsRef.current));
     handsRef.current = new Set(nextBoss || (game !== "time" && game !== "money") ? [] : handsOnSlots(ROUND_LENGTH));
@@ -270,21 +296,21 @@ export function PlayScreen({
     dotsRef.current = blankDots(nextBoss ? BOSS_LENGTH : ROUND_LENGTH);
     startStarsRef.current = child.stars;
     finishedRef.current = false;
-    phaseRef.current = "ask";
+    const openingPhase: Phase = nextBoss ? "intro" : "ask";
+    phaseRef.current = openingPhase;
     indexRef.current = 0;
     startedRef.current = Date.now();
     const prefer = nextSpec?.reviewKeys?.(child.words) ?? (game === "times" ? weakTimesFacts(skillsRef.current) : []);
     const opening = nextBoss
-      ? makeBossRound(game, nextLevel, rngRandom(), prefer, ceiling).map((question) => ({
-          slot: { kind: "choice" as const, question },
-          returning: false,
-        }))
+      ? bossOpening(game, nextLevel, prefer, child.grade, crownFight, child.challengeAhead)
       : [buildSlot(0)];
     questionsRef.current = opening;
     setQuestions(opening);
     setRoundId((n) => n + 1);
     setIndex(0);
-    setPhase("ask");
+    setPhase(openingPhase);
+    setEnergy(bossMaxEnergy(BOSS_LENGTH, crownFight));
+    setMood("arrive");
     setDots(dotsRef.current);
     setCombo(0);
     setBestCombo(0);
@@ -319,7 +345,15 @@ export function PlayScreen({
       answers: answersRef.current,
       bestCombo: bestRef.current,
       boss,
+      crown: boss && crownFight,
     });
+  }
+
+  function beginBattle() {
+    startedRef.current = Date.now();
+    phaseRef.current = "ask";
+    setPhase("ask");
+    setMood("idle");
   }
 
   const finishRef = useRef(finish);
@@ -340,6 +374,7 @@ export function PlayScreen({
     indexRef.current = fromIndex + 1;
     setIndex(fromIndex + 1);
     setPhase("ask");
+    if (boss) setMood("idle");
     setHintOn(false);
     setPractice(null);
     setTeachSlot(null);
@@ -368,7 +403,15 @@ export function PlayScreen({
     const nextCombo = served.returning ? 0 : fromCombo + 1;
     if (!served.returning) bestRef.current = Math.max(bestRef.current, nextCombo);
     setCombo(nextCombo);
-    blip(true, soundRef.current, nextCombo);
+    if (boss) {
+      const hitPhase = phaseForIndex(fromIndex, roundTotal());
+      const dealt = served.returning ? 1 : nextCombo;
+      setEnergy((current) => bossEnergyAfterHit(current, bossMaxEnergy(BOSS_LENGTH, crownFight), dealt, hitPhase, true));
+      setMood(dealt >= 3 ? "dizzy" : "hit");
+      bossStrike(soundRef.current, dealt);
+    } else {
+      blip(true, soundRef.current, nextCombo);
+    }
     phaseRef.current = "feedback";
     setPhase("feedback");
     waitRef.current = window.setTimeout(() => advance(fromIndex), 620);
@@ -395,7 +438,12 @@ export function PlayScreen({
       easeLadder();
     }
     setCombo(0);
-    blip(false, soundRef.current, 0);
+    if (boss) {
+      setMood("raspberry");
+      bossRaspberry(soundRef.current);
+    } else {
+      blip(false, soundRef.current, 0);
+    }
     beginTeach(served.slot, "scored");
   }
 
@@ -430,7 +478,12 @@ export function PlayScreen({
         const slot = practiceRef.current;
         if (!slot) return;
         practiceTaughtRef.current = true;
-        blip(false, soundRef.current, 0);
+        if (boss) {
+          setMood("raspberry");
+          bossRaspberry(soundRef.current);
+        } else {
+          blip(false, soundRef.current, 0);
+        }
         beginTeach(slot, "practice");
         return;
       }
@@ -494,15 +547,18 @@ export function PlayScreen({
     if (!showSpeed) return;
     const id = window.setInterval(() => {
       const now = phaseRef.current;
-      if (now === "done" || now === "teach" || now === "practice") return;
+      if (now === "done" || now === "teach" || now === "practice" || now === "intro") return;
       setLeft((s) => (s <= 1 ? 0 : s - 1));
     }, 1000);
     return () => window.clearInterval(id);
   }, [roundId, showSpeed]);
 
   useEffect(() => {
-    if (showSpeed && left === 0 && phase !== "done" && phase !== "teach" && phase !== "practice") finishRef.current();
-  }, [left, phase, showSpeed]);
+    if (showSpeed && left === 0 && phase !== "done" && phase !== "teach" && phase !== "practice" && phase !== "intro") {
+      if (boss && !bossIsTimed(child.grade)) return;
+      finishRef.current();
+    }
+  }, [left, phase, showSpeed, boss, child.grade]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -550,8 +606,24 @@ export function PlayScreen({
       dotsRef.current.filter((dot) => dot === "ok" || dot === "helped").length,
       total,
     );
-    chime(stars === 3 ? "cheer" : "coin", soundRef.current);
-  }, [phase, total, roundId]);
+    const won = boss && bossWon(dotsRef.current.filter((dot) => dot === "ok" || dot === "helped").length, total);
+    if (won) bossFanfare(soundRef.current);
+    else chime(stars === 3 ? "cheer" : "coin", soundRef.current);
+  }, [phase, total, roundId, boss]);
+
+  const bossMusic = boss && phase !== "done";
+  useEffect(() => {
+    if (!bossMusic) {
+      stopBossMusic();
+      return;
+    }
+    return startBossMusic(sound);
+  }, [bossMusic, sound, roundId]);
+
+  useEffect(() => {
+    if (phase !== "intro") return;
+    speak(bossDef.taunt, sound);
+  }, [phase, sound, bossDef.taunt]);
 
   useEffect(() => {
     if (phase === "ask" || phase === "practice") retryFocusRef.current?.focus();
@@ -567,7 +639,7 @@ export function PlayScreen({
   const reaction = phase === "feedback" ? (combo >= 3 ? "★" : "✓") : phase === "teach" ? "…" : null;
   const hostId = hostIdFor(game);
   const host = squisheeById(hostId);
-  const buddyCue = buddyReaction({ phase, ok, stars: liveStars, hintOn });
+  const buddyCue = buddyReaction({ phase: phase === "intro" ? "ask" : phase, ok, stars: liveStars, hintOn });
   const choice = slot?.kind === "choice" ? slot.question : null;
   const filled = dots.filter((dot) => dot != null).length;
 
@@ -590,8 +662,12 @@ export function PlayScreen({
     );
   }
 
+  const fightPhase = boss ? phaseForIndex(index, total) : "rally";
+  const bossWonRound = boss && bossWon(correct, total);
+  const maxEnergy = bossMaxEnergy(BOSS_LENGTH, crownFight);
+
   return (
-    <div className={cx("ac-shell", spec?.layout === "wide" && "ac-wide")} data-phase={phase}>
+    <div className={cx("ac-shell", spec?.layout === "wide" && "ac-wide", boss && "is-boss", crownFight && "is-crown")} data-phase={phase}>
       <header className="ac-play-top">
         <button type="button" className="ac-x" onClick={close} aria-label="Close">
           ×
@@ -605,7 +681,9 @@ export function PlayScreen({
         >
           <SpeakerIcon muted={!sound} />
         </button>
-        {canSpeed ? (
+        {boss && !bossIsTimed(child.grade) ? (
+          <span className="ac-take-time">Take your time</span>
+        ) : canSpeed ? (
           <button
             type="button"
             className={cx("ac-speed", speed && "is-on")}
@@ -640,12 +718,18 @@ export function PlayScreen({
       </header>
 
       {phase === "done" ? (
-        <section className="ac-done" data-confetti={liveStars === 3 ? "on" : "off"} data-boss={boss ? "yes" : "no"}>
-          {liveStars === 3 ? <Confetti /> : null}
-          <SquisheeImg id={friend && !met ? friend.id : mascot} className="ac-done-pal" label={friend?.name ?? ""} />
+        <section className="ac-done" data-confetti={liveStars === 3 || bossWonRound ? "on" : "off"} data-boss={boss ? "yes" : "no"}>
+          {liveStars === 3 || bossWonRound ? <Confetti /> : null}
+          {bossWonRound ? (
+            <BossFigure face={bossDef.face} look={bossDef.look} mood="friendly" crown={crownFight} name={bossDef.name} size="hero" />
+          ) : (
+            <SquisheeImg id={friend && !met ? friend.id : mascot} className="ac-done-pal" label={friend?.name ?? ""} />
+          )}
           <h1>
-            {boss && bossWon(correct, total)
-              ? "Boss beaten!"
+            {bossWonRound
+              ? crownFight
+                ? "Gold Crown!"
+                : "Boss beaten!"
               : boss
                 ? "Nice try!"
                 : correct >= total
@@ -661,11 +745,18 @@ export function PlayScreen({
             {correct} of {total} · {liveStars} {liveStars === 1 ? "star" : "stars"} · +
             {coinsForRound(correct, total, bestCombo, boss)} coins
           </p>
-          {boss && bossWon(correct, total) && host ? (
-            <div className="ac-unlock" data-befriend={host.id}>
-              <SquisheeImg id={host.id} className="ac-done-pal" label={host.name} />
-              <p>{host.name} is your friend!</p>
-              <h2>{host.name}</h2>
+          {bossWonRound ? (
+            <div className="ac-boss-win" data-boss-win={game}>
+              <p>{bossDef.friendly}</p>
+              <p className="ac-trophy" data-trophy={bossDef.trophyId}>
+                {bossDef.trophyName}
+              </p>
+              <p data-cosmetic={bossDef.cosmeticId}>{bossDef.cosmeticName} unlocked.</p>
+              <p>{bossDef.name} joined your Squishee Book.</p>
+              {host ? <p data-befriend={host.id}>{host.name} is your friend too.</p> : null}
+              <a className="ac-quiet ac-quiet-link" href="#/shelf">
+                Boss card
+              </a>
             </div>
           ) : boss ? (
             <p className="ac-hint">The boss is still there. You can try again.</p>
@@ -689,8 +780,13 @@ export function PlayScreen({
           ) : null}
           <div className="ac-done-actions">
             <button type="button" className="ac-go" onClick={() => restart()}>
-              Play again
+              {boss && !bossWonRound ? "Try the boss" : "Play again"}
             </button>
+            {bossWonRound ? (
+              <a className="ac-quiet ac-quiet-link" href={`#/play/${game}/crown`}>
+                Gold Crown rematch
+              </a>
+            ) : null}
             <a className="ac-quiet ac-quiet-link" href="#/map">
               Island map
             </a>
@@ -699,15 +795,28 @@ export function PlayScreen({
             </button>
           </div>
         </section>
+      ) : phase === "intro" && boss ? (
+        <BossIntro boss={bossDef} crown={crownFight} onStart={beginBattle} />
       ) : slot ? (
         <>
+          {boss ? (
+            <BossHud
+              boss={bossDef}
+              energy={energy}
+              maxEnergy={maxEnergy}
+              mood={mood}
+              buddyId={child.avatarId}
+              phase={fightPhase}
+              crown={crownFight}
+            />
+          ) : null}
           <div className="ac-play-meta">
             {filled === 0 && !boss ? (
               <button type="button" className="ac-pill" onClick={() => setMenu(true)}>
                 {servedPill(game, served?.slot, level)}
               </button>
             ) : (
-              <span className="ac-pill">{boss ? "Boss round" : servedPill(game, served?.slot, level)}</span>
+              <span className="ac-pill">{boss ? bossDef.name : servedPill(game, served?.slot, level)}</span>
             )}
             <span className="ac-nudge-slot" aria-live="polite">
               {nudge === "up" ? <span className="ac-nudge">Harder</span> : null}
@@ -741,10 +850,11 @@ export function PlayScreen({
             ) : null}
             <Stars value={liveStars} />
           </div>
-          <div className="ac-buddy-row">
-            <RoundBuddy id={child.avatarId} cosmetic={child.equipped} reaction={buddyCue} />
-          </div>
-          {boss ? <HostGreet id={hostId} /> : null}
+          {boss ? null : (
+            <div className="ac-buddy-row">
+              <RoundBuddy id={child.avatarId} cosmetic={child.equipped} reaction={buddyCue} />
+            </div>
+          )}
           <RoundCastProvider buddyId={child.avatarId} hostId={hostId} equipped={child.equipped}>
           <div
             className={cx(
@@ -754,6 +864,8 @@ export function PlayScreen({
               phase === "feedback" && combo >= 3 && "is-streak",
               phase === "teach" && "is-teach",
               hintOn && asking && "is-hint",
+              boss && fightPhase === "cards" && "is-cards",
+              boss && fightPhase === "super" && "is-super",
             )}
           >
             {reaction ? (

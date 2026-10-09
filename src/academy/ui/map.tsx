@@ -4,11 +4,13 @@ import { catchphrase } from "../buddy/cast";
 import { hatchPick } from "../buddy/egg";
 import { hostIdFor } from "../buddy/hosts";
 import { ownedIds } from "../buddy/unlock";
+import { bossForGame } from "../bosses";
 import { GAMES, gameById } from "../games/registry";
 import { bandFor } from "../grade-map";
 import { areaIndex, areaOpen, bossReady, normalizeJourney } from "../journey";
 import { DAILY_GOAL, STOPS_PER_AREA, todayIso, type Child } from "../model";
 import { AcademyPal, BackLink, Foot, LockIcon, Logo, cx } from "./bits";
+import { PalWithLook } from "./boss-figure";
 import { EggIcon } from "./buddy-view";
 
 const STOP_NAME = ["Start", "Hop", "Skip", "Boss"];
@@ -26,7 +28,7 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
     <div className="ac-shell ac-map-shell">
       <header className="ac-top">
         <Logo />
-        <AcademyPal id={child.avatarId} cosmetic={child.equipped} className="ac-meter-pal" label={child.name} />
+        <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="ac-meter-pal" label={child.name} />
       </header>
       <h1>Island map</h1>
       <p className="ac-lede">Finish a round to hop. Beat the boss to befriend the host.</p>
@@ -58,6 +60,8 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
           const beaten = journey.bosses.includes(game.id);
           const host = hostIdFor(game.id);
           const hostName = squisheeById(host)?.name ?? "Host";
+          const boss = bossForGame(game.id);
+          const atBoss = current && bossReady(journey, game.id, child.grade);
           return (
             <li key={game.id} className={cx("ac-island", `is-${game.tint}`, !open && "is-locked", current && "is-here")} data-host={host}>
               <div className="ac-island-head">
@@ -99,9 +103,16 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
               {later ? (
                 <p className="ac-hint">Coming later for this grade.</p>
               ) : open ? (
-                <a className="ac-quiet" href={`#/play/${game.id}`}>
-                  {current && bossReady(journey, game.id, child.grade) ? "Boss round" : current ? "Play" : offer === "intro" ? "Gentle intro" : "Practice"}
-                </a>
+                <div className="ac-island-actions">
+                  <a className="ac-quiet" href={`#/play/${game.id}`}>
+                    {atBoss ? `Face ${boss.name}` : current ? "Play" : offer === "intro" ? "Gentle intro" : "Practice"}
+                  </a>
+                  {beaten ? (
+                    <a className="ac-quiet" href={`#/play/${game.id}/crown`}>
+                      Gold Crown
+                    </a>
+                  ) : null}
+                </div>
               ) : (
                 <p className="ac-hint">
                   <LockIcon /> Beat the {gameById(GAMES[index - 1]?.id)?.title ?? "last"} boss.

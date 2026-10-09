@@ -63,7 +63,8 @@ export async function importBackup(code: string): Promise<Save | null> {
     const raw = JSON.parse(json) as unknown;
     if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
     const record = raw as { version?: unknown; children?: unknown };
-    if (record.version !== SAVE_VERSION || !Array.isArray(record.children) || record.children.length === 0) return null;
+    if (typeof record.version !== "number" || record.version < 1 || record.version > SAVE_VERSION) return null;
+    if (!Array.isArray(record.children) || record.children.length === 0) return null;
     const firstId = childId(record.children[0]);
     if (!firstId) return null;
     const save = parseSave(raw);

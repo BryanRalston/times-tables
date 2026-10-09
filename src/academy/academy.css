@@ -1067,7 +1067,18 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   .ac-buddy.is-cheer .ac-buddy-img,
   .ac-buddy.is-dance .ac-buddy-img,
   .ac-buddy.is-oops .ac-buddy-img,
-  .ac-egg.is-ready { animation: none; }
+  .ac-egg.is-ready,
+  .ac-boss.is-arrive,
+  .ac-boss.is-idle,
+  .ac-boss.is-hit,
+  .ac-boss.is-dizzy,
+  .ac-boss.is-raspberry,
+  .ac-boss.is-friendly,
+  .ac-buddy.is-attack,
+  .ac-spark,
+  .ac-razz,
+  .ac-hearts { animation: none; }
+  .ac-shell.is-boss .ac-stage.is-cards .ac-choice { transform: none; }
   .ac-hour, .ac-minute, .ac-progress > span { transition: none; }
   .ac-confetti i { top: 16px; opacity: 1; }
 }
@@ -1437,3 +1448,135 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
 }
 .ac-gone { opacity: 0.35; }
 .ac-teach-pic { margin: 8px 0; font-size: 40px; text-align: center; }
+
+body:has(.ac-boss-intro) { background: #3c2448; }
+.ac-boss-intro {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  min-height: 70vh;
+  padding: 24px 16px 32px;
+  color: #fffaf6;
+  text-align: center;
+}
+.ac-boss-kicker {
+  margin: 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+.ac-boss-banner {
+  margin: 0;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: #ff4b93;
+  color: #fff;
+  font-size: 28px;
+}
+.ac-boss-taunt { margin: 0; max-width: 28rem; font-size: 20px; }
+.ac-boss-intro .ac-go { max-width: 240px; }
+.ac-boss-hud { display: grid; gap: 8px; margin: 8px 0 4px; }
+.ac-boss-meter {
+  height: 18px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: inset 0 0 0 3px #3c2448;
+  overflow: hidden;
+}
+.ac-boss-meter > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #f0b429, #ff4b93);
+}
+.ac-boss-row { display: flex; align-items: flex-end; justify-content: space-between; min-height: 140px; }
+.ac-buddy.is-attack { animation: ac-lunge 0.45s ease; }
+.ac-phase-banner {
+  margin: 0;
+  text-align: center;
+  color: #3c2448;
+  background: #fff6ea;
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+.ac-phase-banner.is-super { background: #ffe08a; }
+.ac-boss { position: relative; display: grid; place-items: center; }
+.ac-boss.is-fight { width: 112px; height: 132px; }
+.ac-boss.is-hero { width: 180px; height: 210px; }
+.ac-boss-face { width: 72%; height: auto; position: relative; z-index: 1; }
+.ac-boss-cape, .ac-boss-gear { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ac-boss.is-arrive { animation: ac-boss-in 0.7s ease; }
+.ac-boss.is-idle { animation: ac-float 2.4s ease-in-out infinite; }
+.ac-boss.is-hit { animation: ac-wobble 0.45s ease; }
+.ac-boss.is-dizzy { animation: ac-wobble 0.7s ease; }
+.ac-boss.is-raspberry { animation: ac-razz 0.5s ease; }
+.ac-boss.is-friendly { animation: ac-float 2.2s ease-in-out infinite; }
+.ac-razz {
+  position: absolute;
+  right: 0;
+  bottom: 8px;
+  z-index: 2;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fff;
+  color: #3c2448;
+  font-size: 14px;
+}
+.ac-hearts { position: absolute; top: 0; right: 8px; color: #ff4b93; font-size: 22px; }
+.ac-sparkles { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.ac-sparkles i {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffe08a;
+  animation: ac-pop 0.6s ease infinite;
+}
+.ac-sparkles i:nth-child(1) { top: 12%; left: 10%; }
+.ac-sparkles i:nth-child(2) { top: 20%; right: 8%; animation-delay: 0.1s; background: #ffb4d6; }
+.ac-sparkles i:nth-child(3) { bottom: 18%; left: 16%; animation-delay: 0.2s; background: #fff; }
+.ac-sparkles i:nth-child(4) { bottom: 28%; right: 14%; animation-delay: 0.15s; }
+.ac-shell.is-boss .ac-stage .ac-mascot { display: none; }
+.ac-shell.is-boss .ac-stage.is-cards .ac-choice:nth-child(odd) { transform: rotate(-2deg); }
+.ac-shell.is-boss .ac-stage.is-cards .ac-choice:nth-child(even) { transform: rotate(2deg); }
+.ac-shell.is-boss .ac-stage.is-super { box-shadow: 0 0 0 4px #f0b429; border-radius: 24px; }
+.ac-take-time { flex: 1; text-align: center; font-size: 14px; }
+.ac-island-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ac-book { display: grid; gap: 12px; }
+.ac-book-card {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 20px;
+  background: #fff;
+  text-align: center;
+}
+.ac-book-card.is-locked { opacity: 0.55; }
+.ac-book-card h3 { margin: 0; }
+.ac-book-card p { margin: 0; }
+.ac-trophy { color: #a56b00; font-weight: 800; }
+.ac-trophy.is-gold { color: #a56b00; }
+.ac-boss-win { display: grid; justify-items: center; gap: 6px; }
+.ac-pal-look { position: relative; display: inline-grid; }
+.ac-look-badge { position: absolute; top: -6px; right: -8px; width: 42px; height: 24px; }
+@keyframes ac-boss-in {
+  from { transform: translateY(-40px) scale(0.8); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes ac-float {
+  50% { transform: translateY(-6px); }
+}
+@keyframes ac-wobble {
+  25% { transform: rotate(-8deg); }
+  75% { transform: rotate(8deg); }
+}
+@keyframes ac-razz {
+  40% { transform: scale(1.06) rotate(4deg); }
+}
+@keyframes ac-lunge {
+  40% { transform: translateX(18px) scale(1.05); }
+}
+@keyframes ac-pop {
+  50% { transform: translateY(-10px); opacity: 1; }
+  100% { opacity: 0; }
+}

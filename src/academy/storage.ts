@@ -1,5 +1,6 @@
 import { parseCosmeticIds, parseEquippedCosmetic } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
+import { bossForGame } from "./bosses";
 import { hostIdFor } from "./buddy/hosts";
 import { ownedIds, palOwned } from "./buddy/unlock";
 import { defaultLevels, gameById, GAMES, isGameId } from "./games/registry";
@@ -21,7 +22,7 @@ import {
 
 /** Stable key. The schema version lives on the save, not in the key name. */
 export const STORAGE_KEY = "squishee-academy-v1";
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 
 /**
  * Migrations run from the save's version up to SAVE_VERSION.
@@ -33,6 +34,7 @@ const MIGRATIONS: Record<number, (raw: Record<string, unknown>) => Record<string
   3: migrateV3toV4,
   4: migrateV4toV5,
   5: migrateV5toV6,
+  6: migrateV6toV7,
 };
 
 /** A newer app wrote this disk. Don't replace it with an older schema. */
@@ -73,6 +75,10 @@ export function blankChild(opts: { id?: string; name?: string; grade?: Grade; av
     egg: "none",
     words: {},
     challengeAhead: false,
+    trophies: [],
+    bossLooks: [],
+    equippedLook: "",
+    goldCrowns: [],
   };
 }
 
@@ -169,6 +175,25 @@ function migrateV5toV6(raw: Record<string, unknown>): Record<string, unknown> {
       })
     : raw.children;
   return { ...raw, version: 6, children };
+}
+
+/** Version 6 had buddies and word cards. Boss trophies, looks, and crowns start here. */
+function migrateV6toV7(raw: Record<string, unknown>): Record<string, unknown> {
+  const children = Array.isArray(raw.children)
+    ? raw.children.map((row) => {
+        if (!row || typeof row !== "object" || Array.isArray(row)) return row;
+        const child = row as Record<string, unknown>;
+        const journey = asRecord(child.journey);
+        const bosses = Array.isArray(journey.bosses) ? journey.bosses.filter((id): id is string => typeof id === "string") : [];
+        const trophies = Array.isArray(child.trophies) ? child.trophies : bosses.map((id) => bossForGame(id).trophyId);
+        const bossLooks = Array.isArray(child.bossLooks) ? child.bossLooks : bosses.map((id) => bossForGame(id).cosmeticId);
+        const firstLook = bossLooks.find((id): id is string => typeof id === "string") ?? "";
+        const equippedLook = typeof child.equippedLook === "string" ? child.equippedLook : firstLook;
+        const goldCrowns = Array.isArray(child.goldCrowns) ? child.goldCrowns : [];
+        return { ...child, trophies, bossLooks, equippedLook, goldCrowns };
+      })
+    : raw.children;
+  return { ...raw, version: 7, children };
 }
 
 function migrateRaw(raw: unknown): unknown {
@@ -270,6 +295,28 @@ function parseSquisheeIds(raw: unknown): string[] {
   return out;
 }
 
+function parseIdList(raw: unknown, max = 40): string[] {
+  if (!Array.isArray(raw)) return [];
+  const out: string[] = [];
+  const ok = /^[a-z][a-z0-9-]{0,39}$/;
+  for (const id of raw) {
+    if (typeof id !== "string" || !ok.test(id) || out.includes(id)) continue;
+    out.push(id);
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+function parseGameList(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const out: string[] = [];
+  for (const id of raw) {
+    if (!isGameId(id) || out.includes(id)) continue;
+    out.push(id);
+  }
+  return out;
+}
+
 function parseBest(raw: unknown): Record<string, number> {
   const o = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
   const out: Record<string, number> = {};
@@ -303,6 +350,10 @@ export function parseChild(raw: unknown): Child | null {
   };
   const avatarRaw = typeof o.avatarId === "string" && squisheeById(o.avatarId) ? o.avatarId : SQUAD_IDS[0];
   const avatarId = palOwned(draft, avatarRaw) ? avatarRaw : (ownedIds(draft)[0] ?? SQUAD_IDS[0]);
+  const trophies = Array.isArray(o.trophies) ? parseIdList(o.trophies) : journey.bosses.map((id) => bossForGame(id).trophyId);
+  const bossLooks = Array.isArray(o.bossLooks) ? parseIdList(o.bossLooks) : journey.bosses.map((id) => bossForGame(id).cosmeticId);
+  const equippedLook =
+    typeof o.equippedLook === "string" ? (bossLooks.includes(o.equippedLook) ? o.equippedLook : "") : (bossLooks[0] ?? "");
   return {
     id: o.id,
     name: typeof o.name === "string" ? cleanName(o.name) : "",
@@ -330,6 +381,10 @@ export function parseChild(raw: unknown): Child | null {
     egg: parseGiftState(o.egg),
     words: parseWords(o.words),
     challengeAhead,
+    trophies,
+    bossLooks,
+    equippedLook,
+    goldCrowns: parseGameList(o.goldCrowns),
   };
 }
 

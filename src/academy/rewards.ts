@@ -1,6 +1,7 @@
 import { applyBuyCosmetic, COSMETICS, isCosmeticId } from "@/lib/cosmetics";
 import { hashSeed } from "@/lib/rng";
 import { noteMark, skillHeat } from "./adapt";
+import { grantBossPrize } from "./boss-battle";
 import { GAMES, barKeys, chipKeys, chipLabel as chipText, skillLabel as skillText, type GameId } from "./games/registry";
 import { syncEgg } from "./buddy/egg";
 import { friendFromBoss } from "./buddy/hosts";
@@ -150,7 +151,7 @@ export function applyRound(child: Child, result: RoundResult, today: string): Ch
   const boss = result.boss === true;
   const daily = withDailyRound(child, today);
   const befriended = boss && bossWon(result.correct, result.total);
-  return {
+  const next: Child = {
     ...child,
     stars: child.stars + stars,
     streak: streak.count,
@@ -178,6 +179,7 @@ export function applyRound(child: Child, result: RoundResult, today: string): Ch
     ...daily,
     egg: syncEgg(child, daily),
   };
+  return grantBossPrize(next, result.game, befriended, result.crown === true);
 }
 
 export function secondsThisWeek(map: Record<string, number>, today: string): number {

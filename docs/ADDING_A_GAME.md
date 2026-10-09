@@ -34,6 +34,8 @@ Progress stays in `localStorage` under `squishee-academy-v1`. The schema version
 
 A new game does not need a migration. On load, any registered game missing from `levels` or `bestStars` is filled (the grade’s default level, and 0 stars).
 
+Boss fights are generic. `bossForGame` in `src/academy/bosses.ts` builds a boss from the module when you do not add a named one. Add a row there if you want a name, a taunt, and a look. Questions stay inside the grade window from `docs/GRADE_MAP.md` (`playWindow`): a normal boss may step one level up inside that window, and a Gold Crown rematch uses the top of it. A game marked “later” still falls back to its core levels so the fight never climbs past the band.
+
 Bump `SAVE_VERSION` only when the shape or meaning of a field changes. Add one function to `MIGRATIONS` keyed by the old version. It must return the next version. `parseSave` runs the chain. A save newer than this build is played in memory if it still parses, and it is not written back over.
 
 Keep the key different from Squishee Math (`g3-path-v2`). Nothing in the save is sent off the device.
