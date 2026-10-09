@@ -66,13 +66,17 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       const dens = board.mode === "compare" || board.mode === "equivalent" ? [board.den, board.den2] : [board.den];
       for (const den of dens) expect(FRACTION_DENOMINATORS).toContain(den);
       if (board.mode === "equivalent") expect(board.num * board.den2).toBe(board.num2 * board.den);
+      const choiceDens = question.choices.flatMap((choice) => [...choice.matchAll(/\/(\d+)/g)].map((match) => Number(match[1])));
+      for (const den of choiceDens) expect(FRACTION_DENOMINATORS).toContain(den);
       if (grade === "1") {
         expect(board.mode).toBe("parts");
         for (const den of dens) expect([2, 4]).toContain(den);
+        for (const den of choiceDens) expect([2, 4]).toContain(den);
       }
       if (grade === "2") {
         expect(board.mode).not.toBe("equivalent");
         for (const den of dens) expect([2, 3, 4]).toContain(den);
+        for (const den of choiceDens) expect([2, 3, 4]).toContain(den);
       }
       break;
     }

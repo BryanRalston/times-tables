@@ -61,8 +61,11 @@ function defaultLevel(grade: Grade): FractionLevel {
   }
 }
 
-function fracChoices(rng: Rng, answer: string, extras: string[]): string[] {
-  const pool = ["1/2", "1/3", "1/4", "2/3", "2/4", "3/4", "1/6", "1/8", "2/6", "3/6", "2/8", "4/8", "3/8", "0", "1"];
+const HALF_FOURTHS = ["1/2", "2/2", "1/4", "2/4", "3/4", "4/4"];
+const THROUGH_FOURTHS = ["1/2", "2/2", "1/3", "2/3", "1/4", "2/4", "3/4", "4/4"];
+const THROUGH_EIGHTHS = ["1/2", "1/3", "1/4", "2/3", "2/4", "3/4", "1/6", "2/6", "3/6", "1/8", "2/8", "3/8", "4/8", "6/8"];
+
+function fracChoices(rng: Rng, answer: string, extras: string[], pool: readonly string[]): string[] {
   return uniqueChoices(rng, answer, pool, extras);
 }
 
@@ -76,7 +79,7 @@ function makeParts(rng: Rng): ChoiceQ {
     title: "What fraction is shaded?",
     hint: "Count the shaded parts and the equal parts",
     answer,
-    choices: fracChoices(rng, answer, [`${Math.max(1, num - 1)}/${den}`, `${Math.min(den, num + 1)}/${den}`]),
+    choices: fracChoices(rng, answer, [`${Math.max(1, num - 1)}/${den}`, `${Math.min(den, num + 1)}/${den}`], HALF_FOURTHS),
     skill: "fractions:parts",
     tags: ["parts"],
     solved: `${answer} is shaded`,
@@ -100,7 +103,7 @@ function makeUnit(rng: Rng): ChoiceQ {
     title: "What unit fraction is shaded?",
     hint: "One shaded part",
     answer,
-    choices: fracChoices(rng, answer, [`2/${den}`, `1/${other}`]),
+    choices: fracChoices(rng, answer, [`2/${den}`, `1/${other}`], THROUGH_FOURTHS),
     skill: "fractions:unit",
     tags: ["unit"],
     solved: answer,
@@ -180,7 +183,7 @@ function makeCompare(rng: Rng): ChoiceQ {
     title: askGreater ? "Which fraction is greater?" : "Which fraction is less?",
     hint: sameDen ? "Same denominator. More parts is greater." : "Same numerator. Bigger pieces is greater.",
     answer,
-    choices: fracChoices(rng, answer, [left, right]),
+    choices: fracChoices(rng, answer, [left, right], THROUGH_FOURTHS),
     skill: "fractions:compare",
     tags: ["compare"],
     solved: `${answer} is ${askGreater ? "greater" : "less"}`,
@@ -202,7 +205,7 @@ function makeEquivalent(rng: Rng): ChoiceQ {
     title: `Which fraction matches ${num}/${den}?`,
     hint: "Same amount, different parts",
     answer,
-    choices: fracChoices(rng, answer, [`${num}/${den}`, `${num2}/${den}`, `1/${den2}`]),
+    choices: fracChoices(rng, answer, [`${num}/${den}`, `${num2}/${den}`, `1/${den2}`], THROUGH_EIGHTHS),
     skill: "fractions:equivalent",
     tags: ["equivalent"],
     solved: `${num}/${den} = ${answer}`,
@@ -225,7 +228,7 @@ function makeShade(rng: Rng): ChoiceQ {
     title: `Shade ${num} of the ${den} parts`,
     hint: "Tap a part to shade it",
     answer,
-    choices: fracChoices(rng, answer, []),
+    choices: fracChoices(rng, answer, [], THROUGH_EIGHTHS),
     skill: "fractions:shade",
     tags: ["shade"],
     solved: answer,
