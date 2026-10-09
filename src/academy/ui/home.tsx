@@ -5,13 +5,9 @@ import { bossReady, dailySnapshot, normalizeJourney } from "../journey";
 import { gradeLabel, todayIso, type Child } from "../model";
 import { gameOfDay, rollGift, unlockedCount, type GiftRoll } from "../rewards";
 import { chime } from "../sound";
-import { AcademyPal, Flame, Foot, GiftBox, LockIcon, Logo, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
-
-/** Not a game yet. A real game is a registry module, not a locked card. */
-const COMING_SOON = { title: "Sight Words", audience: "K–1", tint: "lav", mascot: "grape" };
+import { AcademyPal, Flame, Foot, GiftBox, Logo, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
 
 export function HomeScreen({ child, sound, onClaim }: { child: Child; sound: boolean; onClaim: () => void }) {
-  const [toast, setToast] = useState<string | null>(null);
   const [prize, setPrize] = useState<GiftRoll | null>(null);
   const todayId = todayIso();
   const today = gameOfDay(todayId);
@@ -76,21 +72,6 @@ export function HomeScreen({ child, sound, onClaim }: { child: Child; sound: boo
             <Stars value={child.bestStars[game.id] ?? 0} />
           </a>
         ))}
-        <button
-          type="button"
-          className={`ac-card is-${COMING_SOON.tint} is-soon`}
-          onClick={() => {
-            setToast("Sight words are coming soon.");
-            window.setTimeout(() => setToast(null), 1800);
-          }}
-        >
-          <span className="ac-soon">
-            <LockIcon /> Soon
-          </span>
-          <SquisheeImg id={COMING_SOON.mascot} />
-          <h2>{COMING_SOON.title}</h2>
-          <p>{COMING_SOON.audience}</p>
-        </button>
       </div>
 
       <div className="ac-meters">
@@ -127,11 +108,6 @@ export function HomeScreen({ child, sound, onClaim }: { child: Child; sound: boo
         Today: {GAMES.find((game) => game.id === today)?.title ?? today} · {gradeLabel(child.grade)}
       </p>
       <Foot />
-      {toast ? (
-        <div className="ac-toast" role="status">
-          {toast}
-        </div>
-      ) : null}
       {prize ? (
         <div className="ac-modal" role="dialog" aria-label="Daily gift">
           <div className="ac-modal-card ac-prize">

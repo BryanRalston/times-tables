@@ -13,6 +13,7 @@ import {
   type Ladder,
 } from "../adapt";
 import { gameById, pillLabel } from "../games/registry";
+import { insertReplay } from "../games/words";
 import { bossReady, bossWon } from "../journey";
 import {
   BOSS_LENGTH,
@@ -124,12 +125,16 @@ export function PlayScreen({
       roll: rngRandom().next(),
     });
     const levelId = levels[pick.index]?.id ?? levels[0]?.id ?? level;
-    const prefer = game === "times" ? weakTimesFacts(skillsRef.current) : [];
-    return makeQuestion(game, levelId, rngRandom(), prefer);
+    return makeQuestion(game, levelId, rngRandom(), preferIds());
+  }
+
+  function preferIds(): string[] {
+    if (spec?.reviewKeys) return spec.reviewKeys(child.words);
+    return game === "times" ? weakTimesFacts(skillsRef.current) : [];
   }
 
   const [questions, setQuestions] = useState<ChoiceQ[]>(() =>
-    boss ? makeBossRound(game, level, rngRandom()) : [nextQuestion()],
+    boss ? makeBossRound(game, level, rngRandom(), preferIds()) : [nextQuestion()],
   );
   const questionsRef = useRef(questions);
   questionsRef.current = questions;
@@ -147,7 +152,9 @@ export function PlayScreen({
     phaseRef.current = "ask";
     resultsRef.current = [];
     startedRef.current = Date.now();
-    const opening = nextBoss ? makeBossRound(game, nextLevel, rngRandom()) : [nextQuestion()];
+    const opening = nextBoss
+      ? makeBossRound(game, nextLevel, rngRandom(), nextSpec?.reviewKeys?.(child.words) ?? (game === "times" ? weakTimesFacts(skillsRef.current) : []))
+      : [nextQuestion()];
     questionsRef.current = opening;
     setQuestions(opening);
     setRoundId((n) => n + 1);
@@ -232,7 +239,7 @@ export function PlayScreen({
     waitRef.current = window.setTimeout(() => advance(fromIndex), mark.ok ? 620 : 760);
   }
 
-  function choose(value: string) {
+  function choose(value: string, hint = false) {
     if (!value || menuRef.current || finishedRef.current) return;
     const asking = phaseRef.current === "ask" || phaseRef.current === "retry";
     if (!asking) return;
@@ -240,6 +247,11 @@ export function PlayScreen({
     if (!q) return;
     const ok = value === q.answer;
     if (!ok && phaseRef.current === "ask" && !taughtRef.current) {
+      const replayed = insertReplay(questionsRef.current, index, q);
+      if (replayed !== questionsRef.current) {
+        questionsRef.current = replayed;
+        setQuestions(replayed);
+      }
       phaseRef.current = "teach";
       taughtRef.current = true;
       setPicked(value);
@@ -253,8 +265,15 @@ export function PlayScreen({
     setPicked(value);
     setPhase("feedback");
     setHintOn(false);
+    if (!ok) {
+      const replayed = insertReplay(questionsRef.current, index, q);
+      if (replayed !== questionsRef.current) {
+        questionsRef.current = replayed;
+        setQuestions(replayed);
+      }
+    }
     settle(
-      { skill: q.skill, tags: q.tags, factKey: q.factKey, ok, taught: taughtRef.current },
+      { skill: q.skill, tags: q.tags, factKey: q.factKey, ok, taught: taughtRef.current, hint: hint || undefined },
       index,
       combo,
     );
@@ -298,6 +317,7 @@ export function PlayScreen({
     function onKey(e: KeyboardEvent) {
       if (menuRef.current || e.metaKey || e.ctrlKey || e.altKey) return;
       if (phaseRef.current !== "ask" && phaseRef.current !== "retry") return;
+      if (questionsRef.current[index]?.visual.kind === "spell") return;
       const n = Number(e.key);
       if (n >= 1 && n <= 4) chooseRef.current(questionsRef.current[index]?.choices[n - 1] ?? "");
     }
@@ -340,6 +360,7 @@ export function PlayScreen({
   const correct = results.filter((mark) => mark.ok).length;
   const liveStars = starsForRound(correct, total);
   const mascot = spec?.mascot ?? "peach";
+  const ChoiceView = spec?.Choices;
   const friend = unlockId ? squisheeById(unlockId) : undefined;
   const reveal = phase === "feedback";
   const ok = reveal && picked === q?.answer;
@@ -488,33 +509,37 @@ export function PlayScreen({
                 {spec?.Aside ? <spec.Aside question={q} /> : null}
                 <div className="ac-stage-copy">
                   {spec ? <spec.Prompt question={q} reveal={reveal} mascot={mascot} happy={ok} /> : null}
-                  <div className="ac-choices">
-                    {q.choices.map((choice, choiceIndex) => {
-                      const cls =
-                        phase !== "feedback"
-                          ? ""
-                          : choice === q.answer
-                            ? "is-yes"
-                            : choice === picked
-                              ? "is-no"
-                              : "is-dim";
-                      const pile = q.visual.kind === "money" ? q.visual.piles?.[choice] : undefined;
-                      const label =
-                        q.visual.kind === "money" && q.visual.labels?.[choice] ? q.visual.labels[choice] : choice;
-                      return (
-                        <button
-                          key={choice}
-                          ref={choiceIndex === 0 ? retryFocusRef : undefined}
-                          type="button"
-                          className={cx("ac-choice", pile && "is-coins", cls)}
-                          aria-label={label}
-                          onClick={() => choose(choice)}
-                        >
-                          {pile ? <CoinRow pile={pile} label={label} /> : choice}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  {ChoiceView ? (
+                    <ChoiceView question={q} reveal={reveal} picked={picked} onChoose={choose} />
+                  ) : (
+                    <div className="ac-choices">
+                      {q.choices.map((choice, choiceIndex) => {
+                        const cls =
+                          phase !== "feedback"
+                            ? ""
+                            : choice === q.answer
+                              ? "is-yes"
+                              : choice === picked
+                                ? "is-no"
+                                : "is-dim";
+                        const pile = q.visual.kind === "money" ? q.visual.piles?.[choice] : undefined;
+                        const label =
+                          q.visual.kind === "money" && q.visual.labels?.[choice] ? q.visual.labels[choice] : choice;
+                        return (
+                          <button
+                            key={choice}
+                            ref={choiceIndex === 0 ? retryFocusRef : undefined}
+                            type="button"
+                            className={cx("ac-choice", pile && "is-coins", cls)}
+                            aria-label={label}
+                            onClick={() => choose(choice)}
+                          >
+                            {pile ? <CoinRow pile={pile} label={label} /> : choice}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                   <div className={cx("ac-banner", reveal && (ok ? "is-yes" : "is-no"), hintOn && !reveal && "is-hint")} aria-live="polite">
                     {reveal ? (ok ? q.praise : q.almost) : hintOn ? hintCue(q).caption : ""}
                   </div>

@@ -78,7 +78,7 @@ const bundle = jsChunks.join("\n");
 if (!bundle.includes("/academy-sw.js")) fail("bundle does not register /academy-sw.js");
 if (!bundle.includes('scope:"/"') && !bundle.includes('scope: "/"')) fail("bundle service worker scope is not /");
 
-for (const sheet of ["times-tables", "add-subtract", "telling-time"]) {
+for (const sheet of ["times-tables", "add-subtract", "telling-time", "sight-words", "spelling"]) {
   const sheetPath = resolve(root, "worksheets", sheet, "index.html");
   if (!existsSync(sheetPath)) fail(`missing worksheet ${sheet}`);
   const sheetHtml = readFileSync(sheetPath, "utf8");

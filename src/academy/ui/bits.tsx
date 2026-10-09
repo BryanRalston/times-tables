@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { canDressFace } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
-import { MINUS, TIMES, type AddVisual, type MoneyVisual, type TimeVisual, type TimesVisual } from "../games/types";
+import { MINUS, TIMES, type AddVisual, type Visual } from "../games/types";
 import { cosmeticCompositeUrl, squisheeUrl } from "../paths";
 
 export function cx(...parts: Array<string | false | null | undefined>): string {
@@ -317,11 +317,11 @@ export function Equation({
   reveal,
   answer,
 }: {
-  visual: AddVisual | TimesVisual | TimeVisual | MoneyVisual;
+  visual: Visual;
   reveal: boolean;
   answer: string;
 }) {
-  if (visual.kind === "time" || visual.kind === "money") return null;
+  if (visual.kind === "time" || visual.kind === "money" || visual.kind === "sight" || visual.kind === "spell") return null;
   if (visual.kind === "times") {
     return (
       <p className="ac-eq">

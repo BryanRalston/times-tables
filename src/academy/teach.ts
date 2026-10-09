@@ -38,7 +38,13 @@ export interface MoneyFrame {
   caption: string;
 }
 
-export type TeachFrame = AddFrame | TimesFrame | TimeFrame | MoneyFrame;
+export interface WordFrame {
+  kind: "sight" | "spell";
+  show: string;
+  caption: string;
+}
+
+export type TeachFrame = AddFrame | TimesFrame | TimeFrame | MoneyFrame | WordFrame;
 
 export interface WorkedExample {
   speech: string;
@@ -80,6 +86,22 @@ function framesFor(question: ChoiceQ): TeachFrame[] {
       return timeFrames(visual);
     case "money":
       return moneyFrames(visual, question.answer);
+    case "sight":
+      return [
+        {
+          kind: "sight",
+          show: visual.word,
+          caption: visual.mode === "hear" ? `The word is ${visual.word}.` : visual.sentence || visual.word,
+        },
+      ];
+    case "spell":
+      return [
+        {
+          kind: "spell",
+          show: visual.word,
+          caption: visual.sentence ? `${visual.word}. ${visual.sentence}` : visual.word,
+        },
+      ];
     default: {
       const neverVisual: never = visual;
       return neverVisual;

@@ -16,7 +16,7 @@ import {
 
 /** Stable key. The schema version lives on the save, not in the key name. */
 export const STORAGE_KEY = "squishee-academy-v1";
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 /**
  * Migrations run from the save's version up to SAVE_VERSION.
@@ -25,6 +25,7 @@ export const SAVE_VERSION = 3;
 const MIGRATIONS: Record<number, (raw: Record<string, unknown>) => Record<string, unknown>> = {
   1: migrateV1toV2,
   2: migrateV2toV3,
+  3: migrateV3toV4,
 };
 
 /** A newer app wrote this disk. Don't replace it with an older schema. */
@@ -60,6 +61,7 @@ export function blankChild(opts: { id?: string; name?: string; grade?: Grade; av
     dailyDate: null,
     dailyRounds: 0,
     dailyGift: "none",
+    words: {},
   };
 }
 
@@ -105,6 +107,18 @@ function migrateV2toV3(raw: Record<string, unknown>): Record<string, unknown> {
       })
     : raw.children;
   return { ...raw, version: 3, children };
+}
+
+/** Version 3 had island progress and no per-word memory for sight words or spelling. */
+function migrateV3toV4(raw: Record<string, unknown>): Record<string, unknown> {
+  const children = Array.isArray(raw.children)
+    ? raw.children.map((row) => {
+        if (!row || typeof row !== "object" || Array.isArray(row)) return row;
+        const child = row as Record<string, unknown>;
+        return { ...child, words: asRecord(child.words) };
+      })
+    : raw.children;
+  return { ...raw, version: 4, children };
 }
 
 function migrateRaw(raw: unknown): unknown {
@@ -157,6 +171,23 @@ function parseSeconds(raw: unknown): Record<string, number> {
   for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
     if (!DATE_KEY.test(key)) continue;
     out[key] = clampInt(value, 0, 4 * 60 * 60);
+  }
+  return out;
+}
+
+function parseWords(raw: unknown): Child["words"] {
+  if (!raw || typeof raw !== "object") return {};
+  const out: Child["words"] = {};
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (!/^(sw|sp):[a-z0-9'-]{1,32}$/i.test(key)) continue;
+    if (!value || typeof value !== "object") continue;
+    const row = value as Record<string, unknown>;
+    out[key] = {
+      box: clampInt(row.box, 0, 5),
+      ok: clampInt(row.ok, 0, 100000),
+      miss: clampInt(row.miss, 0, 100000),
+      streak: clampInt(row.streak, 0, 100000),
+    };
   }
   return out;
 }
@@ -214,6 +245,7 @@ export function parseChild(raw: unknown): Child | null {
     dailyDate,
     dailyRounds: clampInt(o.dailyRounds, 0, 100),
     dailyGift: parseGiftState(o.dailyGift),
+    words: parseWords(o.words),
   };
 }
 

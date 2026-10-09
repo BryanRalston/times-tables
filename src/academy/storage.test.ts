@@ -89,7 +89,15 @@ describe("academy save", () => {
     expect(migrated.version).toBe(SAVE_VERSION);
     expect(migrated.children[0]?.levels.times).toBe("mix");
     expect(migrated.children[0]?.levels.time).toBe(defaultLevels("3").time);
-    expect(migrated.children[0]?.bestStars).toEqual({ times: 2, add: 0, time: 0, money: 0 });
+    expect(migrated.children[0]?.bestStars).toEqual({
+      times: 2,
+      add: 0,
+      time: 0,
+      money: 0,
+      sight: 0,
+      spelling: 0,
+    });
+    expect(migrated.children[0]?.words).toEqual({});
     expect(migrated.children[0]?.coins).toBe(0);
     expect(migrated.children[0]?.journey).toEqual({ areaId: "times", stop: 0, bosses: [] });
     expect(migrated.children[0]?.dailyGift).toBe("none");
@@ -126,6 +134,30 @@ describe("academy save", () => {
     expect(fromV2.children[0]?.bestStars.money).toBe(0);
     expect(fromV2.children[0]?.coins).toBe(0);
     expect(fromV2.children[0]?.journey.areaId).toBe("times");
+    expect(fromV2.children[0]?.words).toEqual({});
+
+    const fromV3 = parseSave({
+      version: 3,
+      activeId: "maya",
+      sound: true,
+      children: [
+        {
+          id: "maya",
+          name: "Maya",
+          grade: "2",
+          stars: 4,
+          coins: 7,
+          levels: { times: "twos" },
+          journey: { areaId: "add", stop: 1, bosses: ["times"] },
+        },
+      ],
+    });
+    expect(fromV3.version).toBe(SAVE_VERSION);
+    expect(fromV3.children[0]?.coins).toBe(7);
+    expect(fromV3.children[0]?.words).toEqual({});
+    expect(fromV3.children[0]?.journey).toEqual({ areaId: "add", stop: 1, bosses: ["times"] });
+    expect(fromV3.children[0]?.levels.sight).toBe(defaultLevels("2").sight);
+    expect(fromV3.children[0]?.levels.spelling).toBe(defaultLevels("2").spelling);
 
     const mem = new Map<string, string>();
     const disk = {

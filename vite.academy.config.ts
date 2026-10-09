@@ -111,6 +111,8 @@ export default defineConfig({
         sheetAdd: resolve("academy/worksheets/add-subtract/index.html"),
         sheetTime: resolve("academy/worksheets/telling-time/index.html"),
         sheetMoney: resolve("academy/worksheets/money/index.html"),
+        sheetSight: resolve("academy/worksheets/sight-words/index.html"),
+        sheetSpelling: resolve("academy/worksheets/spelling/index.html"),
       },
     },
   },

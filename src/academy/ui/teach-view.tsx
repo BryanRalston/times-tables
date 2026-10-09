@@ -56,6 +56,9 @@ function TeachArt({ frame }: { frame: TeachFrame }) {
       );
     case "money":
       return <MoneyArt frame={frame} />;
+    case "sight":
+    case "spell":
+      return <p className="ac-sight-word">{frame.show}</p>;
     default: {
       const neverFrame: never = frame;
       return neverFrame;

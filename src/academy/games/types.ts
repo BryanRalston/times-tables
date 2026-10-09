@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Rng } from "@/lib/rng";
-import type { Grade } from "../model";
+import type { Grade, WordCard } from "../model";
 
 export const MINUS = "−";
 export const TIMES = "×";
@@ -51,6 +51,35 @@ export interface CoinPile {
 
 export type MoneyMode = "name" | "count" | "make" | "change" | "dollars";
 
+export type SightMode = "hear" | "match" | "fill";
+
+export interface SightVisual {
+  kind: "sight";
+  mode: SightMode;
+  word: string;
+  spoken: string;
+  /** Sentence with a blank, when the mode shows one. */
+  sentence: string;
+  /** Choice text to emoji, for picture matching. */
+  pictures?: Record<string, string>;
+  fallback: string;
+  caption: string;
+  bigFallback: boolean;
+}
+
+export interface SpellVisual {
+  kind: "spell";
+  word: string;
+  spoken: string;
+  sentence: string;
+  pattern: string;
+  patternLabel: string;
+  tiles: { id: string; letter: string }[];
+  fallback: string;
+  caption: string;
+  bigFallback: boolean;
+}
+
 export interface MoneyVisual {
   kind: "money";
   mode: MoneyMode;
@@ -61,7 +90,7 @@ export interface MoneyVisual {
   labels?: Record<string, string>;
 }
 
-export type Visual = AddVisual | TimesVisual | TimeVisual | MoneyVisual;
+export type Visual = AddVisual | TimesVisual | TimeVisual | MoneyVisual | SightVisual | SpellVisual;
 
 export interface ChoiceQ {
   id: string;
@@ -75,6 +104,8 @@ export interface ChoiceQ {
   skill: string;
   tags: string[];
   factKey?: string;
+  /** A miss of this question should be asked again soon in the same round. */
+  replay?: boolean;
   visual: Visual;
 }
 
@@ -82,6 +113,8 @@ export interface SheetItem {
   prompt: string;
   answer: string;
   clock?: { hours: number; minutes: number };
+  /** Dotted handwriting model. Sentence rows leave this off so the answer stays in the key. */
+  trace?: string;
 }
 
 export interface SkillRow {
@@ -102,6 +135,13 @@ export interface PromptProps {
   reveal: boolean;
   mascot: string;
   happy: boolean;
+}
+
+export interface ChoiceProps {
+  question: ChoiceQ;
+  reveal: boolean;
+  picked: string | null;
+  onChoose: (value: string, hint?: boolean) => void;
 }
 
 /**
@@ -129,8 +169,12 @@ export interface GameModule {
   makeQuestion: (rng: Rng, level: string, prefer?: string[]) => ChoiceQ;
   makeSheetItem: (rng: Rng, level: string, focus?: number) => SheetItem;
   Prompt: (props: PromptProps) => ReactNode;
+  /** Replaces the four answer buttons when a game builds its own taps. */
+  Choices?: (props: ChoiceProps) => ReactNode;
   Aside?: (props: { question: ChoiceQ }) => ReactNode;
   SheetBody: (props: { items: SheetItem[] }) => ReactNode;
+  /** Word ids that should be practiced sooner. Times tables keep using skill facts. */
+  reviewKeys?: (words: Record<string, WordCard>) => string[];
   focus?: SheetFocus;
   /** Parent progress bars, most-practiced first when counts tie. */
   bars: SkillRow[];

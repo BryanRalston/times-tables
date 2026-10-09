@@ -14,7 +14,7 @@ export function harderLevel(levels: readonly LevelDef[], level: string): string 
  * Five questions. Most use the next level. The rest stay on the current level
  * so the boss is mixed, and a step harder than a normal round.
  */
-export function makeBossRound(gameId: string, level: string, rng: Rng): ChoiceQ[] {
+export function makeBossRound(gameId: string, level: string, rng: Rng, prefer: string[] = []): ChoiceQ[] {
   const game = gameById(gameId);
   if (!game) return [];
   const safe = game.isLevel(level) ? level : game.defaultLevel("K");
@@ -22,7 +22,7 @@ export function makeBossRound(gameId: string, level: string, rng: Rng): ChoiceQ[
   const out: ChoiceQ[] = [];
   for (let i = 0; i < BOSS_LENGTH; i++) {
     const use = i % 2 === 0 || safe === hard ? hard : safe;
-    out.push(game.makeQuestion(rng, use));
+    out.push(game.makeQuestion(rng, use, prefer));
   }
   return out;
 }
