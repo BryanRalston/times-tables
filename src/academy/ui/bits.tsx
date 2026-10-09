@@ -324,8 +324,8 @@ function TokenAdd({ visual }: { visual: AddVisual }) {
 }
 
 export function Groups({ a, b }: { a: number; b: number }) {
-  if (a > 6 || b > 6 || a * b > 24 || a < 1) return null;
-  const faces = a <= 4 && a * b <= 12;
+  if (a < 1 || a > 5 || b > 10 || a * b > 20) return null;
+  const faces = a * b <= 12;
   const token = useCast()?.buddyId ?? "peach";
   return (
     <div className="ac-groups" aria-hidden={faces ? undefined : true} aria-label={faces ? `${a} groups of ${b} squishees` : undefined}>

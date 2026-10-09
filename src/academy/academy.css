@@ -958,7 +958,7 @@ button.ac-go:disabled { opacity: 0.45; }
 .ac-token { width: 22px; height: 22px; object-fit: contain; display: inline-block; }
 .ac-token.is-faded { opacity: 0.35; filter: grayscale(1); }
 .ac-ten .ac-token { width: 28px; height: 28px; }
-.ac-groups .ac-token { width: 20px; height: 20px; }
+.ac-groups .ac-token { width: 16px; height: 16px; }
 .ac-clock-wrap { position: relative; display: block; }
 .ac-clock-pal {
   position: absolute;
@@ -970,28 +970,27 @@ button.ac-go:disabled { opacity: 0.45; }
   pointer-events: none;
   object-fit: contain;
 }
+.ac-buddy-row { display: flex; justify-content: flex-end; min-height: 52px; }
 .ac-buddy {
-  position: absolute;
-  right: 2px;
-  bottom: 2px;
-  z-index: 3;
-  width: 120px;
+  position: static;
+  z-index: 1;
+  width: auto;
+  max-width: 100%;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 6px;
   pointer-events: none;
 }
-.ac-buddy-img { width: 56px; height: 56px; object-fit: contain; }
-.ac-buddy .ac-bubble { font-size: 13px; text-align: right; }
+.ac-buddy-img { width: 48px; height: 48px; object-fit: contain; }
+.ac-buddy .ac-bubble { font-size: 13px; text-align: left; margin: 0; }
 .ac-buddy-point {
   width: 0;
   height: 0;
   border: 7px solid transparent;
-  border-bottom-color: #e21870;
+  border-top-color: #e21870;
 }
-.ac-buddy[data-point="hint"] { top: -6px; bottom: auto; }
-.ac-buddy[data-point="example"] { top: 4px; bottom: auto; left: 4px; right: auto; align-items: flex-start; }
+.ac-buddy[data-point="example"] .ac-buddy-point { border-top-color: #f0b429; }
 .ac-buddy.is-cheer .ac-buddy-img,
 .ac-buddy.is-dance .ac-buddy-img { animation: ac-hop 0.4s ease; }
 .ac-buddy.is-dance .ac-buddy-img { animation-iteration-count: 3; }

@@ -703,12 +703,14 @@ export function PlayScreen({
             ) : null}
             <Stars value={liveStars} />
           </div>
+          <div className="ac-buddy-row">
+            <RoundBuddy id={child.avatarId} cosmetic={child.equipped} reaction={buddyCue} />
+          </div>
           {boss ? <HostGreet id={hostId} /> : null}
           <RoundCastProvider buddyId={child.avatarId} hostId={hostId} equipped={child.equipped}>
           <div
             className={cx(
               "ac-stage",
-              "has-buddy",
               spec?.layout === "wide" && phase !== "teach" && slot.kind !== "clock" && slot.kind !== "pay" && "is-time",
               phase === "feedback" && "is-yes",
               phase === "feedback" && combo >= 3 && "is-streak",
@@ -716,7 +718,6 @@ export function PlayScreen({
               hintOn && asking && "is-hint",
             )}
           >
-            <RoundBuddy id={child.avatarId} cosmetic={child.equipped} reaction={buddyCue} />
             {reaction ? (
               <span className="ac-react" aria-hidden="true">
                 {reaction}
