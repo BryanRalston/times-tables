@@ -21,7 +21,7 @@ import {
   skillBars,
 } from "../rewards";
 import { activeChild, addChild } from "../storage";
-import { BackLink, Flame, LockIcon, Logo, SquisheeImg, cx } from "./bits";
+import { BackLink, Flame, FreeNote, Logo, SquisheeImg, cx } from "./bits";
 
 const GATE_KEY = "squishee-academy-gate";
 
@@ -38,7 +38,6 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
   const [gate, setGate] = useState(() => grownupGate(rngRandom()));
   const [guess, setGuess] = useState("");
   const [miss, setMiss] = useState(false);
-  const [plan, setPlan] = useState(false);
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
   const [grade, setGrade] = useState<Grade>("K");
@@ -106,9 +105,6 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
     <div className="ac-shell ac-mid">
       <header className="ac-parent-top">
         <h1>Grown-ups</h1>
-        <button type="button" className="ac-soon-pill" onClick={() => setPlan(true)}>
-          <LockIcon /> Family plan
-        </button>
       </header>
 
       <div className="ac-kids">
@@ -226,18 +222,7 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
       </section>
 
       <BackLink>Back to games</BackLink>
-
-      {plan ? (
-        <div className="ac-modal" role="dialog" aria-label="Family plan">
-          <div className="ac-modal-card">
-            <h2>Family plan coming soon</h2>
-            <p>This test build is free on this device. No account, no payment, and nothing is sent to a server.</p>
-            <button type="button" className="ac-go" onClick={() => setPlan(false)}>
-              OK
-            </button>
-          </div>
-        </div>
-      ) : null}
+      <FreeNote />
     </div>
   );
 }

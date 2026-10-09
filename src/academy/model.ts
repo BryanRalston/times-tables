@@ -5,6 +5,15 @@ export interface SkillStat {
   miss: number;
 }
 
+/** Where the child is standing on the island. `bosses` are beaten area ids. */
+export interface Journey {
+  areaId: string;
+  stop: number;
+  bosses: string[];
+}
+
+export type DailyGiftState = "none" | "closed" | "open";
+
 export interface Child {
   id: string;
   name: string;
@@ -21,6 +30,16 @@ export interface Child {
   rounds: number;
   /** Level id per game id. Missing games are filled from the registry on load. */
   levels: Record<string, string>;
+  /** Play coins. Spent on outfits. Not real money. */
+  coins: number;
+  cosmetics: string[];
+  equipped: string;
+  /** Squishees granted by a daily gift, in addition to star unlocks. */
+  gifted: string[];
+  journey: Journey;
+  dailyDate: string | null;
+  dailyRounds: number;
+  dailyGift: DailyGiftState;
 }
 
 export interface AnswerMark {
@@ -36,6 +55,10 @@ export interface RoundResult {
   total: number;
   seconds: number;
   answers: AnswerMark[];
+  /** Longest run of correct answers in the round. */
+  bestCombo?: number;
+  /** True when this round was the area boss. */
+  boss?: boolean;
 }
 
 export interface Save {
@@ -78,6 +101,12 @@ export type SquadId = (typeof SQUAD_IDS)[number];
 export const MAX_CHILDREN = 4;
 export const ROUND_SECONDS = 120;
 export const ROUND_LENGTH = 10;
+/** Practice stops before the boss. The last index is the boss. */
+export const STOPS_PER_AREA = 4;
+export const BOSS_LENGTH = 5;
+export const DAILY_GOAL = 3;
+/** Share of a boss round that opens the next island. */
+export const BOSS_PASS = 0.6;
 
 const GRADES: readonly Grade[] = ["K", "1", "2", "3"];
 

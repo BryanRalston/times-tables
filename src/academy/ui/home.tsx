@@ -1,31 +1,33 @@
 import { useState } from "react";
-import { GAMES } from "../games/registry";
+import { squisheeById } from "@/lib/squishees";
+import { GAMES, gameById } from "../games/registry";
+import { bossReady, dailySnapshot, normalizeJourney } from "../journey";
 import { gradeLabel, todayIso, type Child } from "../model";
-import { gameOfDay, giftCount, unlockedCount } from "../rewards";
-import { Flame, Foot, LockIcon, Logo, SquisheeImg, Stars } from "./bits";
+import { gameOfDay, rollGift, unlockedCount, type GiftRoll } from "../rewards";
+import { chime } from "../sound";
+import { AcademyPal, Flame, Foot, GiftBox, LockIcon, Logo, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
 
 /** Not a game yet. A real game is a registry module, not a locked card. */
 const COMING_SOON = { title: "Sight Words", audience: "K–1", tint: "lav", mascot: "grape" };
 
-export function HomeScreen({ child }: { child: Child }) {
+export function HomeScreen({ child, sound, onClaim }: { child: Child; sound: boolean; onClaim: () => void }) {
   const [toast, setToast] = useState<string | null>(null);
-  const today = gameOfDay(todayIso());
-  const gifts = giftCount(child);
+  const [prize, setPrize] = useState<GiftRoll | null>(null);
+  const todayId = todayIso();
+  const today = gameOfDay(todayId);
+  const daily = dailySnapshot(child, todayId);
+  const journey = normalizeJourney(child.journey);
+  const here = gameById(journey.areaId) ?? GAMES[0];
+  const boss = here ? bossReady(journey, here.id) : false;
   const pals = ["frog", "peach", "bunny"];
 
   return (
     <div className="ac-shell">
       <header className="ac-top">
         <Logo />
-        {child.streak > 0 ? (
-          <div className="ac-streak" aria-label={`${child.streak} day streak`}>
-            <Flame /> {child.streak}-day streak
-          </div>
-        ) : (
-          <div className="ac-streak">
-            <Flame /> Let’s play
-          </div>
-        )}
+        <a className="ac-streak" href="#/map">
+          Island
+        </a>
       </header>
 
       <section className="ac-hero">
@@ -35,15 +37,39 @@ export function HomeScreen({ child }: { child: Child }) {
           ))}
         </div>
         <h1>Hi {child.name}! Ready to play?</h1>
-        <p className="ac-lede">2-minute games · earn stars · unlock squishees</p>
-        <a className="ac-go" href={`#/play/${today}`}>
-          <span className="ac-play-tri" aria-hidden="true" /> Play today&apos;s game
+        <p className="ac-lede">2-minute games · hop the island · collect squishees</p>
+        <div className="ac-daily" data-daily-rounds={daily.rounds} data-daily-goal={daily.goal} data-gift={daily.ready ? "closed" : daily.claimed ? "open" : "none"}>
+          <ProgressRing value={daily.rounds} max={daily.goal} label={`${daily.rounds} of ${daily.goal} rounds today`} />
+          <div className="ac-streak" aria-label={child.streak > 0 ? `${child.streak} day streak` : "No streak yet"}>
+            <Flame /> {child.streak > 0 ? `${child.streak}-day streak` : "Start a streak"}
+          </div>
+          <button
+            type="button"
+            className={cx("ac-gift", daily.ready && "is-ready", (daily.claimed || prize != null) && "is-open")}
+            disabled={!daily.ready}
+            aria-label={daily.ready ? "Open today's gift" : daily.claimed ? "Today's gift is open" : "Gift at 3 rounds"}
+            onClick={() => {
+              if (!daily.ready) return;
+              setPrize(rollGift(todayId, child));
+              chime("gift", sound);
+              onClaim();
+            }}
+          >
+            <GiftBox open={daily.claimed || prize != null} />
+          </button>
+        </div>
+        <a className="ac-go" href={here ? `#/play/${here.id}` : "#/map"}>
+          <span className="ac-play-tri" aria-hidden="true" /> {boss ? "Boss round" : "Play the island"}
+        </a>
+        <a className="ac-map-link" href="#/map">
+          Island map
         </a>
       </section>
 
       <div className="ac-grid">
         {GAMES.map((game) => (
           <a key={game.id} className={`ac-card is-${game.tint}`} href={`#/play/${game.id}`}>
+            {journey.areaId === game.id ? <span className="ac-soon">Here</span> : null}
             <SquisheeImg id={game.mascot} />
             <h2>{game.title}</h2>
             <p>{game.audience}</p>
@@ -78,7 +104,7 @@ export function HomeScreen({ child }: { child: Child }) {
           </span>
         </a>
         <a className="ac-meter" href="#/shelf">
-          <SquisheeImg id={child.avatarId} className="ac-meter-pal" />
+          <AcademyPal id={child.avatarId} cosmetic={child.equipped} className="ac-meter-pal" />
           <span>
             <strong>
               {unlockedCount(child.stars)}/{24}
@@ -88,11 +114,11 @@ export function HomeScreen({ child }: { child: Child }) {
         </a>
         <a className="ac-meter" href="#/shelf">
           <span className="ac-meter-ico" aria-hidden="true">
-            🎁
+            ●
           </span>
           <span>
-            <strong>{gifts}</strong>
-            <small>{gifts === 1 ? "gift" : "gifts"}</small>
+            <strong>{child.coins}</strong>
+            <small>coins</small>
           </span>
         </a>
       </div>
@@ -106,6 +132,51 @@ export function HomeScreen({ child }: { child: Child }) {
           {toast}
         </div>
       ) : null}
+      {prize ? (
+        <div className="ac-modal" role="dialog" aria-label="Daily gift">
+          <div className="ac-modal-card ac-prize">
+            <GiftBox open />
+            <h2>Daily gift!</h2>
+            <PrizeBody prize={prize} />
+            <button type="button" className="ac-go" onClick={() => setPrize(null)}>
+              Nice!
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
+}
+
+function PrizeBody({ prize }: { prize: GiftRoll }) {
+  if (prize.kind === "coins") return <p>{prize.amount} coins for the shelf.</p>;
+  if (prize.kind === "cosmetic") {
+    return (
+      <p>
+        A new outfit: <strong>{outfitName(prize.id)}</strong>
+      </p>
+    );
+  }
+  const pal = squisheeById(prize.id);
+  return (
+    <p>
+      <AcademyPal id={prize.id} className="ac-done-pal" label={pal?.name ?? ""} />
+      {pal?.name ?? "A friend"} hopped in.
+    </p>
+  );
+}
+
+function outfitName(id: string): string {
+  switch (id) {
+    case "party-hat":
+      return "party hat";
+    case "scarf":
+      return "scarf";
+    case "bow":
+      return "bow";
+    case "shades":
+      return "shades";
+    default:
+      return id;
+  }
 }

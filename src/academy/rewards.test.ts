@@ -4,6 +4,9 @@ import { blankChild } from "./storage";
 import {
   acknowledgeUnlocks,
   applyRound,
+  buyOutfit,
+  claimDailyGift,
+  coinsForRound,
   formatMinutes,
   giftCount,
   isMastered,
@@ -11,12 +14,14 @@ import {
   newestUnlock,
   nextStreak,
   practiceTip,
+  rollGift,
   skillBars,
   starsForRound,
   starsNeeded,
   unlockedCount,
   weakTimesFacts,
 } from "./rewards";
+import { dailySnapshot } from "./journey";
 
 function child(partial: Partial<Child> = {}): Child {
   return { ...blankChild({ id: "kid", name: "Maya", grade: "3" }), ...partial };
@@ -125,6 +130,52 @@ describe("stars, streak, and unlocks", () => {
     const bars = skillBars(skills);
     expect(bars.some((row) => row.key === "add:within20" && row.pct === 80)).toBe(true);
     expect(bars.find((row) => row.key === "table:2")?.pct).toBe(100);
+  });
+
+  it("pays coins for stars, a combo, and a beaten boss", () => {
+    expect(coinsForRound(10, 10, 0, false)).toBe(6);
+    expect(coinsForRound(10, 10, 5, false)).toBe(8);
+    expect(coinsForRound(4, 5, 3, true)).toBe(8);
+    expect(coinsForRound(1, 5, 0, true)).toBe(2);
+    const today = "2026-10-09";
+    const next = applyRound(child(), round({ correct: 10, bestCombo: 5 }), today);
+    expect(next.coins).toBe(8);
+    const boss = applyRound(next, round({ game: "times", correct: 4, total: 5, bestCombo: 3, boss: true }), today);
+    expect(boss.coins).toBe(next.coins + coinsForRound(4, 5, 3, true));
+  });
+
+  it("fills a daily goal of 3, keeps the streak, and opens one gift", () => {
+    const today = "2026-10-09";
+    let row = child();
+    expect(dailySnapshot(row, today)).toEqual({ rounds: 0, goal: 3, ready: false, claimed: false });
+    row = applyRound(row, round(), today);
+    row = applyRound(row, round(), today);
+    expect(dailySnapshot(row, today).ready).toBe(false);
+    expect(row.streak).toBe(1);
+    row = applyRound(row, round(), today);
+    expect(dailySnapshot(row, today)).toEqual({ rounds: 3, goal: 3, ready: true, claimed: false });
+    expect(claimDailyGift(row, "2026-10-08")).toBe(row);
+    const gift = rollGift(today, row);
+    const opened = claimDailyGift(row, today);
+    expect(dailySnapshot(opened, today).claimed).toBe(true);
+    expect(claimDailyGift(opened, today)).toBe(opened);
+    if (gift.kind === "coins") expect(opened.coins).toBe(row.coins + gift.amount);
+    if (gift.kind === "cosmetic") expect(opened.cosmetics).toContain(gift.id);
+    if (gift.kind === "pal") expect(opened.gifted).toContain(gift.id);
+    const tomorrow = applyRound(opened, round(), "2026-10-10");
+    expect(tomorrow.streak).toBe(2);
+    expect(dailySnapshot(tomorrow, "2026-10-10")).toEqual({ rounds: 1, goal: 3, ready: false, claimed: false });
+  });
+
+  it("spends coins on an outfit once", () => {
+    const rich = child({ coins: 20 });
+    const bought = buyOutfit(rich, "bow");
+    expect(bought.cosmetics).toContain("bow");
+    expect(bought.equipped).toBe("bow");
+    expect(bought.coins).toBe(16);
+    expect(buyOutfit(bought, "bow")).toBe(bought);
+    const poor = child({ coins: 1 });
+    expect(buyOutfit(poor, "bow")).toBe(poor);
   });
 
   it("counts unopened unlocks as gifts until the child meets them", () => {

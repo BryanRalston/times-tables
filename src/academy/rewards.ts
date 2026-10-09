@@ -1,13 +1,27 @@
+import { applyBuyCosmetic, COSMETICS, isCosmeticId } from "@/lib/cosmetics";
 import { hashSeed } from "@/lib/rng";
 import { GAMES, barKeys, chipKeys, chipLabel as chipText, skillLabel as skillText, type GameId } from "./games/registry";
+import { advanceJourney, withDailyRound } from "./journey";
 import { SQUAD_IDS, addDays, weekDates, type Child, type RoundResult, type SkillStat } from "./model";
 
-/** Finishing a round always earns a star. 6 right earns 2. 9 right earns 3. */
-export function starsForRound(correct: number, _total = 10): 1 | 2 | 3 {
+/** Finishing a round always earns a star. 90% earns 3. 60% earns 2. A 10-question round is 9 and 6. */
+export function starsForRound(correct: number, total = 10): 1 | 2 | 3 {
   const c = Math.max(0, Math.floor(correct));
-  if (c >= 9) return 3;
-  if (c >= 6) return 2;
+  const t = Math.max(1, Math.floor(total) || 10);
+  const ratio = c / t;
+  if (ratio >= 0.9) return 3;
+  if (ratio >= 0.6) return 2;
   return 1;
+}
+
+/** Play coins for a round. A long combo and a beaten boss add a little extra. */
+export function coinsForRound(correct: number, total: number, bestCombo = 0, boss = false): number {
+  const stars = starsForRound(correct, total);
+  let coins = stars * 2;
+  if (bestCombo >= 3) coins += 1;
+  if (bestCombo >= 5) coins += 1;
+  if (boss && total > 0 && correct / total >= 0.6) coins += 3;
+  return coins;
 }
 
 export function nextStreak(
@@ -48,6 +62,65 @@ export function giftCount(child: Pick<Child, "stars" | "opened">): number {
   return Math.max(0, unlockedCount(child.stars) - child.opened);
 }
 
+export function palUnlocked(child: Pick<Child, "stars" | "gifted">, id: string, index: number): boolean {
+  return index < unlockedCount(child.stars) || child.gifted.includes(id);
+}
+
+export type GiftRoll =
+  | { kind: "coins"; amount: number }
+  | { kind: "cosmetic"; id: string }
+  | { kind: "pal"; id: string };
+
+/** The same day always opens the same gift. Coins, an outfit, or a squishee. */
+export function rollGift(today: string, child: Pick<Child, "cosmetics" | "gifted" | "stars">): GiftRoll {
+  const n = hashSeed(`gift:${today}`);
+  const lane = n % 3;
+  if (lane === 1) {
+    const left = COSMETICS.map((item) => item.id).filter((id) => !child.cosmetics.includes(id));
+    const pick = left[n % left.length];
+    if (pick) return { kind: "cosmetic", id: pick };
+  }
+  if (lane === 2) {
+    const unlocked = new Set<string>([...SQUAD_IDS.slice(0, unlockedCount(child.stars)), ...child.gifted]);
+    const next = SQUAD_IDS.find((id) => !unlocked.has(id));
+    if (next) return { kind: "pal", id: next };
+  }
+  return { kind: "coins", amount: 4 + (n % 5) };
+}
+
+export function claimDailyGift(child: Child, today: string): Child {
+  if (child.dailyDate !== today || child.dailyGift !== "closed") return child;
+  const gift = rollGift(today, child);
+  const opened: Child = { ...child, dailyGift: "open" };
+  if (gift.kind === "coins") {
+    return { ...opened, coins: Math.min(1_000_000, opened.coins + gift.amount) };
+  }
+  if (gift.kind === "cosmetic") {
+    const cosmetics = opened.cosmetics.includes(gift.id) ? opened.cosmetics : [...opened.cosmetics, gift.id];
+    return { ...opened, cosmetics, equipped: opened.equipped || gift.id };
+  }
+  const gifted = opened.gifted.includes(gift.id) ? opened.gifted : [...opened.gifted, gift.id];
+  return { ...opened, gifted };
+}
+
+export function buyOutfit(child: Child, id: string): Child {
+  const result = applyBuyCosmetic(child.coins, child.cosmetics, id);
+  if (!result.ok) return child;
+  return {
+    ...child,
+    coins: result.coins,
+    cosmetics: result.cosmetics,
+    equipped: child.equipped || id,
+  };
+}
+
+export function wearOutfit(child: Child, id: string): Child {
+  if (id === "") return child.equipped ? { ...child, equipped: "" } : child;
+  if (!isCosmeticId(id) || !child.cosmetics.includes(id)) return child;
+  if (child.equipped === id) return child;
+  return { ...child, equipped: id };
+}
+
 export function acknowledgeUnlocks(child: Child): Child {
   const opened = Math.max(child.opened, unlockedCount(child.stars));
   if (opened === child.opened) return child;
@@ -82,6 +155,9 @@ export function applyRound(child: Child, result: RoundResult, today: string): Ch
   const secondsByDay = { ...child.secondsByDay };
   const add = Math.max(0, Math.min(180, Math.round(result.seconds)));
   secondsByDay[today] = Math.min(DAY_CAP_SECONDS, (secondsByDay[today] ?? 0) + add);
+  const bestCombo = Math.max(0, Math.floor(result.bestCombo ?? 0));
+  const boss = result.boss === true;
+  const daily = withDailyRound(child, today);
   return {
     ...child,
     stars: child.stars + stars,
@@ -94,6 +170,14 @@ export function applyRound(child: Child, result: RoundResult, today: string): Ch
       [result.game]: Math.max(child.bestStars[result.game] ?? 0, stars),
     },
     rounds: child.rounds + 1,
+    coins: Math.min(1_000_000, child.coins + coinsForRound(result.correct, result.total, bestCombo, boss)),
+    journey: advanceJourney(child.journey, {
+      game: result.game,
+      correct: result.correct,
+      total: result.total,
+      boss,
+    }),
+    ...daily,
   };
 }
 

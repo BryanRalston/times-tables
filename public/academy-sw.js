@@ -1,5 +1,5 @@
 /* Academy-only offline cache. Registered with scope /times-tables/academy/ so Squishee Math is not controlled. */
-const CACHE = "squishee-academy-v1";
+const CACHE = "squishee-academy-v2";
 
 self.addEventListener("install", () => {
   self.skipWaiting();

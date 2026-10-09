@@ -85,6 +85,7 @@ export default defineConfig({
         sheetTimes: resolve("academy/worksheets/times-tables/index.html"),
         sheetAdd: resolve("academy/worksheets/add-subtract/index.html"),
         sheetTime: resolve("academy/worksheets/telling-time/index.html"),
+        sheetMoney: resolve("academy/worksheets/money/index.html"),
       },
     },
   },

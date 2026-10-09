@@ -1,15 +1,16 @@
 import { sheetHref as sheetPath } from "../paths";
 import type { Grade } from "../model";
 import { addGame } from "./add";
+import { moneyGame } from "./money";
 import { timeGame } from "./time";
 import { timesGame } from "./times";
 import type { GameModule, LevelDef } from "./types";
 
 /**
- * Launch games, in home-card order. Adding a game is: implement a GameModule,
- * append it here, and add a worksheet HTML entry. See docs/ADDING_A_GAME.md.
+ * Home-card order is also the island order. Append a game; do not insert one
+ * in front, or saved journey positions shift. See docs/ADDING_A_GAME.md.
  */
-export const GAMES = [timesGame, addGame, timeGame] as const;
+export const GAMES = [timesGame, addGame, timeGame, moneyGame] as const;
 
 export type GameId = (typeof GAMES)[number]["id"];
 

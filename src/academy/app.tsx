@@ -1,11 +1,12 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { gameForScreen, isGameId, type GameId } from "./games/registry";
 import { todayIso, type RoundResult, type Save } from "./model";
-import { applyRound, acknowledgeUnlocks } from "./rewards";
+import { acknowledgeUnlocks, applyRound, claimDailyGift } from "./rewards";
 import { activeChild, loadSave, mapActive, withLevel, writeSave } from "./storage";
 import { HelloScreen, SettingsScreen, SheetsScreen, ShelfScreen } from "./ui/extra";
 import { GrownupsScreen } from "./ui/grownups";
 import { HomeScreen } from "./ui/home";
+import { MapScreen } from "./ui/map";
 import { PlayScreen } from "./ui/play";
 import { WorksheetPage } from "./ui/worksheet";
 
@@ -15,7 +16,8 @@ type Route =
   | { name: "grownups" }
   | { name: "settings" }
   | { name: "shelf" }
-  | { name: "sheets" };
+  | { name: "sheets" }
+  | { name: "map" };
 
 function parseRoute(hash: string): Route {
   const path = hash.replace(/^#/, "").replace(/^\//, "");
@@ -25,6 +27,7 @@ function parseRoute(hash: string): Route {
   if (head === "settings") return { name: "settings" };
   if (head === "shelf") return { name: "shelf" };
   if (head === "sheets") return { name: "sheets" };
+  if (head === "map") return { name: "map" };
   return { name: "home" };
 }
 
@@ -69,6 +72,7 @@ function AcademyApp() {
       settings: "Settings · Squishee Academy",
       shelf: "Squishees · Squishee Academy",
       sheets: "Free worksheets · Squishee Academy",
+      map: "Island · Squishee Academy",
     };
     document.title = titles[route.name];
   }, [route]);
@@ -94,6 +98,7 @@ function AcademyApp() {
         onRound={onRound}
         onLevel={(level) => setSave((current) => mapActive(current, (row) => withLevel(row, route.game, level)))}
         onAck={() => setSave((current) => mapActive(current, acknowledgeUnlocks))}
+        onToggleSound={() => setSave((current) => ({ ...current, sound: !current.sound }))}
       />
     );
   } else if (route.name === "grownups") {
@@ -104,8 +109,16 @@ function AcademyApp() {
     body = <ShelfScreen save={save} onSave={setSave} />;
   } else if (route.name === "sheets") {
     body = <SheetsScreen />;
+  } else if (route.name === "map") {
+    body = <MapScreen child={child} />;
   } else {
-    body = <HomeScreen child={child} />;
+    body = (
+      <HomeScreen
+        child={child}
+        sound={save.sound}
+        onClaim={() => setSave((current) => mapActive(current, (row) => claimDailyGift(row, todayIso())))}
+      />
+    );
   }
 
   return body;

@@ -1,7 +1,31 @@
 import type { Rng } from "@/lib/rng";
-import { ROUND_LENGTH } from "../model";
+import { BOSS_LENGTH, ROUND_LENGTH } from "../model";
 import { gameById } from "./registry";
-import type { ChoiceQ, SheetItem } from "./types";
+import type { ChoiceQ, LevelDef, SheetItem } from "./types";
+
+/** The next level up, or the top level when the child is already there. */
+export function harderLevel(levels: readonly LevelDef[], level: string): string {
+  const idx = levels.findIndex((row) => row.id === level);
+  if (idx < 0) return levels[levels.length - 1]?.id ?? level;
+  return levels[Math.min(levels.length - 1, idx + 1)]!.id;
+}
+
+/**
+ * Five questions. Most use the next level. The rest stay on the current level
+ * so the boss is mixed, and a step harder than a normal round.
+ */
+export function makeBossRound(gameId: string, level: string, rng: Rng): ChoiceQ[] {
+  const game = gameById(gameId);
+  if (!game) return [];
+  const safe = game.isLevel(level) ? level : game.defaultLevel("K");
+  const hard = harderLevel(game.levels, safe);
+  const out: ChoiceQ[] = [];
+  for (let i = 0; i < BOSS_LENGTH; i++) {
+    const use = i % 2 === 0 || safe === hard ? hard : safe;
+    out.push(game.makeQuestion(rng, use));
+  }
+  return out;
+}
 
 export function makeQuestion(gameId: string, level: string, rng: Rng, prefer: string[] = []): ChoiceQ {
   const game = gameById(gameId);
