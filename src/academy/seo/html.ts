@@ -200,7 +200,7 @@ export function privacyHtml(): string {
       <p>This is a COPPA-friendly kids' site. We do not ask children for an email, a photo, a location, or any contact information. We do not let third parties collect data from these pages.</p>
       <p>A backup code is made on this device so a grown-up can move progress to another device. The code is not uploaded. If you copy it, you are the one holding it.</p>
       <p>The games, pictures, and worksheets can be saved on the device the first time you visit, so they still open with the internet off. That copy stays in this browser.</p>
-      <p class="contact"><strong>Contact:</strong> [Bryan — add the email families should use]</p>
+      <p class="contact"><strong>Contact:</strong> <a href="mailto:hello@squisheeacademy.com">hello@squisheeacademy.com</a></p>
       <p class="play noprint"><a href="../#/">Back to games</a> <a class="quiet" href="../worksheets/">Worksheets</a></p>
     </article>`,
   });

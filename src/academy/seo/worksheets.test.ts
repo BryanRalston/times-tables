@@ -82,9 +82,9 @@ describe("printable worksheets", () => {
     );
     expect(files.find((file) => file.path === "worksheets/index.html")?.body).toContain("telling-time-quarter-hour/");
     expect(files.find((file) => file.path === "privacy/index.html")?.body).toContain("COPPA");
-    expect(files.find((file) => file.path === "privacy/index.html")?.body).toContain(
-      "[Bryan — add the email families should use]",
-    );
+    const privacy = files.find((file) => file.path === "privacy/index.html")?.body ?? "";
+    expect(privacy).toContain('<a href="mailto:hello@squisheeacademy.com">hello@squisheeacademy.com</a>');
+    expect(privacy).not.toContain("[Bryan — add the email families should use]");
     expect(files.some((file) => file.path === "worksheets/counting-coins/index.html")).toBe(true);
   });
 });

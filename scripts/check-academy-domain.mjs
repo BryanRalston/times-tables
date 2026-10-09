@@ -126,7 +126,9 @@ if (staticSheets < 15 || staticSheets > 25) fail(`expected 15–25 static worksh
 const privacy = readFileSync(resolve(root, "privacy/index.html"), "utf8");
 if (!privacy.includes("does not collect") && !privacy.includes("do not collect")) fail("privacy page");
 if (!privacy.includes("COPPA")) fail("privacy COPPA");
-if (!privacy.includes("[Bryan — add the email families should use]")) fail("privacy contact placeholder");
+if (!privacy.includes('<a href="mailto:hello@squisheeacademy.com">hello@squisheeacademy.com</a>')) {
+  fail("privacy contact email");
+}
 if (privacy.includes("<script")) fail("privacy page needs JavaScript");
 
 const manifestList = JSON.parse(readFileSync(resolve(root, "precache-manifest.json"), "utf8"));
