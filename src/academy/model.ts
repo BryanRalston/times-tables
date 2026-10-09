@@ -11,6 +11,14 @@ export interface SkillStat {
   miss: number;
 }
 
+/** Per-word memory for sight words and spelling. A miss resets `box` so the word is due again. */
+export interface WordCard {
+  box: number;
+  ok: number;
+  miss: number;
+  streak: number;
+}
+
 /** Where the child is standing on the island. `bosses` are beaten area ids. */
 export interface Journey {
   areaId: string;
@@ -46,6 +54,8 @@ export interface Child {
   dailyDate: string | null;
   dailyRounds: number;
   dailyGift: DailyGiftState;
+  /** Sight-word and spelling cards, keyed `sw:` or `sp:`. */
+  words: Record<string, WordCard>;
 }
 
 export interface AnswerMark {
@@ -55,6 +65,8 @@ export interface AnswerMark {
   ok: boolean;
   /** The child missed once and saw a worked example before this mark. */
   taught?: boolean;
+  /** The try was finished with a letter hint. Counted correct, and the word stays due. */
+  hint?: boolean;
 }
 
 export interface RoundResult {

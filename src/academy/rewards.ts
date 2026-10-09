@@ -3,6 +3,7 @@ import { hashSeed } from "@/lib/rng";
 import { noteMark, skillHeat } from "./adapt";
 import { GAMES, barKeys, chipKeys, chipLabel as chipText, skillLabel as skillText, type GameId } from "./games/registry";
 import { advanceJourney, withDailyRound } from "./journey";
+import { noteRoundWords } from "./games/words";
 import { SQUAD_IDS, addDays, weekDates, type Child, type RoundResult, type SkillStat } from "./model";
 
 /** Finishing a round always earns a star. 90% earns 3. 60% earns 2. A 10-question round is 9 and 6. */
@@ -159,6 +160,7 @@ export function applyRound(child: Child, result: RoundResult, today: string): Ch
     },
     rounds: child.rounds + 1,
     coins: Math.min(1_000_000, child.coins + coinsForRound(result.correct, result.total, bestCombo, boss)),
+    words: noteRoundWords(child.words, result.answers),
     journey: advanceJourney(child.journey, {
       game: result.game,
       correct: result.correct,
