@@ -90,15 +90,17 @@ function makeParts(rng: Rng): ChoiceQ {
 }
 
 function makeUnit(rng: Rng): ChoiceQ {
-  const den = rng.pick([2, 3, 4, 6, 8]);
+  const dens = [2, 3, 4, 6, 8];
+  const den = rng.pick(dens);
   const answer = `1/${den}`;
+  const other = rng.pick(dens.filter((item) => item !== den));
   const board: FractionBoard = { game: "fractions", mode: "unit", num: 1, den };
   return sceneQuestion(rng, {
     game: "fractions",
     title: "What unit fraction is shaded?",
     hint: "One shaded part",
     answer,
-    choices: fracChoices(rng, answer, [`2/${den}`, `1/${den + 1}`]),
+    choices: fracChoices(rng, answer, [`2/${den}`, `1/${other}`]),
     skill: "fractions:unit",
     tags: ["unit"],
     solved: answer,
