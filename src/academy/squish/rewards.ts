@@ -7,17 +7,6 @@ let count = 0;
 let loaded = false;
 const listeners = new Set<() => void>();
 
-/** A soft pitch unique to each squishee, kept in a cute range. */
-export function squishPitch(id: string): number {
-  let hash = 2166136261;
-  for (let i = 0; i < id.length; i += 1) {
-    hash ^= id.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  const unit = (hash >>> 0) % 1000;
-  return 320 + (unit / 999) * 150;
-}
-
 /** Catchphrase every few squishes. Hearts only for the round buddy. */
 export function squishFlourish(countOn: number, role: SquishRole): { line: boolean; hearts: boolean } {
   return {
@@ -74,19 +63,4 @@ export function resetSquishCount(): void {
   loaded = true;
   writeStored(0);
   for (const listener of listeners) listener();
-}
-
-export function squishBuzz(reduced: boolean, vibrate?: (ms: number) => void): void {
-  if (reduced) return;
-  const buzz = vibrate ?? defaultVibrate;
-  try {
-    buzz(8);
-  } catch {
-    /* Some browsers expose vibrate and then throw. */
-  }
-}
-
-function defaultVibrate(ms: number): void {
-  if (typeof navigator === "undefined" || typeof navigator.vibrate !== "function") return;
-  navigator.vibrate(ms);
 }

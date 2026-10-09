@@ -1,29 +1,12 @@
+import { readFileSync } from "node:fs";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it } from "vitest";
+import { pokeMotion, pokePlayback } from "@/components/poke-play";
+import { squisheeMediaUrl } from "../paths";
+import { Squishy } from "../ui/squishy";
 import { applyPointer, gestureStart, holdAmount, replayPointer, squishHitPolicy, type Sample } from "./gesture";
-import { idleFrame, meshArea, meshVertex, restBody, squishSettled, stepSquish, touchNorm, SOFT_COLS, SOFT_ROWS, type SquishBody, type SquishFrame } from "./physics";
-import { squishVoice } from "../sound";
-import { bumpSquishCount, getSquishCount, resetSquishCount, squishBuzz, squishFlourish, squishPitch } from "./rewards";
-
-const DT = 1 / 60;
-
-function press(body: SquishBody, frame: SquishFrame, frames: number): SquishBody {
-  let next = body;
-  for (let i = 0; i < frames; i += 1) next = stepSquish(next, frame, DT).body;
-  return next;
-}
-
-function release(body: SquishBody, impulse: SquishFrame["impulse"], reduced = false): { body: SquishBody; sy: number[] } {
-  const sy: number[] = [];
-  let frame = stepSquish(body, { ...idleFrame(reduced), impulse, nx: -0.2 }, DT);
-  sy.push(frame.body.sy);
-  let next = frame.body;
-  for (let i = 0; i < 110; i += 1) {
-    frame = stepSquish(next, idleFrame(reduced), DT);
-    next = frame.body;
-    sy.push(next.sy);
-  }
-  return { body: next, sy };
-}
+import { bumpSquishCount, getSquishCount, resetSquishCount, squishFlourish } from "./rewards";
 
 const buddyPoke: Sample[] = [
   { kind: "down", x: 40, y: 20, t: 0 },
@@ -105,153 +88,83 @@ describe("squish pointer", () => {
     expect(cancel.gesture.phase).toBe("idle");
   });
 
-  it("reads the dent from the touch point inside the toy", () => {
-    expect(touchNorm(0, 10, 40, 40)).toEqual({ nx: -1, ny: -0.5 });
-    expect(touchNorm(40, 40, 40, 40)).toEqual({ nx: 1, ny: 1 });
-  });
 });
 
-function nearest(body: SquishBody, nx: number, ny: number) {
-  const x = (nx + 1) / 2;
-  const y = (ny + 1) / 2;
-  let best = meshVertex(body, 0, 0);
-  let bestD = Infinity;
-  for (let r = 0; r < SOFT_ROWS; r += 1) {
-    for (let c = 0; c < SOFT_COLS; c += 1) {
-      const v = meshVertex(body, c, r);
-      const d = (v.rx - x) ** 2 + (v.ry - y) ** 2;
-      if (d < bestD) {
-        best = v;
-        bestD = d;
-      }
-    }
-  }
-  return best;
-}
-
-describe("squish physics", () => {
-  it("taps into a quick squash, a side bulge, and a secondary wobble", () => {
-    let body = restBody();
-    const widths: number[] = [];
-    const shears: number[] = [];
-    body = stepSquish(body, { ...idleFrame(), impulse: "tap", nx: 0, ny: -0.4 }, DT).body;
-    for (let i = 0; i < 200; i += 1) {
-      body = stepSquish(body, idleFrame(), DT).body;
-      widths.push(body.sx);
-      const mid = meshVertex(body, Math.round((SOFT_COLS - 1) / 2), Math.round((SOFT_ROWS - 1) * 0.35));
-      shears.push(mid.x - mid.rx);
-    }
-    expect(Math.max(...widths)).toBeGreaterThan(1.04);
-    expect(Math.min(...widths.slice(0, 8))).toBeLessThan(1.2);
-    const turned = shears.some((value, i) => i > 4 && shears[i - 3]! * value < 0);
-    expect(turned).toBe(true);
-    expect(squishSettled(body, false)).toBe(true);
+describe("math poke art", () => {
+  it("uses the chroma-key clip for frog, cat, and bunny, and the strip when video is skipped", () => {
+    expect(pokePlayback("frog", false).clip).toMatch(/frog-poke\.mp4$/);
+    expect(pokePlayback("frog", false).strip).toBeNull();
+    expect(pokePlayback("cat", false).clip).toMatch(/cat-poke\.mp4$/);
+    expect(pokePlayback("bunny", false).clip).toMatch(/bunny-poke\.mp4$/);
+    const frogStrip = pokePlayback("frog", true);
+    expect(frogStrip.clip).toBeNull();
+    expect(frogStrip.strip).toMatchObject({ frames: 16, fps: 12 });
+    expect(frogStrip.strip?.src).toMatch(/frog-poke-strip\.png$/);
+    expect(pokePlayback("bunny", true).strip?.src).toMatch(/bunny-poke-strip\.png$/);
+    expect(pokePlayback("cat", true).strip?.src).toMatch(/cat-poke-strip\.png$/);
+    expect(squisheeMediaUrl("/times-tables/academy/squishees/frog-poke.mp4")).toBe("/times-tables/squishees/frog-poke.mp4");
+    expect(squisheeMediaUrl(pokePlayback("frog", true).strip?.src ?? "")).toBe("/times-tables/squishees/frog-poke-strip.png");
   });
 
-  it("dents under the finger, bulges the sides, keeps volume, and plants the base", () => {
-    const frame: SquishFrame = { ...idleFrame(), pressing: true, hold01: 1, nx: 0, ny: -0.45 };
-    let body = restBody();
-    let visual = stepSquish(body, frame, DT).visual;
-    for (let i = 0; i < 40; i += 1) {
-      const stepped = stepSquish(body, frame, DT);
-      body = stepped.body;
-      visual = stepped.visual;
-    }
-    const dent = nearest(body, 0, -0.45);
-    const side = meshVertex(body, 0, Math.round((SOFT_ROWS - 1) / 2));
-    const foot = meshVertex(body, 6, SOFT_ROWS - 1);
-    const area = meshArea(body);
-    expect(dent.y - dent.ry).toBeGreaterThan(0.1);
-    expect(side.rx - side.x).toBeGreaterThan(0.03);
-    expect(Math.abs(foot.y - foot.ry)).toBeLessThan(0.001);
-    expect(area).toBeGreaterThan(0.9);
-    expect(area).toBeLessThan(1.12);
-    expect(body.sx).toBeGreaterThan(1.04);
-    expect(visual.dentX).toBeCloseTo(0);
-    expect(visual.spread).toBeGreaterThan(1);
-
-    const rise: number[] = [];
-    body = stepSquish(body, { ...idleFrame(), impulse: "release", nx: 0, ny: -0.45 }, DT).body;
-    rise.push(nearest(body, 0, -0.45).y);
-    let stillMoving = false;
-    for (let i = 0; i < 18; i += 1) {
-      body = stepSquish(body, idleFrame(), DT).body;
-      rise.push(nearest(body, 0, -0.45).y);
-      if (!squishSettled(body, false)) stillMoving = true;
-    }
-    for (let i = 0; i < 220; i += 1) body = stepSquish(body, idleFrame(), DT).body;
-    expect(rise[0]!).toBeGreaterThan(rise[rise.length - 1]! + 0.02);
-    expect(stillMoving).toBe(true);
-    expect(Math.min(...rise)).toBeGreaterThan(dent.ry - 0.04);
-    expect(squishSettled(body, false)).toBe(true);
+  it("keeps every other squishee on the still, squashed with the same CSS", () => {
+    expect(pokePlayback("peach", false)).toEqual({ clip: null, strip: null });
+    expect(pokePlayback("panda", true)).toEqual({ clip: null, strip: null });
+    expect(pokePlayback("avocado", false)).toEqual({ clip: null, strip: null });
+    expect(pokeMotion(false, pokePlayback("peach", false)).squash).toBe(true);
   });
 
-  it("stretches from the grab point and keeps the base down", () => {
-    const frame: SquishFrame = { ...idleFrame(), pressing: true, hold01: 0.2, dx: 48, dy: 8, nx: 0.7, ny: -0.2, width: 100, height: 100 };
-    const dragged = press(restBody(), frame, 28);
-    const grab = nearest(dragged, 0.7, -0.2);
-    const far = meshVertex(dragged, 0, 2);
-    const foot = meshVertex(dragged, 6, SOFT_ROWS - 1);
-    expect(grab.x - grab.rx).toBeGreaterThan(0.12);
-    expect(grab.x - grab.rx).toBeGreaterThan((far.x - far.rx) + 0.05);
-    expect(Math.abs(foot.y - foot.ry)).toBeLessThan(0.001);
-
-    let body = stepSquish(dragged, { ...idleFrame(), impulse: "flick", dx: 48, dy: 8, nx: 0.7, ny: -0.2 }, DT).body;
-    for (let i = 0; i < 240; i += 1) body = stepSquish(body, idleFrame(), DT).body;
-    expect(squishSettled(body, false)).toBe(true);
-    expect(Math.abs(meshVertex(body, 6, SOFT_ROWS - 1).y - 1)).toBeLessThan(0.001);
+  it("drops the clip and the squash when motion is reduced", () => {
+    expect(pokeMotion(true, pokePlayback("frog", false))).toEqual({ squash: false, clip: null, strip: null });
+    expect(pokeMotion(true, pokePlayback("frog", true))).toEqual({ squash: false, clip: null, strip: null });
   });
 
-  it("steps a few seconds of soft-body inside a phone frame budget", () => {
-    let body = restBody();
-    const held: SquishFrame = { ...idleFrame(), pressing: true, hold01: 1, nx: -0.2, ny: -0.3 };
-    const t0 = performance.now();
-    for (let i = 0; i < 90; i += 1) body = stepSquish(body, held, DT).body;
-    for (let i = 0; i < 150; i += 1) body = stepSquish(body, idleFrame(), DT).body;
-    expect(performance.now() - t0).toBeLessThan(120);
-    expect(Number.isFinite(body.sx)).toBe(true);
+  it("rests on the still picture and does not mount a mesh", () => {
+    const frog = renderToStaticMarkup(
+      createElement(Squishy, { id: "frog" }, createElement("img", { src: "/times-tables/squishees/frog.png", alt: "" })),
+    );
+    expect(frog).toContain("frog.png");
+    expect(frog).toContain('data-squash="0"');
+    expect(frog).toContain("ac-squish-stage");
+    expect(frog).not.toContain("<canvas");
+    expect(frog).not.toContain("<video");
+    expect(frog).not.toContain("frog-poke");
+
+    const peach = renderToStaticMarkup(
+      createElement(Squishy, { id: "peach" }, createElement("img", { src: "/times-tables/squishees/peach.png", alt: "" })),
+    );
+    expect(peach).toContain('data-squash="0"');
+    expect(peach).not.toContain("peach-poke");
+    expect(peach).not.toContain("<canvas");
   });
 
-  it("uses only a tiny uniform scale when motion is reduced", () => {
-    const held: SquishFrame = { ...idleFrame(true), pressing: true, hold01: 1, nx: 1, ny: -1, dx: 30, dy: 20 };
-    let body = restBody();
-    const scales: number[] = [];
-    for (let i = 0; i < 20; i += 1) {
-      const stepped = stepSquish(body, held, DT);
-      body = stepped.body;
-      scales.push(body.sx);
-      expect(body.sx).toBeCloseTo(body.sy);
-      expect(body.x).toBe(0);
-      expect(body.y).toBe(0);
-      expect(body.rot).toBe(0);
-      expect(stepped.visual.dentX).toBe(0);
-      expect(body.sx).toBeGreaterThan(0.95);
-      expect(body.sx).toBeLessThanOrEqual(1);
-    }
-    expect(scales.at(-1)!).toBeLessThan(0.97);
-
-    const back = release(body, "tap", true);
-    for (const sy of back.sy) {
-      expect(sy).toBeGreaterThan(0.955);
-      expect(sy).toBeLessThanOrEqual(1);
-    }
-    expect(back.body.x).toBe(0);
-    expect(back.body.rot).toBe(0);
+  it("reuses the Math squash classes, tap tone, and leaves the clock pal alone", () => {
+    const ui = readFileSync(new URL("../ui/squishy.tsx", import.meta.url), "utf8");
+    const tap = readFileSync(new URL("../../lib/sound.ts", import.meta.url), "utf8");
+    const clock = readFileSync(new URL("../ui/bits.tsx", import.meta.url), "utf8");
+    const css = readFileSync(new URL("../../components/poke-squish.css", import.meta.url), "utf8");
+    expect(ui).toContain("SquashOnPoke");
+    expect(ui).toContain("MagentaVideo");
+    expect(ui).toContain("PokeStrip");
+    expect(ui).toContain("if (soundRef.current) playTap()");
+    expect(ui).not.toContain("squishTone");
+    expect(ui).not.toContain("drawSoftBody");
+    expect(tap).toMatch(/function playTap\(\)[\s\S]*tone\(880,\s*c\.currentTime,\s*0\.04,\s*"sine",\s*0\.025\)/);
+    expect(css).toContain("animation: squash 640ms cubic-bezier(0.22, 1, 0.36, 1)");
+    expect(css).toContain("animation: poke-bounce 520ms cubic-bezier(0.22, 1, 0.36, 1)");
+    expect(css).toContain("transform-origin: 50% 90%");
+    expect(clock).toContain('<img className="ac-clock-pal"');
+    expect(clock).not.toContain("ac-clock-pal\" src={squisheeUrl(rider.file)} alt=\"\" draggable={false} /></Squishy>");
+    const academyCss = readFileSync(new URL("../academy.css", import.meta.url), "utf8");
+    expect(academyCss).toContain(".ac-map-you { width: 46px; height: 46px; object-fit: contain; animation: ac-hop 0.7s ease; }");
+    expect(academyCss).toContain(".ac-choice .ac-squish,\n.ac-cell .ac-squish { pointer-events: none; cursor: inherit; }");
+    expect(ui).not.toContain("squishBuzz");
+    expect(ui).not.toContain("vibrate");
   });
 });
 
 describe("squish fun", () => {
   beforeEach(() => {
     resetSquishCount();
-  });
-
-  it("gives each squishee a stable cute pitch", () => {
-    expect(squishPitch("peach")).toBe(squishPitch("peach"));
-    expect(squishPitch("peach")).not.toBe(squishPitch("frog"));
-    for (const id of ["peach", "frog", "panda", "galaxy-narwhal", "star-mochi"]) {
-      expect(squishPitch(id)).toBeGreaterThanOrEqual(320);
-      expect(squishPitch(id)).toBeLessThanOrEqual(470);
-    }
   });
 
   it("says a line sometimes and bursts hearts for the buddy", () => {
@@ -269,21 +182,4 @@ describe("squish fun", () => {
     expect(getSquishCount()).toBe(2);
   });
 
-  it("uses a quiet noise squish instead of a beep", () => {
-    const down = squishVoice("peach", "down", 0.2);
-    const up = squishVoice("peach", "up", 0.8);
-    expect(down.bodyHz).toBeLessThan(160);
-    expect(up.bodyHz).toBeLessThan(180);
-    expect(down.noiseGain).toBeGreaterThan(0.02);
-    expect(down.bodyGain + down.noiseGain + down.squelchGain).toBeLessThan(0.12);
-    expect(down.squelchHz).not.toBe(up.squelchHz);
-    expect(down.noiseHz).not.toBe(squishVoice("peach", "down", 0.9).noiseHz);
-  });
-
-  it("skips the haptic when motion is reduced", () => {
-    const pulses: number[] = [];
-    squishBuzz(true, (ms) => pulses.push(ms));
-    squishBuzz(false, (ms) => pulses.push(ms));
-    expect(pulses).toEqual([8]);
-  });
 });

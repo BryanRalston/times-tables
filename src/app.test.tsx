@@ -516,7 +516,10 @@ describe("first-visit Home door", () => {
     expect(css).toContain("width: var(--hop-tile, 3.2%)");
     expect(css).toContain("min-width: 44px");
     expect(css).toContain("[data-leftover-board] .leftover-hole");
-    expect(css).toContain("@keyframes poke-bounce");
+    expect(css).toContain("poke-squish.css");
+    const pokeCss = readFileSync(join(HERE, "components/poke-squish.css"), "utf8");
+    expect(pokeCss).toContain("@keyframes poke-bounce");
+    expect(pokeCss).toContain("@keyframes squash");
     expect(css).toContain(".candy-portal-call");
     expect(css).toContain("height: 2.2rem");
     expect(css).toContain("[data-cosmetic-card].shelf-slot");

@@ -1669,7 +1669,7 @@ body:has(.ac-boss-intro) { background: #3c2448; }
   -webkit-touch-callout: none;
   cursor: pointer;
 }
-.ac-squish[data-squish="buddy"] { touch-action: none; cursor: grab; }
+.ac-squish[data-squish="buddy"] { touch-action: manipulation; cursor: pointer; }
 .ac-squish img { pointer-events: none; }
 .ac-squish-stage {
   position: relative;
@@ -1677,16 +1677,26 @@ body:has(.ac-boss-intro) { background: #3c2448; }
   max-width: 100%;
   line-height: 0;
   vertical-align: middle;
+  overflow: visible;
 }
 .ac-boss-face > .ac-squish-stage { display: block; width: 100%; }
-.ac-squish-view {
+.ac-poke-clip {
   position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  opacity: 0;
 }
-.ac-squish[data-live="yes"] .ac-squish-view { opacity: 1; }
-.ac-squish[data-live="yes"] .is-faded + .ac-squish-view { opacity: 0.35; }
-.ac-squish[data-live="yes"] > .ac-squish-stage > img { opacity: 0; }
+.ac-poke-clip canvas,
+.ac-poke-clip.poke-strip {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.ac-poke-clip canvas.hidden { display: none; }
+.ac-squish[data-poke-art="on"] > .ac-squish-stage > img { visibility: hidden; }
+.ac-squish:has(.is-faded) .ac-poke-clip { opacity: 0.35; filter: grayscale(1); }
 .ac-choice .ac-squish,
 .ac-cell .ac-squish { pointer-events: none; cursor: inherit; }
 .ac-dots .ac-squish,
@@ -1749,4 +1759,7 @@ body:has(.ac-boss-intro) { background: #3c2448; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ac-squish-hearts i { animation: none; opacity: 1; transform: translate(-50%, -6px); }
+  .ac-squish .squash,
+  .ac-squish .poke-bounce,
+  .ac-squish .poke-strip-run { animation: none; }
 }
