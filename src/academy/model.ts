@@ -54,6 +54,12 @@ export interface Child {
   dailyDate: string | null;
   dailyRounds: number;
   dailyGift: DailyGiftState;
+  /** Island hosts befriended by beating their boss. */
+  friends: string[];
+  /** Squishees that hatched from the island egg. */
+  hatched: string[];
+  /** Mystery egg on the map. Ready after the daily goal. */
+  egg: DailyGiftState;
   /** Sight-word and spelling cards, keyed `sw:` or `sp:`. */
   words: Record<string, WordCard>;
 }

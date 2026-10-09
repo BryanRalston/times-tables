@@ -1,20 +1,25 @@
 import { useEffect, useState } from "react";
 import { COSMETICS, cosmeticPrice, type CosmeticId } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
+import { bookEntries, catchphrase } from "../buddy/cast";
+import { palOwned, withBuddy } from "../buddy/unlock";
 import { GAMES, sheetHref } from "../games/registry";
 import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type Grade, type Save } from "../model";
-import { buyOutfit, giftCount, palUnlocked, starsNeeded, unlockedCount, wearOutfit } from "../rewards";
+import { buyOutfit, wearOutfit } from "../rewards";
 import { activeChild, mapActive, withGrade, withLevel } from "../storage";
 import { silence, speak } from "../voice";
 import { AcademyPal, BackLink, Foot, FreeNote, Logo, SquisheeImg, cx } from "./bits";
 import { GradeChips } from "./grownups";
 
+const STARTERS = SQUAD_IDS.slice(0, 3);
+
 export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save: Save) => void; sound: boolean }) {
   const [name, setName] = useState("");
   const [grade, setGrade] = useState<Grade>(DEFAULT_START_GRADE);
+  const [buddy, setBuddy] = useState<string>(STARTERS[0] ?? "peach");
 
   useEffect(() => {
-    speak("Tap play!", sound);
+    speak("Pick a buddy!", sound);
     return () => silence();
   }, [sound]);
 
@@ -28,18 +33,32 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
         onSubmit={(e) => {
           e.preventDefault();
           const cleaned = cleanName(name) || "Pal";
-          onSave(mapActive(save, (child) => withGrade({ ...child, name: cleaned, avatarId: "peach" }, grade)));
-          window.location.hash = "#/play/add";
+          const pick = (STARTERS as readonly string[]).includes(buddy) ? buddy : "peach";
+          onSave(mapActive(save, (child) => withGrade({ ...child, name: cleaned, avatarId: pick }, grade)));
+          window.location.hash = "#/";
         }}
       >
-        <div className="ac-pals">
-          <SquisheeImg id="frog" />
-          <SquisheeImg id="bunny" />
+        <h1 className="ac-sr">Pick a buddy</h1>
+        <div className="ac-buddy-picks" role="radiogroup" aria-label="Pick a buddy">
+          {STARTERS.map((id) => (
+            <button
+              key={id}
+              type="button"
+              role="radio"
+              aria-checked={buddy === id}
+              data-buddy-pick={id}
+              className={cx("ac-buddy-pick", buddy === id && "is-on")}
+              onClick={() => setBuddy(id)}
+            >
+              <SquisheeImg id={id} label={squisheeById(id)?.name ?? id} />
+              <small>{squisheeById(id)?.name ?? id}</small>
+            </button>
+          ))}
         </div>
-        <h1 className="ac-sr">Ready to play?</h1>
+        <p className="ac-bubble">{catchphrase(buddy)}</p>
         <GradeChips grade={grade} onGrade={setGrade} className="ac-hello-grades" />
         <button type="submit" className="ac-pal-play" aria-label="Play">
-          <SquisheeImg id="peach" />
+          <SquisheeImg id={buddy} />
           <span className="ac-play-tri" aria-hidden="true" />
         </button>
         <label className="ac-field ac-name-opt">
@@ -128,21 +147,21 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
 
 export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save) => void }) {
   const child = activeChild(save);
-  const owned = unlockedCount(child.stars);
-  const gifts = giftCount(child);
+  const book = bookEntries();
+  const found = book.filter((entry) => palOwned(child, entry.id)).length;
 
   return (
     <div className="ac-shell ac-mid">
       <header className="ac-top">
         <Logo />
       </header>
-      <h1>Shelf</h1>
+      <h1>Squishee Book</h1>
       <p className="ac-lede">
-        {child.coins} coins · {owned} of {SQUAD_IDS.length} squishees
-        {gifts > 0 ? ` · ${gifts} new` : ""}
+        {found} of {book.length} found · {child.coins} coins
       </p>
       <AcademyPal id={child.avatarId} cosmetic={child.equipped} className="ac-shelf-you" label="You" />
-      <h2>Outfits</h2>
+      <h2>Outfit shop</h2>
+      <p className="ac-hint">Spend coins you earn. Never real money.</p>
       <div className="ac-shelf">
         <button
           type="button"
@@ -175,20 +194,39 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
         })}
       </div>
       <h2>Squishees</h2>
-      <div className="ac-shelf">
-        {SQUAD_IDS.map((id, index) => {
-          const open = palUnlocked(child, id, index);
-          const meta = squisheeById(id);
+      <div className="ac-shelf" data-book="squishees">
+        {book.map((entry) => {
+          const open = palOwned(child, entry.id);
+          const card = (
+            <>
+              <AcademyPal
+                id={entry.id}
+                cosmetic={open && child.avatarId === entry.id ? child.equipped : ""}
+                className={cx(!open && "ac-sil")}
+                label={open ? entry.name : ""}
+              />
+              <small>{open ? entry.name : "???"}</small>
+              <small>{entry.rarity === "rare" ? "Rare" : "Common"}</small>
+              <small>{open ? entry.line : entry.find}</small>
+            </>
+          );
+          if (!open) {
+            return (
+              <div key={entry.id} className="ac-shelf-card is-locked" data-found="no" data-rarity={entry.rarity}>
+                {card}
+              </div>
+            );
+          }
           return (
             <button
-              key={id}
+              key={entry.id}
               type="button"
-              className={cx("ac-shelf-card", !open && "is-locked", child.avatarId === id && "is-you")}
-              disabled={!open}
-              onClick={() => onSave(mapActive(save, (row) => ({ ...row, avatarId: id, opened: Math.max(row.opened, owned) })))}
+              data-found="yes"
+              data-rarity={entry.rarity}
+              className={cx("ac-shelf-card", child.avatarId === entry.id && "is-you")}
+              onClick={() => onSave(mapActive(save, (row) => withBuddy(row, entry.id)))}
             >
-              <AcademyPal id={id} cosmetic={child.avatarId === id ? child.equipped : ""} label={open ? meta?.name : ""} />
-              <small>{open ? (meta?.name ?? id) : `${starsNeeded(index)} stars`}</small>
+              {card}
             </button>
           );
         })}

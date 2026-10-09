@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { emptyPile, formatCents } from "../games/money-model";
 import type { TeachFrame, WorkedExample } from "../teach";
 import { AnalogClock, cx } from "./bits";
+import { CountToken } from "./count-token";
 import { CoinRow } from "./coins";
 
 function prefersReducedMotion(): boolean {
@@ -140,11 +141,10 @@ function Blocks({ n, tone }: { n: number; tone: "pink" | "teal" }) {
 }
 
 function TenFrame({ filled }: { filled: number }) {
+  const n = Math.max(0, Math.min(10, filled));
   return (
-    <div className="ac-ten" aria-hidden="true">
-      {Array.from({ length: 10 }, (_, i) => (
-        <i key={i} className={i < filled ? "is-on" : ""} />
-      ))}
+    <div className="ac-ten" aria-label={`${n} squishees on a ten-frame`}>
+      {Array.from({ length: 10 }, (_, i) => (i < n ? <CountToken key={i} /> : <i key={i} />))}
     </div>
   );
 }

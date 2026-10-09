@@ -3,6 +3,8 @@ import { canDressFace } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
 import { MINUS, TIMES, type AddVisual, type Visual } from "../games/types";
 import { cosmeticCompositeUrl, squisheeUrl } from "../paths";
+import { CountToken, SquisheeTen } from "./count-token";
+import { useCast } from "./round-cast";
 
 export function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(" ");
@@ -219,7 +221,9 @@ export function AnalogClock({
   };
   const hour = point(hourDeg, 50);
   const minute = point(minuteDeg, 72);
+  const rider = squisheeById(useCast()?.hostId ?? "");
   return (
+    <span className="ac-clock-wrap">
     <svg
       className={cx("ac-clock", className)}
       viewBox="0 0 200 200"
@@ -244,6 +248,8 @@ export function AnalogClock({
       <line x1="100" y1="100" x2={minute.x} y2={minute.y} className="ac-minute" strokeLinecap="round" />
       <circle cx="100" cy="100" r="7" fill="#4a2d55" />
     </svg>
+    {rider ? <img className="ac-clock-pal" src={squisheeUrl(rider.file)} alt="" draggable={false} /> : null}
+    </span>
   );
 }
 
@@ -283,6 +289,13 @@ export function DotModel({ visual }: { visual: AddVisual }) {
       </div>
     );
   }
+  const total = visual.pink + visual.teal;
+  if (visual.op === "+" && visual.max <= 10 && total <= 10) {
+    return <SquisheeTen pink={visual.pink} teal={visual.teal} />;
+  }
+  if (total <= 12) {
+    return <TokenAdd visual={visual} />;
+  }
   return (
     <div className="ac-dots" aria-hidden="true">
       <Dots n={visual.pink} tone="pink" />
@@ -292,15 +305,33 @@ export function DotModel({ visual }: { visual: AddVisual }) {
   );
 }
 
+function TokenAdd({ visual }: { visual: AddVisual }) {
+  const cast = useCast();
+  const kept = cast?.buddyId ?? "peach";
+  const extra = cast?.hostId ?? "frog";
+  const gone = visual.op === "-";
+  return (
+    <div className="ac-dots" aria-label={gone ? "Squishees, some shared away" : "Squishees to count"}>
+      {Array.from({ length: visual.pink }, (_, i) => (
+        <CountToken key={`p${i}`} id={kept} />
+      ))}
+      <span className="ac-dot-gap" />
+      {Array.from({ length: visual.teal }, (_, i) => (
+        <CountToken key={`t${i}`} id={extra} faded={gone} />
+      ))}
+    </div>
+  );
+}
+
 export function Groups({ a, b }: { a: number; b: number }) {
   if (a > 6 || b > 6 || a * b > 24 || a < 1) return null;
+  const faces = a <= 4 && a * b <= 12;
+  const token = useCast()?.buddyId ?? "peach";
   return (
-    <div className="ac-groups" aria-hidden="true">
+    <div className="ac-groups" aria-hidden={faces ? undefined : true} aria-label={faces ? `${a} groups of ${b} squishees` : undefined}>
       {Array.from({ length: a }, (_, g) => (
         <span key={g} className="ac-group">
-          {Array.from({ length: b }, (_, i) => (
-            <i key={i} />
-          ))}
+          {Array.from({ length: b }, (_, i) => (faces ? <CountToken key={i} id={token} /> : <i key={i} />))}
         </span>
       ))}
     </div>

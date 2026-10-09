@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { squisheeById } from "@/lib/squishees";
+import { bookEntries, catchphrase } from "../buddy/cast";
+import { ownedIds } from "../buddy/unlock";
 import { GAMES } from "../games/registry";
 import { dailySnapshot, normalizeJourney } from "../journey";
 import { gradeLabel, todayIso, type Child } from "../model";
 import { nextPlacement } from "../placement";
-import { gameOfDay, rollGift, unlockedCount, type GiftRoll } from "../rewards";
+import { gameOfDay, rollGift, type GiftRoll } from "../rewards";
 import { chime } from "../sound";
 import { WeekStickers } from "./stickers";
 import { AcademyPal, Foot, GiftBox, Logo, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
@@ -25,8 +27,8 @@ export function HomeScreen({
   const today = gameOfDay(todayId);
   const daily = dailySnapshot(child, todayId);
   const journey = normalizeJourney(child.journey);
-  const pals = ["frog", "peach", "bunny"];
   const place = nextPlacement(child);
+  const book = bookEntries();
 
   return (
     <div className="ac-shell">
@@ -39,10 +41,9 @@ export function HomeScreen({
 
       <section className="ac-hero">
         <div className="ac-pals">
-          {pals.map((id) => (
-            <SquisheeImg key={id} id={id} className={id === "peach" ? "is-mid" : ""} />
-          ))}
+          <AcademyPal id={child.avatarId} cosmetic={child.equipped} className="is-mid" label={child.name} />
         </div>
+        <p className="ac-bubble">{catchphrase(child.avatarId)}</p>
         <h1>Hi {child.name}! Ready to play?</h1>
         <p className="ac-lede">2-minute games · hop the island · collect squishees</p>
         <div className="ac-daily" data-daily-rounds={daily.rounds} data-daily-goal={daily.goal} data-gift={daily.ready ? "closed" : daily.claimed ? "open" : "none"}>
@@ -97,9 +98,9 @@ export function HomeScreen({
           <AcademyPal id={child.avatarId} cosmetic={child.equipped} className="ac-meter-pal" />
           <span>
             <strong>
-              {unlockedCount(child.stars)}/{24}
+              {ownedIds(child).length}/{book.length}
             </strong>
-            <small>squishees</small>
+            <small>book</small>
           </span>
         </a>
         <a className="ac-meter" href="#/shelf">
