@@ -1,3 +1,5 @@
+import { squishPitch } from "./squish/rewards";
+
 let ctx: AudioContext | null = null;
 
 function tone(freq: number, dur: number, delay: number, type: OscillatorType, volume: number) {
@@ -97,6 +99,20 @@ export function bossFanfare(enabled: boolean) {
     tone(659, 0.1, 0.1, "sine", 0.03);
     tone(784, 0.1, 0.2, "sine", 0.03);
     tone(1046, 0.22, 0.3, "triangle", 0.028);
+  });
+}
+
+/** Soft toy squish. Pitch follows the squishee. Silent when muted. */
+export function squishTone(id: string, enabled: boolean, which: "down" | "up") {
+  withAudio(enabled, () => {
+    const base = squishPitch(id);
+    if (which === "down") {
+      tone(base, 0.055, 0, "sine", 0.026);
+      tone(base * 0.5, 0.07, 0.01, "triangle", 0.008);
+      return;
+    }
+    tone(base * 1.16, 0.045, 0, "sine", 0.022);
+    tone(base * 1.48, 0.06, 0.035, "sine", 0.012);
   });
 }
 

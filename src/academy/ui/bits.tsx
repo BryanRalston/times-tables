@@ -3,8 +3,12 @@ import { canDressFace } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
 import { MINUS, TIMES, type AddVisual, type Visual } from "../games/types";
 import { cosmeticCompositeUrl, squisheeUrl } from "../paths";
+import type { SquishRole } from "../squish/gesture";
 import { CountToken, SquisheeTen } from "./count-token";
 import { useCast } from "./round-cast";
+import { Squishy } from "./squishy";
+
+type SquishMode = SquishRole | "off";
 
 export function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(" ");
@@ -18,10 +22,26 @@ export function BackLink({ href = "#/", children = "Games" }: { href?: string; c
   );
 }
 
-export function SquisheeImg({ id, className, label }: { id: string; className?: string; label?: string }) {
+export function SquisheeImg({
+  id,
+  className,
+  label,
+  squish = "toy",
+}: {
+  id: string;
+  className?: string;
+  label?: string;
+  squish?: SquishMode;
+}) {
   const s = squisheeById(id);
   if (!s) return null;
-  return <img className={className} src={squisheeUrl(s.file)} alt={label ?? ""} draggable={false} />;
+  const img = <img className={className} src={squisheeUrl(s.file)} alt={label ?? ""} draggable={false} />;
+  if (squish === "off") return img;
+  return (
+    <Squishy id={id} role={squish}>
+      {img}
+    </Squishy>
+  );
 }
 
 export function AcademyPal({
@@ -29,16 +49,24 @@ export function AcademyPal({
   cosmetic,
   className,
   label,
+  squish = "toy",
 }: {
   id: string;
   cosmetic?: string;
   className?: string;
   label?: string;
+  squish?: SquishMode;
 }) {
   const s = squisheeById(id);
   if (!s) return null;
   const src = cosmetic && canDressFace(id, cosmetic) ? cosmeticCompositeUrl(id, cosmetic) : squisheeUrl(s.file);
-  return <img className={className} src={src} alt={label ?? ""} draggable={false} />;
+  const img = <img className={className} src={src} alt={label ?? ""} draggable={false} />;
+  if (squish === "off") return img;
+  return (
+    <Squishy id={id} role={squish}>
+      {img}
+    </Squishy>
+  );
 }
 
 export function ProgressRing({ value, max, label }: { value: number; max: number; label: string }) {
@@ -248,6 +276,7 @@ export function AnalogClock({
       <line x1="100" y1="100" x2={minute.x} y2={minute.y} className="ac-minute" strokeLinecap="round" />
       <circle cx="100" cy="100" r="7" fill="#4a2d55" />
     </svg>
+    {/* Sits on the clock hands, so a squish would fight the drag. */}
     {rider ? <img className="ac-clock-pal" src={squisheeUrl(rider.file)} alt="" draggable={false} /> : null}
     </span>
   );

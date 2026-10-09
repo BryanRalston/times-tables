@@ -12,6 +12,7 @@ import { buyOutfit, wearOutfit } from "../rewards";
 import { activeChild, mapActive, withGrade, withLevel } from "../storage";
 import { silence, speak } from "../voice";
 import { AcademyPal, BackLink, Foot, FreeNote, Logo, SquisheeImg, cx } from "./bits";
+import { SquishTally } from "./squishy";
 import { BossFigure, PalWithLook } from "./boss-figure";
 import { GradeChips } from "./grownups";
 
@@ -207,6 +208,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
       <p className="ac-lede">
         {found} of {book.length} found · {child.coins} coins
       </p>
+      <SquishTally />
       <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="ac-shelf-you" label="You" />
       <h2>Outfit shop</h2>
       <p className="ac-hint">Spend coins you earn. Never real money.</p>

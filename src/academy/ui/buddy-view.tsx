@@ -1,20 +1,8 @@
-import { useEffect, useState } from "react";
 import { squisheeById } from "@/lib/squishees";
 import { catchphrase } from "../buddy/cast";
 import { bubbleText, buddyMotion, type BuddyReaction } from "../buddy/react";
 import { AcademyPal, cx } from "./bits";
-
-function useReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const apply = () => setReduced(media.matches);
-    apply();
-    media.addEventListener("change", apply);
-    return () => media.removeEventListener("change", apply);
-  }, []);
-  return reduced;
-}
+import { useReducedMotion } from "./squishy";
 
 export function RoundBuddy({
   id,
@@ -38,7 +26,7 @@ export function RoundBuddy({
     >
       {text ? <span className="ac-bubble">{text}</span> : null}
       {reaction.point ? <span className="ac-buddy-point" /> : null}
-      <AcademyPal id={id} cosmetic={cosmetic} className="ac-buddy-img" />
+      <AcademyPal id={id} cosmetic={cosmetic} className="ac-buddy-img" squish="buddy" />
     </div>
   );
 }

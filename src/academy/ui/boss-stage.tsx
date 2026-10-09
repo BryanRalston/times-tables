@@ -48,7 +48,7 @@ export function BossHud({
         <span style={{ width: `${pct * 100}%` }} />
       </div>
       <div className="ac-boss-row">
-        <SquisheeImg id={buddyId} className={cx("ac-buddy", (mood === "hit" || mood === "dizzy") && "is-attack")} label="" />
+        <SquisheeImg id={buddyId} squish="buddy" className={cx("ac-buddy", (mood === "hit" || mood === "dizzy") && "is-attack")} label="" />
         <BossFigure face={boss.face} look={boss.look} mood={mood} crown={crown} name="" size="fight" />
       </div>
       {phase === "rally" ? null : <p className={cx("ac-phase-banner", phase === "super" && "is-super")}>{bossPhaseLabel(phase)}</p>}

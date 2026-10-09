@@ -4,38 +4,9 @@ import { SQUAD_IDS } from "../model";
 import { starsNeeded } from "../rewards";
 import { EGG_IDS } from "./egg";
 import { hostIdFor } from "./hosts";
+import { catchphrase } from "./lines";
 
-/** One short line. Shown in a speech bubble and on the book. */
-const LINES: Record<string, string> = {
-  peach: "Sweet and ready!",
-  frog: "Hop to it!",
-  bunny: "Boing! Let's count.",
-  melon: "Cool and juicy!",
-  grape: "A bunch of fun!",
-  bear: "We can count them.",
-  cat: "Purr-fect try!",
-  panda: "Groups are my favorite.",
-  owl: "Hoot! Sound it out.",
-  chick: "Peep! You can do it.",
-  duck: "Waddle with me!",
-  pig: "Oink! Nice work.",
-  penguin: "Watch the long hand.",
-  whale: "A big splash of math!",
-  avocado: "Guac and roll!",
-  donut: "Hole-y moly!",
-  corn: "A-maize-ing!",
-  lemon: "Sweet, not sour.",
-  strawberry: "Berry proud of you!",
-  cookie: "You are a smart cookie!",
-  boba: "Sip, sip, hooray!",
-  fox: "Let's share the coins.",
-  otter: "Hold paws and count.",
-  capybara: "Calm and clever.",
-  "crystal-axolotl": "Sparkle and count!",
-  "rainbow-cupcake": "A sprinkle of luck!",
-  "star-mochi": "Wish on a star!",
-  "galaxy-narwhal": "Out of this world!",
-};
+export { catchphrase } from "./lines";
 
 export type FindKind = "starter" | "boss" | "stars" | "egg";
 
@@ -46,10 +17,6 @@ export interface BookEntry {
   line: string;
   find: string;
   findKind: FindKind;
-}
-
-export function catchphrase(id: string): string {
-  return LINES[id] ?? "Let's play!";
 }
 
 export function findBlurb(id: string, games: readonly { id: string; title: string }[] = GAMES): { kind: FindKind; text: string } {

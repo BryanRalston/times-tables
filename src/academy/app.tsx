@@ -11,6 +11,7 @@ import { HomeScreen } from "./ui/home";
 import { MapScreen } from "./ui/map";
 import { PlayScreen } from "./ui/play";
 import { WorksheetPage } from "./ui/worksheet";
+import { SoundContext } from "./ui/sound-context";
 
 type Route =
   | { name: "home" }
@@ -138,5 +139,5 @@ function AcademyApp() {
     );
   }
 
-  return body;
+  return <SoundContext.Provider value={save.sound}>{body}</SoundContext.Provider>;
 }

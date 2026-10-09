@@ -2,6 +2,7 @@ import { squisheeById } from "@/lib/squishees";
 import { lookForCosmetic, type BossLook } from "../bosses";
 import { squisheeUrl } from "../paths";
 import { AcademyPal, cx } from "./bits";
+import { Squishy } from "./squishy";
 
 export type BossMood = "arrive" | "idle" | "hit" | "dizzy" | "raspberry" | "friendly";
 
@@ -148,7 +149,9 @@ export function BossFigure({
       <svg className="ac-boss-cape" viewBox="0 0 200 240" aria-hidden="true">
         <Cape look={look} />
       </svg>
-      <img className="ac-boss-face" src={src} alt={name ?? ""} draggable={false} />
+      <Squishy id={face} className="ac-boss-face">
+        <img src={src} alt={name ?? ""} draggable={false} />
+      </Squishy>
       <svg className="ac-boss-gear" viewBox="0 0 200 240" aria-hidden="true">
         <Gear look={look} gold={crown || mood === "friendly"} />
       </svg>

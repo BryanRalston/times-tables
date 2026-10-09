@@ -1,6 +1,7 @@
 import { squisheeById } from "@/lib/squishees";
 import { squisheeUrl } from "../paths";
 import { useCast } from "./round-cast";
+import { Squishy } from "./squishy";
 
 export function CountToken({ id, faded }: { id?: string; faded?: boolean }) {
   const cast = useCast();
@@ -8,12 +9,14 @@ export function CountToken({ id, faded }: { id?: string; faded?: boolean }) {
   const squishee = squisheeById(face);
   if (!squishee) return <i className="ac-dot" />;
   return (
-    <img
-      className={faded ? "ac-token is-faded" : "ac-token"}
-      src={squisheeUrl(squishee.file)}
-      alt=""
-      draggable={false}
-    />
+    <Squishy id={squishee.id} expression={false} lines={false}>
+      <img
+        className={faded ? "ac-token is-faded" : "ac-token"}
+        src={squisheeUrl(squishee.file)}
+        alt=""
+        draggable={false}
+      />
+    </Squishy>
   );
 }
 
