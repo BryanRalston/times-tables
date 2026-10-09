@@ -2,6 +2,19 @@ import { WORKSHEETS, type StaticItem, type StaticSheet } from "./catalog";
 
 export const CANONICAL_ORIGIN = "https://squisheeacademy.com";
 
+export const HOME_TITLE = "Squishee Academy";
+export const HOME_DESCRIPTION = "Free K-3 learning games with squishees. No ads, no accounts.";
+
+/** Stable path in the domain build. Crawlers fetch this file directly. */
+export const SHARE_IMAGE_PATH = "/og/squishee-academy.png";
+export const SHARE_IMAGE_WIDTH = 1200;
+export const SHARE_IMAGE_HEIGHT = 630;
+export const SHARE_IMAGE_ALT = "Squishee Academy. Free learning games for K-3.";
+
+export function shareImageUrl(): string {
+  return `${CANONICAL_ORIGIN}${SHARE_IMAGE_PATH}`;
+}
+
 export interface SeoFile {
   path: string;
   body: string;
@@ -18,6 +31,54 @@ export function escapeHtml(value: string): string {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
+}
+
+export function iconLinks(): string {
+  return `  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />`;
+}
+
+export function socialMeta(opts: { title: string; description: string; url: string }): string {
+  const title = escapeHtml(opts.title);
+  const description = escapeHtml(opts.description);
+  const alt = escapeHtml(SHARE_IMAGE_ALT);
+  const image = shareImageUrl();
+  return `  <meta property="og:title" content="${title}" />
+  <meta property="og:description" content="${description}" />
+  <meta property="og:url" content="${opts.url}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Squishee Academy" />
+  <meta property="og:image" content="${image}" />
+  <meta property="og:image:width" content="${SHARE_IMAGE_WIDTH}" />
+  <meta property="og:image:height" content="${SHARE_IMAGE_HEIGHT}" />
+  <meta property="og:image:alt" content="${alt}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${title}" />
+  <meta name="twitter:description" content="${description}" />
+  <meta name="twitter:image" content="${image}" />
+  <meta name="twitter:image:alt" content="${alt}" />`;
+}
+
+function metaContent(html: string, name: string): string | null {
+  const re = new RegExp(
+    `<meta[^>]*name="${name}"[^>]*content="([^"]*)"[^>]*>|<meta[^>]*content="([^"]*)"[^>]*name="${name}"[^>]*>`,
+    "i",
+  );
+  const match = html.match(re);
+  return match?.[1] ?? match?.[2] ?? null;
+}
+
+/** Open Graph and Twitter tags for a domain HTML document that does not have them yet. */
+export function withOpenGraph(html: string): string {
+  if (html.includes('property="og:title"')) return html;
+  const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? HOME_TITLE;
+  const description = metaContent(html, "description") ?? HOME_DESCRIPTION;
+  const canonical = html.match(/<link[^>]*rel="canonical"[^>]*href="([^"]+)"/i)?.[1];
+  const url = canonical ?? canonicalUrl("");
+  const canonicalTag = canonical ? "" : `  <link rel="canonical" href="${url}" />\n`;
+  return html.replace("</head>", `${canonicalTag}${socialMeta({ title, description, url })}\n  </head>`);
 }
 
 const PAGE_STYLE = `
@@ -121,14 +182,9 @@ function documentPage(opts: {
   <title>${escapeHtml(opts.title)}</title>
   <meta name="description" content="${escapeHtml(opts.description)}" />
   <link rel="canonical" href="${canonical}" />
-  <meta property="og:title" content="${escapeHtml(opts.title)}" />
-  <meta property="og:description" content="${escapeHtml(opts.description)}" />
-  <meta property="og:url" content="${canonical}" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Squishee Academy" />
-  <meta property="og:image" content="${CANONICAL_ORIGIN}/squishees/frog.png" />
+${socialMeta({ title: opts.title, description: opts.description, url: canonical })}
   <meta name="theme-color" content="#fff1f7" />
-  <link rel="icon" href="/favicon.svg" />
+${iconLinks()}
   <style>${PAGE_STYLE}</style>
 </head>
 <body>

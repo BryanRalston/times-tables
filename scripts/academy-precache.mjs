@@ -35,6 +35,9 @@ export const COIN_FILES = ["penny.png", "nickel.png", "dime.png", "quarter.png",
 const PRECACHE_EXT = /\.(?:html|js|css|svg|png|webp|woff2?|webmanifest|mp3|wav|ogg|m4a)$/i;
 const SKIP_COPY = /^(?:squishees|cosmetics|money)\//;
 
+/** Share card. Left out of the offline cache so the worker never answers it. */
+export const SHARE_IMAGE_PATH = "/og/squishee-academy.png";
+
 export function artPaths() {
   const out = ["favicon.svg"];
   for (const id of SQUAD_IDS) out.push(`squishees/${id}.png`);
@@ -48,6 +51,7 @@ export function artPaths() {
 export function isPrecacheFile(rel) {
   if (!rel || SKIP_COPY.test(rel)) return false;
   if (rel === "precache-manifest.json" || rel === "CNAME" || rel === ".nojekyll") return false;
+  if (rel === SHARE_IMAGE_PATH.slice(1)) return false;
   return PRECACHE_EXT.test(rel);
 }
 
@@ -210,13 +214,16 @@ self.addEventListener("fetch", (event) => {
 
 export function domainServiceWorker() {
   return `/* Squishee Academy offline cache. Served from the domain root so scope is /. */
-const CACHE = "squishee-academy-root-v2";
+const CACHE = "squishee-academy-root-v3";
+const SHARE_IMAGE = ${JSON.stringify(SHARE_IMAGE_PATH)};
 ${PRECACHE_RUNTIME}
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
+  // Link-preview crawlers need the PNG itself. Do not intercept, cache, or replace it with the app shell.
+  if (url.pathname === SHARE_IMAGE) return;
 
   event.respondWith(
     fetch(req)

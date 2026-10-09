@@ -7,6 +7,37 @@ function fail(msg) {
   process.exit(1);
 }
 
+const SHARE_IMAGE = "https://squisheeacademy.com/og/squishee-academy.png";
+const SHARE_ALT = "Squishee Academy. Free learning games for K-3.";
+
+function assertShareCard(label, html) {
+  const title = html.match(/<title>([^<]*)<\/title>/)?.[1];
+  const description = html.match(/name="description"\s+content="([^"]*)"/)?.[1];
+  const canonical = html.match(/rel="canonical"\s+href="(https:\/\/squisheeacademy\.com\/[^"]*)"/)?.[1];
+  if (!title || !description || !canonical) fail(`${label} missing title, description, or absolute canonical`);
+  const tags = [
+    `property="og:title" content="${title}"`,
+    `property="og:description" content="${description}"`,
+    `property="og:url" content="${canonical}"`,
+    'property="og:type" content="website"',
+    'property="og:site_name" content="Squishee Academy"',
+    `property="og:image" content="${SHARE_IMAGE}"`,
+    'property="og:image:width" content="1200"',
+    'property="og:image:height" content="630"',
+    `property="og:image:alt" content="${SHARE_ALT}"`,
+    'name="twitter:card" content="summary_large_image"',
+    `name="twitter:title" content="${title}"`,
+    `name="twitter:description" content="${description}"`,
+    `name="twitter:image" content="${SHARE_IMAGE}"`,
+    `name="twitter:image:alt" content="${SHARE_ALT}"`,
+  ];
+  for (const tag of tags) {
+    if (!html.includes(tag)) fail(`${label} missing ${tag}`);
+  }
+  if (/property="og:image" content="(?!https:\/\/)/.test(html)) fail(`${label} og:image is not an absolute https URL`);
+  if (/name="twitter:image" content="(?!https:\/\/)/.test(html)) fail(`${label} twitter:image is not an absolute https URL`);
+}
+
 const cases = [
   ["/times-tables/squishees/frog.png", "/squishees/frog.png"],
   ['"/times-tables/academy/"', '"/"'],
@@ -44,12 +75,25 @@ const manifest = JSON.parse(readFileSync(resolve(root, "manifest.webmanifest"), 
 if (manifest.start_url !== "/") fail(`manifest start_url ${manifest.start_url}`);
 if (manifest.scope !== "/") fail(`manifest scope ${manifest.scope}`);
 if (manifest.name !== "Squishee Academy") fail("manifest name");
-if (manifest.icons?.[0]?.src !== "/squishees/frog.png") fail(`manifest icon ${manifest.icons?.[0]?.src}`);
+const iconSrcs = (manifest.icons ?? []).map((icon) => icon.src);
+for (const src of [
+  "/favicon-32.png",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/apple-touch-icon.png",
+  "/icons/icon-512-maskable.png",
+]) {
+  if (!iconSrcs.includes(src)) fail(`manifest missing ${src}`);
+}
+const maskable = (manifest.icons ?? []).find((icon) => icon.purpose === "maskable");
+if (maskable?.sizes !== "512x512" || maskable?.type !== "image/png") fail("manifest maskable icon");
 
 const sw = readFileSync(resolve(root, "academy-sw.js"), "utf8");
 if (!sw.includes('caches.match("/index.html")')) fail("service worker missing root index fallback");
 if (sw.includes("/times-tables/academy")) fail("service worker still scoped to the math subpath");
 if (hasRootTimesTablesPath(sw)) fail("service worker has a root /times-tables/ path");
+if (!sw.includes('const SHARE_IMAGE = "/og/squishee-academy.png"')) fail("service worker missing share image path");
+if (!sw.includes("if (url.pathname === SHARE_IMAGE) return;")) fail("service worker intercepts the share image");
 
 function walk(dir) {
   for (const name of readdirSync(dir)) {
@@ -165,5 +209,44 @@ if (!existsSync(resolve(root, "404.html"))) fail("404.html missing");
 if (!existsSync(resolve(root, "squishees/frog.png"))) fail("squishees/frog.png missing");
 if (!existsSync(resolve(root, "favicon.svg"))) fail("favicon.svg missing");
 if (!existsSync(resolve(root, "money/penny.png"))) fail("money/penny.png missing");
+
+assertShareCard("index.html", html);
+if (!html.includes('property="og:title" content="Squishee Academy"')) fail("home og:title");
+if (!html.includes('content="Free K-3 learning games with squishees. No ads, no accounts."')) fail("home description");
+if (!html.includes('property="og:url" content="https://squisheeacademy.com/"')) fail("home og:url");
+if (!html.includes('rel="apple-touch-icon" href="/apple-touch-icon.png"')) fail("home apple touch icon");
+for (const page of [
+  ["privacy/index.html", "https://squisheeacademy.com/privacy/"],
+  ["worksheets/index.html", "https://squisheeacademy.com/worksheets/"],
+  ["worksheets/multiplication-7s/index.html", "https://squisheeacademy.com/worksheets/multiplication-7s/"],
+  ["worksheets/times-tables/index.html", "https://squisheeacademy.com/worksheets/times-tables/"],
+]) {
+  const pageHtml = readFileSync(resolve(root, page[0]), "utf8");
+  assertShareCard(page[0], pageHtml);
+  if (!pageHtml.includes(`property="og:url" content="${page[1]}"`)) fail(`${page[0]} og:url`);
+}
+
+const imagePath = resolve(root, "og/squishee-academy.png");
+if (!existsSync(imagePath)) fail("share image missing from domain build");
+const image = readFileSync(imagePath);
+if (image.length > 300 * 1024) fail(`share image is ${image.length} bytes`);
+if (image.subarray(0, 8).toString("hex") !== "89504e470d0a1a0a") fail("share image is not a png");
+if (image.readUInt32BE(16) !== 1200 || image.readUInt32BE(20) !== 630) {
+  fail(`share image is ${image.readUInt32BE(16)}x${image.readUInt32BE(20)}`);
+}
+if (manifestList.includes("/og/squishee-academy.png")) fail("service worker precaches the share image");
+for (const rel of [
+  "favicon.ico",
+  "favicon-16.png",
+  "favicon-32.png",
+  "apple-touch-icon.png",
+  "icons/icon-192.png",
+  "icons/icon-512.png",
+  "icons/icon-512-maskable.png",
+]) {
+  if (!existsSync(resolve(root, rel))) fail(`${rel} missing`);
+}
+const ico = readFileSync(resolve(root, "favicon.ico"));
+if (ico.readUInt16LE(0) !== 0 || ico.readUInt16LE(2) !== 1 || ico.readUInt16LE(4) < 3) fail("favicon.ico set");
 
 console.log("check-academy-domain OK dist-domain");

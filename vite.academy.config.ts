@@ -3,7 +3,7 @@ import { cpSync, createReadStream, existsSync, mkdirSync, readdirSync, rmSync, s
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { dirname, join, normalize, resolve, sep } from "node:path";
 import { defineConfig } from "vite";
-import { academySeoFiles } from "./src/academy/seo/html";
+import { academySeoFiles, withOpenGraph } from "./src/academy/seo/html";
 import { academyDomainPlugins } from "./scripts/academy-domain-plugin.mjs";
 import { academyPrecachePlugin } from "./scripts/academy-precache.mjs";
 
@@ -69,6 +69,15 @@ function sharedPublic() {
   };
 }
 
+function academyOpenGraphPlugin() {
+  return {
+    name: "academy-domain-open-graph",
+    transformIndexHtml(html: string) {
+      return withOpenGraph(html);
+    },
+  };
+}
+
 function academySeoPlugin(dir: string) {
   return {
     name: "academy-seo-pages",
@@ -90,6 +99,7 @@ export default defineConfig({
     react(),
     sharedPublic(),
     ...(domain ? academyDomainPlugins(outDir) : [hoistAcademyHtml(outDir)]),
+    ...(domain ? [academyOpenGraphPlugin()] : []),
     academySeoPlugin(outDir),
     academyPrecachePlugin(outDir, {
       appPrefix: domain ? "" : "/times-tables/academy",
