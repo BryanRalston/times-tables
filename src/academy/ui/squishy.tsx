@@ -9,7 +9,6 @@ import {
   stepSquish,
   touchNorm,
   type SquishBody,
-  type SquishFace,
   type SquishFrame,
   type SquishVisual,
 } from "../squish/physics";
@@ -31,7 +30,6 @@ export function useReducedMotion(): boolean {
 
 function paintReduced(el: HTMLElement, visual: SquishVisual) {
   el.style.transform = `translate3d(0, 0, 0) scale(${visual.sx.toFixed(4)})`;
-  el.dataset.face = visual.face;
 }
 
 function restVisual(): SquishVisual {
@@ -44,8 +42,6 @@ function restVisual(): SquishVisual {
     dentX: 0,
     dentY: 0,
     depth: 0,
-    face: "rest",
-    squint: 0,
     spread: 1,
     contact: 0,
   };
@@ -54,14 +50,12 @@ function restVisual(): SquishVisual {
 export function Squishy({
   id,
   role = "toy",
-  expression = true,
   lines = true,
   className,
   children,
 }: {
   id: string;
   role?: SquishRole;
-  expression?: boolean;
   lines?: boolean;
   className?: string;
   children: ReactNode;
@@ -79,8 +73,6 @@ export function Squishy({
   const popTimer = useRef(0);
   const alive = useRef(true);
   const seen = useRef(true);
-  const expressionRef = useRef(expression);
-  expressionRef.current = expression;
   const reduced = useReducedMotion();
   const reducedRef = useRef(reduced);
   reducedRef.current = reduced;
@@ -109,13 +101,12 @@ export function Squishy({
       if (node) {
         node.style.transform = "";
         node.dataset.live = "no";
-        node.dataset.face = "rest";
       }
       if (canvas) canvas.width = 0;
     };
   }, []);
 
-  function renderMesh(face: SquishFace) {
+  function renderMesh() {
     const el = ref.current;
     const canvas = canvasRef.current;
     if (!el || !canvas) return;
@@ -125,11 +116,9 @@ export function Squishy({
     canvas.style.top = `${img.offsetTop}px`;
     canvas.style.width = `${img.offsetWidth}px`;
     canvas.style.height = `${img.offsetHeight}px`;
-    const shown = expressionRef.current ? visual.current : { ...visual.current, squint: 0, face: "rest" as const };
-    drawSoftBody(canvas, img, body.current, shown, bodyMapOf(img));
+    drawSoftBody(canvas, img, body.current, visual.current, bodyMapOf(img));
     el.style.transform = "";
     el.dataset.live = "yes";
-    el.dataset.face = expressionRef.current ? face : "rest";
   }
 
   function kick() {
@@ -161,7 +150,6 @@ export function Squishy({
     if (el) {
       if (!moving) {
         el.style.transform = "";
-        el.dataset.face = "rest";
         el.dataset.live = "no";
         body.current = restBody();
         visual.current = restVisual();
@@ -169,7 +157,7 @@ export function Squishy({
         el.dataset.live = "no";
         paintReduced(el, stepped.visual);
       } else {
-        renderMesh(stepped.visual.face);
+        renderMesh();
       }
     }
     if (moving && alive.current && (seen.current || frame.current.pressing)) {

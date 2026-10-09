@@ -9,7 +9,7 @@ export function CountToken({ id, faded }: { id?: string; faded?: boolean }) {
   const squishee = squisheeById(face);
   if (!squishee) return <i className="ac-dot" />;
   return (
-    <Squishy id={squishee.id} expression={false} lines={false}>
+    <Squishy id={squishee.id} lines={false}>
       <img
         className={faded ? "ac-token is-faded" : "ac-token"}
         src={squisheeUrl(squishee.file)}

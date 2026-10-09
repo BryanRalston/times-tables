@@ -168,8 +168,6 @@ describe("squish physics", () => {
     expect(area).toBeLessThan(1.12);
     expect(body.sx).toBeGreaterThan(1.04);
     expect(visual.dentX).toBeCloseTo(0);
-    expect(visual.face).toBe("giggle");
-    expect(visual.squint).toBeGreaterThan(0.45);
     expect(visual.spread).toBeGreaterThan(1);
 
     const rise: number[] = [];

@@ -1,5 +1,4 @@
 export type SquishImpulse = "none" | "tap" | "release" | "flick";
-export type SquishFace = "rest" | "squint" | "giggle";
 
 export const SOFT_COLS = 20;
 export const SOFT_ROWS = 24;
@@ -27,7 +26,6 @@ export interface SquishBody {
   consL: Float32Array;
   consK: Float32Array;
   restArea: number;
-  squint: number;
   wobble: number;
   phase: number;
   grabX: number;
@@ -44,8 +42,6 @@ export interface SquishVisual {
   dentX: number;
   dentY: number;
   depth: number;
-  face: SquishFace;
-  squint: number;
   spread: number;
   contact: number;
 }
@@ -126,7 +122,6 @@ export function restBody(): SquishBody {
     consL,
     consK,
     restArea: 1,
-    squint: 0,
     wobble: 0,
     phase: 0,
     grabX: 0,
@@ -201,10 +196,6 @@ export function stepSquish(body: SquishBody, frame: SquishFrame, dt: number): { 
   for (let i = 0; i < sub; i += 1) substep(body, frame, h);
   summarize(body);
   const depth = measureDepth(body, frame);
-  const targetSquint = depth * depth * (0.62 + 0.38 * depth);
-  const follow = frame.pressing ? 0.2 : 0.08;
-  body.squint += (targetSquint - body.squint) * follow;
-  if (body.squint < 0.004) body.squint = 0;
   maybeRest(body, frame.pressing);
   return { body, visual: visualOf(body, frame, depth) };
 }
@@ -601,7 +592,7 @@ function summarize(body: SquishBody): void {
 }
 
 function maybeRest(body: SquishBody, pressing: boolean): void {
-  if (pressing || body.wobble > 0.05 || body.squint > 0.02) return;
+  if (pressing || body.wobble > 0.05) return;
   const { pos, rest, prev } = body;
   for (let i = 0; i < pos.length; i += 1) {
     if (Math.abs((pos[i] ?? 0) - (rest[i] ?? 0)) > 0.006) return;
@@ -619,17 +610,10 @@ function maybeRest(body: SquishBody, pressing: boolean): void {
   body.vx = 0;
   body.vy = 0;
   body.vr = 0;
-  body.squint = 0;
   body.wobble = 0;
   body.grabX = 0;
   body.grabY = 0;
   body.wave = 0;
-}
-
-function faceFor(depth: number, impulse: SquishImpulse): SquishFace {
-  if (depth >= 0.72) return "giggle";
-  if (depth >= 0.28 || impulse === "tap" || impulse === "flick") return "squint";
-  return "rest";
 }
 
 function visualOf(body: SquishBody, frame: SquishFrame, depth: number): SquishVisual {
@@ -643,8 +627,6 @@ function visualOf(body: SquishBody, frame: SquishFrame, depth: number): SquishVi
     dentX: frame.pressing || frame.impulse !== "none" ? clamp(frame.nx, -1, 1) : 0,
     dentY: frame.pressing || frame.impulse !== "none" ? clamp(frame.ny, -1, 1) : 0,
     depth,
-    face: faceFor(depth, frame.impulse),
-    squint: body.squint,
     spread,
     contact: depth,
   };
@@ -665,7 +647,6 @@ function stepReduced(body: SquishBody, frame: SquishFrame): { body: SquishBody; 
   body.vx = 0;
   body.vy = 0;
   body.vr = 0;
-  body.squint = 0;
   body.wobble = 0;
   body.pos.set(body.rest);
   body.prev.set(body.rest);
@@ -680,8 +661,6 @@ function stepReduced(body: SquishBody, frame: SquishFrame): { body: SquishBody; 
       dentX: 0,
       dentY: 0,
       depth: press * 0.35,
-      face: press > 0.6 ? "squint" : "rest",
-      squint: 0,
       spread: 1,
       contact: 0,
     },
@@ -689,7 +668,7 @@ function stepReduced(body: SquishBody, frame: SquishFrame): { body: SquishBody; 
 }
 
 export function squishSettled(body: SquishBody, pressing: boolean): boolean {
-  if (pressing || body.wobble > 0.04 || body.squint > 0.015) return false;
+  if (pressing || body.wobble > 0.04) return false;
   if (Math.abs(body.sx - 1) > 0.008 || Math.abs(body.sy - 1) > 0.008) return false;
   if (Math.abs(body.x) > 0.01 || Math.abs(body.y) > 0.01 || Math.abs(body.rot) > 0.4) return false;
   const { pos, rest, prev } = body;
