@@ -1,4 +1,6 @@
+import { parseCosmeticIds, parseEquippedCosmetic } from "@/lib/cosmetics";
 import { defaultLevels, gameById, GAMES, isGameId } from "./games/registry";
+import { blankJourney, parseJourney } from "./journey";
 import {
   MAX_CHILDREN,
   SQUAD_IDS,
@@ -6,6 +8,7 @@ import {
   isGrade,
   isSquadId,
   type Child,
+  type DailyGiftState,
   type Grade,
   type Save,
   type SkillStat,
@@ -13,7 +16,7 @@ import {
 
 /** Stable key. The schema version lives on the save, not in the key name. */
 export const STORAGE_KEY = "squishee-academy-v1";
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 /**
  * Migrations run from the save's version up to SAVE_VERSION.
@@ -21,6 +24,7 @@ export const SAVE_VERSION = 2;
  */
 const MIGRATIONS: Record<number, (raw: Record<string, unknown>) => Record<string, unknown>> = {
   1: migrateV1toV2,
+  2: migrateV2toV3,
 };
 
 /** A newer app wrote this disk. Don't replace it with an older schema. */
@@ -48,6 +52,14 @@ export function blankChild(opts: { id?: string; name?: string; grade?: Grade; av
     bestStars: Object.fromEntries(GAMES.map((game) => [game.id, 0])),
     rounds: 0,
     levels: defaultLevels(grade),
+    coins: 0,
+    cosmetics: [],
+    equipped: "",
+    gifted: [],
+    journey: blankJourney(),
+    dailyDate: null,
+    dailyRounds: 0,
+    dailyGift: "none",
   };
 }
 
@@ -71,6 +83,28 @@ function migrateV1toV2(raw: Record<string, unknown>): Record<string, unknown> {
       })
     : raw.children;
   return { ...raw, version: 2, children };
+}
+
+/** Version 2 had stars and levels, and no island, coins, or daily gift. */
+function migrateV2toV3(raw: Record<string, unknown>): Record<string, unknown> {
+  const children = Array.isArray(raw.children)
+    ? raw.children.map((row) => {
+        if (!row || typeof row !== "object" || Array.isArray(row)) return row;
+        const child = row as Record<string, unknown>;
+        return {
+          ...child,
+          coins: child.coins ?? 0,
+          cosmetics: child.cosmetics ?? [],
+          equipped: child.equipped ?? "",
+          gifted: child.gifted ?? [],
+          journey: child.journey ?? blankJourney(),
+          dailyDate: child.dailyDate ?? null,
+          dailyRounds: child.dailyRounds ?? 0,
+          dailyGift: child.dailyGift ?? "none",
+        };
+      })
+    : raw.children;
+  return { ...raw, version: 3, children };
 }
 
 function migrateRaw(raw: unknown): unknown {
@@ -127,6 +161,21 @@ function parseSeconds(raw: unknown): Record<string, number> {
   return out;
 }
 
+function parseGiftState(raw: unknown): DailyGiftState {
+  if (raw === "closed" || raw === "open" || raw === "none") return raw;
+  return "none";
+}
+
+function parseGifted(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const out: string[] = [];
+  for (const id of raw) {
+    if (typeof id !== "string" || !isSquadId(id) || out.includes(id)) continue;
+    out.push(id);
+  }
+  return out;
+}
+
 function parseBest(raw: unknown): Record<string, number> {
   const o = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
   const out: Record<string, number> = {};
@@ -141,6 +190,8 @@ export function parseChild(raw: unknown): Child | null {
   const grade = isGrade(o.grade) ? o.grade : "K";
   const avatarId = isSquadId(o.avatarId) ? o.avatarId : SQUAD_IDS[0];
   const lastPlayed = typeof o.lastPlayed === "string" && DATE_KEY.test(o.lastPlayed) ? o.lastPlayed : null;
+  const cosmetics = parseCosmeticIds(o.cosmetics);
+  const dailyDate = typeof o.dailyDate === "string" && DATE_KEY.test(o.dailyDate) ? o.dailyDate : null;
   return {
     id: o.id,
     name: typeof o.name === "string" ? cleanName(o.name) : "",
@@ -155,6 +206,14 @@ export function parseChild(raw: unknown): Child | null {
     bestStars: parseBest(o.bestStars),
     rounds: clampInt(o.rounds, 0, 100000),
     levels: parseLevels(o.levels, grade),
+    coins: clampInt(o.coins, 0, 1_000_000),
+    cosmetics,
+    equipped: parseEquippedCosmetic(o.equipped, cosmetics),
+    gifted: parseGifted(o.gifted),
+    journey: parseJourney(o.journey),
+    dailyDate,
+    dailyRounds: clampInt(o.dailyRounds, 0, 100),
+    dailyGift: parseGiftState(o.dailyGift),
   };
 }
 

@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
+import { canDressFace } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
-import { MINUS, TIMES, type AddVisual, type TimeVisual, type TimesVisual } from "../games/types";
-import { squisheeUrl } from "../paths";
+import { MINUS, TIMES, type AddVisual, type MoneyVisual, type TimeVisual, type TimesVisual } from "../games/types";
+import { cosmeticCompositeUrl, squisheeUrl } from "../paths";
 
 export function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(" ");
@@ -19,6 +20,64 @@ export function SquisheeImg({ id, className, label }: { id: string; className?: 
   const s = squisheeById(id);
   if (!s) return null;
   return <img className={className} src={squisheeUrl(s.file)} alt={label ?? ""} draggable={false} />;
+}
+
+export function AcademyPal({
+  id,
+  cosmetic,
+  className,
+  label,
+}: {
+  id: string;
+  cosmetic?: string;
+  className?: string;
+  label?: string;
+}) {
+  const s = squisheeById(id);
+  if (!s) return null;
+  const src = cosmetic && canDressFace(id, cosmetic) ? cosmeticCompositeUrl(id, cosmetic) : squisheeUrl(s.file);
+  return <img className={className} src={src} alt={label ?? ""} draggable={false} />;
+}
+
+export function ProgressRing({ value, max, label }: { value: number; max: number; label: string }) {
+  const r = 16;
+  const c = 2 * Math.PI * r;
+  const pct = max <= 0 ? 0 : Math.max(0, Math.min(1, value / max));
+  return (
+    <svg className="ac-ring" viewBox="0 0 44 44" role="img" aria-label={label}>
+      <circle className="ac-ring-track" cx="22" cy="22" r={r} />
+      <circle
+        className="ac-ring-value"
+        cx="22"
+        cy="22"
+        r={r}
+        strokeDasharray={`${c * pct} ${c}`}
+      />
+      <text x="22" y="26" textAnchor="middle">
+        {value}
+      </text>
+    </svg>
+  );
+}
+
+export function GiftBox({ open }: { open?: boolean }) {
+  return (
+    <svg className="ac-gift-ico" viewBox="0 0 48 48" aria-hidden="true">
+      <rect x="8" y="20" width="32" height="22" rx="4" fill={open ? "#fff6ea" : "#ff4b93"} />
+      <rect x="6" y="16" width="36" height="8" rx="3" fill={open ? "#ffe0ee" : "#ff7eb3"} />
+      <path d="M24 16v26" stroke="#fff" strokeWidth="3" />
+      <path d="M16 16c0-6 8-8 8-2 0-6 8-4 8 2" fill="none" stroke="#f0b429" strokeWidth="3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function SpeakerIcon({ muted }: { muted?: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 10h4l5-4v12l-5-4H4z" />
+      {muted ? <path d="M16 9l5 6M21 9l-5 6" /> : <path d="M16 9.5a3 3 0 0 1 0 5M18 7a6 6 0 0 1 0 10" />}
+    </svg>
+  );
 }
 
 export function Stars({ value, of = 3, className }: { value: number; of?: number; className?: string }) {
@@ -228,11 +287,11 @@ export function Equation({
   reveal,
   answer,
 }: {
-  visual: AddVisual | TimesVisual | TimeVisual;
+  visual: AddVisual | TimesVisual | TimeVisual | MoneyVisual;
   reveal: boolean;
   answer: string;
 }) {
-  if (visual.kind === "time") return null;
+  if (visual.kind === "time" || visual.kind === "money") return null;
   if (visual.kind === "times") {
     return (
       <p className="ac-eq">

@@ -14,7 +14,7 @@ The module owns:
 - `Prompt` (and `Aside`, for a wide layout like the clock) and `SheetBody`
 - parent-page bars and chips (`bars`, `chips`, `skillLabel`, `chipLabel`)
 
-Copy `times.tsx`, `add.tsx`, or `time.tsx` as the starting point. Register it in `src/academy/games/registry.ts` by appending it to `GAMES`. Home, settings, worksheets list, and “today’s game” read that list.
+Copy `times.tsx`, `add.tsx`, `time.tsx`, or `money.tsx` as the starting point. Register it in `src/academy/games/registry.ts` by appending it to `GAMES`. Home, the island map, settings, worksheets, today’s game, and the grown-ups skill list read that list. Append only. The map stores a game id, and inserting a game in front would move families who are mid-island.
 
 Do not put a half-built game in the registry. A locked “coming soon” card can stay on the home screen until the module exists.
 
