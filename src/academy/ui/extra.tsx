@@ -3,6 +3,7 @@ import { COSMETICS, cosmeticPrice, type CosmeticId } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
 import { wearBossLook } from "../boss-battle";
 import { bossCosmeticName, bossForGame } from "../bosses";
+import { bondHearts, bondName, bondScore, bondTier } from "../buddy/bond";
 import { bookEntries, catchphrase } from "../buddy/cast";
 import { palOwned, withBuddy } from "../buddy/unlock";
 import { GAMES, sheetHref } from "../games/registry";
@@ -289,6 +290,13 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
               <small>{open ? entry.name : "???"}</small>
               <small>{entry.rarity === "rare" ? "Rare" : "Common"}</small>
               <small>{open ? entry.line : entry.find}</small>
+              {open ? <small>{entry.fact}</small> : null}
+              {open ? <small>Loves {entry.favorite}</small> : null}
+              {open ? (
+                <small className="ac-bond-pips" data-bond={bondTier(bondScore(child.bonds, entry.id))}>
+                  {bondHearts(bondTier(bondScore(child.bonds, entry.id))) || bondName(0)}
+                </small>
+              ) : null}
             </>
           );
           if (!open) {

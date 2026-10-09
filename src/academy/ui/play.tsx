@@ -12,6 +12,7 @@ import {
   stepLadder,
   type Ladder,
 } from "../adapt";
+import { bondName, bondScore, bondTier } from "../buddy/bond";
 import { hostIdFor } from "../buddy/hosts";
 import { buddyReaction } from "../buddy/react";
 import { slotStory } from "../buddy/story";
@@ -639,7 +640,24 @@ export function PlayScreen({
   const reaction = phase === "feedback" ? (combo >= 3 ? "★" : "✓") : phase === "teach" ? "…" : null;
   const hostId = hostIdFor(game);
   const host = squisheeById(hostId);
-  const buddyCue = buddyReaction({ phase: phase === "intro" ? "ask" : phase, ok, stars: liveStars, hintOn });
+  const counting =
+    slot?.kind === "choice" &&
+    (slot.question.visual.kind === "add" ||
+      slot.question.visual.kind === "times" ||
+      slot.question.visual.kind === "money" ||
+      (slot.question.visual.kind === "scene" &&
+        (slot.question.visual.board.game === "count" ||
+          slot.question.visual.board.game === "problems" ||
+          slot.question.visual.board.game === "place")));
+  const buddyCue = buddyReaction({
+    phase: phase === "intro" ? "ask" : phase,
+    ok,
+    stars: liveStars,
+    hintOn,
+    combo,
+    counting: phase === "ask" && counting,
+  });
+  const palBond = bondTier(bondScore(child.bonds, child.avatarId));
   const choice = slot?.kind === "choice" ? slot.question : null;
   const filled = dots.filter((dot) => dot != null).length;
 
@@ -762,6 +780,9 @@ export function PlayScreen({
             <p className="ac-hint">The boss is still there. You can try again.</p>
           ) : null}
           <RoundBuddy id={child.avatarId} cosmetic={child.equipped} reaction={buddyCue} />
+          <p className="ac-bond" data-bond={palBond}>
+            {squisheeById(child.avatarId)?.name ?? "Buddy"} · {bondName(palBond)}
+          </p>
           {friend && !met ? (
             <div className="ac-unlock">
               <p>New friend!</p>

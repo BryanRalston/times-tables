@@ -1,3 +1,4 @@
+import type { Board, CountBoard, FractionBoard, MeasureBoard, PhonicsBoard, PlaceBoard, ProblemBoard, ShapeBoard } from "./games/boards";
 import { COIN_CENTS, COIN_NAME, emptyPile, formatCents, pileCents } from "./games/money-model";
 import { timeTalk } from "./games/time";
 import type { AddVisual, ChoiceQ, CoinKind, CoinPile, MoneyVisual, TimeVisual, TimesVisual } from "./games/types";
@@ -107,6 +108,19 @@ export function choiceSpoken(question: ChoiceQ, choice: string): string {
 
 /** Title plus each choice, so a child who cannot read can still pick by ear. */
 export function promptSpeech(question: ChoiceQ): string {
+  const visual = question.visual;
+  if (visual.kind === "spell") return speakable(visual.spoken);
+  if (visual.kind === "sight") {
+    if (visual.mode === "fill") {
+      const heard = question.choices.map((choice) => speakable(choice).trim()).filter((line) => line.length > 0);
+      const sentence = speakable(visual.spoken);
+      return heard.length ? `Listen. ${sentence}. ${heard.join(". ")}` : `Listen. ${sentence}.`;
+    }
+    return `Listen. ${visual.word}.`;
+  }
+  if (visual.kind === "scene" && visual.board.game === "phonics" && visual.board.mode === "cvc") {
+    return speakable(`${question.title}. ${visual.board.blend}`);
+  }
   const title = speakable(question.title).trim();
   const lead = /[.!?]$/.test(title) ? title : `${title}.`;
   if (question.choices.length === 0) return lead;
@@ -120,7 +134,8 @@ export function promptSpeech(question: ChoiceQ): string {
 export function workedExample(question: ChoiceQ): WorkedExample {
   const frames = framesFor(question);
   const caption = frames[frames.length - 1]?.caption ?? question.almost;
-  return { speech: speakable(caption), caption, frames };
+  const bits = frames.length > 0 && frames.length <= 4 ? frames.map((frame) => frame.caption) : [caption];
+  return { speech: speakable(bits.join(". ")), caption, frames };
 }
 
 function framesFor(question: ChoiceQ): TeachFrame[] {
@@ -151,13 +166,7 @@ function framesFor(question: ChoiceQ): TeachFrame[] {
         },
       ];
     case "scene":
-      return [
-        {
-          kind: "scene",
-          show: visual.picture,
-          caption: question.almost.replace(/^Almost!\s*/, ""),
-        },
-      ];
+      return sceneFrames(question, visual.board);
     default: {
       const neverVisual: never = visual;
       return neverVisual;
@@ -372,6 +381,189 @@ function moneyFrames(visual: MoneyVisual, answer: string): MoneyFrame[] {
     default: {
       const neverMode: never = visual.mode;
       return neverMode;
+    }
+  }
+}
+
+function captions(lines: string[]): SceneFrame[] {
+  return lines.map((caption) => ({ kind: "scene", show: caption, caption }));
+}
+
+function solvedLine(question: ChoiceQ): string {
+  const almost = question.almost.replace(/^Almost!\s*/, "").trim();
+  if (almost) return almost;
+  return question.praise.replace(/^Yes!\s*/, "").trim() || question.answer;
+}
+
+function countSteps(n: number, solved: string): SceneFrame[] {
+  const marks: string[] = [];
+  if (n <= 5) {
+    for (let i = 1; i <= Math.max(1, n); i++) marks.push(String(i));
+  } else {
+    marks.push("1, 2, 3");
+    const mid = Math.min(n - 1, 10);
+    if (mid > 3) marks.push(`Count to ${mid}`);
+  }
+  if (marks[marks.length - 1] !== solved) marks.push(solved);
+  return captions(marks);
+}
+
+function countTeach(board: CountBoard, solved: string): SceneFrame[] {
+  switch (board.mode) {
+    case "objects":
+    case "to20":
+      return countSteps(board.n, solved);
+    case "compare":
+      return captions(["Look at each group", solved]);
+    case "neighbor":
+      return captions([board.ask === "before" ? `One less than ${board.n}` : `One more than ${board.n}`, solved]);
+    case "subitize":
+      return captions(["See the dot groups", solved]);
+    case "tenframe": {
+      const total = board.frames.reduce((sum, n) => sum + n, 0);
+      return captions([total >= 10 ? "A full ten-frame is 10" : "Count the dots in the frame", solved]);
+    }
+    case "build":
+      return captions([`Fill the frame to ${board.n}`, solved]);
+    default: {
+      const neverBoard: never = board;
+      return neverBoard;
+    }
+  }
+}
+
+function placeTeach(board: PlaceBoard, solved: string): SceneFrame[] {
+  switch (board.mode) {
+    case "blocks":
+    case "build":
+      return captions([`${Math.floor(board.n / 10)} tens`, `${board.n % 10} ones`, solved]);
+    case "expanded":
+      return captions(["Hundreds, then tens, then ones", solved]);
+    case "compare":
+      return captions(["Look at the biggest place first", solved]);
+    case "round10":
+      return captions(["5 or more in the ones rounds up", solved]);
+    case "round100":
+      return captions(["50 or more in the tens rounds up", solved]);
+    default: {
+      const neverBoard: never = board;
+      return neverBoard;
+    }
+  }
+}
+
+function shapeTeach(board: ShapeBoard, solved: string): SceneFrame[] {
+  switch (board.mode) {
+    case "flat":
+    case "solid":
+      return captions([board.mode === "flat" ? "A flat shape sits on the page" : "A solid shape you could hold", solved]);
+    case "sides":
+      return captions(["Count around the shape", solved]);
+    case "symmetry":
+      return captions(["A line of symmetry makes two matching halves", solved]);
+    case "parts":
+      return captions(["Equal parts are the same size", solved]);
+    default: {
+      const neverBoard: never = board;
+      return neverBoard;
+    }
+  }
+}
+
+function fractionTeach(board: FractionBoard, solved: string): SceneFrame[] {
+  switch (board.mode) {
+    case "parts":
+    case "unit":
+    case "shade":
+      return captions([`The whole has ${board.den} equal parts`, `${board.num} part${board.num === 1 ? "" : "s"} shaded`, solved]);
+    case "line":
+      return captions([`The line is split into ${board.den}`, solved]);
+    case "compare":
+      return captions(["Compare the same kind of part", solved]);
+    case "equivalent":
+      return captions(["Same amount, different parts", solved]);
+    default: {
+      const neverBoard: never = board;
+      return neverBoard;
+    }
+  }
+}
+
+function measureTeach(board: MeasureBoard, solved: string): SceneFrame[] {
+  switch (board.mode) {
+    case "compare":
+      return captions(["Look from end to end", solved]);
+    case "ruler":
+      return captions(["Start at 0", solved]);
+    case "picture":
+    case "bar":
+      return captions(["Read one row", solved]);
+    case "more":
+      return captions(["Subtract the smaller number", solved]);
+    default: {
+      const neverBoard: never = board;
+      return neverBoard;
+    }
+  }
+}
+
+function phonicsTeach(board: PhonicsBoard, solved: string): SceneFrame[] {
+  switch (board.mode) {
+    case "sounds":
+    case "begin":
+      return captions([`The sound is ${board.phoneme}`, solved]);
+    case "rhyme":
+      return captions([`Listen for the ending of ${board.cue}`, solved]);
+    case "cvc":
+      return captions([board.blend, solved]);
+    case "end":
+      return captions([`The last sound in ${board.word}`, solved]);
+    default: {
+      const neverBoard: never = board;
+      return neverBoard;
+    }
+  }
+}
+
+function problemTeach(board: ProblemBoard): SceneFrame[] {
+  switch (board.mode) {
+    case "add":
+      return captions([`Start with ${board.a}`, `Add ${board.b}`, `${board.a} + ${board.b} = ${board.a + board.b}`]);
+    case "sub":
+      return captions([`Start with ${board.a}`, `Take away ${board.b}`, `${board.a} - ${board.b} = ${board.a - board.b}`]);
+    case "mult":
+      return captions([`${board.a} groups`, `${board.b} in each group`, `${board.a} × ${board.b} = ${board.a * board.b}`]);
+    case "div":
+      return captions([`${board.a} shared into ${board.b} groups`, `${board.a} ÷ ${board.b} = ${board.a / board.b}`]);
+    case "picture":
+      return captions([`${board.a} groups`, `${board.b} in each group`, `${board.a} groups of ${board.b}`]);
+    default: {
+      const neverMode: never = board.mode;
+      return neverMode;
+    }
+  }
+}
+
+function sceneFrames(question: ChoiceQ, board: Board): SceneFrame[] {
+  const solved = solvedLine(question);
+  switch (board.game) {
+    case "count":
+      return countTeach(board, solved);
+    case "place":
+      return placeTeach(board, solved);
+    case "shapes":
+      return shapeTeach(board, solved);
+    case "fractions":
+      return fractionTeach(board, solved);
+    case "measure":
+      return measureTeach(board, solved);
+    case "phonics":
+      return phonicsTeach(board, solved);
+    case "problems":
+      return problemTeach(board);
+    default: {
+      const neverBoard: never = board;
+      return neverBoard;
     }
   }
 }

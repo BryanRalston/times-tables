@@ -3,6 +3,7 @@ import { hashSeed } from "@/lib/rng";
 import { noteMark, skillHeat } from "./adapt";
 import { grantBossPrize } from "./boss-battle";
 import { GAMES, barKeys, chipKeys, chipLabel as chipText, skillLabel as skillText, type GameId } from "./games/registry";
+import { bondScore, learningLooks, studyCount, withLearningLooks } from "./buddy/bond";
 import { syncEgg } from "./buddy/egg";
 import { friendFromBoss } from "./buddy/hosts";
 import { advanceJourney, bossWon, withDailyRound } from "./journey";
@@ -151,6 +152,12 @@ export function applyRound(child: Child, result: RoundResult, today: string): Ch
   const boss = result.boss === true;
   const daily = withDailyRound(child, today);
   const befriended = boss && bossWon(result.correct, result.total);
+  const prevBond = bondScore(child.bonds, child.avatarId);
+  const nextBond = Math.min(9999, prevBond + 1);
+  const bestStars = {
+    ...child.bestStars,
+    [result.game]: Math.max(child.bestStars[result.game] ?? 0, stars),
+  };
   const next: Child = {
     ...child,
     stars: child.stars + stars,
@@ -158,10 +165,8 @@ export function applyRound(child: Child, result: RoundResult, today: string): Ch
     lastPlayed: streak.lastPlayed,
     skills,
     secondsByDay,
-    bestStars: {
-      ...child.bestStars,
-      [result.game]: Math.max(child.bestStars[result.game] ?? 0, stars),
-    },
+    bestStars,
+    bonds: { ...child.bonds, [child.avatarId]: nextBond },
     rounds: child.rounds + 1,
     coins: Math.min(1_000_000, child.coins + coinsForRound(result.correct, result.total, bestCombo, boss)),
     words: noteRoundWords(child.words, result.answers),
@@ -179,7 +184,11 @@ export function applyRound(child: Child, result: RoundResult, today: string): Ch
     ...daily,
     egg: syncEgg(child, daily),
   };
-  return grantBossPrize(next, result.game, befriended, result.crown === true);
+  const prized = grantBossPrize(next, result.game, befriended, result.crown === true);
+  return withLearningLooks(
+    prized,
+    learningLooks(prevBond, nextBond, studyCount(child.bestStars), studyCount(bestStars)),
+  );
 }
 
 export function secondsThisWeek(map: Record<string, number>, today: string): number {

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Rng } from "@/lib/rng";
+import { buddyName, pickLine } from "./flavor";
 import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { SquisheeImg, cx } from "../ui/bits";
@@ -51,7 +52,7 @@ export function makeSpellingQuestion(rng: Rng, level: SpellLevel, prefer: string
   return {
     id: qid(rng),
     game: "spelling",
-    title: "Spell the word",
+    title: pickLine(rng, ["Spell the word you hear", `${buddyName(rng)} says a word. Spell it.`]),
     hint: "Tap letters to build it. Tap a letter again to put it back.",
     praise: `Yes! ${word.word}`,
     almost: `Almost! ${word.word}. ${word.sentence}`,

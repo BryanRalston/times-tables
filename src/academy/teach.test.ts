@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
 import { makeAddQuestion, type AddLevel } from "./games/add";
+import { makeProblemQuestion } from "./games/problems";
 import { makeMoneyQuestion, type MoneyLevel } from "./games/money";
 import { makeTimeQuestion, type TimeLevel } from "./games/time";
 import { makeTimesQuestion, type TimesLevel } from "./games/times";
@@ -186,6 +187,65 @@ describe("worked examples", () => {
     expect(speakable("3/4")).toBe("three fourths");
     expect(speakable("2/8")).toBe("two eighths");
     expect(speakable("Shade 1/2 of it")).toBe("Shade one half of it");
+  });
+
+  it("counts along after a miss on a story or a group of squishees", () => {
+    const story = makeProblemQuestion(rngFromSeed("teach-story"), "add");
+    const example = workedExample(story);
+    expect(example.frames.length).toBeGreaterThanOrEqual(2);
+    expect(example.frames[0]?.kind).toBe("scene");
+    expect(example.speech.toLowerCase()).toContain("add");
+    const heard = promptSpeech({
+      id: "hear",
+      game: "sight",
+      title: "Tap the word you hear",
+      hint: "Listen",
+      praise: "Yes",
+      almost: "Almost",
+      answer: "cat",
+      choices: ["cat", "can", "car", "cap"],
+      skill: "sight:preprimer",
+      tags: ["hear"],
+      visual: {
+        kind: "sight",
+        mode: "hear",
+        word: "cat",
+        spoken: "cat",
+        sentence: "",
+        fallback: "cat",
+        caption: "No speaker",
+        bigFallback: true,
+      },
+    });
+    expect(heard).toBe("Listen. cat.");
+    expect(heard).not.toContain("can");
+    const spelled = promptSpeech({
+      id: "spell",
+      game: "spelling",
+      title: "Spell the word you hear",
+      hint: "Tap letters",
+      praise: "Yes",
+      almost: "Almost",
+      answer: "cat",
+      choices: ["cat", "hat", "bat", "sat"],
+      skill: "spell:cvc",
+      tags: ["cvc"],
+      visual: {
+        kind: "spell",
+        word: "cat",
+        spoken: "cat. The cat sat.",
+        sentence: "The ___ sat.",
+        pattern: "cvc",
+        patternLabel: "CVC",
+        tiles: [],
+        fallback: "cat",
+        caption: "Spell",
+        bigFallback: true,
+        showSentence: false,
+      },
+    });
+    expect(spelled.startsWith("cat.")).toBe(true);
+    expect(spelled).not.toContain("hat");
   });
 
   it("speaks the question and every choice", () => {

@@ -37,6 +37,7 @@ describe("word problem questions", () => {
         if (q.visual.kind !== "scene" || q.visual.board.game !== "problems") throw new Error(level);
         const board = q.visual.board;
         expect(q.title.length).toBeGreaterThan(12);
+        expect(["Peach", "Frog", "Bunny", "Bear", "Panda", "Fox", "Owl", "Penguin", "Cat", "Donut"].some((name) => q.title.includes(name))).toBe(true);
         switch (board.mode) {
           case "add":
             expect(board.a + board.b).toBeLessThanOrEqual(10);
@@ -91,7 +92,7 @@ describe("word problem questions", () => {
     for (let seed = 0; seed < 10; seed += 1) {
       for (const level of problemsGame.levels) {
         const row = problemsGame.makeSheetItem(rngFromSeed(`problems-sheet-${seed}-${level.id}`), level.id);
-        const add = row.prompt.match(/^Sam has (\d+) apples?\. Jo gives Sam (\d+) more\. How many apples\?$/);
+        const add = row.prompt.match(/^Peach has (\d+) apples?\. Frog brings (\d+) more\. How many apples\?$/);
         if (add) {
           expect(Number(add[1])).toBeGreaterThanOrEqual(1);
           expect(Number(add[2])).toBeGreaterThanOrEqual(1);
@@ -99,25 +100,25 @@ describe("word problem questions", () => {
           expect(row.answer).toBe(String(Number(add[1]) + Number(add[2])));
           continue;
         }
-        const sub = row.prompt.match(/^Max has (\d+) fish and gives away (\d+)\. How many fish are left\?$/);
+        const sub = row.prompt.match(/^Bear has (\d+) fish and gives (\d+) to Panda\. How many fish are left\?$/);
         if (sub) {
           expect(Number(sub[2])).toBeGreaterThanOrEqual(1);
           expect(Number(sub[1])).toBeLessThanOrEqual(12);
           expect(row.answer).toBe(String(Number(sub[1]) - Number(sub[2])));
           continue;
         }
-        const mult = row.prompt.match(/^Ana has (\d+) bags with (\d+) stars in each bag\. How many stars\?$/);
+        const mult = row.prompt.match(/^Panda has (\d+) bags with (\d+) stars in each bag\. How many stars\?$/);
         if (mult) {
           expect(row.answer).toBe(String(Number(mult[1]) * Number(mult[2])));
           continue;
         }
-        const div = row.prompt.match(/^Lee has (\d+) cookies in (\d+) equal boxes\. How many cookies are in each box\?$/);
+        const div = row.prompt.match(/^Fox has (\d+) cookies shared with (\d+) friends\. How many cookies does each friend get\?$/);
         if (div) {
           expect(Number(div[1]) % Number(div[2])).toBe(0);
           expect(row.answer).toBe(String(Number(div[1]) / Number(div[2])));
           continue;
         }
-        const picture = row.prompt.match(/^Nia draws (\d+) groups of (\d+) frogs\. How many frogs\?$/);
+        const picture = row.prompt.match(/^Bunny draws (\d+) groups of (\d+) frogs\. How many frogs\?$/);
         expect(picture).not.toBeNull();
         expect(row.answer).toBe(String(Number(picture?.[1]) * Number(picture?.[2])));
       }

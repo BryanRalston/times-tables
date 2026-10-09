@@ -1,5 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import type { Grade } from "../model";
+import { buddyName, pickLine } from "./flavor";
 import { countName, type CountBoard } from "./boards";
 import { distinctInts, nearChoices, sceneQuestion } from "./pick";
 import { DotClusters, SceneCard, SquisheeRow, TenFrames, sceneModule } from "./scene-ui";
@@ -68,7 +69,11 @@ function makeObjects(rng: Rng, max: number, level: "objects" | "to20"): ChoiceQ 
   const board: CountBoard = { game: "count", mode: level, emoji: "", name: "squishees", n };
   return ask(rng, {
     game: "count",
-    title: "How many squishees?",
+    title: pickLine(rng, [
+      "How many squishees?",
+      `${buddyName(rng)} wants to count. How many squishees?`,
+      "Count each one. How many squishees?",
+    ]),
     hint: "Count each one",
     answer: String(n),
     choices: nearChoices(rng, n, 0, max),
@@ -154,7 +159,7 @@ function makeSubitize(rng: Rng): ChoiceQ {
   const board: CountBoard = { game: "count", mode: "subitize", clusters };
   return ask(rng, {
     game: "count",
-    title: "How many dots?",
+    title: pickLine(rng, ["How many dots?", `${buddyName(rng)} sees a dot pattern. How many dots?`]),
     hint: "Look at the pattern",
     answer: String(n),
     choices: nearChoices(rng, n, 1, 8),

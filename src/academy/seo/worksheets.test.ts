@@ -1,6 +1,39 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { rewriteDomainSource } from "../../../scripts/academy-domain-rewrite.mjs";
 import { coinCents, formatMoney, WORKSHEETS, type StaticItem } from "./catalog";
-import { academySeoFiles, canonicalUrl, sitemapXml, worksheetHtml } from "./html";
+import {
+  academySeoFiles,
+  canonicalUrl,
+  HOME_DESCRIPTION,
+  privacyHtml,
+  SHARE_IMAGE_ALT,
+  shareImageUrl,
+  sitemapXml,
+  withOpenGraph,
+  worksheetHtml,
+  worksheetIndexHtml,
+} from "./html";
+
+function expectShareCard(html: string, title: string, description: string, url: string) {
+  const image = shareImageUrl();
+  expect(image).toBe("https://squisheeacademy.com/og/squishee-academy.png");
+  expect(html).toContain(`property="og:title" content="${title}"`);
+  expect(html).toContain(`property="og:description" content="${description}"`);
+  expect(html).toContain(`property="og:url" content="${url}"`);
+  expect(html).toContain('property="og:type" content="website"');
+  expect(html).toContain('property="og:site_name" content="Squishee Academy"');
+  expect(html).toContain(`property="og:image" content="${image}"`);
+  expect(html).toContain('property="og:image:width" content="1200"');
+  expect(html).toContain('property="og:image:height" content="630"');
+  expect(html).toContain(`property="og:image:alt" content="${SHARE_IMAGE_ALT}"`);
+  expect(html).toContain('name="twitter:card" content="summary_large_image"');
+  expect(html).toContain(`name="twitter:title" content="${title}"`);
+  expect(html).toContain(`name="twitter:description" content="${description}"`);
+  expect(html).toContain(`name="twitter:image" content="${image}"`);
+  expect(html).toContain(`name="twitter:image:alt" content="${SHARE_IMAGE_ALT}"`);
+  expect(html).not.toContain('property="og:image" content="/');
+}
 
 function moneyCents(answer: string): number {
   if (answer.endsWith("¢")) return Number(answer.slice(0, -1));
@@ -186,23 +219,23 @@ function expectFresh(item: StaticItem) {
     expect(item.answer).toBe(`${blend[1]}${blend[2]}${blend[3]}`);
     return;
   }
-  const add = item.prompt.match(/^Sam has (\d+) apples\. Jo gives Sam (\d+) more\. How many apples\?$/);
+  const add = item.prompt.match(/^Peach has (\d+) apples\. Frog brings (\d+) more\. How many apples\?$/);
   if (add) {
     expect(Number(add[1]) + Number(add[2])).toBeLessThanOrEqual(10);
     expect(item.answer).toBe(String(Number(add[1]) + Number(add[2])));
     return;
   }
-  const sub = item.prompt.match(/^Max has (\d+) fish and gives away (\d+)\. How many fish are left\?$/);
+  const sub = item.prompt.match(/^Bear has (\d+) fish and gives (\d+) to Panda\. How many fish are left\?$/);
   if (sub) {
     expect(item.answer).toBe(String(Number(sub[1]) - Number(sub[2])));
     return;
   }
-  const bags = item.prompt.match(/^Ana has (\d+) bags with (\d+) stars in each bag\. How many stars\?$/);
+  const bags = item.prompt.match(/^Panda has (\d+) bags with (\d+) stars in each bag\. How many stars\?$/);
   if (bags) {
     expect(item.answer).toBe(String(Number(bags[1]) * Number(bags[2])));
     return;
   }
-  const boxes = item.prompt.match(/^Lee has (\d+) cookies in (\d+) equal boxes\. How many cookies are in each box\?$/);
+  const boxes = item.prompt.match(/^Fox has (\d+) cookies shared with (\d+) friends\. How many cookies does each friend get\?$/);
   if (boxes) {
     expect(Number(boxes[1]) % Number(boxes[2])).toBe(0);
     expect(item.answer).toBe(String(Number(boxes[1]) / Number(boxes[2])));
@@ -254,5 +287,44 @@ describe("printable worksheets", () => {
     expect(privacy).toContain('<a href="mailto:hello@squisheeacademy.com">hello@squisheeacademy.com</a>');
     expect(privacy).not.toContain("[Bryan — add the email families should use]");
     expect(files.some((file) => file.path === "worksheets/counting-coins/index.html")).toBe(true);
+  });
+
+  it("puts absolute share cards on the home page, worksheets, and privacy", () => {
+    const sheet = WORKSHEETS.find((item) => item.slug === "multiplication-7s");
+    expect(sheet).toBeTruthy();
+    expectShareCard(
+      worksheetHtml(sheet!),
+      sheet!.title,
+      sheet!.description,
+      "https://squisheeacademy.com/worksheets/multiplication-7s/",
+    );
+    const index = worksheetIndexHtml();
+    expectShareCard(
+      index,
+      "Free K–3 Math Worksheets | Squishee Academy",
+      "Free printable math worksheets for grades K–3. Times tables, addition, subtraction, telling time, and counting coins. Answer keys included. No signup.",
+      "https://squisheeacademy.com/worksheets/",
+    );
+    const privacy = privacyHtml();
+    expectShareCard(
+      privacy,
+      "Privacy | Squishee Academy",
+      "Squishee Academy collects no personal information. Progress stays on this device. No ads, no accounts, and no analytics.",
+      "https://squisheeacademy.com/privacy/",
+    );
+    expect(privacy).toContain('rel="apple-touch-icon" href="/apple-touch-icon.png"');
+    expect(index).toContain('rel="icon" href="/favicon.ico"');
+
+    const home = withOpenGraph(readFileSync("academy/index.html", "utf8"));
+    expectShareCard(home, "Squishee Academy", HOME_DESCRIPTION, "https://squisheeacademy.com/");
+    expect(home).toContain('rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png"');
+
+    const practice = withOpenGraph(rewriteDomainSource(readFileSync("academy/worksheets/times-tables/index.html", "utf8")));
+    expectShareCard(
+      practice,
+      "Free Times Tables Worksheet (K–3) | Squishee Academy",
+      "Print a free times tables worksheet for grades K–3. Random multiplication problems and an answer key. No signup.",
+      "https://squisheeacademy.com/worksheets/times-tables/",
+    );
   });
 });

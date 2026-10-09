@@ -1,5 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import type { Grade } from "../model";
+import { buddyName, pickLine } from "./flavor";
 import { sideCount, symmetryAnswer, type ShapeBoard, type ShapeName } from "./boards";
 import { nearChoices, sceneQuestion, uniqueChoices } from "./pick";
 import { SceneCard, ShapeFig, sceneModule } from "./scene-ui";
@@ -59,7 +60,7 @@ function nameQuestion(rng: Rng, shape: ShapeName, pool: ShapeName[], level: "fla
   const board: ShapeBoard = { game: "shapes", mode: level, shape };
   return sceneQuestion(rng, {
     game: "shapes",
-    title: "What shape is this?",
+    title: pickLine(rng, ["What shape is this?", `${buddyName(rng)} holds up a shape. What shape is it?`]),
     hint: level === "flat" ? "A flat shape sits on the page" : "A solid shape you could hold",
     answer: shape,
     choices: uniqueChoices(rng, shape, pool),
@@ -82,7 +83,9 @@ function makeSides(rng: Rng): ChoiceQ {
   const board: ShapeBoard = { game: "shapes", mode: "sides", shape, ask: askSides ? "sides" : "corners" };
   return sceneQuestion(rng, {
     game: "shapes",
-    title: askSides ? "How many sides?" : "How many corners?",
+    title: askSides
+      ? pickLine(rng, ["How many sides?", `${buddyName(rng)} asks how many sides`])
+      : pickLine(rng, ["How many corners?", `${buddyName(rng)} asks how many corners`]),
     hint: "Count around the shape",
     answer: String(count),
     choices: nearChoices(rng, count, 0, 8),
@@ -104,7 +107,7 @@ function makeSymmetry(rng: Rng): ChoiceQ {
   const board: ShapeBoard = { game: "shapes", mode: "symmetry", shape };
   return sceneQuestion(rng, {
     game: "shapes",
-    title: "How many lines of symmetry?",
+    title: pickLine(rng, ["How many lines of symmetry?", `${buddyName(rng)} folds the shape. How many lines of symmetry?`]),
     hint: "A line of symmetry makes two matching halves",
     answer,
     choices: uniqueChoices(rng, answer, ["1", "2", "3", "4", "more than 4"]),

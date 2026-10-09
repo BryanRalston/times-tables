@@ -1,5 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import type { Grade } from "../model";
+import { buddyName, pickLine } from "./flavor";
 import { blockPhrase, expandedForm, roundHalfUp, type PlaceBoard } from "./boards";
 import { extremeChoices, nearChoices, sceneQuestion, uniqueChoices } from "./pick";
 import { BaseTen, SceneCard, sceneModule } from "./scene-ui";
@@ -62,7 +63,7 @@ function makeBlocks(rng: Rng): ChoiceQ {
   const board: PlaceBoard = { game: "place", mode: "blocks", n };
   return sceneQuestion(rng, {
     game: "place",
-    title: "How many blocks?",
+    title: pickLine(rng, ["How many blocks?", `${buddyName(rng)} built with tens and ones. What number is that?`]),
     hint: "A rod is a ten. A cube is a one.",
     answer: String(n),
     choices: nearChoices(rng, n, 0, 120),

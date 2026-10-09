@@ -1,5 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import type { Grade } from "../model";
+import { buddyName, pickLine } from "./flavor";
 import type { MeasureBoard, MeasureItem } from "./boards";
 import { distinctInts, nearChoices, sceneQuestion, uniqueChoices } from "./pick";
 import { BarGraph, PictureGraph, Ruler, SceneCard, sceneModule } from "./scene-ui";
@@ -95,7 +96,7 @@ function makeRuler(rng: Rng): ChoiceQ {
   const board: MeasureBoard = { game: "measure", mode: "ruler", inches };
   return sceneQuestion(rng, {
     game: "measure",
-    title: "How many inches long is the ribbon?",
+    title: pickLine(rng, ["How many inches long is the ribbon?", `${buddyName(rng)} measures the ribbon. How many inches?`]),
     hint: "Start at 0",
     answer: String(inches),
     choices: nearChoices(rng, inches, 1, 12),

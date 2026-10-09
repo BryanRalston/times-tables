@@ -1,5 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import type { Grade } from "../model";
+import { buddyName, pickLine } from "./flavor";
 import type { PhonicsBoard } from "./boards";
 import { sceneQuestion, uniqueChoices } from "./pick";
 import { SceneCard, sceneModule } from "./scene-ui";
@@ -154,7 +155,10 @@ function makeSounds(rng: Rng): ChoiceQ {
   };
   return sceneQuestion(rng, {
     game: "phonics",
-    title: "Which picture starts with this sound?",
+    title: pickLine(rng, [
+      `Which picture starts with ${target.phoneme}?`,
+      `${buddyName(rng)} says ${target.phoneme}. Which picture starts that way?`,
+    ]),
     hint: "Tap the speaker if you want to hear it again",
     answer: target.word,
     choices: uniqueChoices(rng, target.word, [], rows.map((row) => row.word)),
@@ -185,7 +189,10 @@ function makeBegin(rng: Rng): ChoiceQ {
   };
   return sceneQuestion(rng, {
     game: "phonics",
-    title: `Which picture starts with ${target.phoneme}?`,
+    title: pickLine(rng, [
+      `Which picture starts with ${target.phoneme}?`,
+      `${buddyName(rng)} says ${target.phoneme}. Which picture is it?`,
+    ]),
     hint: "Listen for the first sound",
     answer: target.word,
     choices: uniqueChoices(rng, target.word, [], rows.map((row) => row.word)),
@@ -244,7 +251,7 @@ function makeCvc(rng: Rng): ChoiceQ {
   const board: PhonicsBoard = { game: "phonics", mode: "cvc", word, blend, letters };
   return sceneQuestion(rng, {
     game: "phonics",
-    title: "Which word do these sounds make?",
+    title: pickLine(rng, ["Which word do these sounds make?", `${buddyName(rng)} says the sounds. Which word is it?`]),
     hint: "Say each sound, then put them together",
     answer: word,
     choices: uniqueChoices(rng, word, pool),
@@ -253,7 +260,7 @@ function makeCvc(rng: Rng): ChoiceQ {
     solved: `${blend} makes ${word}`,
     picture: letters,
     hands: false,
-    quietChoices: false,
+    quietChoices: true,
     labels: {},
     board,
     factKey: `cvc:${word}`,

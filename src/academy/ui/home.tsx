@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { squisheeById } from "@/lib/squishees";
+import { bondName, bondScore, bondTier } from "../buddy/bond";
 import { bookEntries, catchphrase } from "../buddy/cast";
 import { ownedIds } from "../buddy/unlock";
 import { bossForGame } from "../bosses";
@@ -34,6 +35,7 @@ export function HomeScreen({
   const place = nextPlacement(child);
   const book = bookEntries();
   const bossHere = bossReady(journey, journey.areaId, child.grade);
+  const palTier = bondTier(bondScore(child.bonds, child.avatarId));
 
   return (
     <div className="ac-shell">
@@ -49,6 +51,9 @@ export function HomeScreen({
           <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="is-mid" label={child.name} />
         </div>
         <p className="ac-bubble">{catchphrase(child.avatarId)}</p>
+        <p className="ac-bond" data-bond={palTier}>
+          {squisheeById(child.avatarId)?.name ?? "Buddy"} · {bondName(palTier)}
+        </p>
         <h1>Hi {child.name}! Ready to play?</h1>
         <p className="ac-lede">2-minute games · hop the island · collect squishees</p>
         <div className="ac-daily" data-daily-rounds={daily.rounds} data-daily-goal={daily.goal} data-gift={daily.ready ? "closed" : daily.claimed ? "open" : "none"}>

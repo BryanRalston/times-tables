@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import type { Child, RoundResult } from "../model";
 import { applyRound } from "../rewards";
 import { blankChild, parseSave, SAVE_VERSION } from "../storage";
+import { bondName, bondTier } from "./bond";
 import { bookEntries, catchphrase, findBlurb } from "./cast";
 import { EGG_IDS, hatchPick } from "./egg";
 import { hostIdFor } from "./hosts";
+import { STUDY_PALS } from "./persona";
 import { bubbleText, buddyMotion, buddyReaction } from "./react";
 import { storyLine } from "./story";
 import { openEgg, palOwned, withBuddy } from "./unlock";
@@ -83,6 +85,33 @@ describe("squishee unlocks", () => {
     }
     expect(catchphrase("crystal-axolotl").length).toBeLessThan(42);
     expect(findBlurb("crystal-axolotl").kind).toBe("egg");
+    const koala = book.find((entry) => entry.id === "koala");
+    expect(koala?.findKind).toBe("study");
+    expect(koala?.fact.length).toBeGreaterThan(8);
+    expect(koala?.favorite.length).toBeGreaterThan(2);
+    for (const entry of book) {
+      expect(entry.fact.length).toBeGreaterThan(8);
+      expect(entry.fact.length).toBeLessThan(90);
+      expect(entry.favorite.length).toBeGreaterThan(2);
+    }
+  });
+
+  it("grows a friendship from practice and befriends a study pal after 3 stars", () => {
+    const today = "2026-10-09";
+    let row = child({ coins: 4, avatarId: "peach" });
+    expect(palOwned(row, STUDY_PALS.times!)).toBe(false);
+    expect(bondTier(0)).toBe(0);
+    row = applyRound(row, round({ game: "times", correct: 10, total: 10 }), today);
+    expect(row.bonds.peach).toBe(1);
+    expect(bondName(bondTier(row.bonds.peach!))).toBe("Practice pal");
+    expect(palOwned(row, "koala")).toBe(true);
+    expect(row.cosmetics).toContain("scarf");
+    expect(row.coins).toBeGreaterThanOrEqual(4);
+    row = applyRound(row, round(), "2026-10-10");
+    row = applyRound(row, round(), "2026-10-11");
+    expect(bondTier(row.bonds.peach!)).toBe(2);
+    expect(row.cosmetics).toContain("bow");
+    expect(row.coins).toBeGreaterThan(4);
   });
 });
 
@@ -106,17 +135,23 @@ describe("buddy reactions", () => {
     expect(buddyReaction({ phase: "teach", ok: false, stars: 1, hintOn: false })).toEqual({
       mood: "oops",
       point: "example",
-      line: "miss",
+      line: "work",
     });
+    expect(buddyReaction({ phase: "feedback", ok: true, stars: 2, hintOn: false, combo: 3 }).line).toBe("streak");
+    expect(buddyReaction({ phase: "ask", ok: false, stars: 1, hintOn: false, counting: true }).line).toBe("count");
     expect(buddyReaction({ phase: "done", ok: true, stars: 3, hintOn: false })).toEqual({
       mood: "dance",
       point: null,
       line: "dance",
     });
     expect(buddyReaction({ phase: "done", ok: true, stars: 2, hintOn: false }).mood).toBe("cheer");
-    expect(bubbleText("miss", "Hop!")).toBe("Let's look together.");
-    expect(bubbleText("cheer", "Hop!")).toBe("Hop!");
-    expect(bubbleText("ready", "Hop!")).toBe("");
+    expect(bubbleText("miss", "frog")).toBe("Let's look together.");
+    expect(bubbleText("cheer", "frog")).toBe("Hop to it!");
+    expect(bubbleText("streak", "frog")).toBe("Hop, hop, streak!");
+    expect(bubbleText("count", "panda")).toContain("group");
+    expect(bubbleText("work", "owl")).toContain("Sound");
+    expect(bubbleText("ready", "frog")).toBe("");
+    expect(bubbleText("streak", "frog")).not.toBe(bubbleText("streak", "owl"));
     expect(buddyMotion(true)).toBe("reduce");
     expect(buddyMotion(false)).toBe("ok");
   });
@@ -144,7 +179,8 @@ describe("buddy save migration", () => {
       ],
     });
     expect(save.version).toBe(SAVE_VERSION);
-    expect(SAVE_VERSION).toBe(7);
+    expect(SAVE_VERSION).toBe(8);
+    expect(save.children[0]?.bonds).toEqual({});
     expect(save.children[0]?.levels.count).toBeTruthy();
     expect(save.children[0]?.bestStars.count).toBe(0);
     const maya = save.children[0];

@@ -1,6 +1,7 @@
 import { parseTimesKey, timesKey } from "@/lib/practice";
 import { makeFluencyItem } from "@/lib/questions";
 import type { Rng } from "@/lib/rng";
+import { buddyName, pickLine } from "./flavor";
 import type { FluencyData, Question } from "@/lib/types";
 import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
@@ -138,7 +139,11 @@ export function makeTimesQuestion(rng: Rng, level: TimesLevel, prefer: string[] 
   return {
     id: qid(rng),
     game: "times",
-    title: "Tap the answer!",
+    title: pickLine(rng, [
+      "Tap the answer!",
+      `${buddyName(rng)} sets out ${a} groups of ${b}. How many?`,
+      `How many is ${a} groups of ${b}?`,
+    ]),
     hint: a <= 6 ? `${a} groups of ${b}` : "Tap the product",
     praise: `Yes! ${solved}`,
     almost: `Almost! ${solved}`,

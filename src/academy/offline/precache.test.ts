@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { COSMETIC_IDS } from "@/lib/cosmetics";
 import { SQUAD_IDS } from "../model";
-import { artPaths, buildPrecacheList, isPrecacheFile, referencedUrls, subpathServiceWorker } from "../../../scripts/academy-precache.mjs";
+import { artPaths, buildPrecacheList, domainServiceWorker, isPrecacheFile, referencedUrls, SHARE_IMAGE_PATH, subpathServiceWorker } from "../../../scripts/academy-precache.mjs";
+import { SHARE_IMAGE_PATH as htmlShareImage } from "../seo/html";
 
 describe("offline precache", () => {
   it("lists app files, squad art, outfits, and sounds", () => {
@@ -38,5 +39,11 @@ describe("offline precache", () => {
     const sound = readFileSync("src/academy/sound.ts", "utf8");
     expect(sound).not.toMatch(/\.(mp3|wav|ogg|m4a)/);
     expect(readFileSync("public/academy-sw.js", "utf8")).toBe(subpathServiceWorker());
+    expect(htmlShareImage).toBe(SHARE_IMAGE_PATH);
+    expect(isPrecacheFile(SHARE_IMAGE_PATH.slice(1))).toBe(false);
+    const domainSw = domainServiceWorker();
+    expect(domainSw).toContain(`const SHARE_IMAGE = ${JSON.stringify(SHARE_IMAGE_PATH)}`);
+    expect(domainSw).toContain("if (url.pathname === SHARE_IMAGE) return;");
+    expect(domainSw).toContain('caches.match("/index.html")');
   });
 });

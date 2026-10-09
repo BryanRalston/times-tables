@@ -1,4 +1,5 @@
 import type { Rng } from "@/lib/rng";
+import { STORY_STARS, type StoryStar } from "../buddy/persona";
 import type { Grade } from "../model";
 import { countName, type ProblemBoard } from "./boards";
 import { nearChoices, sceneQuestion, uniqueChoices } from "./pick";
@@ -23,8 +24,6 @@ const BARS = [
   { key: "problems:div", label: "Share stories" },
   { key: "problems:picture", label: "Picture stories" },
 ];
-
-const NAMES = ["Sam", "Jo", "Max", "Ana", "Lee", "Nia"] as const;
 
 const THINGS = [
   { name: "apples", emoji: "🍎" },
@@ -72,35 +71,59 @@ function storyValue(op: ProblemBoard["op"], a: number, b: number): number {
   }
 }
 
+function starOf(rng: Rng): StoryStar {
+  return rng.pick([...STORY_STARS]);
+}
+
+function storyTitle(rng: Rng, level: Exclude<ProblemLevel, "picture">, star: StoryStar, a: number, b: number, thing: string): string {
+  const items = countName(thing, a);
+  const each = countName(thing, b);
+  const roll = rng.int(0, 2);
+  if (level === "add") {
+    if (roll === 0) return `${star.name} the ${star.trait} has ${a} ${items}. ${star.pal} brings ${b} more. How many ${thing} now?`;
+    if (roll === 1) return `${star.name} finds ${a} ${items} and ${star.pal} finds ${b}. How many ${thing} in all?`;
+    return `There are ${a} ${items} with ${star.name} and ${b} with ${star.pal}. How many ${thing} altogether?`;
+  }
+  if (level === "sub") {
+    if (roll === 0) return `${star.name} has ${a} ${items} and gives ${b} to ${star.pal}. How many ${thing} are left?`;
+    if (roll === 1) return `${star.name} the ${star.trait} sees ${a} ${items}. ${b} go to ${star.pal}. How many ${thing} are left?`;
+    return `${star.name} starts with ${a} ${items} and shares ${b} with ${star.pal}. How many ${thing} are left?`;
+  }
+  if (level === "mult") {
+    if (roll === 0) return `${star.name} has ${a} ${countName("bags", a)} with ${b} ${each} in each bag. How many ${thing}?`;
+    if (roll === 1) return `${star.name} the ${star.trait} makes ${a} rows of ${b} ${each}. How many ${thing}?`;
+    return `${star.pal} sets out ${a} groups of ${b} ${each} for ${star.name}. How many ${thing}?`;
+  }
+  if (roll === 0) return `${star.name} has ${a} ${items} shared into ${b} equal groups. How many ${thing} are in each group?`;
+  if (roll === 1) return `${star.name} the ${star.trait} shares ${a} ${items} with ${b} friends. How many ${thing} does each friend get?`;
+  return `${star.pal} and ${star.name} split ${a} ${items} into ${b} equal piles. How many ${thing} in each pile?`;
+}
+
 function makeStory(rng: Rng, level: Exclude<ProblemLevel, "picture">): ChoiceQ {
-  const who = rng.pick([...NAMES]);
+  const star = starOf(rng);
   const thing = rng.pick([...THINGS]);
   let a = 1;
   let b = 1;
   let op: ProblemBoard["op"] = "+";
-  let title = "";
   if (level === "add") {
     a = rng.int(1, 9);
     b = rng.int(1, 10 - a);
     op = "+";
-    title = `${who} has ${a} ${countName(thing.name, a)}. A friend gives ${who} ${b} more. How many ${thing.name} now?`;
   } else if (level === "sub") {
     a = rng.int(1, 12);
     b = rng.int(1, a);
     op = "-";
-    title = `${who} has ${a} ${countName(thing.name, a)} and gives away ${b}. How many ${thing.name} are left?`;
   } else if (level === "mult") {
     a = rng.int(1, 5);
     b = rng.int(1, 5);
     op = "×";
-    title = `${who} has ${a} ${countName("bags", a)} with ${b} ${countName(thing.name, b)} in each bag. How many ${thing.name}?`;
   } else {
     b = rng.int(2, 5);
     const quotient = rng.int(1, 5);
     a = b * quotient;
     op = "÷";
-    title = `${who} has ${a} ${countName(thing.name, a)} shared into ${b} equal groups. How many ${thing.name} are in each group?`;
   }
+  const title = storyTitle(rng, level, star, a, b, thing.name);
   const answer = storyValue(op, a, b);
   const board: ProblemBoard = { game: "problems", mode: level, op, a, b, emoji: thing.emoji, thing: thing.name };
   const hi = level === "add" ? 12 : level === "sub" ? 12 : 25;
@@ -152,7 +175,7 @@ function pictureOptions(groups: number, size: number): Array<{ groups: number; s
 }
 
 function makePicture(rng: Rng): ChoiceQ {
-  const who = rng.pick([...NAMES]);
+  const star = starOf(rng);
   const thing = rng.pick([...THINGS]);
   const groups = rng.int(2, 4);
   const size = rng.int(1, 4);
@@ -175,7 +198,10 @@ function makePicture(rng: Rng): ChoiceQ {
   };
   return sceneQuestion(rng, {
     game: "problems",
-    title: `${who} needs ${groups} groups of ${size} ${countName(thing.name, size)}. Which picture shows that?`,
+    title:
+      rng.next() < 0.5
+        ? `${star.name} the ${star.trait} needs ${groups} groups of ${size} ${countName(thing.name, size)}. Which picture shows that?`
+        : `${star.name} draws ${groups} groups of ${size} ${countName(thing.name, size)} for ${star.pal}. Which picture matches?`,
     hint: "Count the groups and how many are in each group",
     answer: "p0",
     choices: uniqueChoices(rng, "p0", [], ids),
@@ -218,7 +244,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const a = rng.int(1, 9);
       const b = rng.int(1, 10 - a);
       return {
-        prompt: `Sam has ${a} ${countName("apples", a)}. Jo gives Sam ${b} more. How many apples?`,
+        prompt: `Peach has ${a} ${countName("apples", a)}. Frog brings ${b} more. How many apples?`,
         answer: String(a + b),
       };
     }
@@ -226,7 +252,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const a = rng.int(1, 12);
       const b = rng.int(1, a);
       return {
-        prompt: `Max has ${a} fish and gives away ${b}. How many fish are left?`,
+        prompt: `Bear has ${a} fish and gives ${b} to Panda. How many fish are left?`,
         answer: String(a - b),
       };
     }
@@ -234,7 +260,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const a = rng.int(1, 5);
       const b = rng.int(1, 5);
       return {
-        prompt: `Ana has ${a} bags with ${b} stars in each bag. How many stars?`,
+        prompt: `Panda has ${a} bags with ${b} stars in each bag. How many stars?`,
         answer: String(a * b),
       };
     }
@@ -242,7 +268,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const b = rng.int(2, 5);
       const q = rng.int(1, 5);
       return {
-        prompt: `Lee has ${b * q} cookies in ${b} equal boxes. How many cookies are in each box?`,
+        prompt: `Fox has ${b * q} cookies shared with ${b} friends. How many cookies does each friend get?`,
         answer: String(q),
       };
     }
@@ -250,7 +276,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const groups = rng.int(2, 4);
       const size = rng.int(1, 4);
       return {
-        prompt: `Nia draws ${groups} groups of ${size} frogs. How many frogs?`,
+        prompt: `Bunny draws ${groups} groups of ${size} frogs. How many frogs?`,
         answer: String(groups * size),
       };
     }

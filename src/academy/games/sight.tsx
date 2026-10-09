@@ -1,4 +1,5 @@
 import type { Rng } from "@/lib/rng";
+import { buddyName, pickLine } from "./flavor";
 import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { SquisheeImg, cx } from "../ui/bits";
@@ -85,7 +86,7 @@ export function makeSightQuestion(rng: Rng, level: SightList, prefer: string[] =
   let answer = word.word;
   let choices: string[] = [];
   let pictures: Record<string, string> | undefined;
-  let title = "Tap what you hear";
+  let title = pickLine(rng, ["Tap the word you hear", `${buddyName(rng)} says a word. Tap it.`]);
   let hint = "Tap the speaker to hear it again.";
   let sentence = "";
 

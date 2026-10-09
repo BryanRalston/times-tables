@@ -1,5 +1,6 @@
 import { squisheeById } from "@/lib/squishees";
 import { catchphrase } from "../buddy/cast";
+import { buddyMove } from "../buddy/persona";
 import { bubbleText, buddyMotion, type BuddyReaction } from "../buddy/react";
 import { AcademyPal, cx } from "./bits";
 import { useReducedMotion } from "./squishy";
@@ -14,13 +15,14 @@ export function RoundBuddy({
   reaction: BuddyReaction;
 }) {
   const reduced = useReducedMotion();
-  const text = bubbleText(reaction.line, catchphrase(id));
+  const text = bubbleText(reaction.line, id);
   return (
     <div
       className={cx("ac-buddy", `is-${reaction.mood}`)}
       data-buddy={id}
       data-mood={reaction.mood}
       data-point={reaction.point ?? "none"}
+      data-move={buddyMove(id)}
       data-motion={buddyMotion(reduced)}
       aria-hidden="true"
     >
