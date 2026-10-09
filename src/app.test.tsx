@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@/app";
 import { doorRoute } from "@/lib/nav";
 import { resetProgressMemory, useProgress } from "@/lib/progress";
@@ -121,6 +121,10 @@ describe("first-visit Home door", () => {
   });
 
   it("Guest who finished one small lesson stays put and may roll the die", () => {
+    // "Now" is the later of the calendar unit and the unit after the last
+    // finished lesson. Pin a unit-1 school day so finishing u1 still marks u2.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 20, 12, 0, 0));
     useProgress.setState({
       activities: { "u1-leftover": { plays: 1, best: 4, last: 4, stars: 3, misses: [] } },
       pathHopperAt: 0,
@@ -130,6 +134,7 @@ describe("first-visit Home door", () => {
     });
     stubHash("#/lessons");
     const html = renderToStaticMarkup(<App />);
+    vi.useRealTimers();
     expect(html).toContain('data-path-hop-from="1"');
     expect(html).toContain('data-path-travel="0"');
     expect(html).toContain('data-hop-credits="1"');

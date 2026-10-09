@@ -24,6 +24,21 @@ if (!existsSync(nojekyll)) fail("dist/.nojekyll missing");
 const catPng = resolve("dist/squishees/cat.png");
 if (!existsSync(catPng)) fail("dist/squishees/cat.png missing");
 
+const academyIndex = resolve("dist/academy/index.html");
+if (!existsSync(academyIndex)) fail("dist/academy/index.html missing");
+const academyHtml = readFileSync(academyIndex, "utf8");
+if (!/\/times-tables\/academy\/assets\/[^"']+\.js/.test(academyHtml)) {
+  fail("dist/academy/index.html must contain hashed /times-tables/academy/assets/*.js");
+}
+if (/src\/academy\/main\.tsx/.test(academyHtml)) fail("dist/academy/index.html still points at source");
+for (const sheet of ["times-tables", "add-subtract", "telling-time"]) {
+  const sheetPath = resolve(`dist/academy/worksheets/${sheet}/index.html`);
+  if (!existsSync(sheetPath)) fail(`missing worksheet ${sheet}`);
+  const sheetHtml = readFileSync(sheetPath, "utf8");
+  if (!sheetHtml.includes("<title>")) fail(`worksheet ${sheet} missing title`);
+}
+if (!existsSync(resolve("dist/academy-sw.js"))) fail("dist/academy-sw.js missing");
+
 console.log("check-pages OK dist/index.html");
 
 const live = process.env.PAGES_URL ?? "https://bryanralston.github.io/times-tables/";
