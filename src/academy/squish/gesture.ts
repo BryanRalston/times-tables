@@ -69,7 +69,8 @@ export function holdAmount(elapsedMs: number): number {
   const t = (elapsedMs - HOLD_START_MS) / HOLD_FULL_MS;
   if (t >= 1) return 1;
   if (t <= 0) return 0;
-  return t;
+  // Soft at the surface, then the toy resists as the finger sinks in.
+  return 1 - (1 - t) ** 2.15;
 }
 
 export function squishHitPolicy(place: SquishPlace): { interactive: boolean; stopPropagation: boolean; answers: false } {
@@ -219,8 +220,8 @@ export function applyPointer(gesture: Gesture, sample: Sample, role: SquishRole)
     impulse,
     pressing: false,
     hold01: 0,
-    dx: 0,
-    dy: 0,
+    dx,
+    dy,
     speed,
     stopPropagation: role === "buddy",
     answers: false,

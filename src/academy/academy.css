@@ -1670,45 +1670,28 @@ body:has(.ac-boss-intro) { background: #3c2448; }
   cursor: pointer;
 }
 .ac-squish[data-squish="buddy"] { touch-action: none; cursor: grab; }
-.ac-squish[data-live="yes"] { will-change: transform; }
 .ac-squish img { pointer-events: none; }
+.ac-squish-stage {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  line-height: 0;
+  vertical-align: middle;
+}
+.ac-boss-face > .ac-squish-stage { display: block; width: 100%; }
+.ac-squish-view {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+}
+.ac-squish[data-live="yes"] .ac-squish-view { opacity: 1; }
+.ac-squish[data-live="yes"] .is-faded + .ac-squish-view { opacity: 0.35; }
+.ac-squish[data-live="yes"] > .ac-squish-stage > img { opacity: 0; }
 .ac-choice .ac-squish,
 .ac-cell .ac-squish { pointer-events: none; cursor: inherit; }
 .ac-dots .ac-squish,
 .ac-groups .ac-squish,
 .ac-emoji-row .ac-squish { padding: 4px; margin: -4px; }
-.ac-squish-face {
-  position: absolute;
-  left: 16%;
-  right: 16%;
-  top: 18%;
-  bottom: 22%;
-  width: auto;
-  height: auto;
-  pointer-events: none;
-  opacity: 0;
-}
-.ac-squish[data-face="squint"] .ac-squish-face,
-.ac-squish[data-face="giggle"] .ac-squish-face { opacity: 0.95; }
-.ac-squish[data-face="squint"] .ac-squish-smile,
-.ac-squish[data-face="squint"] .ac-squish-blush { opacity: 0; }
-.ac-squish-eye,
-.ac-squish-smile { fill: none; stroke: #3c2448; stroke-width: 4.5; stroke-linecap: round; }
-.ac-squish-blush { fill: #ff8fbe; opacity: 0.8; }
-.ac-squish-hee {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 1px);
-  transform: translateX(-50%);
-  color: #e4377e;
-  font-family: Fredoka, Nunito, sans-serif;
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1;
-  opacity: 0;
-  pointer-events: none;
-}
-.ac-squish[data-face="giggle"] .ac-squish-hee { opacity: 1; }
 .ac-squish-line {
   position: absolute;
   left: 50%;

@@ -80,7 +80,7 @@ export function squishBuzz(reduced: boolean, vibrate?: (ms: number) => void): vo
   if (reduced) return;
   const buzz = vibrate ?? defaultVibrate;
   try {
-    buzz(12);
+    buzz(8);
   } catch {
     /* Some browsers expose vibrate and then throw. */
   }
