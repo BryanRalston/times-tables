@@ -37,11 +37,15 @@ Vite `base` is `/times-tables/`. GitHub Action builds `dist` on push to `main`. 
 
 ## Squishee Academy
 
-K–3 games (times tables, add & subtract, telling time) live on the same Pages site, at a separate entry:
+K–3 games (times tables, add & subtract, telling time). Canonical site, once Pages is on:
 
-https://bryanralston.github.io/times-tables/academy/
+https://squisheeacademy.com/
 
-`npm run build` emits that app into `dist/academy/` after the Squishee Math build. Academy keeps its own `localStorage` key and does not change Squishee Math. Worksheets: `/academy/worksheets/times-tables/`, `/academy/worksheets/add-subtract/`, `/academy/worksheets/telling-time/`. Adding a game is one module: [`docs/ADDING_A_GAME.md`](docs/ADDING_A_GAME.md).
+`www.squisheeacademy.com` redirects to that apex. The same app also stays at https://bryanralston.github.io/times-tables/academy/ so Squishee Math at https://bryanralston.github.io/times-tables/ is unchanged. Do not set a custom domain on this repo’s Pages site.
+
+`npm run build` emits the subpath app into `dist/academy/`. `npm run build:academy-domain` emits the root site (`base: /`, service worker and manifest scope `/`, `CNAME`) into `dist-domain/`. Pushing `main` runs `.github/workflows/academy-domain.yml`, which publishes that folder to `BryanRalston/squishee-academy` (`gh-pages`). That needs Actions secret `ACADEMY_DEPLOY_TOKEN` (Contents and Pages write on `squishee-academy`).
+
+Academy keeps its own `localStorage` key. Worksheets: `/worksheets/times-tables/`, `/worksheets/add-subtract/`, `/worksheets/telling-time/`. Adding a game is one module: [`docs/ADDING_A_GAME.md`](docs/ADDING_A_GAME.md). The domain build reads the same worksheet inputs.
 
 The old single-file leftover page lives in `legacy/`.
 

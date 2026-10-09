@@ -1,0 +1,56 @@
+name: Deploy Squishee Academy domain
+
+# Publishes the root-base Academy build to BryanRalston/squishee-academy.
+# That repo's Pages site owns squisheeacademy.com. This repo's Pages site
+# stays on bryanralston.github.io/times-tables/ so Squishee Math does not move.
+# ACADEMY_DEPLOY_TOKEN must be a fine-grained PAT with Contents and Pages
+# write on BryanRalston/squishee-academy.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: academy-domain-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Pillow for asset check
+        run: python3 -m pip install --user -r scripts/requirements-assets.txt
+      - run: npm test
+      - run: npm run build:academy-domain
+      - uses: actions/upload-artifact@v4
+        with:
+          name: academy-domain
+          path: dist-domain
+          if-no-files-found: error
+          retention-days: 5
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: academy-domain
+          path: dist-domain
+      - name: Publish squisheeacademy.com
+        env:
+          ACADEMY_DEPLOY_TOKEN: ${{ secrets.ACADEMY_DEPLOY_TOKEN }}
+        run: node scripts/publish-academy-domain.mjs
