@@ -141,7 +141,7 @@ export function Squishy({
       event.preventDefault();
       event.stopPropagation();
     }
-    if (plan.capture) event.currentTarget.setPointerCapture(event.pointerId);
+    if (plan.capture) capturePointer(event.currentTarget, event.pointerId);
     frame.current = {
       reduced: reducedRef.current,
       pressing: true,
@@ -165,13 +165,13 @@ export function Squishy({
     if (plan.stopPropagation) event.stopPropagation();
     if (plan.yieldScroll) {
       pointer.current = null;
-      if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+      releasePointer(event.currentTarget, event.pointerId);
       frame.current = { ...idleFrame(reducedRef.current), impulse: "release", nx: point.nx, ny: point.ny };
       kick();
       return;
     }
-    if (plan.capture && !event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.setPointerCapture(event.pointerId);
+    if (plan.capture && !hasCapture(event.currentTarget, event.pointerId)) {
+      capturePointer(event.currentTarget, event.pointerId);
     }
     frame.current = {
       reduced: reducedRef.current,
@@ -196,7 +196,7 @@ export function Squishy({
       event.preventDefault();
       event.stopPropagation();
     }
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    releasePointer(event.currentTarget, event.pointerId);
     frame.current = { ...idleFrame(reducedRef.current), impulse: plan.impulse, nx: point.nx, ny: point.ny };
     if (plan.countSquish) {
       squishTone(id, soundRef.current, "up");
@@ -224,7 +224,14 @@ export function Squishy({
       onDragStart={(event) => event.preventDefault()}
     >
       {children}
-      {expression ? <SquishFace /> : null}
+      {expression ? (
+        <>
+          <SquishFace />
+          <span className="ac-squish-hee" aria-hidden="true">
+            hee
+          </span>
+        </>
+      ) : null}
       {pop.line ? <span className="ac-squish-line">{pop.line}</span> : null}
       {pop.hearts ? (
         <span className="ac-squish-hearts" aria-hidden="true">
@@ -235,6 +242,30 @@ export function Squishy({
       ) : null}
     </span>
   );
+}
+
+function capturePointer(el: HTMLElement, id: number) {
+  try {
+    el.setPointerCapture(id);
+  } catch {
+    /* A cancelled pointer has nothing to capture. The squish still plays. */
+  }
+}
+
+function hasCapture(el: HTMLElement, id: number): boolean {
+  try {
+    return el.hasPointerCapture(id);
+  } catch {
+    return false;
+  }
+}
+
+function releasePointer(el: HTMLElement, id: number) {
+  try {
+    if (el.hasPointerCapture(id)) el.releasePointerCapture(id);
+  } catch {
+    /* Already released. */
+  }
 }
 
 function readPoint(event: ReactPointerEvent<HTMLSpanElement>): { x: number; y: number; nx: number; ny: number } {
@@ -248,12 +279,9 @@ function SquishFace() {
     <svg className="ac-squish-face" viewBox="0 0 100 100" aria-hidden="true">
       <path className="ac-squish-eye" d="M28 40c4-7 12-7 16 0" />
       <path className="ac-squish-eye" d="M56 40c4-7 12-7 16 0" />
-      <path className="ac-squish-smile" d="M38 54c4 8 20 8 24 0" />
-      <circle className="ac-squish-blush" cx="26" cy="52" r="5" />
-      <circle className="ac-squish-blush" cx="74" cy="52" r="5" />
-      <text className="ac-squish-hee" x="50" y="24" textAnchor="middle">
-        hee
-      </text>
+      <path className="ac-squish-smile" d="M38 62c4 7 20 7 24 0" />
+      <circle className="ac-squish-blush" cx="24" cy="58" r="6" />
+      <circle className="ac-squish-blush" cx="76" cy="58" r="6" />
     </svg>
   );
 }
