@@ -62,19 +62,48 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string): s
   }
 }
 
+function handsStory(kind: Exclude<RoundSlot, { kind: "choice" }>["kind"], buddy: string, host: string): string {
+  switch (kind) {
+    case "clock":
+      return `${host} checks the clock. What time is it?`;
+    case "pay":
+      return `${buddy} and ${host} share the coins. How much do they have?`;
+    case "array":
+      return `${host} sets out rows. Build the array.`;
+    case "frame":
+      return `${buddy} and ${host} move the counters.`;
+    case "count":
+      return `${buddy} and ${host} make a number.`;
+    case "blocks":
+      return `${host} sets out base-ten blocks. Build the number.`;
+    case "shade":
+      return `${buddy} and ${host} shade a shape.`;
+    case "letters":
+      return `${buddy} helps ${host} spell the word.`;
+    case "sight":
+      return `${host} and ${buddy} read a word together.`;
+    case "phonics":
+      return `${host} says a sound for ${buddy}. Build what you hear.`;
+    case "measure":
+      return `${host} measures with ${buddy}.`;
+    case "shapes":
+      return `${host} sorts the shapes.`;
+    case "story":
+      return `${buddy} and ${host} act out the story.`;
+    default: {
+      const neverKind: never = kind;
+      return neverKind;
+    }
+  }
+}
+
 export function slotStory(slot: RoundSlot, buddyId: string, hostId: string): string {
   const buddy = nameOf(buddyId, "Peach");
   const host = nameOf(hostId, "Panda");
   switch (slot.kind) {
     case "choice":
       return storyLine(slot.question.visual, buddyId, hostId);
-    case "clock":
-      return `${host} checks the clock. What time is it?`;
-    case "pay":
-      return `${buddy} and ${host} share the coins. How much do they have?`;
-    default: {
-      const neverSlot: never = slot;
-      return neverSlot;
-    }
+    default:
+      return handsStory(slot.kind, buddy, host);
   }
 }

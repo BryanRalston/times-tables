@@ -51,7 +51,23 @@ export interface SceneFrame {
   caption: string;
 }
 
-export type TeachFrame = AddFrame | TimesFrame | TimeFrame | MoneyFrame | WordFrame | SceneFrame;
+export type ModelArt =
+  | { type: "blocks"; hundreds: number; tens: number; ones: number }
+  | { type: "counters"; n: number; frame: boolean }
+  | { type: "shade"; num: number; den: number }
+  | { type: "word"; text: string }
+  | { type: "ruler"; inches: number }
+  | { type: "bars"; count: number; emoji: string }
+  | { type: "shape"; name: string; part: boolean }
+  | { type: "groups"; sizes: number[] };
+
+export interface ModelFrame {
+  kind: "model";
+  art: ModelArt;
+  caption: string;
+}
+
+export type TeachFrame = AddFrame | TimesFrame | TimeFrame | MoneyFrame | WordFrame | SceneFrame | ModelFrame;
 
 export interface WorkedExample {
   speech: string;

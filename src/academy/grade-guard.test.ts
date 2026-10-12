@@ -8,6 +8,7 @@ import { spellWords, type SpellLevel } from "./games/spell-data";
 import { TIME_MINUTES, type TimeLevel } from "./games/time";
 import { TIMES_SPEC, type TimesLevel } from "./games/times";
 import { FRACTION_DENOMINATORS, GRADE_BANDS, playWindow } from "./grade-map";
+import { makeHandsTask, type HandsTask } from "./hands-build";
 import { makeClockTask, makePayTask } from "./hands";
 import type { Grade } from "./model";
 import { nextPlacement } from "./placement";
@@ -111,6 +112,96 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
     default: {
       const neverBoard: never = board;
       throw new Error(String(neverBoard));
+    }
+  }
+}
+
+function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
+  expect(task.speech.length).toBeGreaterThan(0);
+  expect(task.speech).not.toMatch(/[×÷¢]/);
+  switch (task.kind) {
+    case "clock":
+    case "pay":
+      break;
+    case "array":
+      expect(task.rows * task.cols).toBeLessThanOrEqual(level === "count" ? 20 : 100);
+      if (grade !== "3") {
+        expect([6, 7, 8, 9]).not.toContain(task.rows);
+        expect([6, 7, 8, 9]).not.toContain(task.cols);
+      }
+      break;
+    case "frame": {
+      const max = level === "within5" ? 5 : level === "within10" ? 10 : level === "within20" ? 20 : 99;
+      expect(task.target).toBe(task.op === "+" ? task.start + task.change : task.start - task.change);
+      expect(task.target).toBeGreaterThanOrEqual(0);
+      expect(task.target).toBeLessThanOrEqual(max);
+      expect(task.change).toBeGreaterThanOrEqual(1);
+      if (grade === "K" || grade === "1") expect(level).not.toBe("within100");
+      if (task.model === "blocks") expect(task.start).toBeGreaterThanOrEqual(10);
+      break;
+    }
+    case "count":
+      if (task.mode === "pile") expect(task.target).toBeLessThanOrEqual(level === "subitize" ? 6 : 10);
+      if (task.mode === "teen") {
+        expect(task.target).toBeGreaterThanOrEqual(11);
+        expect(task.target).toBeLessThanOrEqual(20);
+      }
+      if (grade === "K" || grade === "1") expect(task.mode).not.toBe("ten");
+      break;
+    case "blocks":
+      expect(task.hundreds).toBeGreaterThanOrEqual(0);
+      expect(task.tens).toBeGreaterThanOrEqual(0);
+      expect(task.ones).toBeGreaterThanOrEqual(0);
+      if (grade === "1" || grade === "2") expect(task.hundreds).toBe(0);
+      if (level === "round100") {
+        expect(task.hundreds).toBeGreaterThanOrEqual(1);
+        expect(task.tens).toBe(0);
+        expect(task.ones).toBe(0);
+      }
+      break;
+    case "shade":
+      expect(FRACTION_DENOMINATORS).toContain(task.den);
+      expect(task.num).toBeGreaterThanOrEqual(1);
+      expect(task.num).toBeLessThanOrEqual(task.den);
+      if (grade === "1") expect([2, 4]).toContain(task.den);
+      if (grade === "2") expect([2, 3, 4]).toContain(task.den);
+      expect(task.speech).not.toContain("/");
+      break;
+    case "letters":
+      expect(task.word.length).toBeGreaterThanOrEqual(3);
+      expect(task.word.length).toBeLessThanOrEqual(6);
+      if (grade === "K" || grade === "1") expect(task.showSentence).toBe(false);
+      break;
+    case "sight":
+      expect(task.choices).toContain(task.word);
+      if (grade === "K" || grade === "1") expect(task.mode).toBe("picture");
+      break;
+    case "phonics":
+      if (grade === "K" || grade === "1") {
+        expect(task.mode).toBe("letter");
+        const word = task.factKey.split(":")[1] ?? "";
+        if (word.length > 2) expect(task.speech.toLowerCase().includes(word.toLowerCase())).toBe(false);
+      }
+      if (grade === "2") expect(task.mode).not.toBe("end");
+      break;
+    case "measure":
+      if (grade === "K") expect(task.mode).toBe("compare");
+      if (grade === "1") expect(task.mode).not.toBe("ruler");
+      if (task.mode === "ruler") expect(task.speech).not.toMatch(/\d/);
+      break;
+    case "shapes":
+      expect(task.options).toContain(task.answer);
+      if (grade === "K") expect(task.mode).not.toBe("parts");
+      break;
+    case "story":
+      if (grade === "K") expect(task.mode).toBe("join");
+      if (grade === "K" || grade === "1") expect(["join", "take"]).toContain(task.mode);
+      if (grade !== "3") expect(task.mode).not.toBe("share");
+      if (task.mode === "join") expect(task.a + task.b).toBeLessThanOrEqual(10);
+      break;
+    default: {
+      const neverTask: never = task;
+      throw new Error(String(neverTask));
     }
   }
 }
@@ -297,6 +388,9 @@ describe("grade bands", () => {
             if (level === "name") expect(pay.bank).toHaveLength(1);
             if (grade === "K" || grade === "1") expect(pay.cents).toBeLessThanOrEqual(75);
           }
+          const hands = makeHandsTask(game.id, level, rngFromSeed(`hands-${game.id}-${grade}-${level}-${i}`));
+          expect(hands.skill).toBe(`${game.id}:${level}`);
+          assertHandsGrade(grade, level, hands);
         }
       }
     }

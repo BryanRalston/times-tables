@@ -129,7 +129,7 @@ Kindergarten can drift to before and after. Ten-frames wait until grade 2 unless
 
 Levels: tens and ones with base-ten blocks, expanded form, compare, round to 10, round to 100, build a number.
 
-Tens-and-ones blocks stay under 100. Expanded form and compare also use numbers through 999, which is the grade 2 standard. Hundreds flats are not a hands-on level yet.
+Tens-and-ones blocks stay under 100. Expanded form and compare also use numbers through 999, which is the grade 2 standard. The tens-and-ones hands-on card stays under 100. Rounding to the nearest hundred drags hundred tiles for that rounded number.
 
 | Grade | Offer | Start | Core levels | Standards |
 |---|---|---|---|---|

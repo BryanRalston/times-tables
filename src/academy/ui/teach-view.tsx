@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import type { ShapeName } from "../games/boards";
+import { ShapeFig } from "../games/scene-ui";
 import { emptyPile, formatCents } from "../games/money-model";
-import type { TeachFrame, WorkedExample } from "../teach";
+import type { ModelArt, TeachFrame, WorkedExample } from "../teach";
 import { AnalogClock, cx } from "./bits";
 import { CountToken } from "./count-token";
 import { CoinRow } from "./coins";
@@ -62,6 +64,8 @@ function TeachArt({ frame }: { frame: TeachFrame }) {
       return <p className="ac-sight-word">{frame.show}</p>;
     case "scene":
       return <p className="ac-teach-pic">{frame.show}</p>;
+    case "model":
+      return <ModelArtView art={frame.art} />;
     default: {
       const neverFrame: never = frame;
       return neverFrame;
@@ -201,6 +205,106 @@ function TimesArt({ frame }: { frame: Extract<TeachFrame, { kind: "times" }> }) 
       ))}
     </div>
   );
+}
+
+const SHAPE_NAMES: readonly ShapeName[] = [
+  "circle",
+  "triangle",
+  "square",
+  "rectangle",
+  "pentagon",
+  "hexagon",
+  "cube",
+  "sphere",
+  "cone",
+  "cylinder",
+];
+
+function isShapeName(value: string): value is ShapeName {
+  return (SHAPE_NAMES as readonly string[]).includes(value);
+}
+
+function ModelArtView({ art }: { art: ModelArt }) {
+  switch (art.type) {
+    case "blocks":
+      return (
+        <div className="ac-base" aria-hidden="true">
+          {Array.from({ length: art.hundreds }, (_, i) => (
+            <i key={`h${i}`} className="ac-flat" />
+          ))}
+          {Array.from({ length: art.tens }, (_, i) => (
+            <i key={`t${i}`} className="ac-rod" />
+          ))}
+          <span className="ac-ones">
+            {Array.from({ length: art.ones }, (_, i) => (
+              <i key={`o${i}`} className="ac-dot is-pink" />
+            ))}
+          </span>
+        </div>
+      );
+    case "counters":
+      if (!art.frame) {
+        return (
+          <div className="ac-dots" aria-hidden="true">
+            {pile(Math.min(art.n, 20), "pink")}
+          </div>
+        );
+      }
+      if (art.n <= 10) return <TenFrame filled={art.n} />;
+      return (
+        <div className="ac-ten-stack">
+          <TenFrame filled={10} />
+          <TenFrame filled={Math.max(0, art.n - 10)} />
+        </div>
+      );
+    case "shade":
+      return (
+        <div className="ac-frac" aria-hidden="true">
+          {Array.from({ length: art.den }, (_, i) => (
+            <i key={i} className={i < art.num ? "is-on" : ""} />
+          ))}
+        </div>
+      );
+    case "word":
+      return <p className="ac-sight-word">{art.text}</p>;
+    case "ruler":
+      return (
+        <div className="ac-unit-row" aria-hidden="true">
+          {Array.from({ length: art.inches }, (_, i) => (
+            <i key={i} className="ac-inch" />
+          ))}
+        </div>
+      );
+    case "bars":
+      return (
+        <div className="ac-unit-row" aria-hidden="true">
+          {Array.from({ length: art.count }, (_, i) => (
+            <i key={i} className="ac-inch">
+              {art.emoji}
+            </i>
+          ))}
+        </div>
+      );
+    case "shape":
+      if (art.part) return <p className="ac-sight-word">{art.name}</p>;
+      return isShapeName(art.name) ? <ShapeFig name={art.name} /> : <p className="ac-sight-word">{art.name}</p>;
+    case "groups":
+      return (
+        <div className="ac-groups" aria-hidden="true">
+          {art.sizes.map((size, index) => (
+            <span key={index} className="ac-group">
+              {Array.from({ length: size }, (_, i) => (
+                <i key={i} />
+              ))}
+            </span>
+          ))}
+        </div>
+      );
+    default: {
+      const neverArt: never = art;
+      return neverArt;
+    }
+  }
 }
 
 function MoneyArt({ frame }: { frame: Extract<TeachFrame, { kind: "money" }> }) {
