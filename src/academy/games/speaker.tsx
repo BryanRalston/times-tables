@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { SpeakerIcon, cx } from "../ui/bits";
+import { useSoundEnabled } from "../ui/sound-context";
+import { clipsCover } from "../voice/player";
 import {
   markVoicesSettled,
   needsSpeechFallback,
@@ -23,10 +25,11 @@ export function SpeakerBar({
   large: boolean;
   label: string;
 }) {
+  const sound = useSoundEnabled();
   const [slow, setSlow] = useState(slowPreference);
   const [forced, setForced] = useState(false);
   const [envFallback, setEnvFallback] = useState(() => needsSpeechFallback(readSpeechProbe()));
-  const show = forced || envFallback;
+  const show = forced || (!clipsCover(text) && envFallback);
 
   useEffect(() => {
     const update = () => setEnvFallback(needsSpeechFallback(readSpeechProbe()));
@@ -50,12 +53,17 @@ export function SpeakerBar({
   }, []);
 
   useEffect(() => {
+    if (!sound) {
+      stopSpeech();
+      return;
+    }
     const ok = speakText(text, slow, () => setForced(true));
     if (!ok) setForced(true);
     return () => stopSpeech();
-  }, [text, slow]);
+  }, [text, slow, sound]);
 
   function replay() {
+    if (!sound) return;
     const ok = speakText(text, slow, () => setForced(true));
     if (!ok) setForced(true);
   }

@@ -87,6 +87,8 @@ export function isPrecacheFile(rel) {
   if (!rel || SKIP_COPY.test(rel)) return false;
   if (rel === "precache-manifest.json" || rel === "CNAME" || rel === ".nojekyll") return false;
   if (rel === SHARE_IMAGE_PATH.slice(1)) return false;
+  // Game clips load on first play and stay in the runtime cache. Core clips precache on install.
+  if (rel.startsWith("voice/lazy/")) return false;
   return PRECACHE_EXT.test(rel);
 }
 
@@ -212,7 +214,7 @@ self.addEventListener("activate", (event) => {
 
 export function subpathServiceWorker() {
   return `/* Academy-only offline cache. Registered with scope /times-tables/academy/ so Squishee Math is not controlled. */
-const CACHE = "squishee-academy-v4";
+const CACHE = "squishee-academy-v5";
 ${PRECACHE_RUNTIME}
 function isMathShell(pathname) {
   return pathname === "/times-tables" || pathname === "/times-tables/" || pathname === "/times-tables/index.html";
@@ -252,7 +254,7 @@ self.addEventListener("fetch", (event) => {
 
 export function domainServiceWorker() {
   return `/* Squishee Academy offline cache. Served from the domain root so scope is /. */
-const CACHE = "squishee-academy-root-v4";
+const CACHE = "squishee-academy-root-v5";
 const SHARE_IMAGE = ${JSON.stringify(SHARE_IMAGE_PATH)};
 ${PRECACHE_RUNTIME}
 self.addEventListener("fetch", (event) => {
