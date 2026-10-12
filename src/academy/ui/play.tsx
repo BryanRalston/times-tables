@@ -20,7 +20,7 @@ import { bossEnergyAfterHit, bossIsTimed, bossMaxEnergy, phaseForIndex } from ".
 import { bossForGame } from "../bosses";
 import { playWindow } from "../grade-map";
 import { gameById, pillLabel } from "../games/registry";
-import { makeClockTask, makePayTask } from "../hands";
+import { makeHandsTask } from "../hands-build";
 import { bossReady, bossWon } from "../journey";
 import {
   autoSpeakGrade,
@@ -54,7 +54,7 @@ import { BossHud, BossIntro } from "./boss-stage";
 import { Flame, SpeakerIcon, SquisheeImg, Stars, cx, fmtSeconds } from "./bits";
 import { RoundCastProvider } from "./round-cast";
 import { CoinRow } from "./coins";
-import { ClockBoard, PayBoard } from "./hands";
+import { HandsBoard } from "./build-boards";
 import { WorkedExample } from "./teach-view";
 
 function Confetti() {
@@ -82,8 +82,7 @@ function bossOpening(
   return questions.map((question, i) => {
     const twist = phaseForIndex(i, questions.length);
     const skillLevel = question.skill.split(":")[1] ?? level;
-    if (twist === "cards" && game === "time") return { slot: makeClockTask(skillLevel, rngRandom()), returning: false };
-    if (twist === "cards" && game === "money") return { slot: makePayTask(skillLevel, rngRandom()), returning: false };
+    if (twist === "cards") return { slot: makeHandsTask(game, skillLevel, rngRandom()), returning: false };
     return { slot: { kind: "choice", question }, returning: false };
   });
 }
@@ -122,9 +121,16 @@ function markOf(slot: RoundSlot, ok: boolean, unscored = false): AnswerMark {
 }
 
 function praiseLine(slot: RoundSlot): string {
-  if (slot.kind === "choice") return slot.question.praise;
-  if (slot.kind === "clock") return "Yes! The hands show it.";
-  return "Yes! That pays the price.";
+  switch (slot.kind) {
+    case "choice":
+      return slot.question.praise;
+    case "clock":
+      return "Yes! The hands show it.";
+    case "pay":
+      return "Yes! That pays the price.";
+    default:
+      return slot.praise;
+  }
 }
 
 export function PlayScreen({
@@ -252,14 +258,13 @@ export function PlayScreen({
     if (queued) return { slot: queued, returning: true };
     const handsOn = handsRef.current.has(i);
     const lvl = levelNow();
-    if (handsOn && game === "time") return { slot: makeClockTask(lvl, rngRandom()), returning: false };
-    if (handsOn && game === "money") return { slot: makePayTask(lvl, rngRandom()), returning: false };
+    if (handsOn) return { slot: makeHandsTask(game, lvl, rngRandom()), returning: false };
     return { slot: { kind: "choice", question: nextQuestion() }, returning: false };
   }
 
   const [questions, setQuestions] = useState<Served[]>(() => {
     if (blocked) return [];
-    handsRef.current = new Set(boss || (game !== "time" && game !== "money") ? [] : handsOnSlots(ROUND_LENGTH));
+    handsRef.current = new Set(boss ? [] : handsOnSlots(ROUND_LENGTH));
     if (boss) {
       return bossOpening(game, level, preferIds(), child.grade, crownFight, child.challengeAhead);
     }
@@ -289,7 +294,7 @@ export function PlayScreen({
     const nextBoss = crownFight || bossReady(child.journey, game, child.grade);
     skillsRef.current = cloneSkills(child.skills);
     ladderRef.current = startLadder(openingIndex(nextBase, child.rounds, nextBoss, boundsRef.current));
-    handsRef.current = new Set(nextBoss || (game !== "time" && game !== "money") ? [] : handsOnSlots(ROUND_LENGTH));
+    handsRef.current = new Set(nextBoss ? [] : handsOnSlots(ROUND_LENGTH));
     returnsRef.current = new Map();
     replayHereRef.current = false;
     practiceTaughtRef.current = false;
@@ -880,7 +885,7 @@ export function PlayScreen({
           <div
             className={cx(
               "ac-stage",
-              spec?.layout === "wide" && phase !== "teach" && slot.kind !== "clock" && slot.kind !== "pay" && "is-time",
+              spec?.layout === "wide" && phase !== "teach" && slot.kind === "choice" && "is-time",
               phase === "feedback" && "is-yes",
               phase === "feedback" && combo >= 3 && "is-streak",
               phase === "teach" && "is-teach",
@@ -906,14 +911,10 @@ export function PlayScreen({
               </div>
             ) : (
               <div className="ac-stage-main" key={slotFact(slot) + phase}>
-                {slot.kind === "clock" || slot.kind === "pay" ? (
+                {slot.kind !== "choice" ? (
                   <>
                     <p className="ac-story">{slotStory(slot, child.avatarId, hostId)}</p>
-                    {slot.kind === "clock" ? (
-                      <ClockBoard task={slot} onAnswer={(good) => answer(good)} />
-                    ) : (
-                      <PayBoard task={slot} onAnswer={(good) => answer(good)} />
-                    )}
+                    <HandsBoard task={slot} onAnswer={(good) => answer(good)} />
                   </>
                 ) : choice ? (
                   <>

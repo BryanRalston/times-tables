@@ -89,7 +89,7 @@ export function ClockBoard({ task, onAnswer }: { task: ClockTask; onAnswer: (ok:
 export function PayBoard({ task, onAnswer }: { task: PayTask; onAnswer: (ok: boolean) => void }) {
   const [pile, setPile] = useState<CoinPile>(emptyPile);
   const trayRef = useRef<HTMLDivElement>(null);
-  const drag = useRef<CoinKind | null>(null);
+  const drag = useRef<{ kind: CoinKind; x: number; y: number } | null>(null);
   const [ghost, setGhost] = useState<{ kind: CoinKind; x: number; y: number } | null>(null);
 
   function add(kind: CoinKind) {
@@ -101,14 +101,16 @@ export function PayBoard({ task, onAnswer }: { task: PayTask; onAnswer: (ok: boo
   }
 
   function dropAt(x: number, y: number) {
-    const kind = drag.current;
+    const current = drag.current;
     drag.current = null;
     setGhost(null);
-    if (!kind) return;
+    if (!current) return;
     const tray = trayRef.current?.getBoundingClientRect();
     if (!tray) return;
-    const inside = x >= tray.left && x <= tray.right && y >= tray.top && y <= tray.bottom;
-    if (inside) add(kind);
+    const pointX = x || current.x;
+    const pointY = y || current.y;
+    const inside = pointX >= tray.left && pointX <= tray.right && pointY >= tray.top && pointY <= tray.bottom;
+    if (inside) add(current.kind);
   }
 
   const faces: CoinKind[] = [];
@@ -127,19 +129,17 @@ export function PayBoard({ task, onAnswer }: { task: PayTask; onAnswer: (ok: boo
             className="ac-coin-drag"
             aria-label={`Drag ${COIN_NAME[kind].toLowerCase()}`}
             onPointerDown={(event) => {
-              drag.current = kind;
+              drag.current = { kind, x: event.clientX, y: event.clientY };
               event.currentTarget.setPointerCapture(event.pointerId);
               setGhost({ kind, x: event.clientX, y: event.clientY });
             }}
             onPointerMove={(event) => {
-              if (drag.current !== kind) return;
+              if (drag.current?.kind !== kind) return;
+              drag.current = { kind, x: event.clientX, y: event.clientY };
               setGhost({ kind, x: event.clientX, y: event.clientY });
             }}
             onPointerUp={(event) => dropAt(event.clientX, event.clientY)}
-            onPointerCancel={() => {
-              drag.current = null;
-              setGhost(null);
-            }}
+            onPointerCancel={(event) => dropAt(event.clientX, event.clientY)}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();

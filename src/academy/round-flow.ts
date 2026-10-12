@@ -3,11 +3,12 @@ import { makeQuestion } from "./questions";
 import type { ChoiceQ } from "./games/types";
 import { WEEKDAY_LETTERS, WEEKDAY_NAMES, weekDates } from "./model";
 import { promptSpeech, workedExample, type WorkedExample } from "./teach";
+import { handsExample, makeBuildTask, type BuildTask } from "./hands-build";
 import { clockQuestion, makeClockTask, makePayTask, payQuestion, type ClockTask, type PayTask } from "./hands";
 
 export type { ClockTask, PayTask };
 
-export type RoundSlot = { kind: "choice"; question: ChoiceQ } | ClockTask | PayTask;
+export type RoundSlot = { kind: "choice"; question: ChoiceQ } | ClockTask | PayTask | BuildTask;
 
 export interface MissPlan {
   /** Scored index → fact that must be asked again before the round ends. */
@@ -50,9 +51,16 @@ export function speechFor(slot: RoundSlot): string {
 }
 
 export function exampleFor(slot: RoundSlot): WorkedExample {
-  if (slot.kind === "choice") return workedExample(slot.question);
-  if (slot.kind === "clock") return workedExample(clockQuestion(slot));
-  return workedExample(payQuestion(slot));
+  switch (slot.kind) {
+    case "choice":
+      return workedExample(slot.question);
+    case "clock":
+      return workedExample(clockQuestion(slot));
+    case "pay":
+      return workedExample(payQuestion(slot));
+    default:
+      return handsExample(slot);
+  }
 }
 
 /**
@@ -132,15 +140,23 @@ export function similarChoice(game: string, question: ChoiceQ, rng: Rng): Choice
 }
 
 export function similarSlot(game: string, slot: RoundSlot, rng: Rng): RoundSlot {
-  if (slot.kind === "clock") {
-    const level = slot.skill.startsWith("time:") ? slot.skill.slice(5) : "hour";
-    return makeClockTask(level, rng, slot.factKey);
+  switch (slot.kind) {
+    case "clock": {
+      const level = slot.skill.startsWith("time:") ? slot.skill.slice(5) : "hour";
+      return makeClockTask(level, rng, slot.factKey);
+    }
+    case "pay": {
+      const level = slot.skill.startsWith("money:") ? slot.skill.slice(6) : "count";
+      return makePayTask(level, rng, slot.factKey);
+    }
+    case "choice":
+      return { kind: "choice", question: similarChoice(game, slot.question, rng) };
+    default: {
+      const prefix = `${game}:`;
+      const level = slot.skill.startsWith(prefix) ? slot.skill.slice(prefix.length) : slot.skill;
+      return makeBuildTask(game, level, rng, slot.factKey);
+    }
   }
-  if (slot.kind === "pay") {
-    const level = slot.skill.startsWith("money:") ? slot.skill.slice(6) : "count";
-    return makePayTask(level, rng, slot.factKey);
-  }
-  return { kind: "choice", question: similarChoice(game, slot.question, rng) };
 }
 
 export interface StickerDay {
