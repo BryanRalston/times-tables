@@ -1,3 +1,5 @@
+import { startClipSpeech, stopClipSpeech } from "../voice/player";
+
 export interface SpeechProbe {
   synthesis: boolean;
   voices: number;
@@ -46,8 +48,7 @@ export function speakRate(slow: boolean): number {
   return slow ? 0.68 : 0.95;
 }
 
-/** Speak `text`. Returns false when the device has no voice, so the caller can show text. */
-export function speakText(text: string, slow: boolean, onFail?: () => void): boolean {
+function speakWithDevice(text: string, slow: boolean, onFail?: () => void): boolean {
   const probe = readSpeechProbe();
   if (needsSpeechFallback(probe)) return false;
   try {
@@ -71,7 +72,31 @@ export function speakText(text: string, slow: boolean, onFail?: () => void): boo
   }
 }
 
+function cancelDevice(): void {
+  if (typeof window === "undefined" || !window.speechSynthesis) return;
+  try {
+    window.speechSynthesis.cancel();
+  } catch {
+    /* the caption stays */
+  }
+}
+
+/** Speak `text` from a clip when one exists. Returns false when nothing can talk, so the caller can show text. */
+export function speakText(text: string, slow: boolean, onFail?: () => void): boolean {
+  cancelDevice();
+  const rate = slow ? 0.78 : 1;
+  if (
+    startClipSpeech(text, rate, () => {
+      if (!speakWithDevice(text, slow, onFail)) onFail?.();
+    })
+  ) {
+    return true;
+  }
+  return speakWithDevice(text, slow, onFail);
+}
+
 export function stopSpeech(): void {
+  stopClipSpeech();
   if (typeof window === "undefined" || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
 }

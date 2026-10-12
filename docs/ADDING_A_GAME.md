@@ -39,3 +39,7 @@ Boss fights are generic. `bossForGame` in `src/academy/bosses.ts` builds a boss 
 Bump `SAVE_VERSION` only when the shape or meaning of a field changes. Add one function to `MIGRATIONS` keyed by the old version. It must return the next version. `parseSave` runs the chain. A save newer than this build is played in memory if it still parses, and it is not written back over.
 
 Keep the key different from Squishee Math (`g3-path-v2`). Nothing in the save is sent off the device.
+
+## Voice clips
+
+Kids hear recorded clips, not the device voice. `src/academy/voice/clips.test.ts` builds the lines a game can speak and fails when a line has no clip. After adding prompts, hints, or praise, regenerate with `npx vite-node scripts/export-voice-clips.ts` and `python3 scripts/render-voice.py`. The voice model and license are in `docs/VOICE.md`.

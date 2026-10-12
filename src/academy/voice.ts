@@ -1,4 +1,6 @@
-/** Spoken prompts. The picture on screen is the fallback when speech is missing or blocked. */
+import { startClipSpeech, stopClipSpeech } from "./voice/player";
+
+/** Spoken prompts. Recorded clips play first. The device voice is only for a line with no clip. */
 
 export interface VoiceLike {
   lang: string;
@@ -28,6 +30,7 @@ export function pickLocalVoice(voices: readonly VoiceLike[]): VoiceLike | null {
 }
 
 export function silence(): void {
+  stopClipSpeech();
   if (!canSpeak()) return;
   try {
     window.speechSynthesis.cancel();
@@ -84,9 +87,25 @@ export function warmVoices(): void {
   }
 }
 
+function cancelDevice(): void {
+  if (!canSpeak()) return;
+  try {
+    window.speechSynthesis.cancel();
+  } catch {
+    /* a missing voice is fine */
+  }
+}
+
 export function speak(text: string, enabled: boolean): void {
   const line = text.trim();
-  if (!enabled || !line || !canSpeak()) return;
+  if (!enabled || !line) return;
+  cancelDevice();
+  if (startClipSpeech(line, 1, () => sayWithDevice(line))) return;
+  sayWithDevice(line);
+}
+
+function sayWithDevice(line: string): void {
+  if (!canSpeak()) return;
   try {
     if (deviceVoices().length === 0) pendingLine = line;
     sayNow(line);

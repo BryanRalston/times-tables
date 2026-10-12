@@ -15,6 +15,8 @@ describe("offline precache", () => {
     expect(isPrecacheFile("assets/app.js")).toBe(true);
     expect(isPrecacheFile("assets/font.woff2")).toBe(true);
     expect(isPrecacheFile("sounds/cheer.wav")).toBe(true);
+    expect(isPrecacheFile("voice/core/seven.mp3")).toBe(true);
+    expect(isPrecacheFile("voice/lazy/elephant.mp3")).toBe(false);
     expect(isPrecacheFile("squishees/frog.png")).toBe(false);
     expect(isPrecacheFile("precache-manifest.json")).toBe(false);
 
