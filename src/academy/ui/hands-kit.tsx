@@ -1,5 +1,6 @@
 import { useRef, useState, type KeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { squisheeById } from "@/lib/squishees";
+import { show } from "../i18n";
 import { squisheeUrl } from "../paths";
 import { useCast } from "./round-cast";
 
@@ -94,7 +95,7 @@ export function HandsShell({
         </p>
       ) : null}
       <button type="button" className="ac-go" onClick={onDone}>
-        Done
+        {show("Done")}
       </button>
     </div>
   );

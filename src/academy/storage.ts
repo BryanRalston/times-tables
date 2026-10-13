@@ -22,7 +22,7 @@ import {
 
 /** Stable key. The schema version lives on the save, not in the key name. */
 export const STORAGE_KEY = "squishee-academy-v1";
-export const SAVE_VERSION = 8;
+export const SAVE_VERSION = 9;
 
 /**
  * Migrations run from the save's version up to SAVE_VERSION.
@@ -36,6 +36,7 @@ const MIGRATIONS: Record<number, (raw: Record<string, unknown>) => Record<string
   5: migrateV5toV6,
   6: migrateV6toV7,
   7: migrateV7toV8,
+  8: migrateV8toV9,
 };
 
 /** A newer app wrote this disk. Don't replace it with an older schema. */
@@ -86,7 +87,7 @@ export function blankChild(opts: { id?: string; name?: string; grade?: Grade; av
 
 export function freshSave(): Save {
   const child = blankChild();
-  return { version: SAVE_VERSION, activeId: child.id, sound: true, children: [child] };
+  return { version: SAVE_VERSION, activeId: child.id, sound: true, lang: "en", langChosen: false, children: [child] };
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -208,6 +209,12 @@ function migrateV7toV8(raw: Record<string, unknown>): Record<string, unknown> {
       })
     : raw.children;
   return { ...raw, version: 8, children };
+}
+
+/** Version 8 had bonds. Language stays English for families who already play. */
+function migrateV8toV9(raw: Record<string, unknown>): Record<string, unknown> {
+  const lang = raw.lang === "es" ? "es" : "en";
+  return { ...raw, version: 9, lang, langChosen: true };
 }
 
 function migrateRaw(raw: unknown): unknown {
@@ -423,7 +430,8 @@ export function parseSave(raw: unknown): Save {
   const children = o.children.map(parseChild).filter((child): child is Child => child != null).slice(0, MAX_CHILDREN);
   if (!children.length) return freshSave();
   const activeId = children.some((child) => child.id === o.activeId) ? String(o.activeId) : children[0]!.id;
-  return { version: SAVE_VERSION, activeId, sound: o.sound !== false, children };
+  const lang = o.lang === "es" ? "es" : "en";
+  return { version: SAVE_VERSION, activeId, sound: o.sound !== false, lang, langChosen: o.langChosen === true, children };
 }
 
 export function activeChild(save: Save): Child {

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { COIN_NAME, emptyPile, formatCents, oneCoin, pileCents, type CoinPile } from "../games/money-model";
+import { coinWord, show, t } from "../i18n";
 import {
   clockMatches,
   dragClock,
@@ -51,7 +52,10 @@ export function ClockBoard({ task, onAnswer }: { task: ClockTask; onAnswer: (ok:
         className="ac-clock-drag"
         role="group"
         tabIndex={0}
-        aria-label={`${timeTalk(hours, minutes)}. Drag the hands. Arrow keys move them.`}
+        aria-label={t(
+          `${timeTalk(hours, minutes)}. Drag the hands. Arrow keys move them.`,
+          `${timeTalk(hours, minutes)}. Arrastra las manecillas. Las flechas las mueven.`,
+        )}
         onPointerDown={(event) => {
           dragging.current = true;
           event.currentTarget.setPointerCapture(event.pointerId);
@@ -80,7 +84,7 @@ export function ClockBoard({ task, onAnswer }: { task: ClockTask; onAnswer: (ok:
         <AnalogClock hours={hours} minutes={minutes} />
       </div>
       <button type="button" className="ac-go" onClick={() => onAnswer(clockMatches(task, hours, minutes))}>
-        Done
+        {show("Done")}
       </button>
     </div>
   );
@@ -121,13 +125,13 @@ export function PayBoard({ task, onAnswer }: { task: PayTask; onAnswer: (ok: boo
   return (
     <div className="ac-hands" data-hands="pay">
       <p className="ac-hands-cap">{task.speech}</p>
-      <div className="ac-bank" aria-label="Coins">
+      <div className="ac-bank" aria-label={show("Coins")}>
         {task.bank.map((kind) => (
           <button
             key={kind}
             type="button"
             className="ac-coin-drag"
-            aria-label={`Drag ${COIN_NAME[kind].toLowerCase()}`}
+            aria-label={t(`Drag ${COIN_NAME[kind].toLowerCase()}`, `Arrastra ${coinWord(kind)}`)}
             onPointerDown={(event) => {
               drag.current = { kind, x: event.clientX, y: event.clientY };
               event.currentTarget.setPointerCapture(event.pointerId);
@@ -151,14 +155,14 @@ export function PayBoard({ task, onAnswer }: { task: PayTask; onAnswer: (ok: boo
           </button>
         ))}
       </div>
-      <div ref={trayRef} className="ac-tray" aria-label="Coins to pay">
-        {faces.length === 0 ? <span className="ac-tray-empty">Drag coins here</span> : null}
+      <div ref={trayRef} className="ac-tray" aria-label={show("Coins to pay")}>
+        {faces.length === 0 ? <span className="ac-tray-empty">{show("Drag coins here")}</span> : null}
         {faces.map((kind, index) => (
           <button
             key={`${kind}-${index}`}
             type="button"
             className="ac-coin-drag is-in"
-            aria-label={`Remove ${COIN_NAME[kind].toLowerCase()}`}
+            aria-label={t(`Remove ${COIN_NAME[kind].toLowerCase()}`, `Quita ${coinWord(kind)}`)}
             onClick={() => remove(kind)}
           >
             <CoinRow pile={oneCoin(kind)} label="" />
@@ -174,7 +178,7 @@ export function PayBoard({ task, onAnswer }: { task: PayTask; onAnswer: (ok: boo
         </div>
       ) : null}
       <button type="button" className="ac-go" onClick={() => onAnswer(payMatches(task.cents, pile))}>
-        Done
+        {show("Done")}
       </button>
     </div>
   );

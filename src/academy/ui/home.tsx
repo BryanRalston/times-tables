@@ -7,7 +7,8 @@ import { bossForGame } from "../bosses";
 import { GAMES } from "../games/registry";
 import { bandFor } from "../grade-map";
 import { bossReady, dailySnapshot, normalizeJourney } from "../journey";
-import { gradeLabel, todayIso, type Child } from "../model";
+import { gradeText, show, t } from "../i18n";
+import { todayIso, type Child } from "../model";
 import { nextPlacement } from "../placement";
 import { gameOfDay, rollGift, type GiftRoll } from "../rewards";
 import { chime } from "../sound";
@@ -42,7 +43,7 @@ export function HomeScreen({
       <header className="ac-top">
         <Logo />
         <a className="ac-streak" href="#/map">
-          Island
+          {show("Island")}
         </a>
       </header>
 
@@ -52,17 +53,25 @@ export function HomeScreen({
         </div>
         <p className="ac-bubble">{catchphrase(child.avatarId)}</p>
         <p className="ac-bond" data-bond={palTier}>
-          {squisheeById(child.avatarId)?.name ?? "Buddy"} · {bondName(palTier)}
+          {squisheeById(child.avatarId)?.name ?? show("Buddy")} · {bondName(palTier)}
         </p>
-        <h1>Hi {child.name}! Ready to play?</h1>
-        <p className="ac-lede">2-minute games · hop the island · collect squishees</p>
+        <h1>
+          {t(`Hi ${child.name}! Ready to play?`, `¡Hola ${child.name}! ¿Listo para jugar?`)}
+        </h1>
+        <p className="ac-lede">{show("2-minute games · hop the island · collect squishees")}</p>
         <div className="ac-daily" data-daily-rounds={daily.rounds} data-daily-goal={daily.goal} data-gift={daily.ready ? "closed" : daily.claimed ? "open" : "none"}>
-          <ProgressRing value={daily.rounds} max={daily.goal} label={`${daily.rounds} of ${daily.goal} rounds today`} />
+          <ProgressRing
+            value={daily.rounds}
+            max={daily.goal}
+            label={t(`${daily.rounds} of ${daily.goal} rounds today`, `${daily.rounds} de ${daily.goal} rondas hoy`)}
+          />
           <button
             type="button"
             className={cx("ac-gift", daily.ready && "is-ready", (daily.claimed || prize != null) && "is-open")}
             disabled={!daily.ready}
-            aria-label={daily.ready ? "Open today's gift" : daily.claimed ? "Today's gift is open" : "Gift at 3 rounds"}
+            aria-label={
+              daily.ready ? show("Open today's gift") : daily.claimed ? show("Today's gift is open") : show("Gift at 3 rounds")
+            }
             onClick={() => {
               if (!daily.ready) return;
               setPrize(rollGift(todayId, child));
@@ -80,10 +89,13 @@ export function HomeScreen({
           data-placement={place.reason}
           onClick={() => onPlay(bossHere ? journey.areaId : place.game, bossHere ? (child.levels[journey.areaId] ?? place.level) : place.level)}
         >
-          <span className="ac-play-tri" aria-hidden="true" /> {bossHere ? `Face ${bossForGame(journey.areaId).name}` : "Play"}
+          <span className="ac-play-tri" aria-hidden="true" />{" "}
+          {bossHere
+            ? t(`Face ${bossForGame(journey.areaId).name}`, `Enfrenta a ${bossForGame(journey.areaId).name}`)
+            : show("Play")}
         </button>
         <a className="ac-map-link" href="#/map">
-          Island map
+          {show("Island map")}
         </a>
       </section>
 
@@ -99,7 +111,7 @@ export function HomeScreen({
                 className={`ac-card is-${game.tint} is-soon`}
                 data-offer="later"
                 onClick={() => {
-                  setToast(`${game.title} is coming later for this grade.`);
+                  setToast(t(`${game.title} is coming later for this grade.`, `${show(game.title)} llega más adelante para este grado.`));
                   window.setTimeout(() => setToast(null), 1800);
                 }}
               >
@@ -107,21 +119,21 @@ export function HomeScreen({
                   <LockIcon /> Later
                 </span>
                 <SquisheeImg id={game.mascot} />
-                <h2>{game.title}</h2>
-                <p>Coming later</p>
+                <h2>{show(game.title)}</h2>
+                <p>{show("Coming later")}</p>
               </button>
             );
           }
           return (
             <a key={game.id} className={`ac-card is-${game.tint}`} data-offer={offer} href={`#/play/${game.id}`}>
               {journey.areaId === game.id ? (
-                <span className="ac-soon">Here</span>
+                <span className="ac-soon">{show("Here")}</span>
               ) : offer === "intro" ? (
-                <span className="ac-soon">Intro</span>
+                <span className="ac-soon">{show("Intro")}</span>
               ) : null}
               <SquisheeImg id={game.mascot} />
-              <h2>{game.title}</h2>
-              <p>{offer === "intro" ? "Gentle intro" : game.audience}</p>
+              <h2>{show(game.title)}</h2>
+              <p>{offer === "intro" ? show("Gentle intro") : show(game.audience)}</p>
               <Stars value={child.bestStars[game.id] ?? 0} />
             </a>
           );
@@ -135,7 +147,7 @@ export function HomeScreen({
           </span>
           <span>
             <strong>{child.stars}</strong>
-            <small>stars</small>
+            <small>{show("stars")}</small>
           </span>
         </a>
         <a className="ac-meter" href="#/shelf">
@@ -144,7 +156,7 @@ export function HomeScreen({
             <strong>
               {ownedIds(child).length}/{book.length}
             </strong>
-            <small>book</small>
+            <small>{show("book")}</small>
           </span>
         </a>
         <a className="ac-meter" href="#/shelf">
@@ -153,13 +165,13 @@ export function HomeScreen({
           </span>
           <span>
             <strong>{child.coins}</strong>
-            <small>coins</small>
+            <small>{show("coins")}</small>
           </span>
         </a>
       </div>
 
       <p className="ac-today-note">
-        Today: {GAMES.find((game) => game.id === today)?.title ?? today} · {gradeLabel(child.grade)}
+        {t("Today", "Hoy")}: {show(GAMES.find((game) => game.id === today)?.title ?? today)} · {gradeText(child.grade)}
       </p>
       <Foot />
       {toast ? (
@@ -168,10 +180,10 @@ export function HomeScreen({
         </div>
       ) : null}
       {prize ? (
-        <div className="ac-modal" role="dialog" aria-label="Daily gift">
+        <div className="ac-modal" role="dialog" aria-label={show("Daily gift")}>
           <div className="ac-modal-card ac-prize">
             <GiftBox open />
-            <h2>Daily gift!</h2>
+            <h2>{show("Daily gift!")}</h2>
             <PrizeBody prize={prize} />
             <button type="button" className="ac-go" onClick={() => setPrize(null)}>
               Nice!
@@ -184,19 +196,20 @@ export function HomeScreen({
 }
 
 function PrizeBody({ prize }: { prize: GiftRoll }) {
-  if (prize.kind === "coins") return <p>{prize.amount} coins for the shelf.</p>;
+  if (prize.kind === "coins") return <p>{t(`${prize.amount} coins for the shelf.`, `${prize.amount} monedas para la tienda.`)}</p>;
   if (prize.kind === "cosmetic") {
     return (
       <p>
-        A new outfit: <strong>{outfitName(prize.id)}</strong>
+        {t("A new outfit:", "Un disfraz nuevo:")} <strong>{outfitName(prize.id)}</strong>
       </p>
     );
   }
   const pal = squisheeById(prize.id);
+  const name = pal?.name ?? t("A friend", "Un amigo");
   return (
     <p>
       <AcademyPal id={prize.id} className="ac-done-pal" label={pal?.name ?? ""} />
-      {pal?.name ?? "A friend"} hopped in.
+      {t(`${name} hopped in.`, `${name} llegó de un salto.`)}
     </p>
   );
 }
@@ -204,13 +217,13 @@ function PrizeBody({ prize }: { prize: GiftRoll }) {
 function outfitName(id: string): string {
   switch (id) {
     case "party-hat":
-      return "party hat";
+      return t("party hat", "gorro de fiesta");
     case "scarf":
-      return "scarf";
+      return t("scarf", "bufanda");
     case "bow":
-      return "bow";
+      return t("bow", "moño");
     case "shades":
-      return "shades";
+      return t("shades", "gafas");
     default:
       return id;
   }

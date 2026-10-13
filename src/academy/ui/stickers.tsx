@@ -1,10 +1,11 @@
+import { show } from "../i18n";
 import { weekStickers } from "../round-flow";
 import { cx } from "./bits";
 
 export function WeekStickers({ secondsByDay, today }: { secondsByDay: Record<string, number>; today: string }) {
   const days = weekStickers(secondsByDay, today);
   return (
-    <div className="ac-stickers" aria-label="This week">
+    <div className="ac-stickers" aria-label={show("This week")}>
       {days.map((day) => (
         <span
           key={day.iso}

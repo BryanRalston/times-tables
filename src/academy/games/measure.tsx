@@ -1,6 +1,7 @@
 import type { Rng } from "@/lib/rng";
+import { howManyPhrase, longShortOf, t, thingName } from "../i18n";
 import type { Grade } from "../model";
-import { buddyName, pickLine } from "./flavor";
+import { buddyName, pickTalk } from "./flavor";
 import type { MeasureBoard, MeasureItem } from "./boards";
 import { distinctInts, nearChoices, sceneQuestion, uniqueChoices } from "./pick";
 import { BarGraph, PictureGraph, Ruler, SceneCard, sceneModule } from "./scene-ui";
@@ -73,19 +74,20 @@ function makeCompare(rng: Rng): ChoiceQ {
   const target = askLong ? Math.max(...values) : Math.min(...values);
   const answer = items[values.indexOf(target)]!.name;
   const board: MeasureBoard = { game: "measure", mode: "compare", items, ask: askLong ? "longest" : "shortest" };
+  const named = thingName(answer, 1, answer);
   return sceneQuestion(rng, {
     game: "measure",
-    title: askLong ? "Which is the longest?" : "Which is the shortest?",
-    hint: "Look at the bars",
+    title: askLong ? t("Which is the longest?", "¿Cuál mide más?") : t("Which is the shortest?", "¿Cuál mide menos?"),
+    hint: t("Look at the bars", "Mira las barras"),
     answer,
     choices: uniqueChoices(rng, answer, [], items.map((item) => item.name)),
     skill: "measure:compare",
     tags: ["compare"],
-    solved: `The ${answer} is the ${askLong ? "longest" : "shortest"}`,
+    solved: t(`The ${answer} is the ${askLong ? "longest" : "shortest"}`, `${named} es ${longShortOf(answer, askLong)}`),
     picture: items.find((item) => item.name === answer)?.emoji ?? "📏",
     hands: true,
     quietChoices: false,
-    labels: Object.fromEntries(items.map((item) => [item.name, item.name])),
+    labels: Object.fromEntries(items.map((item) => [item.name, thingName(item.name, 1, item.name)])),
     board,
     factKey: `compare:${items.map((item) => `${item.name}${item.value}`).join("-")}:${board.ask}`,
   });
@@ -94,15 +96,19 @@ function makeCompare(rng: Rng): ChoiceQ {
 function makeRuler(rng: Rng): ChoiceQ {
   const inches = rng.int(1, 12);
   const board: MeasureBoard = { game: "measure", mode: "ruler", inches };
+  const buddy = buddyName(rng);
   return sceneQuestion(rng, {
     game: "measure",
-    title: pickLine(rng, ["How many inches long is the ribbon?", `${buddyName(rng)} measures the ribbon. How many inches?`]),
-    hint: "Start at 0",
+    title: pickTalk(rng, [
+      ["How many inches long is the ribbon?", "¿Cuántas pulgadas mide el listón?"],
+      [`${buddy} measures the ribbon. How many inches?`, `${buddy} mide el listón. ¿Cuántas pulgadas son?`],
+    ]),
+    hint: t("Start at 0", "Empieza en el 0"),
     answer: String(inches),
     choices: nearChoices(rng, inches, 1, 12),
     skill: "measure:ruler",
     tags: ["ruler"],
-    solved: `${inches} inches`,
+    solved: t(`${inches} inches`, inches === 1 ? `${inches} pulgada` : `${inches} pulgadas`),
     picture: `${inches} in`,
     hands: false,
     quietChoices: false,
@@ -121,21 +127,29 @@ function makeGraph(rng: Rng, mode: "picture" | "bar"): ChoiceQ {
   const answer = askMost ? focusItem.name : String(focusItem.value);
   const board: MeasureBoard = { game: "measure", mode, items, ask: askMost ? "most" : "count", focus };
   const graph = mode === "picture" ? "picture graph" : "bar graph";
+  const graphEs = mode === "picture" ? "gráfica de dibujos" : "gráfica de barras";
+  const many = pluralName(focusItem.name);
+  const manyEs = thingName(focusItem.name, focusItem.value, many);
+  const howMany = howManyPhrase(focusItem.name, focusItem.value, many);
   return sceneQuestion(rng, {
     game: "measure",
-    title: askMost ? `Which has the most on the ${graph}?` : `How many ${pluralName(focusItem.name)} are on the ${graph}?`,
-    hint: askMost ? "Find the tallest or fullest row" : "Count that row",
+    title: askMost
+      ? t(`Which has the most on the ${graph}?`, `¿Cuál tiene más en la ${graphEs}?`)
+      : t(`How many ${many} are on the ${graph}?`, `¿${howMany} hay en la ${graphEs}?`),
+    hint: askMost ? t("Find the tallest or fullest row", "Busca la fila más alta o más llena") : t("Count that row", "Cuenta esa fila"),
     answer,
     choices: askMost
       ? uniqueChoices(rng, answer, [], items.map((item) => item.name))
       : nearChoices(rng, focusItem.value, 0, 10),
     skill: `measure:${mode}`,
     tags: [mode],
-    solved: askMost ? `${answer} has the most` : `${focusItem.value} ${pluralName(focusItem.name)}`,
+    solved: askMost
+      ? t(`${answer} has the most`, `${thingName(answer, 1, answer)} tiene más`)
+      : t(`${focusItem.value} ${many}`, `${focusItem.value} ${manyEs}`),
     picture: focusItem.emoji.repeat(focusItem.value),
     hands: false,
     quietChoices: false,
-    labels: {},
+    labels: Object.fromEntries(items.map((item) => [item.name, thingName(item.name, 1, item.name)])),
     board,
     factKey: `${mode}:${items.map((item) => item.value).join("-")}:${board.ask}:${focus}`,
   });
@@ -149,13 +163,16 @@ function makeMore(rng: Rng): ChoiceQ {
   const answer = high - low;
   return sceneQuestion(rng, {
     game: "measure",
-    title: `How many more ${pluralName(items[0]!.name)} than ${pluralName(items[1]!.name)}?`,
-    hint: "Subtract the smaller number",
+    title: t(
+      `How many more ${pluralName(items[0]!.name)} than ${pluralName(items[1]!.name)}?`,
+      `¿Cuántos ${thingName(items[0]!.name, 2, pluralName(items[0]!.name))} más que ${thingName(items[1]!.name, 2, pluralName(items[1]!.name))}?`,
+    ),
+    hint: t("Subtract the smaller number", "Resta el número más chico"),
     answer: String(answer),
     choices: nearChoices(rng, answer, 0, 8),
     skill: "measure:more",
     tags: ["more"],
-    solved: `${answer} more`,
+    solved: t(`${answer} more`, `${answer} más`),
     picture: `${high} ${low}`,
     hands: false,
     quietChoices: false,
@@ -193,24 +210,41 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       if (b === a) b = a === 12 ? 1 : a + 1;
       const longer = rng.next() < 0.5;
       return {
-        prompt: `Which is ${longer ? "longer" : "shorter"}, ${a} units or ${b} units?`,
+        prompt: longer
+          ? t(`Which is longer, ${a} units or ${b} units?`, `¿Cuál es más largo, ${a} unidades o ${b} unidades?`)
+          : t(`Which is shorter, ${a} units or ${b} units?`, `¿Cuál es más corto, ${a} unidades o ${b} unidades?`),
         answer: String(longer ? Math.max(a, b) : Math.min(a, b)),
       };
     }
     case "ruler": {
       const inches = rng.int(1, 12);
-      return { prompt: `The ribbon goes from 0 to ${inches} on the ruler. How many inches?`, answer: String(inches) };
+      return {
+        prompt: t(
+          `The ribbon goes from 0 to ${inches} on the ruler. How many inches?`,
+          `El listón va del 0 al ${inches} en la regla. ¿Cuántas pulgadas son?`,
+        ),
+        answer: String(inches),
+      };
     }
     case "picture":
     case "bar": {
       const n = rng.int(1, 8);
       const icon = safe === "picture" ? "🍎" : "▮";
-      return { prompt: `The graph shows ${icon.repeat(n)} apples. How many apples?`, answer: String(n) };
+      return {
+        prompt: t(`The graph shows ${icon.repeat(n)} apples. How many apples?`, `La gráfica muestra ${icon.repeat(n)} manzanas. ¿Cuántas manzanas hay?`),
+        answer: String(n),
+      };
     }
     case "more": {
       const cats = rng.int(2, 8);
       const dogs = rng.int(1, cats - 1);
-      return { prompt: `There are ${cats} cats and ${dogs} dogs. How many more cats?`, answer: String(cats - dogs) };
+      return {
+        prompt: t(
+          `There are ${cats} cats and ${dogs} dogs. How many more cats?`,
+          `Hay ${cats} gatos y ${dogs} perros. ¿Cuántos gatos más hay?`,
+        ),
+        answer: String(cats - dogs),
+      };
     }
     default: {
       const neverLevel: never = safe;
@@ -240,7 +274,7 @@ export function MeasurePrompt({ question, reveal, mascot, happy }: PromptProps) 
 function MeasureArt({ board }: { board: MeasureBoard }) {
   switch (board.mode) {
     case "compare":
-      return <p className="ac-big-num">{board.ask === "longest" ? "Longest" : "Shortest"}</p>;
+      return <p className="ac-big-num">{board.ask === "longest" ? t("Longest", "El más largo") : t("Shortest", "El más corto")}</p>;
     case "ruler":
       return <Ruler inches={board.inches} />;
     case "picture":

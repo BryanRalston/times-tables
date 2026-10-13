@@ -1,3 +1,5 @@
+import { getLocale } from "./i18n";
+import { loadSpanishVoice } from "./voice/clips";
 import { startClipSpeech, stopClipSpeech } from "./voice/player";
 
 /** Spoken prompts. Recorded clips play first. The device voice is only for a line with no clip. */
@@ -20,13 +22,14 @@ export function canSpeak(): boolean {
  * Prefer a voice that ships on the device. Those speak with no network,
  * which is what a tablet in a classroom actually has.
  */
-export function pickLocalVoice(voices: readonly VoiceLike[]): VoiceLike | null {
-  const english = voices.filter((voice) => voice.lang.toLowerCase().startsWith("en"));
-  const localEnglish = english.find((voice) => voice.localService);
-  if (localEnglish) return localEnglish;
+export function pickLocalVoice(voices: readonly VoiceLike[], prefer = "en"): VoiceLike | null {
+  const pref = prefer.toLowerCase();
+  const preferred = voices.filter((voice) => voice.lang.toLowerCase().startsWith(pref));
+  const localPreferred = preferred.find((voice) => voice.localService);
+  if (localPreferred) return localPreferred;
   const anyLocal = voices.find((voice) => voice.localService);
   if (anyLocal) return anyLocal;
-  return english[0] ?? null;
+  return preferred[0] ?? null;
 }
 
 export function silence(): void {
@@ -54,13 +57,14 @@ function sayNow(line: string): void {
   if (synth.paused) synth.resume();
   synth.cancel();
   const utter = new SpeechSynthesisUtterance(line);
-  const voice = pickLocalVoice(deviceVoices());
+  const prefer = getLocale() === "es" ? "es" : "en";
+  const voice = pickLocalVoice(deviceVoices(), prefer);
   if (voice) {
     const match = deviceVoices().find((row) => row.lang === voice.lang && row.name === voice.name);
     if (match) utter.voice = match;
     utter.lang = voice.lang;
   } else {
-    utter.lang = "en-US";
+    utter.lang = prefer === "es" ? "es-MX" : "en-US";
   }
   utter.rate = 0.95;
   utter.pitch = 1.08;
@@ -100,6 +104,13 @@ export function speak(text: string, enabled: boolean): void {
   const line = text.trim();
   if (!enabled || !line) return;
   cancelDevice();
+  if (getLocale() === "es") {
+    void loadSpanishVoice().then(() => {
+      if (startClipSpeech(line, 1, () => sayWithDevice(line))) return;
+      sayWithDevice(line);
+    });
+    return;
+  }
   if (startClipSpeech(line, 1, () => sayWithDevice(line))) return;
   sayWithDevice(line);
 }

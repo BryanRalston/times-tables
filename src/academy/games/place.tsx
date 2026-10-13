@@ -1,6 +1,7 @@
 import type { Rng } from "@/lib/rng";
+import { t } from "../i18n";
 import type { Grade } from "../model";
-import { buddyName, pickLine } from "./flavor";
+import { buddyName, pickTalk } from "./flavor";
 import { blockPhrase, expandedForm, roundHalfUp, type PlaceBoard } from "./boards";
 import { extremeChoices, nearChoices, sceneQuestion, uniqueChoices } from "./pick";
 import { BaseTen, SceneCard, sceneModule } from "./scene-ui";
@@ -61,10 +62,14 @@ function different(rng: Rng, n: number, lo: number, hi: number): number {
 function makeBlocks(rng: Rng): ChoiceQ {
   const n = rng.int(10, 99);
   const board: PlaceBoard = { game: "place", mode: "blocks", n };
+  const buddy = buddyName(rng);
   return sceneQuestion(rng, {
     game: "place",
-    title: pickLine(rng, ["How many blocks?", `${buddyName(rng)} built with tens and ones. What number is that?`]),
-    hint: "A rod is a ten. A cube is a one.",
+    title: pickTalk(rng, [
+      ["How many blocks?", "¿Cuántos bloques hay?"],
+      [`${buddy} built with tens and ones. What number is that?`, `${buddy} armó decenas y unidades. ¿Qué número es?`],
+    ]),
+    hint: t("A rod is a ten. A cube is a one.", "Una barra es una decena. Un cubo es una unidad."),
     answer: String(n),
     choices: nearChoices(rng, n, 0, 120),
     skill: "place:blocks",
@@ -92,8 +97,8 @@ function makeExpanded(rng: Rng): ChoiceQ {
   const board: PlaceBoard = { game: "place", mode: "expanded", n };
   return sceneQuestion(rng, {
     game: "place",
-    title: `What is ${n} in expanded form?`,
-    hint: "Hundreds, then tens, then ones",
+    title: t(`What is ${n} in expanded form?`, `¿Cómo se escribe ${n} en forma desarrollada?`),
+    hint: t("Hundreds, then tens, then ones", "Primero las centenas, luego las decenas y las unidades"),
     answer,
     choices: uniqueChoices(rng, answer, pool),
     skill: "place:expanded",
@@ -129,13 +134,13 @@ function makeCompare(rng: Rng): ChoiceQ {
   const board: PlaceBoard = { game: "place", mode: "compare", left, right, ask: askGreater ? "greater" : "less" };
   return sceneQuestion(rng, {
     game: "place",
-    title: askGreater ? "Which number is greater?" : "Which number is less?",
-    hint: "Look at the hundreds, then the tens",
+    title: askGreater ? t("Which number is greater?", "¿Qué número es mayor?") : t("Which number is less?", "¿Qué número es menor?"),
+    hint: t("Look at the hundreds, then the tens", "Mira las centenas y luego las decenas"),
     answer: String(answer),
     choices,
     skill: "place:compare",
     tags: ["compare"],
-    solved: `${answer} is ${askGreater ? "greater" : "less"}`,
+    solved: askGreater ? t(`${answer} is greater`, `${answer} es mayor`) : t(`${answer} is less`, `${answer} es menor`),
     picture: `${left} ${right}`,
     hands: false,
     quietChoices: false,
@@ -153,13 +158,16 @@ function makeRound(rng: Rng, place: 10 | 100): ChoiceQ {
   const board: PlaceBoard = { game: "place", mode: place === 10 ? "round10" : "round100", n };
   return sceneQuestion(rng, {
     game: "place",
-    title: `Round ${n} to the nearest ${place}`,
-    hint: place === 10 ? "Look at the ones. 5 or more rounds up." : "Look at the tens. 50 or more rounds up.",
+    title: t(`Round ${n} to the nearest ${place}`, `Redondea ${n} a la ${place === 10 ? "decena" : "centena"} más cercana`),
+    hint:
+      place === 10
+        ? t("Look at the ones. 5 or more rounds up.", "Mira las unidades. 5 o más, sube.")
+        : t("Look at the tens. 50 or more rounds up.", "Mira las decenas. 50 o más, sube."),
     answer: String(answer),
     choices: nearChoices(rng, answer, 0, 1000, [n, down, up, answer + place, Math.max(0, answer - place)]),
     skill: place === 10 ? "place:round10" : "place:round100",
     tags: [place === 10 ? "round10" : "round100"],
-    solved: `${n} rounds to ${answer}`,
+    solved: t(`${n} rounds to ${answer}`, `${n} se redondea a ${answer}`),
     picture: String(n),
     hands: false,
     quietChoices: false,
@@ -174,8 +182,8 @@ function makeBuild(rng: Rng): ChoiceQ {
   const board: PlaceBoard = { game: "place", mode: "build", n };
   return sceneQuestion(rng, {
     game: "place",
-    title: `Build ${n}`,
-    hint: "Add tens and ones until you make the number",
+    title: t(`Build ${n}`, `Forma ${n}`),
+    hint: t("Add tens and ones until you make the number", "Agrega decenas y unidades hasta formar el número"),
     answer: String(n),
     choices: nearChoices(rng, n, 0, 120),
     skill: "place:build",
@@ -218,11 +226,14 @@ function sheetItem(rng: Rng, level: string): SheetItem {
     case "build": {
       const tens = rng.int(1, 9);
       const ones = rng.int(0, 9);
-      return { prompt: `${tens} tens and ${ones} ones =`, answer: String(tens * 10 + ones) };
+      return {
+        prompt: t(`${tens} tens and ${ones} ones =`, `${tens} decenas y ${ones} unidades =`),
+        answer: String(tens * 10 + ones),
+      };
     }
     case "expanded": {
       const n = rng.next() < 0.5 ? rng.int(10, 99) : rng.int(100, 999);
-      return { prompt: `Write ${n} in expanded form.`, answer: expandedForm(n) };
+      return { prompt: t(`Write ${n} in expanded form.`, `Escribe ${n} en forma desarrollada.`), answer: expandedForm(n) };
     }
     case "compare": {
       const left = rng.int(10, 99);
@@ -231,17 +242,19 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const a = Math.min(left, right);
       const b = Math.max(left, right);
       return {
-        prompt: `Which is ${greater ? "greater" : "less"}, ${a} or ${b}?`,
+        prompt: greater
+          ? t(`Which is greater, ${a} or ${b}?`, `¿Cuál es mayor, ${a} o ${b}?`)
+          : t(`Which is less, ${a} or ${b}?`, `¿Cuál es menor, ${a} o ${b}?`),
         answer: String(greater ? b : a),
       };
     }
     case "round10": {
       const n = rng.int(10, 99);
-      return { prompt: `Round ${n} to the nearest 10.`, answer: String(roundHalfUp(n, 10)) };
+      return { prompt: t(`Round ${n} to the nearest 10.`, `Redondea ${n} a la decena más cercana.`), answer: String(roundHalfUp(n, 10)) };
     }
     case "round100": {
       const n = rng.int(100, 999);
-      return { prompt: `Round ${n} to the nearest 100.`, answer: String(roundHalfUp(n, 100)) };
+      return { prompt: t(`Round ${n} to the nearest 100.`, `Redondea ${n} a la centena más cercana.`), answer: String(roundHalfUp(n, 100)) };
     }
     default: {
       const neverLevel: never = safe;

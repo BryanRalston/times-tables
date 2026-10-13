@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { show, t } from "../i18n";
 import type { ArrayTask, BlocksTask, CountTask, FrameTask, ShadeTask } from "../hands-build";
 import { arrayMatches, blocksMatches, countMatches, frameMatches, shadeMatches } from "../hands-build";
 import { cx } from "./bits";
@@ -22,31 +23,31 @@ export function ArrayBoard({ task, onAnswer }: { task: ArrayTask; onAnswer: (ok:
       kind="array"
       fact={task.factKey}
       caption={task.speech}
-      total={`${rows.length} ${rows.length === 1 ? "row" : "rows"}`}
+      total={t(`${rows.length} ${rows.length === 1 ? "row" : "rows"}`, `${rows.length} ${rows.length === 1 ? "fila" : "filas"}`)}
       onDone={() => onAnswer(arrayMatches(task, rows))}
     >
-      <div ref={trayRef} className="ac-tray ac-array-tray" aria-label="Rows in the array">
-        {rows.length === 0 ? <span className="ac-tray-empty">Drag rows here</span> : null}
+      <div ref={trayRef} className="ac-tray ac-array-tray" aria-label={show("Rows in the array")}>
+        {rows.length === 0 ? <span className="ac-tray-empty">{show("Drag rows here")}</span> : null}
         {rows.map((width, index) => (
           <button
             key={`${width}-${index}`}
             type="button"
             className="ac-row-chip is-in ac-placed"
-            aria-label={`Remove a row of ${width}`}
+            aria-label={t(`Remove a row of ${width}`, `Quita una fila de ${width}`)}
             onClick={() => setRows((current) => current.filter((_, i) => i !== index))}
           >
             {face(width)}
           </button>
         ))}
       </div>
-      <div className="ac-bank" aria-label="Row tiles">
+      <div className="ac-bank" aria-label={show("Row tiles")}>
         {[task.cols, task.decoy].map((width) => (
           <button
             key={width}
             type="button"
             className="ac-row-chip"
             data-piece={String(width)}
-            aria-label={`Row of ${width}`}
+            aria-label={t(`Row of ${width}`, `Fila de ${width}`)}
             {...pointerProps(String(width))}
           >
             {face(width)}
@@ -87,7 +88,7 @@ function TenGrid({
               );
             }
             return (
-              <button key={index} type="button" aria-label="Take one off" onClick={onRemove}>
+              <button key={index} type="button" aria-label={show("Take one off")} onClick={onRemove}>
                 <CastFace />
               </button>
             );
@@ -123,7 +124,7 @@ function FillFrame({ task, onAnswer }: { task: FrameTask; onAnswer: (ok: boolean
         />
       </div>
       <div className="ac-bank">
-        <button type="button" className="ac-coin-drag" data-piece="counter" aria-label="Drag a counter" {...pointerProps("counter")}>
+        <button type="button" className="ac-coin-drag" data-piece="counter" aria-label={show("Drag a counter")} {...pointerProps("counter")}>
           <CastFace />
         </button>
       </div>
@@ -149,21 +150,21 @@ function TakeFrame({ task, onAnswer }: { task: FrameTask; onAnswer: (ok: boolean
       kind="frame"
       fact={task.factKey}
       caption={task.speech}
-      total={`${away} away`}
+      total={t(`${away} away`, `${away} afuera`)}
       onDone={() => onAnswer(frameMatches(task, away))}
     >
-      <div className="ac-ten-stack" aria-label="Counters still here">
+      <div className="ac-ten-stack" aria-label={show("Counters still here")}>
         <TenGrid cells={task.cells} filled={left} locked={0} />
         {left > 0 ? (
-          <button type="button" className="ac-coin-drag" data-piece="counter" aria-label="Drag a counter away" {...pointerProps("stay")}>
+          <button type="button" className="ac-coin-drag" data-piece="counter" aria-label={show("Drag a counter away")} {...pointerProps("stay")}>
             <CastFace />
           </button>
         ) : null}
       </div>
-      <div ref={awayRef} className="ac-tray" aria-label="Taken away">
-        {away === 0 ? <span className="ac-tray-empty">Drag away</span> : null}
+      <div ref={awayRef} className="ac-tray" aria-label={show("Taken away")}>
+        {away === 0 ? <span className="ac-tray-empty">{show("Drag away")}</span> : null}
         {Array.from({ length: away }, (_, i) => (
-          <button key={i} type="button" className="ac-coin-drag is-in ac-placed" aria-label="Put back" onClick={() => setAway((n) => Math.max(0, n - 1))}>
+          <button key={i} type="button" className="ac-coin-drag is-in ac-placed" aria-label={show("Put back")} onClick={() => setAway((n) => Math.max(0, n - 1))}>
             <CastFace who="host" />
           </button>
         ))}
@@ -200,18 +201,18 @@ function RodMath({ task, onAnswer }: { task: FrameTask; onAnswer: (ok: boolean) 
       kind="frame"
       fact={task.factKey}
       caption={task.speech}
-      total={adding ? String(task.start + moved) : `${moved} away`}
+      total={adding ? String(task.start + moved) : t(`${moved} away`, `${moved} afuera`)}
       onDone={() => onAnswer(frameMatches(task, moved))}
     >
       <BlockPile tens={Math.floor(task.start / 10)} ones={task.start % 10} />
-      <div ref={trayRef} className="ac-tray" aria-label={adding ? "Blocks to add" : "Blocks to take away"}>
-        {count === 0 ? <span className="ac-tray-empty">{adding ? "Drag blocks here" : "Drag away"}</span> : null}
+      <div ref={trayRef} className="ac-tray" aria-label={adding ? show("Blocks to add") : show("Blocks to take away")}>
+        {count === 0 ? <span className="ac-tray-empty">{adding ? show("Drag blocks here") : show("Drag away")}</span> : null}
         {Array.from({ length: count }, (_, i) => (
           <button
             key={i}
             type="button"
             className="ac-block-drag is-in ac-placed"
-            aria-label="Put back"
+            aria-label={show("Put back")}
             onClick={() => setMoved((n) => Math.max(0, n - unit))}
           >
             {pieceFace(kind)}
@@ -219,7 +220,7 @@ function RodMath({ task, onAnswer }: { task: FrameTask; onAnswer: (ok: boolean) 
         ))}
       </div>
       <div className="ac-bank">
-        <button type="button" className="ac-block-drag" data-piece={kind} aria-label={kind === "ten" ? "Drag a ten" : "Drag a one"} {...pointerProps(kind)}>
+        <button type="button" className="ac-block-drag" data-piece={kind} aria-label={kind === "ten" ? show("Drag a ten") : show("Drag a one")} {...pointerProps(kind)}>
           {pieceFace(kind)}
         </button>
       </div>
@@ -259,21 +260,21 @@ export function CountBoard({ task, onAnswer }: { task: CountTask; onAnswer: (ok:
           ))}
         </div>
       ) : null}
-      <div ref={trayRef} className={task.mode === "ten" ? "" : "ac-tray"} aria-label="Counters">
+      <div ref={trayRef} className={task.mode === "ten" ? "" : "ac-tray"} aria-label={show("Counters")}>
         {task.mode === "ten" ? (
           <TenGrid cells={cells} filled={placed} locked={0} onRemove={() => setPlaced((n) => Math.max(0, n - 1))} />
         ) : placed === 0 ? (
-          <span className="ac-tray-empty">Drag counters here</span>
+          <span className="ac-tray-empty">{show("Drag counters here")}</span>
         ) : (
           Array.from({ length: placed }, (_, i) => (
-            <button key={i} type="button" className="ac-coin-drag is-in ac-placed" aria-label="Remove a counter" onClick={() => setPlaced((n) => Math.max(0, n - 1))}>
+            <button key={i} type="button" className="ac-coin-drag is-in ac-placed" aria-label={show("Remove a counter")} onClick={() => setPlaced((n) => Math.max(0, n - 1))}>
               <CastFace />
             </button>
           ))
         )}
       </div>
       <div className="ac-bank">
-        <button type="button" className="ac-coin-drag" data-piece="counter" aria-label="Drag a counter" {...pointerProps("counter")}>
+        <button type="button" className="ac-coin-drag" data-piece="counter" aria-label={show("Drag a counter")} {...pointerProps("counter")}>
           <CastFace />
         </button>
       </div>
@@ -301,32 +302,32 @@ export function BlocksBoard({ task, onAnswer }: { task: BlocksTask; onAnswer: (o
   }
   return (
     <HandsShell kind="blocks" fact={task.factKey} caption={task.speech} total={String(value)} onDone={() => onAnswer(blocksMatches(task, built))}>
-      <div ref={trayRef} className="ac-tray ac-block-tray" aria-label="Blocks you built">
-        {value === 0 ? <span className="ac-tray-empty">Drag blocks here</span> : null}
+      <div ref={trayRef} className="ac-tray ac-block-tray" aria-label={show("Blocks you built")}>
+        {value === 0 ? <span className="ac-tray-empty">{show("Drag blocks here")}</span> : null}
         {Array.from({ length: built.hundreds }, (_, i) => (
-          <button key={`h${i}`} type="button" className="ac-block-drag is-in ac-placed" aria-label="Remove a hundred" onClick={() => remove("hundreds")}>
+          <button key={`h${i}`} type="button" className="ac-block-drag is-in ac-placed" aria-label={show("Remove a hundred")} onClick={() => remove("hundreds")}>
             {pieceFace("hundred")}
           </button>
         ))}
         {Array.from({ length: built.tens }, (_, i) => (
-          <button key={`t${i}`} type="button" className="ac-block-drag is-in ac-placed" aria-label="Remove a ten" onClick={() => remove("tens")}>
+          <button key={`t${i}`} type="button" className="ac-block-drag is-in ac-placed" aria-label={show("Remove a ten")} onClick={() => remove("tens")}>
             {pieceFace("ten")}
           </button>
         ))}
         {Array.from({ length: built.ones }, (_, i) => (
-          <button key={`o${i}`} type="button" className="ac-block-drag is-in ac-placed" aria-label="Remove a one" onClick={() => remove("ones")}>
+          <button key={`o${i}`} type="button" className="ac-block-drag is-in ac-placed" aria-label={show("Remove a one")} onClick={() => remove("ones")}>
             {pieceFace("one")}
           </button>
         ))}
       </div>
-      <div className="ac-bank" aria-label="Base ten blocks">
+      <div className="ac-bank" aria-label={show("Base ten blocks")}>
         {kinds.map((kind) => (
           <button
             key={kind}
             type="button"
             className="ac-block-drag"
             data-piece={kind}
-            aria-label={kind === "hundred" ? "Drag a hundred" : kind === "ten" ? "Drag a ten" : "Drag a one"}
+            aria-label={kind === "hundred" ? show("Drag a hundred") : kind === "ten" ? show("Drag a ten") : show("Drag a one")}
             {...pointerProps(kind)}
           >
             {pieceFace(kind)}
@@ -365,14 +366,14 @@ export function ShadeBoard({ task, onAnswer }: { task: ShadeTask; onAnswer: (ok:
       kind="shade"
       fact={task.factKey}
       caption={task.speech}
-      total={`${shaded} shaded`}
+      total={t(`${shaded} shaded`, `${shaded} pintadas`)}
       onDone={() => onAnswer(shadeMatches(task, on))}
     >
       <div
         ref={boxRef}
         className={cx("ac-frac", "ac-shade")}
         role="group"
-        aria-label="Shade the parts"
+        aria-label={show("Shade the parts")}
         onPointerDown={(event) => {
           event.currentTarget.setPointerCapture(event.pointerId);
           const index = indexAt(event.clientX, event.clientY);
@@ -399,7 +400,7 @@ export function ShadeBoard({ task, onAnswer }: { task: ShadeTask; onAnswer: (ok:
             className={cx("ac-frac-btn", filled && "is-on")}
             aria-pressed={filled}
             data-piece={String(index)}
-            aria-label={filled ? "Shaded part" : "Empty part"}
+            aria-label={filled ? show("Shaded part") : show("Empty part")}
           />
         ))}
       </div>

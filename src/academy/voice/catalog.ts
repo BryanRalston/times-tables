@@ -2,6 +2,8 @@ import { rngFromSeed } from "@/lib/rng";
 import { bookEntries } from "../buddy/cast";
 import { personaOf, STORY_STARS } from "../buddy/persona";
 import { bossForGame } from "../bosses";
+import { show, t, yourTurnLine } from "../i18n";
+import { TRAIT_ES } from "../i18n-es";
 import { ALL_SIGHT } from "../games/sight-data";
 import { blendOf, RHYME_FAMILIES, SOUND_BANK } from "../games/phonics";
 import { ALL_SPELL } from "../games/spell-data";
@@ -32,7 +34,7 @@ const NUMBER_MAX = 1000;
 /** Games whose clips ship in the first offline cache. Sight words and the rest load with the game. */
 export const CORE_VOICE_GAMES = new Set(["add", "time", "ui", "buddy", "boss"]);
 
-const BUBBLES = ["The hint can help.", "Let's look together.", "Three stars!", "Your turn!"];
+const BUBBLES = ["The hint can help.", "Let's look together.", "Three stars!", "Your turn!"] as const;
 
 function push(lines: SpokenLine[], line: string, game: string) {
   const text = line.trim();
@@ -43,7 +45,7 @@ function push(lines: SpokenLine[], line: string, game: string) {
 function addChoice(lines: SpokenLine[], question: ChoiceQ, game: string) {
   const prompt = promptSpeech(question);
   push(lines, prompt, game);
-  push(lines, `Your turn. ${prompt}`, game);
+  push(lines, yourTurnLine(prompt), game);
   push(lines, hintCue(question).speech, game);
   push(lines, workedExample(question).speech, game);
   push(lines, speakable(question.praise), game);
@@ -53,15 +55,15 @@ function addChoice(lines: SpokenLine[], question: ChoiceQ, game: string) {
 function explicitLines(): SpokenLine[] {
   const lines: SpokenLine[] = [];
   for (const game of GAMES) {
-    push(lines, game.title, "ui");
+    push(lines, show(game.title), "ui");
     const boss = bossForGame(game.id);
     push(lines, boss.taunt, "boss");
     push(lines, boss.friendly, "boss");
   }
-  push(lines, "Pick a buddy!", "ui");
-  push(lines, "Yes!", "ui");
-  push(lines, "Almost!", "ui");
-  for (const line of BUBBLES) push(lines, line, "buddy");
+  push(lines, show("Pick a buddy!"), "ui");
+  push(lines, show("Yes!"), "ui");
+  push(lines, show("Almost!"), "ui");
+  for (const line of BUBBLES) push(lines, show(line), "buddy");
   for (const entry of bookEntries()) {
     const persona = personaOf(entry.id);
     push(lines, persona.line, "buddy");
@@ -72,7 +74,7 @@ function explicitLines(): SpokenLine[] {
   }
   push(lines, personaOf("someone-new").line, "buddy");
   for (const star of STORY_STARS) {
-    push(lines, `${star.name} the ${star.trait}`, "problems");
+    push(lines, t(`${star.name} the ${star.trait}`, `${star.name}, ${TRAIT_ES[star.trait] ?? star.trait},`), "problems");
     push(lines, star.pal, "problems");
     push(lines, star.name, "problems");
   }
@@ -80,23 +82,23 @@ function explicitLines(): SpokenLine[] {
     push(lines, word.word, "sight");
     push(lines, word.sentence, "sight");
     push(lines, blankOut(word.sentence, word.word).replaceAll("___", "blank"), "sight");
-    push(lines, `Listen. ${word.word}.`, "sight");
-    push(lines, `Yes! ${word.word}`, "sight");
-    push(lines, `Almost! The word is ${word.word}.`, "sight");
+    push(lines, t(`Listen. ${word.word}.`, `Escucha. ${word.word}.`), "sight");
+    push(lines, t(`Yes! ${word.word}`, `¡Sí! ${word.word}`), "sight");
+    push(lines, t(`Almost! The word is ${word.word}.`, `¡Casi! La palabra es ${word.word}.`), "sight");
   }
   for (const word of ALL_SPELL) {
     push(lines, word.word, "spelling");
     push(lines, word.sentence, "spelling");
     push(lines, `${word.word}. ${word.sentence}`, "spelling");
-    push(lines, `Yes! ${word.word}`, "spelling");
-    push(lines, `Almost! ${word.word}. ${word.sentence}`, "spelling");
+    push(lines, t(`Yes! ${word.word}`, `¡Sí! ${word.word}`), "spelling");
+    push(lines, t(`Almost! ${word.word}. ${word.sentence}`, `¡Casi! ${word.word}. ${word.sentence}`), "spelling");
   }
   for (const row of SOUND_BANK) {
     push(lines, row.phoneme, "phonics");
     push(lines, row.word, "phonics");
     push(lines, `${row.letter} ${row.phoneme}`, "phonics");
     push(lines, `${row.letter.toLowerCase()} ${row.phoneme}`, "phonics");
-    push(lines, `${row.letter} says ${row.phoneme}, like ${row.word}`, "phonics");
+    push(lines, t(`${row.letter} says ${row.phoneme}, like ${row.word}`, `${row.letter} dice ${row.phoneme}, como ${row.word}`), "phonics");
   }
   for (const family of RHYME_FAMILIES) {
     for (const word of family.words) {
@@ -124,7 +126,7 @@ export function collectSpokenLines(): SpokenLine[] {
       for (let i = 0; i < HAND_SAMPLES; i += 1) {
         const task = makeClockTask(level.id, rngFromSeed(`hands:time:${level.id}:${i}`));
         push(lines, task.speech, "time");
-        push(lines, `Your turn. ${task.speech}`, "time");
+        push(lines, yourTurnLine(task.speech), "time");
         push(lines, exampleFor(task).speech, "time");
       }
     }
@@ -135,7 +137,7 @@ export function collectSpokenLines(): SpokenLine[] {
       for (let i = 0; i < HAND_SAMPLES; i += 1) {
         const task = makePayTask(level.id, rngFromSeed(`hands:money:${level.id}:${i}`));
         push(lines, task.speech, "money");
-        push(lines, `Your turn. ${task.speech}`, "money");
+        push(lines, yourTurnLine(task.speech), "money");
         push(lines, exampleFor(task).speech, "money");
       }
     }

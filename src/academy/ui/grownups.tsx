@@ -2,10 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { rngRandom } from "@/lib/rng";
 import {
   DEFAULT_START_GRADE,
-  WEEKDAY_LETTERS,
   WEEKDAY_NAMES,
   cleanName,
-  gradeLabel,
   mondayIndex,
   todayIso,
   weekDates,
@@ -23,7 +21,9 @@ import {
   secondsThisWeek,
   skillBars,
 } from "../rewards";
+import { gradeText, show, t, weekdayLetter } from "../i18n";
 import { activeChild, addChild } from "../storage";
+import { LanguageToggle, withLang } from "./lang";
 import { BackupPanel } from "./backup-panel";
 import { BackLink, Flame, Foot, Logo, SquisheeImg, cx } from "./bits";
 import { InstallTip } from "./install-tip";
@@ -100,12 +100,12 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
             setGate(grownupGate(rngRandom()));
           }}
         >
-          <h1>Grown-ups</h1>
-          <p>Press and hold, then multiply. This keeps the charts for families.</p>
+          <h1>{show("Grown-ups")}</h1>
+          <p>{show("Press and hold, then multiply. This keeps the charts for families.")}</p>
           {armed ? (
             <>
               <p className="ac-gate-q">
-                What is {gate.a} × {gate.b}?
+                {show("What is")} {gate.a} × {gate.b}?
               </p>
               <input
                 inputMode="numeric"
@@ -113,10 +113,10 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
                 autoFocus
                 value={guess}
                 onChange={(e) => setGuess(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                aria-label="Answer"
+                aria-label={show("Answer")}
               />
               <button type="submit" className="ac-go">
-                Continue
+                {show("Continue")}
               </button>
             </>
           ) : (
@@ -142,11 +142,11 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
                 if (e.key === " " || e.key === "Enter") clearHold();
               }}
             >
-              {holding ? "Keep holding..." : "Press and hold"}
+              {holding ? show("Keep holding...") : show("Press and hold")}
             </button>
           )}
-          {miss ? <p className="ac-hint">That answer is not right.</p> : null}
-          <BackLink>Back to games</BackLink>
+          {miss ? <p className="ac-hint">{show("That answer is not right.")}</p> : null}
+          <BackLink>{show("Back to games")}</BackLink>
         </form>
       </div>
     );
@@ -170,7 +170,8 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
   return (
     <div className="ac-shell ac-mid">
       <header className="ac-parent-top">
-        <h1>Grown-ups</h1>
+        <h1>{show("Grown-ups")}</h1>
+        <LanguageToggle lang={save.lang} onLang={(lang) => onSave(withLang(save, lang))} />
       </header>
       <InstallTip />
 
@@ -184,13 +185,13 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
           >
             <SquisheeImg id={kid.avatarId} />
             <span>
-              {kid.name} · {gradeLabel(kid.grade)}
+              {kid.name} · {gradeText(kid.grade)}
             </span>
           </button>
         ))}
         {save.children.length < 4 ? (
           <button type="button" className="ac-kid" onClick={() => setAdding((v) => !v)}>
-            + Child
+            {show("+ Child")}
           </button>
         ) : null}
       </div>
@@ -209,13 +210,13 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
           <input
             value={name}
             maxLength={12}
-            placeholder="Name"
-            aria-label="Child name"
+            placeholder={show("Name")}
+            aria-label={show("Child name")}
             onChange={(e) => setName(e.target.value)}
           />
           <GradeChips grade={grade} onGrade={setGrade} />
           <button type="submit" className="ac-go" disabled={!cleanName(name)}>
-            Add
+            {show("Add")}
           </button>
         </form>
       ) : null}
@@ -225,28 +226,31 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
           <strong>
             <Flame /> {child.streak}
           </strong>
-          <span>day streak</span>
+          <span>{show("day streak")}</span>
         </article>
         <article className="ac-statcard">
           <strong>{formatMinutes(weekSeconds)}</strong>
-          <span>this week</span>
+          <span>{show("this week")}</span>
         </article>
         <article className="ac-statcard">
           <strong>{chips.length}</strong>
-          <span>skills mastered</span>
+          <span>{show("skills mastered")}</span>
         </article>
       </div>
 
       <section className="ac-panel ac-week-card">
-        <h2>Progress card</h2>
+        <h2>{show("Progress card")}</h2>
         <p>{card.line}</p>
         <p className="ac-hint">
-          Streak {card.streak} · {card.mastered} skills mastered
+          {t(
+            `Streak ${card.streak} · ${card.mastered} skills mastered`,
+            `Racha de ${card.streak} · ${card.mastered} destrezas logradas`,
+          )}
         </p>
       </section>
 
       <section className="ac-panel">
-        <h2>This week</h2>
+        <h2>{show("This week")}</h2>
         <div className="ac-bars">
           {days.map((day, i) => {
             const height = seconds[i] ? Math.max(12, Math.round((seconds[i]! / peak) * 100)) : 8;
@@ -255,9 +259,9 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
                 <span
                   className={i === todayIndex ? "is-today" : ""}
                   style={{ height: `${height}%` }}
-                  title={`${WEEKDAY_NAMES[i]} ${formatMinutes(seconds[i] ?? 0)}`}
+                  title={`${show(WEEKDAY_NAMES[i] ?? "Day")} ${formatMinutes(seconds[i] ?? 0)}`}
                 />
-                <small>{WEEKDAY_LETTERS[i]}</small>
+                <small>{weekdayLetter(i)}</small>
               </div>
             );
           })}
@@ -265,20 +269,25 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
       </section>
 
       <section className="ac-panel">
-        <h2>What {child.name || "your child"} is learning</h2>
+        <h2>
+          {t(
+            `What ${child.name || "your child"} is learning`,
+            `Qué está aprendiendo ${child.name || "tu hijo o hija"}`,
+          )}
+        </h2>
         {lessons.map((row) => (
           <article key={row.key} className="ac-lesson">
-            <h3>{row.label}</h3>
+            <h3>{show(row.label)}</h3>
             <p>{row.learning}</p>
-            <p className="ac-next">Practice next: {row.next}</p>
+            <p className="ac-next">{t("Practice next", "Siguiente práctica")}: {show(row.next)}</p>
           </article>
         ))}
       </section>
 
       <section className="ac-panel">
-        <h2>Skills</h2>
+        <h2>{show("Skills")}</h2>
         {bars.length === 0 ? (
-          <p className="ac-hint">Play a few rounds and this fills in.</p>
+          <p className="ac-hint">{t("Play a few rounds and this fills in.", "Juega unas rondas y esto se llena.")}</p>
         ) : (
           bars.map((row) => (
             <div key={row.key} className="ac-skill">
@@ -299,16 +308,16 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
             ))}
           </div>
         ) : (
-          <p className="ac-hint">Mastered skills show up after a little practice.</p>
+          <p className="ac-hint">{show("Mastered skills show up after a little practice.")}</p>
         )}
         <div className="ac-tip">
           <p>{tip.text}</p>
-          <a href={sheet}>Print the worksheet</a>
+          <a href={sheet}>{show("Print the worksheet")}</a>
         </div>
       </section>
 
       <BackupPanel save={save} onSave={onSave} />
-      <BackLink>Back to games</BackLink>
+      <BackLink>{show("Back to games")}</BackLink>
       <Foot />
     </div>
   );
@@ -325,7 +334,7 @@ export function GradeChips({
 }) {
   const grades: Grade[] = ["K", "1", "2", "3"];
   return (
-    <div className={cx("ac-grades", className)} role="group" aria-label="Grade">
+    <div className={cx("ac-grades", className)} role="group" aria-label={show("Grade")}>
       {grades.map((g) => (
         <button key={g} type="button" className={cx("ac-grade", grade === g && "is-on")} onClick={() => onGrade(g)}>
           {g === "K" ? "K" : g}

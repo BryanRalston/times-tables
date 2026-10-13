@@ -1,3 +1,4 @@
+import { show } from "../i18n";
 import { personaOf } from "./persona";
 
 export type BuddyPhase = "ask" | "teach" | "practice" | "feedback" | "done";
@@ -57,13 +58,13 @@ export function bubbleText(line: BuddyLine, id: string): string {
     case "cheer":
       return persona.line;
     case "hint":
-      return "The hint can help.";
+      return show("The hint can help.");
     case "miss":
-      return "Let's look together.";
+      return show("Let's look together.");
     case "dance":
-      return "Three stars!";
+      return show("Three stars!");
     case "turn":
-      return "Your turn!";
+      return show("Your turn!");
     case "ready":
       return "";
     case "streak":

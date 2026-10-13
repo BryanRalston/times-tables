@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { show } from "../i18n";
 import type { ShapeName } from "../games/boards";
 import { ShapeFig } from "../games/scene-ui";
 import { emptyPile, formatCents } from "../games/money-model";
@@ -37,11 +38,11 @@ export function WorkedExample({
 
   if (!frame) return null;
   return (
-    <div className="ac-teach" role="region" aria-label="Worked example">
+    <div className="ac-teach" role="region" aria-label={show("Worked example")}>
       <TeachArt frame={frame} />
       <p className="ac-teach-cap">{frame.caption}</p>
       <button type="button" className="ac-go" onClick={() => onDoneRef.current()}>
-        Try again
+        {show("Try again")}
       </button>
     </div>
   );

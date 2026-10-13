@@ -1,5 +1,6 @@
 import type { Rng } from "@/lib/rng";
-import { buddyName, pickLine } from "./flavor";
+import { gamePill, t } from "../i18n";
+import { buddyName, pickTalk } from "./flavor";
 import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { DotModel, Equation, SquisheeImg, cx } from "../ui/bits";
@@ -150,9 +151,9 @@ export function makeAddQuestion(rng: Rng, level: AddLevel): ChoiceQ {
     id: qid(rng),
     game: "add",
     title: addTitle(rng, op),
-    hint: max <= 20 ? "Count the dots" : "Count the tens and the ones",
-    praise: `Yes! ${solved}`,
-    almost: `Almost! ${solved}`,
+    hint: max <= 20 ? t("Count the dots", "Cuenta los puntos") : t("Count the tens and the ones", "Cuenta las decenas y las unidades"),
+    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`),
+    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`),
     answer: String(hidden),
     choices: fourChoices(rng, hidden, [hidden - 1, hidden + 1, wild, hidden + 2, hidden - 2]),
     skill: `add:${level}`,
@@ -164,9 +165,17 @@ export function makeAddQuestion(rng: Rng, level: AddLevel): ChoiceQ {
 function addTitle(rng: Rng, op: "+" | "-"): string {
   const who = buddyName(rng);
   if (op === "+") {
-    return pickLine(rng, ["Tap the missing number!", `${who} adds some more. What is missing?`, "Count on. Tap the missing number!"]);
+    return pickTalk(rng, [
+      ["Tap the missing number!", "¡Toca el número que falta!"],
+      [`${who} adds some more. What is missing?`, `${who} suma un poco más. ¿Qué falta?`],
+      ["Count on. Tap the missing number!", "Sigue contando. ¡Toca el número que falta!"],
+    ]);
   }
-  return pickLine(rng, ["Tap the missing number!", `${who} takes some away. What is missing?`, "What number is hiding?"]);
+  return pickTalk(rng, [
+    ["Tap the missing number!", "¡Toca el número que falta!"],
+    [`${who} takes some away. What is missing?`, `${who} quita algunos. ¿Qué falta?`],
+    ["What number is hiding?", "¿Qué número se esconde?"],
+  ]);
 }
 
 function makeTensQuestion(rng: Rng): ChoiceQ {
@@ -220,9 +229,9 @@ function makeTensQuestion(rng: Rng): ChoiceQ {
     id: qid(rng),
     game: "add",
     title: addTitle(rng, op),
-    hint: "Count the tens and the ones",
-    praise: `Yes! ${solved}`,
-    almost: `Almost! ${solved}`,
+    hint: t("Count the tens and the ones", "Cuenta las decenas y las unidades"),
+    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`),
+    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`),
     answer: String(hidden),
     choices: fourChoices(rng, hidden, [hidden - 1, hidden + 1, hidden + 10, hidden - 10, hidden + 2]),
     skill: "add:tens",
@@ -290,7 +299,7 @@ export const addGame = {
   defaultLevel,
   sheetDefaultLevel: "within20",
   isLevel: isAddLevel,
-  pill: (level) => `Add & Subtract · Level ${level.num}`,
+  pill: (level) => gamePill("Add & Subtract", level.num),
   makeQuestion: (rng, level) => makeAddQuestion(rng, isAddLevel(level) ? level : "within5"),
   makeSheetItem: sheetItem,
   Prompt: AddPrompt,

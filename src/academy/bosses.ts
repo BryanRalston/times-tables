@@ -1,4 +1,6 @@
 import { gameById } from "./games/registry";
+import { getLocale, show, t } from "./i18n";
+import { BOSS_ES } from "./i18n-es";
 
 export type BossLook = "crown" | "cape" | "armor" | "clock" | "coins" | "spell";
 
@@ -204,25 +206,33 @@ function slug(id: string): string {
 }
 
 /** Authored boss, or a generated one so a new island still has a fight. */
+function withSpanish(boss: IslandBoss): IslandBoss {
+  if (getLocale() !== "es") return boss;
+  const es = BOSS_ES[boss.gameId];
+  if (!es) return boss;
+  return { ...boss, ...es };
+}
+
 export function bossForGame(gameId: string): IslandBoss {
   const authored = AUTHORED.find((row) => row.gameId === gameId);
-  if (authored) return authored;
+  if (authored) return withSpanish(authored);
   const game = gameById(gameId);
   const title = game?.title ?? "Squishee";
   const name = `Boss ${title}`;
   const look = LOOKS[lookIndex(gameId)] ?? "crown";
+  const shown = show(title);
   return {
     gameId,
     name,
-    taunt: `${name} bounced in for a silly showdown. Ready?`,
-    friendly: `${name} wants to be friends!`,
-    personality: `The big boss of ${title}, in a homemade crown.`,
+    taunt: t(`${name} bounced in for a silly showdown. Ready?`, `${name} llegó rebotando para un duelo chistoso. ¿Listo?`),
+    friendly: t(`${name} wants to be friends!`, `¡${name} quiere ser tu amigo!`),
+    personality: t(`The big boss of ${title}, in a homemade crown.`, `El gran jefe de ${shown}, con una corona hecha en casa.`),
     face: game?.mascot ?? "peach",
     look,
     cosmeticId: `boss-look-${slug(gameId)}`,
-    cosmeticName: "Boss crown",
+    cosmeticName: t("Boss crown", "Corona de jefe"),
     trophyId: `trophy-${slug(gameId)}`,
-    trophyName: `${title} trophy`,
+    trophyName: t(`${title} trophy`, `Trofeo de ${shown}`),
   };
 }
 
@@ -235,7 +245,7 @@ export function lookForCosmetic(id: string): BossLook | null {
 
 export function bossCosmeticName(id: string): string {
   const authored = AUTHORED.find((row) => row.cosmeticId === id);
-  if (authored) return authored.cosmeticName;
-  if (id.startsWith("boss-look-")) return "Boss crown";
-  return "Boss look";
+  if (authored) return bossForGame(authored.gameId).cosmeticName;
+  if (id.startsWith("boss-look-")) return t("Boss crown", "Corona de jefe");
+  return t("Boss look", "Disfraz de jefe");
 }

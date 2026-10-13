@@ -89,6 +89,7 @@ export function isPrecacheFile(rel) {
   if (rel === SHARE_IMAGE_PATH.slice(1)) return false;
   // Game clips load on first play and stay in the runtime cache. Core clips precache on install.
   if (rel.startsWith("voice/lazy/")) return false;
+  if (rel.startsWith("voice/es/")) return false;
   return PRECACHE_EXT.test(rel);
 }
 

@@ -1,5 +1,6 @@
 import type { Rng } from "@/lib/rng";
-import { buddyName, pickLine } from "./flavor";
+import { coinAsA, coinButton, gamePill, t } from "../i18n";
+import { buddyName, pickTalk } from "./flavor";
 import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { CoinRow } from "../ui/coins";
@@ -87,15 +88,15 @@ function centChoices(rng: Rng, answer: number, preferred: number[]): string[] {
 function hintFor(kind: CoinKind): string {
   switch (kind) {
     case "penny":
-      return "Copper. It says 1.";
+      return t("Copper. It says 1.", "Es de cobre. Dice 1.");
     case "nickel":
-      return "Silver. It says 5.";
+      return t("Silver. It says 5.", "Es plateada. Dice 5.");
     case "dime":
-      return "Small and silver. It says 10.";
+      return t("Small and silver. It says 10.", "Es chiquita y plateada. Dice 10.");
     case "quarter":
-      return "The biggest silver coin. It says 25.";
+      return t("The biggest silver coin. It says 25.", "Es la moneda plateada más grande. Dice 25.");
     case "dollar":
-      return "A green bill. It says $1.";
+      return t("A green bill. It says $1.", "Es un billete verde. Dice $1.");
     default: {
       const neverKind: never = kind;
       return neverKind;
@@ -121,31 +122,47 @@ function makeName(rng: Rng): ChoiceQ {
   const kind = rng.pick(nameKinds());
   const name = COIN_NAME[kind];
   const choices = rng.shuffle(nameKinds().map((row) => COIN_NAME[row]));
+  const labels: Record<string, string> = {};
+  for (const row of nameKinds()) labels[COIN_NAME[row]] = coinButton(row, COIN_NAME[row]);
+  const coin = coinAsA(kind, name.toLowerCase());
   return {
     id: qid(rng),
     game: "money",
-    title: pickLine(rng, ["What coin is this?", `${buddyName(rng)} holds up a coin. What coin is it?`]),
+    title: (() => {
+      const buddy = buddyName(rng);
+      return pickTalk(rng, [
+        ["What coin is this?", "¿Qué moneda es esta?"],
+        [`${buddy} holds up a coin. What coin is it?`, `${buddy} muestra una moneda. ¿Cuál es?`],
+      ]);
+    })(),
     hint: hintFor(kind),
-    praise: `Yes! That is a ${name.toLowerCase()}.`,
-    almost: `Almost! That one is a ${name.toLowerCase()}.`,
+    praise: t(`Yes! That is a ${name.toLowerCase()}.`, `¡Sí! Es ${coin}.`),
+    almost: t(`Almost! That one is a ${name.toLowerCase()}.`, `¡Casi! Esa es ${coin}.`),
     answer: name,
     choices,
     skill: "money:name",
     tags: ["coins"],
-    visual: { kind: "money", mode: "name", coins: oneCoin(kind) },
+    visual: { kind: "money", mode: "name", coins: oneCoin(kind), labels },
   };
 }
 
 function makeCount(rng: Rng): ChoiceQ {
   const coins = countPile(rng);
   const total = pileCents(coins);
+  const pile = describePile(coins);
   return {
     id: qid(rng),
     game: "money",
-    title: pickLine(rng, ["How much money?", `${buddyName(rng)} counts the coins. How much?`]),
-    hint: "Add the coins",
-    praise: `Yes! ${describePile(coins)} is ${formatCents(total)}.`,
-    almost: `Almost! ${describePile(coins)} is ${formatCents(total)}.`,
+    title: (() => {
+      const buddy = buddyName(rng);
+      return pickTalk(rng, [
+        ["How much money?", "¿Cuánto dinero hay?"],
+        [`${buddy} counts the coins. How much?`, `${buddy} cuenta las monedas. ¿Cuánto es?`],
+      ]);
+    })(),
+    hint: t("Add the coins", "Suma las monedas"),
+    praise: t(`Yes! ${pile} is ${formatCents(total)}.`, `¡Sí! ${pile} son ${formatCents(total)}.`),
+    almost: t(`Almost! ${pile} is ${formatCents(total)}.`, `¡Casi! ${pile} son ${formatCents(total)}.`),
     answer: formatCents(total),
     choices: centChoices(rng, total, [total + 1, total - 1, total + 5, total - 5, total + 10]),
     skill: "money:count",
@@ -172,16 +189,21 @@ function makeMake(rng: Rng): ChoiceQ {
     labels[key] = describePile(pile);
   });
   const answer = "p0";
+  const made = labels[answer] ?? "";
+  const price = formatCents(target);
   return {
     id: qid(rng),
     game: "money",
-    title: pickLine(rng, [
-      `Which coins make ${formatCents(target)}?`,
-      `${buddyName(rng)} needs ${formatCents(target)}. Which coins make it?`,
-    ]),
-    hint: "Count each group",
-    praise: `Yes! ${labels[answer]} makes ${formatCents(target)}.`,
-    almost: `Almost! ${labels[answer]} makes ${formatCents(target)}.`,
+    title: (() => {
+      const buddy = buddyName(rng);
+      return pickTalk(rng, [
+        [`Which coins make ${price}?`, `¿Qué monedas forman ${price}?`],
+        [`${buddy} needs ${price}. Which coins make it?`, `${buddy} necesita ${price}. ¿Qué monedas lo forman?`],
+      ]);
+    })(),
+    hint: t("Count each group", "Cuenta cada grupo"),
+    praise: t(`Yes! ${made} makes ${price}.`, `¡Sí! ${made} forman ${price}.`),
+    almost: t(`Almost! ${made} makes ${price}.`, `¡Casi! ${made} forman ${price}.`),
     answer,
     choices: rng.shuffle(keys),
     skill: "money:make",
@@ -197,13 +219,22 @@ function makeChange(rng: Rng): ChoiceQ {
   for (let price = 5; price < paidCents; price += 5) steps.push(price);
   const price = rng.pick(steps.length ? steps : [1]);
   const change = paidCents - price;
+  const paidLabel = formatCents(paidCents);
+  const priceLabel = formatCents(price);
+  const changeLabel = formatCents(change);
   return {
     id: qid(rng),
     game: "money",
-    title: pickLine(rng, ["How much change?", `${buddyName(rng)} pays. How much change is left?`]),
-    hint: `You pay ${formatCents(paidCents)}. The price is ${formatCents(price)}.`,
-    praise: `Yes! The change is ${formatCents(change)}.`,
-    almost: `Almost! The change is ${formatCents(change)}.`,
+    title: (() => {
+      const buddy = buddyName(rng);
+      return pickTalk(rng, [
+        ["How much change?", "¿Cuánto es el cambio?"],
+        [`${buddy} pays. How much change is left?`, `${buddy} paga. ¿Cuánto cambio sobra?`],
+      ]);
+    })(),
+    hint: t(`You pay ${paidLabel}. The price is ${priceLabel}.`, `Pagas ${paidLabel}. El precio es ${priceLabel}.`),
+    praise: t(`Yes! The change is ${changeLabel}.`, `¡Sí! El cambio es ${changeLabel}.`),
+    almost: t(`Almost! The change is ${changeLabel}.`, `¡Casi! El cambio es ${changeLabel}.`),
     answer: formatCents(change),
     choices: centChoices(rng, change, [change + 5, change - 5, change + 10, price, paidCents]),
     skill: "money:change",
@@ -218,13 +249,20 @@ function makeDollars(rng: Rng): ChoiceQ {
   const coins = composePile(rng, cents, false);
   coins.dollar = dollars;
   const total = pileCents(coins);
+  const amount = formatCents(total);
   return {
     id: qid(rng),
     game: "money",
-    title: pickLine(rng, ["How many dollars and cents?", `${buddyName(rng)} has dollars and coins. How much?`]),
-    hint: "Dollars, then cents",
-    praise: `Yes! That is ${formatCents(total)}.`,
-    almost: `Almost! That is ${formatCents(total)}.`,
+    title: (() => {
+      const buddy = buddyName(rng);
+      return pickTalk(rng, [
+        ["How many dollars and cents?", "¿Cuántos dólares y centavos hay?"],
+        [`${buddy} has dollars and coins. How much?`, `${buddy} tiene dólares y monedas. ¿Cuánto es?`],
+      ]);
+    })(),
+    hint: t("Dollars, then cents", "Primero los dólares, luego los centavos"),
+    praise: t(`Yes! That is ${amount}.`, `¡Sí! Son ${amount}.`),
+    almost: t(`Almost! That is ${amount}.`, `¡Casi! Son ${amount}.`),
     answer: formatCents(total),
     choices: centChoices(rng, total, [total + 5, total - 5, total + 10, total - 25, dollars * 100, cents]),
     skill: "money:dollars",
@@ -257,25 +295,38 @@ function sheetItem(rng: Rng, level: string): SheetItem {
   switch (safe) {
     case "name": {
       const kind = rng.pick(nameKinds());
-      return { prompt: `Name the coin marked ${COIN_CENTS[kind]}:`, answer: COIN_NAME[kind] };
+      return { prompt: t(`Name the coin marked ${COIN_CENTS[kind]}:`, `Nombra la moneda marcada ${COIN_CENTS[kind]}:`), answer: COIN_NAME[kind] };
     }
     case "count": {
       const coins = countPile(rng);
-      return { prompt: `${describePile(coins)} =`, answer: formatCents(pileCents(coins)) };
+      const pile = describePile(coins);
+      return { prompt: t(`${pile} =`, `${pile} =`), answer: formatCents(pileCents(coins)) };
     }
     case "make": {
       const target = rng.pick(MAKE_TARGETS);
-      return { prompt: `Make ${formatCents(target)}. One way:`, answer: describePile(composePile(rng, target, false)) };
+      const way = describePile(composePile(rng, target, false));
+      const price = formatCents(target);
+      return { prompt: t(`Make ${price}. One way:`, `Forma ${price}. Una forma:`), answer: way };
     }
     case "change": {
       const paid = rng.int(2, 20) * 5;
       const price = rng.int(1, paid / 5 - 1) * 5;
-      return { prompt: `Pay ${formatCents(paid)}. Price ${formatCents(price)}. Change =`, answer: formatCents(paid - price) };
+      const paidLabel = formatCents(paid);
+      const priceLabel = formatCents(price);
+      return {
+        prompt: t(`Pay ${paidLabel}. Price ${priceLabel}. Change =`, `Pagas ${paidLabel}. Precio ${priceLabel}. Cambio =`),
+        answer: formatCents(paid - price),
+      };
     }
     case "dollars": {
       const dollars = rng.int(1, 2);
       const cents = rng.pick([10, 25, 50, 75]);
-      return { prompt: `${dollars} dollar${dollars === 1 ? "" : "s"} and ${cents}¢ =`, answer: formatCents(dollars * 100 + cents) };
+      const word = dollars === 1 ? "dollar" : "dollars";
+      const esWord = dollars === 1 ? "dólar" : "dólares";
+      return {
+        prompt: t(`${dollars} ${word} and ${cents}¢ =`, `${dollars} ${esWord} y ${cents}¢ =`),
+        answer: formatCents(dollars * 100 + cents),
+      };
     }
     default: {
       const neverLevel: never = safe;
@@ -291,12 +342,8 @@ function labelFor(rows: { key: string; label: string }[], key: string): string |
 function MoneyArt({ visual, large }: { visual: MoneyVisual; large?: boolean }) {
   const mode: MoneyMode = visual.mode;
   if (mode === "make") return null;
-  const label =
-    mode === "name"
-      ? "A coin"
-      : mode === "change"
-        ? `You pay ${describePile(visual.coins)}`
-        : describePile(visual.coins);
+  const pile = describePile(visual.coins);
+  const label = mode === "name" ? t("A coin", "Una moneda") : mode === "change" ? t(`You pay ${pile}`, `Pagas ${pile}`) : pile;
   return <CoinRow pile={visual.coins} large={large ?? mode === "name"} label={label} />;
 }
 
@@ -351,7 +398,7 @@ export const moneyGame = {
   defaultLevel,
   sheetDefaultLevel: "count",
   isLevel: isMoneyLevel,
-  pill: (level) => `Money · Level ${level.num}`,
+  pill: (level) => gamePill("Money", level.num),
   makeQuestion: (rng, level) => makeMoneyQuestion(rng, isMoneyLevel(level) ? level : "name"),
   makeSheetItem: sheetItem,
   Prompt: MoneyPrompt,

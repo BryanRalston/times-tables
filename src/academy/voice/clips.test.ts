@@ -6,6 +6,7 @@ import { GAMES } from "../games/registry";
 import type { ChoiceQ } from "../games/types";
 import { makeClockTask, makePayTask } from "../hands";
 import { exampleFor } from "../round-flow";
+import { yourTurnLine } from "../i18n";
 import { hintCue, promptSpeech, speakable, workedExample } from "../teach";
 import { voiceClipUrl, VOICE_FILES, VOICE_MODEL } from "./clips";
 import { collectClipSpecs, collectSpokenLines, lineChunkErrors } from "./catalog";
@@ -92,7 +93,7 @@ describe("recorded voice", () => {
     function addChoice(question: ChoiceQ) {
       const prompt = promptSpeech(question);
       check(prompt);
-      check(`Your turn. ${prompt}`);
+      check(yourTurnLine(prompt));
       check(hintCue(question).speech);
       check(workedExample(question).speech);
       check(speakable(question.praise));
@@ -115,7 +116,7 @@ describe("recorded voice", () => {
               ? makeClockTask(level.id, rngFromSeed(`voice-gap:hands:${game.id}:${level.id}:${i}`))
               : makePayTask(level.id, rngFromSeed(`voice-gap:hands:${game.id}:${level.id}:${i}`));
           check(task.speech);
-          check(`Your turn. ${task.speech}`);
+          check(yourTurnLine(task.speech));
           check(exampleFor(task).speech);
         }
       }

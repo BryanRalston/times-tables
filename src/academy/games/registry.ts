@@ -1,3 +1,4 @@
+import { show } from "../i18n";
 import { sheetHref as sheetPath } from "../paths";
 import type { Grade } from "../model";
 import { addGame } from "./add";
@@ -94,7 +95,7 @@ export function chipKeys(): string[] {
 export function skillLabel(key: string): string {
   for (const game of GAMES) {
     const label = game.skillLabel(key);
-    if (label) return label;
+    if (label) return show(label);
   }
   return key;
 }
@@ -102,7 +103,7 @@ export function skillLabel(key: string): string {
 export function chipLabel(key: string): string {
   for (const game of GAMES) {
     const label = game.chipLabel(key);
-    if (label) return label;
+    if (label) return show(label);
   }
   return skillLabel(key);
 }

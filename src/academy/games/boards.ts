@@ -1,3 +1,5 @@
+import { getLocale } from "../i18n";
+
 export type CountBoard =
   | { game: "count"; mode: "objects" | "to20"; emoji: string; name: string; n: number }
   | { game: "count"; mode: "compare"; emoji: string; name: string; groups: number[]; ask: "more" | "less" }
@@ -93,10 +95,22 @@ function bit(count: number, word: string): string {
   return `${count} ${word}${count === 1 ? "" : "s"}`;
 }
 
+function bitEs(count: number, one: string, many: string): string {
+  return `${count} ${count === 1 ? one : many}`;
+}
+
 export function blockPhrase(n: number): string {
   const hundreds = Math.floor(n / 100);
   const tens = Math.floor((n % 100) / 10);
   const ones = n % 10;
+  if (getLocale() === "es") {
+    const parts: string[] = [];
+    if (hundreds > 0) parts.push(bitEs(hundreds, "centena", "centenas"));
+    if (tens > 0) parts.push(bitEs(tens, "decena", "decenas"));
+    if (ones > 0 || parts.length === 0) parts.push(bitEs(ones, "unidad", "unidades"));
+    if (parts.length === 1) return parts[0]!;
+    return `${parts.slice(0, -1).join(", ")} y ${parts[parts.length - 1]}`;
+  }
   const parts: string[] = [];
   if (hundreds > 0) parts.push(bit(hundreds, "hundred"));
   if (tens > 0) parts.push(bit(tens, "ten"));

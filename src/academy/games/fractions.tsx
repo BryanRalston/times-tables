@@ -1,6 +1,7 @@
 import type { Rng } from "@/lib/rng";
+import { t } from "../i18n";
 import type { Grade } from "../model";
-import { buddyName, pickLine } from "./flavor";
+import { buddyName, pickTalk } from "./flavor";
 import { fractionText, type FractionBoard } from "./boards";
 import { sceneQuestion, uniqueChoices } from "./pick";
 import { FractionBar, FractionLine, SceneCard, sceneModule } from "./scene-ui";
@@ -112,15 +113,19 @@ function makeParts(rng: Rng): ChoiceQ {
   const num = rng.int(1, den);
   const answer = `${num}/${den}`;
   const board: FractionBoard = { game: "fractions", mode: "parts", num, den };
+  const buddy = buddyName(rng);
   return sceneQuestion(rng, {
     game: "fractions",
-    title: pickLine(rng, ["What fraction is shaded?", `${buddyName(rng)} shares a snack. What fraction is shaded?`]),
-    hint: "Count the shaded parts and the equal parts",
+    title: pickTalk(rng, [
+      ["What fraction is shaded?", "¿Qué fracción está sombreada?"],
+      [`${buddy} shares a snack. What fraction is shaded?`, `${buddy} comparte un bocadillo. ¿Qué fracción está sombreada?`],
+    ]),
+    hint: t("Count the shaded parts and the equal parts", "Cuenta las partes sombreadas y las partes iguales"),
     answer,
     choices: fracChoices(rng, answer, [`${Math.max(1, num - 1)}/${den}`, `${Math.min(den, num + 1)}/${den}`], HALF_FOURTHS),
     skill: "fractions:parts",
     tags: ["parts"],
-    solved: `${answer} is shaded`,
+    solved: t(`${answer} is shaded`, `${answer} está sombreada`),
     picture: answer,
     hands: false,
     quietChoices: false,
@@ -136,10 +141,14 @@ function makeUnit(rng: Rng): ChoiceQ {
   const answer = `1/${den}`;
   const other = rng.pick(dens.filter((item) => item !== den));
   const board: FractionBoard = { game: "fractions", mode: "unit", num: 1, den };
+  const buddy = buddyName(rng);
   return sceneQuestion(rng, {
     game: "fractions",
-    title: pickLine(rng, ["What unit fraction is shaded?", `${buddyName(rng)} shades one part. What unit fraction is that?`]),
-    hint: "One shaded part",
+    title: pickTalk(rng, [
+      ["What unit fraction is shaded?", "¿Qué fracción unitaria está sombreada?"],
+      [`${buddy} shades one part. What unit fraction is that?`, `${buddy} sombrea una parte. ¿Qué fracción unitaria es?`],
+    ]),
+    hint: t("One shaded part", "Una parte sombreada"),
     answer,
     choices: fracChoices(rng, answer, [`2/${den}`, `1/${other}`], THROUGH_FOURTHS),
     skill: "fractions:unit",
@@ -160,15 +169,19 @@ function makeLine(rng: Rng): ChoiceQ {
   const answer = fractionText(num, den);
   const ticks = Array.from({ length: den + 1 }, (_, i) => fractionText(i, den));
   const board: FractionBoard = { game: "fractions", mode: "line", num, den };
+  const buddy = buddyName(rng);
   return sceneQuestion(rng, {
     game: "fractions",
-    title: pickLine(rng, ["Which fraction is the dot?", `${buddyName(rng)} stands on the line. Which fraction is the dot?`]),
-    hint: "Read the tick under the dot",
+    title: pickTalk(rng, [
+      ["Which fraction is the dot?", "¿Qué fracción es el punto?"],
+      [`${buddy} stands on the line. Which fraction is the dot?`, `${buddy} está en la recta. ¿Qué fracción es el punto?`],
+    ]),
+    hint: t("Read the tick under the dot", "Lee la marca debajo del punto"),
     answer,
     choices: uniqueChoices(rng, answer, notEquivalent(answer, [...ticks, "1/2", "3/4"])),
     skill: "fractions:line",
     tags: ["line"],
-    solved: `The dot is at ${answer}`,
+    solved: t(`The dot is at ${answer}`, `El punto está en ${answer}`),
     picture: answer,
     hands: false,
     quietChoices: false,
@@ -230,17 +243,26 @@ function makeCompare(rng: Rng): ChoiceQ {
     den2,
     ask: askGreater ? "greater" : "less",
   };
+  const buddy = buddyName(rng);
   return sceneQuestion(rng, {
     game: "fractions",
     title: askGreater
-      ? pickLine(rng, ["Which shaded fraction is greater?", `${buddyName(rng)} asks which shaded fraction is greater`])
-      : pickLine(rng, ["Which shaded fraction is less?", `${buddyName(rng)} asks which shaded fraction is less`]),
-    hint: sameDen ? "Same denominator. More parts are greater." : "Same numerator. Bigger pieces are greater.",
+      ? pickTalk(rng, [
+          ["Which shaded fraction is greater?", "¿Qué fracción sombreada es mayor?"],
+          [`${buddy} asks which shaded fraction is greater`, `${buddy} pregunta qué fracción sombreada es mayor`],
+        ])
+      : pickTalk(rng, [
+          ["Which shaded fraction is less?", "¿Qué fracción sombreada es menor?"],
+          [`${buddy} asks which shaded fraction is less`, `${buddy} pregunta qué fracción sombreada es menor`],
+        ]),
+    hint: sameDen
+      ? t("Same denominator. More parts are greater.", "El mismo denominador. Más partes es mayor.")
+      : t("Same numerator. Bigger pieces are greater.", "El mismo numerador. Las partes más grandes son mayores."),
     answer,
     choices,
     skill: "fractions:compare",
     tags: ["compare"],
-    solved: `${answer} is ${askGreater ? "greater" : "less"}`,
+    solved: askGreater ? t(`${answer} is greater`, `${answer} es mayor`) : t(`${answer} is less`, `${answer} es menor`),
     picture: `${left} ${right}`,
     hands: false,
     quietChoices: false,
@@ -254,13 +276,15 @@ function makeEquivalent(rng: Rng): ChoiceQ {
   const [num, den, num2, den2] = rng.pick(PAIRS);
   const answer = `${num2}/${den2}`;
   const board: FractionBoard = { game: "fractions", mode: "equivalent", num, den, num2, den2 };
+  const buddy = buddyName(rng);
+  const shown = `${num}/${den}`;
   return sceneQuestion(rng, {
     game: "fractions",
-    title: pickLine(rng, [
-      `Which fraction matches ${num}/${den}?`,
-      `${buddyName(rng)} has ${num}/${den}. Which fraction matches?`,
+    title: pickTalk(rng, [
+      [`Which fraction matches ${shown}?`, `¿Qué fracción es igual a ${shown}?`],
+      [`${buddy} has ${shown}. Which fraction matches?`, `${buddy} tiene ${shown}. ¿Qué fracción es igual?`],
     ]),
-    hint: "Same amount, different parts",
+    hint: t("Same amount, different parts", "La misma cantidad, en partes distintas"),
     answer,
     choices: uniqueChoices(
       rng,
@@ -269,7 +293,7 @@ function makeEquivalent(rng: Rng): ChoiceQ {
     ),
     skill: "fractions:equivalent",
     tags: ["equivalent"],
-    solved: `${num}/${den} = ${answer}`,
+    solved: t(`${num}/${den} = ${answer}`, `${num}/${den} = ${answer}`),
     picture: `${num}/${den}`,
     hands: false,
     quietChoices: false,
@@ -284,10 +308,14 @@ function makeShade(rng: Rng): ChoiceQ {
   const num = rng.int(1, den);
   const answer = `${num}/${den}`;
   const board: FractionBoard = { game: "fractions", mode: "shade", num, den };
+  const buddy = buddyName(rng);
   return sceneQuestion(rng, {
     game: "fractions",
-    title: pickLine(rng, [`Shade ${num} of the ${den} parts`, `${buddyName(rng)} says shade ${num} of the ${den} parts`]),
-    hint: "Tap a part to shade it",
+    title: pickTalk(rng, [
+      [`Shade ${num} of the ${den} parts`, `Sombrea ${num} de las ${den} partes`],
+      [`${buddy} says shade ${num} of the ${den} parts`, `${buddy} dice que sombrees ${num} de las ${den} partes`],
+    ]),
+    hint: t("Tap a part to shade it", "Toca una parte para sombrearla"),
     answer,
     choices: fracChoices(rng, answer, [], THROUGH_EIGHTHS),
     skill: "fractions:shade",
@@ -330,16 +358,28 @@ function sheetItem(rng: Rng, level: string): SheetItem {
     case "shade": {
       const den = rng.pick([2, 4]);
       const num = rng.int(1, den);
-      return { prompt: `${num} of ${den} equal parts are shaded. What fraction?`, answer: `${num}/${den}` };
+      return {
+        prompt: t(`${num} of ${den} equal parts are shaded. What fraction?`, `${num} de ${den} partes iguales están sombreadas. ¿Qué fracción es?`),
+        answer: `${num}/${den}`,
+      };
     }
     case "unit": {
       const den = rng.pick([2, 3, 4]);
-      return { prompt: `1 of ${den} equal parts is shaded. What unit fraction?`, answer: `1/${den}` };
+      return {
+        prompt: t(`1 of ${den} equal parts is shaded. What unit fraction?`, `1 de ${den} partes iguales está sombreada. ¿Qué fracción unitaria es?`),
+        answer: `1/${den}`,
+      };
     }
     case "line": {
       const den = rng.pick([2, 3, 4]);
       const num = rng.int(0, den);
-      return { prompt: `A number line from 0 to 1 has ${den} equal jumps. The dot is on jump ${num}. What fraction?`, answer: fractionText(num, den) };
+      return {
+        prompt: t(
+          `A number line from 0 to 1 has ${den} equal jumps. The dot is on jump ${num}. What fraction?`,
+          `Una recta del 0 al 1 tiene ${den} saltos iguales. El punto está en el salto ${num}. ¿Qué fracción es?`,
+        ),
+        answer: fractionText(num, den),
+      };
     }
     case "compare": {
       const den = rng.pick([2, 3, 4]);
@@ -347,11 +387,17 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       let num2 = rng.int(1, den - 1);
       if (num2 === num) num2 = num === 1 ? 2 : num - 1;
       const greater = num > num2 ? `${num}/${den}` : `${num2}/${den}`;
-      return { prompt: `Which is greater, ${num}/${den} or ${num2}/${den}?`, answer: greater };
+      return {
+        prompt: t(`Which is greater, ${num}/${den} or ${num2}/${den}?`, `¿Cuál es mayor, ${num}/${den} o ${num2}/${den}?`),
+        answer: greater,
+      };
     }
     case "equivalent": {
       const pair = rng.pick(PAIRS);
-      return { prompt: `Which fraction matches ${pair[0]}/${pair[1]}?`, answer: `${pair[2]}/${pair[3]}` };
+      return {
+        prompt: t(`Which fraction matches ${pair[0]}/${pair[1]}?`, `¿Qué fracción es igual a ${pair[0]}/${pair[1]}?`),
+        answer: `${pair[2]}/${pair[3]}`,
+      };
     }
     default: {
       const neverLevel: never = safe;

@@ -1,6 +1,7 @@
 import type { Rng } from "@/lib/rng";
+import { t, thingName } from "../i18n";
 import type { Grade } from "../model";
-import { buddyName, pickLine } from "./flavor";
+import { buddyName, pickTalk } from "./flavor";
 import { countName, type CountBoard } from "./boards";
 import { distinctInts, nearChoices, sceneQuestion } from "./pick";
 import { DotClusters, SceneCard, SquisheeRow, TenFrames, sceneModule } from "./scene-ui";
@@ -67,19 +68,20 @@ function makeObjects(rng: Rng, max: number, level: "objects" | "to20"): ChoiceQ 
   const lo = level === "to20" ? 8 : 1;
   const n = rng.int(lo, max);
   const board: CountBoard = { game: "count", mode: level, emoji: "", name: "squishees", n };
+  const buddy = buddyName(rng);
   return ask(rng, {
     game: "count",
-    title: pickLine(rng, [
-      "How many squishees?",
-      `${buddyName(rng)} wants to count. How many squishees?`,
-      "Count each one. How many squishees?",
+    title: pickTalk(rng, [
+      ["How many squishees?", "¿Cuántos squishees hay?"],
+      [`${buddy} wants to count. How many squishees?`, `${buddy} quiere contar. ¿Cuántos squishees hay?`],
+      ["Count each one. How many squishees?", "Cuenta uno por uno. ¿Cuántos squishees hay?"],
     ]),
-    hint: "Count each one",
+    hint: t("Count each one", "Cuenta uno por uno"),
     answer: String(n),
     choices: nearChoices(rng, n, 0, max),
     skill: `count:${level}`,
     tags: [level],
-    solved: `${n} ${countName("squishees", n)}`,
+    solved: `${n} ${thingName("squishees", n, countName("squishees", n))}`,
     picture: "sq",
     hands: false,
     quietChoices: false,
@@ -111,13 +113,13 @@ function makeCompare(rng: Rng): ChoiceQ {
   };
   return ask(rng, {
     game: "count",
-    title: askMore ? "Which group has the most?" : "Which group has the fewest?",
-    hint: "Look at the pictures",
+    title: askMore ? t("Which group has the most?", "¿Qué grupo tiene más?") : t("Which group has the fewest?", "¿Qué grupo tiene menos?"),
+    hint: t("Look at the pictures", "Mira los dibujos"),
     answer,
     choices: rng.shuffle(ids),
     skill: "count:compare",
     tags: ["compare"],
-    solved: askMore ? `${target} is the most` : `${target} is the fewest`,
+    solved: askMore ? t(`${target} is the most`, `${target} es el que tiene más`) : t(`${target} is the fewest`, `${target} es el que tiene menos`),
     picture: `sq:${target}`,
     hands: true,
     quietChoices: false,
@@ -137,13 +139,17 @@ function makeNeighbor(rng: Rng): ChoiceQ {
   const board: CountBoard = { game: "count", mode: "neighbor", n, ask: askBefore ? "before" : "after" };
   return ask(rng, {
     game: "count",
-    title: askBefore ? `What number comes before ${n}?` : `What number comes after ${n}?`,
-    hint: askBefore ? "One less" : "One more",
+    title: askBefore
+      ? t(`What number comes before ${n}?`, `¿Qué número va antes de ${n}?`)
+      : t(`What number comes after ${n}?`, `¿Qué número va después de ${n}?`),
+    hint: askBefore ? t("One less", "Uno menos") : t("One more", "Uno más"),
     answer: String(answer),
     choices: nearChoices(rng, answer, 0, 20),
     skill: "count:neighbor",
     tags: ["neighbor"],
-    solved: askBefore ? `${answer} comes before ${n}` : `${answer} comes after ${n}`,
+    solved: askBefore
+      ? t(`${answer} comes before ${n}`, `${answer} va antes de ${n}`)
+      : t(`${answer} comes after ${n}`, `${answer} va después de ${n}`),
     picture: String(n),
     hands: false,
     quietChoices: false,
@@ -157,15 +163,19 @@ function makeSubitize(rng: Rng): ChoiceQ {
   const n = rng.int(1, 6);
   const clusters = rng.pick(DOTS[n - 1] ?? [[n]]);
   const board: CountBoard = { game: "count", mode: "subitize", clusters };
+  const buddy = buddyName(rng);
   return ask(rng, {
     game: "count",
-    title: pickLine(rng, ["How many dots?", `${buddyName(rng)} sees a dot pattern. How many dots?`]),
-    hint: "Look at the pattern",
+    title: pickTalk(rng, [
+      ["How many dots?", "¿Cuántos puntos hay?"],
+      [`${buddy} sees a dot pattern. How many dots?`, `${buddy} ve un patrón de puntos. ¿Cuántos puntos hay?`],
+    ]),
+    hint: t("Look at the pattern", "Mira el patrón"),
     answer: String(n),
     choices: nearChoices(rng, n, 1, 8),
     skill: "count:subitize",
     tags: ["subitize"],
-    solved: `${n} dots`,
+    solved: t(`${n} dots`, n === 1 ? `${n} punto` : `${n} puntos`),
     picture: "●".repeat(n),
     hands: false,
     quietChoices: false,
@@ -181,13 +191,16 @@ function makeTen(rng: Rng): ChoiceQ {
   const board: CountBoard = { game: "count", mode: "tenframe", frames };
   return ask(rng, {
     game: "count",
-    title: frames.length > 1 ? "How many squishees?" : "How many squishees in the ten-frame?",
-    hint: n > 10 ? "A full frame is 10" : "Count each squishee",
+    title:
+      frames.length > 1
+        ? t("How many squishees?", "¿Cuántos squishees hay?")
+        : t("How many squishees in the ten-frame?", "¿Cuántos squishees hay en el tablero de diez?"),
+    hint: n > 10 ? t("A full frame is 10", "Un tablero lleno es 10") : t("Count each squishee", "Cuenta cada squishee"),
     answer: String(n),
     choices: nearChoices(rng, n, 0, 20),
     skill: "count:tenframe",
     tags: ["tenframe"],
-    solved: `${n} ${countName("squishees", n)}`,
+    solved: `${n} ${thingName("squishees", n, countName("squishees", n))}`,
     picture: "●".repeat(Math.min(10, n)),
     hands: false,
     quietChoices: false,
@@ -202,13 +215,13 @@ function makeBuild(rng: Rng): ChoiceQ {
   const board: CountBoard = { game: "count", mode: "build", n };
   return ask(rng, {
     game: "count",
-    title: `Show ${n} on the ten-frame`,
-    hint: "Tap a spot for each squishee",
+    title: t(`Show ${n} on the ten-frame`, `Muestra ${n} en el tablero de diez`),
+    hint: t("Tap a spot for each squishee", "Toca un espacio por cada squishee"),
     answer: String(n),
     choices: nearChoices(rng, n, 0, 10),
     skill: "count:build",
     tags: ["build"],
-    solved: `${n} dots`,
+    solved: t(`${n} dots`, n === 1 ? `${n} punto` : `${n} puntos`),
     picture: String(n),
     hands: true,
     quietChoices: true,
@@ -247,7 +260,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
     case "objects":
     case "to20": {
       const n = rng.int(1, safe === "objects" ? 10 : 20);
-      return { prompt: `Count the stars: ${"★".repeat(n)}`, answer: String(n) };
+      return { prompt: t(`Count the stars: ${"★".repeat(n)}`, `Cuenta las estrellas: ${"★".repeat(n)}`), answer: String(n) };
     }
     case "compare": {
       const a = rng.int(1, 20);
@@ -255,25 +268,32 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       if (b === a) b = a === 20 ? 1 : a + 1;
       const more = rng.next() < 0.5;
       const answer = more ? Math.max(a, b) : Math.min(a, b);
-      return { prompt: `Which is ${more ? "more" : "less"}, ${a} or ${b}?`, answer: String(answer) };
+      return {
+        prompt: more
+          ? t(`Which is more, ${a} or ${b}?`, `¿Cuál es más, ${a} o ${b}?`)
+          : t(`Which is less, ${a} or ${b}?`, `¿Cuál es menos, ${a} o ${b}?`),
+        answer: String(answer),
+      };
     }
     case "neighbor": {
       const after = rng.next() < 0.5;
       const n = rng.int(after ? 0 : 1, after ? 19 : 20);
       return {
-        prompt: after ? `What number comes after ${n}?` : `What number comes before ${n}?`,
+        prompt: after
+          ? t(`What number comes after ${n}?`, `¿Qué número va después de ${n}?`)
+          : t(`What number comes before ${n}?`, `¿Qué número va antes de ${n}?`),
         answer: String(after ? n + 1 : n - 1),
       };
     }
     case "subitize": {
       const a = rng.int(1, 3);
       const b = rng.int(1, 3);
-      return { prompt: `Dot groups: ${a} and ${b}. How many dots?`, answer: String(a + b) };
+      return { prompt: t(`Dot groups: ${a} and ${b}. How many dots?`, `Grupos de puntos: ${a} y ${b}. ¿Cuántos puntos hay?`), answer: String(a + b) };
     }
     case "tenframe":
     case "build": {
       const n = rng.int(safe === "build" ? 1 : 0, safe === "build" ? 10 : 20);
-      return { prompt: `Filled dots: ${"●".repeat(n)}`, answer: String(n) };
+      return { prompt: t(`Filled dots: ${"●".repeat(n)}`, `Puntos llenos: ${"●".repeat(n)}`), answer: String(n) };
     }
     default: {
       const neverLevel: never = safe;
@@ -306,7 +326,7 @@ function CountArt({ board }: { board: CountBoard }) {
     case "to20":
       return <SquisheeRow n={board.n} name={board.name} />;
     case "compare":
-      return <p className="ac-big-num">{board.ask === "more" ? "More" : "Less"}</p>;
+      return <p className="ac-big-num">{board.ask === "more" ? t("More", "Más") : t("Less", "Menos")}</p>;
     case "neighbor":
       return <p className="ac-big-num">{board.ask === "after" ? `${board.n}, ?` : `?, ${board.n}`}</p>;
     case "subitize":

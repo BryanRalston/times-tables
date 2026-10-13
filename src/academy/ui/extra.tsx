@@ -8,7 +8,8 @@ import { bookEntries, catchphrase } from "../buddy/cast";
 import { palOwned, withBuddy } from "../buddy/unlock";
 import { GAMES, sheetHref } from "../games/registry";
 import { playWindow } from "../grade-map";
-import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type Grade, type Save } from "../model";
+import { prefersSpanish, setLocale, show, t } from "../i18n";
+import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type AppLang, type Grade, type Save } from "../model";
 import { buyOutfit, wearOutfit } from "../rewards";
 import { activeChild, mapActive, withGrade, withLevel } from "../storage";
 import { silence, speak } from "../voice";
@@ -16,6 +17,7 @@ import { AcademyPal, BackLink, Foot, FreeNote, Logo, SquisheeImg, cx } from "./b
 import { SquishTally } from "./squishy";
 import { BossFigure, PalWithLook } from "./boss-figure";
 import { GradeChips } from "./grownups";
+import { LanguageToggle, withLang } from "./lang";
 
 const STARTERS = SQUAD_IDS.slice(0, 3);
 
@@ -23,11 +25,13 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
   const [name, setName] = useState("");
   const [grade, setGrade] = useState<Grade>(DEFAULT_START_GRADE);
   const [buddy, setBuddy] = useState<string>(STARTERS[0] ?? "peach");
+  const [lang, setLang] = useState<AppLang>(save.lang);
+  const offerSpanish = !save.langChosen && prefersSpanish();
 
   useEffect(() => {
-    speak("Pick a buddy!", sound);
+    speak(t("Pick a buddy!", "¡Elige un amigo!"), sound);
     return () => silence();
-  }, [sound]);
+  }, [sound, lang]);
 
   return (
     <div className="ac-shell">
@@ -40,12 +44,40 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
           e.preventDefault();
           const cleaned = cleanName(name) || "Pal";
           const pick = (STARTERS as readonly string[]).includes(buddy) ? buddy : "peach";
-          onSave(mapActive(save, (child) => withGrade({ ...child, name: cleaned, avatarId: pick }, grade)));
+          onSave(withLang(mapActive(save, (child) => withGrade({ ...child, name: cleaned, avatarId: pick }, grade)), lang));
           window.location.hash = "#/";
         }}
       >
-        <h1 className="ac-sr">Pick a buddy</h1>
-        <div className="ac-buddy-picks" role="radiogroup" aria-label="Pick a buddy">
+        <h1 className="ac-sr">{show("Pick a buddy")}</h1>
+        {offerSpanish ? (
+          <div className="ac-panel">
+            <p>¿Quieres jugar en español?</p>
+            <p className="ac-hint">Play in Spanish? You can switch any time in Settings.</p>
+            <div className="ac-grades">
+              <button
+                type="button"
+                className={cx("ac-grade", lang === "en" && "is-on")}
+                onClick={() => {
+                  setLang("en");
+                  setLocale("en");
+                }}
+              >
+                English
+              </button>
+              <button
+                type="button"
+                className={cx("ac-grade", lang === "es" && "is-on")}
+                onClick={() => {
+                  setLang("es");
+                  setLocale("es");
+                }}
+              >
+                Español
+              </button>
+            </div>
+          </div>
+        ) : null}
+        <div className="ac-buddy-picks" role="radiogroup" aria-label={show("Pick a buddy")}>
           {STARTERS.map((id) => (
             <button
               key={id}
@@ -63,18 +95,18 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
         </div>
         <p className="ac-bubble">{catchphrase(buddy)}</p>
         <GradeChips grade={grade} onGrade={setGrade} className="ac-hello-grades" />
-        <button type="submit" className="ac-pal-play" aria-label="Play">
+        <button type="submit" className="ac-pal-play" aria-label={show("Play")}>
           <SquisheeImg id={buddy} />
           <span className="ac-play-tri" aria-hidden="true" />
         </button>
         <label className="ac-field ac-name-opt">
-          Name
+          {show("Name")}
           <input
             value={name}
             maxLength={12}
             autoComplete="off"
-            aria-label="Your name"
-            placeholder="You can skip this"
+            aria-label={show("Your name")}
+            placeholder={show("You can skip this")}
             onChange={(e) => setName(e.target.value)}
           />
         </label>
@@ -93,7 +125,7 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
       <header className="ac-top">
         <Logo />
       </header>
-      <h1>Settings</h1>
+      <h1>{show("Settings")}</h1>
       <form
         className="ac-panel"
         onSubmit={(e) => {
@@ -104,16 +136,17 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
         }}
       >
         <label className="ac-field">
-          Name
+          {show("Name")}
           <input value={name} maxLength={12} onChange={(e) => setName(e.target.value)} />
         </label>
         <button type="submit" className="ac-quiet">
-          Save name
+          {show("Save name")}
         </button>
       </form>
+      <LanguageToggle lang={save.lang} onLang={(lang) => onSave(withLang(save, lang))} />
       <section className="ac-panel">
-        <h2>Grade</h2>
-        <p className="ac-hint">This sets the starting level and the levels each game can use.</p>
+        <h2>{show("Grade")}</h2>
+        <p className="ac-hint">{show("This sets the starting level and the levels each game can use.")}</p>
         <GradeChips
           grade={child.grade}
           onGrade={(grade) => {
@@ -123,8 +156,8 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
         />
       </section>
       <section className="ac-panel">
-        <h2>Challenge ahead</h2>
-        <p className="ac-hint">A grown-up can open levels past this grade. Games still start in the grade band.</p>
+        <h2>{show("Challenge ahead")}</h2>
+        <p className="ac-hint">{show("A grown-up can open levels past this grade. Games still start in the grade band.")}</p>
         <button
           type="button"
           className={cx("ac-grade", child.challengeAhead && "is-on")}
@@ -149,13 +182,13 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
             )
           }
         >
-          {child.challengeAhead ? "On" : "Off"}
+          {child.challengeAhead ? show("On") : show("Off")}
         </button>
       </section>
       <section className="ac-panel">
-        <h2>Sound</h2>
+        <h2>{show("Sound")}</h2>
         <button type="button" className={cx("ac-grade", save.sound && "is-on")} onClick={() => onSave({ ...save, sound: !save.sound })}>
-          {save.sound ? "On" : "Off"}
+          {save.sound ? show("On") : show("Off")}
         </button>
       </section>
       {GAMES.map((game) => {
@@ -167,9 +200,9 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
         );
         return (
           <section key={game.id} className="ac-panel">
-            <h2>{game.title}</h2>
+            <h2>{show(game.title)}</h2>
             {allowed.ids.length === 0 ? (
-              <p className="ac-hint">Coming later for this grade.</p>
+              <p className="ac-hint">{show("Coming later for this grade.")}</p>
             ) : (
               <div className="ac-levels">
                 {game.levels
@@ -181,7 +214,7 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
                       className={cx("ac-grade", child.levels[game.id] === row.id && "is-on")}
                       onClick={() => onSave(mapActive(save, (kid) => withLevel(kid, game.id, row.id)))}
                     >
-                      {row.label}
+                      {show(row.label)}
                     </button>
                   ))}
               </div>
@@ -189,7 +222,7 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
           </section>
         );
       })}
-      <BackLink>Back to games</BackLink>
+      <BackLink>{show("Back to games")}</BackLink>
       <Foot />
     </div>
   );
@@ -205,14 +238,17 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
       <header className="ac-top">
         <Logo />
       </header>
-      <h1>Squishee Book</h1>
+      <h1>{show("Squishee Book")}</h1>
       <p className="ac-lede">
-        {found} of {book.length} found · {child.coins} coins
+        {t(
+          `${found} of ${book.length} found · ${child.coins} coins`,
+          `${found} de ${book.length} encontrados · ${child.coins} monedas`,
+        )}
       </p>
       <SquishTally />
-      <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="ac-shelf-you" label="You" />
-      <h2>Outfit shop</h2>
-      <p className="ac-hint">Spend coins you earn. Never real money.</p>
+      <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="ac-shelf-you" label={show("You")} />
+      <h2>{show("Outfit shop")}</h2>
+      <p className="ac-hint">{show("Spend coins you earn. Never real money.")}</p>
       <div className="ac-shelf">
         <button
           type="button"
@@ -220,7 +256,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
           onClick={() => onSave(mapActive(save, (row) => wearOutfit(row, "")))}
         >
           <SquisheeImg id={child.avatarId} />
-          <small>No outfit</small>
+          <small>{show("No outfit")}</small>
         </button>
         {COSMETICS.map((item) => {
           const have = child.cosmetics.includes(item.id);
@@ -244,7 +280,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
           );
         })}
       </div>
-      <h2>Boss cards</h2>
+      <h2>{show("Boss cards")}</h2>
       <div className="ac-book" data-book="bosses">
         {GAMES.map((game) => {
           const boss = bossForGame(game.id);
@@ -258,24 +294,26 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
               ) : (
                 <p className="ac-hint">???</p>
               )}
-              <h3>{friend ? boss.name : "Boss"}</h3>
-              <p>{friend ? boss.friendly : "Beat this boss to meet them."}</p>
+              <h3>{friend ? boss.name : show("Boss")}</h3>
+              <p>{friend ? boss.friendly : show("Beat this boss to meet them.")}</p>
               {friend ? <p className="ac-trophy" data-trophy={boss.trophyId}>{boss.trophyName}</p> : null}
-              {gold ? <p className="ac-trophy is-gold">Gold Crown</p> : null}
+              {gold ? <p className="ac-trophy is-gold">{show("Gold Crown")}</p> : null}
               {friend ? (
                 <button
                   type="button"
                   className="ac-quiet"
                   onClick={() => onSave(mapActive(save, (row) => wearBossLook(row, wearing ? "" : boss.cosmeticId)))}
                 >
-                  {wearing ? `Take off ${bossCosmeticName(boss.cosmeticId)}` : `Wear ${bossCosmeticName(boss.cosmeticId)}`}
+                  {wearing
+                    ? t(`Take off ${bossCosmeticName(boss.cosmeticId)}`, `Quítale ${bossCosmeticName(boss.cosmeticId)}`)
+                    : t(`Wear ${bossCosmeticName(boss.cosmeticId)}`, `Ponte ${bossCosmeticName(boss.cosmeticId)}`)}
                 </button>
               ) : null}
             </article>
           );
         })}
       </div>
-      <h2>Squishees</h2>
+      <h2>{show("Squishees")}</h2>
       <div className="ac-shelf" data-book="squishees">
         {book.map((entry) => {
           const open = palOwned(child, entry.id);
@@ -288,10 +326,10 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
                 label={open ? entry.name : ""}
               />
               <small>{open ? entry.name : "???"}</small>
-              <small>{entry.rarity === "rare" ? "Rare" : "Common"}</small>
+              <small>{entry.rarity === "rare" ? show("Rare") : show("Common")}</small>
               <small>{open ? entry.line : entry.find}</small>
               {open ? <small>{entry.fact}</small> : null}
-              {open ? <small>Loves {entry.favorite}</small> : null}
+              {open ? <small>{t(`Loves ${entry.favorite}`, `Le encanta ${entry.favorite}`)}</small> : null}
               {open ? (
                 <small className="ac-bond-pips" data-bond={bondTier(bondScore(child.bonds, entry.id))}>
                   {bondHearts(bondTier(bondScore(child.bonds, entry.id))) || bondName(0)}
@@ -320,7 +358,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
           );
         })}
       </div>
-      <BackLink>Back to games</BackLink>
+      <BackLink>{show("Back to games")}</BackLink>
       <FreeNote />
     </div>
   );
@@ -329,13 +367,13 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
 function outfitName(id: CosmeticId): string {
   switch (id) {
     case "party-hat":
-      return "Party hat";
+      return show("Party hat");
     case "scarf":
-      return "Scarf";
+      return show("Scarf");
     case "bow":
-      return "Bow";
+      return show("Bow");
     case "shades":
-      return "Shades";
+      return show("Shades");
     default: {
       const neverId: never = id;
       return neverId;
@@ -349,26 +387,26 @@ export function SheetsScreen() {
       <header className="ac-top">
         <Logo />
       </header>
-      <h1>Free worksheets</h1>
-      <p className="ac-lede">Print a page, or shuffle a new set. No signup.</p>
+      <h1>{show("Free worksheets")}</h1>
+      <p className="ac-lede">{show("Print a page, or shuffle a new set. No signup.")}</p>
       <div className="ac-sheet-list">
         {GAMES.map((game) => (
           <a key={game.id} className="ac-panel ac-sheet-link" href={sheetHref(game.id)}>
             <SquisheeImg id={game.mascot} />
             <span>
-              <strong>{game.title}</strong>
-              <small>Printable + answer key</small>
+              <strong>{show(game.title)}</strong>
+              <small>{show("Printable + answer key")}</small>
             </span>
           </a>
         ))}
         <a className="ac-panel ac-sheet-link" href={`${import.meta.env.BASE_URL}worksheets/`}>
           <span>
-            <strong>All printable worksheets</strong>
-            <small>Times, clocks, coins, and more</small>
+            <strong>{show("All printable worksheets")}</strong>
+            <small>{show("Times, clocks, coins, and more")}</small>
           </span>
         </a>
       </div>
-      <BackLink>Back to games</BackLink>
+      <BackLink>{show("Back to games")}</BackLink>
       <FreeNote />
     </div>
   );

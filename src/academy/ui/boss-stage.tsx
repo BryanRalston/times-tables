@@ -1,17 +1,18 @@
 import { bossPhaseLabel, type BossPhase } from "../boss-battle";
+import { show, t } from "../i18n";
 import type { IslandBoss } from "../bosses";
 import { BossFigure, type BossMood } from "./boss-figure";
 import { SquisheeImg, cx } from "./bits";
 
 export function BossIntro({ boss, crown, onStart }: { boss: IslandBoss; crown: boolean; onStart: () => void }) {
   return (
-    <div className="ac-boss-intro" role="dialog" aria-label={`${boss.name} appears`} data-boss-intro={boss.gameId}>
-      <p className="ac-boss-kicker">{crown ? "Gold Crown rematch" : "Boss battle"}</p>
+    <div className="ac-boss-intro" role="dialog" aria-label={t(`${boss.name} appears`, `${boss.name} aparece`)} data-boss-intro={boss.gameId}>
+      <p className="ac-boss-kicker">{crown ? show("Gold Crown rematch") : show("Boss battle")}</p>
       <BossFigure face={boss.face} look={boss.look} mood="arrive" crown={crown} name={boss.name} size="hero" />
       <p className="ac-boss-banner">{boss.name}</p>
       <p className="ac-boss-taunt">{boss.taunt}</p>
       <button type="button" className="ac-go" onClick={onStart}>
-        Let's play
+        {show("Let's play")}
       </button>
     </div>
   );

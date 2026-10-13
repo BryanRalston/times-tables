@@ -1,3 +1,4 @@
+import { t } from "./i18n";
 import { gameById } from "./games/registry";
 import { bandFor, playWindow } from "./grade-map";
 import { bossForGame } from "./bosses";
@@ -45,11 +46,11 @@ export function phaseForIndex(index: number, total: number): BossPhase {
 export function bossPhaseLabel(phase: BossPhase): string {
   switch (phase) {
     case "rally":
-      return "Boss rally";
+      return t("Boss rally", "Arranque del jefe");
     case "cards":
-      return "Hands-on cards";
+      return t("Hands-on cards", "Tarjetas para mover");
     case "super":
-      return "Super question";
+      return t("Super question", "Pregunta estrella");
     default: {
       const neverPhase: never = phase;
       return neverPhase;

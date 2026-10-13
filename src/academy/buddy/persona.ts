@@ -1,3 +1,6 @@
+import { getLocale } from "../i18n";
+import { PERSONA_ES, PERSONA_FALLBACK_ES } from "../i18n-es";
+
 export type BuddyMove = "hop" | "wiggle" | "spin" | "bounce" | "sway";
 
 export interface Persona {
@@ -121,7 +124,11 @@ const FALLBACK: Persona = person(
 );
 
 export function personaOf(id: string): Persona {
-  return PEOPLE[id] ?? FALLBACK;
+  const base = PEOPLE[id] ?? FALLBACK;
+  if (getLocale() !== "es") return base;
+  const es = PEOPLE[id] ? PERSONA_ES[id] : PERSONA_FALLBACK_ES;
+  if (!es) return base;
+  return { ...base, line: es.line, fact: es.fact, trait: es.trait, streak: es.streak, count: es.count, work: es.work };
 }
 
 export function studyGame(id: string): string | null {
