@@ -1,4 +1,5 @@
 import { squisheeById } from "@/lib/squishees";
+import { show, t } from "../i18n";
 import { catchphrase } from "../buddy/cast";
 import { buddyMove } from "../buddy/persona";
 import { bubbleText, buddyMotion, type BuddyReaction } from "../buddy/react";
@@ -47,10 +48,10 @@ export function HostGreet({ id }: { id: string }) {
 }
 
 export function CoinShare({ buddyId, hostId }: { buddyId: string; hostId: string }) {
-  const buddy = squisheeById(buddyId)?.name ?? "Buddy";
-  const host = squisheeById(hostId)?.name ?? "Friend";
+  const buddy = squisheeById(buddyId)?.name ?? show("Buddy");
+  const host = squisheeById(hostId)?.name ?? show("Friend");
   return (
-    <div className="ac-share" aria-label={`${buddy} and ${host} share the coins`}>
+    <div className="ac-share" aria-label={t(`${buddy} and ${host} share the coins`, `${buddy} y ${host} comparten las monedas`)}>
       <AcademyPal id={buddyId} className="ac-share-pal" label="" />
       <AcademyPal id={hostId} className="ac-share-pal" label="" />
     </div>

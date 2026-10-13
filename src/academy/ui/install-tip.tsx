@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { show } from "../i18n";
 
 interface InstallPrompt extends Event {
   prompt: () => Promise<void>;
@@ -20,12 +21,17 @@ export function InstallTip() {
 
   return (
     <section className="ac-panel ac-install">
-      <h2>Add to Home Screen</h2>
+      <h2>{show("Add to Home Screen")}</h2>
       <p>
-        The first visit saves the games, pictures, and worksheets on this device. After that, they still open on a plane,
-        with the internet off.
+        {show(
+          "The first visit saves the games, pictures, and worksheets on this device. After that, they still open on a plane, with the internet off.",
+        )}
       </p>
-      <p>On an iPhone or iPad, tap Share, then Add to Home Screen. On Android, open the browser menu and tap Install app or Add to Home Screen.</p>
+      <p>
+        {show(
+          "On an iPhone or iPad, tap Share, then Add to Home Screen. On Android, open the browser menu and tap Install app or Add to Home Screen.",
+        )}
+      </p>
       {promptEvent && !installed ? (
         <button
           type="button"
@@ -41,10 +47,10 @@ export function InstallTip() {
               .catch(() => setPromptEvent(null));
           }}
         >
-          Install app
+          {show("Install app")}
         </button>
       ) : null}
-      {installed ? <p className="ac-hint">Installed on this device.</p> : null}
+      {installed ? <p className="ac-hint">{show("Installed on this device.")}</p> : null}
     </section>
   );
 }

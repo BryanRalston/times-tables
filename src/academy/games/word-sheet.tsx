@@ -1,3 +1,4 @@
+import { show } from "../i18n";
 import type { SheetItem } from "./types";
 
 export function WordSheet({ items }: { items: SheetItem[] }) {
@@ -7,7 +8,7 @@ export function WordSheet({ items }: { items: SheetItem[] }) {
   }
   return (
     <>
-      <h2>Word list</h2>
+      <h2>{show("Word list")}</h2>
       <ul className="ac-word-list">
         {bank.map((word) => (
           <li key={word}>{word}</li>

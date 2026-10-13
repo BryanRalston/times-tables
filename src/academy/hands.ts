@@ -1,4 +1,5 @@
 import type { Rng } from "@/lib/rng";
+import { t } from "./i18n";
 import { emptyPile, formatCents, pileCents, type CoinPile } from "./games/money-model";
 import { TIME_MINUTES, isTimeLevel, timeTalk, type TimeLevel } from "./games/time";
 import type { ChoiceQ, CoinKind } from "./games/types";
@@ -130,7 +131,7 @@ export function makeClockTask(level: string, rng: Rng, avoid?: string): ClockTas
     hours,
     minutes,
     snap,
-    speech: `Show ${phrase}. Drag the hands.`,
+    speech: t(`Show ${phrase}. Drag the hands.`, `Muestra ${phrase}. Arrastra las manecillas.`),
     skill: `time:${safe}`,
     factKey: fact,
   };
@@ -179,7 +180,10 @@ export function makePayTask(level: string, rng: Rng, avoid?: string): PayTask {
     kind: "pay",
     cents: pick.cents,
     bank: pick.bank,
-    speech: `Pay ${speakable(formatCents(pick.cents))}. Drag the coins.`,
+    speech: t(
+      `Pay ${speakable(formatCents(pick.cents))}. Drag the coins.`,
+      `Paga ${speakable(formatCents(pick.cents))}. Arrastra las monedas.`,
+    ),
     skill: `money:${level in PAY_PLANS ? level : "count"}`,
     factKey: String(pick.cents),
   };
@@ -196,8 +200,8 @@ export function clockQuestion(task: ClockTask): ChoiceQ {
   return {
     id: `clock-${task.factKey}`,
     game: "time",
-    title: `Show ${timeTalk(task.hours, task.minutes)}`,
-    hint: "Drag the hands",
+    title: t(`Show ${timeTalk(task.hours, task.minutes)}`, `Muestra ${timeTalk(task.hours, task.minutes)}`),
+    hint: t("Drag the hands", "Arrastra las manecillas"),
     praise: timeTalk(task.hours, task.minutes),
     almost: timeTalk(task.hours, task.minutes),
     answer,

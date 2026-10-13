@@ -25,3 +25,18 @@ python3 scripts/render-voice.py
 ```
 
 `src/academy/voice/clips.test.ts` fails if a new prompt, hint, praise line, word, or number cannot be played from clips.
+
+## Spanish
+
+Spanish uses the same Kokoro model and the same line-splitting as English. The voice is `ef_dora` (`lang="es"`), also Apache-2.0. Clips live in `academy/public/voice/es/` and are not part of the English precache. The manifest is a separate chunk (`src/academy/voice/manifest-es.ts`) loaded only when the language is Español, so an English player does not download the Spanish files.
+
+Number clips do not share filenames with English. “7” is `siete` in Spanish and `seven` in English.
+
+`ef_dora` also reads the English words that stay on screen in Phonics, Sight Words, and Spelling. Those games teach English reading, so the target word stays English while the instruction around it is Spanish. See `docs/LANGUAGE.md`.
+
+```bash
+npx vite-node scripts/export-voice-es.ts
+VOICE_JOBS=/tmp/voice-jobs-es.json VOICE_NAME=ef_dora VOICE_LANG=es python3 scripts/render-voice.py
+```
+
+`src/academy/voice/clips-es.test.ts` fails if any Spanish speakable line has no clip. `VOICE_CLEAN=1` only deletes files in folders named by the current job list, so a Spanish render does not remove English clips.

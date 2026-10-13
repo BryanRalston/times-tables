@@ -1,6 +1,7 @@
 import type { Rng } from "@/lib/rng";
+import { t } from "../i18n";
 import type { Grade } from "../model";
-import { buddyName, pickLine } from "./flavor";
+import { buddyName, pickTalk } from "./flavor";
 import type { PhonicsBoard } from "./boards";
 import { sceneQuestion, uniqueChoices } from "./pick";
 import { SceneCard, sceneModule } from "./scene-ui";
@@ -153,18 +154,22 @@ function makeSounds(rng: Rng): ChoiceQ {
     word: target.word,
     emoji: target.emoji,
   };
+  const buddy = buddyName(rng);
   return sceneQuestion(rng, {
     game: "phonics",
-    title: pickLine(rng, [
-      `Which picture starts with ${target.phoneme}?`,
-      `${buddyName(rng)} says ${target.phoneme}. Which picture starts that way?`,
+    title: pickTalk(rng, [
+      [`Which picture starts with ${target.phoneme}?`, `¿Qué dibujo empieza con ${target.phoneme}?`],
+      [`${buddy} says ${target.phoneme}. Which picture starts that way?`, `${buddy} dice ${target.phoneme}. ¿Qué dibujo empieza así?`],
     ]),
-    hint: "Tap the speaker if you want to hear it again",
+    hint: t("Tap the speaker if you want to hear it again", "Toca la bocina si quieres escucharlo otra vez"),
     answer: target.word,
     choices: uniqueChoices(rng, target.word, [], rows.map((row) => row.word)),
     skill: "phonics:sounds",
     tags: ["sounds"],
-    solved: `${target.letter} says ${target.phoneme}, like ${target.word}`,
+    solved: t(
+      `${target.letter} says ${target.phoneme}, like ${target.word}`,
+      `${target.letter} dice ${target.phoneme}, como ${target.word}`,
+    ),
     picture: target.letter,
     hands: true,
     quietChoices: false,
@@ -187,18 +192,19 @@ function makeBegin(rng: Rng): ChoiceQ {
     word: target.word,
     emoji: target.emoji,
   };
+  const buddy = buddyName(rng);
   return sceneQuestion(rng, {
     game: "phonics",
-    title: pickLine(rng, [
-      `Which picture starts with ${target.phoneme}?`,
-      `${buddyName(rng)} says ${target.phoneme}. Which picture is it?`,
+    title: pickTalk(rng, [
+      [`Which picture starts with ${target.phoneme}?`, `¿Qué dibujo empieza con ${target.phoneme}?`],
+      [`${buddy} says ${target.phoneme}. Which picture is it?`, `${buddy} dice ${target.phoneme}. ¿Qué dibujo es?`],
     ]),
-    hint: "Listen for the first sound",
+    hint: t("Listen for the first sound", "Escucha el primer sonido"),
     answer: target.word,
     choices: uniqueChoices(rng, target.word, [], rows.map((row) => row.word)),
     skill: "phonics:begin",
     tags: ["begin"],
-    solved: `${target.word} starts with ${target.phoneme}`,
+    solved: t(`${target.word} starts with ${target.phoneme}`, `${target.word} empieza con ${target.phoneme}`),
     picture: target.emoji,
     hands: true,
     quietChoices: false,
@@ -219,13 +225,13 @@ function makeRhyme(rng: Rng): ChoiceQ {
   const board: PhonicsBoard = { game: "phonics", mode: "rhyme", cue, family: home.family };
   return sceneQuestion(rng, {
     game: "phonics",
-    title: `Which word rhymes with ${cue}?`,
-    hint: "The ending sounds the same",
+    title: t(`Which word rhymes with ${cue}?`, `¿Qué palabra rima con ${cue}?`),
+    hint: t("The ending sounds the same", "El final suena igual"),
     answer,
     choices: uniqueChoices(rng, answer, [], [answer, ...distractors]),
     skill: "phonics:rhyme",
     tags: ["rhyme"],
-    solved: `${answer} rhymes with ${cue}`,
+    solved: t(`${answer} rhymes with ${cue}`, `${answer} rima con ${cue}`),
     picture: cue,
     hands: false,
     quietChoices: false,
@@ -249,15 +255,19 @@ function makeCvc(rng: Rng): ChoiceQ {
   const blend = blendOf(word);
   const letters = word.toUpperCase().split("").join(" ");
   const board: PhonicsBoard = { game: "phonics", mode: "cvc", word, blend, letters };
+  const buddy = buddyName(rng);
   return sceneQuestion(rng, {
     game: "phonics",
-    title: pickLine(rng, ["Which word do these sounds make?", `${buddyName(rng)} says the sounds. Which word is it?`]),
-    hint: "Say each sound, then put them together",
+    title: pickTalk(rng, [
+      ["Which word do these sounds make?", "¿Qué palabra forman estos sonidos?"],
+      [`${buddy} says the sounds. Which word is it?`, `${buddy} dice los sonidos. ¿Qué palabra es?`],
+    ]),
+    hint: t("Say each sound, then put them together", "Di cada sonido y luego júntalos"),
     answer: word,
     choices: uniqueChoices(rng, word, pool),
     skill: "phonics:cvc",
     tags: ["cvc"],
-    solved: `${blend} makes ${word}`,
+    solved: t(`${blend} makes ${word}`, `${blend} forma ${word}`),
     picture: letters,
     hands: false,
     quietChoices: true,
@@ -277,13 +287,13 @@ function makeEnd(rng: Rng): ChoiceQ {
   const board: PhonicsBoard = { game: "phonics", mode: "end", letter, phoneme, word };
   return sceneQuestion(rng, {
     game: "phonics",
-    title: `Which sound ends ${word}?`,
-    hint: "Listen to the last sound",
+    title: t(`Which sound ends ${word}?`, `¿Con qué sonido termina ${word}?`),
+    hint: t("Listen to the last sound", "Escucha el último sonido"),
     answer: letter,
     choices: uniqueChoices(rng, letter, [], [letter, ...others.slice(0, 3)]),
     skill: "phonics:end",
     tags: ["end"],
-    solved: `${word} ends with ${phoneme}`,
+    solved: t(`${word} ends with ${phoneme}`, `${word} termina con ${phoneme}`),
     picture: word,
     hands: false,
     quietChoices: false,
@@ -321,7 +331,10 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const target = rows[0]!;
       const words = rows.map((row) => row.word).join(", ");
       return {
-        prompt: `Which word starts with the ${target.phoneme} sound: ${words}?`,
+        prompt: t(
+          `Which word starts with the ${target.phoneme} sound: ${words}?`,
+          `¿Qué palabra empieza con el sonido ${target.phoneme}: ${words}?`,
+        ),
         answer: target.word,
       };
     }
@@ -332,15 +345,21 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const others = RHYME_FAMILIES.filter((row) => row.family !== home.family)
         .slice(0, 3)
         .map((row) => row.words[0]!);
-      return { prompt: `Which word rhymes with ${cue}: ${[answer, ...others].join(", ")}?`, answer };
+      return {
+        prompt: t(
+          `Which word rhymes with ${cue}: ${[answer, ...others].join(", ")}?`,
+          `¿Qué palabra rima con ${cue}: ${[answer, ...others].join(", ")}?`,
+        ),
+        answer,
+      };
     }
     case "cvc": {
       const word = rng.pick(CVC_WORDS);
-      return { prompt: `Blend ${word.split("").join("-")}.`, answer: word };
+      return { prompt: t(`Blend ${word.split("").join("-")}.`, `Une los sonidos de ${word.split("").join("-")}.`), answer: word };
     }
     case "end": {
       const word = rng.pick(CVC_WORDS);
-      return { prompt: `What letter sound ends ${word}?`, answer: word[2] ?? "" };
+      return { prompt: t(`What letter sound ends ${word}?`, `¿Qué sonido de letra termina ${word}?`), answer: word[2] ?? "" };
     }
     default: {
       const neverLevel: never = safe;
@@ -373,14 +392,20 @@ function PhonicsArt({ board }: { board: PhonicsBoard }) {
       return (
         <>
           <p className="ac-letter">{board.letter}</p>
-          <SpeakerBar text={board.phoneme} fallback={board.phoneme} caption="The sound" large={false} label="Hear the sound" />
+          <SpeakerBar text={board.phoneme} fallback={board.phoneme} caption={t("The sound", "El sonido")} large={false} label={t("Hear the sound", "Escucha el sonido")} />
         </>
       );
     case "begin":
       return (
         <>
           <p className="ac-letter">{board.phoneme}</p>
-          <SpeakerBar text={board.phoneme} fallback={board.phoneme} caption="Listen for this sound" large={false} label="Hear the sound" />
+          <SpeakerBar
+            text={board.phoneme}
+            fallback={board.phoneme}
+            caption={t("Listen for this sound", "Escucha este sonido")}
+            large={false}
+            label={t("Hear the sound", "Escucha el sonido")}
+          />
         </>
       );
     case "rhyme":
@@ -389,14 +414,20 @@ function PhonicsArt({ board }: { board: PhonicsBoard }) {
       return (
         <>
           <p className="ac-letter">{board.letters}</p>
-          <SpeakerBar text={board.blend} fallback={board.blend} caption="Blend the sounds" large={false} label="Hear the sounds" />
+          <SpeakerBar
+            text={board.blend}
+            fallback={board.blend}
+            caption={t("Blend the sounds", "Une los sonidos")}
+            large={false}
+            label={t("Hear the sounds", "Escucha los sonidos")}
+          />
         </>
       );
     case "end":
       return (
         <>
           <p className="ac-letter">{board.word}</p>
-          <SpeakerBar text={board.word} fallback={board.word} caption="The word" large label="Hear the word" />
+          <SpeakerBar text={board.word} fallback={board.word} caption={t("The word", "La palabra")} large label={t("Hear the word", "Escucha la palabra")} />
         </>
       );
     default: {

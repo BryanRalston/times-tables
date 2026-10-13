@@ -1,3 +1,4 @@
+import { show } from "../i18n";
 import type { Child } from "../model";
 import { STUDY_PALS } from "./persona";
 
@@ -19,13 +20,13 @@ export function bondTier(score: number): 0 | 1 | 2 | 3 {
 export function bondName(tier: 0 | 1 | 2 | 3): string {
   switch (tier) {
     case 0:
-      return "New pal";
+      return show("New pal");
     case 1:
-      return "Practice pal";
+      return show("Practice pal");
     case 2:
-      return "Good friend";
+      return show("Good friend");
     case 3:
-      return "Best buddy";
+      return show("Best buddy");
     default: {
       const neverTier: never = tier;
       return neverTier;

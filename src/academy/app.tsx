@@ -3,6 +3,7 @@ import { gameForScreen, isGameId, type GameId } from "./games/registry";
 import { todayIso, type RoundResult, type Save } from "./model";
 import { openEgg } from "./buddy/unlock";
 import { acknowledgeUnlocks, applyRound, claimDailyGift } from "./rewards";
+import { setLocale, show } from "./i18n";
 import { activeChild, loadSave, mapActive, withLevel, writeSave } from "./storage";
 import { warmVoices } from "./voice";
 import { HelloScreen, SettingsScreen, SheetsScreen, ShelfScreen } from "./ui/extra";
@@ -62,6 +63,7 @@ export function AcademyRoot() {
 function AcademyApp() {
   const [save, setSave] = useState<Save>(() => loadSave());
   const route = useRoute();
+  setLocale(save.lang);
 
   useEffect(() => {
     writeSave(save);
@@ -74,15 +76,15 @@ function AcademyApp() {
   useEffect(() => {
     const titles: Record<Route["name"], string> = {
       home: "Squishee Academy",
-      play: "Play · Squishee Academy",
-      grownups: "Grown-ups · Squishee Academy",
-      settings: "Settings · Squishee Academy",
-      shelf: "Squishees · Squishee Academy",
-      sheets: "Free worksheets · Squishee Academy",
-      map: "Island · Squishee Academy",
+      play: `${show("Play")} · Squishee Academy`,
+      grownups: `${show("Grown-ups")} · Squishee Academy`,
+      settings: `${show("Settings")} · Squishee Academy`,
+      shelf: `${show("Squishees")} · Squishee Academy`,
+      sheets: `${show("Free worksheets")} · Squishee Academy`,
+      map: `${show("Island")} · Squishee Academy`,
     };
     document.title = titles[route.name];
-  }, [route]);
+  }, [route, save.lang]);
 
   const child = activeChild(save);
 

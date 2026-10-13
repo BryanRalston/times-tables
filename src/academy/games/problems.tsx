@@ -1,5 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import { STORY_STARS, type StoryStar } from "../buddy/persona";
+import { howManyPhrase, starLead, t, thingName } from "../i18n";
 import type { Grade } from "../model";
 import { countName, type ProblemBoard } from "./boards";
 import { nearChoices, sceneQuestion, uniqueChoices } from "./pick";
@@ -78,25 +79,83 @@ function starOf(rng: Rng): StoryStar {
 function storyTitle(rng: Rng, level: Exclude<ProblemLevel, "picture">, star: StoryStar, a: number, b: number, thing: string): string {
   const items = countName(thing, a);
   const each = countName(thing, b);
+  const esItems = thingName(thing, a, items);
+  const esEach = thingName(thing, b, each);
+  const esMany = howManyPhrase(thing, 2, thing);
+  const lead = starLead(star.name, star.trait);
+  const bags = countName("bags", a);
+  const esBags = thingName("bags", a, bags);
   const roll = rng.int(0, 2);
   if (level === "add") {
-    if (roll === 0) return `${star.name} the ${star.trait} has ${a} ${items}. ${star.pal} brings ${b} more. How many ${thing} now?`;
-    if (roll === 1) return `${star.name} finds ${a} ${items} and ${star.pal} finds ${b}. How many ${thing} in all?`;
-    return `There are ${a} ${items} with ${star.name} and ${b} with ${star.pal}. How many ${thing} altogether?`;
+    if (roll === 0) {
+      return t(
+        `${star.name} the ${star.trait} has ${a} ${items}. ${star.pal} brings ${b} more. How many ${thing} now?`,
+        `${lead} tiene ${a} ${esItems}. ${star.pal} trae ${b} más. ¿${esMany} hay ahora?`,
+      );
+    }
+    if (roll === 1) {
+      return t(
+        `${star.name} finds ${a} ${items} and ${star.pal} finds ${b}. How many ${thing} in all?`,
+        `${star.name} encuentra ${a} ${esItems} y ${star.pal} encuentra ${b}. ¿${esMany} hay en total?`,
+      );
+    }
+    return t(
+      `There are ${a} ${items} with ${star.name} and ${b} with ${star.pal}. How many ${thing} altogether?`,
+      `Hay ${a} ${esItems} con ${star.name} y ${b} con ${star.pal}. ¿${esMany} hay en total?`,
+    );
   }
   if (level === "sub") {
-    if (roll === 0) return `${star.name} has ${a} ${items} and gives ${b} to ${star.pal}. How many ${thing} are left?`;
-    if (roll === 1) return `${star.name} the ${star.trait} sees ${a} ${items}. ${b} go to ${star.pal}. How many ${thing} are left?`;
-    return `${star.name} starts with ${a} ${items} and shares ${b} with ${star.pal}. How many ${thing} are left?`;
+    if (roll === 0) {
+      return t(
+        `${star.name} has ${a} ${items} and gives ${b} to ${star.pal}. How many ${thing} are left?`,
+        `${star.name} tiene ${a} ${esItems} y le da ${b} a ${star.pal}. ¿${esMany} quedan?`,
+      );
+    }
+    if (roll === 1) {
+      return t(
+        `${star.name} the ${star.trait} sees ${a} ${items}. ${b} go to ${star.pal}. How many ${thing} are left?`,
+        `${lead} ve ${a} ${esItems}. ${b} se van con ${star.pal}. ¿${esMany} quedan?`,
+      );
+    }
+    return t(
+      `${star.name} starts with ${a} ${items} and shares ${b} with ${star.pal}. How many ${thing} are left?`,
+      `${star.name} empieza con ${a} ${esItems} y comparte ${b} con ${star.pal}. ¿${esMany} quedan?`,
+    );
   }
   if (level === "mult") {
-    if (roll === 0) return `${star.name} has ${a} ${countName("bags", a)} with ${b} ${each} in each bag. How many ${thing}?`;
-    if (roll === 1) return `${star.name} the ${star.trait} makes ${a} rows of ${b} ${each}. How many ${thing}?`;
-    return `${star.pal} sets out ${a} groups of ${b} ${each} for ${star.name}. How many ${thing}?`;
+    if (roll === 0) {
+      return t(
+        `${star.name} has ${a} ${bags} with ${b} ${each} in each bag. How many ${thing}?`,
+        `${star.name} tiene ${a} ${esBags} con ${b} ${esEach} en cada bolsa. ¿${esMany} hay?`,
+      );
+    }
+    if (roll === 1) {
+      return t(
+        `${star.name} the ${star.trait} makes ${a} rows of ${b} ${each}. How many ${thing}?`,
+        `${lead} hace ${a} filas de ${b} ${esEach}. ¿${esMany} hay?`,
+      );
+    }
+    return t(
+      `${star.pal} sets out ${a} groups of ${b} ${each} for ${star.name}. How many ${thing}?`,
+      `${star.pal} pone ${a} grupos de ${b} ${esEach} para ${star.name}. ¿${esMany} hay?`,
+    );
   }
-  if (roll === 0) return `${star.name} has ${a} ${items} shared into ${b} equal groups. How many ${thing} are in each group?`;
-  if (roll === 1) return `${star.name} the ${star.trait} shares ${a} ${items} with ${b} friends. How many ${thing} does each friend get?`;
-  return `${star.pal} and ${star.name} split ${a} ${items} into ${b} equal piles. How many ${thing} in each pile?`;
+  if (roll === 0) {
+    return t(
+      `${star.name} has ${a} ${items} shared into ${b} equal groups. How many ${thing} are in each group?`,
+      `${star.name} pone ${a} ${esItems} en ${b} grupos iguales. ¿${esMany} hay en cada grupo?`,
+    );
+  }
+  if (roll === 1) {
+    return t(
+      `${star.name} the ${star.trait} shares ${a} ${items} with ${b} friends. How many ${thing} does each friend get?`,
+      `${lead} comparte ${a} ${esItems} con ${b} amigos. ¿${esMany} recibe cada amigo?`,
+    );
+  }
+  return t(
+    `${star.pal} and ${star.name} split ${a} ${items} into ${b} equal piles. How many ${thing} in each pile?`,
+    `${star.pal} y ${star.name} parten ${a} ${esItems} en ${b} montones iguales. ¿${esMany} hay en cada montón?`,
+  );
 }
 
 function makeStory(rng: Rng, level: Exclude<ProblemLevel, "picture">): ChoiceQ {
@@ -130,7 +189,7 @@ function makeStory(rng: Rng, level: Exclude<ProblemLevel, "picture">): ChoiceQ {
   return sceneQuestion(rng, {
     game: "problems",
     title,
-    hint: "Use the picture, then pick the number",
+    hint: t("Use the picture, then pick the number", "Mira el dibujo y elige el número"),
     answer: String(answer),
     choices: nearChoices(rng, answer, 0, hi),
     skill: `problems:${level}`,
@@ -200,14 +259,20 @@ function makePicture(rng: Rng): ChoiceQ {
     game: "problems",
     title:
       rng.next() < 0.5
-        ? `${star.name} the ${star.trait} needs ${groups} groups of ${size} ${countName(thing.name, size)}. Which picture shows that?`
-        : `${star.name} draws ${groups} groups of ${size} ${countName(thing.name, size)} for ${star.pal}. Which picture matches?`,
-    hint: "Count the groups and how many are in each group",
+        ? t(
+            `${star.name} the ${star.trait} needs ${groups} groups of ${size} ${countName(thing.name, size)}. Which picture shows that?`,
+            `${starLead(star.name, star.trait)} necesita ${groups} grupos de ${size} ${thingName(thing.name, size, countName(thing.name, size))}. ¿Qué dibujo lo muestra?`,
+          )
+        : t(
+            `${star.name} draws ${groups} groups of ${size} ${countName(thing.name, size)} for ${star.pal}. Which picture matches?`,
+            `${star.name} dibuja ${groups} grupos de ${size} ${thingName(thing.name, size, countName(thing.name, size))} para ${star.pal}. ¿Qué dibujo es igual?`,
+          ),
+    hint: t("Count the groups and how many are in each group", "Cuenta los grupos y cuántos hay en cada uno"),
     answer: "p0",
     choices: uniqueChoices(rng, "p0", [], ids),
     skill: "problems:picture",
     tags: ["picture"],
-    solved: `${groups} groups of ${size}`,
+    solved: t(`${groups} groups of ${size}`, `${groups} grupos de ${size}`),
     picture: groupPicture(thing.emoji, groups, size),
     hands: true,
     quietChoices: false,
@@ -244,7 +309,10 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const a = rng.int(1, 9);
       const b = rng.int(1, 10 - a);
       return {
-        prompt: `Peach has ${a} ${countName("apples", a)}. Frog brings ${b} more. How many apples?`,
+        prompt: t(
+          `Peach has ${a} ${countName("apples", a)}. Frog brings ${b} more. How many apples?`,
+          `Peach tiene ${a} ${thingName("apples", a, countName("apples", a))}. Frog trae ${b} más. ¿Cuántas manzanas hay?`,
+        ),
         answer: String(a + b),
       };
     }
@@ -252,7 +320,10 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const a = rng.int(1, 12);
       const b = rng.int(1, a);
       return {
-        prompt: `Bear has ${a} fish and gives ${b} to Panda. How many fish are left?`,
+        prompt: t(
+          `Bear has ${a} fish and gives ${b} to Panda. How many fish are left?`,
+          `Bear tiene ${a} ${a === 1 ? "pez" : "peces"} y le da ${b} a Panda. ¿Cuántos peces quedan?`,
+        ),
         answer: String(a - b),
       };
     }
@@ -260,7 +331,10 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const a = rng.int(1, 5);
       const b = rng.int(1, 5);
       return {
-        prompt: `Panda has ${a} bags with ${b} stars in each bag. How many stars?`,
+        prompt: t(
+          `Panda has ${a} bags with ${b} stars in each bag. How many stars?`,
+          `Panda tiene ${a} ${thingName("bags", a, countName("bags", a))} con ${b} ${thingName("stars", b, countName("stars", b))} en cada bolsa. ¿Cuántas estrellas hay?`,
+        ),
         answer: String(a * b),
       };
     }
@@ -268,7 +342,10 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const b = rng.int(2, 5);
       const q = rng.int(1, 5);
       return {
-        prompt: `Fox has ${b * q} cookies shared with ${b} friends. How many cookies does each friend get?`,
+        prompt: t(
+          `Fox has ${b * q} cookies shared with ${b} friends. How many cookies does each friend get?`,
+          `Fox tiene ${b * q} galletas para ${b} amigos. ¿Cuántas galletas recibe cada amigo?`,
+        ),
         answer: String(q),
       };
     }
@@ -276,7 +353,10 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const groups = rng.int(2, 4);
       const size = rng.int(1, 4);
       return {
-        prompt: `Bunny draws ${groups} groups of ${size} frogs. How many frogs?`,
+        prompt: t(
+          `Bunny draws ${groups} groups of ${size} frogs. How many frogs?`,
+          `Bunny dibuja ${groups} grupos de ${size} ranas. ¿Cuántas ranas hay?`,
+        ),
         answer: String(groups * size),
       };
     }
@@ -313,7 +393,7 @@ function ProblemArt({ board }: { board: ProblemBoard }) {
     case "div":
       return <StoryGroups op={board.op} a={board.a} b={board.b} emoji={board.emoji} />;
     case "picture":
-      return <p className="ac-big-num">?</p>;
+      return <p className="ac-big-num">{t("?", "?")}</p>;
     default: {
       const neverMode: never = board.mode;
       return neverMode;

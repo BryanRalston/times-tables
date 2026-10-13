@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { show } from "../i18n";
 import type { ShapeName } from "../games/boards";
 import { ShapeFig } from "../games/scene-ui";
 import type { MeasureTask, ShapeTask, StoryTask } from "../hands-build";
@@ -94,7 +95,7 @@ export function MeasureBoard({ task, onAnswer }: { task: MeasureTask; onAnswer: 
       kind="measure"
       fact={task.factKey}
       caption={task.speech}
-      total={task.mode === "compare" ? (placed == null ? "Choose one" : `${placed}`) : String(count)}
+      total={task.mode === "compare" ? (placed == null ? show("Choose one") : `${placed}`) : String(count)}
       onDone={() => onAnswer(measureMatches(task, task.mode === "compare" ? (placed ?? -1) : count))}
     >
       {task.mode === "ruler" ? <div className="ac-ribbon" style={{ width: task.target * 32 }} aria-hidden="true" /> : null}
@@ -104,19 +105,19 @@ export function MeasureBoard({ task, onAnswer }: { task: MeasureTask; onAnswer: 
           <Units n={task.bars[1] ?? 0} emoji={emoji || "●"} />
         </div>
       ) : null}
-      <div ref={trayRef} className="ac-tray" aria-label="Your measure">
+      <div ref={trayRef} className="ac-tray" aria-label={show("Your measure")}>
         {task.mode === "compare" ? (
           placed == null ? (
-            <span className="ac-tray-empty">Drag one here</span>
+            <span className="ac-tray-empty">{show("Drag one here")}</span>
           ) : (
-            <button type="button" className="ac-measure-drag is-in ac-placed" aria-label="Put back" onClick={() => setPlaced(null)}>
+            <button type="button" className="ac-measure-drag is-in ac-placed" aria-label={show("Put back")} onClick={() => setPlaced(null)}>
               <Units n={placed} />
             </button>
           )
         ) : count === 0 ? (
-          <span className="ac-tray-empty">{task.mode === "ruler" ? "Drag the inches" : "Drag them here"}</span>
+          <span className="ac-tray-empty">{task.mode === "ruler" ? show("Drag the inches") : show("Drag them here")}</span>
         ) : (
-          <button type="button" className="ac-placed" aria-label="Remove one" onClick={() => setPlaced((n) => Math.max(0, (n ?? 0) - 1))}>
+          <button type="button" className="ac-placed" aria-label={show("Remove one")} onClick={() => setPlaced((n) => Math.max(0, (n ?? 0) - 1))}>
             <Units n={count} emoji={task.mode === "graph" ? emoji || "▮" : emoji || undefined} />
           </button>
         )}
@@ -137,7 +138,7 @@ export function MeasureBoard({ task, onAnswer }: { task: MeasureTask; onAnswer: 
             </button>
           ))
         ) : (
-          <button type="button" className="ac-block-drag" data-piece="unit" aria-label={task.mode === "ruler" ? "Drag an inch" : "Drag one"} {...pointerProps("unit")}>
+          <button type="button" className="ac-block-drag" data-piece="unit" aria-label={task.mode === "ruler" ? show("Drag an inch") : show("Drag one")} {...pointerProps("unit")}>
             <Units n={1} emoji={emoji || (task.mode === "graph" ? "▮" : undefined)} />
           </button>
         )}
@@ -170,10 +171,10 @@ export function ShapeBoard({ task, onAnswer }: { task: ShapeTask; onAnswer: (ok:
             </span>
           </button>
         ) : (
-          <span className="ac-tray-empty">Drag the shape</span>
+          <span className="ac-tray-empty">{show("Drag the shape")}</span>
         )}
       </div>
-      <div className="ac-bank" aria-label="Shapes">
+      <div className="ac-bank" aria-label={show("Shapes")}>
         {task.options
           .filter((name) => name !== placed)
           .map((name) => (
@@ -228,12 +229,12 @@ function JoinStory({ task, onAnswer }: { task: StoryTask; onAnswer: (ok: boolean
       caption={task.speech}
       onDone={() => onAnswer(storyMatches(task, { groups, away: 0, bins: [] }))}
     >
-      <div ref={trayRef} className="ac-tray ac-scene" aria-label="In the story">
-        {placed.length === 0 ? <span className="ac-tray-empty">Drag the groups</span> : null}
+      <div ref={trayRef} className="ac-tray ac-scene" aria-label={show("In the story")}>
+        {placed.length === 0 ? <span className="ac-tray-empty">{show("Drag the groups")}</span> : null}
         {placed.map((id) => {
           const size = task.pieces.find((piece) => piece.id === id)?.size ?? 0;
           return (
-            <button key={id} type="button" className="ac-group-chip is-in ac-placed" aria-label="Take the group out" onClick={() => setPlaced((current) => current.filter((item) => item !== id))}>
+            <button key={id} type="button" className="ac-group-chip is-in ac-placed" aria-label={show("Take the group out")} onClick={() => setPlaced((current) => current.filter((item) => item !== id))}>
               <Faces n={size} who={id === "g2" ? "host" : "buddy"} />
             </button>
           );
@@ -270,14 +271,14 @@ function GroupStory({ task, onAnswer }: { task: StoryTask; onAnswer: (ok: boolea
       caption={task.speech}
       onDone={() => onAnswer(storyMatches(task, { groups, away: 0, bins: [] }))}
     >
-      <div ref={trayRef} className="ac-tray ac-scene" aria-label="In the story">
-        {groups.length === 0 ? <span className="ac-tray-empty">Drag the groups</span> : null}
+      <div ref={trayRef} className="ac-tray ac-scene" aria-label={show("In the story")}>
+        {groups.length === 0 ? <span className="ac-tray-empty">{show("Drag the groups")}</span> : null}
         {groups.map((size, index) => (
           <button
             key={`${size}-${index}`}
             type="button"
             className="ac-group-chip is-in ac-placed"
-            aria-label="Take the group out"
+            aria-label={show("Take the group out")}
             onClick={() => setGroups((current) => current.filter((_, i) => i !== index))}
           >
             <Faces n={size} who="buddy" />
@@ -316,22 +317,22 @@ function TakeStory({ task, onAnswer }: { task: StoryTask; onAnswer: (ok: boolean
       total={`${left} left`}
       onDone={() => onAnswer(storyMatches(task, { groups: [], away, bins: [] }))}
     >
-      <div className="ac-scene ac-face-row" aria-label="Still in the story">
+      <div className="ac-scene ac-face-row" aria-label={show("Still in the story")}>
         {Array.from({ length: left }, (_, i) => (
           <span key={i} className="ac-face-slot">
             <CastFace />
           </span>
         ))}
         {left > 0 ? (
-          <button type="button" className="ac-coin-drag" data-piece="counter" aria-label="Drag one out" {...pointerProps("out")}>
+          <button type="button" className="ac-coin-drag" data-piece="counter" aria-label={show("Drag one out")} {...pointerProps("out")}>
             <CastFace />
           </button>
         ) : null}
       </div>
-      <div ref={awayRef} className="ac-tray" aria-label="Given away">
-        {away === 0 ? <span className="ac-tray-empty">Drag them out</span> : null}
+      <div ref={awayRef} className="ac-tray" aria-label={show("Given away")}>
+        {away === 0 ? <span className="ac-tray-empty">{show("Drag them out")}</span> : null}
         {Array.from({ length: away }, (_, i) => (
-          <button key={i} type="button" className="ac-coin-drag is-in ac-placed" aria-label="Put back" onClick={() => setAway((n) => Math.max(0, n - 1))}>
+          <button key={i} type="button" className="ac-coin-drag is-in ac-placed" aria-label={show("Put back")} onClick={() => setAway((n) => Math.max(0, n - 1))}>
             <CastFace who="host" />
           </button>
         ))}
@@ -373,7 +374,7 @@ function ShareStory({ task, onAnswer }: { task: StoryTask; onAnswer: (ok: boolea
       caption={task.speech}
       onDone={() => onAnswer(storyMatches(task, { groups: [], away: 0, bins }))}
     >
-      <div className="ac-share" aria-label="Equal groups">
+      <div className="ac-share" aria-label={show("Equal groups")}>
         {bins.map((row, index) => (
           <div
             key={index}
@@ -389,7 +390,7 @@ function ShareStory({ task, onAnswer }: { task: StoryTask; onAnswer: (ok: boolea
                 key={token}
                 type="button"
                 className="ac-coin-drag is-in ac-placed"
-                aria-label="Take back"
+                aria-label={show("Take back")}
                 onClick={() => setBins((current) => current.map((bin) => bin.filter((item) => item !== token)))}
               >
                 <CastFace />
@@ -400,7 +401,7 @@ function ShareStory({ task, onAnswer }: { task: StoryTask; onAnswer: (ok: boolea
       </div>
       <div className="ac-bank">
         {bank.map((token) => (
-          <button key={token} type="button" className="ac-coin-drag" data-piece="counter" aria-label="Drag into a group" {...pointerProps(String(token))}>
+          <button key={token} type="button" className="ac-coin-drag" data-piece="counter" aria-label={show("Drag into a group")} {...pointerProps(String(token))}>
             <CastFace />
           </button>
         ))}

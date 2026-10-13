@@ -21,6 +21,7 @@ import { bossForGame } from "../bosses";
 import { playWindow } from "../grade-map";
 import { gameById, pillLabel } from "../games/registry";
 import { makeHandsTask } from "../hands-build";
+import { show, t, yourTurnLine } from "../i18n";
 import { bossReady, bossWon } from "../journey";
 import {
   autoSpeakGrade,
@@ -125,9 +126,9 @@ function praiseLine(slot: RoundSlot): string {
     case "choice":
       return slot.question.praise;
     case "clock":
-      return "Yes! The hands show it.";
+      return t("Yes! The hands show it.", "¡Sí! Las manecillas lo muestran.");
     case "pay":
-      return "Yes! That pays the price.";
+      return t("Yes! That pays the price.", "¡Sí! Así se paga.");
     default:
       return slot.praise;
   }
@@ -543,7 +544,7 @@ export function PlayScreen({
       ? example.speech
       : slot
         ? phase === "practice"
-          ? `Your turn. ${speechFor(slot)}`
+          ? yourTurnLine(speechFor(slot))
           : speechFor(slot)
         : "";
   const total = boss ? questions.length || BOSS_LENGTH : ROUND_LENGTH;
@@ -670,15 +671,20 @@ export function PlayScreen({
     return (
       <div className="ac-shell">
         <header className="ac-play-top">
-          <button type="button" className="ac-x" onClick={onExit} aria-label="Close">
+          <button type="button" className="ac-x" onClick={onExit} aria-label={show("Close")}>
             ×
           </button>
         </header>
         <section className="ac-done">
-          <h1>{spec?.title ?? "This game"} is coming later</h1>
-          <p className="ac-hint">This grade plays other games first. A grown-up can turn on challenge ahead in settings.</p>
+          <h1>
+            {t(
+              `${show(spec?.title ?? "This game")} is coming later`,
+              `${show(spec?.title ?? "This game")} llega más adelante`,
+            )}
+          </h1>
+          <p className="ac-hint">{show("This grade plays other games first. A grown-up can turn on challenge ahead in settings.")}</p>
           <button type="button" className="ac-go" onClick={onExit}>
-            Home
+            {show("Home")}
           </button>
         </section>
       </div>
@@ -692,20 +698,20 @@ export function PlayScreen({
   return (
     <div className={cx("ac-shell", spec?.layout === "wide" && "ac-wide", boss && "is-boss", crownFight && "is-crown")} data-phase={phase}>
       <header className="ac-play-top">
-        <button type="button" className="ac-x" onClick={close} aria-label="Close">
+        <button type="button" className="ac-x" onClick={close} aria-label={show("Close")}>
           ×
         </button>
         <button
           type="button"
           className={cx("ac-mute", !sound && "is-off")}
           aria-pressed={!sound}
-          aria-label={sound ? "Mute sounds" : "Turn sounds on"}
+          aria-label={sound ? show("Mute sounds") : show("Turn sounds on")}
           onClick={onToggleSound}
         >
           <SpeakerIcon muted={!sound} />
         </button>
         {boss && !bossIsTimed(child.grade) ? (
-          <span className="ac-take-time">Take your time</span>
+          <span className="ac-take-time">{show("Take your time")}</span>
         ) : canSpeed ? (
           <button
             type="button"
@@ -718,7 +724,7 @@ export function PlayScreen({
               });
             }}
           >
-            Speed
+            {show("Speed")}
           </button>
         ) : (
           <span className="ac-speed-gap" />
@@ -731,7 +737,7 @@ export function PlayScreen({
               aria-valuemin={0}
               aria-valuemax={ROUND_SECONDS}
               aria-valuenow={left}
-              aria-label="Time left"
+              aria-label={show("Time left")}
             >
               <span style={{ width: `${(left / ROUND_SECONDS) * 100}%` }} />
             </div>
@@ -751,22 +757,22 @@ export function PlayScreen({
           <h1>
             {bossWonRound
               ? crownFight
-                ? "Gold Crown!"
-                : "Boss beaten!"
+                ? show("Gold Crown!")
+                : show("Boss beaten!")
               : boss
-                ? "Nice try!"
+                ? show("Nice try!")
                 : correct >= total
-                  ? "Perfect round!"
+                  ? show("Perfect round!")
                   : liveStars === 3
-                    ? "So close!"
+                    ? show("So close!")
                     : liveStars === 2
-                      ? "Nice work!"
-                      : "You stuck with it!"}
+                      ? show("Nice work!")
+                      : show("You stuck with it!")}
           </h1>
           <Stars value={liveStars} className="ac-stars-big" />
           <p>
-            {correct} of {total} · {liveStars} {liveStars === 1 ? "star" : "stars"} · +
-            {coinsForRound(correct, total, bestCombo, boss)} coins
+            {correct} {show("of")} {total} · {liveStars} {liveStars === 1 ? show("star") : show("stars")} · +
+            {coinsForRound(correct, total, bestCombo, boss)} {show("coins")}
           </p>
           {bossWonRound ? (
             <div className="ac-boss-win" data-boss-win={game}>
@@ -774,24 +780,34 @@ export function PlayScreen({
               <p className="ac-trophy" data-trophy={bossDef.trophyId}>
                 {bossDef.trophyName}
               </p>
-              <p data-cosmetic={bossDef.cosmeticId}>{bossDef.cosmeticName} unlocked.</p>
-              <p>{bossDef.name} joined your Squishee Book.</p>
-              {host ? <p data-befriend={host.id}>{host.name} is your friend too.</p> : null}
+              <p data-cosmetic={bossDef.cosmeticId}>
+                {bossDef.cosmeticName} {show("unlocked.")}
+              </p>
+              <p>
+                {bossDef.name} {show("joined your Squishee Book.")}
+              </p>
+              {host ? (
+                <p data-befriend={host.id}>
+                  {host.name} {show("is your friend too.")}
+                </p>
+              ) : null}
               <a className="ac-quiet ac-quiet-link" href="#/shelf">
-                Boss card
+                {show("Boss card")}
               </a>
             </div>
           ) : boss ? (
-            <p className="ac-hint">The boss is still there. You can try again.</p>
+            <p className="ac-hint">{show("The boss is still there. You can try again.")}</p>
           ) : null}
           <RoundBuddy id={child.avatarId} cosmetic={child.equipped} reaction={buddyCue} />
           <p className="ac-bond" data-bond={palBond}>
-            {squisheeById(child.avatarId)?.name ?? "Buddy"} · {bondName(palBond)}
+            {squisheeById(child.avatarId)?.name ?? show("Buddy")} · {bondName(palBond)}
           </p>
           {friend && !met ? (
             <div className="ac-unlock">
-              <p>New friend!</p>
-              <h2>{friend.name} hopped in</h2>
+              <p>{show("New friend!")}</p>
+              <h2>
+                {friend.name} {show("hopped in")}
+              </h2>
               <button
                 type="button"
                 className="ac-go"
@@ -800,24 +816,24 @@ export function PlayScreen({
                   onAck();
                 }}
               >
-                Meet {friend.name}
+                {show("Meet")} {friend.name}
               </button>
             </div>
           ) : null}
           <div className="ac-done-actions">
             <button type="button" className="ac-go" onClick={() => restart()}>
-              {boss && !bossWonRound ? "Try the boss" : "Play again"}
+              {boss && !bossWonRound ? show("Try the boss") : show("Play again")}
             </button>
             {bossWonRound ? (
               <a className="ac-quiet ac-quiet-link" href={`#/play/${game}/crown`}>
-                Gold Crown rematch
+                {show("Gold Crown rematch")}
               </a>
             ) : null}
             <a className="ac-quiet ac-quiet-link" href="#/map">
-              Island map
+              {show("Island map")}
             </a>
             <button type="button" className="ac-quiet" onClick={onExit}>
-              Home
+              {show("Home")}
             </button>
           </div>
         </section>
@@ -845,14 +861,14 @@ export function PlayScreen({
               <span className="ac-pill">{boss ? bossDef.name : servedPill(game, served?.slot, level)}</span>
             )}
             <span className="ac-nudge-slot" aria-live="polite">
-              {nudge === "up" ? <span className="ac-nudge">Harder</span> : null}
-              {nudge === "down" ? <span className="ac-nudge is-down">Easier</span> : null}
+              {nudge === "up" ? <span className="ac-nudge">{show("Harder")}</span> : null}
+              {nudge === "down" ? <span className="ac-nudge is-down">{show("Easier")}</span> : null}
             </span>
             {phase !== "feedback" ? (
               <button
                 type="button"
                 className="ac-hear"
-                aria-label="Hear it again"
+                aria-label={show("Hear it again")}
                 onClick={() => speak(speech, sound)}
               >
                 <SpeakerIcon />
@@ -865,7 +881,7 @@ export function PlayScreen({
                 type="button"
                 className="ac-hint-btn"
                 aria-pressed={hintOn}
-                aria-label="Hint"
+                aria-label={show("Hint")}
                 onClick={() => {
                   setHintOn(true);
                   speak(hintCue(choice).speech, sound);
@@ -907,7 +923,7 @@ export function PlayScreen({
             ) : phase === "feedback" ? (
               <div className="ac-stage-main">
                 <SquisheeImg id={mascot} className="ac-mascot is-happy" label="" />
-                <p className="ac-banner is-yes">{served ? praiseLine(served.slot) : "Yes!"}</p>
+                <p className="ac-banner is-yes">{served ? praiseLine(served.slot) : show("Yes!")}</p>
               </div>
             ) : (
               <div className="ac-stage-main" key={slotFact(slot) + phase}>
@@ -949,14 +965,14 @@ export function PlayScreen({
                                 aria-label={label}
                                 onClick={() => answer(option === choice.answer)}
                               >
-                                {pile ? <CoinRow pile={pile} label={label} /> : option}
+                                {pile ? <CoinRow pile={pile} label={label} /> : label}
                               </button>
                             );
                           })}
                         </div>
                       )}
                       <div className={cx("ac-banner", hintOn && "is-hint")} aria-live="polite">
-                        {hintOn ? hintCue(choice).caption : phase === "practice" ? "Try one like it" : ""}
+                        {hintOn ? hintCue(choice).caption : phase === "practice" ? show("Try one like it") : ""}
                       </div>
                     </div>
                   </>
@@ -971,7 +987,10 @@ export function PlayScreen({
             aria-valuemin={0}
             aria-valuemax={total}
             aria-valuenow={filled}
-            aria-label={`Question ${Math.min(total, index + 1)} of ${total}`}
+            aria-label={t(
+              `Question ${Math.min(total, index + 1)} of ${total}`,
+              `Pregunta ${Math.min(total, index + 1)} de ${total}`,
+            )}
           >
             <span style={{ width: `${(filled / total) * 100}%` }} />
           </div>
@@ -984,11 +1003,11 @@ export function PlayScreen({
                 aria-valuemin={0}
                 aria-valuemax={5}
                 aria-valuenow={Math.min(5, combo)}
-                aria-label={combo >= 2 ? `Combo ${combo}` : "Combo"}
+                aria-label={combo >= 2 ? t(`Combo ${combo}`, `Racha ${combo}`) : show("Combo")}
               >
                 <span style={{ width: `${Math.min(100, (combo / 5) * 100)}%` }} />
               </div>
-              <small>{combo >= 2 ? `Combo ×${combo}` : "Combo"}</small>
+              <small>{combo >= 2 ? t(`Combo ×${combo}`, `Racha ×${combo}`) : show("Combo")}</small>
             </div>
           )}
           <div className="ac-qdots" aria-hidden="true">
@@ -999,11 +1018,14 @@ export function PlayScreen({
             })}
           </div>
           <p className="ac-qmeta">
-            Question {Math.min(total, index + 1)} of {total}
+            {t(
+              `Question ${Math.min(total, index + 1)} of ${total}`,
+              `Pregunta ${Math.min(total, index + 1)} de ${total}`,
+            )}
             {!calm && combo >= 2 ? (
               <>
                 {" "}
-                · <Flame /> nice streak
+                · <Flame /> {t("nice streak", "buena racha")}
               </>
             ) : null}
           </p>
@@ -1011,10 +1033,10 @@ export function PlayScreen({
       ) : null}
 
       {menu ? (
-        <div className="ac-modal" role="dialog" aria-label="Pick a level">
+        <div className="ac-modal" role="dialog" aria-label={show("Pick a level")}>
           <div className="ac-modal-card">
-            <h2>Pick a level</h2>
-            <p className="ac-hint">Starts a new round.</p>
+            <h2>{show("Pick a level")}</h2>
+            <p className="ac-hint">{show("Starts a new round.")}</p>
             {(spec?.levels ?? []).filter((row) => gradeWindow.ids.includes(row.id)).map((row) => (
               <button
                 key={row.id}
@@ -1027,8 +1049,10 @@ export function PlayScreen({
                   restart(row.id);
                 }}
               >
-                <strong>Level {row.num}</strong>
-                <small>{row.label}</small>
+                <strong>
+                  {show("Level")} {row.num}
+                </strong>
+                <small>{show(row.label)}</small>
               </button>
             ))}
             <button type="button" className="ac-quiet" onClick={() => setMenu(false)}>

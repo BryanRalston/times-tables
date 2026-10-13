@@ -8,6 +8,7 @@ import { syncEgg } from "./buddy/egg";
 import { friendFromBoss } from "./buddy/hosts";
 import { advanceJourney, bossWon, withDailyRound } from "./journey";
 import { noteRoundWords } from "./games/words";
+import { show, t } from "./i18n";
 import { SQUAD_IDS, addDays, weekDates, type Child, type RoundResult, type SkillStat } from "./model";
 
 /** Finishing a round always earns a star. 90% earns 3. 60% earns 2. A 10-question round is 9 and 6. */
@@ -268,24 +269,33 @@ export function practiceTip(
   name: string,
   skills: Record<string, SkillStat>,
 ): { text: string; factor: number | null } {
-  const who = name.trim() || "Your child";
+  const who = name.trim() || t("Your child", "Tu hijo o hija");
   const weak = weakTimesFacts(skills);
   if (weak.length >= 2) {
     const factor = Number(weak[0]!.split("×")[0]);
     return {
-      text: `${who} keeps missing ${weak[0]} and ${weak[1]}. Try the free times tables worksheet tonight.`,
+      text: t(
+        `${who} keeps missing ${weak[0]} and ${weak[1]}. Try the free times tables worksheet tonight.`,
+        `A ${who} se le escapan ${weak[0]} y ${weak[1]}. Prueben la hoja de las tablas esta noche.`,
+      ),
       factor: Number.isFinite(factor) ? factor : null,
     };
   }
   if (weak.length === 1) {
     const factor = Number(weak[0]!.split("×")[0]);
     return {
-      text: `${who} keeps missing ${weak[0]}. Try the free times tables worksheet tonight.`,
+      text: t(
+        `${who} keeps missing ${weak[0]}. Try the free times tables worksheet tonight.`,
+        `A ${who} se le escapa ${weak[0]}. Prueben la hoja de las tablas esta noche.`,
+      ),
       factor: Number.isFinite(factor) ? factor : null,
     };
   }
   return {
-    text: `${who} can print a free worksheet and play it together tonight.`,
+    text: t(
+      `${who} can print a free worksheet and play it together tonight.`,
+      `${who} puede imprimir una hoja gratis y jugarla juntos esta noche.`,
+    ),
     factor: null,
   };
 }
@@ -333,33 +343,35 @@ function lessonCopy(who: string, label: string, key: string, stat: SkillStat): {
   const n = stat.ok + stat.miss;
   const heat = skillHeat(stat);
   const ratio = n > 0 ? stat.ok / n : 0;
+  const skill = show(label);
   if (n < 3) {
     return {
-      learning: `${who} just started ${label}.`,
-      next: `Play ${label} a couple more times this week.`,
+      learning: t(`${who} just started ${skill}.`, `${who} acaba de empezar ${skill}.`),
+      next: t(`Play ${skill} a couple more times this week.`, `Jueguen ${skill} un par de veces más esta semana.`),
     };
   }
   if (heat === "mastered") {
+    const next = PRACTICE_NEXT[key];
     return {
-      learning: `${who} can do ${label}.`,
-      next: PRACTICE_NEXT[key] ?? `Come back to ${label} in a few days so it stays easy.`,
+      learning: t(`${who} can do ${skill}.`, `${who} ya puede con ${skill}.`),
+      next: next ? show(next) : t(`Come back to ${skill} in a few days so it stays easy.`, `Vuelvan a ${skill} en unos días para que siga fácil.`),
     };
   }
   if (ratio < 0.6) {
     return {
-      learning: `${who} is learning ${label}, and some answers still slip.`,
-      next: "Use the pictures and count it out loud together.",
+      learning: t(`${who} is learning ${skill}, and some answers still slip.`, `${who} está aprendiendo ${skill} y algunas respuestas se escapan.`),
+      next: t("Use the pictures and count it out loud together.", "Usen los dibujos y cuéntenlo en voz alta juntos."),
     };
   }
   return {
-    learning: `${who} is learning ${label} and getting most of them right.`,
-    next: `One more short game of ${label} should lock it in.`,
+    learning: t(`${who} is learning ${skill} and getting most of them right.`, `${who} está aprendiendo ${skill} y le salen casi todas.`),
+    next: t(`One more short game of ${skill} should lock it in.`, `Un juego cortito más de ${skill} y queda listo.`),
   };
 }
 
 /** Plain-language notes for skills the child has actually played. */
 export function skillLessons(name: string, skills: Record<string, SkillStat>): SkillLesson[] {
-  const who = name.trim() || "Your child";
+  const who = name.trim() || t("Your child", "Tu hijo o hija");
   const keys = [...new Set([...barKeys(), ...chipKeys()])];
   const rows: { key: string; n: number; stat: SkillStat }[] = [];
   for (const key of keys) {
@@ -376,7 +388,7 @@ export function skillLessons(name: string, skills: Record<string, SkillStat>): S
 
 /** Practiced skills, plus a starting note for any game with no marks yet. */
 export function parentBrief(child: Pick<Child, "name" | "skills" | "levels">): SkillLesson[] {
-  const who = child.name.trim() || "Your child";
+  const who = child.name.trim() || t("Your child", "Tu hijo o hija");
   const lessons = skillLessons(who, child.skills);
   for (const game of GAMES) {
     const touched = [...game.bars, ...game.chips].some((row) => {
@@ -387,12 +399,13 @@ export function parentBrief(child: Pick<Child, "name" | "skills" | "levels">): S
     const levelId = child.levels[game.id] ?? game.levels[0]?.id ?? "";
     const level = game.levels.find((row) => row.id === levelId);
     const key = `${game.id}:${levelId}`;
-    const label = game.skillLabel(key) ?? level?.label ?? game.title;
+    const label = show(game.skillLabel(key) ?? level?.label ?? game.title);
+    const title = show(game.title);
     lessons.push({
       key,
       label,
-      learning: `${who} has not played ${game.title} yet.`,
-      next: `Start with ${label}. It matches this grade.`,
+      learning: t(`${who} has not played ${title} yet.`, `${who} todavía no juega ${title}.`),
+      next: t(`Start with ${label}. It matches this grade.`, `Empiecen con ${label}. Va con este grado.`),
     });
   }
   return lessons;

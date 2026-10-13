@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { gamePill, t } from "../i18n";
 import type { Grade } from "../model";
 import { SquisheeImg, cx } from "../ui/bits";
 import { CountToken } from "../ui/count-token";
@@ -198,7 +199,7 @@ export function FractionBar({ num, den }: { num: number; den: number }) {
 export function FractionLine({ den, mark }: { den: number; mark: number }) {
   const ticks = Array.from({ length: den + 1 }, (_, i) => i);
   return (
-    <svg className="ac-line" viewBox="0 0 320 80" role="img" aria-label="Number line from 0 to 1">
+    <svg className="ac-line" viewBox="0 0 320 80" role="img" aria-label={t("Number line from 0 to 1", "Recta numérica del 0 al 1")}>
       <line x1="20" y1="36" x2="300" y2="36" className="ac-line-base" />
       {ticks.map((i) => {
         const x = 20 + (280 * i) / den;
@@ -343,13 +344,13 @@ function isPartKind(value: string): value is PartKind {
 function partAlt(kind: PartKind): string {
   switch (kind) {
     case "halves":
-      return "Two equal parts";
+      return t("Two equal parts", "Dos partes iguales");
     case "thirds":
-      return "Three equal parts";
+      return t("Three equal parts", "Tres partes iguales");
     case "fourths":
-      return "Four equal parts";
+      return t("Four equal parts", "Cuatro partes iguales");
     case "unequal":
-      return "Parts that are not equal";
+      return t("Parts that are not equal", "Partes que no son iguales");
     default: {
       const neverKind: never = kind;
       return neverKind;
@@ -361,12 +362,12 @@ function partAlt(kind: PartKind): string {
 export function pictureAlt(label: string | undefined, choice: string, picture: string): string {
   if (picture.startsWith("sq:")) {
     const n = Number(picture.slice(3));
-    if (!Number.isFinite(n)) return "A group of squishees";
-    return `${n} ${n === 1 ? "squishee" : "squishees"}`;
+    if (!Number.isFinite(n)) return t("A group of squishees", "Un grupo de squishees");
+    return t(`${n} ${n === 1 ? "squishee" : "squishees"}`, `${n} ${n === 1 ? "squishee" : "squishees"}`);
   }
   if (picture.startsWith("shape:")) {
     const kind = picture.slice(6);
-    return isPartKind(kind) ? partAlt(kind) : "A shape split into parts";
+    return isPartKind(kind) ? partAlt(kind) : t("A shape split into parts", "Una figura partida en partes");
   }
   const groups = picture.split(" ").filter((part) => part.length > 0);
   const token = groups[0] ?? "";
@@ -498,7 +499,11 @@ function TenBuilder({
     }
     if (tries === 0) {
       setTries(1);
-      setNote(filled === 0 ? "Tap a spot for each squishee." : "Count the squishees and try again.");
+      setNote(
+        filled === 0
+          ? t("Tap a spot for each squishee.", "Toca un espacio por cada squishee.")
+          : t("Count the squishees and try again.", "Cuenta los squishees e inténtalo otra vez."),
+      );
       return;
     }
     onChoose(String(filled));
@@ -512,7 +517,7 @@ function TenBuilder({
             key={i}
             type="button"
             className={cx("ac-cell", filledCell && "is-on")}
-            aria-label={filledCell ? "Squishee" : "Empty"}
+            aria-label={filledCell ? "Squishee" : t("Empty", "Vacío")}
             aria-pressed={filledCell}
             onClick={() => setOn((rows) => rows.map((cell, n) => (n === i ? !cell : cell)))}
           >
@@ -541,7 +546,7 @@ function BlockBuilder({ answer, onChoose }: { answer: string; onChoose: ChoicePr
     }
     if (tries === 0) {
       setTries(1);
-      setNote("A ten is a tall rod. A one is a little cube.");
+      setNote(t("A ten is a tall rod. A one is a little cube.", "Una decena es una barra alta. Una unidad es un cubito."));
       return;
     }
     onChoose(String(value));
@@ -613,7 +618,7 @@ function ShadeBuilder({
     }
     if (tries === 0) {
       setTries(1);
-      setNote("Tap a part to shade it. Tap again to clear it.");
+      setNote(t("Tap a part to shade it. Tap again to clear it.", "Toca una parte para sombrearla. Toca otra vez para quitarla."));
       return;
     }
     onChoose(made);
@@ -628,7 +633,7 @@ function ShadeBuilder({
             type="button"
             className={cx("ac-frac-btn", part && "is-on")}
             aria-pressed={part}
-            aria-label={part ? "Shaded part" : "Empty part"}
+            aria-label={part ? t("Shaded part", "Parte sombreada") : t("Empty part", "Parte vacía")}
             onClick={() => setOn((rows) => rows.map((cell, n) => (n === i ? !cell : cell)))}
           />
         ))}
@@ -732,7 +737,7 @@ export function sceneModule(opts: {
     defaultLevel: opts.defaultLevel,
     sheetDefaultLevel: opts.sheetDefaultLevel,
     isLevel: opts.isLevel,
-    pill: (level) => `${opts.short} · Level ${level.num}`,
+    pill: (level) => gamePill(opts.short, level.num),
     makeQuestion: opts.makeQuestion,
     makeSheetItem: opts.makeSheetItem,
     Prompt: opts.Prompt,

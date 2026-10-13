@@ -1,3 +1,4 @@
+import { getLocale } from "../i18n";
 import { speakable } from "../teach";
 
 export interface SpeechPiece {
@@ -25,15 +26,28 @@ export function normalizeSpeech(text: string): string {
   line = line.replace(/[…]/g, ". ").replace(/[—–]/g, ", ");
   line = line.replace(/_+/g, " blank ");
   line = speakable(line);
-  line = line.replace(/\$(\d+)\.(\d{2})/g, (_full, dollars: string, cents: string) => {
-    return `${dollars} dollars and ${Number(cents)} cents`;
-  });
-  line = line.replace(/\b(\d+) dollars\.(\d{2})\b/g, (_full, dollars: string, cents: string) => {
-    return `${dollars} dollars and ${Number(cents)} cents`;
-  });
-  line = line.replace(/÷/g, " divided by ");
-  line = line.replace(/(\d)\s*-\s*(\d)/g, "$1 minus $2");
-  line = line.replace(/&/g, " and ");
+  if (getLocale() === "es") {
+    line = line.replace(/\$(\d+)\.(\d{2})/g, (_full, dollars: string, cents: string) => {
+      const dollarWord = Number(dollars) === 1 ? "dólar" : "dólares";
+      return `${dollars} ${dollarWord} y ${Number(cents)} centavos`;
+    });
+    line = line.replace(/\b(\d+) dólares\.(\d{2})\b/g, (_full, dollars: string, cents: string) => {
+      return `${dollars} dólares y ${Number(cents)} centavos`;
+    });
+    line = line.replace(/÷/g, " dividido entre ");
+    line = line.replace(/(\d)\s*-\s*(\d)/g, "$1 menos $2");
+    line = line.replace(/&/g, " y ");
+  } else {
+    line = line.replace(/\$(\d+)\.(\d{2})/g, (_full, dollars: string, cents: string) => {
+      return `${dollars} dollars and ${Number(cents)} cents`;
+    });
+    line = line.replace(/\b(\d+) dollars\.(\d{2})\b/g, (_full, dollars: string, cents: string) => {
+      return `${dollars} dollars and ${Number(cents)} cents`;
+    });
+    line = line.replace(/÷/g, " divided by ");
+    line = line.replace(/(\d)\s*-\s*(\d)/g, "$1 minus $2");
+    line = line.replace(/&/g, " and ");
+  }
   line = line.replace(/[()]/g, " ");
   return line.toLowerCase().replace(/\s+/g, " ").trim();
 }
@@ -57,6 +71,10 @@ function scan(norm: string): { tokens: Token[] | null; error: string | null } {
   while (i < norm.length) {
     const ch = norm[i] ?? "";
     if (ch === " " || ch === "\n" || ch === "\t") {
+      i += 1;
+      continue;
+    }
+    if (ch === "¿" || ch === "¡") {
       i += 1;
       continue;
     }
@@ -85,7 +103,7 @@ function scan(norm: string): { tokens: Token[] | null; error: string | null } {
       i += num[1].length;
       continue;
     }
-    const word = /^([a-z]+(?:'[a-z]+)?(?:-[a-z]+)*)/.exec(rest);
+    const word = /^([a-záéíóúüñ]+(?:'[a-záéíóúüñ]+)?(?:-[a-záéíóúüñ]+)*)/.exec(rest);
     if (word?.[1]) {
       tokens.push({ kind: "word", text: word[1], gapBefore: gap });
       gap = 0;

@@ -1,6 +1,7 @@
 import { formatClockTime } from "@/lib/clock";
 import type { Rng } from "@/lib/rng";
-import { buddyName, pickLine } from "./flavor";
+import { getLocale, show, t } from "../i18n";
+import { buddyName, pickTalk } from "./flavor";
 import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { AnalogClock, SquisheeImg, cx } from "../ui/bits";
@@ -71,6 +72,16 @@ function capPhrase(phrase: string): string {
 }
 
 export function timeTalk(hours: number, minutes: number): string {
+  if (getLocale() === "es") {
+    if (minutes === 0) return `${hours} en punto`;
+    if (minutes === 30) return `${hours} y media`;
+    if (minutes === 15) return `${hours} y cuarto`;
+    if (minutes === 45) {
+      const next = hours === 12 ? 1 : hours + 1;
+      return `cuarto para las ${next}`;
+    }
+    return formatClockTime(hours, minutes);
+  }
   if (minutes === 0) return `${hours} o'clock`;
   if (minutes === 30) return `half past ${hours}`;
   if (minutes === 15) return `quarter past ${hours}`;
@@ -84,11 +95,11 @@ export function timeTalk(hours: number, minutes: number): string {
 export function timeHint(_hours: number, minutes: number): string {
   const pointed = Math.round(minutes / 5) % 12;
   const number = pointed === 0 ? 12 : pointed;
-  if (minutes === 30) return "The long hand points to 6 = half past";
-  if (minutes === 0) return "The long hand points to 12 = o'clock";
-  if (minutes === 15) return "The long hand points to 3 = quarter past";
-  if (minutes === 45) return "The long hand points to 9 = quarter to";
-  return `The long hand points to ${number}. Count by fives.`;
+  if (minutes === 30) return t("The long hand points to 6 = half past", "La manecilla larga apunta al 6. Eso es y media.");
+  if (minutes === 0) return t("The long hand points to 12 = o'clock", "La manecilla larga apunta al 12. Eso es en punto.");
+  if (minutes === 15) return t("The long hand points to 3 = quarter past", "La manecilla larga apunta al 3. Eso es y cuarto.");
+  if (minutes === 45) return t("The long hand points to 9 = quarter to", "La manecilla larga apunta al 9. Eso es cuarto para.");
+  return t(`The long hand points to ${number}. Count by fives.`, `La manecilla larga apunta al ${number}. Cuenta de 5 en 5.`);
 }
 
 export function fourTimeChoices(rng: Rng, hours: number, minutes: number): string[] {
@@ -138,10 +149,16 @@ export function makeTimeQuestion(rng: Rng, level: TimeLevel): ChoiceQ {
   return {
     id: qid(rng),
     game: "time",
-    title: pickLine(rng, ["What time is it?", `${buddyName(rng)} checks the clock. What time is it?`]),
+    title: (() => {
+      const buddy = buddyName(rng);
+      return pickTalk(rng, [
+        ["What time is it?", "¿Qué hora es?"],
+        [`${buddy} checks the clock. What time is it?`, `${buddy} mira el reloj. ¿Qué hora es?`],
+      ]);
+    })(),
     hint: timeHint(hours, minutes),
-    praise: `Yes! ${capPhrase(phrase)}`,
-    almost: `Almost! It is ${phrase}.`,
+    praise: t(`Yes! ${capPhrase(phrase)}`, `¡Sí! ${capPhrase(phrase)}`),
+    almost: t(`Almost! It is ${phrase}.`, `¡Casi! Son las ${phrase}.`),
     answer,
     choices: fourTimeChoices(rng, hours, minutes),
     skill: `time:${level}`,
@@ -155,7 +172,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
   const hours = rng.int(1, 12);
   const minutes = rng.pick(TIME_MINUTES[safe]);
   return {
-    prompt: "What time is it?",
+    prompt: t("What time is it?", "¿Qué hora es?"),
     answer: formatClockTime(hours, minutes),
     clock: { hours, minutes },
   };
@@ -189,7 +206,7 @@ export function TimeSheet({ items }: { items: SheetItem[] }) {
         item.clock ? (
           <figure key={`${item.answer}-${i}`}>
             <AnalogClock hours={item.clock.hours} minutes={item.clock.minutes} />
-            <figcaption>What time is it? __________</figcaption>
+            <figcaption>{t("What time is it?", "¿Qué hora es?")} __________</figcaption>
           </figure>
         ) : null,
       )}
@@ -213,7 +230,7 @@ export const timeGame = {
   defaultLevel,
   sheetDefaultLevel: "half",
   isLevel: isTimeLevel,
-  pill: (level) => `Telling Time · ${level.label}`,
+  pill: (level) => t(`Telling Time · ${level.label}`, `La hora · ${show(level.label)}`),
   makeQuestion: (rng, level) => makeTimeQuestion(rng, isTimeLevel(level) ? level : "hour"),
   makeSheetItem: sheetItem,
   Prompt: TimePrompt,

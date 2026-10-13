@@ -1,7 +1,8 @@
 import type { Rng } from "@/lib/rng";
 import { makeQuestion } from "./questions";
 import type { ChoiceQ } from "./games/types";
-import { WEEKDAY_LETTERS, WEEKDAY_NAMES, weekDates } from "./model";
+import { weekdayLetter, weekdayName } from "./i18n";
+import { weekDates } from "./model";
 import { promptSpeech, workedExample, type WorkedExample } from "./teach";
 import { handsExample, makeBuildTask, type BuildTask } from "./hands-build";
 import { clockQuestion, makeClockTask, makePayTask, payQuestion, type ClockTask, type PayTask } from "./hands";
@@ -171,8 +172,8 @@ export interface StickerDay {
 export function weekStickers(secondsByDay: Record<string, number>, today: string): StickerDay[] {
   return weekDates(today).map((iso, index) => ({
     iso,
-    name: WEEKDAY_NAMES[index] ?? "Day",
-    letter: WEEKDAY_LETTERS[index] ?? "",
+    name: weekdayName(index),
+    letter: weekdayLetter(index),
     played: (secondsByDay[iso] ?? 0) > 0,
     today: iso === today,
   }));

@@ -1,5 +1,6 @@
 import type { Rng } from "@/lib/rng";
-import { buddyName, pickLine } from "./flavor";
+import { gamePill, t } from "../i18n";
+import { buddyName, pickTalk } from "./flavor";
 import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { SquisheeImg, cx } from "../ui/bits";
@@ -86,29 +87,33 @@ export function makeSightQuestion(rng: Rng, level: SightList, prefer: string[] =
   let answer = word.word;
   let choices: string[] = [];
   let pictures: Record<string, string> | undefined;
-  let title = pickLine(rng, ["Tap the word you hear", `${buddyName(rng)} says a word. Tap it.`]);
-  let hint = "Tap the speaker to hear it again.";
+  const buddy = buddyName(rng);
+  let title = pickTalk(rng, [
+    ["Tap the word you hear", "Toca la palabra que escuchas"],
+    [`${buddy} says a word. Tap it.`, `${buddy} dice una palabra. Tócala.`],
+  ]);
+  let hint = t("Tap the speaker to hear it again.", "Toca la bocina para escucharla otra vez.");
   let sentence = "";
 
   if (mode === "hear") {
     const others = otherWords(rng, list, word, []);
     choices = rng.shuffle([word.word, ...others.map((item) => item.word)]);
   } else if (mode === "match" && sentenceMatch) {
-    title = "Tap the sentence";
-    hint = "Find the sentence for this word.";
+    title = t("Tap the sentence", "Toca la oración");
+    hint = t("Find the sentence for this word.", "Busca la oración de esta palabra.");
     const others = rng.shuffle(list.filter((item) => item.sentence !== word.sentence)).slice(0, 3);
     answer = word.sentence;
     choices = rng.shuffle([word.sentence, ...others.map((item) => item.sentence)]);
   } else if (mode === "match") {
-    title = "Tap the picture";
-    hint = "Tap the speaker if you want to hear it.";
+    title = t("Tap the picture", "Toca el dibujo");
+    hint = t("Tap the speaker if you want to hear it.", "Toca la bocina si quieres escucharla.");
     const others = rng.shuffle(concreteOthers(list, word)).slice(0, 3);
     pictures = { [word.word]: word.emoji };
     for (const item of others) pictures[item.word] = item.emoji;
     choices = rng.shuffle([word.word, ...others.map((item) => item.word)]);
   } else {
-    title = "Tap the missing word";
-    hint = "Listen, then tap the word that fits.";
+    title = t("Tap the missing word", "Toca la palabra que falta");
+    hint = t("Listen, then tap the word that fits.", "Escucha y toca la palabra que va ahí.");
     sentence = blankOut(word.sentence, word.word);
     const others = otherWords(rng, list, word, []);
     choices = rng.shuffle([word.word, ...others.map((item) => item.word)]);
@@ -119,8 +124,8 @@ export function makeSightQuestion(rng: Rng, level: SightList, prefer: string[] =
     game: "sight",
     title,
     hint,
-    praise: `Yes! ${word.word}`,
-    almost: `Almost! The word is ${word.word}.`,
+    praise: t(`Yes! ${word.word}`, `¡Sí! ${word.word}`),
+    almost: t(`Almost! The word is ${word.word}.`, `¡Casi! La palabra es ${word.word}.`),
     answer,
     choices,
     skill: `sight:${level}`,
@@ -134,8 +139,11 @@ export function makeSightQuestion(rng: Rng, level: SightList, prefer: string[] =
       spoken,
       sentence,
       pictures,
-      fallback: mode === "hear" ? word.word : "Ask someone to read this one.",
-      caption: mode === "hear" ? "No speaker. The word is" : "No speaker on this device.",
+      fallback: mode === "hear" ? word.word : t("Ask someone to read this one.", "Pide que alguien lea esta."),
+      caption:
+        mode === "hear"
+          ? t("No speaker. The word is", "Sin bocina. La palabra es")
+          : t("No speaker on this device.", "Este aparato no tiene bocina."),
       bigFallback: mode === "hear",
     },
   };
@@ -145,7 +153,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
   const list = sightWords(isSightList(level) ? level : "preprimer");
   const word = rng.pick(list);
   if (rng.next() < 0.65) {
-    return { prompt: "Trace and write:", answer: word.word, trace: word.word };
+    return { prompt: t("Trace and write:", "Traza y escribe:"), answer: word.word, trace: word.word };
   }
   return { prompt: blankOut(word.sentence, word.word), answer: word.word };
 }
@@ -209,7 +217,7 @@ export function SightPrompt({
         fallback={visual.fallback}
         caption={visual.caption}
         large={visual.bigFallback}
-        label="Hear it again"
+        label={t("Hear it again", "Escúchala otra vez")}
       />
       <SightCue mode={visual.mode} word={visual.word} sentence={visual.sentence} />
       <p className="ac-hint">{question.hint}</p>
@@ -261,7 +269,7 @@ export const sightGame = {
   defaultLevel,
   sheetDefaultLevel: "preprimer",
   isLevel: isSightList,
-  pill: (level) => `Sight Words · Level ${level.num}`,
+  pill: (level) => gamePill("Sight Words", level.num),
   makeQuestion: (rng, level, prefer) => makeSightQuestion(rng, isSightList(level) ? level : "preprimer", prefer),
   makeSheetItem: sheetItem,
   Prompt: SightPrompt,

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { setLocale, type Locale } from "./i18n";
 import { rngFromSeed } from "@/lib/rng";
 import { openingIndex, startLadder, stepLadder } from "./adapt";
 import { GAMES } from "./games/registry";
@@ -361,6 +362,10 @@ describe("grade bands", () => {
   });
 
   it("keeps 200 questions inside each grade", () => {
+    const locales: Locale[] = ["en", "es"];
+    try {
+    for (const locale of locales) {
+      setLocale(locale);
     for (const game of GAMES) {
       for (const grade of GRADES) {
         const allowed = playWindow(game.levels.map((level) => level.id), game.id, grade, false);
@@ -394,5 +399,9 @@ describe("grade bands", () => {
         }
       }
     }
-  });
+    }
+    } finally {
+      setLocale("en");
+    }
+  }, 20_000);
 });

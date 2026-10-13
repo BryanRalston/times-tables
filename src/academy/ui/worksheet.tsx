@@ -1,9 +1,12 @@
 import { useMemo, useState } from "react";
 import { rngFromSeed } from "@/lib/rng";
 import { gameById } from "../games/registry";
+import { setLocale, show, t } from "../i18n";
 import { makeSheet } from "../questions";
+import { loadSave } from "../storage";
 
 export function WorksheetPage({ game: gameId }: { game: string }) {
+  setLocale(loadSave().lang);
   const spec = gameById(gameId);
   const [level, setLevel] = useState(() => readLevel(gameId));
   const [focus, setFocus] = useState<number | undefined>(() => readFocus(gameId));
@@ -34,19 +37,19 @@ export function WorksheetPage({ game: gameId }: { game: string }) {
     setSeed(Date.now() % 1_000_000_000);
   }
 
-  const title = `${spec.title} worksheet`;
+  const title = t(`${spec.title} worksheet`, `Hoja de ${show(spec.title)}`);
 
   return (
     <div className="ac-sheet-page">
       <header className="ac-sheet-bar ac-no-print">
-        <a href={`${import.meta.env.BASE_URL || "/times-tables/academy/"}#/`}>← Games</a>
+        <a href={`${import.meta.env.BASE_URL || "/times-tables/academy/"}#/`}>← {show("Games")}</a>
         <div className="ac-sheet-controls">
           <label>
-            Level
+            {show("Level")}
             <select value={level} onChange={(e) => pushLevel(e.target.value)}>
               {spec.levels.map((row) => (
                 <option key={row.id} value={row.id}>
-                  {row.label}
+                  {show(row.label)}
                 </option>
               ))}
             </select>
@@ -65,23 +68,23 @@ export function WorksheetPage({ game: gameId }: { game: string }) {
             </label>
           ) : null}
           <button type="button" onClick={() => setSeed(Date.now() % 1_000_000_000)}>
-            New problems
+            {t("New problems", "Problemas nuevos")}
           </button>
           <button type="button" className="ac-go" onClick={() => window.print()}>
-            Print
+            {show("Print")}
           </button>
         </div>
       </header>
       <article className="ac-paper">
         <p className="ac-kicker">Squishee Academy</p>
         <h1>{title}</h1>
-        <p className="ac-seo">{spec.blurb}</p>
+        <p className="ac-seo">{show(spec.blurb)}</p>
         <p className="ac-name-line">
-          Name _______________________ &nbsp;&nbsp; Date ____________
+          {show("Name")} _______________________ &nbsp;&nbsp; {t("Date", "Fecha")} ____________
         </p>
         <spec.SheetBody items={items} />
         <section className="ac-key">
-          <h2>Answer key</h2>
+          <h2>{show("Answer key")}</h2>
           <ol>
             {items.map((item, i) => (
               <li key={`${item.prompt}-${i}`}>{item.clock ? item.answer : `${item.prompt} ${item.answer}`}</li>

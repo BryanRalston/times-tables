@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { show, t } from "../i18n";
 import type { LetterTask, PhonicsTask, SightTask } from "../hands-build";
 import { lettersMatch, phonicsMatches, sightMatches } from "../hands-build";
 import { cx } from "./bits";
@@ -20,16 +21,17 @@ export function LetterBoard({ task, onAnswer }: { task: LetterTask; onAnswer: (o
   return (
     <HandsShell kind="letters" fact={task.factKey} caption={task.speech} onDone={() => onAnswer(lettersMatch(task, built))}>
       {task.showSentence ? <p className="ac-fill-sentence">{task.sentence}</p> : null}
-      <div ref={slotRef} className="ac-slots" aria-label="Letter spots">
+      <div ref={slotRef} className="ac-slots" aria-label={show("Letter spots")}>
         {Array.from({ length: task.word.length }, (_, index) => {
           const id = placed[index];
+          const letter = id ? labelOf(task.tiles, id) : "";
           return (
             <button
               key={id ?? `empty-${index}`}
               type="button"
               className={cx("ac-slot", !id && "is-empty", id && "ac-placed")}
               disabled={!id}
-              aria-label={id ? `Remove ${labelOf(task.tiles, id)}` : "Empty spot"}
+              aria-label={id ? t(`Remove ${letter}`, `Quita ${letter}`) : show("Empty spot")}
               onClick={() => id && setPlaced((current) => current.filter((item) => item !== id))}
             >
               {id ? labelOf(task.tiles, id) : ""}
@@ -37,9 +39,9 @@ export function LetterBoard({ task, onAnswer }: { task: LetterTask; onAnswer: (o
           );
         })}
       </div>
-      <div className="ac-tiles" aria-label="Letters">
+      <div className="ac-tiles" aria-label={show("Letters")}>
         {pool.map((tile) => (
-          <button key={tile.id} type="button" className="ac-tile" data-piece={tile.label} aria-label={`Letter ${tile.label}`} {...pointerProps(tile.id)}>
+          <button key={tile.id} type="button" className="ac-tile" data-piece={tile.label} aria-label={t(`Letter ${tile.label}`, `Letra ${tile.label}`)} {...pointerProps(tile.id)}>
             {tile.label}
           </button>
         ))}
@@ -59,16 +61,16 @@ export function SightBoard({ task, onAnswer }: { task: SightTask; onAnswer: (ok:
   return (
     <HandsShell kind="sight" fact={task.factKey} caption={task.speech} onDone={() => onAnswer(sightMatches(task, placed))}>
       {task.mode === "picture" ? <p className="ac-sight-emoji" aria-hidden="true">{task.emoji}</p> : <p className="ac-fill-sentence">{task.sentence}</p>}
-      <div ref={wellRef} className="ac-tray ac-word-well" aria-label="Drop the word">
+      <div ref={wellRef} className="ac-tray ac-word-well" aria-label={show("Drop the word")}>
         {placed ? (
-          <button type="button" className="ac-tile is-in ac-placed" aria-label={`Remove ${placed}`} onClick={() => setPlaced(null)}>
+          <button type="button" className="ac-tile is-in ac-placed" aria-label={t(`Remove ${placed}`, `Quita ${placed}`)} onClick={() => setPlaced(null)}>
             {placed}
           </button>
         ) : (
-          <span className="ac-tray-empty">Drag the word</span>
+          <span className="ac-tray-empty">{show("Drag the word")}</span>
         )}
       </div>
-      <div className="ac-tiles" aria-label="Words">
+      <div className="ac-tiles" aria-label={show("Words")}>
         {task.choices.filter((word) => word !== placed).map((word) => (
           <button key={word} type="button" className="ac-tile ac-word-tile" data-piece={word} aria-label={word} {...pointerProps(word)}>
             {word}
@@ -95,7 +97,7 @@ export function PhonicsBoard({ task, onAnswer }: { task: PhonicsTask; onAnswer: 
     <HandsShell kind="phonics" fact={task.factKey} caption={task.speech} onDone={() => onAnswer(phonicsMatches(task, labels))}>
       {task.mode === "letter" ? <p className="ac-sight-emoji" aria-hidden="true">{task.prompt}</p> : null}
       {task.mode === "rhyme" ? <p className="ac-sight-word">{task.prompt}</p> : null}
-      <div ref={slotRef} className="ac-slots" aria-label={blend ? "Build the word" : "Drop the tile"}>
+      <div ref={slotRef} className="ac-slots" aria-label={blend ? show("Build the word") : show("Drop the tile")}>
         {task.mode === "end"
           ? task.prompt.split("").map((letter, index) => (
               <span key={`${letter}-${index}`} className="ac-slot is-lock">
@@ -112,7 +114,7 @@ export function PhonicsBoard({ task, onAnswer }: { task: PhonicsTask; onAnswer: 
               type="button"
               className={cx("ac-slot", !id && "is-empty", id && "ac-placed")}
               disabled={!id}
-              aria-label={id ? `Remove ${label}` : "Empty spot"}
+              aria-label={id ? t(`Remove ${label}`, `Quita ${label}`) : show("Empty spot")}
               onClick={() => id && setPlaced((current) => current.filter((item) => item !== id))}
             >
               {label}

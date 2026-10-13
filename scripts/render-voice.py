@@ -13,16 +13,17 @@ from kokoro_onnx import Kokoro
 
 ROOT = Path(__file__).resolve().parents[1]
 VOICE = ROOT / "academy" / "public" / "voice"
-JOBS = Path("/tmp/voice-jobs.json")
+JOBS = Path(os.environ.get("VOICE_JOBS", "/tmp/voice-jobs.json"))
 MODEL = Path("/tmp/kokoro/kokoro-v1.0.onnx")
 VOICES = Path("/tmp/kokoro/voices-v1.0.bin")
-VOICE_NAME = "af_heart"
+VOICE_NAME = os.environ.get("VOICE_NAME", "af_heart")
+VOICE_LANG = os.environ.get("VOICE_LANG", "en-us")
 SPEED = 0.92
 
 
 def render(kokoro: Kokoro, say: str, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
-    audio, sample_rate = kokoro.create(say, voice=VOICE_NAME, speed=SPEED, lang="en-us", trim=True)
+    audio, sample_rate = kokoro.create(say, voice=VOICE_NAME, speed=SPEED, lang=VOICE_LANG, trim=True)
     wav = dest.with_suffix(".wav")
     sf.write(wav, audio, sample_rate)
     env = os.environ.copy()
@@ -81,7 +82,8 @@ def main() -> None:
     removed = 0
     if os.environ.get("VOICE_CLEAN") == "1":
         wanted = {(VOICE / job["file"]).resolve() for job in jobs}
-        for folder in ("core", "lazy"):
+        folders = {Path(job["file"]).parts[0] for job in jobs if job.get("file")}
+        for folder in sorted(folders):
             directory = VOICE / folder
             if not directory.exists():
                 continue

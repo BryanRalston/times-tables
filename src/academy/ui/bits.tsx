@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { show, t } from "../i18n";
 import { canDressFace } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
 import { MINUS, TIMES, type AddVisual, type Visual } from "../games/types";
@@ -184,24 +185,24 @@ function IconGear() {
 }
 
 export function FreeNote() {
-  return <p className="ac-free">Free for every family. No ads, no accounts.</p>;
+  return <p className="ac-free">{show("Free for every family. No ads, no accounts.")}</p>;
 }
 
 export function Foot() {
   return (
     <>
-      <nav className="ac-foot" aria-label="More">
+      <nav className="ac-foot" aria-label={show("More")}>
         <a href="#/grownups">
-          <IconPeople /> Grown-ups
+          <IconPeople /> {show("Grown-ups")}
         </a>
         <a href="#/sheets">
-          <IconPrint /> Free worksheets
+          <IconPrint /> {show("Free worksheets")}
         </a>
         <a href="#/settings">
-          <IconGear /> Settings
+          <IconGear /> {show("Settings")}
         </a>
         <a href={`${import.meta.env.BASE_URL}privacy/`}>
-          <IconShield /> Privacy
+          <IconShield /> {show("Privacy")}
         </a>
       </nav>
       <FreeNote />
@@ -222,10 +223,18 @@ export function clockAria(hours: number, minutes: number): string {
   const long = Math.round(minutes / 5) % 12;
   const longN = long === 0 ? 12 : long;
   const short = hours % 12 === 0 ? 12 : hours % 12;
-  if (minutes === 0) return `Analog clock. Short hand on ${short}. Long hand on 12.`;
+  if (minutes === 0) return t(`Analog clock. Short hand on ${short}. Long hand on 12.`, `Reloj. La manecilla corta en el ${short}. La larga en el 12.`);
   const next = short === 12 ? 1 : short + 1;
-  if (minutes >= 25) return `Analog clock. Short hand between ${short} and ${next}. Long hand on ${longN}.`;
-  return `Analog clock. Short hand just after ${short}. Long hand on ${longN}.`;
+  if (minutes >= 25) {
+    return t(
+      `Analog clock. Short hand between ${short} and ${next}. Long hand on ${longN}.`,
+      `Reloj. La manecilla corta entre el ${short} y el ${next}. La larga en el ${longN}.`,
+    );
+  }
+  return t(
+    `Analog clock. Short hand just after ${short}. Long hand on ${longN}.`,
+    `Reloj. La manecilla corta acaba de pasar el ${short}. La larga en el ${longN}.`,
+  );
 }
 
 export function AnalogClock({

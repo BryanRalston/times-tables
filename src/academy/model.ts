@@ -116,11 +116,17 @@ export interface RoundResult {
   crown?: boolean;
 }
 
+export type AppLang = "en" | "es";
+
 export interface Save {
   /** Schema version. Bump it in storage.ts and add a migration. */
   version: number;
   activeId: string;
   sound: boolean;
+  /** Academy language. English until a family picks Español. */
+  lang: AppLang;
+  /** True after the first language choice, so a later visit is not asked again. */
+  langChosen: boolean;
   children: Child[];
 }
 

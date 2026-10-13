@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Rng } from "@/lib/rng";
-import { buddyName, pickLine } from "./flavor";
+import { gamePill, t } from "../i18n";
+import { buddyName, pickTalk } from "./flavor";
 import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { SquisheeImg, cx } from "../ui/bits";
@@ -49,13 +50,17 @@ export function makeSpellingQuestion(rng: Rng, level: SpellLevel, prefer: string
   const choices = rng.shuffle([word.word, ...decoyWords(word.word)]);
   const sentence = blankOut(word.sentence, word.word);
   const showSentence = level === "patterns";
+  const buddy = buddyName(rng);
   return {
     id: qid(rng),
     game: "spelling",
-    title: pickLine(rng, ["Spell the word you hear", `${buddyName(rng)} says a word. Spell it.`]),
-    hint: "Tap letters to build it. Tap a letter again to put it back.",
-    praise: `Yes! ${word.word}`,
-    almost: `Almost! ${word.word}. ${word.sentence}`,
+    title: pickTalk(rng, [
+      ["Spell the word you hear", "Deletrea la palabra que escuchas"],
+      [`${buddy} says a word. Spell it.`, `${buddy} dice una palabra. Deletréala.`],
+    ]),
+    hint: t("Tap letters to build it. Tap a letter again to put it back.", "Toca las letras para armarla. Toca una letra otra vez para devolverla."),
+    praise: t(`Yes! ${word.word}`, `¡Sí! ${word.word}`),
+    almost: t(`Almost! ${word.word}. ${word.sentence}`, `¡Casi! ${word.word}. ${word.sentence}`),
     answer: word.word,
     choices,
     skill: `spell:${level}`,
@@ -71,7 +76,7 @@ export function makeSpellingQuestion(rng: Rng, level: SpellLevel, prefer: string
       patternLabel: word.patternLabel,
       tiles,
       fallback: word.word,
-      caption: "No speaker. Spell this word:",
+      caption: t("No speaker. Spell this word:", "Sin bocina. Deletrea esta palabra:"),
       bigFallback: true,
       showSentence,
     },
@@ -83,7 +88,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
   const word = rng.pick(list);
   if (rng.next() < 0.6) {
     return {
-      prompt: `Trace and write · ${word.patternLabel}`,
+      prompt: t(`Trace and write · ${word.patternLabel}`, `Traza y escribe · ${word.patternLabel}`),
       answer: word.word,
       trace: word.word,
     };
@@ -136,7 +141,7 @@ export function SpellingPrompt({
         fallback={visual.fallback}
         caption={visual.caption}
         large={visual.bigFallback}
-        label="Hear the word and the sentence"
+        label={t("Hear the word and the sentence", "Escucha la palabra y la oración")}
       />
       {visual.showSentence ? <p className="ac-fill-sentence">{visual.sentence}</p> : null}
       <p className="ac-hint">{question.hint}</p>
@@ -165,7 +170,7 @@ export function SpellingChoices({ question, reveal, onChoose }: ChoiceProps) {
     if (reveal || !board || !visual) return;
     const built = placedWord(board);
     if (built.length === 0) {
-      setNote("Tap the letters you hear.");
+      setNote(t("Tap the letters you hear.", "Toca las letras que escuchas."));
       return;
     }
     if (built === visual.word) {
@@ -175,7 +180,7 @@ export function SpellingChoices({ question, reveal, onChoose }: ChoiceProps) {
     if (!hinted.current) {
       hinted.current = true;
       setBoard(hintLetter(board));
-      setNote("Almost! Here is a letter.");
+      setNote(t("Almost! Here is a letter.", "¡Casi! Aquí va una letra."));
       return;
     }
     if (board.locked === 0) return;
@@ -213,7 +218,7 @@ export function SpellingChoices({ question, reveal, onChoose }: ChoiceProps) {
 
   return (
     <div className="ac-spell">
-      <div className="ac-slots" aria-label="Your word">
+      <div className="ac-slots" aria-label={t("Your word", "Tu palabra")}>
         {Array.from({ length: visual.word.length }, (_, index) => {
           const tile = board.placed[index];
           const locked = index < board.locked;
@@ -222,7 +227,7 @@ export function SpellingChoices({ question, reveal, onChoose }: ChoiceProps) {
               key={tile ? tile.id : `slot-${index}`}
               type="button"
               className={cx("ac-slot", locked && "is-lock", !tile && "is-empty")}
-              aria-label={tile ? `Remove ${tile.letter}` : "Empty spot"}
+              aria-label={tile ? t(`Remove ${tile.letter}`, `Quita ${tile.letter}`) : t("Empty spot", "Espacio vacío")}
               disabled={reveal || !tile || locked}
               onClick={() => tile && setBoard(liftTile(board, tile.id))}
             >
@@ -238,7 +243,7 @@ export function SpellingChoices({ question, reveal, onChoose }: ChoiceProps) {
             type="button"
             className="ac-tile"
             data-tile={tile.letter}
-            aria-label={`Letter ${tile.letter}`}
+            aria-label={t(`Letter ${tile.letter}`, `Letra ${tile.letter}`)}
             disabled={reveal}
             onClick={() => setBoard(placeTile(board, tile.id))}
           >
@@ -250,7 +255,7 @@ export function SpellingChoices({ question, reveal, onChoose }: ChoiceProps) {
         {note}
       </p>
       <button type="button" className="ac-check" data-check="spell" disabled={reveal} onClick={check}>
-        Check
+        {t("Check", "Revisar")}
       </button>
     </div>
   );
@@ -272,7 +277,7 @@ export const spellingGame = {
   defaultLevel,
   sheetDefaultLevel: "cvc",
   isLevel: isSpellLevel,
-  pill: (level) => `Spelling · Level ${level.num}`,
+  pill: (level) => gamePill("Spelling", level.num),
   makeQuestion: (rng, level, prefer) => makeSpellingQuestion(rng, isSpellLevel(level) ? level : "cvc", prefer),
   makeSheetItem: sheetItem,
   Prompt: SpellingPrompt,

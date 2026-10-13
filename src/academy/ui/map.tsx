@@ -8,6 +8,7 @@ import { bossForGame } from "../bosses";
 import { GAMES, gameById } from "../games/registry";
 import { bandFor } from "../grade-map";
 import { areaIndex, areaOpen, bossReady, normalizeJourney } from "../journey";
+import { show, t } from "../i18n";
 import { DAILY_GOAL, STOPS_PER_AREA, todayIso, type Child } from "../model";
 import { AcademyPal, BackLink, Foot, LockIcon, Logo, cx } from "./bits";
 import { PalWithLook } from "./boss-figure";
@@ -30,8 +31,8 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
         <Logo />
         <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="ac-meter-pal" label={child.name} />
       </header>
-      <h1>Island map</h1>
-      <p className="ac-lede">Finish a round to hop. Beat the boss to befriend the host.</p>
+      <h1>{show("Island map")}</h1>
+      <p className="ac-lede">{t("Finish a round to hop. Beat the boss to befriend the host.", "Termina una ronda para saltar. Vence al jefe para hacerte amigo del anfitrión.")}</p>
       <div className="ac-egg-card" data-egg={eggReady ? "ready" : eggOpen ? "open" : "wait"}>
         <EggIcon ready={eggReady} />
         {eggReady ? (
@@ -43,12 +44,18 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
               onOpenEgg();
             }}
           >
-            Hatch the egg
+            {show("Hatch the egg")}
           </button>
         ) : eggOpen ? (
-          <p>The egg hatched today.</p>
+          <p>{show("The egg hatched today.")}</p>
         ) : (
-          <p>{left === 0 ? "Play today to grow the egg." : `${left} more ${left === 1 ? "round" : "rounds"} and the egg hatches.`}</p>
+          <p>
+            {left === 0
+              ? show("Play today to grow the egg.")
+              : left === 1
+                ? t(`${left} more round and the egg hatches.`, `${left} ronda más y se abre el huevo.`)
+                : t(`${left} more rounds and the egg hatches.`, `${left} rondas más y se abre el huevo.`)}
+          </p>
         )}
       </div>
       <ol className="ac-islands" data-area={journey.areaId} data-stop={journey.stop}>
@@ -59,7 +66,7 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
           const current = index === here;
           const beaten = journey.bosses.includes(game.id);
           const host = hostIdFor(game.id);
-          const hostName = squisheeById(host)?.name ?? "Host";
+          const hostName = squisheeById(host)?.name ?? show("Host");
           const boss = bossForGame(game.id);
           const atBoss = current && bossReady(journey, game.id, child.grade);
           return (
@@ -67,20 +74,20 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
               <div className="ac-island-head">
                 <AcademyPal id={host} className={cx(!open && "ac-sil")} label={open ? hostName : ""} />
                 <div>
-                  <h2>{game.title}</h2>
+                  <h2>{show(game.title)}</h2>
                   {open && !later ? <p className="ac-bubble">{catchphrase(host)}</p> : null}
                   <p>
                     {later
-                      ? "Coming later"
+                      ? show("Coming later")
                       : !open
-                        ? "Locked"
+                        ? show("Locked")
                         : beaten
-                          ? `${hostName} is your friend`
+                          ? t(`${hostName} is your friend`, `${hostName} es tu amigo`)
                           : current
-                            ? "You are here"
+                            ? show("You are here")
                             : offer === "intro"
-                              ? "Gentle intro"
-                              : `${hostName} says hi`}
+                              ? show("Gentle intro")
+                              : t(`${hostName} says hi`, `${hostName} te saluda`)}
                   </p>
                 </div>
               </div>
@@ -95,46 +102,57 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
                       ) : (
                         <small>{boss ? "★" : stop + 1}</small>
                       )}
-                      <em>{STOP_NAME[stop]}</em>
+                      <em>{show(STOP_NAME[stop] ?? "")}</em>
                     </span>
                   );
                 })}
               </div>
               {later ? (
-                <p className="ac-hint">Coming later for this grade.</p>
+                <p className="ac-hint">{show("Coming later for this grade.")}</p>
               ) : open ? (
                 <div className="ac-island-actions">
                   <a className="ac-quiet" href={`#/play/${game.id}`}>
-                    {atBoss ? `Face ${boss.name}` : current ? "Play" : offer === "intro" ? "Gentle intro" : "Practice"}
+                    {atBoss ? t(`Face ${boss.name}`, `Enfrenta a ${boss.name}`) : current ? show("Play") : offer === "intro" ? show("Gentle intro") : t("Practice", "Practica")}
                   </a>
                   {beaten ? (
                     <a className="ac-quiet" href={`#/play/${game.id}/crown`}>
-                      Gold Crown
+                      {show("Gold Crown")}
                     </a>
                   ) : null}
                 </div>
               ) : (
                 <p className="ac-hint">
-                  <LockIcon /> Beat the {gameById(GAMES[index - 1]?.id)?.title ?? "last"} boss.
+                  <LockIcon />{" "}
+                  {(() => {
+                    const prev = gameById(GAMES[index - 1]?.id)?.title;
+                    return prev
+                      ? t(`Beat the ${prev} boss.`, `Vence al jefe de ${show(prev)}.`)
+                      : t("Beat the last boss.", "Vence al jefe anterior.");
+                  })()}
                 </p>
               )}
             </li>
           );
         })}
       </ol>
-      <BackLink>Back to games</BackLink>
+      <BackLink>{show("Back to games")}</BackLink>
       <Foot />
       {hatchedId ? (
-        <div className="ac-modal" role="dialog" aria-label="Hatched squishee">
+        <div className="ac-modal" role="dialog" aria-label={show("Hatched squishee")}>
           <div className="ac-modal-card ac-prize">
             <AcademyPal id={hatchedId} className="ac-done-pal" label={squisheeById(hatchedId)?.name ?? ""} />
-            <h2>{squisheeById(hatchedId)?.name ?? "A friend"} hatched!</h2>
+            <h2>
+              {t(
+                `${squisheeById(hatchedId)?.name ?? "A friend"} hatched!`,
+                `¡${squisheeById(hatchedId)?.name ?? "Un amigo"} salió del huevo!`,
+              )}
+            </h2>
             <p className="ac-bubble">{catchphrase(hatchedId)}</p>
             <a className="ac-go" href="#/shelf">
-              Open the book
+              {show("Open the book")}
             </a>
             <button type="button" className="ac-quiet" onClick={() => setHatchedId(null)}>
-              Nice!
+              {show("Nice!")}
             </button>
           </div>
         </div>

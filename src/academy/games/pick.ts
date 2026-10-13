@@ -1,4 +1,5 @@
 import type { Rng } from "@/lib/rng";
+import { almostDetail, yesDetail } from "../i18n";
 import type { Board } from "./boards";
 import { qid } from "./choices";
 import type { ChoiceQ } from "./types";
@@ -104,8 +105,8 @@ export function sceneQuestion(
     game: spec.game,
     title: spec.title,
     hint: spec.hint,
-    praise: `Yes! ${spec.solved}`,
-    almost: `Almost! ${spec.solved}`,
+    praise: yesDetail(spec.solved),
+    almost: almostDetail(spec.solved),
     answer: spec.answer,
     choices: spec.choices,
     skill: spec.skill,
