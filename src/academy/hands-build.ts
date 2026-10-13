@@ -192,14 +192,17 @@ export interface BlocksBuilt {
   ones: number;
 }
 
-const SIGHT_LISTS: readonly SightList[] = ["preprimer", "primer", "first", "second", "third"];
+const SIGHT_LISTS: readonly SightList[] = ["preprimer", "primer", "first", "second", "third", "fourth"];
 const NUMBERS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
 const FRACTION_NAME: Record<number, [string, string]> = {
   2: ["half", "halves"],
   3: ["third", "thirds"],
   4: ["fourth", "fourths"],
   6: ["sixth", "sixths"],
+  5: ["fifth", "fifths"],
   8: ["eighth", "eighths"],
+  10: ["tenth", "tenths"],
+  12: ["twelfth", "twelfths"],
 };
 const EQUIVALENT_PAIRS: ReadonlyArray<readonly [number, number, number, number]> = [
   [1, 2, 2, 4],
@@ -399,7 +402,7 @@ function makeTenFrame(level: string, rng: Rng, avoid?: string): FrameTask {
 }
 
 function makeRodFrame(level: string, rng: Rng, avoid?: string): FrameTask {
-  const safe = level === "within100" ? "within100" : "tens";
+  const safe = level === "within100" || level === "within1000" || level === "thousands" || level === "tens" ? level : "tens";
   return fresh(avoid, () => {
     const sub = rng.next() < 0.4;
     const onesChange = rng.next() < 0.65;
@@ -446,7 +449,7 @@ function makeRodFrame(level: string, rng: Rng, avoid?: string): FrameTask {
 
 function makeFrameTask(level: string, rng: Rng, avoid?: string): FrameTask {
   const safe = isAddLevel(level) ? level : "within10";
-  if (safe === "tens" || safe === "within100") return makeRodFrame(safe, rng, avoid);
+  if (safe === "tens" || safe === "within100" || safe === "within1000" || safe === "thousands") return makeRodFrame(safe, rng, avoid);
   return makeTenFrame(safe, rng, avoid);
 }
 
@@ -666,7 +669,7 @@ function makeLetterTask(level: string, rng: Rng, avoid?: string): LetterTask {
       id: tile.id,
       label: tile.letter,
     }));
-    const showSentence = safe === "patterns";
+    const showSentence = safe === "patterns" || safe === "grade4";
     const speech = showSentence
       ? t(`${row.sentence} Spell ${row.word}.`, `${row.sentence} Deletrea ${row.word}.`)
       : t(`Spell ${row.word}. Drag the letters.`, `Deletrea ${row.word}. Arrastra las letras.`);
@@ -687,7 +690,7 @@ function isSightList(value: string): value is SightList {
 
 function makeSightTask(level: string, rng: Rng, avoid?: string): SightTask {
   const safe: SightList = isSightList(level) ? level : "preprimer";
-  const sentence = safe === "second" || safe === "third";
+  const sentence = safe === "second" || safe === "third" || safe === "fourth";
   const pool = sightWords(safe).filter((row) => (sentence ? countWord(row.sentence, row.word) > 0 : row.emoji.length > 0));
   return fresh(avoid, () => {
     const row = rng.pick(pool);
@@ -1036,7 +1039,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
         ...base("problems", safe, `div:${a}:${b}`, speech, t(`Yes! ${each} in each group.`, `¡Sí! ${each} en cada grupo.`)),
       };
     }
-    if (safe === "mult" || safe === "picture") {
+    if (safe === "mult" || safe === "picture" || safe === "steps") {
       const a = rng.int(1, 4);
       const b = rng.int(1, 4);
       const decoy = b >= 4 ? b - 1 : b + 1;

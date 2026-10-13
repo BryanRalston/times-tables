@@ -45,6 +45,7 @@ export function isCountLevel(value: unknown): value is CountLevel {
 
 function defaultLevel(grade: Grade): CountLevel {
   switch (grade) {
+    case "PK":
     case "K":
       return "objects";
     case "1":
@@ -52,6 +53,7 @@ function defaultLevel(grade: Grade): CountLevel {
     case "2":
       return "tenframe";
     case "3":
+    case "4":
       return "neighbor";
     default: {
       const neverGrade: never = grade;
@@ -346,7 +348,7 @@ export const countGame = sceneModule({
   id: "count",
   title: "Counting",
   short: "Counting",
-  audience: "K–3",
+  audience: "Pre-K–4",
   tint: "coral",
   mascot: "chick",
   sheetSlug: "counting",

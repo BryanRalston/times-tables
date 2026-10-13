@@ -24,6 +24,7 @@ const LEVELS = [
   { id: "first", label: "1st grade", num: 3 },
   { id: "second", label: "2nd grade", num: 4 },
   { id: "third", label: "3rd grade", num: 5 },
+  { id: "fourth", label: "Grade 4 vocabulary", num: 6 },
 ] as const;
 
 const BARS = [
@@ -32,6 +33,7 @@ const BARS = [
   { key: "sight:first", label: "1st grade words" },
   { key: "sight:second", label: "2nd grade words" },
   { key: "sight:third", label: "3rd grade words" },
+  { key: "sight:fourth", label: "Grade 4 vocabulary" },
 ];
 
 const CHIPS = BARS;
@@ -48,6 +50,7 @@ export function pickSightMode(rng: Rng, level: SightList): SightMode {
       if (roll < 0.48) return "match";
       return "fill";
     case "third":
+    case "fourth":
       if (roll < 0.22) return "hear";
       if (roll < 0.36) return "match";
       return "fill";
@@ -66,7 +69,7 @@ function resolveMode(rng: Rng, level: SightList, word: SightWord, list: readonly
   const rolled = pickSightMode(rng, level);
   if (rolled !== "match") return rolled;
   if (word.emoji && concreteOthers(list, word).length >= 3) return "match";
-  if (level === "second" || level === "third") return "fill";
+  if (level === "second" || level === "third" || level === "fourth") return "fill";
   return "hear";
 }
 
@@ -81,7 +84,7 @@ export function makeSightQuestion(rng: Rng, level: SightList, prefer: string[] =
   const word = pickFromPrefer(rng, list, prefer);
   const mode = resolveMode(rng, level, word, list);
   const sentenceMatch =
-    mode === "match" && (level === "second" || level === "third") && rng.next() < 0.45;
+    mode === "match" && (level === "second" || level === "third" || level === "fourth") && rng.next() < 0.45;
   const spoken =
     mode === "fill" ? blankOut(word.sentence, word.word).replaceAll("___", "blank") : word.word;
   let answer = word.word;
@@ -174,6 +177,10 @@ function defaultLevel(grade: Grade): SightList {
       return "second";
     case "3":
       return "third";
+    case "PK":
+      return "preprimer";
+    case "4":
+      return "fourth";
     default: {
       const neverGrade: never = grade;
       return neverGrade;
@@ -256,7 +263,7 @@ export function SightChoices({ question, reveal, picked, onChoose }: ChoiceProps
 export const sightGame = {
   id: "sight",
   title: "Sight Words",
-  audience: "K–3",
+  audience: "K–4",
   tint: "lav",
   mascot: "grape",
   sheetSlug: "sight-words",

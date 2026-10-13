@@ -22,7 +22,7 @@ import {
 
 /** Stable key. The schema version lives on the save, not in the key name. */
 export const STORAGE_KEY = "squishee-academy-v1";
-export const SAVE_VERSION = 9;
+export const SAVE_VERSION = 10;
 
 /**
  * Migrations run from the save's version up to SAVE_VERSION.
@@ -37,6 +37,7 @@ const MIGRATIONS: Record<number, (raw: Record<string, unknown>) => Record<string
   6: migrateV6toV7,
   7: migrateV7toV8,
   8: migrateV8toV9,
+  9: migrateV9toV10,
 };
 
 /** A newer app wrote this disk. Don't replace it with an older schema. */
@@ -215,6 +216,11 @@ function migrateV7toV8(raw: Record<string, unknown>): Record<string, unknown> {
 function migrateV8toV9(raw: Record<string, unknown>): Record<string, unknown> {
   const lang = raw.lang === "es" ? "es" : "en";
   return { ...raw, version: 9, lang, langChosen: true };
+}
+
+/** Version 9 knew K–3. Pre-K and grade 4 are new grades. Saved grades stay put. */
+function migrateV9toV10(raw: Record<string, unknown>): Record<string, unknown> {
+  return { ...raw, version: 10 };
 }
 
 function migrateRaw(raw: unknown): unknown {

@@ -5,9 +5,10 @@ import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { DotModel, Equation, SquisheeImg, cx } from "../ui/bits";
 import { fourChoices, qid } from "./choices";
+import { makeBigAddQuestion, spanSheet } from "./span";
 import { MINUS, type ChoiceQ, type GameModule, type SheetItem } from "./types";
 
-export const ADD_LEVELS = ["within5", "within10", "within20", "tens", "within100"] as const;
+export const ADD_LEVELS = ["within5", "within10", "within20", "tens", "within100", "within1000", "thousands"] as const;
 export type AddLevel = (typeof ADD_LEVELS)[number];
 
 export const ADD_MAX: Record<AddLevel, number> = {
@@ -16,6 +17,8 @@ export const ADD_MAX: Record<AddLevel, number> = {
   within20: 20,
   tens: 100,
   within100: 100,
+  within1000: 1000,
+  thousands: 9999,
 };
 
 const LEVELS = [
@@ -24,6 +27,8 @@ const LEVELS = [
   { id: "within20", label: "Within 20", num: 3 },
   { id: "tens", label: "Tens and ones", num: 4 },
   { id: "within100", label: "Within 100", num: 5 },
+  { id: "within1000", label: "Within 1000", num: 6 },
+  { id: "thousands", label: "Thousands", num: 7 },
 ] as const;
 
 const BARS = [
@@ -32,6 +37,8 @@ const BARS = [
   { key: "add:within20", label: "Add within 20" },
   { key: "add:tens", label: "Tens and ones" },
   { key: "add:within100", label: "Add within 100" },
+  { key: "add:within1000", label: "Add within 1000" },
+  { key: "add:thousands", label: "Add thousands" },
 ];
 
 const CHIPS = [
@@ -52,6 +59,8 @@ function defaultLevel(grade: Grade): AddLevel {
   const start = bandFor("add", grade)?.start;
   if (isAddLevel(start)) return start;
   switch (grade) {
+    case "PK":
+      return "within5";
     case "K":
       return "within5";
     case "1":
@@ -60,6 +69,8 @@ function defaultLevel(grade: Grade): AddLevel {
       return "within20";
     case "3":
       return "within100";
+    case "4":
+      return "within1000";
     default: {
       const neverGrade: never = grade;
       return neverGrade;
@@ -84,6 +95,7 @@ function tensOperands(rng: Rng): { op: "+" | "-"; pink: number; teal: number; to
 }
 
 export function makeAddQuestion(rng: Rng, level: AddLevel): ChoiceQ {
+  if (level === "within1000" || level === "thousands") return makeBigAddQuestion(rng, level);
   if (level === "tens") return makeTensQuestion(rng);
   const max = ADD_MAX[level];
   const sub = rng.next() < (max <= 10 ? 0.28 : 0.45);
@@ -241,6 +253,8 @@ function makeTensQuestion(rng: Rng): ChoiceQ {
 }
 
 function sheetItem(rng: Rng, level: string): SheetItem {
+  const extra = spanSheet(rng, "add", level);
+  if (extra) return extra;
   if (level === "tens") {
     const fact = tensOperands(rng);
     if (fact.op === "+") return { prompt: `${fact.pink} + ${fact.teal} =`, answer: String(fact.total) };
@@ -268,7 +282,7 @@ export function AddPrompt({ question, reveal, mascot, happy }: { question: Choic
       <h1>{question.title}</h1>
       <SquisheeImg id={mascot} className={cx("ac-mascot", happy && "is-happy")} />
       <Equation visual={question.visual} reveal={reveal} answer={question.answer} />
-      {question.visual.kind === "add" ? <DotModel visual={question.visual} /> : null}
+      {question.visual.kind === "add" && question.visual.max <= 100 ? <DotModel visual={question.visual} /> : null}
       <p className="ac-hint">{question.hint}</p>
     </section>
   );
@@ -287,7 +301,7 @@ export function AddSheet({ items }: { items: SheetItem[] }) {
 export const addGame = {
   id: "add",
   title: "Add & Subtract",
-  audience: "K–3",
+  audience: "K–4",
   tint: "mint",
   mascot: "frog",
   sheetSlug: "add-subtract",

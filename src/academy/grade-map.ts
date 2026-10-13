@@ -31,12 +31,19 @@ function band(row: GradeBand): GradeBand {
 }
 
 /**
- * Kindergarten through grade 3. Level ids match each game module.
+ * Pre-K through grade 4. Level ids match each game module.
  * Standards are Common Core cluster codes. Sight words follow Dolch, with
- * Fry words folded into the grade 2 and grade 3 lists.
+ * Fry words folded into the grade 2 and grade 3 lists. Grade 4 vocabulary
+ * is its own list.
  */
 export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
   times: {
+    PK: band({
+      levels: ["count"],
+      start: "count",
+      offer: "later",
+      standards: ["K.CC.A.1"],
+    }),
     K: band({
       levels: ["count"],
       start: "count",
@@ -59,10 +66,23 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       levels: ["mix", "toTen"],
       start: "toTen",
       offer: "play",
+      cap: "toTen",
       standards: ["3.OA.A.1", "3.OA.C.7"],
+    }),
+    "4": band({
+      levels: ["factors", "multi", "divide"],
+      start: "factors",
+      offer: "play",
+      standards: ["4.OA.B.4", "4.NBT.B.5", "4.NBT.B.6"],
     }),
   },
   add: {
+    PK: band({
+      levels: ["within5"],
+      start: "within5",
+      offer: "later",
+      standards: ["K.OA.A.2"],
+    }),
     K: band({
       levels: ["within5", "within10"],
       start: "within5",
@@ -87,8 +107,20 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       offer: "play",
       standards: ["3.NBT.A.2"],
     }),
+    "4": band({
+      levels: ["within1000", "thousands"],
+      start: "within1000",
+      offer: "play",
+      standards: ["4.NBT.B.4"],
+    }),
   },
   time: {
+    PK: band({
+      levels: ["hour"],
+      start: "hour",
+      offer: "later",
+      standards: ["1.MD.B.3"],
+    }),
     K: band({
       levels: ["hour"],
       start: "hour",
@@ -111,10 +143,23 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       levels: ["quarter", "fives"],
       start: "fives",
       offer: "play",
+      cap: "fives",
       standards: ["2.MD.C.7", "3.MD.A.1"],
+    }),
+    "4": band({
+      levels: ["elapsed"],
+      start: "elapsed",
+      offer: "play",
+      standards: ["4.MD.A.2"],
     }),
   },
   money: {
+    PK: band({
+      levels: ["name"],
+      start: "name",
+      offer: "intro",
+      standards: ["2.MD.C.8"],
+    }),
     K: band({
       levels: ["name"],
       start: "name",
@@ -131,16 +176,30 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       levels: ["make", "change", "dollars"],
       start: "make",
       offer: "play",
+      cap: "dollars",
       standards: ["2.MD.C.8"],
     }),
     "3": band({
       levels: ["change", "dollars"],
       start: "dollars",
       offer: "play",
+      cap: "dollars",
       standards: ["2.MD.C.8"],
+    }),
+    "4": band({
+      levels: ["spend"],
+      start: "spend",
+      offer: "play",
+      standards: ["4.MD.A.2"],
     }),
   },
   sight: {
+    PK: band({
+      levels: ["preprimer"],
+      start: "preprimer",
+      offer: "later",
+      standards: ["RF.K.3.C"],
+    }),
     K: band({
       levels: ["preprimer", "primer"],
       start: "preprimer",
@@ -165,10 +224,23 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       levels: ["second", "third"],
       start: "third",
       offer: "play",
+      cap: "third",
       standards: ["RF.3.3.D"],
+    }),
+    "4": band({
+      levels: ["fourth"],
+      start: "fourth",
+      offer: "play",
+      standards: ["RF.4.3.A", "L.4.4", "L.4.6"],
     }),
   },
   spelling: {
+    PK: band({
+      levels: ["cvc"],
+      start: "cvc",
+      offer: "later",
+      standards: ["RF.K.3.A"],
+    }),
     K: band({
       levels: ["cvc"],
       start: "cvc",
@@ -192,10 +264,24 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       levels: ["long", "patterns"],
       start: "patterns",
       offer: "play",
+      cap: "patterns",
       standards: ["RF.3.3.A", "RF.3.3.C"],
+    }),
+    "4": band({
+      levels: ["grade4"],
+      start: "grade4",
+      offer: "play",
+      standards: ["RF.4.3.A", "L.4.2"],
     }),
   },
   count: {
+    PK: band({
+      levels: ["objects"],
+      start: "objects",
+      offer: "play",
+      cap: "objects",
+      standards: ["K.CC.A.1", "K.CC.B.4", "K.CC.B.5"],
+    }),
     K: band({
       levels: ["objects", "to20", "compare"],
       start: "objects",
@@ -220,8 +306,20 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       offer: "play",
       standards: ["1.NBT.A.1"],
     }),
+    "4": band({
+      levels: ["neighbor"],
+      start: "neighbor",
+      offer: "play",
+      standards: ["4.NBT.A.2"],
+    }),
   },
   place: {
+    PK: band({
+      levels: ["blocks"],
+      start: "blocks",
+      offer: "later",
+      standards: ["1.NBT.B.2"],
+    }),
     K: band({
       levels: ["blocks"],
       start: "blocks",
@@ -248,8 +346,21 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       offer: "play",
       standards: ["3.NBT.A.1"],
     }),
+    "4": band({
+      levels: ["big", "roundBig"],
+      start: "big",
+      offer: "play",
+      standards: ["4.NBT.A.1", "4.NBT.A.2", "4.NBT.A.3"],
+    }),
   },
   shapes: {
+    PK: band({
+      levels: ["color", "match", "pattern", "flat"],
+      start: "color",
+      offer: "play",
+      cap: "flat",
+      standards: ["K.G.A.1", "K.G.A.2", "K.MD.A.2"],
+    }),
     K: band({
       levels: ["flat", "solid"],
       start: "flat",
@@ -272,10 +383,23 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       levels: ["parts"],
       start: "parts",
       offer: "play",
+      cap: "parts",
       standards: ["3.G.A.2"],
+    }),
+    "4": band({
+      levels: ["angles"],
+      start: "angles",
+      offer: "play",
+      standards: ["4.G.A.1", "4.MD.C.5"],
     }),
   },
   fractions: {
+    PK: band({
+      levels: ["parts"],
+      start: "parts",
+      offer: "later",
+      standards: ["1.G.A.3"],
+    }),
     K: band({
       levels: ["parts"],
       start: "parts",
@@ -299,10 +423,24 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       levels: ["equivalent", "shade"],
       start: "equivalent",
       offer: "play",
+      cap: "shade",
       standards: ["3.NF.A.1", "3.NF.A.2", "3.NF.A.3"],
+    }),
+    "4": band({
+      levels: ["addLike", "decimals"],
+      start: "addLike",
+      offer: "play",
+      standards: ["4.NF.A.1", "4.NF.B.3", "4.NF.C.6", "4.NF.C.7"],
     }),
   },
   measure: {
+    PK: band({
+      levels: ["size"],
+      start: "size",
+      offer: "play",
+      cap: "size",
+      standards: ["K.MD.A.1", "K.MD.A.2"],
+    }),
     K: band({
       levels: ["compare"],
       start: "compare",
@@ -327,10 +465,24 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       levels: ["bar", "more"],
       start: "bar",
       offer: "play",
+      cap: "more",
       standards: ["3.MD.B.3"],
+    }),
+    "4": band({
+      levels: ["area", "perimeter"],
+      start: "area",
+      offer: "play",
+      standards: ["4.MD.A.3"],
     }),
   },
   phonics: {
+    PK: band({
+      levels: ["letters", "sounds"],
+      start: "letters",
+      offer: "play",
+      cap: "sounds",
+      standards: ["RF.K.1.D", "RF.K.2.D"],
+    }),
     K: band({
       levels: ["sounds", "begin"],
       start: "sounds",
@@ -358,8 +510,20 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       offer: "play",
       standards: ["RF.3.3.A", "RF.3.3.C"],
     }),
+    "4": band({
+      levels: ["cvc", "end"],
+      start: "end",
+      offer: "play",
+      standards: ["RF.4.3.A"],
+    }),
   },
   problems: {
+    PK: band({
+      levels: ["add"],
+      start: "add",
+      offer: "later",
+      standards: ["K.OA.A.2"],
+    }),
     K: band({
       levels: ["add"],
       start: "add",
@@ -385,7 +549,14 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       levels: ["div", "picture"],
       start: "picture",
       offer: "play",
+      cap: "picture",
       standards: ["3.OA.A.3"],
+    }),
+    "4": band({
+      levels: ["steps"],
+      start: "steps",
+      offer: "play",
+      standards: ["4.OA.A.3"],
     }),
   },
 };

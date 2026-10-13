@@ -37,7 +37,7 @@ describe("word problem questions", () => {
         if (q.visual.kind !== "scene" || q.visual.board.game !== "problems") throw new Error(level);
         const board = q.visual.board;
         expect(q.title.length).toBeGreaterThan(12);
-        expect(["Peach", "Frog", "Bunny", "Bear", "Panda", "Fox", "Owl", "Penguin", "Cat", "Donut"].some((name) => q.title.includes(name))).toBe(true);
+        expect(["Peach", "Frog", "Bunny", "Bear", "Panda", "Fox", "Owl", "Penguin", "Cat", "Donut", "Chick", "Otter", "Cookie"].some((name) => q.title.includes(name))).toBe(true);
         switch (board.mode) {
           case "add":
             expect(board.a + board.b).toBeLessThanOrEqual(10);
@@ -77,6 +77,12 @@ describe("word problem questions", () => {
             expect(groups).toHaveLength(board.a);
             expect(groups.every((part) => part === board.emoji.repeat(board.b))).toBe(true);
             for (const choice of q.choices) expect(q.visual.labels[choice]).toBe("");
+            break;
+          }
+          case "steps": {
+            const away = board.extra ?? 0;
+            expect(q.answer).toBe(String(board.a * board.b - away));
+            expect(away).toBeGreaterThanOrEqual(1);
             break;
           }
           default: {
@@ -119,8 +125,13 @@ describe("word problem questions", () => {
           continue;
         }
         const picture = row.prompt.match(/^Bunny draws (\d+) groups of (\d+) frogs\. How many frogs\?$/);
-        expect(picture).not.toBeNull();
-        expect(row.answer).toBe(String(Number(picture?.[1]) * Number(picture?.[2])));
+        if (picture) {
+          expect(row.answer).toBe(String(Number(picture[1]) * Number(picture[2])));
+          continue;
+        }
+        const steps = row.prompt.match(/^(\d+) bags of (\d+) apples\. Give away (\d+)\. How many are left\?$/);
+        expect(steps).not.toBeNull();
+        expect(row.answer).toBe(String(Number(steps?.[1]) * Number(steps?.[2]) - Number(steps?.[3])));
       }
     }
   });

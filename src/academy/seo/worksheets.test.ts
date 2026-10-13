@@ -241,6 +241,84 @@ function expectFresh(item: StaticItem) {
     expect(item.answer).toBe(String(Number(boxes[1]) / Number(boxes[2])));
     return;
   }
+  const product = item.prompt.match(/^(\d+) × (\d+) =$/);
+  if (product) {
+    expect(item.answer).toBe(String(Number(product[1]) * Number(product[2])));
+    return;
+  }
+  const like = item.prompt.match(/^(\d+)\/(\d+) \+ (\d+)\/(\d+) =$/);
+  if (like) {
+    expect(like[2]).toBe(like[4]);
+    expect(item.answer).toBe(`${Number(like[1]) + Number(like[3])}/${like[2]}`);
+    return;
+  }
+  const hundredths = item.prompt.match(/^Write (\d+) hundredths as a decimal\.$/);
+  if (hundredths) {
+    expect(item.answer).toBe((Number(hundredths[1]) / 100).toFixed(2));
+    return;
+  }
+  const area = item.prompt.match(/^Area of a (\d+) by (\d+) rectangle =$/);
+  if (area) {
+    expect(item.answer).toBe(String(Number(area[1]) * Number(area[2])));
+    return;
+  }
+  const peri = item.prompt.match(/^Perimeter of a (\d+) by (\d+) rectangle =$/);
+  if (peri) {
+    expect(item.answer).toBe(String(2 * (Number(peri[1]) + Number(peri[2]))));
+    return;
+  }
+  const digit = item.prompt.match(/^What is the value of the (\d) in (\d+)\?$/);
+  if (digit) {
+    const text = digit[2] ?? "";
+    const place = 10 ** (text.length - 1 - text.indexOf(digit[1] ?? ""));
+    expect(item.answer).toBe(String(Number(digit[1]) * place));
+    return;
+  }
+  const letter = item.prompt.match(/^Name the letter that looks like ([A-Z])\.$/);
+  if (letter) {
+    expect(item.answer).toBe(letter[1]);
+    return;
+  }
+  const color = item.prompt.match(/^Which color is named (red|blue|yellow|green)\?$/);
+  if (color) {
+    expect(item.answer).toBe(color[1]);
+    return;
+  }
+  const next = item.prompt.match(/^Red, blue, red, blue\. What comes next\?$/);
+  if (next) {
+    expect(item.answer).toBe("red");
+    return;
+  }
+  const bigger = item.prompt.match(/^Which is bigger, a seed or a pumpkin\?$/);
+  if (bigger) {
+    expect(item.answer).toBe("pumpkin");
+    return;
+  }
+  const remain = item.prompt.match(/^(\d+) ÷ (\d+) =$/);
+  if (remain) {
+    const a = Number(remain[1]);
+    const b = Number(remain[2]);
+    const q = Math.floor(a / b);
+    const r = a % b;
+    expect(item.answer).toBe(r === 0 ? String(q) : `${q} remainder ${r}`);
+    return;
+  }
+  const elapsed = item.prompt.match(/^A show starts at (\d+):(\d+) and lasts (\d+) minutes\. What time does it end\?$/);
+  if (elapsed) {
+    const start = Number(elapsed[1]) * 60 + Number(elapsed[2]);
+    const end = start + Number(elapsed[3]);
+    const hours = Math.floor(end / 60);
+    const minutes = end % 60;
+    const shown = hours > 12 ? hours - 12 : hours;
+    expect(item.answer).toBe(`${shown}:${String(minutes).padStart(2, "0")}`);
+    return;
+  }
+  const money = item.prompt.match(/^A snack is \$(\d+\.\d{2}) and a drink is \$(\d+\.\d{2})\. How much altogether\?$/);
+  if (money) {
+    const sum = Math.round((Number(money[1]) + Number(money[2])) * 100);
+    expect(item.answer).toBe(`$${(sum / 100).toFixed(2)}`);
+    return;
+  }
   throw new Error(`unchecked worksheet prompt: ${item.prompt}`);
 }
 

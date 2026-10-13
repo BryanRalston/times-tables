@@ -9,7 +9,7 @@ export function fourChoices(rng: Rng, answer: number, preferred: number[]): stri
   const used = new Set<number>([answer]);
   const consider = (n: number) => {
     if (picked.length >= 3) return;
-    if (!Number.isInteger(n) || n < 0 || n > 500 || used.has(n)) return;
+    if (!Number.isInteger(n) || n < 0 || n > 2_000_000 || used.has(n)) return;
     used.add(n);
     picked.push(n);
   };

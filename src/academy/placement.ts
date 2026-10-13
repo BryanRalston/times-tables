@@ -80,7 +80,7 @@ export function nextPlacement(child: {
   }
 
   const starters = GAMES.filter((game) => windowFor(game.id, game.levels.map((level) => level.id), child.grade, challenge).ids.length > 0);
-  const game = starters.find((row) => row.id === "add") ?? starters[0];
+  const game = starters.find((row) => row.id === "add") ?? starters.find((row) => row.id === "count") ?? starters[0];
   if (!game || rows.length === 0) {
     const startGame = game ?? GAMES[0];
     if (!startGame) return { game: "add", level: "within5", reason: "start" };

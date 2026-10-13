@@ -3,7 +3,7 @@ import { gamePill, t } from "../i18n";
 import type { Grade } from "../model";
 import { SquisheeImg, cx } from "../ui/bits";
 import { CountToken } from "../ui/count-token";
-import type { MeasureItem, ShapeName } from "./boards";
+import type { AngleKind, MeasureItem, ShapeColor, ShapeName } from "./boards";
 import { labelFor } from "./pick";
 import type { ChoiceProps, ChoiceQ, GameModule, LevelDef, SheetItem, SkillRow } from "./types";
 
@@ -178,6 +178,78 @@ export function ShapeFig({ name }: { name: ShapeName }) {
       return neverName;
     }
   }
+}
+
+const SWATCH: Record<ShapeColor, string> = {
+  red: "#e85d6a",
+  blue: "#4c8dff",
+  yellow: "#f6c945",
+  green: "#3cbf7a",
+};
+
+export function ColorSwatch({ color }: { color: ShapeColor }) {
+  return (
+    <svg className="ac-shape" viewBox="0 0 120 100" role="img" aria-label={color}>
+      <circle cx="60" cy="50" r="36" fill={SWATCH[color]} stroke="#2a2430" strokeWidth="3" />
+    </svg>
+  );
+}
+
+export function SizeDot({ n }: { n: number }) {
+  const radius = 10 + Math.max(1, Math.min(4, n)) * 8;
+  return (
+    <svg className="ac-shape" viewBox="0 0 120 100" role="img" aria-label={String(n)}>
+      <circle cx="60" cy="50" r={radius} />
+    </svg>
+  );
+}
+
+export function AngleFig({ kind }: { kind: AngleKind }) {
+  const sweep = kind === "acute" ? 40 : kind === "right" ? 90 : kind === "obtuse" ? 130 : 180;
+  const rad = ((180 - sweep) * Math.PI) / 180;
+  const x2 = 24 + Math.cos(rad) * 78;
+  const y2 = 78 - Math.sin(rad) * 78;
+  return (
+    <svg className="ac-shape" viewBox="0 0 120 100" role="img" aria-label={kind}>
+      <line x1="24" y1="78" x2="108" y2="78" />
+      <line x1="24" y1="78" x2={x2} y2={y2} />
+      {kind === "right" ? <path d="M24 62 H40 V78" fill="none" /> : null}
+    </svg>
+  );
+}
+
+export function RectFig({ length, width, label }: { length: number; width: number; label: string }) {
+  const w = Math.min(120, 28 + length * 8);
+  const h = Math.min(72, 18 + width * 6);
+  const x = (160 - w) / 2;
+  const y = (110 - h) / 2;
+  return (
+    <svg className="ac-shape" viewBox="0 0 160 120" role="img" aria-label={label}>
+      <rect x={x} y={y} width={w} height={h} />
+      <text x={80} y={y + h + 16} textAnchor="middle">
+        {length} × {width}
+      </text>
+    </svg>
+  );
+}
+
+export function DecimalGrid({ tenths, hundredths }: { tenths: number; hundredths: number }) {
+  const filled = Math.max(0, Math.min(100, tenths * 10 + hundredths));
+  return (
+    <div className="ac-decimal" aria-hidden="true">
+      {Array.from({ length: 100 }, (_, index) => (
+        <i key={index} className={index < filled ? "is-on" : ""} />
+      ))}
+    </div>
+  );
+}
+
+function isShapeColor(value: string): value is ShapeColor {
+  return value === "red" || value === "blue" || value === "yellow" || value === "green";
+}
+
+function isFlatName(value: string): value is ShapeName {
+  return value === "circle" || value === "triangle" || value === "square" || value === "rectangle";
 }
 
 /** Equilateral, so the picture has three lines of symmetry. */
@@ -369,6 +441,25 @@ export function pictureAlt(label: string | undefined, choice: string, picture: s
     const kind = picture.slice(6);
     return isPartKind(kind) ? partAlt(kind) : t("A shape split into parts", "Una figura partida en partes");
   }
+  const swatch = picture.startsWith("swatch:") ? picture.slice(7) : "";
+  if (isShapeColor(swatch)) {
+    switch (swatch) {
+      case "red":
+        return t("red", "rojo");
+      case "blue":
+        return t("blue", "azul");
+      case "yellow":
+        return t("yellow", "amarillo");
+      case "green":
+        return t("green", "verde");
+      default: {
+        const neverColor: never = swatch;
+        return neverColor;
+      }
+    }
+  }
+  if (picture.startsWith("fig:")) return picture.slice(4);
+  if (picture.startsWith("grow:")) return t("A circle", "Un círculo");
   const groups = picture.split(" ").filter((part) => part.length > 0);
   const token = groups[0] ?? "";
   const units = [...token];
@@ -438,6 +529,18 @@ function PictureFace({ picture }: { picture: string }) {
   if (picture.startsWith("shape:")) {
     const kind = picture.slice(6);
     if (isPartKind(kind)) return <PartFig kind={kind} />;
+  }
+  if (picture.startsWith("swatch:")) {
+    const color = picture.slice(7);
+    if (isShapeColor(color)) return <ColorSwatch color={color} />;
+  }
+  if (picture.startsWith("fig:")) {
+    const name = picture.slice(4);
+    if (isFlatName(name)) return <ShapeFig name={name} />;
+  }
+  if (picture.startsWith("grow:")) {
+    const n = Number(picture.slice(5));
+    if (Number.isFinite(n)) return <SizeDot n={n} />;
   }
   return (
     <span className="ac-pic-emoji" aria-hidden="true">

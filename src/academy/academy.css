@@ -807,9 +807,49 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
 }
 .ac-hello-grades { justify-content: center; margin: 10px 0 14px; }
 .ac-hello-grades .ac-grade {
-  min-width: 76px;
-  min-height: 76px;
-  font-size: 32px;
+  min-width: 58px;
+  min-height: 64px;
+  font-size: 20px;
+  padding: 0 6px;
+}
+.is-prek .ac-choice {
+  min-height: 112px;
+  font-size: 34px;
+}
+.is-prek .ac-choice.is-card {
+  min-height: 128px;
+}
+.ac-pattern,
+.ac-size-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.ac-pattern .ac-shape,
+.ac-size-row .ac-shape {
+  width: 72px;
+  height: 60px;
+}
+.ac-pattern-next {
+  font-size: 40px;
+  font-weight: 800;
+}
+.ac-decimal {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+  width: min(240px, 80%);
+  margin: 8px auto;
+}
+.ac-decimal i {
+  aspect-ratio: 1;
+  background: #efe6dc;
+  border-radius: 2px;
+}
+.ac-decimal i.is-on {
+  background: #7ad7c8;
 }
 .ac-pal-play {
   display: flex;

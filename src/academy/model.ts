@@ -1,7 +1,7 @@
-export type Grade = "K" | "1" | "2" | "3";
+export type Grade = "PK" | "K" | "1" | "2" | "3" | "4";
 
 /**
- * Grade the hello screen starts on. The middle of K–3 is still gentle,
+ * Grade the hello screen starts on. The middle of the band is still gentle,
  * and the first round drops one level so a new kid wins quickly.
  */
 export const DEFAULT_START_GRADE: Grade = "1";
@@ -92,14 +92,20 @@ export interface AnswerMark {
   unscored?: boolean;
 }
 
-/** Kindergarten and grade 1 hear each prompt. Older grades tap the speaker. */
+/** Pre-K, kindergarten, and grade 1 hear each prompt. Older grades tap the speaker. */
 export function autoSpeakGrade(grade: Grade): boolean {
-  return grade === "K" || grade === "1";
+  return grade === "PK" || grade === "K" || grade === "1";
 }
 
 /** A countdown is opt-in, and only from grade 2 up. */
 export function speedRoundGrade(grade: Grade): boolean {
-  return grade === "2" || grade === "3";
+  return grade === "2" || grade === "3" || grade === "4";
+}
+
+/** Pre-K rounds stay short. Every other grade plays ten cards. */
+export function roundLength(grade: Grade): number {
+  if (grade === "PK") return 6;
+  return ROUND_LENGTH;
 }
 
 export interface RoundResult {
@@ -169,7 +175,7 @@ export const DAILY_GOAL = 3;
 /** Share of a boss round that opens the next island. */
 export const BOSS_PASS = 0.6;
 
-const GRADES: readonly Grade[] = ["K", "1", "2", "3"];
+const GRADES: readonly Grade[] = ["PK", "K", "1", "2", "3", "4"];
 
 export function isGrade(v: unknown): v is Grade {
   return typeof v === "string" && (GRADES as readonly string[]).includes(v);
@@ -181,6 +187,8 @@ export function isSquadId(v: unknown): v is SquadId {
 
 export function gradeLabel(grade: Grade): string {
   switch (grade) {
+    case "PK":
+      return "Pre-K";
     case "K":
       return "K";
     case "1":
@@ -189,6 +197,8 @@ export function gradeLabel(grade: Grade): string {
       return "Gr 2";
     case "3":
       return "Gr 3";
+    case "4":
+      return "Gr 4";
     default: {
       const neverGrade: never = grade;
       return neverGrade;

@@ -64,6 +64,10 @@ describe("phonics questions", () => {
             expect(board.phoneme.length).toBeGreaterThan(0);
             expect(q.visual.labels[q.answer]).toContain(board.phoneme);
             break;
+          case "letters":
+            expect(q.answer).toBe(board.letter);
+            expect(q.answer).toMatch(/^[A-Z]$/);
+            break;
           default: {
             const neverBoard: never = board;
             throw new Error(String(neverBoard));
@@ -95,6 +99,11 @@ describe("phonics questions", () => {
         const blend = row.prompt.match(/^Blend ([a-z])-([a-z])-([a-z])\.$/);
         if (blend) {
           expect(row.answer).toBe(`${blend[1]}${blend[2]}${blend[3]}`);
+          continue;
+        }
+        const letter = row.prompt.match(/^Name the letter that looks like ([A-Z])\.$/);
+        if (letter) {
+          expect(row.answer).toBe(letter[1]);
           continue;
         }
         const end = row.prompt.match(/^What letter sound ends ([a-z]+)\?$/);

@@ -179,7 +179,7 @@ describe("academy save", () => {
 
     const mem = new Map<string, string>();
     const disk = {
-      version: 10,
+      version: 11,
       activeId: "maya",
       sound: true,
       children: [{ id: "maya", name: "Maya", grade: "2", stars: 4 }],
@@ -201,7 +201,7 @@ describe("academy save", () => {
       children: loaded.children.map((child) => ({ ...child, stars: 99 })),
     });
     const kept = JSON.parse(mem.get(STORAGE_KEY) ?? "{}") as { version: number; children: { stars: number }[] };
-    expect(kept.version).toBe(10);
+    expect(kept.version).toBe(11);
     expect(kept.children[0]?.stars).toBe(4);
     mem.delete(STORAGE_KEY);
     loadSave();

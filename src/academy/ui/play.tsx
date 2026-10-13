@@ -26,8 +26,8 @@ import { bossReady, bossWon } from "../journey";
 import {
   autoSpeakGrade,
   BOSS_LENGTH,
-  ROUND_LENGTH,
   ROUND_SECONDS,
+  roundLength,
   speedRoundGrade,
   type AnswerMark,
   type Child,
@@ -168,6 +168,7 @@ export function PlayScreen({
     ? 0
     : Math.max(gradeWindow.min, Math.min(gradeWindow.max, spec?.levels.findIndex((row) => row.id === level) ?? gradeWindow.min));
   const bounds = { min: Math.max(0, gradeWindow.min), max: Math.max(0, gradeWindow.max) };
+  const cards = roundLength(child.grade);
   const calm = autoSpeakGrade(child.grade);
   const canSpeed = speedRoundGrade(child.grade);
   const crownFight = crown && child.journey.bosses.includes(game);
@@ -178,7 +179,7 @@ export function PlayScreen({
   const [phase, setPhase] = useState<Phase>(openingBoss ? "intro" : "ask");
   const [energy, setEnergy] = useState(() => bossMaxEnergy(BOSS_LENGTH, crownFight));
   const [mood, setMood] = useState<BossMood>("arrive");
-  const [dots, setDots] = useState<(Dot | null)[]>(() => blankDots(ROUND_LENGTH));
+  const [dots, setDots] = useState<(Dot | null)[]>(() => blankDots(cards));
   const [combo, setCombo] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
   const [left, setLeft] = useState(ROUND_SECONDS);
@@ -206,7 +207,7 @@ export function PlayScreen({
   const practiceTaughtRef = useRef(false);
   const replayHereRef = useRef(false);
   const answersRef = useRef<AnswerMark[]>([]);
-  const dotsRef = useRef<(Dot | null)[]>(blankDots(ROUND_LENGTH));
+  const dotsRef = useRef<(Dot | null)[]>(blankDots(cards));
   const indexRef = useRef(0);
   const bossSnap = useRef<{ roundId: number; boss: boolean }>({ roundId: -1, boss: false });
   if (bossSnap.current.roundId !== roundId) {
@@ -265,7 +266,7 @@ export function PlayScreen({
 
   const [questions, setQuestions] = useState<Served[]>(() => {
     if (blocked) return [];
-    handsRef.current = new Set(boss ? [] : handsOnSlots(ROUND_LENGTH));
+    handsRef.current = new Set(boss ? [] : handsOnSlots(cards));
     if (boss) {
       return bossOpening(game, level, preferIds(), child.grade, crownFight, child.challengeAhead);
     }
@@ -277,7 +278,7 @@ export function PlayScreen({
   practiceRef.current = practice;
 
   function roundTotal() {
-    return boss ? questionsRef.current.length || BOSS_LENGTH : ROUND_LENGTH;
+    return boss ? questionsRef.current.length || BOSS_LENGTH : cards;
   }
 
   function paint(i: number, dot: Dot) {
@@ -295,12 +296,12 @@ export function PlayScreen({
     const nextBoss = crownFight || bossReady(child.journey, game, child.grade);
     skillsRef.current = cloneSkills(child.skills);
     ladderRef.current = startLadder(openingIndex(nextBase, child.rounds, nextBoss, boundsRef.current));
-    handsRef.current = new Set(nextBoss ? [] : handsOnSlots(ROUND_LENGTH));
+    handsRef.current = new Set(nextBoss ? [] : handsOnSlots(cards));
     returnsRef.current = new Map();
     replayHereRef.current = false;
     practiceTaughtRef.current = false;
     answersRef.current = [];
-    dotsRef.current = blankDots(nextBoss ? BOSS_LENGTH : ROUND_LENGTH);
+    dotsRef.current = blankDots(nextBoss ? BOSS_LENGTH : cards);
     startStarsRef.current = child.stars;
     finishedRef.current = false;
     const openingPhase: Phase = nextBoss ? "intro" : "ask";
@@ -547,7 +548,7 @@ export function PlayScreen({
           ? yourTurnLine(speechFor(slot))
           : speechFor(slot)
         : "";
-  const total = boss ? questions.length || BOSS_LENGTH : ROUND_LENGTH;
+  const total = boss ? questions.length || BOSS_LENGTH : cards;
   const showSpeed = canSpeed && speed;
 
   useEffect(() => {
@@ -669,7 +670,7 @@ export function PlayScreen({
 
   if (blocked) {
     return (
-      <div className="ac-shell">
+      <div className={cx("ac-shell", child.grade === "PK" && "is-prek")}>
         <header className="ac-play-top">
           <button type="button" className="ac-x" onClick={onExit} aria-label={show("Close")}>
             ×
@@ -696,7 +697,7 @@ export function PlayScreen({
   const maxEnergy = bossMaxEnergy(BOSS_LENGTH, crownFight);
 
   return (
-    <div className={cx("ac-shell", spec?.layout === "wide" && "ac-wide", boss && "is-boss", crownFight && "is-crown")} data-phase={phase}>
+    <div className={cx("ac-shell", child.grade === "PK" && "is-prek", spec?.layout === "wide" && "ac-wide", boss && "is-boss", crownFight && "is-crown")} data-phase={phase}>
       <header className="ac-play-top">
         <button type="button" className="ac-x" onClick={close} aria-label={show("Close")}>
           ×

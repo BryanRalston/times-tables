@@ -43,6 +43,20 @@ describe("shape questions", () => {
             expect(q.visual.pictures?.[q.answer]).toBe(`shape:${q.answer}`);
             expect(q.visual.labels[q.answer]).toBe("");
             break;
+          case "color":
+          case "pattern":
+            expect(["red", "blue", "yellow", "green"]).toContain(q.answer);
+            expect(q.visual.pictures?.[q.answer]).toMatch(/^swatch:/);
+            expect(q.visual.labels[q.answer]).toBe("");
+            break;
+          case "match":
+            expect(["circle", "triangle", "square", "rectangle"]).toContain(q.answer);
+            expect(q.visual.pictures?.[q.answer]).toBe(`fig:${q.answer}`);
+            break;
+          case "angles":
+            if (board.ask === "degrees") expect(["90", "180"]).toContain(q.answer);
+            else expect(["acute", "right", "obtuse", "straight"]).toContain(q.answer);
+            break;
           default: {
             const neverBoard: never = board;
             throw new Error(String(neverBoard));

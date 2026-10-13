@@ -63,6 +63,17 @@ describe("measurement questions", () => {
             }
             break;
           }
+          case "size":
+            expect(["s1", "s2", "s3", "s4"]).toContain(q.answer);
+            expect(q.visual.labels[q.answer]).toBe("");
+            expect(q.visual.pictures?.[q.answer]).toMatch(/^grow:/);
+            break;
+          case "area":
+            expect(q.answer).toBe(String(board.length * board.width));
+            break;
+          case "perimeter":
+            expect(q.answer).toBe(String(2 * (board.length + board.width)));
+            break;
           case "more": {
             const high = board.items[board.left]?.value ?? 0;
             const low = board.items[board.right]?.value ?? 0;
@@ -101,6 +112,20 @@ describe("measurement questions", () => {
         if (graph) {
           const icon = graph[1]!.includes("▮") ? "▮" : "🍎";
           expect(row.answer).toBe(String(graph[1]!.length / icon.length));
+          continue;
+        }
+        if (/^Which is bigger,/.test(row.prompt)) {
+          expect(row.answer.length).toBeGreaterThan(0);
+          continue;
+        }
+        const area = row.prompt.match(/^Area of a (\d+) by (\d+) rectangle =$/);
+        if (area) {
+          expect(row.answer).toBe(String(Number(area[1]) * Number(area[2])));
+          continue;
+        }
+        const perimeter = row.prompt.match(/^Perimeter of a (\d+) by (\d+) rectangle =$/);
+        if (perimeter) {
+          expect(row.answer).toBe(String(2 * (Number(perimeter[1]) + Number(perimeter[2]))));
           continue;
         }
         const more = row.prompt.match(/^There are (\d+) cats and (\d+) dogs\. How many more cats\?$/);

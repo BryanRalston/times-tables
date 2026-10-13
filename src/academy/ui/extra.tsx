@@ -34,7 +34,7 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
   }, [sound, lang]);
 
   return (
-    <div className="ac-shell">
+    <div className={cx("ac-shell", grade === "PK" && "is-prek")}>
       <header className="ac-top">
         <Logo />
       </header>

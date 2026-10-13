@@ -26,7 +26,7 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
   const left = Math.max(0, DAILY_GOAL - (child.dailyDate === today ? child.dailyRounds : 0));
 
   return (
-    <div className="ac-shell ac-map-shell">
+    <div className={cx("ac-shell ac-map-shell", child.grade === "PK" && "is-prek")}>
       <header className="ac-top">
         <Logo />
         <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="ac-meter-pal" label={child.name} />

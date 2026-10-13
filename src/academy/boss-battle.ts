@@ -17,11 +17,13 @@ export const BOSS_SUPER_BONUS = 4;
  */
 export function bossIsTimed(grade: Grade): boolean {
   switch (grade) {
+    case "PK":
     case "K":
     case "1":
       return false;
     case "2":
     case "3":
+    case "4":
       return true;
     default: {
       const neverGrade: never = grade;

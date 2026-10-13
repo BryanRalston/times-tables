@@ -6,9 +6,10 @@ import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { AnalogClock, SquisheeImg, cx } from "../ui/bits";
 import { qid } from "./choices";
+import { makeElapsedQuestion } from "./span";
 import { type ChoiceQ, type GameModule, type SheetItem } from "./types";
 
-export const TIME_LEVELS = ["hour", "half", "quarter", "fives"] as const;
+export const TIME_LEVELS = ["hour", "half", "quarter", "fives", "elapsed"] as const;
 export type TimeLevel = (typeof TIME_LEVELS)[number];
 
 export const TIME_MINUTES: Record<TimeLevel, readonly number[]> = {
@@ -16,6 +17,7 @@ export const TIME_MINUTES: Record<TimeLevel, readonly number[]> = {
   half: [0, 30],
   quarter: [0, 15, 30, 45],
   fives: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55],
+  elapsed: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55],
 };
 
 const LEVELS = [
@@ -23,6 +25,7 @@ const LEVELS = [
   { id: "half", label: "Half hours", num: 2 },
   { id: "quarter", label: "Quarter hours", num: 3 },
   { id: "fives", label: "5 minutes", num: 4 },
+  { id: "elapsed", label: "Elapsed time", num: 5 },
 ] as const;
 
 const BARS = [
@@ -30,6 +33,7 @@ const BARS = [
   { key: "time:half", label: "Time: half hour" },
   { key: "time:quarter", label: "Time: quarter hour" },
   { key: "time:fives", label: "Time: 5 minutes" },
+  { key: "time:elapsed", label: "Elapsed time" },
 ];
 
 const CHIPS = [
@@ -59,6 +63,10 @@ function defaultLevel(grade: Grade): TimeLevel {
       return "quarter";
     case "3":
       return "fives";
+    case "PK":
+      return "hour";
+    case "4":
+      return "elapsed";
     default: {
       const neverGrade: never = grade;
       return neverGrade;
@@ -142,6 +150,7 @@ function timeTags(minutes: number): string[] {
 }
 
 export function makeTimeQuestion(rng: Rng, level: TimeLevel): ChoiceQ {
+  if (level === "elapsed") return makeElapsedQuestion(rng);
   const hours = rng.int(1, 12);
   const minutes = rng.pick(TIME_MINUTES[level]);
   const phrase = timeTalk(hours, minutes);
@@ -217,7 +226,7 @@ export function TimeSheet({ items }: { items: SheetItem[] }) {
 export const timeGame = {
   id: "time",
   title: "Telling Time",
-  audience: "Grade 1–3",
+  audience: "Grade 1–4",
   tint: "sun",
   mascot: "melon",
   sheetSlug: "telling-time",

@@ -48,6 +48,7 @@ export function normalizeSpeech(text: string): string {
     line = line.replace(/(\d)\s*-\s*(\d)/g, "$1 minus $2");
     line = line.replace(/&/g, " and ");
   }
+  line = line.replace(/(\d),(?=\d)/g, "$1");
   line = line.replace(/[()]/g, " ");
   return line.toLowerCase().replace(/\s+/g, " ").trim();
 }
@@ -121,6 +122,24 @@ function gapAfter(tokens: Token[], index: number): number {
   return next.gapBefore > 0 ? next.gapBefore : WORD_GAP;
 }
 
+function numberPieces(token: Token, tokens: Token[], index: number): SpeechPiece[] {
+  const n = Number(token.text);
+  const gap = gapAfter(tokens, index);
+  if (!Number.isFinite(n) || n <= 1000) return [{ key: token.text, gapMs: gap }];
+  const parts: string[] = [];
+  const millions = Math.floor(n / 1_000_000);
+  const thousands = Math.floor((n % 1_000_000) / 1000);
+  const rest = n % 1000;
+  if (millions > 0) {
+    parts.push(String(millions), "million");
+  }
+  if (thousands > 0) {
+    parts.push(String(thousands), "thousand");
+  }
+  if (rest > 0 || parts.length === 0) parts.push(String(rest));
+  return parts.map((key, piece) => ({ key, gapMs: piece === parts.length - 1 ? gap : WORD_GAP }));
+}
+
 function clockPieces(token: Token, tokens: Token[], index: number): SpeechPiece[] {
   const [hours, minutes] = token.text.split(":");
   return [
@@ -145,7 +164,7 @@ export function idealPieces(text: string): SpeechPiece[] | null {
       continue;
     }
     if (token.kind === "num") {
-      pieces.push({ key: token.text, gapMs: gapAfter(tokens, i) });
+      pieces.push(...numberPieces(token, tokens, i));
       i += 1;
       continue;
     }
@@ -192,8 +211,9 @@ export function planSpeech(text: string, has: (key: string) => boolean): SpeechP
       continue;
     }
     if (token.kind === "num") {
-      if (!has(token.text)) return null;
-      pieces.push({ key: token.text, gapMs: gapAfter(tokens, i) });
+      const parts = numberPieces(token, tokens, i);
+      if (parts.some((part) => !has(part.key))) return null;
+      pieces.push(...parts);
       i += 1;
       continue;
     }
