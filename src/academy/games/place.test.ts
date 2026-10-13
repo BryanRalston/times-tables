@@ -66,6 +66,13 @@ describe("place value questions", () => {
             expect(board.n).toBeLessThanOrEqual(99);
             expect(q.answer).toBe(String(board.n));
             break;
+          case "big":
+            expect(board.n).toBeGreaterThanOrEqual(1000);
+            expect(q.answer).toBe(String(board.digit * board.place));
+            break;
+          case "roundBig":
+            expect(q.answer).toBe(String(Math.floor(board.n / board.place + 0.5) * board.place));
+            break;
           default: {
             const neverBoard: never = board;
             throw new Error(String(neverBoard));
@@ -94,6 +101,17 @@ describe("place value questions", () => {
           const a = Number(compared[2]);
           const b = Number(compared[3]);
           expect(row.answer).toBe(String(compared[1] === "greater" ? Math.max(a, b) : Math.min(a, b)));
+          continue;
+        }
+        if (/value of the \d+ in \d+/.test(row.prompt)) {
+          expect(row.answer).toMatch(/^\d+$/);
+          continue;
+        }
+        const bigRound = row.prompt.match(/^Round (\d+) to the nearest (1000|10000|100000)\.$/);
+        if (bigRound) {
+          const place = Number(bigRound[2]);
+          const n = Number(bigRound[1]);
+          expect(row.answer).toBe(String(Math.floor(n / place + 0.5) * place));
           continue;
         }
         const rounded = row.prompt.match(/^Round (\d+) to the nearest (10|100)\.$/);

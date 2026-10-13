@@ -332,12 +332,12 @@ export function GradeChips({
   onGrade: (grade: Grade) => void;
   className?: string;
 }) {
-  const grades: Grade[] = ["K", "1", "2", "3"];
+  const grades: Grade[] = ["PK", "K", "1", "2", "3", "4"];
   return (
     <div className={cx("ac-grades", className)} role="group" aria-label={show("Grade")}>
       {grades.map((g) => (
         <button key={g} type="button" className={cx("ac-grade", grade === g && "is-on")} onClick={() => onGrade(g)}>
-          {g === "K" ? "K" : g}
+          {g === "PK" ? "Pre-K" : g === "K" ? "K" : g}
         </button>
       ))}
     </div>

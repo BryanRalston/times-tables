@@ -19,9 +19,15 @@ export function areaIndex(journey: Journey): number {
   return index < 0 ? 0 : index;
 }
 
-function laterFor(gameId: string, grade: Grade | undefined): boolean {
+/**
+ * Islands that do not block the path. Coming-later games are skipped.
+ * Pre-K coin-name intros stay on the home screen and do not gate counting.
+ */
+function skipsGate(gameId: string, grade: Grade | undefined): boolean {
   if (!grade) return false;
-  return bandFor(gameId, grade)?.offer === "later";
+  const offer = bandFor(gameId, grade)?.offer;
+  if (offer === "later") return true;
+  return grade === "PK" && offer === "intro";
 }
 
 /** The first island is open. Each later island opens when the previous boss is beaten. */
@@ -35,7 +41,7 @@ export function areaOpen(journey: Journey, index: number, grade?: Grade): boolea
   for (let i = 0; i < index; i++) {
     const game = GAMES[i];
     if (!game) return false;
-    if (laterFor(game.id, grade)) continue;
+    if (skipsGate(game.id, grade)) continue;
     if (!journey.bosses.includes(game.id)) return false;
   }
   return true;
@@ -58,7 +64,7 @@ export function normalizeJourney(journey: Journey, grade?: Grade): Journey {
   }
   let hopped = false;
   if (grade) {
-    while (index < GAMES.length - 1 && laterFor(GAMES[index]!.id, grade)) {
+    while (index < GAMES.length - 1 && skipsGate(GAMES[index]!.id, grade)) {
       const next = index + 1;
       if (!areaOpen(draft, next, grade)) break;
       index = next;
@@ -112,7 +118,7 @@ export function advanceJourney(journey: Journey, step: RoundStep, grade?: Grade)
     const bosses = here.bosses.includes(step.game) ? here.bosses : [...here.bosses, step.game];
     let nextIndex = areaIndex(here) + 1;
     if (grade) {
-      while (nextIndex < GAMES.length && laterFor(GAMES[nextIndex]!.id, grade)) nextIndex += 1;
+      while (nextIndex < GAMES.length && skipsGate(GAMES[nextIndex]!.id, grade)) nextIndex += 1;
     }
     const next = GAMES[nextIndex];
     if (!next) return { areaId: here.areaId, stop: STOPS_PER_AREA - 1, bosses };

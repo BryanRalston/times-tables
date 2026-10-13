@@ -4,26 +4,35 @@ import type { Grade } from "../model";
 import { buddyName, pickTalk } from "./flavor";
 import { sideCount, symmetryAnswer, type ShapeBoard, type ShapeName } from "./boards";
 import { nearChoices, sceneQuestion, uniqueChoices } from "./pick";
-import { SceneCard, ShapeFig, sceneModule } from "./scene-ui";
+import { makeAngleQuestion, makeColorQuestion, makeMatchQuestion, makePatternQuestion, spanSheet } from "./span";
+import { AngleFig, ColorSwatch, SceneCard, ShapeFig, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
-export const SHAPE_LEVELS = ["flat", "solid", "sides", "symmetry", "parts"] as const;
+export const SHAPE_LEVELS = ["color", "match", "pattern", "flat", "solid", "sides", "symmetry", "parts", "angles"] as const;
 export type ShapeLevel = (typeof SHAPE_LEVELS)[number];
 
 const LEVELS = [
-  { id: "flat", label: "Flat shapes", num: 1 },
-  { id: "solid", label: "Solid shapes", num: 2 },
-  { id: "sides", label: "Sides and corners", num: 3 },
-  { id: "symmetry", label: "Symmetry", num: 4 },
-  { id: "parts", label: "Halves, thirds, fourths", num: 5 },
+  { id: "color", label: "Colors", num: 1 },
+  { id: "match", label: "Matching", num: 2 },
+  { id: "pattern", label: "Patterns", num: 3 },
+  { id: "flat", label: "Flat shapes", num: 4 },
+  { id: "solid", label: "Solid shapes", num: 5 },
+  { id: "sides", label: "Sides and corners", num: 6 },
+  { id: "symmetry", label: "Symmetry", num: 7 },
+  { id: "parts", label: "Halves, thirds, fourths", num: 8 },
+  { id: "angles", label: "Angles", num: 9 },
 ] as const;
 
 const BARS = [
+  { key: "shapes:color", label: "Colors" },
+  { key: "shapes:match", label: "Matching" },
+  { key: "shapes:pattern", label: "Patterns" },
   { key: "shapes:flat", label: "Flat shapes" },
   { key: "shapes:solid", label: "Solid shapes" },
   { key: "shapes:sides", label: "Sides and corners" },
   { key: "shapes:symmetry", label: "Symmetry" },
   { key: "shapes:parts", label: "Equal parts" },
+  { key: "shapes:angles", label: "Angles" },
 ];
 
 const FLAT: ShapeName[] = ["circle", "triangle", "square", "rectangle"];
@@ -42,6 +51,8 @@ export function isShapeLevel(value: unknown): value is ShapeLevel {
 
 function defaultLevel(grade: Grade): ShapeLevel {
   switch (grade) {
+    case "PK":
+      return "color";
     case "K":
       return "flat";
     case "1":
@@ -50,6 +61,8 @@ function defaultLevel(grade: Grade): ShapeLevel {
       return "sides";
     case "3":
       return "parts";
+    case "4":
+      return "angles";
     default: {
       const neverGrade: never = grade;
       return neverGrade;
@@ -177,6 +190,12 @@ function makeParts(rng: Rng): ChoiceQ {
 
 export function makeShapeQuestion(rng: Rng, level: ShapeLevel): ChoiceQ {
   switch (level) {
+    case "color":
+      return makeColorQuestion(rng);
+    case "match":
+      return makeMatchQuestion(rng);
+    case "pattern":
+      return makePatternQuestion(rng);
     case "flat":
       return nameQuestion(rng, rng.pick(FLAT), FLAT, "flat");
     case "solid":
@@ -187,6 +206,8 @@ export function makeShapeQuestion(rng: Rng, level: ShapeLevel): ChoiceQ {
       return makeSymmetry(rng);
     case "parts":
       return makeParts(rng);
+    case "angles":
+      return makeAngleQuestion(rng);
     default: {
       const neverLevel: never = level;
       return neverLevel;
@@ -205,6 +226,14 @@ const SIDE_WORDS: Record<string, number> = {
 function sheetItem(rng: Rng, level: string): SheetItem {
   const safe: ShapeLevel = isShapeLevel(level) ? level : "flat";
   switch (safe) {
+    case "color":
+    case "match":
+    case "pattern":
+    case "angles": {
+      const printed = spanSheet(rng, "shapes", safe);
+      if (printed) return printed;
+      return { prompt: t("Name the matching shape.", "Nombra la figura igual."), answer: "circle" };
+    }
     case "flat": {
       const shape = rng.pick(FLAT);
       const clue =
@@ -293,6 +322,19 @@ export function ShapesPrompt({ question, reveal, mascot, happy }: PromptProps) {
 
 function ShapeArt({ board }: { board: ShapeBoard }) {
   switch (board.mode) {
+    case "color":
+      return <ColorSwatch color={board.color} />;
+    case "match":
+      return <ShapeFig name={board.shape} />;
+    case "pattern":
+      return (
+        <div className="ac-pattern">
+          {board.items.map((color, index) => (
+            <ColorSwatch key={`${color}-${index}`} color={color} />
+          ))}
+          <span className="ac-pattern-next">?</span>
+        </div>
+      );
     case "flat":
     case "solid":
     case "sides":
@@ -300,6 +342,8 @@ function ShapeArt({ board }: { board: ShapeBoard }) {
       return <ShapeFig name={board.shape} />;
     case "parts":
       return <p className="ac-big-num">{t("Find it", "Búscala")}</p>;
+    case "angles":
+      return <AngleFig kind={board.kind} />;
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -311,7 +355,7 @@ export const shapesGame = sceneModule({
   id: "shapes",
   title: "Shapes",
   short: "Shapes",
-  audience: "K–3",
+  audience: "Pre-K–4",
   tint: "berry",
   mascot: "cat",
   sheetSlug: "shapes",

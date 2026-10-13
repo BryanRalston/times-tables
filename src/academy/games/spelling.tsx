@@ -31,6 +31,7 @@ const LEVELS = [
   { id: "blends", label: "Blends", num: 3 },
   { id: "long", label: "Long vowels", num: 4 },
   { id: "patterns", label: "Grade 2–3 patterns", num: 5 },
+  { id: "grade4", label: "Grade 4 words", num: 6 },
 ] as const;
 
 const BARS = [
@@ -39,6 +40,7 @@ const BARS = [
   { key: "spell:blends", label: "Blends" },
   { key: "spell:long", label: "Long vowels" },
   { key: "spell:patterns", label: "Grade 2–3 patterns" },
+  { key: "spell:grade4", label: "Grade 4 words" },
 ];
 
 const CHIPS = BARS;
@@ -49,7 +51,7 @@ export function makeSpellingQuestion(rng: Rng, level: SpellLevel, prefer: string
   const tiles = buildTiles(word.word, extraLetters(word.word, rng), rng);
   const choices = rng.shuffle([word.word, ...decoyWords(word.word)]);
   const sentence = blankOut(word.sentence, word.word);
-  const showSentence = level === "patterns";
+  const showSentence = level === "patterns" || level === "grade4";
   const buddy = buddyName(rng);
   return {
     id: qid(rng),
@@ -112,6 +114,10 @@ function defaultLevel(grade: Grade): SpellLevel {
       return "long";
     case "3":
       return "patterns";
+    case "PK":
+      return "cvc";
+    case "4":
+      return "grade4";
     default: {
       const neverGrade: never = grade;
       return neverGrade;
@@ -264,7 +270,7 @@ export function SpellingChoices({ question, reveal, onChoose }: ChoiceProps) {
 export const spellingGame = {
   id: "spelling",
   title: "Spelling",
-  audience: "K–3",
+  audience: "K–4",
   tint: "sky",
   mascot: "owl",
   sheetSlug: "spelling",

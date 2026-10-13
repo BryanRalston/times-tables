@@ -1,4 +1,4 @@
-export const SPELL_LEVELS = ["cvc", "digraphs", "blends", "long", "patterns"] as const;
+export const SPELL_LEVELS = ["cvc", "digraphs", "blends", "long", "patterns", "grade4"] as const;
 export type SpellLevel = (typeof SPELL_LEVELS)[number];
 
 export interface SpellWord {
@@ -145,15 +145,43 @@ const PATTERNS = pack("patterns", [
   ["thought", "ough", "I thought of a joke."],
 ]);
 
+const GRADE4 = pack("grade4", [
+  ["knight", "silent kn", "The knight holds a shield."],
+  ["thumb", "silent b", "My thumb taps the screen."],
+  ["listen", "silent t", "Listen to the story."],
+  ["climb", "silent b", "We climb the hill."],
+  ["wrap", "silent w", "Wrap the gift."],
+  ["lamb", "silent b", "The lamb is soft."],
+  ["often", "silent t", "We often read at night."],
+  ["caught", "aught", "I caught the ball."],
+  ["answer", "silent w", "I know the answer."],
+  ["nature", "ture", "We walk in nature."],
+  ["signal", "al", "The signal turns green."],
+  ["island", "silent s", "The island is quiet."],
+  ["crumb", "silent b", "A crumb fell on the floor."],
+  ["design", "silent g", "Draw a new design."],
+  ["replay", "prefix re", "Replay the song."],
+  ["unpack", "prefix un", "Unpack the bag."],
+  ["redo", "prefix re", "Redo the last step."],
+  ["unlock", "prefix un", "Unlock the gate."],
+  ["enough", "ough", "One apple is enough."],
+  ["ghost", "silent h", "The ghost is friendly."],
+  ["wrist", "silent w", "The watch is on my wrist."],
+  ["wrote", "silent w", "I wrote a note."],
+  ["known", "silent k", "The answer is known."],
+  ["doubt", "silent b", "I doubt the rain will last."],
+]);
+
 const BY_LEVEL: Record<SpellLevel, readonly SpellWord[]> = {
   cvc: CVC,
   digraphs: DIGRAPHS,
   blends: BLENDS,
   long: LONG,
   patterns: PATTERNS,
+  grade4: GRADE4,
 };
 
-export const ALL_SPELL: readonly SpellWord[] = [...CVC, ...DIGRAPHS, ...BLENDS, ...LONG, ...PATTERNS];
+export const ALL_SPELL: readonly SpellWord[] = [...CVC, ...DIGRAPHS, ...BLENDS, ...LONG, ...PATTERNS, ...GRADE4];
 
 export function spellWords(level: SpellLevel): readonly SpellWord[] {
   return BY_LEVEL[level];

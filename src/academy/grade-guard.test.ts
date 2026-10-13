@@ -17,7 +17,7 @@ import { blankChild } from "./storage";
 import type { Board } from "./games/boards";
 import type { ChoiceQ } from "./games/types";
 
-const GRADES: Grade[] = ["K", "1", "2", "3"];
+const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4"];
 const SAMPLES = 200;
 const FIVES_ONLY = [5, 10, 20, 25, 35, 40, 50, 55];
 
@@ -54,6 +54,14 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
         const place = board.mode === "round10" ? 10 : 100;
         expect(question.answer).toBe(String(Math.floor(board.n / place + 0.5) * place));
       }
+      if (board.mode === "big") {
+        expect(board.n).toBeGreaterThanOrEqual(1000);
+        expect(board.n).toBeLessThanOrEqual(999999);
+        expect(question.answer).toBe(String(board.digit * board.place));
+      }
+      if (board.mode === "roundBig") {
+        expect(question.answer).toBe(String(Math.floor(board.n / board.place + 0.5) * board.place));
+      }
       if (grade === "1" || grade === "2") {
         expect(board.mode).not.toBe("round10");
         expect(board.mode).not.toBe("round100");
@@ -65,6 +73,20 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if (grade === "K") expect(board.mode).not.toBe("parts");
       break;
     case "fractions": {
+      if (board.mode === "decimals") {
+        expect(board.tenths).toBeGreaterThanOrEqual(0);
+        expect(board.tenths).toBeLessThanOrEqual(9);
+        expect(board.hundredths).toBeGreaterThanOrEqual(0);
+        expect(board.hundredths).toBeLessThanOrEqual(9);
+        break;
+      }
+      if (board.mode === "addLike") {
+        expect([2, 3, 4, 5, 6, 8, 10, 12]).toContain(board.den);
+        const result = board.op === "+" ? board.num + board.num2 : board.num - board.num2;
+        expect(result).toBeGreaterThan(0);
+        expect(result).toBeLessThanOrEqual(board.den);
+        break;
+      }
       const dens = board.mode === "compare" || board.mode === "equivalent" ? [board.den, board.den2] : [board.den];
       for (const den of dens) expect(FRACTION_DENOMINATORS).toContain(den);
       if (board.mode === "equivalent") expect(board.num * board.den2).toBe(board.num2 * board.den);
@@ -85,18 +107,23 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
     case "measure":
       if (board.mode === "ruler") expect(board.inches).toBeLessThanOrEqual(12);
       if (board.mode === "compare") expect(new Set(board.items.map((item) => item.value)).size).toBe(board.items.length);
-      if (grade === "K") expect(board.mode).toBe("compare");
+      if (grade === "K") expect(board.mode === "compare" || board.mode === "size").toBe(true);
+      if (grade === "PK") expect(board.mode).toBe("size");
       if (grade === "1") expect(board.mode).not.toBe("ruler");
       break;
     case "phonics":
       if (board.mode === "cvc") expect(question.answer).toMatch(/^[a-z]{3}$/);
       if (board.mode === "rhyme") expect(question.answer.endsWith(board.family)).toBe(true);
-      if (grade === "K" || grade === "1") {
-        expect(board.mode === "sounds" || board.mode === "begin").toBe(true);
+      if (grade === "PK" || grade === "K" || grade === "1") {
         expect(question.visual.kind).toBe("scene");
-        if (question.visual.kind === "scene") {
-          expect(question.visual.pictures?.[question.answer]).toBeTruthy();
-          expect(question.visual.labels[question.answer]).toBe("");
+        if (board.mode === "letters") {
+          expect(question.answer).toMatch(/^[A-Z]$/);
+        } else {
+          expect(board.mode === "sounds" || board.mode === "begin").toBe(true);
+          if (question.visual.kind === "scene") {
+            expect(question.visual.pictures?.[question.answer]).toBeTruthy();
+            expect(question.visual.labels[question.answer]).toBe("");
+          }
         }
       }
       break;
@@ -126,7 +153,7 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
       break;
     case "array":
       expect(task.rows * task.cols).toBeLessThanOrEqual(level === "count" ? 20 : 100);
-      if (grade !== "3") {
+      if (grade !== "3" && grade !== "4") {
         expect([6, 7, 8, 9]).not.toContain(task.rows);
         expect([6, 7, 8, 9]).not.toContain(task.cols);
       }
@@ -186,7 +213,7 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
       if (grade === "2") expect(task.mode).not.toBe("end");
       break;
     case "measure":
-      if (grade === "K") expect(task.mode).toBe("compare");
+      if (grade === "K" || grade === "PK") expect(task.mode).toBe("compare");
       if (grade === "1") expect(task.mode).not.toBe("ruler");
       if (task.mode === "ruler") expect(task.speech).not.toMatch(/\d/);
       break;
@@ -212,7 +239,8 @@ function assertQuestion(grade: Grade, level: string, question: ChoiceQ): void {
   const visual = question.visual;
   switch (visual.kind) {
     case "add": {
-      const max = level === "within5" ? 5 : level === "within10" ? 10 : level === "within20" ? 20 : 100;
+      const max =
+        level === "within5" ? 5 : level === "within10" ? 10 : level === "within20" ? 20 : level === "within1000" ? 1000 : level === "thousands" ? 9999 : 100;
       expect(visual.pink).toBeGreaterThanOrEqual(0);
       expect(visual.teal).toBeGreaterThanOrEqual(0);
       if (visual.op === "+") {
@@ -233,15 +261,31 @@ function assertQuestion(grade: Grade, level: string, question: ChoiceQ): void {
       break;
     }
     case "times": {
-      expect(visual.a * visual.b).toBe(Number(question.answer));
-      expect(visual.a * visual.b).toBeLessThanOrEqual(100);
-      const spec = TIMES_SPEC[level as TimesLevel];
-      expect(spec.factors.includes(visual.a) || spec.factors.includes(visual.b)).toBe(true);
-      expect(visual.b).toBeLessThanOrEqual(spec.max);
+      if (visual.ask === "factor") {
+        expect(visual.a % Number(question.answer)).toBe(0);
+      } else if (visual.ask === "multiple") {
+        expect(Number(question.answer) % visual.a).toBe(0);
+      } else if (visual.ask === "divide") {
+        const remainder = visual.remainder ?? 0;
+        expect(question.answer).toBe(`${visual.hidden} remainder ${remainder}`);
+        expect(visual.a).toBe(visual.b * visual.hidden + remainder);
+      } else if (level === "multi") {
+        expect(visual.a * visual.b).toBe(Number(question.answer));
+        expect(visual.a).toBeGreaterThanOrEqual(12);
+        expect(visual.b).toBeGreaterThanOrEqual(2);
+      } else {
+        expect(visual.a * visual.b).toBe(Number(question.answer));
+        expect(visual.a * visual.b).toBeLessThanOrEqual(level === "multi" ? 25 * 19 : 100);
+        const spec = TIMES_SPEC[level as TimesLevel];
+        expect(spec.factors.includes(visual.a) || spec.factors.includes(visual.b)).toBe(true);
+        expect(visual.b).toBeLessThanOrEqual(spec.max);
+      }
       if (level === "count") expect(visual.a * visual.b).toBeLessThanOrEqual(20);
-      if (grade !== "3") expect([6, 7, 8, 9]).not.toContain(visual.a);
-      if (grade !== "3") expect([6, 7, 8, 9]).not.toContain(visual.b);
-      if (grade === "K") throw new Error("kindergarten is not served multiplication");
+      if (grade !== "3" && grade !== "4") {
+        expect([6, 7, 8, 9]).not.toContain(visual.a);
+        expect([6, 7, 8, 9]).not.toContain(visual.b);
+      }
+      if (grade === "K" || grade === "PK") throw new Error("this grade is not served multiplication");
       break;
     }
     case "time": {
@@ -284,6 +328,10 @@ function assertQuestion(grade: Grade, level: string, question: ChoiceQ): void {
         expect(visual.coins.dollar).toBeLessThanOrEqual(2);
         expect(pileCents(visual.coins)).toBeLessThanOrEqual(300);
       }
+      if (visual.mode === "spend") {
+        expect(visual.priceCents ?? 0).toBeGreaterThan(0);
+        expect(question.answer.startsWith("$")).toBe(true);
+      }
       break;
     }
     case "sight": {
@@ -300,7 +348,7 @@ function assertQuestion(grade: Grade, level: string, question: ChoiceQ): void {
       const list = spellWords(level as SpellLevel);
       expect(list.some((word) => word.word === visual.word)).toBe(true);
       expect(question.answer).toBe(visual.word);
-      if (level === "patterns") expect(visual.showSentence).toBe(true);
+      if (level === "patterns" || level === "grade4") expect(visual.showSentence).toBe(true);
       else expect(visual.showSentence).toBe(false);
       if (grade === "K" || grade === "1") expect(visual.showSentence).toBe(false);
       break;
@@ -344,7 +392,7 @@ describe("grade bands", () => {
     const ids = add!.levels.map((level) => level.id);
     const band = playWindow(ids, "add", "K", false);
     expect(band.ids).toEqual(["within5", "within10", "within20"]);
-    expect(playWindow(ids, "add", "K", true).ids.at(-1)).toBe("within100");
+    expect(playWindow(ids, "add", "K", true).ids.at(-1)).toBe("thousands");
     let ladder = startLadder(openingIndex(ids.indexOf(band.start), 0, false, { min: band.min, max: band.max }));
     for (let i = 0; i < 12; i++) {
       ladder = stepLadder(ladder, ids.length, true, { min: band.min, max: band.max });
@@ -389,7 +437,7 @@ describe("grade bands", () => {
           if (game.id === "money") {
             const pay = makePayTask(level, rngFromSeed(`pay-${grade}-${level}-${i}`));
             expect(pay.cents).toBeGreaterThan(0);
-            expect(pay.cents).toBeLessThanOrEqual(grade === "3" || grade === "2" ? 200 : 75);
+            expect(pay.cents).toBeLessThanOrEqual(grade === "4" ? 400 : grade === "3" || grade === "2" ? 200 : 75);
             if (level === "name") expect(pay.bank).toHaveLength(1);
             if (grade === "K" || grade === "1") expect(pay.cents).toBeLessThanOrEqual(75);
           }

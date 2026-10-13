@@ -6,6 +6,7 @@ import type { Grade } from "../model";
 import { CoinRow } from "../ui/coins";
 import { SquisheeImg, cx } from "../ui/bits";
 import { fourChoices, qid } from "./choices";
+import { makeSpendQuestion, spanSheet } from "./span";
 import {
   COIN_CENTS,
   COIN_NAME,
@@ -20,7 +21,7 @@ import {
 } from "./money-model";
 import type { ChoiceQ, CoinPile, GameModule, MoneyMode, MoneyVisual, SheetItem } from "./types";
 
-export const MONEY_LEVELS = ["name", "count", "make", "change", "dollars"] as const;
+export const MONEY_LEVELS = ["name", "count", "make", "change", "dollars", "spend"] as const;
 export type MoneyLevel = (typeof MONEY_LEVELS)[number];
 
 const LEVELS = [
@@ -29,6 +30,7 @@ const LEVELS = [
   { id: "make", label: "Make an amount", num: 3 },
   { id: "change", label: "Make change", num: 4 },
   { id: "dollars", label: "Dollars and cents", num: 5 },
+  { id: "spend", label: "Money problems", num: 6 },
 ] as const;
 
 const BARS = [
@@ -37,6 +39,7 @@ const BARS = [
   { key: "money:make", label: "Make an amount" },
   { key: "money:change", label: "Make change" },
   { key: "money:dollars", label: "Dollars and cents" },
+  { key: "money:spend", label: "Money problems" },
 ];
 
 const CHIPS = [
@@ -45,6 +48,7 @@ const CHIPS = [
   { key: "money:make", label: "Makes an amount" },
   { key: "money:change", label: "Makes change" },
   { key: "money:dollars", label: "Dollars and cents" },
+  { key: "money:spend", label: "Money problems" },
 ];
 
 const PAYS: CoinPile[] = [
@@ -74,6 +78,10 @@ function defaultLevel(grade: Grade): MoneyLevel {
       return "make";
     case "3":
       return "dollars";
+    case "PK":
+      return "name";
+    case "4":
+      return "spend";
     default: {
       const neverGrade: never = grade;
       return neverGrade;
@@ -283,6 +291,8 @@ export function makeMoneyQuestion(rng: Rng, level: MoneyLevel): ChoiceQ {
       return makeChange(rng);
     case "dollars":
       return makeDollars(rng);
+    case "spend":
+      return makeSpendQuestion(rng);
     default: {
       const neverLevel: never = level;
       return neverLevel;
@@ -328,6 +338,11 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         answer: formatCents(dollars * 100 + cents),
       };
     }
+    case "spend": {
+      const printed = spanSheet(rng, "money", "spend");
+      if (printed) return printed;
+      return { prompt: t("A snack is $1.50 and a drink is $1.25. How much altogether?", "Una merienda cuesta $1.50 y un jugo cuesta $1.25. ¿Cuánto es en total?"), answer: "$2.75" };
+    }
     default: {
       const neverLevel: never = safe;
       return neverLevel;
@@ -343,7 +358,13 @@ function MoneyArt({ visual, large }: { visual: MoneyVisual; large?: boolean }) {
   const mode: MoneyMode = visual.mode;
   if (mode === "make") return null;
   const pile = describePile(visual.coins);
-  const label = mode === "name" ? t("A coin", "Una moneda") : mode === "change" ? t(`You pay ${pile}`, `Pagas ${pile}`) : pile;
+  if (mode === "spend" && visual.coins.dollar === 0) return null;
+  const label =
+    mode === "name"
+      ? t("A coin", "Una moneda")
+      : mode === "change" || mode === "spend"
+        ? t(`You pay ${pile}`, `Pagas ${pile}`)
+        : pile;
   return <CoinRow pile={visual.coins} large={large ?? mode === "name"} label={label} />;
 }
 
@@ -364,7 +385,7 @@ export function MoneyPrompt({
       <h1>{question.title}</h1>
       <SquisheeImg id={mascot} className={cx("ac-mascot", happy && "is-happy")} />
       <MoneyArt visual={visual} />
-      {visual.mode === "change" && visual.priceCents != null ? (
+      {(visual.mode === "change" || visual.mode === "spend") && visual.priceCents != null ? (
         <p className="ac-eq ac-money-price">{formatCents(visual.priceCents)}</p>
       ) : null}
       <p className="ac-hint">{question.hint}</p>
@@ -385,7 +406,7 @@ export function MoneySheet({ items }: { items: SheetItem[] }) {
 export const moneyGame = {
   id: "money",
   title: "Money",
-  audience: "K–3",
+  audience: "Pre-K–4",
   tint: "gold",
   mascot: "lemon",
   sheetSlug: "money",

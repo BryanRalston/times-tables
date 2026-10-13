@@ -18,11 +18,13 @@ function visual(level: MoneyLevel, seed: number): MoneyVisual {
 
 describe("money questions", () => {
   it("starts each grade on a K–3 level", () => {
+    expect(moneyGame.defaultLevel("PK")).toBe("name");
     expect(moneyGame.defaultLevel("K")).toBe("name");
     expect(moneyGame.defaultLevel("1")).toBe("count");
     expect(moneyGame.defaultLevel("2")).toBe("make");
     expect(moneyGame.defaultLevel("3")).toBe("dollars");
-    expect(MONEY_LEVELS).toEqual(["name", "count", "make", "change", "dollars"]);
+    expect(moneyGame.defaultLevel("4")).toBe("spend");
+    expect(MONEY_LEVELS).toEqual(["name", "count", "make", "change", "dollars", "spend"]);
     expect(isMoneyLevel("change")).toBe(true);
     expect(isMoneyLevel("nope")).toBe(false);
   });

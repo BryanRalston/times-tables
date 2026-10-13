@@ -45,6 +45,7 @@ export function yourTurnLine(prompt: string): string {
 
 export function gradeText(grade: Grade): string {
   if (locale !== "es") return gradeLabel(grade);
+  if (grade === "PK") return "Prekínder";
   if (grade === "K") return "Kínder";
   return `Grado ${grade}`;
 }
@@ -266,7 +267,10 @@ export function spanishFraction(num: number, den: number): string {
     3: ["tercio", "tercios"],
     4: ["cuarto", "cuartos"],
     6: ["sexto", "sextos"],
+    5: ["quinto", "quintos"],
     8: ["octavo", "octavos"],
+    10: ["décimo", "décimos"],
+    12: ["doceavo", "doceavos"],
   };
   const pair = forms[den];
   if (!pair) return `${num} de ${den}`;

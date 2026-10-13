@@ -6,11 +6,12 @@ import { buddyName, pickTalk } from "./flavor";
 import type { FluencyData, Question } from "@/lib/types";
 import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
+import { makeDivideQuestion, makeFactorQuestion, makeMultiQuestion, spanSheet } from "./span";
 import { Equation, Groups, SquisheeImg, cx } from "../ui/bits";
 import { fourChoices, qid } from "./choices";
 import { TIMES, type ChoiceQ, type GameModule, type SheetItem } from "./types";
 
-export const TIMES_LEVELS = ["count", "twos", "mix", "toTen"] as const;
+export const TIMES_LEVELS = ["count", "twos", "mix", "toTen", "factors", "multi", "divide"] as const;
 export type TimesLevel = (typeof TIMES_LEVELS)[number];
 
 export const TIMES_SPEC: Record<TimesLevel, { factors: number[]; max: number }> = {
@@ -18,6 +19,9 @@ export const TIMES_SPEC: Record<TimesLevel, { factors: number[]; max: number }> 
   twos: { factors: [2, 5, 10], max: 10 },
   mix: { factors: [2, 3, 4, 5, 10], max: 10 },
   toTen: { factors: [2, 3, 4, 5, 6, 7, 8, 9, 10], max: 10 },
+  factors: { factors: [2, 3, 4, 5, 10], max: 10 },
+  multi: { factors: [2, 3, 4, 5, 10], max: 9 },
+  divide: { factors: [2, 3, 4, 5, 10], max: 9 },
 };
 
 /** 6, 7, 8, and 9 are grade 3 facts (3.OA). Earlier levels may still use 10. */
@@ -28,6 +32,9 @@ const LEVELS = [
   { id: "twos", label: "2s, 5s, 10s", num: 2 },
   { id: "mix", label: "Mix through 5s", num: 3 },
   { id: "toTen", label: "Up to 10s", num: 4 },
+  { id: "factors", label: "Factors and multiples", num: 5 },
+  { id: "multi", label: "Multi-digit multiply", num: 6 },
+  { id: "divide", label: "Division with remainders", num: 7 },
 ] as const;
 
 const BARS = ["2", "5", "10", "3", "4", "6", "7", "8", "9"].map((n) => ({ key: `table:${n}`, label: `×${n}` }));
@@ -41,6 +48,7 @@ function defaultLevel(grade: Grade): TimesLevel {
   const start = bandFor("times", grade)?.start;
   if (isTimesLevel(start)) return start;
   switch (grade) {
+    case "PK":
     case "K":
       return "count";
     case "1":
@@ -49,6 +57,8 @@ function defaultLevel(grade: Grade): TimesLevel {
       return "twos";
     case "3":
       return "toTen";
+    case "4":
+      return "factors";
     default: {
       const neverGrade: never = grade;
       return neverGrade;
@@ -134,6 +144,9 @@ function tableTags(a: number, b: number): string[] {
 }
 
 export function makeTimesQuestion(rng: Rng, level: TimesLevel, prefer: string[] = []): ChoiceQ {
+  if (level === "factors") return makeFactorQuestion(rng);
+  if (level === "multi") return makeMultiQuestion(rng);
+  if (level === "divide") return makeDivideQuestion(rng);
   const { a, b } = nextTimesFact(rng, level, prefer);
   const product = a * b;
   const solved = `${a} ${TIMES} ${b} = ${product}`;
@@ -161,6 +174,8 @@ export function makeTimesQuestion(rng: Rng, level: TimesLevel, prefer: string[] 
 }
 
 function sheetItem(rng: Rng, level: string, focus?: number): SheetItem {
+  const extra = spanSheet(rng, "times", level);
+  if (extra) return extra;
   const safe = isTimesLevel(level) ? level : "toTen";
   const fact =
     focus && focus >= 2 && focus <= 12 ? { a: focus, b: rng.int(1, 10) } : nextTimesFact(rng, safe, []);
@@ -197,7 +212,7 @@ export function TimesSheet({ items }: { items: SheetItem[] }) {
 export const timesGame = {
   id: "times",
   title: "Times Tables",
-  audience: "Grade 2–3",
+  audience: "Grade 2–4",
   tint: "pink",
   mascot: "peach",
   sheetSlug: "times-tables",

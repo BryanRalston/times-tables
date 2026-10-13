@@ -183,6 +183,8 @@ export function collectClipSpecs(lines: readonly SpokenLine[] = collectSpokenLin
     }
   }
   for (let n = 0; n <= NUMBER_MAX; n += 1) touch(games, String(n), n <= 100 ? "ui" : "place");
+  touch(games, "thousand", "place");
+  touch(games, "million", "place");
   for (let minutes = 0; minutes < 60; minutes += 1) {
     touch(games, `min:${String(minutes).padStart(2, "0")}`, "time");
   }

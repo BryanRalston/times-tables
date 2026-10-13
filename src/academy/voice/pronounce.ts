@@ -201,6 +201,11 @@ const ES_LETTER: Record<string, string> = {
 };
 
 function pronounceSpanishWord(word: string, alone: boolean): string {
+  if (word === "thousand") return "mil";
+  if (word === "million") return "millón";
+  if (word === "hundredths") return "centésimos";
+  if (word === "tenths") return "décimos";
+  if (word === "remainder") return "residuo";
   if (isPhoneme(word)) return PHONEMES[word] ?? word;
   if (word === "y") return "i";
   if (/^[a-z]$/.test(word) && alone) return ES_LETTER[word] ?? word;

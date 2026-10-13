@@ -392,6 +392,25 @@ export function Equation({
 }) {
   if (visual.kind === "time" || visual.kind === "money" || visual.kind === "sight" || visual.kind === "spell" || visual.kind === "scene") return null;
   if (visual.kind === "times") {
+    if (visual.ask === "divide") {
+      const shown = reveal ? answer : "?";
+      return (
+        <p className="ac-eq">
+          <span>{visual.a}</span>
+          <span className="ac-op">÷</span>
+          <span>{visual.b}</span>
+          <span className="ac-op">=</span>
+          <span className="ac-blank">{shown}</span>
+        </p>
+      );
+    }
+    if (visual.ask === "factor" || visual.ask === "multiple") {
+      return (
+        <p className="ac-eq">
+          <span className="ac-blank">{reveal ? answer : "?"}</span>
+        </p>
+      );
+    }
     return (
       <p className="ac-eq">
         <span>{visual.a}</span>

@@ -77,7 +77,7 @@ describe("island map", () => {
       expect(q.choices).toHaveLength(4);
       expect(q.choices).toContain(q.answer);
     }
-    const top = makeBossRound("add", "within100", rngFromSeed("top"));
-    expect(top.every((q) => q.skill === "add:within100")).toBe(true);
+    const top = makeBossRound("add", "thousands", rngFromSeed("top"));
+    expect(top.every((q) => q.skill === "add:thousands")).toBe(true);
   });
 });

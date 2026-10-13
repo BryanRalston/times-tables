@@ -4,10 +4,11 @@ import type { Grade } from "../model";
 import { buddyName, pickTalk } from "./flavor";
 import { blockPhrase, expandedForm, roundHalfUp, type PlaceBoard } from "./boards";
 import { extremeChoices, nearChoices, sceneQuestion, uniqueChoices } from "./pick";
+import { makeBigPlaceQuestion, makeRoundBigQuestion, spanSheet } from "./span";
 import { BaseTen, SceneCard, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
-export const PLACE_LEVELS = ["blocks", "expanded", "compare", "round10", "round100", "build"] as const;
+export const PLACE_LEVELS = ["blocks", "expanded", "compare", "round10", "round100", "build", "big", "roundBig"] as const;
 export type PlaceLevel = (typeof PLACE_LEVELS)[number];
 
 const LEVELS = [
@@ -17,6 +18,8 @@ const LEVELS = [
   { id: "round10", label: "Round to 10", num: 4 },
   { id: "round100", label: "Round to 100", num: 5 },
   { id: "build", label: "Build a number", num: 6 },
+  { id: "big", label: "Place value to 1,000,000", num: 7 },
+  { id: "roundBig", label: "Round large numbers", num: 8 },
 ] as const;
 
 const BARS = [
@@ -26,6 +29,8 @@ const BARS = [
   { key: "place:round10", label: "Round to 10" },
   { key: "place:round100", label: "Round to 100" },
   { key: "place:build", label: "Build a number" },
+  { key: "place:big", label: "Place value to 1,000,000" },
+  { key: "place:roundBig", label: "Round large numbers" },
 ];
 
 export function isPlaceLevel(value: unknown): value is PlaceLevel {
@@ -34,6 +39,7 @@ export function isPlaceLevel(value: unknown): value is PlaceLevel {
 
 function defaultLevel(grade: Grade): PlaceLevel {
   switch (grade) {
+    case "PK":
     case "K":
     case "1":
       return "blocks";
@@ -41,6 +47,8 @@ function defaultLevel(grade: Grade): PlaceLevel {
       return "expanded";
     case "3":
       return "round10";
+    case "4":
+      return "big";
     default: {
       const neverGrade: never = grade;
       return neverGrade;
@@ -212,6 +220,10 @@ export function makePlaceQuestion(rng: Rng, level: PlaceLevel): ChoiceQ {
       return makeRound(rng, 100);
     case "build":
       return makeBuild(rng);
+    case "big":
+      return makeBigPlaceQuestion(rng);
+    case "roundBig":
+      return makeRoundBigQuestion(rng);
     default: {
       const neverLevel: never = level;
       return neverLevel;
@@ -255,6 +267,12 @@ function sheetItem(rng: Rng, level: string): SheetItem {
     case "round100": {
       const n = rng.int(100, 999);
       return { prompt: t(`Round ${n} to the nearest 100.`, `Redondea ${n} a la centena más cercana.`), answer: String(roundHalfUp(n, 100)) };
+    }
+    case "big":
+    case "roundBig": {
+      const printed = spanSheet(rng, "place", safe);
+      if (printed) return printed;
+      return { prompt: t("What is the value of the 4 in 345678?", "¿Cuál es el valor del 4 en 345678?"), answer: "40000" };
     }
     default: {
       const neverLevel: never = safe;
@@ -302,6 +320,15 @@ function PlaceArt({ board }: { board: PlaceBoard }) {
     case "round100":
     case "build":
       return <p className="ac-big-num">{board.n}</p>;
+    case "big":
+      return (
+        <p className="ac-big-num">
+          {board.n.toLocaleString("en-US")}
+          <small>{board.digit}</small>
+        </p>
+      );
+    case "roundBig":
+      return <p className="ac-big-num">{board.n.toLocaleString("en-US")}</p>;
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -313,7 +340,7 @@ export const placeGame = sceneModule({
   id: "place",
   title: "Place Value",
   short: "Place Value",
-  audience: "1–3",
+  audience: "1–4",
   tint: "leaf",
   mascot: "bear",
   sheetSlug: "place-value",

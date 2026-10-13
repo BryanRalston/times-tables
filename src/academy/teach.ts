@@ -78,14 +78,17 @@ export interface WorkedExample {
 
 const COIN_ORDER: CoinKind[] = ["dollar", "quarter", "dime", "nickel", "penny"];
 
-const NUMBER_WORD = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+const NUMBER_WORD = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
 
 const FRACTION_WORD: Record<string, [string, string]> = {
   "2": ["half", "halves"],
   "3": ["third", "thirds"],
   "4": ["fourth", "fourths"],
+  "5": ["fifth", "fifths"],
   "6": ["sixth", "sixths"],
   "8": ["eighth", "eighths"],
+  "10": ["tenth", "tenths"],
+  "12": ["twelfth", "twelfths"],
 };
 
 /** "1/2" is spoken as "one half", so a voice does not say "slash". */
@@ -416,6 +419,18 @@ function moneyFrames(visual: MoneyVisual, answer: string): MoneyFrame[] {
     case "count":
     case "dollars":
       return runningFrames(coinsOf(visual.coins), formatCents(pileCents(visual.coins)));
+    case "spend": {
+      const price = visual.priceCents ?? 0;
+      const paid = pileCents(visual.coins);
+      if (paid > price && paid > 0) {
+        return [
+          { kind: "money", coins: [], runningCents: price, caption: t(`The prices add to ${formatCents(price)}`, `Los precios suman ${formatCents(price)}`) },
+          { kind: "money", coins: coinsOf(visual.coins), runningCents: paid, caption: t(`You pay ${formatCents(paid)}`, `Pagas ${formatCents(paid)}`) },
+          { kind: "money", coins: [], runningCents: paid - price, caption: t(`Change is ${formatCents(paid - price)}`, `El cambio es ${formatCents(paid - price)}`) },
+        ];
+      }
+      return [{ kind: "money", coins: [], runningCents: price, caption: t(`The prices add to ${formatCents(price)}`, `Los precios suman ${formatCents(price)}`) }];
+    }
     default: {
       const neverMode: never = visual.mode;
       return neverMode;
@@ -495,6 +510,10 @@ function placeTeach(board: PlaceBoard, solved: string): SceneFrame[] {
       return captions([t("5 or more in the ones rounds up", "5 o más en las unidades sube"), solved]);
     case "round100":
       return captions([t("50 or more in the tens rounds up", "50 o más en las decenas sube"), solved]);
+    case "big":
+      return captions([t("Find the place, then multiply", "Encuentra el lugar y luego multiplica"), solved]);
+    case "roundBig":
+      return captions([t("Look at the digit to the right", "Mira el dígito de la derecha"), solved]);
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -518,6 +537,14 @@ function shapeTeach(board: ShapeBoard, solved: string): SceneFrame[] {
       return captions([t("A line of symmetry makes two matching halves", "Una línea de simetría hace dos mitades iguales"), solved]);
     case "parts":
       return captions([t("Equal parts are the same size", "Las partes iguales tienen el mismo tamaño"), solved]);
+    case "color":
+      return captions([t("Look at the color", "Mira el color"), solved]);
+    case "match":
+      return captions([t("Find the same shape", "Busca la misma figura"), solved]);
+    case "pattern":
+      return captions([t("Say the pattern", "Di el patrón"), solved]);
+    case "angles":
+      return captions([t("A right angle is a square corner", "Un ángulo recto es una esquina cuadrada"), solved]);
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -541,6 +568,10 @@ function fractionTeach(board: FractionBoard, solved: string): SceneFrame[] {
       return captions([t("Compare the same kind of part", "Compara el mismo tipo de parte"), solved]);
     case "equivalent":
       return captions([t("Same amount, different parts", "La misma cantidad, distintas partes"), solved]);
+    case "addLike":
+      return captions([t("The denominator stays the same", "El denominador se queda igual"), solved]);
+    case "decimals":
+      return captions([t("Tenths, then hundredths", "Décimos, luego centésimos"), solved]);
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -559,6 +590,12 @@ function measureTeach(board: MeasureBoard, solved: string): SceneFrame[] {
       return captions([t("Read one row", "Lee una fila"), solved]);
     case "more":
       return captions([t("Subtract the smaller number", "Resta el número menor"), solved]);
+    case "size":
+      return captions([t("Look at the pictures", "Mira los dibujos"), solved]);
+    case "area":
+      return captions([t("Length times width", "Largo por ancho"), solved]);
+    case "perimeter":
+      return captions([t("Add all four sides", "Suma los cuatro lados"), solved]);
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -568,6 +605,8 @@ function measureTeach(board: MeasureBoard, solved: string): SceneFrame[] {
 
 function phonicsTeach(board: PhonicsBoard, solved: string): SceneFrame[] {
   switch (board.mode) {
+    case "letters":
+      return captions([t(`The letter is ${board.letter}`, `La letra es ${board.letter}`), solved]);
     case "sounds":
     case "begin":
       return captions([t(`The sound is ${board.phoneme}`, `El sonido es ${board.phoneme}`), solved]);
@@ -607,6 +646,14 @@ function problemTeach(board: ProblemBoard): SceneFrame[] {
         t(`${board.b} in each group`, `${board.b} en cada grupo`),
         t(`${board.a} groups of ${board.b}`, `${board.a} grupos de ${board.b}`),
       ]);
+    case "steps": {
+      const away = board.extra ?? 0;
+      return captions([
+        t(`${board.a} groups of ${board.b}`, `${board.a} grupos de ${board.b}`),
+        t(`Take away ${away}`, `Quita ${away}`),
+        `${board.a * board.b} - ${away} = ${board.a * board.b - away}`,
+      ]);
+    }
     default: {
       const neverMode: never = board.mode;
       return neverMode;

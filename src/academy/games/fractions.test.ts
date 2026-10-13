@@ -83,6 +83,14 @@ describe("fraction questions", () => {
             expect([2, 3, 4, 6, 8]).toContain(board.den);
             expect(q.answer).toBe(`${board.num}/${board.den}`);
             break;
+          case "addLike": {
+            const result = board.op === "+" ? board.num + board.num2 : board.num - board.num2;
+            expect(q.answer).toBe(`${result}/${board.den}`);
+            break;
+          }
+          case "decimals":
+            expect(q.answer).toMatch(/^\d+\.\d+$/);
+            break;
           default: {
             const neverBoard: never = board;
             throw new Error(String(neverBoard));
@@ -96,6 +104,16 @@ describe("fraction questions", () => {
     for (let seed = 0; seed < 10; seed += 1) {
       for (const level of fractionsGame.levels) {
         const row = fractionsGame.makeSheetItem(rngFromSeed(`fractions-sheet-${seed}-${level.id}`), level.id);
+        if (level.id === "addLike") {
+          expect(row.prompt).toBe("2/8 + 3/8 =");
+          expect(row.answer).toBe("5/8");
+          continue;
+        }
+        if (level.id === "decimals") {
+          expect(row.prompt).toBe("Write 25 hundredths as a decimal.");
+          expect(row.answer).toBe("0.25");
+          continue;
+        }
         const dens = [...`${row.prompt} ${row.answer}`.matchAll(/\/(\d+)/g)].map((found) => Number(found[1]));
         for (const found of dens) expect([2, 3, 4, 6, 8]).toContain(found);
         if (level.id !== "equivalent") {

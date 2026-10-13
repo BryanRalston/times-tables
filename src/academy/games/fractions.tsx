@@ -4,10 +4,11 @@ import type { Grade } from "../model";
 import { buddyName, pickTalk } from "./flavor";
 import { fractionText, type FractionBoard } from "./boards";
 import { sceneQuestion, uniqueChoices } from "./pick";
-import { FractionBar, FractionLine, SceneCard, sceneModule } from "./scene-ui";
+import { makeAddLikeQuestion, makeDecimalQuestion, spanSheet } from "./span";
+import { DecimalGrid, FractionBar, FractionLine, SceneCard, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
-export const FRACTION_LEVELS = ["parts", "unit", "line", "compare", "equivalent", "shade"] as const;
+export const FRACTION_LEVELS = ["parts", "unit", "line", "compare", "equivalent", "shade", "addLike", "decimals"] as const;
 export type FractionLevel = (typeof FRACTION_LEVELS)[number];
 
 const LEVELS = [
@@ -17,6 +18,8 @@ const LEVELS = [
   { id: "compare", label: "Compare fractions", num: 4 },
   { id: "equivalent", label: "Equivalent fractions", num: 5 },
   { id: "shade", label: "Shade a fraction", num: 6 },
+  { id: "addLike", label: "Add like fractions", num: 7 },
+  { id: "decimals", label: "Decimals", num: 8 },
 ] as const;
 
 const BARS = [
@@ -26,6 +29,8 @@ const BARS = [
   { key: "fractions:compare", label: "Compare fractions" },
   { key: "fractions:equivalent", label: "Equivalent fractions" },
   { key: "fractions:shade", label: "Shade a fraction" },
+  { key: "fractions:addLike", label: "Add like fractions" },
+  { key: "fractions:decimals", label: "Decimals" },
 ];
 
 const PAIRS: Array<[number, number, number, number]> = [
@@ -49,6 +54,7 @@ export function isFractionLevel(value: unknown): value is FractionLevel {
 
 function defaultLevel(grade: Grade): FractionLevel {
   switch (grade) {
+    case "PK":
     case "K":
     case "1":
       return "parts";
@@ -56,6 +62,8 @@ function defaultLevel(grade: Grade): FractionLevel {
       return "line";
     case "3":
       return "equivalent";
+    case "4":
+      return "addLike";
     default: {
       const neverGrade: never = grade;
       return neverGrade;
@@ -344,6 +352,10 @@ export function makeFractionQuestion(rng: Rng, level: FractionLevel): ChoiceQ {
       return makeEquivalent(rng);
     case "shade":
       return makeShade(rng);
+    case "addLike":
+      return makeAddLikeQuestion(rng);
+    case "decimals":
+      return makeDecimalQuestion(rng);
     default: {
       const neverLevel: never = level;
       return neverLevel;
@@ -399,6 +411,12 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         answer: `${pair[2]}/${pair[3]}`,
       };
     }
+    case "addLike":
+    case "decimals": {
+      const printed = spanSheet(rng, "fractions", safe);
+      if (printed) return printed;
+      return { prompt: "2/8 + 3/8 =", answer: "5/8" };
+    }
     default: {
       const neverLevel: never = safe;
       return neverLevel;
@@ -448,6 +466,16 @@ function FractionArt({ board }: { board: FractionBoard }) {
       return <FractionBar num={board.num} den={board.den} />;
     case "shade":
       return null;
+    case "addLike":
+      return (
+        <div className="ac-frac-pair">
+          <FractionBar num={board.num} den={board.den} />
+          <p className="ac-frac-name">{board.op}</p>
+          <FractionBar num={board.num2} den={board.den} />
+        </div>
+      );
+    case "decimals":
+      return <DecimalGrid tenths={board.tenths} hundredths={board.hundredths} />;
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -459,7 +487,7 @@ export const fractionsGame = sceneModule({
   id: "fractions",
   title: "Fractions",
   short: "Fractions",
-  audience: "1–3",
+  audience: "1–4",
   tint: "sand",
   mascot: "panda",
   sheetSlug: "fractions",

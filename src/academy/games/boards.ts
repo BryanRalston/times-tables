@@ -10,7 +10,9 @@ export type CountBoard =
 
 export type PlaceBoard =
   | { game: "place"; mode: "blocks" | "expanded" | "round10" | "round100" | "build"; n: number }
-  | { game: "place"; mode: "compare"; left: number; right: number; ask: "greater" | "less" };
+  | { game: "place"; mode: "compare"; left: number; right: number; ask: "greater" | "less" }
+  | { game: "place"; mode: "big"; n: number; digit: number; place: number }
+  | { game: "place"; mode: "roundBig"; n: number; place: number };
 
 export type ShapeName =
   | "circle"
@@ -24,11 +26,19 @@ export type ShapeName =
   | "cone"
   | "cylinder";
 
+export type ShapeColor = "red" | "blue" | "yellow" | "green";
+
+export type AngleKind = "acute" | "right" | "obtuse" | "straight";
+
 export type ShapeBoard =
   | { game: "shapes"; mode: "flat" | "solid"; shape: ShapeName }
   | { game: "shapes"; mode: "sides"; shape: ShapeName; ask: "sides" | "corners" }
   | { game: "shapes"; mode: "symmetry"; shape: "square" | "rectangle" | "triangle" | "circle" }
-  | { game: "shapes"; mode: "parts"; parts: "halves" | "thirds" | "fourths" | "unequal" };
+  | { game: "shapes"; mode: "parts"; parts: "halves" | "thirds" | "fourths" | "unequal" }
+  | { game: "shapes"; mode: "color"; color: ShapeColor }
+  | { game: "shapes"; mode: "match"; shape: ShapeName }
+  | { game: "shapes"; mode: "pattern"; items: ShapeColor[]; next: ShapeColor }
+  | { game: "shapes"; mode: "angles"; kind: AngleKind; ask: "kind" | "degrees" };
 
 export type FractionBoard =
   | { game: "fractions"; mode: "parts" | "unit" | "shade"; num: number; den: number }
@@ -42,7 +52,18 @@ export type FractionBoard =
       den2: number;
       ask: "greater" | "less";
     }
-  | { game: "fractions"; mode: "equivalent"; num: number; den: number; num2: number; den2: number };
+  | { game: "fractions"; mode: "equivalent"; num: number; den: number; num2: number; den2: number }
+  | { game: "fractions"; mode: "addLike"; num: number; den: number; num2: number; op: "+" | "-" }
+  | {
+      game: "fractions";
+      mode: "decimals";
+      whole: number;
+      tenths: number;
+      hundredths: number;
+      ask: "write" | "compare";
+      otherTenths?: number;
+      otherHundredths?: number;
+    };
 
 export interface MeasureItem {
   name: string;
@@ -52,11 +73,14 @@ export interface MeasureItem {
 
 export type MeasureBoard =
   | { game: "measure"; mode: "compare"; items: MeasureItem[]; ask: "longest" | "shortest" }
+  | { game: "measure"; mode: "size"; ask: "bigger" | "smaller" }
   | { game: "measure"; mode: "ruler"; inches: number }
   | { game: "measure"; mode: "picture" | "bar"; items: MeasureItem[]; ask: "count" | "most"; focus: number }
-  | { game: "measure"; mode: "more"; items: MeasureItem[]; left: number; right: number };
+  | { game: "measure"; mode: "more"; items: MeasureItem[]; left: number; right: number }
+  | { game: "measure"; mode: "area" | "perimeter"; length: number; width: number };
 
 export type PhonicsBoard =
+  | { game: "phonics"; mode: "letters"; letter: string }
   | { game: "phonics"; mode: "sounds" | "begin"; letter: string; phoneme: string; word: string; emoji: string }
   | { game: "phonics"; mode: "rhyme"; cue: string; family: string }
   | { game: "phonics"; mode: "cvc"; word: string; blend: string; letters: string }
@@ -64,12 +88,14 @@ export type PhonicsBoard =
 
 export interface ProblemBoard {
   game: "problems";
-  mode: "add" | "sub" | "mult" | "div" | "picture";
+  mode: "add" | "sub" | "mult" | "div" | "picture" | "steps";
   op: "+" | "-" | "×" | "÷";
   a: number;
   b: number;
   emoji: string;
   thing: string;
+  /** Taken away or added after the first step. */
+  extra?: number;
 }
 
 export type Board = CountBoard | PlaceBoard | ShapeBoard | FractionBoard | MeasureBoard | PhonicsBoard | ProblemBoard;

@@ -179,7 +179,7 @@ describe("buddy save migration", () => {
       ],
     });
     expect(save.version).toBe(SAVE_VERSION);
-    expect(SAVE_VERSION).toBe(9);
+    expect(SAVE_VERSION).toBe(10);
     expect(save.children[0]?.bonds).toEqual({});
     expect(save.children[0]?.levels.count).toBeTruthy();
     expect(save.children[0]?.bestStars.count).toBe(0);

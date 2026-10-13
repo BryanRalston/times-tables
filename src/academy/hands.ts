@@ -34,6 +34,7 @@ export function clockSnap(level: string): number {
     case "quarter":
       return 15;
     case "fives":
+    case "elapsed":
       return 5;
     default:
       return 60;
@@ -165,6 +166,11 @@ const PAY_PLANS: Record<string, { cents: number; bank: CoinKind[] }[]> = {
     { cents: 100, bank: ["quarter", "dollar"] },
     { cents: 125, bank: ["quarter", "dollar"] },
     { cents: 150, bank: ["dime", "quarter", "dollar"] },
+  ],
+  spend: [
+    { cents: 175, bank: ["quarter", "dollar"] },
+    { cents: 250, bank: ["quarter", "dollar"] },
+    { cents: 325, bank: ["quarter", "dollar"] },
   ],
 };
 

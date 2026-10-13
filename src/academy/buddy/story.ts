@@ -16,6 +16,15 @@ export function storyLine(visual: Visual, buddyId: string, hostId: string): stri
   const trait = personaOf(buddyId).trait;
   switch (visual.kind) {
     case "times":
+      if (visual.ask === "factor") {
+        return es ? `${host} busca un factor de ${visual.a}.` : `${host} looks for a factor of ${visual.a}.`;
+      }
+      if (visual.ask === "multiple") {
+        return es ? `${host} cuenta de ${visual.a} en ${visual.a}.` : `${host} skip counts by ${visual.a}.`;
+      }
+      if (visual.ask === "divide") {
+        return es ? `${host} reparte ${visual.a} en grupos de ${visual.b}.` : `${host} shares ${visual.a} into groups of ${visual.b}.`;
+      }
       return es
         ? `${host} pone ${visual.a} grupos de ${visual.b} squishees. ¿Cuántos hay?`
         : `${host} sets out ${visual.a} groups of ${visual.b} squishees. How many?`;

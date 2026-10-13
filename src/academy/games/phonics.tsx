@@ -4,22 +4,25 @@ import type { Grade } from "../model";
 import { buddyName, pickTalk } from "./flavor";
 import type { PhonicsBoard } from "./boards";
 import { sceneQuestion, uniqueChoices } from "./pick";
+import { makeLetterQuestion, spanSheet } from "./span";
 import { SceneCard, sceneModule } from "./scene-ui";
 import { SpeakerBar } from "./speaker";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
-export const PHONICS_LEVELS = ["sounds", "begin", "rhyme", "cvc", "end"] as const;
+export const PHONICS_LEVELS = ["letters", "sounds", "begin", "rhyme", "cvc", "end"] as const;
 export type PhonicsLevel = (typeof PHONICS_LEVELS)[number];
 
 const LEVELS = [
-  { id: "sounds", label: "Letter sounds", num: 1 },
-  { id: "begin", label: "Beginning sounds", num: 2 },
-  { id: "rhyme", label: "Rhyming words", num: 3 },
-  { id: "cvc", label: "CVC blending", num: 4 },
-  { id: "end", label: "Ending sounds", num: 5 },
+  { id: "letters", label: "Letter names", num: 1 },
+  { id: "sounds", label: "Letter sounds", num: 2 },
+  { id: "begin", label: "Beginning sounds", num: 3 },
+  { id: "rhyme", label: "Rhyming words", num: 4 },
+  { id: "cvc", label: "CVC blending", num: 5 },
+  { id: "end", label: "Ending sounds", num: 6 },
 ] as const;
 
 const BARS = [
+  { key: "phonics:letters", label: "Letter names" },
   { key: "phonics:sounds", label: "Letter sounds" },
   { key: "phonics:begin", label: "Beginning sounds" },
   { key: "phonics:rhyme", label: "Rhyming words" },
@@ -105,6 +108,8 @@ export function isPhonicsLevel(value: unknown): value is PhonicsLevel {
 
 function defaultLevel(grade: Grade): PhonicsLevel {
   switch (grade) {
+    case "PK":
+      return "letters";
     case "K":
       return "sounds";
     case "1":
@@ -113,6 +118,8 @@ function defaultLevel(grade: Grade): PhonicsLevel {
       return "cvc";
     case "3":
       return "cvc";
+    case "4":
+      return "end";
     default: {
       const neverGrade: never = grade;
       return neverGrade;
@@ -305,6 +312,8 @@ function makeEnd(rng: Rng): ChoiceQ {
 
 export function makePhonicsQuestion(rng: Rng, level: PhonicsLevel): ChoiceQ {
   switch (level) {
+    case "letters":
+      return makeLetterQuestion(rng);
     case "sounds":
       return makeSounds(rng);
     case "begin":
@@ -325,6 +334,11 @@ export function makePhonicsQuestion(rng: Rng, level: PhonicsLevel): ChoiceQ {
 function sheetItem(rng: Rng, level: string): SheetItem {
   const safe: PhonicsLevel = isPhonicsLevel(level) ? level : "sounds";
   switch (safe) {
+    case "letters": {
+      const printed = spanSheet(rng, "phonics", "letters");
+      if (printed) return printed;
+      return { prompt: t("Name the letter that looks like M.", "Nombra la letra que se ve como M."), answer: "M" };
+    }
     case "sounds":
     case "begin": {
       const rows = pickSounds(rng, 4);
@@ -388,6 +402,8 @@ export function PhonicsPrompt({ question, reveal, mascot, happy }: PromptProps) 
 
 function PhonicsArt({ board }: { board: PhonicsBoard }) {
   switch (board.mode) {
+    case "letters":
+      return <p className="ac-letter">{board.letter}</p>;
     case "sounds":
       return (
         <>
@@ -441,7 +457,7 @@ export const phonicsGame = sceneModule({
   id: "phonics",
   title: "Phonics",
   short: "Phonics",
-  audience: "K–3",
+  audience: "Pre-K–4",
   tint: "lilac",
   mascot: "bunny",
   sheetSlug: "phonics",

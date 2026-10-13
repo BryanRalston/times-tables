@@ -4,10 +4,11 @@ import { howManyPhrase, starLead, t, thingName } from "../i18n";
 import type { Grade } from "../model";
 import { countName, type ProblemBoard } from "./boards";
 import { nearChoices, sceneQuestion, uniqueChoices } from "./pick";
+import { makeStepsQuestion, spanSheet } from "./span";
 import { SceneCard, StoryGroups, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
-export const PROBLEM_LEVELS = ["add", "sub", "mult", "div", "picture"] as const;
+export const PROBLEM_LEVELS = ["add", "sub", "mult", "div", "picture", "steps"] as const;
 export type ProblemLevel = (typeof PROBLEM_LEVELS)[number];
 
 const LEVELS = [
@@ -16,6 +17,7 @@ const LEVELS = [
   { id: "mult", label: "Multiply stories", num: 3 },
   { id: "div", label: "Share stories", num: 4 },
   { id: "picture", label: "Picture stories", num: 5 },
+  { id: "steps", label: "Two-step stories", num: 6 },
 ] as const;
 
 const BARS = [
@@ -24,6 +26,7 @@ const BARS = [
   { key: "problems:mult", label: "Multiply stories" },
   { key: "problems:div", label: "Share stories" },
   { key: "problems:picture", label: "Picture stories" },
+  { key: "problems:steps", label: "Two-step stories" },
 ];
 
 const THINGS = [
@@ -41,6 +44,7 @@ export function isProblemLevel(value: unknown): value is ProblemLevel {
 
 function defaultLevel(grade: Grade): ProblemLevel {
   switch (grade) {
+    case "PK":
     case "K":
     case "1":
       return "add";
@@ -48,6 +52,8 @@ function defaultLevel(grade: Grade): ProblemLevel {
       return "sub";
     case "3":
       return "picture";
+    case "4":
+      return "steps";
     default: {
       const neverGrade: never = grade;
       return neverGrade;
@@ -295,6 +301,8 @@ export function makeProblemQuestion(rng: Rng, level: ProblemLevel): ChoiceQ {
       return makeStory(rng, "div");
     case "picture":
       return makePicture(rng);
+    case "steps":
+      return makeStepsQuestion(rng);
     default: {
       const neverLevel: never = level;
       return neverLevel;
@@ -360,6 +368,11 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         answer: String(groups * size),
       };
     }
+    case "steps": {
+      const printed = spanSheet(rng, "problems", "steps");
+      if (printed) return printed;
+      return { prompt: t("4 bags of 6 apples. Give away 5. How many are left?", "4 bolsas de 6 manzanas. Regala 5. ¿Cuántas quedan?"), answer: "19" };
+    }
     default: {
       const neverLevel: never = safe;
       return neverLevel;
@@ -394,6 +407,8 @@ function ProblemArt({ board }: { board: ProblemBoard }) {
       return <StoryGroups op={board.op} a={board.a} b={board.b} emoji={board.emoji} />;
     case "picture":
       return <p className="ac-big-num">{t("?", "?")}</p>;
+    case "steps":
+      return <StoryGroups op="×" a={board.a} b={board.b} emoji={board.emoji} />;
     default: {
       const neverMode: never = board.mode;
       return neverMode;
@@ -405,7 +420,7 @@ export const problemsGame = sceneModule({
   id: "problems",
   title: "Word Problems",
   short: "Word Problems",
-  audience: "K–3",
+  audience: "K–4",
   tint: "rose",
   mascot: "fox",
   sheetSlug: "word-problems",

@@ -203,7 +203,7 @@ function assertFrame(task: FrameTask, level: string): void {
   expect(task.target).toBeGreaterThanOrEqual(0);
   expect(task.target).toBeLessThanOrEqual(max);
   expect(task.start).toBeLessThanOrEqual(max);
-  if (level === "tens" || level === "within100") {
+  if (level === "tens" || level === "within100" || level === "within1000" || level === "thousands") {
     expect(task.model).toBe("blocks");
     expect(task.start).toBeGreaterThanOrEqual(10);
     expect(task.start).toBeLessThanOrEqual(99);
@@ -262,7 +262,7 @@ function assertLetters(task: LetterTask, level: string): void {
   expect(task.word.length).toBeGreaterThanOrEqual(3);
   expect(task.word.length).toBeLessThanOrEqual(6);
   expect(canSpell(task.word, task.tiles.map((tile) => tile.label))).toBe(true);
-  expect(task.showSentence).toBe(level === "patterns");
+  expect(task.showSentence).toBe(level === "patterns" || level === "grade4");
   if (task.showSentence) expect(task.sentence).toContain("___");
 }
 
@@ -270,14 +270,14 @@ function assertSight(task: SightTask, level: string): void {
   expect(task.choices).toContain(task.word);
   expect(new Set(task.choices).size).toBe(task.choices.length);
   expect(task.choices.length).toBeGreaterThanOrEqual(2);
-  const sentence = level === "second" || level === "third";
+  const sentence = level === "second" || level === "third" || level === "fourth";
   expect(task.mode).toBe(sentence ? "sentence" : "picture");
   if (sentence) expect(task.sentence).toContain("___");
   else expect(task.emoji.length).toBeGreaterThan(0);
 }
 
 function assertPhonics(task: PhonicsTask, level: string): void {
-  if (level === "sounds" || level === "begin") {
+  if (level === "letters" || level === "sounds" || level === "begin") {
     expect(task.mode).toBe("letter");
     const word = task.factKey.split(":")[1] ?? "";
     expect(word.length).toBeGreaterThan(2);
@@ -306,7 +306,7 @@ function assertPhonics(task: PhonicsTask, level: string): void {
 
 function assertMeasure(task: MeasureTask, level: string): void {
   expect(task.target).toBeGreaterThanOrEqual(1);
-  if (level === "compare") {
+  if (level === "compare" || level === "size" || level === "area" || level === "perimeter") {
     expect(task.mode).toBe("compare");
     expect(task.bars).toHaveLength(2);
     expect(new Set(task.bars).size).toBe(2);
@@ -352,7 +352,7 @@ function assertStory(task: StoryTask, level: string): void {
     expect(task.a / task.b).toBeLessThanOrEqual(4);
     return;
   }
-  if (level === "mult" || level === "picture") {
+  if (level === "mult" || level === "picture" || level === "steps") {
     expect(task.mode).toBe("groups");
     expect(task.a).toBeGreaterThanOrEqual(1);
     expect(task.a).toBeLessThanOrEqual(4);

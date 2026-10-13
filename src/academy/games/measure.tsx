@@ -4,26 +4,33 @@ import type { Grade } from "../model";
 import { buddyName, pickTalk } from "./flavor";
 import type { MeasureBoard, MeasureItem } from "./boards";
 import { distinctInts, nearChoices, sceneQuestion, uniqueChoices } from "./pick";
-import { BarGraph, PictureGraph, Ruler, SceneCard, sceneModule } from "./scene-ui";
+import { makeAreaQuestion, makeSizeQuestion, spanSheet } from "./span";
+import { BarGraph, PictureGraph, RectFig, Ruler, SceneCard, SizeDot, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
-export const MEASURE_LEVELS = ["compare", "picture", "bar", "ruler", "more"] as const;
+export const MEASURE_LEVELS = ["size", "compare", "picture", "bar", "ruler", "more", "area", "perimeter"] as const;
 export type MeasureLevel = (typeof MEASURE_LEVELS)[number];
 
 const LEVELS = [
-  { id: "compare", label: "Longer or shorter", num: 1 },
-  { id: "picture", label: "Picture graph", num: 2 },
-  { id: "bar", label: "Bar graph", num: 3 },
-  { id: "ruler", label: "Measure with a ruler", num: 4 },
-  { id: "more", label: "How many more", num: 5 },
+  { id: "size", label: "Bigger and smaller", num: 1 },
+  { id: "compare", label: "Longer or shorter", num: 2 },
+  { id: "picture", label: "Picture graph", num: 3 },
+  { id: "bar", label: "Bar graph", num: 4 },
+  { id: "ruler", label: "Measure with a ruler", num: 5 },
+  { id: "more", label: "How many more", num: 6 },
+  { id: "area", label: "Area", num: 7 },
+  { id: "perimeter", label: "Perimeter", num: 8 },
 ] as const;
 
 const BARS = [
+  { key: "measure:size", label: "Bigger and smaller" },
   { key: "measure:compare", label: "Longer or shorter" },
   { key: "measure:ruler", label: "Measure with a ruler" },
   { key: "measure:picture", label: "Picture graph" },
   { key: "measure:bar", label: "Bar graph" },
   { key: "measure:more", label: "How many more" },
+  { key: "measure:area", label: "Area" },
+  { key: "measure:perimeter", label: "Perimeter" },
 ];
 
 const THINGS = [
@@ -47,6 +54,8 @@ export function isMeasureLevel(value: unknown): value is MeasureLevel {
 
 function defaultLevel(grade: Grade): MeasureLevel {
   switch (grade) {
+    case "PK":
+      return "size";
     case "K":
       return "compare";
     case "1":
@@ -55,6 +64,8 @@ function defaultLevel(grade: Grade): MeasureLevel {
       return "ruler";
     case "3":
       return "bar";
+    case "4":
+      return "area";
     default: {
       const neverGrade: never = grade;
       return neverGrade;
@@ -184,6 +195,8 @@ function makeMore(rng: Rng): ChoiceQ {
 
 export function makeMeasureQuestion(rng: Rng, level: MeasureLevel): ChoiceQ {
   switch (level) {
+    case "size":
+      return makeSizeQuestion(rng);
     case "compare":
       return makeCompare(rng);
     case "ruler":
@@ -194,6 +207,10 @@ export function makeMeasureQuestion(rng: Rng, level: MeasureLevel): ChoiceQ {
       return makeGraph(rng, "bar");
     case "more":
       return makeMore(rng);
+    case "area":
+      return makeAreaQuestion(rng, "area");
+    case "perimeter":
+      return makeAreaQuestion(rng, "perimeter");
     default: {
       const neverLevel: never = level;
       return neverLevel;
@@ -204,6 +221,13 @@ export function makeMeasureQuestion(rng: Rng, level: MeasureLevel): ChoiceQ {
 function sheetItem(rng: Rng, level: string): SheetItem {
   const safe: MeasureLevel = isMeasureLevel(level) ? level : "compare";
   switch (safe) {
+    case "size":
+    case "area":
+    case "perimeter": {
+      const printed = spanSheet(rng, "measure", safe);
+      if (printed) return printed;
+      return { prompt: t("Which is bigger, a seed or a pumpkin?", "¿Qué es más grande, una semilla o una calabaza?"), answer: "pumpkin" };
+    }
     case "compare": {
       const a = rng.int(1, 12);
       let b = rng.int(1, 12);
@@ -273,6 +297,13 @@ export function MeasurePrompt({ question, reveal, mascot, happy }: PromptProps) 
 
 function MeasureArt({ board }: { board: MeasureBoard }) {
   switch (board.mode) {
+    case "size":
+      return (
+        <div className="ac-size-row">
+          <SizeDot n={1} />
+          <SizeDot n={4} />
+        </div>
+      );
     case "compare":
       return <p className="ac-big-num">{board.ask === "longest" ? t("Longest", "El más largo") : t("Shortest", "El más corto")}</p>;
     case "ruler":
@@ -283,6 +314,9 @@ function MeasureArt({ board }: { board: MeasureBoard }) {
       return <BarGraph items={board.items} />;
     case "more":
       return <PictureGraph items={board.items} />;
+    case "area":
+    case "perimeter":
+      return <RectFig length={board.length} width={board.width} label={board.mode} />;
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -294,7 +328,7 @@ export const measureGame = sceneModule({
   id: "measure",
   title: "Measurement",
   short: "Measurement",
-  audience: "K–3",
+  audience: "Pre-K–4",
   tint: "aqua",
   mascot: "penguin",
   sheetSlug: "measurement",

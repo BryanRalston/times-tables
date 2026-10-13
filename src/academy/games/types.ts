@@ -31,6 +31,9 @@ export interface TimesVisual {
   b: number;
   hidden: number;
   solved: string;
+  /** Omitted on fact practice. Factor, multiple, and divide questions set it. */
+  ask?: "product" | "factor" | "multiple" | "divide";
+  remainder?: number;
 }
 
 export interface TimeVisual {
@@ -50,7 +53,7 @@ export interface CoinPile {
   dollar: number;
 }
 
-export type MoneyMode = "name" | "count" | "make" | "change" | "dollars";
+export type MoneyMode = "name" | "count" | "make" | "change" | "dollars" | "spend";
 
 export type SightMode = "hear" | "match" | "fill";
 

@@ -39,7 +39,7 @@ export function HomeScreen({
   const palTier = bondTier(bondScore(child.bonds, child.avatarId));
 
   return (
-    <div className="ac-shell">
+    <div className={cx("ac-shell", child.grade === "PK" && "is-prek")}>
       <header className="ac-top">
         <Logo />
         <a className="ac-streak" href="#/map">

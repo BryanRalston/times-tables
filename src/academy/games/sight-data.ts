@@ -1,4 +1,4 @@
-export const SIGHT_LEVELS = ["preprimer", "primer", "first", "second", "third"] as const;
+export const SIGHT_LEVELS = ["preprimer", "primer", "first", "second", "third", "fourth"] as const;
 export type SightList = (typeof SIGHT_LEVELS)[number];
 
 export interface SightWord {
@@ -289,15 +289,38 @@ const THIRD = pack("third", [
   ["mountain", "⛰️", "The mountain is tall."],
 ]);
 
+const FOURTH = pack("fourth", [
+  ["predict", "🔮", "I predict the sun will shine."],
+  ["observe", "👀", "Observe the ants on the path."],
+  ["explain", "💬", "Explain how you solved it."],
+  ["compare", "⚖️", "Compare the two shapes."],
+  ["measure", "📏", "Measure the ribbon."],
+  ["energy", "⚡", "Food gives your body energy."],
+  ["habitat", "🌲", "A forest is a habitat."],
+  ["diagram", "🗺️", "The diagram shows the parts."],
+  ["conclusion", "✅", "The conclusion ends the report."],
+  ["summarize", "📝", "Summarize the story in one line."],
+  ["evidence", "🔎", "The evidence supports the idea."],
+  ["resource", "💧", "Water is a resource."],
+  ["climate", "🌤️", "The climate stays warm."],
+  ["fraction", "½", "One half is a fraction."],
+  ["product", "✖️", "The product of 3 and 4 is 12."],
+  ["factor", "🔢", "2 is a factor of 8."],
+  ["perimeter", "⬜", "Walk the perimeter of the yard."],
+  ["area", "🟦", "The area is 12 square units."],
+  ["angle", "📐", "A right angle is a square corner."],
+]);
+
 const BY_LIST: Record<SightList, readonly SightWord[]> = {
   preprimer: PREPRIMER,
   primer: PRIMER,
   first: FIRST,
   second: SECOND,
   third: THIRD,
+  fourth: FOURTH,
 };
 
-export const ALL_SIGHT: readonly SightWord[] = [...PREPRIMER, ...PRIMER, ...FIRST, ...SECOND, ...THIRD];
+export const ALL_SIGHT: readonly SightWord[] = [...PREPRIMER, ...PRIMER, ...FIRST, ...SECOND, ...THIRD, ...FOURTH];
 
 export function sightWords(list: SightList): readonly SightWord[] {
   return BY_LIST[list];
