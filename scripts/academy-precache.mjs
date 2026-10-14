@@ -46,7 +46,7 @@ export const WARDROBE_IDS = [
 ];
 
 /** One costume file per squad squishee. A single overlay cannot fit every body. */
-export const WARDROBE_FILES = SQUAD_IDS.flatMap((id) => WARDROBE_IDS.map((look) => `wardrobe/fitted/${id}-${look}.svg`));
+export const WARDROBE_FILES = SQUAD_IDS.flatMap((id) => WARDROBE_IDS.map((look) => `wardrobe/fitted/${id}-${look}.webp`));
 
 export const COIN_FILES = ["penny.png", "nickel.png", "dime.png", "quarter.png", "dollar.png", "five.png"];
 

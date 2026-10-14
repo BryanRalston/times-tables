@@ -5,6 +5,7 @@ import { show, t } from "./i18n";
  * Academy-only looks. Squishee Math keeps the four fitted composites in
  * `@/lib/cosmetics`. Each academy look is drawn to that squishee's head or
  * neck and shares the picture's squish, so the costume deforms with the body.
+ * Looks are cut-out photos of real accessories, pre-fitted per squishee.
  * Nothing here paints eyes or a mouth.
  */
 export const WARDROBE = [
@@ -44,7 +45,7 @@ export function wardrobeById(id: string) {
 
 /** Per-squishee costume. A shared sticker would sit in the wrong place on a different body. */
 export function wardrobeSrc(face: string, id: string): string {
-  return `/times-tables/wardrobe/fitted/${face}-${id}.svg`;
+  return `/times-tables/wardrobe/fitted/${face}-${id}.webp`;
 }
 
 /** Classics first, then the academy set, so a gift day stays stable as kids own more. */

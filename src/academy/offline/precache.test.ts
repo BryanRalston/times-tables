@@ -13,7 +13,7 @@ describe("offline precache", () => {
       expect(paths).toContain(`squishees/${id}.png`);
       for (const cosmetic of COSMETIC_IDS) expect(paths).toContain(`cosmetics/${id}-${cosmetic}.png`);
     }
-    expect(WARDROBE_FILES).toEqual(SQUAD_IDS.flatMap((id) => WARDROBE.map((item) => `wardrobe/fitted/${id}-${item.id}.svg`)));
+    expect(WARDROBE_FILES).toEqual(SQUAD_IDS.flatMap((id) => WARDROBE.map((item) => `wardrobe/fitted/${id}-${item.id}.webp`)));
     for (const file of WARDROBE_FILES) expect(paths).toContain(file);
     expect(isPrecacheFile("assets/app.js")).toBe(true);
     expect(isPrecacheFile("assets/font.woff2")).toBe(true);
