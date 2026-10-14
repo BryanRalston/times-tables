@@ -217,6 +217,41 @@ describe("stars, streak, and unlocks", () => {
     expect(buyOutfit(bought, "bow")).toBe(bought);
     const poor = child({ coins: 1 });
     expect(buyOutfit(poor, "bow")).toBe(poor);
+    const cap = buyOutfit(child({ coins: 14 }), "star-cap");
+    expect(cap.cosmetics).toContain("star-cap");
+    expect(cap.equipped).toBe("star-cap");
+    expect(cap.coins).toBe(0);
+    expect(buyOutfit(child({ coins: 13 }), "star-cap")).toEqual(child({ coins: 13 }));
+  });
+
+  it("gives the same gift for the same day and mixes in academy looks", () => {
+    const fresh = child();
+    expect(rollGift("2026-10-09", fresh)).toEqual(rollGift("2026-10-09", fresh));
+    const kinds = new Set<string>();
+    const outfits = new Set<string>();
+    for (let day = 1; day <= 48; day += 1) {
+      const today = `2026-11-${String(day).padStart(2, "0")}`;
+      const gift = rollGift(today, fresh);
+      expect(rollGift(today, fresh)).toEqual(gift);
+      kinds.add(gift.kind);
+      if (gift.kind === "cosmetic") outfits.add(gift.id);
+    }
+    expect(kinds).toEqual(new Set(["coins", "cosmetic", "pal"]));
+    expect([...outfits].some((id) => id === "party-hat" || id === "scarf" || id === "bow" || id === "shades")).toBe(true);
+    expect([...outfits].some((id) => id !== "party-hat" && id !== "scarf" && id !== "bow" && id !== "shades")).toBe(true);
+    const owned = child({ cosmetics: ["party-hat", "scarf", "bow", "shades"] });
+    for (let day = 1; day <= 24; day += 1) {
+      const gift = rollGift(`2026-12-${String(day).padStart(2, "0")}`, owned);
+      if (gift.kind === "cosmetic") expect(["party-hat", "scarf", "bow", "shades"]).not.toContain(gift.id);
+    }
+  });
+
+  it("unlocks a nicer look when stars cross its line", () => {
+    const today = "2026-10-09";
+    const next = applyRound(child({ stars: 11, coins: 4 }), round({ correct: 10 }), today);
+    expect(next.stars).toBe(14);
+    expect(next.cosmetics).toContain("flower-clip");
+    expect(next.coins).toBeGreaterThan(4);
   });
 
   it("counts unopened unlocks as gifts until the child meets them", () => {

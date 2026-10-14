@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { COSMETIC_IDS } from "@/lib/cosmetics";
 import { SQUAD_IDS } from "../model";
-import { artPaths, buildPrecacheList, domainServiceWorker, isPrecacheFile, pokeMediaFiles, referencedPokeNames, referencedUrls, SHARE_IMAGE_PATH, subpathServiceWorker } from "../../../scripts/academy-precache.mjs";
+import { artPaths, buildPrecacheList, domainServiceWorker, isPrecacheFile, pokeMediaFiles, referencedPokeNames, referencedUrls, SHARE_IMAGE_PATH, subpathServiceWorker, WARDROBE_FILES } from "../../../scripts/academy-precache.mjs";
+import { WARDROBE } from "../wardrobe";
 import { SHARE_IMAGE_PATH as htmlShareImage } from "../seo/html";
 
 describe("offline precache", () => {
@@ -12,6 +13,8 @@ describe("offline precache", () => {
       expect(paths).toContain(`squishees/${id}.png`);
       for (const cosmetic of COSMETIC_IDS) expect(paths).toContain(`cosmetics/${id}-${cosmetic}.png`);
     }
+    expect(WARDROBE_FILES).toEqual(SQUAD_IDS.flatMap((id) => WARDROBE.map((item) => `wardrobe/fitted/${id}-${item.id}.webp`)));
+    for (const file of WARDROBE_FILES) expect(paths).toContain(file);
     expect(isPrecacheFile("assets/app.js")).toBe(true);
     expect(isPrecacheFile("assets/font.woff2")).toBe(true);
     expect(isPrecacheFile("sounds/cheer.wav")).toBe(true);

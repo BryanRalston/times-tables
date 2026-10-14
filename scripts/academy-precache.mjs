@@ -30,6 +30,22 @@ export const SQUAD_IDS = [
 
 export const COSMETIC_IDS = ["party-hat", "scarf", "bow", "shades"];
 
+export const WARDROBE_IDS = [
+  "flower-clip",
+  "star-cap",
+  "bow-tie",
+  "round-glasses",
+  "flower-crown",
+  "berry-beret",
+  "sun-hat",
+  "night-cap",
+  "party-crown",
+  "star-glasses",
+];
+
+/** One costume file per squad squishee. A single overlay cannot fit every body. */
+export const WARDROBE_FILES = SQUAD_IDS.flatMap((id) => WARDROBE_IDS.map((look) => `wardrobe/fitted/${id}-${look}.webp`));
+
 export const COIN_FILES = ["penny.png", "nickel.png", "dime.png", "quarter.png", "dollar.png", "five.png"];
 
 const PRECACHE_EXT = /\.(?:html|js|css|svg|png|webp|woff2?|webmanifest|mp3|wav|ogg|m4a|mp4)$/i;
@@ -80,6 +96,7 @@ export function artPaths() {
     for (const cosmetic of COSMETIC_IDS) out.push(`cosmetics/${id}-${cosmetic}.png`);
   }
   for (const file of COIN_FILES) out.push(`money/${file}`);
+  for (const file of WARDROBE_FILES) out.push(file);
   return out;
 }
 

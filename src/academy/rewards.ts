@@ -1,4 +1,4 @@
-import { applyBuyCosmetic, COSMETICS, isCosmeticId } from "@/lib/cosmetics";
+import { applyBuyCosmetic, isCosmeticId } from "@/lib/cosmetics";
 import { hashSeed } from "@/lib/rng";
 import { noteMark, skillHeat } from "./adapt";
 import { grantBossPrize } from "./boss-battle";
@@ -10,6 +10,7 @@ import { advanceJourney, bossWon, withDailyRound } from "./journey";
 import { noteRoundWords } from "./games/words";
 import { show, t } from "./i18n";
 import { SQUAD_IDS, addDays, weekDates, type Child, type RoundResult, type SkillStat } from "./model";
+import { applyBuyWardrobe, isWardrobeId, looksCrossingStars, nextGiftOutfit } from "./wardrobe";
 
 /** Finishing a round always earns a star. 90% earns 3. 60% earns 2. A 10-question round is 9 and 6. */
 export function starsForRound(correct: number, total = 10): 1 | 2 | 3 {
@@ -83,14 +84,15 @@ export function rollGift(today: string, child: Pick<Child, "cosmetics" | "gifted
   const n = hashSeed(`gift:${today}`);
   const lane = n % 3;
   if (lane === 1) {
-    const left = COSMETICS.map((item) => item.id).filter((id) => !child.cosmetics.includes(id));
-    const pick = left[n % left.length];
+    const pick = nextGiftOutfit(n, child.cosmetics);
     if (pick) return { kind: "cosmetic", id: pick };
   }
   if (lane === 2) {
     const unlocked = new Set<string>([...SQUAD_IDS.slice(0, unlockedCount(child.stars)), ...child.gifted]);
     const next = SQUAD_IDS.find((id) => !unlocked.has(id));
     if (next) return { kind: "pal", id: next };
+    const pick = nextGiftOutfit(n, child.cosmetics);
+    if (pick) return { kind: "cosmetic", id: pick };
   }
   return { kind: "coins", amount: 4 + (n % 5) };
 }
@@ -111,7 +113,8 @@ export function claimDailyGift(child: Child, today: string): Child {
 }
 
 export function buyOutfit(child: Child, id: string): Child {
-  const result = applyBuyCosmetic(child.coins, child.cosmetics, id);
+  const wardrobe = applyBuyWardrobe(child.coins, child.cosmetics, id);
+  const result = wardrobe.reason === "missing" ? applyBuyCosmetic(child.coins, child.cosmetics, id) : wardrobe;
   if (!result.ok) return child;
   return {
     ...child,
@@ -123,7 +126,7 @@ export function buyOutfit(child: Child, id: string): Child {
 
 export function wearOutfit(child: Child, id: string): Child {
   if (id === "") return child.equipped ? { ...child, equipped: "" } : child;
-  if (!isCosmeticId(id) || !child.cosmetics.includes(id)) return child;
+  if ((!isCosmeticId(id) && !isWardrobeId(id)) || !child.cosmetics.includes(id)) return child;
   if (child.equipped === id) return child;
   return { ...child, equipped: id };
 }
@@ -186,10 +189,11 @@ export function applyRound(child: Child, result: RoundResult, today: string): Ch
     egg: syncEgg(child, daily),
   };
   const prized = grantBossPrize(next, result.game, befriended, result.crown === true);
-  return withLearningLooks(
-    prized,
-    learningLooks(prevBond, nextBond, studyCount(child.bestStars), studyCount(bestStars)),
-  );
+  const starLooks = looksCrossingStars(child.stars, child.stars + stars);
+  return withLearningLooks(prized, [
+    ...learningLooks(prevBond, nextBond, studyCount(child.bestStars), studyCount(bestStars)),
+    ...starLooks,
+  ]);
 }
 
 export function secondsThisWeek(map: Record<string, number>, today: string): number {

@@ -1,4 +1,3 @@
-import { parseCosmeticIds, parseEquippedCosmetic } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
 import { bossForGame } from "./bosses";
 import { hostIdFor } from "./buddy/hosts";
@@ -6,6 +5,7 @@ import { ownedIds, palOwned } from "./buddy/unlock";
 import { defaultLevels, gameById, GAMES, isGameId } from "./games/registry";
 import { levelAllowed } from "./grade-map";
 import { blankJourney, normalizeJourney, parseJourney } from "./journey";
+import { parseEquippedLook, parseOwnedLooks } from "./wardrobe";
 import {
   DAILY_GOAL,
   MAX_CHILDREN,
@@ -367,7 +367,7 @@ export function parseChild(raw: unknown): Child | null {
   if (typeof o.id !== "string" || !o.id || o.id.length > 40) return null;
   const grade = isGrade(o.grade) ? o.grade : "K";
   const lastPlayed = typeof o.lastPlayed === "string" && DATE_KEY.test(o.lastPlayed) ? o.lastPlayed : null;
-  const cosmetics = parseCosmeticIds(o.cosmetics);
+  const cosmetics = parseOwnedLooks(o.cosmetics);
   const dailyDate = typeof o.dailyDate === "string" && DATE_KEY.test(o.dailyDate) ? o.dailyDate : null;
   const challengeAhead = o.challengeAhead === true;
   const journey = parseJourney(o.journey, grade);
@@ -409,7 +409,7 @@ export function parseChild(raw: unknown): Child | null {
     levels: parseLevels(o.levels, grade, challengeAhead),
     coins: clampInt(o.coins, 0, 1_000_000),
     cosmetics,
-    equipped: parseEquippedCosmetic(o.equipped, cosmetics),
+    equipped: parseEquippedLook(o.equipped, cosmetics),
     gifted,
     journey,
     dailyDate,
