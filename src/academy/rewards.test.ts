@@ -14,7 +14,6 @@ import {
   newestUnlock,
   nextStreak,
   parentBrief,
-  practiceTip,
   rollGift,
   skillBars,
   starsForRound,
@@ -23,6 +22,7 @@ import {
   weakTimesFacts,
 } from "./rewards";
 import { dailySnapshot } from "./journey";
+import { practiceTip } from "./family-report";
 
 function child(partial: Partial<Child> = {}): Child {
   return { ...blankChild({ id: "kid", name: "Maya", grade: "3" }), ...partial };
@@ -125,9 +125,10 @@ describe("stars, streak, and unlocks", () => {
     expect(masteredChips(skills)).toContain("Within 20");
     expect(weakTimesFacts(skills).slice(0, 2)).toEqual(["7×8", "6×7"]);
     expect(practiceTip("Maya", skills).text).toBe(
-      "Maya keeps missing 7×8 and 6×7. Try the free times tables worksheet tonight.",
+      'Maya is still learning 7×8 and 6×7. The free "Multiplication by 7s" worksheet is a calm one for tonight.',
     );
     expect(practiceTip("Maya", skills).factor).toBe(7);
+    expect(practiceTip("Maya", skills).sheetSlug).toBe("multiplication-7s");
     const bars = skillBars(skills);
     expect(bars.some((row) => row.key === "add:within20" && row.pct === 80)).toBe(true);
     expect(bars.find((row) => row.key === "table:2")?.pct).toBe(100);

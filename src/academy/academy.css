@@ -495,15 +495,47 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   font-size: 28px;
 }
 .ac-statcard span { color: var(--ac-muted); font-size: 13px; }
-.ac-bars { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; align-items: end; height: 140px; margin-top: 8px; }
-.ac-bar-col { display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; gap: 4px; }
-.ac-bar-col span { display: block; width: 100%; max-width: 28px; border-radius: 8px 8px 4px 4px; background: #f7b6d2; }
-.ac-bar-col span.is-today { background: var(--ac-teal); }
-.ac-bar-col small { color: var(--ac-muted); }
-.ac-skill { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; align-items: center; margin-top: 10px; }
+.ac-bars { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; align-items: end; margin-top: 12px; }
+.ac-bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.ac-bar-plot { display: flex; align-items: flex-end; justify-content: center; width: 100%; height: 96px; }
+.ac-bar-plot span { display: block; width: 100%; max-width: 28px; border-radius: 8px 8px 4px 4px; background: #f7b6d2; }
+.ac-bar-plot span.is-today { background: var(--ac-teal); }
+.ac-bar-col small { color: var(--ac-muted); font-size: 12px; line-height: 1.1; }
+.ac-bar-min { font-variant-numeric: tabular-nums; }
+.ac-skill { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 8px; align-items: center; margin-top: 10px; }
+.ac-skill span { min-width: 0; line-height: 1.3; }
+.ac-skill small { grid-column: 1 / -1; color: var(--ac-muted); font-size: 12px; }
 .ac-track { grid-column: 1 / -1; height: 12px; overflow: hidden; border-radius: 99px; background: #f8d7e6; }
 .ac-track i { display: block; height: 100%; border-radius: 99px; background: var(--ac-teal); }
 .ac-track i.is-low { background: #f27aaa; }
+.ac-game { margin-top: 16px; }
+.ac-game h3 { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; font-size: 18px; }
+.ac-game h3 span { min-width: 0; }
+.ac-game h3 strong, .ac-skill strong { font-variant-numeric: tabular-nums; }
+.ac-game > .ac-track { margin-top: 8px; }
+.ac-report h2 { font-size: clamp(26px, 7vw, 34px); }
+.ac-report h3 { margin-top: 14px; font-size: 18px; }
+.ac-report p { line-height: 1.45; }
+.ac-report p + p { margin-top: 8px; }
+.ac-report-list { margin: 6px 0 0; padding-left: 1.2em; }
+.ac-report-list li { margin-top: 4px; }
+.ac-report-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.ac-report-actions a, .ac-report-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 3px 0 var(--ac-line);
+  color: var(--ac-teal);
+  font-weight: 800;
+  text-decoration: none;
+  text-align: center;
+}
+.ac-report-actions a { background: #fff6cc; }
 .ac-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .ac-chip { padding: 6px 10px; border-radius: 999px; background: #e7fbf6; color: #0e7c72; font-weight: 800; }
 .ac-tip { margin-top: 12px; padding: 12px; border-radius: 16px; background: #fff6cc; }
@@ -583,6 +615,13 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   .ac-shelf { grid-template-columns: repeat(4, 1fr); }
 }
 
+@media (max-width: 420px) {
+  .ac-parent-top { flex-wrap: wrap; align-items: flex-start; }
+  .ac-parent-top .ac-panel { width: 100%; margin-top: 8px; }
+  .ac-report-actions a, .ac-report-actions button { width: 100%; }
+  .ac-statcard strong { font-size: 22px; }
+  .ac-bar-plot { height: 84px; }
+}
 @media (max-width: 389px) {
   .ac-foot a { font-size: 12px; }
   .ac-choice { font-size: 28px; min-height: 68px; }
@@ -1171,6 +1210,16 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   .ac-key { break-before: page; }
   .ac-problems li, .ac-clock-grid figure, .ac-word-sheet li { break-inside: avoid; }
   .ac-clock, .ac-dot, .ac-rod, .ac-hour, .ac-minute, .ac-trace { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .ac-shell.ac-mid { width: auto; max-width: none; padding: 0; }
+  .ac-report {
+    border: 0;
+    box-shadow: none;
+    background: white;
+    margin: 0;
+    padding: 0;
+  }
+  .ac-report, .ac-report-list li, .ac-bar-col { break-inside: avoid; }
+  .ac-bar-plot span, .ac-track, .ac-track i { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }
 
 .ac-card.is-sky { background: #e3f2ff; }
