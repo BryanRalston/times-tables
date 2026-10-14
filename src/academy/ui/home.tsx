@@ -11,6 +11,7 @@ import { gradeText, show, t } from "../i18n";
 import { todayIso, type Child } from "../model";
 import { nextPlacement } from "../placement";
 import { gameOfDay, rollGift, type GiftRoll } from "../rewards";
+import { outfitLabel } from "../wardrobe";
 import { chime } from "../sound";
 import { WeekStickers } from "./stickers";
 import { AcademyPal, Foot, GiftBox, LockIcon, Logo, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
@@ -200,7 +201,7 @@ function PrizeBody({ prize }: { prize: GiftRoll }) {
   if (prize.kind === "cosmetic") {
     return (
       <p>
-        {t("A new outfit:", "Un disfraz nuevo:")} <strong>{outfitName(prize.id)}</strong>
+        {t("A new outfit:", "Un disfraz nuevo:")} <strong>{outfitLabel(prize.id)}</strong>
       </p>
     );
   }
@@ -214,17 +215,3 @@ function PrizeBody({ prize }: { prize: GiftRoll }) {
   );
 }
 
-function outfitName(id: string): string {
-  switch (id) {
-    case "party-hat":
-      return t("party hat", "gorro de fiesta");
-    case "scarf":
-      return t("scarf", "bufanda");
-    case "bow":
-      return t("bow", "moño");
-    case "shades":
-      return t("shades", "gafas");
-    default:
-      return id;
-  }
-}

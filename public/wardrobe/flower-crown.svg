@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <path d="M24 44c10-18 24-26 40-26s30 8 40 26" fill="none" stroke="#7dbe6a" stroke-width="6" stroke-linecap="round"/>
+  <g stroke="#3c2448" stroke-width="2.2">
+    <g transform="translate(34 34)">
+      <circle cy="-8" r="7" fill="#ff8ec4"/>
+      <circle cx="7" cy="-1" r="7" fill="#ff4b93"/>
+      <circle cx="-7" cy="-1" r="7" fill="#ff4b93"/>
+      <circle cy="7" r="7" fill="#ffb3d4"/>
+      <circle r="4.5" fill="#ffe08a"/>
+    </g>
+    <g transform="translate(64 26)">
+      <circle cy="-9" r="8" fill="#ffb3d4"/>
+      <circle cx="8" cy="-1" r="8" fill="#ff4b93"/>
+      <circle cx="-8" cy="-1" r="8" fill="#ff4b93"/>
+      <circle cy="8" r="8" fill="#ff8ec4"/>
+      <circle r="5" fill="#ffe08a"/>
+    </g>
+    <g transform="translate(94 34)">
+      <circle cy="-8" r="7" fill="#ff8ec4"/>
+      <circle cx="7" cy="-1" r="7" fill="#ff4b93"/>
+      <circle cx="-7" cy="-1" r="7" fill="#ff4b93"/>
+      <circle cy="7" r="7" fill="#ffb3d4"/>
+      <circle r="4.5" fill="#ffe08a"/>
+    </g>
+  </g>
+</svg>

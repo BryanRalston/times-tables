@@ -112,6 +112,9 @@ describe("squishee unlocks", () => {
     expect(bondTier(row.bonds.peach!)).toBe(2);
     expect(row.cosmetics).toContain("bow");
     expect(row.coins).toBeGreaterThan(4);
+    for (let n = 0; n < 6; n += 1) row = applyRound(row, round(), `2026-10-${12 + n}`);
+    expect(row.bonds.peach).toBe(9);
+    expect(row.cosmetics).toContain("bow-tie");
   });
 });
 

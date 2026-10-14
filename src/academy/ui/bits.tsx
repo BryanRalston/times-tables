@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
-import { show, t } from "../i18n";
 import { canDressFace } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
+import { show, t } from "../i18n";
+import { isWardrobeId, wardrobeSrc } from "../wardrobe";
 import { MINUS, TIMES, type AddVisual, type Visual } from "../games/types";
 import { cosmeticCompositeUrl, squisheeUrl } from "../paths";
 import type { SquishRole } from "../squish/gesture";
@@ -60,12 +61,23 @@ export function AcademyPal({
 }) {
   const s = squisheeById(id);
   if (!s) return null;
-  const src = cosmetic && canDressFace(id, cosmetic) ? cosmeticCompositeUrl(id, cosmetic) : squisheeUrl(s.file);
-  const img = <img className={className} src={src} alt={label ?? ""} draggable={false} />;
-  if (squish === "off") return img;
+  const wear = cosmetic && isWardrobeId(cosmetic) ? cosmetic : "";
+  const fitted = Boolean(cosmetic && canDressFace(id, cosmetic));
+  const src = fitted && cosmetic ? cosmeticCompositeUrl(id, cosmetic) : squisheeUrl(s.file);
+  // Wardrobe looks are a separate sticker. The squishee file stays the character,
+  // and Squishy deforms that picture. The sticker never draws eyes or a mouth.
+  const art = wear ? (
+    <span className={cx("ac-wear", className)} data-wear={wear}>
+      <img className="ac-wear-face" src={src} alt={label ?? ""} draggable={false} />
+      <img className="ac-wear-mark" src={wardrobeSrc(wear)} alt="" draggable={false} />
+    </span>
+  ) : (
+    <img className={className} src={src} alt={label ?? ""} draggable={false} />
+  );
+  if (squish === "off") return art;
   return (
     <Squishy id={id} role={squish}>
-      {img}
+      {art}
     </Squishy>
   );
 }

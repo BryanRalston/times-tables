@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { COSMETICS, cosmeticPrice, type CosmeticId } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
 import { wearBossLook } from "../boss-battle";
 import { bossCosmeticName, bossForGame } from "../bosses";
@@ -11,6 +10,7 @@ import { playWindow } from "../grade-map";
 import { prefersSpanish, setLocale, show, t } from "../i18n";
 import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type AppLang, type Grade, type Save } from "../model";
 import { buyOutfit, wearOutfit } from "../rewards";
+import { outfitHint, outfitLabel, outfitPrice, shopSections } from "../wardrobe";
 import { activeChild, mapActive, withGrade, withLevel } from "../storage";
 import { silence, speak } from "../voice";
 import { AcademyPal, BackLink, Foot, FreeNote, Logo, SquisheeImg, cx } from "./bits";
@@ -232,6 +232,8 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
   const child = activeChild(save);
   const book = bookEntries();
   const found = book.filter((entry) => palOwned(child, entry.id)).length;
+  const shop = shopSections();
+  const lookCount = shop.reduce((sum, section) => sum + section.items.length, 0);
 
   return (
     <div className="ac-shell ac-mid">
@@ -248,38 +250,54 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
       <SquishTally />
       <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="ac-shelf-you" label={show("You")} />
       <h2>{show("Outfit shop")}</h2>
+      <p className="ac-hint">
+        {t(
+          `${child.cosmetics.length} of ${lookCount} looks · ${child.coins} coins`,
+          `${child.cosmetics.length} de ${lookCount} disfraces · ${child.coins} monedas`,
+        )}
+      </p>
       <p className="ac-hint">{show("Spend coins you earn. Never real money.")}</p>
-      <div className="ac-shelf">
-        <button
-          type="button"
-          className={cx("ac-shelf-card", child.equipped === "" && "is-you")}
-          onClick={() => onSave(mapActive(save, (row) => wearOutfit(row, "")))}
-        >
-          <SquisheeImg id={child.avatarId} />
-          <small>{show("No outfit")}</small>
-        </button>
-        {COSMETICS.map((item) => {
-          const have = child.cosmetics.includes(item.id);
-          const price = cosmeticPrice(item.id);
-          return (
-            <button
-              key={item.id}
-              type="button"
-              className={cx("ac-shelf-card", !have && child.coins < price && "is-locked", child.equipped === item.id && "is-you")}
-              disabled={!have && child.coins < price}
-              onClick={() =>
-                onSave(mapActive(save, (row) => (row.cosmetics.includes(item.id) ? wearOutfit(row, item.id) : buyOutfit(row, item.id))))
-              }
-            >
-              <AcademyPal id={child.avatarId} cosmetic={item.id} />
-              <small>
-                {outfitName(item.id)}
-                {have ? "" : ` · ${price}`}
-              </small>
-            </button>
-          );
-        })}
-      </div>
+      <p className="ac-hint">{t("Stars and practice unlock looks too.", "Las estrellas y la práctica también dan disfraces.")}</p>
+      {shop.map((section) => (
+        <section key={section.slot} className="ac-shop-slot" data-slot={section.slot}>
+          <h3>{show(section.title)}</h3>
+          <div className="ac-shop">
+            {section.slot === "hat" ? (
+              <button
+                type="button"
+                className={cx("ac-shelf-card", child.equipped === "" && "is-you")}
+                onClick={() => onSave(mapActive(save, (row) => wearOutfit(row, "")))}
+              >
+                <SquisheeImg id={child.avatarId} />
+                <small>{show("No outfit")}</small>
+              </button>
+            ) : null}
+            {section.items.map((item) => {
+              const have = child.cosmetics.includes(item.id);
+              const price = outfitPrice(item.id);
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  data-outfit={item.id}
+                  className={cx("ac-shelf-card", !have && child.coins < price && "is-locked", child.equipped === item.id && "is-you")}
+                  disabled={!have && child.coins < price}
+                  onClick={() =>
+                    onSave(mapActive(save, (row) => (row.cosmetics.includes(item.id) ? wearOutfit(row, item.id) : buyOutfit(row, item.id))))
+                  }
+                >
+                  <AcademyPal id={child.avatarId} cosmetic={item.id} />
+                  <small>
+                    {outfitLabel(item.id)}
+                    {have ? "" : ` · ${price}`}
+                  </small>
+                  {have ? null : <small>{outfitHint(item.id)}</small>}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      ))}
       <h2>{show("Boss cards")}</h2>
       <div className="ac-book" data-book="bosses">
         {GAMES.map((game) => {
@@ -362,23 +380,6 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
       <FreeNote />
     </div>
   );
-}
-
-function outfitName(id: CosmeticId): string {
-  switch (id) {
-    case "party-hat":
-      return show("Party hat");
-    case "scarf":
-      return show("Scarf");
-    case "bow":
-      return show("Bow");
-    case "shades":
-      return show("Shades");
-    default: {
-      const neverId: never = id;
-      return neverId;
-    }
-  }
 }
 
 export function SheetsScreen() {

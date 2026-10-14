@@ -30,6 +30,21 @@ export const SQUAD_IDS = [
 
 export const COSMETIC_IDS = ["party-hat", "scarf", "bow", "shades"];
 
+export const WARDROBE_FILES = [
+  "wardrobe/flower-clip.svg",
+  "wardrobe/star-cap.svg",
+  "wardrobe/bow-tie.svg",
+  "wardrobe/round-glasses.svg",
+  "wardrobe/flower-crown.svg",
+  "wardrobe/berry-beret.svg",
+  "wardrobe/pearl-scarf.svg",
+  "wardrobe/sun-hat.svg",
+  "wardrobe/night-cap.svg",
+  "wardrobe/heart-scarf.svg",
+  "wardrobe/party-crown.svg",
+  "wardrobe/star-glasses.svg",
+];
+
 export const COIN_FILES = ["penny.png", "nickel.png", "dime.png", "quarter.png", "dollar.png", "five.png"];
 
 const PRECACHE_EXT = /\.(?:html|js|css|svg|png|webp|woff2?|webmanifest|mp3|wav|ogg|m4a|mp4)$/i;
@@ -80,6 +95,7 @@ export function artPaths() {
     for (const cosmetic of COSMETIC_IDS) out.push(`cosmetics/${id}-${cosmetic}.png`);
   }
   for (const file of COIN_FILES) out.push(`money/${file}`);
+  for (const file of WARDROBE_FILES) out.push(file);
   return out;
 }
 

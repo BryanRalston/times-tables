@@ -1,5 +1,6 @@
 import { show } from "../i18n";
 import type { Child } from "../model";
+import { BOND_REWARDS, STUDY_REWARDS } from "../wardrobe";
 import { STUDY_PALS } from "./persona";
 
 /** A few practice rounds, not a long grind. */
@@ -64,8 +65,14 @@ export function learningLooks(prevBond: number, nextBond: number, prevStudy: num
   const out: string[] = [];
   if (prevBond < BOND_FRIEND && nextBond >= BOND_FRIEND) out.push("bow");
   if (prevBond < BOND_BEST && nextBond >= BOND_BEST) out.push("party-hat");
+  for (const row of BOND_REWARDS) {
+    if (prevBond < row.bond && nextBond >= row.bond) out.push(row.id);
+  }
   if (prevStudy < 1 && nextStudy >= 1) out.push("scarf");
   if (prevStudy < 3 && nextStudy >= 3) out.push("shades");
+  for (const row of STUDY_REWARDS) {
+    if (prevStudy < row.study && nextStudy >= row.study) out.push(row.id);
+  }
   return out;
 }
 
