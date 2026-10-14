@@ -3,8 +3,9 @@ import { show, t } from "./i18n";
 
 /**
  * Academy-only looks. Squishee Math keeps the four fitted composites in
- * `@/lib/cosmetics`. These stickers sit beside that art: the squishee picture
- * is never redrawn, and nothing paints a new face onto it.
+ * `@/lib/cosmetics`. Each academy look is drawn to that squishee's head or
+ * neck and shares the picture's squish, so the costume deforms with the body.
+ * Nothing here paints eyes or a mouth.
  */
 export const WARDROBE = [
   { id: "flower-clip", slot: "face", price: 9, stars: 12, bond: 0, study: 0 },
@@ -41,8 +42,9 @@ export function wardrobeById(id: string) {
   return byId.get(id as WardrobeId);
 }
 
-export function wardrobeSrc(id: string): string {
-  return `/times-tables/wardrobe/${id}.svg`;
+/** Per-squishee costume. A shared sticker would sit in the wrong place on a different body. */
+export function wardrobeSrc(face: string, id: string): string {
+  return `/times-tables/wardrobe/fitted/${face}-${id}.svg`;
 }
 
 /** Classics first, then the academy set, so a gift day stays stable as kids own more. */

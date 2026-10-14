@@ -30,20 +30,23 @@ export const SQUAD_IDS = [
 
 export const COSMETIC_IDS = ["party-hat", "scarf", "bow", "shades"];
 
-export const WARDROBE_FILES = [
-  "wardrobe/flower-clip.svg",
-  "wardrobe/star-cap.svg",
-  "wardrobe/bow-tie.svg",
-  "wardrobe/round-glasses.svg",
-  "wardrobe/flower-crown.svg",
-  "wardrobe/berry-beret.svg",
-  "wardrobe/pearl-scarf.svg",
-  "wardrobe/sun-hat.svg",
-  "wardrobe/night-cap.svg",
-  "wardrobe/heart-scarf.svg",
-  "wardrobe/party-crown.svg",
-  "wardrobe/star-glasses.svg",
+export const WARDROBE_IDS = [
+  "flower-clip",
+  "star-cap",
+  "bow-tie",
+  "round-glasses",
+  "flower-crown",
+  "berry-beret",
+  "pearl-scarf",
+  "sun-hat",
+  "night-cap",
+  "heart-scarf",
+  "party-crown",
+  "star-glasses",
 ];
+
+/** One costume file per squad squishee. A single overlay cannot fit every body. */
+export const WARDROBE_FILES = SQUAD_IDS.flatMap((id) => WARDROBE_IDS.map((look) => `wardrobe/fitted/${id}-${look}.svg`));
 
 export const COIN_FILES = ["penny.png", "nickel.png", "dime.png", "quarter.png", "dollar.png", "five.png"];
 

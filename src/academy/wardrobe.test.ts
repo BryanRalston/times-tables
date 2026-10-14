@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createElement } from "react";
@@ -6,6 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { COSMETICS } from "@/lib/cosmetics";
 import { GAMES } from "./games/registry";
+import { SQUAD_IDS } from "./model";
 import { setLocale } from "./i18n";
 import { ES } from "./i18n-es";
 import { learningLooks } from "./buddy/bond";
@@ -37,9 +38,11 @@ describe("academy wardrobe", () => {
       expect(shop).toMatchObject({ price: item.price, slot: item.slot });
     }
     expect(Math.max(...STUDY_REWARDS.map((row) => row.study))).toBeLessThanOrEqual(GAMES.length);
-    for (const item of WARDROBE) {
-      const file = join(HERE, "../../public/wardrobe", `${item.id}.svg`);
-      expect(existsSync(file)).toBe(true);
+    for (const face of SQUAD_IDS) {
+      for (const item of WARDROBE) {
+        const file = join(HERE, "../../public/wardrobe/fitted", `${face}-${item.id}.svg`);
+        expect(existsSync(file), file).toBe(true);
+      }
     }
   });
 
@@ -65,18 +68,26 @@ describe("academy wardrobe", () => {
     }
   });
 
-  it("keeps the squishee picture and sticks the look on as its own layer", () => {
+  it("fits the look to that squishee and squishes the costume with the body", () => {
     const plain = renderToStaticMarkup(createElement(AcademyPal, { id: "peach", cosmetic: "flower-crown" }));
     expect(plain).toContain("squishees/peach.png");
-    expect(plain).toContain("wardrobe/flower-crown.svg");
+    expect(plain).toContain("wardrobe/fitted/peach-flower-crown.svg");
+    expect(plain).not.toContain("wardrobe/flower-crown.svg\"");
     expect(plain).toContain('data-wear="flower-crown"');
     expect(plain).toContain("ac-squish-stage");
-    expect(plain).not.toContain("peach-flower-crown");
     expect(plain).not.toContain("<canvas");
     expect(plain).not.toContain("<video");
-    const fitted = renderToStaticMarkup(createElement(AcademyPal, { id: "peach", cosmetic: "party-hat" }));
-    expect(fitted).toContain("cosmetics/peach-party-hat.png");
-    expect(fitted).not.toContain("data-wear");
+    const bunny = renderToStaticMarkup(createElement(AcademyPal, { id: "bunny", cosmetic: "flower-crown" }));
+    expect(bunny).toContain("wardrobe/fitted/bunny-flower-crown.svg");
+    expect(bunny).not.toContain("wardrobe/fitted/peach-flower-crown.svg");
+    const classic = renderToStaticMarkup(createElement(AcademyPal, { id: "peach", cosmetic: "party-hat" }));
+    expect(classic).toContain("cosmetics/peach-party-hat.png");
+    expect(classic).not.toContain("data-wear");
+    const peachCap = readFileSync(join(HERE, "../../public/wardrobe/fitted/peach-star-cap.svg"), "utf8");
+    const bunnyCap = readFileSync(join(HERE, "../../public/wardrobe/fitted/bunny-star-cap.svg"), "utf8");
+    expect(peachCap).not.toBe(bunnyCap);
+    expect(peachCap).not.toMatch(/mouth|smile|eyeball/i);
+    expect(bunnyCap).not.toMatch(/mouth|smile|eyeball/i);
   });
 
   it("remembers an owned academy look and grants it from stars or practice", () => {

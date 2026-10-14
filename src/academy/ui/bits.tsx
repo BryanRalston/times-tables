@@ -64,12 +64,12 @@ export function AcademyPal({
   const wear = cosmetic && isWardrobeId(cosmetic) ? cosmetic : "";
   const fitted = Boolean(cosmetic && canDressFace(id, cosmetic));
   const src = fitted && cosmetic ? cosmeticCompositeUrl(id, cosmetic) : squisheeUrl(s.file);
-  // Wardrobe looks are a separate sticker. The squishee file stays the character,
-  // and Squishy deforms that picture. The sticker never draws eyes or a mouth.
+  // The squishee file stays the character. The costume is fitted to this body
+  // and shares the squish, and it never draws eyes or a mouth.
   const art = wear ? (
-    <span className={cx("ac-wear", className)} data-wear={wear}>
+    <span className={cx("ac-wear", className)} data-wear={wear} data-face={id}>
       <img className="ac-wear-face" src={src} alt={label ?? ""} draggable={false} />
-      <img className="ac-wear-mark" src={wardrobeSrc(wear)} alt="" draggable={false} />
+      <img className="ac-wear-mark" src={wardrobeSrc(id, wear)} alt="" draggable={false} />
     </span>
   ) : (
     <img className={className} src={src} alt={label ?? ""} draggable={false} />
