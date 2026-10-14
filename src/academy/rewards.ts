@@ -265,41 +265,6 @@ export function weakTimesFacts(skills: Record<string, SkillStat>): string[] {
   return rows.map((row) => row.key);
 }
 
-export function practiceTip(
-  name: string,
-  skills: Record<string, SkillStat>,
-): { text: string; factor: number | null } {
-  const who = name.trim() || t("Your child", "Tu hijo o hija");
-  const weak = weakTimesFacts(skills);
-  if (weak.length >= 2) {
-    const factor = Number(weak[0]!.split("×")[0]);
-    return {
-      text: t(
-        `${who} keeps missing ${weak[0]} and ${weak[1]}. Try the free times tables worksheet tonight.`,
-        `A ${who} se le escapan ${weak[0]} y ${weak[1]}. Prueben la hoja de las tablas esta noche.`,
-      ),
-      factor: Number.isFinite(factor) ? factor : null,
-    };
-  }
-  if (weak.length === 1) {
-    const factor = Number(weak[0]!.split("×")[0]);
-    return {
-      text: t(
-        `${who} keeps missing ${weak[0]}. Try the free times tables worksheet tonight.`,
-        `A ${who} se le escapa ${weak[0]}. Prueben la hoja de las tablas esta noche.`,
-      ),
-      factor: Number.isFinite(factor) ? factor : null,
-    };
-  }
-  return {
-    text: t(
-      `${who} can print a free worksheet and play it together tonight.`,
-      `${who} puede imprimir una hoja gratis y jugarla juntos esta noche.`,
-    ),
-    factor: null,
-  };
-}
-
 export interface SkillLesson {
   key: string;
   label: string;

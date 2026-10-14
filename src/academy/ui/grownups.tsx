@@ -1,27 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { rngRandom } from "@/lib/rng";
-import {
-  DEFAULT_START_GRADE,
-  WEEKDAY_NAMES,
-  cleanName,
-  mondayIndex,
-  todayIso,
-  weekDates,
-  type Grade,
-  type Save,
-} from "../model";
+import { DEFAULT_START_GRADE, cleanName, todayIso, type Grade, type Save } from "../model";
 import { GROWNUP_HOLD_MS, gateAnswerMatches, grownupGate } from "../questions";
-import { weeklyCard } from "../progress-card";
-import { sheetHref } from "../games/registry";
-import {
-  formatMinutes,
-  masteredChips,
-  parentBrief,
-  practiceTip,
-  secondsThisWeek,
-  skillBars,
-} from "../rewards";
-import { gradeText, show, t, weekdayLetter } from "../i18n";
+import { familyBrief } from "../progress-card";
+import { attemptLabel } from "../family-report";
+import { masteredChips, parentBrief } from "../rewards";
+import { gradeText, show, t } from "../i18n";
 import { activeChild, addChild } from "../storage";
 import { LanguageToggle, withLang } from "./lang";
 import { BackupPanel } from "./backup-panel";
@@ -154,28 +138,21 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
 
   const child = activeChild(save);
   const today = todayIso();
-  const days = weekDates(today);
-  const seconds = days.map((day) => child.secondsByDay[day] ?? 0);
-  const peak = Math.max(1, ...seconds);
-  const todayIndex = mondayIndex(today);
-  const bars = skillBars(child.skills);
+  const report = familyBrief(child, today);
+  const card = report.card;
+  const games = report.games;
   const chips = masteredChips(child.skills);
   const lessons = parentBrief(child);
-  const tip = practiceTip(child.name, child.skills);
-  const weekSeconds = secondsThisWeek(child.secondsByDay, today);
-  const card = weeklyCard(child, today);
-  const sheet =
-    tip.factor != null ? sheetHref("times", `?factor=${tip.factor}`) : sheetHref("times");
+  const peak = Math.max(1, ...card.dayLines.map((day) => day.seconds));
+  const showPractice = card.days > 0 || card.wins.length > 0 || card.stuck.length > 0;
 
   return (
     <div className="ac-shell ac-mid">
-      <header className="ac-parent-top">
+      <header className="ac-parent-top ac-no-print">
         <h1>{show("Grown-ups")}</h1>
         <LanguageToggle lang={save.lang} onLang={(lang) => onSave(withLang(save, lang))} />
       </header>
-      <InstallTip />
-
-      <div className="ac-kids">
+      <div className="ac-kids ac-no-print">
         {save.children.map((kid) => (
           <button
             key={kid.id}
@@ -198,7 +175,7 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
 
       {adding ? (
         <form
-          className="ac-add-child"
+          className="ac-add-child ac-no-print"
           onSubmit={(e) => {
             e.preventDefault();
             const next = addChild(save, name, grade);
@@ -221,7 +198,7 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
         </form>
       ) : null}
 
-      <div className="ac-stats3">
+      <div className="ac-stats3 ac-no-print">
         <article className="ac-statcard">
           <strong>
             <Flame /> {child.streak}
@@ -229,7 +206,7 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
           <span>{show("day streak")}</span>
         </article>
         <article className="ac-statcard">
-          <strong>{formatMinutes(weekSeconds)}</strong>
+          <strong>{card.minutesLabel}</strong>
           <span>{show("this week")}</span>
         </article>
         <article className="ac-statcard">
@@ -238,37 +215,115 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
         </article>
       </div>
 
-      <section className="ac-panel ac-week-card">
-        <h2>{show("Progress card")}</h2>
+      <section className="ac-panel ac-report">
+        <p className="ac-kicker">Squishee Academy</p>
+        <h2>{card.headline}</h2>
         <p>{card.line}</p>
-        <p className="ac-hint">
-          {t(
-            `Streak ${card.streak} · ${card.mastered} skills mastered`,
-            `Racha de ${card.streak} · ${card.mastered} destrezas logradas`,
-          )}
-        </p>
-      </section>
-
-      <section className="ac-panel">
-        <h2>{show("This week")}</h2>
-        <div className="ac-bars">
-          {days.map((day, i) => {
-            const height = seconds[i] ? Math.max(12, Math.round((seconds[i]! / peak) * 100)) : 8;
+        {card.streakNote ? <p className="ac-hint">{card.streakNote}</p> : null}
+        <div className="ac-bars" aria-label={show("This week")}>
+          {card.dayLines.map((day) => {
+            const height = day.seconds ? Math.max(12, Math.round((day.seconds / peak) * 100)) : 8;
             return (
-              <div key={day} className="ac-bar-col">
-                <span
-                  className={i === todayIndex ? "is-today" : ""}
-                  style={{ height: `${height}%` }}
-                  title={`${show(WEEKDAY_NAMES[i] ?? "Day")} ${formatMinutes(seconds[i] ?? 0)}`}
-                />
-                <small>{weekdayLetter(i)}</small>
+              <div key={day.iso} className="ac-bar-col" aria-label={`${day.name}, ${day.played ? day.label : show("No practice")}`}>
+                <div className="ac-bar-plot">
+                  <span className={day.iso === today ? "is-today" : ""} style={{ height: `${height}%` }} />
+                </div>
+                <small>{day.letter}</small>
+                <small className="ac-bar-min">{day.label}</small>
               </div>
             );
           })}
         </div>
+        {showPractice ? (
+          <>
+            <h3>{show("Going well")}</h3>
+            {card.wins.length > 0 ? (
+              <ul className="ac-report-list">
+                {card.wins.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="ac-hint">{card.winsNote}</p>
+            )}
+            <h3>{show("Still learning")}</h3>
+            {card.stuck.length > 0 ? (
+              <ul className="ac-report-list">
+                {card.stuck.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="ac-hint">{card.stuckNote}</p>
+            )}
+          </>
+        ) : null}
+        <h3>{show("Tonight")}</h3>
+        <p>{card.suggestion}</p>
+        <p className="ac-hint">{card.deviceNote}</p>
+        <div className="ac-report-actions ac-no-print">
+          {card.sheetHref ? (
+            <a href={card.sheetHref}>
+              {card.sheetTitle
+                ? t(`Print “${card.sheetTitle}”`, `Imprimir «${card.sheetTitle}»`)
+                : show("Print the worksheet")}
+            </a>
+          ) : null}
+          <button type="button" onClick={() => window.print()}>
+            {show("Print this week")}
+          </button>
+        </div>
       </section>
 
-      <section className="ac-panel">
+      <section className="ac-panel ac-no-print">
+        <h2>{show("By game")}</h2>
+        {games.length === 0 ? (
+          <p className="ac-hint">{t("Play a few rounds and this fills in.", "Juega unas rondas y esto se llena.")}</p>
+        ) : (
+          games.map((game) => (
+            <div key={game.id} className="ac-game">
+              <h3>
+                <span>{game.title}</span>
+                <strong>{game.pct}%</strong>
+              </h3>
+              <p className="ac-hint">{attemptLabel(game.attempts)}</p>
+              <div
+                className="ac-track"
+                role="meter"
+                aria-valuenow={game.pct}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={game.title}
+              >
+                <i className={game.pct < 70 ? "is-low" : ""} style={{ width: `${game.pct}%` }} />
+              </div>
+              {game.skills.map((row) => (
+                <div key={row.key} className="ac-skill">
+                  <span>{row.label}</span>
+                  <strong>{row.pct}%</strong>
+                  <div className="ac-track" aria-hidden="true">
+                    <i className={row.pct < 70 ? "is-low" : ""} style={{ width: `${row.pct}%` }} />
+                  </div>
+                  <small>{attemptLabel(row.attempts)}</small>
+                </div>
+              ))}
+            </div>
+          ))
+        )}
+        {chips.length > 0 ? (
+          <div className="ac-chips">
+            {chips.map((chip) => (
+              <span key={chip} className="ac-chip">
+                ✓ {chip}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p className="ac-hint">{show("Mastered skills show up after a little practice.")}</p>
+        )}
+      </section>
+
+      <section className="ac-panel ac-no-print">
         <h2>
           {t(
             `What ${child.name || "your child"} is learning`,
@@ -284,41 +339,12 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
         ))}
       </section>
 
-      <section className="ac-panel">
-        <h2>{show("Skills")}</h2>
-        {bars.length === 0 ? (
-          <p className="ac-hint">{t("Play a few rounds and this fills in.", "Juega unas rondas y esto se llena.")}</p>
-        ) : (
-          bars.map((row) => (
-            <div key={row.key} className="ac-skill">
-              <span>{row.label}</span>
-              <strong>{row.pct}%</strong>
-              <div className="ac-track" aria-hidden="true">
-                <i className={row.pct < 70 ? "is-low" : ""} style={{ width: `${row.pct}%` }} />
-              </div>
-            </div>
-          ))
-        )}
-        {chips.length > 0 ? (
-          <div className="ac-chips">
-            {chips.map((chip) => (
-              <span key={chip} className="ac-chip">
-                ✓ {chip}
-              </span>
-            ))}
-          </div>
-        ) : (
-          <p className="ac-hint">{show("Mastered skills show up after a little practice.")}</p>
-        )}
-        <div className="ac-tip">
-          <p>{tip.text}</p>
-          <a href={sheet}>{show("Print the worksheet")}</a>
-        </div>
-      </section>
-
-      <BackupPanel save={save} onSave={onSave} />
-      <BackLink>{show("Back to games")}</BackLink>
-      <Foot />
+      <div className="ac-no-print">
+        <InstallTip />
+        <BackupPanel save={save} onSave={onSave} />
+        <BackLink>{show("Back to games")}</BackLink>
+        <Foot />
+      </div>
     </div>
   );
 }
