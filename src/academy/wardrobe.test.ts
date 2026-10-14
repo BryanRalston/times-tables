@@ -27,9 +27,9 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 describe("academy wardrobe", () => {
   it("adds twelve earnable looks without changing the math catalog", () => {
     expect(COSMETICS).toHaveLength(4);
-    expect(WARDROBE).toHaveLength(12);
-    expect(shopItems()).toHaveLength(16);
-    expect(giftOutfitIds()).toHaveLength(16);
+    expect(WARDROBE).toHaveLength(10);
+    expect(shopItems()).toHaveLength(14);
+    expect(giftOutfitIds()).toHaveLength(14);
     const prices = WARDROBE.map((item) => item.price);
     expect(prices).toEqual([...prices].sort((a, b) => a - b));
     expect(Math.min(...prices)).toBeGreaterThan(Math.max(...COSMETICS.map((item) => item.price)));
@@ -81,6 +81,10 @@ describe("academy wardrobe", () => {
     const bunny = renderToStaticMarkup(createElement(AcademyPal, { id: "bunny", cosmetic: "flower-crown" }));
     expect(bunny).toContain("wardrobe/fitted/bunny-flower-crown.webp");
     expect(bunny).not.toContain("wardrobe/fitted/peach-flower-crown.webp");
+    const penguin = renderToStaticMarkup(createElement(AcademyPal, { id: "penguin", cosmetic: "bow-tie" }));
+    expect(penguin).not.toContain("penguin-bow-tie");
+    const capy = renderToStaticMarkup(createElement(AcademyPal, { id: "capybara", cosmetic: "star-glasses" }));
+    expect(capy).not.toContain("capybara-star-glasses");
     const classic = renderToStaticMarkup(createElement(AcademyPal, { id: "peach", cosmetic: "party-hat" }));
     expect(classic).toContain("cosmetics/peach-party-hat.png");
     expect(classic).not.toContain("data-wear");

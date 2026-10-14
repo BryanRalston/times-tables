@@ -37,10 +37,8 @@ export const WARDROBE_IDS = [
   "round-glasses",
   "flower-crown",
   "berry-beret",
-  "pearl-scarf",
   "sun-hat",
   "night-cap",
-  "heart-scarf",
   "party-crown",
   "star-glasses",
 ];

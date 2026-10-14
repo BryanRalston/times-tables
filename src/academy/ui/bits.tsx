@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { canDressFace } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
 import { show, t } from "../i18n";
-import { isWardrobeId, wardrobeSrc } from "../wardrobe";
+import { isWardrobeId, lookShowsOn, wardrobeSrc } from "../wardrobe";
 import { MINUS, TIMES, type AddVisual, type Visual } from "../games/types";
 import { cosmeticCompositeUrl, squisheeUrl } from "../paths";
 import type { SquishRole } from "../squish/gesture";
@@ -61,7 +61,7 @@ export function AcademyPal({
 }) {
   const s = squisheeById(id);
   if (!s) return null;
-  const wear = cosmetic && isWardrobeId(cosmetic) ? cosmetic : "";
+  const wear = cosmetic && isWardrobeId(cosmetic) && lookShowsOn(id, cosmetic) ? cosmetic : "";
   const fitted = Boolean(cosmetic && canDressFace(id, cosmetic));
   const src = fitted && cosmetic ? cosmeticCompositeUrl(id, cosmetic) : squisheeUrl(s.file);
   // The squishee file stays the character. The costume is fitted to this body

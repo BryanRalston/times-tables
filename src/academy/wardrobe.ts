@@ -15,10 +15,8 @@ export const WARDROBE = [
   { id: "round-glasses", slot: "face", price: 20, stars: 0, bond: 0, study: 6 },
   { id: "flower-crown", slot: "hat", price: 22, stars: 0, bond: 12, study: 0 },
   { id: "berry-beret", slot: "hat", price: 26, stars: 48, bond: 0, study: 0 },
-  { id: "pearl-scarf", slot: "neck", price: 28, stars: 0, bond: 0, study: 10 },
   { id: "sun-hat", slot: "hat", price: 34, stars: 96, bond: 0, study: 0 },
   { id: "night-cap", slot: "hat", price: 38, stars: 0, bond: 15, study: 0 },
-  { id: "heart-scarf", slot: "neck", price: 42, stars: 160, bond: 0, study: 0 },
   { id: "party-crown", slot: "hat", price: 48, stars: 240, bond: 0, study: 0 },
   { id: "star-glasses", slot: "face", price: 56, stars: 0, bond: 0, study: 13 },
 ] as const;
@@ -41,6 +39,16 @@ export function isShopId(id: string): id is ShopId {
 
 export function wardrobeById(id: string) {
   return byId.get(id as WardrobeId);
+}
+
+/** Looks that cannot sit right on a body: capybara is drawn in profile, penguin already wears a bow tie. */
+const HIDDEN_ON: Readonly<Record<string, readonly string[]>> = {
+  capybara: ["round-glasses", "star-glasses"],
+  penguin: ["bow-tie"],
+};
+
+export function lookShowsOn(face: string, id: string): boolean {
+  return !(HIDDEN_ON[face] ?? []).includes(id);
 }
 
 /** Per-squishee costume. A shared sticker would sit in the wrong place on a different body. */
@@ -167,14 +175,10 @@ function shopEnglish(id: ShopId): string {
       return "Flower crown";
     case "berry-beret":
       return "Berry beret";
-    case "pearl-scarf":
-      return "Pearl scarf";
     case "sun-hat":
       return "Sun hat";
     case "night-cap":
       return "Night cap";
-    case "heart-scarf":
-      return "Heart scarf";
     case "party-crown":
       return "Party crown";
     case "star-glasses":
@@ -215,14 +219,10 @@ export function outfitHint(id: string): string {
       return t("Or 12 games with your pal", "O 12 juegos con tu amigo");
     case "berry-beret":
       return t("Or 48 stars", "O 48 estrellas");
-    case "pearl-scarf":
-      return t("Or 3 stars in 10 games", "O 3 estrellas en 10 juegos");
     case "sun-hat":
       return t("Or 96 stars", "O 96 estrellas");
     case "night-cap":
       return t("Or 15 games with your pal", "O 15 juegos con tu amigo");
-    case "heart-scarf":
-      return t("Or 160 stars", "O 160 estrellas");
     case "party-crown":
       return t("Or 240 stars", "O 240 estrellas");
     case "star-glasses":
