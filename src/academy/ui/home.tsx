@@ -7,10 +7,10 @@ import { bossForGame } from "../bosses";
 import { GAMES } from "../games/registry";
 import { bandFor } from "../grade-map";
 import { bossReady, dailySnapshot, normalizeJourney } from "../journey";
-import { gradeText, show, t } from "../i18n";
+import { show, t } from "../i18n";
 import { todayIso, type Child } from "../model";
-import { nextPlacement } from "../placement";
-import { gameOfDay, rollGift, type GiftRoll } from "../rewards";
+import { nextPlacement, todayPlayLine } from "../placement";
+import { rollGift, type GiftRoll } from "../rewards";
 import { outfitLabel } from "../wardrobe";
 import { chime } from "../sound";
 import { WeekStickers } from "./stickers";
@@ -31,12 +31,18 @@ export function HomeScreen({
   const [prize, setPrize] = useState<GiftRoll | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const todayId = todayIso();
-  const today = gameOfDay(todayId);
   const daily = dailySnapshot(child, todayId);
   const journey = normalizeJourney(child.journey, child.grade);
   const place = nextPlacement(child);
+  const facing = bossReady(journey, journey.areaId, child.grade) && place.reason !== "weak";
+  const playId = facing ? journey.areaId : place.game;
+  const playLevel = facing ? (child.levels[journey.areaId] ?? place.level) : place.level;
+  const playTitle = GAMES.find((game) => game.id === playId)?.title ?? playId;
+  const todayLine = todayPlayLine(show(playTitle), child.grade);
+  const playAction = facing
+    ? t(`Face ${bossForGame(playId).name}`, `Enfrenta a ${bossForGame(playId).name}`)
+    : show("Play");
   const book = bookEntries();
-  const bossHere = bossReady(journey, journey.areaId, child.grade);
   const palTier = bondTier(bondScore(child.bonds, child.avatarId));
 
   return (
@@ -88,12 +94,16 @@ export function HomeScreen({
           type="button"
           className="ac-go ac-play-main"
           data-placement={place.reason}
-          onClick={() => onPlay(bossHere ? journey.areaId : place.game, bossHere ? (child.levels[journey.areaId] ?? place.level) : place.level)}
+          data-play-game={playId}
+          data-play-level={playLevel}
+          aria-label={`${playAction}. ${todayLine}`}
+          onClick={() => onPlay(playId, playLevel)}
         >
-          <span className="ac-play-tri" aria-hidden="true" />{" "}
-          {bossHere
-            ? t(`Face ${bossForGame(journey.areaId).name}`, `Enfrenta a ${bossForGame(journey.areaId).name}`)
-            : show("Play")}
+          <span className="ac-play-tri" aria-hidden="true" />
+          <span className="ac-play-copy">
+            <strong>{playAction}</strong>
+            <small>{todayLine}</small>
+          </span>
         </button>
         <a className="ac-map-link" href="#/map">
           {show("Island map")}
@@ -171,9 +181,6 @@ export function HomeScreen({
         </a>
       </div>
 
-      <p className="ac-today-note">
-        {t("Today", "Hoy")}: {show(GAMES.find((game) => game.id === today)?.title ?? today)} · {gradeText(child.grade)}
-      </p>
       <Foot />
       {toast ? (
         <div className="ac-toast" role="status">

@@ -1114,8 +1114,8 @@ export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: str
   }
 }
 
-export function makeHandsTask(game: string, level: string, rng: Rng, avoid?: string): HandsTask {
-  if (game === "time") return makeClockTask(level, rng, avoid);
+export function makeHandsTask(game: string, level: string, rng: Rng, avoid?: string, prefer: readonly string[] = []): HandsTask {
+  if (game === "time") return makeClockTask(level, rng, avoid, prefer);
   if (game === "money") return makePayTask(level, rng, avoid);
   return makeBuildTask(game, level, rng, avoid);
 }

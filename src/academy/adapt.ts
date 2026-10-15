@@ -32,6 +32,25 @@ export function openingIndex(
   return Math.max(min, index - 1);
 }
 
+/**
+ * First round of a game drops one level under the grade start.
+ * If Play already saved that easier level, do not drop again.
+ */
+export function openingForRound(opts: {
+  savedIndex: number;
+  startIndex: number;
+  roundsPlayed: number;
+  boss: boolean;
+  bounds?: { min: number; max: number };
+}): number {
+  const min = Math.max(0, opts.bounds?.min ?? 0);
+  const max = opts.bounds?.max ?? Number.POSITIVE_INFINITY;
+  const saved = Math.max(min, Math.min(max, Math.max(0, opts.savedIndex)));
+  const placed = opts.roundsPlayed <= 0 && !opts.boss && opts.startIndex > saved;
+  if (placed) return saved;
+  return openingIndex(saved, opts.roundsPlayed, opts.boss, opts.bounds);
+}
+
 /** Step up after a clean streak. Step down after a miss. Stay inside the ladder. */
 export function stepLadder(ladder: Ladder, levelCount: number, ok: boolean, bounds?: { min: number; max: number }): Ladder {
   const count = Math.max(1, levelCount);
@@ -140,6 +159,65 @@ export function servePlan(opts: {
     ladder = stepLadder(ladder, opts.levelCount, opts.outcomes[i]!);
   }
   return out;
+}
+
+/** Clean answers in one round before the ladder steps up. Short rounds use 5. */
+export const CLEAN_UP_AT = 8;
+
+/** Misses of one idea before the ladder steps down. */
+export const IDEA_DOWN_AT = 2;
+
+export interface MasteryClock {
+  clean: number;
+  answered: number;
+  promoted: boolean;
+  ideaMisses: Record<string, number>;
+}
+
+export type MasteryShift = "up" | "down" | "stay";
+
+export function freshMastery(): MasteryClock {
+  return { clean: 0, answered: 0, promoted: false, ideaMisses: {} };
+}
+
+/**
+ * 8 clean answers out of 10, with those answers not using the worked example,
+ * steps up once. Two misses on the same idea steps down. A short first round
+ * uses five clean answers instead of eight.
+ */
+export function clockMastery(
+  clock: MasteryClock,
+  event: { ok: boolean; idea: string; assisted: boolean },
+  stepUpAt = CLEAN_UP_AT,
+): { clock: MasteryClock; shift: MasteryShift } {
+  const ideaMisses = { ...clock.ideaMisses };
+  let clean = clock.clean;
+  let promoted = clock.promoted;
+  const answered = clock.answered + 1;
+  let shift: MasteryShift = "stay";
+  if (event.ok && !event.assisted) {
+    clean += 1;
+    const bar = Math.max(1, stepUpAt);
+    if (!promoted && clean >= bar && clean / answered >= 0.8) {
+      promoted = true;
+      shift = "up";
+    }
+  } else if (!event.ok) {
+    const next = (ideaMisses[event.idea] ?? 0) + 1;
+    ideaMisses[event.idea] = next;
+    if (next >= IDEA_DOWN_AT && next % IDEA_DOWN_AT === 0) shift = "down";
+  }
+  return { clock: { clean, answered, promoted, ideaMisses }, shift };
+}
+
+/** Move one rung and clear the streak. Stays inside the grade window. */
+export function moveLadder(ladder: Ladder, levelCount: number, dir: -1 | 1, bounds?: { min: number; max: number }): Ladder {
+  const count = Math.max(1, levelCount);
+  const min = Math.max(0, Math.min(count - 1, bounds?.min ?? 0));
+  const max = Math.max(min, Math.min(count - 1, bounds?.max ?? count - 1));
+  const index = Math.max(min, Math.min(max, ladder.index));
+  const next = Math.max(min, Math.min(max, index + dir));
+  return { index: next, streak: 0 };
 }
 
 export function cloneSkills(skills: Record<string, SkillStat>): Record<string, SkillStat> {

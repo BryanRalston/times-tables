@@ -1,7 +1,17 @@
 import { skillHeat, skillKeyForLevel, openingIndex, type SkillHeat } from "./adapt";
 import { GAMES } from "./games/registry";
 import { playWindow } from "./grade-map";
+import { gradeText, t } from "./i18n";
 import type { Grade, SkillStat } from "./model";
+
+/** A clock idea and the level that practices it. */
+const IDEA_LEVEL: Record<string, { game: string; level: string }> = {
+  oclock: { game: "time", level: "hour" },
+  halfpast: { game: "time", level: "half" },
+  quarterpast: { game: "time", level: "quarter" },
+  quarterto: { game: "time", level: "quarter" },
+  fives: { game: "time", level: "fives" },
+};
 
 export type PlacementReason = "start" | "weak" | "stretch" | "review";
 
@@ -20,9 +30,22 @@ interface SkillRow {
   n: number;
 }
 
+/** The line on the one Play button. The title is already in the child's language. */
+export function todayPlayLine(title: string, grade: Grade): string {
+  return t(`Today: ${title} · ${gradeText(grade)}`, `Hoy: ${title} · ${gradeText(grade)}`);
+}
+
+function dueStats(stat: SkillStat | undefined): { acc: number; miss: number; n: number } | null {
+  if (!stat) return null;
+  const n = stat.ok + stat.miss;
+  if (n < 2 || stat.miss < 1) return null;
+  if (stat.ok / n >= 0.8) return null;
+  return { acc: stat.ok / n, miss: stat.miss, n };
+}
+
 /**
  * One tap, no quiz. A new child starts a step easier than the grade default.
- * A skill they are still learning comes back. A mastered skill steps up.
+ * A skill they are still missing comes back. A mastered skill steps up.
  */
 function windowFor(gameId: string, levelIds: readonly string[], grade: Grade, challengeAhead: boolean) {
   return playWindow(levelIds, gameId, grade, challengeAhead);
@@ -57,8 +80,28 @@ export function nextPlacement(child: {
     }
   }
 
+  for (const [tag, home] of Object.entries(IDEA_LEVEL)) {
+    const due = dueStats(child.skills[tag]);
+    if (!due) continue;
+    const game = GAMES.find((row) => row.id === home.game);
+    if (!game) continue;
+    const allowed = windowFor(game.id, game.levels.map((level) => level.id), child.grade, challenge);
+    if (!allowed.ids.includes(home.level)) continue;
+    const existing = rows.find((row) => row.game === home.game && row.level === home.level);
+    if (!existing) {
+      rows.push({ game: home.game, level: home.level, heat: "learning", acc: due.acc, miss: due.miss, n: due.n });
+      continue;
+    }
+    if (existing.heat !== "learning" || due.acc < existing.acc) {
+      existing.heat = "learning";
+      existing.acc = Math.min(existing.acc, due.acc);
+      existing.miss = Math.max(existing.miss, due.miss);
+      existing.n = Math.max(existing.n, due.n);
+    }
+  }
+
   const weak = rows
-    .filter((row) => row.heat === "learning")
+    .filter((row) => row.heat === "learning" && row.n >= 2 && row.acc < 0.8)
     .sort((a, b) => a.acc - b.acc || b.miss - a.miss || b.n - a.n);
   const weakest = weak[0];
   if (weakest) return { game: weakest.game, level: weakest.level, reason: "weak" };

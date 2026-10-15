@@ -2,15 +2,19 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { rngRandom } from "@/lib/rng";
 import { squisheeById } from "@/lib/squishees";
 import {
+  CLEAN_UP_AT,
+  clockMastery,
   cloneSkills,
+  freshMastery,
+  moveLadder,
   noteMark,
-  openingIndex,
+  openingForRound,
   pickServeIndex,
   skillHeat,
   skillKeyForLevel,
   startLadder,
-  stepLadder,
   type Ladder,
+  type MasteryClock,
 } from "../adapt";
 import { bondName, bondScore, bondTier } from "../buddy/bond";
 import { hostIdFor } from "../buddy/hosts";
@@ -26,8 +30,9 @@ import { bossReady, bossWon } from "../journey";
 import {
   autoSpeakGrade,
   BOSS_LENGTH,
+  cardsThisRound,
+  PLACEMENT_LENGTH,
   ROUND_SECONDS,
-  roundLength,
   speedRoundOffer,
   type AnswerMark,
   type Child,
@@ -36,7 +41,7 @@ import {
   type SkillStat,
 } from "../model";
 import { makeBossRound, makeQuestion, type ChoiceQ } from "../questions";
-import { coinsForRound, newestUnlock, starsForRound, weakTimesFacts } from "../rewards";
+import { coinsForRound, dueIdeas, newestUnlock, starsForRound, weakTimesFacts } from "../rewards";
 import {
   exampleFor,
   handsOnSlots,
@@ -83,7 +88,7 @@ function bossOpening(
   return questions.map((question, i) => {
     const twist = phaseForIndex(i, questions.length);
     const skillLevel = question.skill.split(":")[1] ?? level;
-    if (twist === "cards") return { slot: makeHandsTask(game, skillLevel, rngRandom()), returning: false };
+    if (twist === "cards") return { slot: makeHandsTask(game, skillLevel, rngRandom(), undefined, prefer), returning: false };
     return { slot: { kind: "choice", question }, returning: false };
   });
 }
@@ -119,6 +124,18 @@ function markOf(slot: RoundSlot, ok: boolean, unscored = false): AnswerMark {
     };
   }
   return { skill: slot.skill, tags: [], factKey: slot.factKey, ok, unscored: unscored || undefined };
+}
+
+function ideaOf(slot: RoundSlot): string {
+  if (slot.kind === "choice") return slot.question.tags[0] || slot.question.skill;
+  if (slot.kind === "clock") {
+    if (slot.minutes === 15) return "quarterpast";
+    if (slot.minutes === 45) return "quarterto";
+    if (slot.minutes === 30) return "halfpast";
+    if (slot.minutes === 0) return "oclock";
+    return "fives";
+  }
+  return slot.skill;
 }
 
 function praiseLine(slot: RoundSlot): string {
@@ -168,12 +185,21 @@ export function PlayScreen({
     ? 0
     : Math.max(gradeWindow.min, Math.min(gradeWindow.max, spec?.levels.findIndex((row) => row.id === level) ?? gradeWindow.min));
   const bounds = { min: Math.max(0, gradeWindow.min), max: Math.max(0, gradeWindow.max) };
-  const cards = roundLength(child.grade);
   const calm = autoSpeakGrade(child.grade);
   const crownFight = crown && child.journey.bosses.includes(game);
   const openingBoss = crownFight || bossReady(child.journey, game, child.grade);
-  const openAt = blocked ? 0 : openingIndex(baseIndex, child.rounds, openingBoss, bounds);
+  const openAt = blocked
+    ? 0
+    : openingForRound({
+        savedIndex: baseIndex,
+        startIndex: Math.max(0, spec?.levels.findIndex((row) => row.id === gradeWindow.start) ?? baseIndex),
+        roundsPlayed: child.rounds,
+        boss: openingBoss,
+        bounds,
+      });
   const roundLevel = spec?.levels[openAt]?.id ?? level;
+  const [planned, setPlanned] = useState(() => cardsThisRound(child.grade, child.rounds, openingBoss));
+  const cards = planned;
   const bossDef = bossForGame(game);
   const [roundId, setRoundId] = useState(0);
   const [index, setIndex] = useState(0);
@@ -216,9 +242,10 @@ export function PlayScreen({
   }
   const boss = bossSnap.current.boss;
   const skillsRef = useRef<Record<string, SkillStat>>(cloneSkills(child.skills));
+  const masteryRef = useRef<MasteryClock>(freshMastery());
   const boundsRef = useRef(bounds);
   boundsRef.current = bounds;
-  const ladderRef = useRef<Ladder>(startLadder(blocked ? 0 : openingIndex(baseIndex, child.rounds, boss, bounds)));
+  const ladderRef = useRef<Ladder>(startLadder(openAt));
   const handsRef = useRef<Set<number>>(new Set());
   const returnsRef = useRef<Map<number, RoundSlot>>(new Map());
   menuRef.current = menu;
@@ -252,8 +279,27 @@ export function PlayScreen({
   }
 
   function preferIds(): string[] {
-    if (spec?.reviewKeys) return spec.reviewKeys(child.words);
-    return game === "times" ? weakTimesFacts(skillsRef.current) : [];
+    const ideas = dueIdeas(skillsRef.current);
+    const words = spec?.reviewKeys?.(child.words) ?? [];
+    const facts = game === "times" ? weakTimesFacts(skillsRef.current) : [];
+    return [...ideas, ...words, ...facts];
+  }
+
+  function stepUpAt(): number {
+    return cards <= PLACEMENT_LENGTH ? 5 : CLEAN_UP_AT;
+  }
+
+  function applyShift(shift: "up" | "down" | "stay") {
+    if (boss || !spec || shift === "stay") {
+      if (shift === "stay") setNudge(null);
+      return;
+    }
+    const before = ladderRef.current.index;
+    ladderRef.current = moveLadder(ladderRef.current, spec.levels.length, shift === "up" ? 1 : -1, boundsRef.current);
+    const after = ladderRef.current.index;
+    if (after > before) setNudge("up");
+    else if (after < before) setNudge("down");
+    else setNudge(null);
   }
 
   function buildSlot(i: number): Served {
@@ -261,7 +307,7 @@ export function PlayScreen({
     if (queued) return { slot: queued, returning: true };
     const handsOn = handsRef.current.has(i);
     const lvl = levelNow();
-    if (handsOn) return { slot: makeHandsTask(game, lvl, rngRandom()), returning: false };
+    if (handsOn) return { slot: makeHandsTask(game, lvl, rngRandom(), undefined, preferIds()), returning: false };
     return { slot: { kind: "choice", question: nextQuestion() }, returning: false };
   }
 
@@ -295,23 +341,33 @@ export function PlayScreen({
     const nextSpec = gameById(game);
     const nextBase = Math.max(boundsRef.current.min, nextSpec?.levels.findIndex((row) => row.id === nextLevel) ?? boundsRef.current.min);
     const nextBoss = crownFight || bossReady(child.journey, game, child.grade);
+    const nextPlanned = cardsThisRound(child.grade, child.rounds, nextBoss);
     skillsRef.current = cloneSkills(child.skills);
-    ladderRef.current = startLadder(openingIndex(nextBase, child.rounds, nextBoss, boundsRef.current));
-    handsRef.current = new Set(nextBoss ? [] : handsOnSlots(cards));
+    masteryRef.current = freshMastery();
+    ladderRef.current = startLadder(
+      openingForRound({
+        savedIndex: nextBase,
+        startIndex: Math.max(0, nextSpec?.levels.findIndex((row) => row.id === gradeWindow.start) ?? nextBase),
+        roundsPlayed: child.rounds,
+        boss: nextBoss,
+        bounds: boundsRef.current,
+      }),
+    );
+    handsRef.current = new Set(nextBoss ? [] : handsOnSlots(nextPlanned));
     returnsRef.current = new Map();
     replayHereRef.current = false;
     practiceTaughtRef.current = false;
     answersRef.current = [];
-    dotsRef.current = blankDots(nextBoss ? BOSS_LENGTH : cards);
+    dotsRef.current = blankDots(nextBoss ? BOSS_LENGTH : nextPlanned);
+    setPlanned(nextPlanned);
     startStarsRef.current = child.stars;
     finishedRef.current = false;
     const openingPhase: Phase = nextBoss ? "intro" : "ask";
     phaseRef.current = openingPhase;
     indexRef.current = 0;
     startedRef.current = Date.now();
-    const prefer = nextSpec?.reviewKeys?.(child.words) ?? (game === "times" ? weakTimesFacts(skillsRef.current) : []);
     const opening = nextBoss
-      ? bossOpening(game, nextLevel, prefer, child.grade, crownFight, child.challengeAhead)
+      ? bossOpening(game, nextLevel, preferIds(), child.grade, crownFight, child.challengeAhead)
       : [buildSlot(0)];
     questionsRef.current = opening;
     setQuestions(opening);
@@ -389,14 +445,6 @@ export function PlayScreen({
     setTeachSlot(null);
   }
 
-  function easeLadder() {
-    if (boss || !spec) return;
-    const before = ladderRef.current.index;
-    ladderRef.current = stepLadder(ladderRef.current, spec.levels.length, false, boundsRef.current);
-    const after = ladderRef.current.index;
-    setNudge(after < before ? "down" : null);
-  }
-
   function scoreClean(served: Served, fromIndex: number, fromCombo: number, hint = false) {
     const mark = markOf(served.slot, true);
     if (hint) mark.hint = true;
@@ -404,10 +452,9 @@ export function PlayScreen({
     answersRef.current = [...answersRef.current, mark];
     paint(fromIndex, "ok");
     if (!boss && spec && !served.returning) {
-      const before = ladderRef.current.index;
-      ladderRef.current = stepLadder(ladderRef.current, spec.levels.length, true, boundsRef.current);
-      const after = ladderRef.current.index;
-      setNudge(after > before ? "up" : null);
+      const step = clockMastery(masteryRef.current, { ok: true, idea: ideaOf(served.slot), assisted: hint }, stepUpAt());
+      masteryRef.current = step.clock;
+      applyShift(step.shift);
     }
     const nextCombo = served.returning ? 0 : fromCombo + 1;
     if (!served.returning) bestRef.current = Math.max(bestRef.current, nextCombo);
@@ -444,7 +491,11 @@ export function PlayScreen({
       noteMark(skillsRef.current, miss);
       answersRef.current = [...answersRef.current, miss];
       paint(fromIndex, "helped");
-      easeLadder();
+      if (!boss) {
+        const step = clockMastery(masteryRef.current, { ok: false, idea: ideaOf(served.slot), assisted: true }, stepUpAt());
+        masteryRef.current = step.clock;
+        applyShift(step.shift);
+      }
     }
     setCombo(0);
     if (boss) {
@@ -702,7 +753,7 @@ export function PlayScreen({
   const maxEnergy = bossMaxEnergy(BOSS_LENGTH, crownFight);
 
   return (
-    <div className={cx("ac-shell", child.grade === "PK" && "is-prek", spec?.layout === "wide" && "ac-wide", boss && "is-boss", crownFight && "is-crown")} data-phase={phase}>
+    <div className={cx("ac-shell", child.grade === "PK" && "is-prek", spec?.layout === "wide" && "ac-wide", boss && "is-boss", crownFight && "is-crown")} data-phase={phase} data-round={child.rounds <= 0 && !boss ? "first" : "play"}>
       <header className="ac-play-top">
         <button type="button" className="ac-x" onClick={close} aria-label={show("Close")}>
           ×
