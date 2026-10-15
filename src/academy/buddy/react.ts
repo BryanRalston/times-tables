@@ -11,7 +11,7 @@ export interface BuddyCue {
   ok: boolean;
   stars: number;
   hintOn: boolean;
-  /** Correct answers in a row. Three or more is a streak celebration. */
+  /** Correct answers in a row. Three or more earns a dance, without a streak label. */
   combo?: number;
   /** This card is something the buddy can count along with. */
   counting?: boolean;
@@ -32,7 +32,7 @@ export function buddyReaction(cue: BuddyCue): BuddyReaction {
     case "teach":
       return { mood: "oops", point: "example", line: "work" };
     case "feedback":
-      if (cue.ok && (cue.combo ?? 0) >= 3) return { mood: "dance", point: null, line: "streak" };
+      if (cue.ok && (cue.combo ?? 0) >= 3) return { mood: "dance", point: null, line: "cheer" };
       return cue.ok
         ? { mood: "cheer", point: null, line: "cheer" }
         : { mood: "oops", point: "hint", line: "miss" };
@@ -42,7 +42,7 @@ export function buddyReaction(cue: BuddyCue): BuddyReaction {
         : { mood: "hint", point: "example", line: "turn" };
     case "ask":
       if (cue.hintOn) return { mood: "hint", point: "hint", line: "hint" };
-      if ((cue.combo ?? 0) >= 3) return { mood: "cheer", point: null, line: "streak" };
+      if ((cue.combo ?? 0) >= 3) return { mood: "cheer", point: null, line: "cheer" };
       if (cue.counting) return { mood: "hint", point: null, line: "count" };
       return { mood: "idle", point: null, line: "ready" };
     default: {
@@ -68,7 +68,7 @@ export function bubbleText(line: BuddyLine, id: string): string {
     case "ready":
       return "";
     case "streak":
-      return persona.streak;
+      return persona.line;
     case "count":
       return persona.count;
     case "work":

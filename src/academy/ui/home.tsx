@@ -43,7 +43,7 @@ export function HomeScreen({
     <div className={cx("ac-shell", child.grade === "PK" && "is-prek")}>
       <header className="ac-top">
         <Logo />
-        <a className="ac-streak" href="#/map">
+        <a className="ac-island-link" href="#/map">
           {show("Island")}
         </a>
       </header>
@@ -59,7 +59,7 @@ export function HomeScreen({
         <h1>
           {t(`Hi ${child.name}! Ready to play?`, `¡Hola ${child.name}! ¿Listo para jugar?`)}
         </h1>
-        <p className="ac-lede">{show("2-minute games · hop the island · collect squishees")}</p>
+        <p className="ac-lede">{show("Short games · hop the island · collect squishees")}</p>
         <div className="ac-daily" data-daily-rounds={daily.rounds} data-daily-goal={daily.goal} data-gift={daily.ready ? "closed" : daily.claimed ? "open" : "none"}>
           <ProgressRing
             value={daily.rounds}

@@ -97,9 +97,38 @@ export function autoSpeakGrade(grade: Grade): boolean {
   return grade === "PK" || grade === "K" || grade === "1";
 }
 
-/** A countdown is opt-in, and only from grade 2 up. */
+/**
+ * Fact levels a child may choose to race. Equal groups (`count`) stay a
+ * counting activity. Factors, multi-digit work, and remainders are not fluency.
+ */
+const TIMES_FLUENCY_LEVELS = ["twos", "mix", "toTen"] as const;
+
+/** Grade 2 and grade 3 are the only grades that may see a speed choice. */
 export function speedRoundGrade(grade: Grade): boolean {
-  return grade === "2" || grade === "3" || grade === "4";
+  switch (grade) {
+    case "PK":
+    case "K":
+    case "1":
+    case "4":
+      return false;
+    case "2":
+    case "3":
+      return true;
+    default: {
+      const neverGrade: never = grade;
+      return neverGrade;
+    }
+  }
+}
+
+/**
+ * Optional speed round. Grade 2–3 Times only, and only on fact levels where
+ * fluency practice makes sense. Boss fights and every other game stay untimed.
+ * The countdown stays off until the child turns this on.
+ */
+export function speedRoundOffer(grade: Grade, game: string, level: string, boss = false): boolean {
+  if (boss || game !== "times" || !speedRoundGrade(grade)) return false;
+  return (TIMES_FLUENCY_LEVELS as readonly string[]).includes(level);
 }
 
 /** Pre-K rounds stay short. Every other grade plays ten cards. */
