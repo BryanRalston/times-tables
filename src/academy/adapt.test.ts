@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  clockMastery,
+  freshMastery,
+  moveLadder,
   noteMark,
+  openingForRound,
   openingIndex,
   pickServeIndex,
   servePlan,
@@ -29,6 +33,18 @@ describe("adaptive ladder", () => {
     expect(openingIndex(0, 0, false)).toBe(0);
     expect(openingIndex(2, 1, false)).toBe(2);
     expect(openingIndex(2, 0, true)).toBe(2);
+  });
+
+  it("does not drop again when Play already saved the easier level", () => {
+    expect(
+      openingForRound({ savedIndex: 3, startIndex: 4, roundsPlayed: 0, boss: false, bounds: { min: 2, max: 5 } }),
+    ).toBe(3);
+    expect(
+      openingForRound({ savedIndex: 4, startIndex: 4, roundsPlayed: 0, boss: false, bounds: { min: 2, max: 5 } }),
+    ).toBe(3);
+    expect(
+      openingForRound({ savedIndex: 3, startIndex: 4, roundsPlayed: 1, boss: false, bounds: { min: 2, max: 5 } }),
+    ).toBe(3);
   });
 
   it("defaults the grade picker to grade 1", () => {
@@ -76,6 +92,44 @@ describe("mastery mix", () => {
     expect(plan.map((row) => row.index)).toEqual([0, 0, 0, 0]);
     expect(plan[2]?.reason).toBe("stay");
     expect(plan[3]?.reason).toBe("review");
+  });
+
+  it("steps up after 8 clean answers and down after two misses of one idea", () => {
+    let clock = freshMastery();
+    for (let i = 0; i < 7; i++) {
+      const step = clockMastery(clock, { ok: true, idea: "add:within10", assisted: false }, 8);
+      clock = step.clock;
+      expect(step.shift).toBe("stay");
+    }
+    const up = clockMastery(clock, { ok: true, idea: "add:within10", assisted: false }, 8);
+    expect(up.shift).toBe("up");
+    expect(up.clock.clean).toBe(8);
+
+    let missed = freshMastery();
+    const once = clockMastery(missed, { ok: false, idea: "quarterpast", assisted: true });
+    expect(once.shift).toBe("stay");
+    const twice = clockMastery(once.clock, { ok: false, idea: "quarterpast", assisted: true });
+    expect(twice.shift).toBe("down");
+    const other = clockMastery(once.clock, { ok: false, idea: "quarterto", assisted: true });
+    expect(other.shift).toBe("stay");
+
+    let mixed = freshMastery();
+    for (let i = 0; i < 2; i++) mixed = clockMastery(mixed, { ok: false, idea: "a", assisted: true }).clock;
+    for (let i = 0; i < 7; i++) mixed = clockMastery(mixed, { ok: true, idea: "b", assisted: false }).clock;
+    const eightOfTen = clockMastery(mixed, { ok: true, idea: "b", assisted: false }, 8);
+    expect(eightOfTen.clock.clean).toBe(8);
+    expect(eightOfTen.clock.answered).toBe(10);
+    expect(eightOfTen.shift).toBe("up");
+
+    const hinted = clockMastery(freshMastery(), { ok: true, idea: "add:within5", assisted: true }, 8);
+    expect(hinted.clock.clean).toBe(0);
+    expect(hinted.shift).toBe("stay");
+
+    let short = freshMastery();
+    for (let i = 0; i < 4; i++) short = clockMastery(short, { ok: true, idea: "count", assisted: false }, 5).clock;
+    expect(clockMastery(short, { ok: true, idea: "count", assisted: false }, 5).shift).toBe("up");
+    expect(moveLadder(startLadder(1), 4, -1, { min: 0, max: 2 })).toEqual({ index: 0, streak: 0 });
+    expect(moveLadder(startLadder(2), 4, 1, { min: 0, max: 2 })).toEqual({ index: 2, streak: 0 });
   });
 
   it("treats five strong tries as mastered and records one outcome per mark", () => {

@@ -1384,7 +1384,31 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   .ac-slot:active, .ac-tile:active, .ac-speaker:active { transform: none; }
 }
 
-.ac-play-main { min-height: 72px; font-size: 28px; margin-top: 4px; }
+button.ac-go.ac-play-main {
+  min-height: 84px;
+  height: auto;
+  margin-top: 8px;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, #2ec98a, #0f9a68);
+  box-shadow: 0 10px 18px -12px rgb(12 120 70 / 0.9);
+}
+.ac-play-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  text-align: center;
+}
+.ac-play-copy strong {
+  font-size: 30px;
+  line-height: 1;
+}
+.ac-play-copy small {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.25;
+}
 .ac-speed-gap { flex: 1; }
 .ac-speed {
   min-width: 72px;
