@@ -25,7 +25,7 @@ import { bossForGame } from "../bosses";
 import { playWindow } from "../grade-map";
 import { gameById, pillLabel } from "../games/registry";
 import { makeHandsTask } from "../hands-build";
-import { show, t, yourTurnLine } from "../i18n";
+import { cardStepLabel, cardsRoundLabel, show, t, yourTurnLine } from "../i18n";
 import { bossReady, bossWon } from "../journey";
 import {
   autoSpeakGrade,
@@ -33,7 +33,7 @@ import {
   cardsThisRound,
   PLACEMENT_LENGTH,
   ROUND_SECONDS,
-  speedRoundGrade,
+  speedRoundOffer,
   type AnswerMark,
   type Child,
   type Grade,
@@ -57,7 +57,7 @@ import { silence, speak } from "../voice";
 import { CoinShare, RoundBuddy } from "./buddy-view";
 import { BossFigure, type BossMood } from "./boss-figure";
 import { BossHud, BossIntro } from "./boss-stage";
-import { Flame, SpeakerIcon, SquisheeImg, Stars, cx, fmtSeconds } from "./bits";
+import { SpeakerIcon, SquisheeImg, Stars, cx, fmtSeconds } from "./bits";
 import { RoundCastProvider } from "./round-cast";
 import { CoinRow } from "./coins";
 import { HandsBoard } from "./build-boards";
@@ -186,9 +186,18 @@ export function PlayScreen({
     : Math.max(gradeWindow.min, Math.min(gradeWindow.max, spec?.levels.findIndex((row) => row.id === level) ?? gradeWindow.min));
   const bounds = { min: Math.max(0, gradeWindow.min), max: Math.max(0, gradeWindow.max) };
   const calm = autoSpeakGrade(child.grade);
-  const canSpeed = speedRoundGrade(child.grade);
   const crownFight = crown && child.journey.bosses.includes(game);
   const openingBoss = crownFight || bossReady(child.journey, game, child.grade);
+  const openAt = blocked
+    ? 0
+    : openingForRound({
+        savedIndex: baseIndex,
+        startIndex: Math.max(0, spec?.levels.findIndex((row) => row.id === gradeWindow.start) ?? baseIndex),
+        roundsPlayed: child.rounds,
+        boss: openingBoss,
+        bounds,
+      });
+  const roundLevel = spec?.levels[openAt]?.id ?? level;
   const [planned, setPlanned] = useState(() => cardsThisRound(child.grade, child.rounds, openingBoss));
   const cards = planned;
   const bossDef = bossForGame(game);
@@ -236,19 +245,7 @@ export function PlayScreen({
   const masteryRef = useRef<MasteryClock>(freshMastery());
   const boundsRef = useRef(bounds);
   boundsRef.current = bounds;
-  const ladderRef = useRef<Ladder>(
-    startLadder(
-      blocked
-        ? 0
-        : openingForRound({
-            savedIndex: baseIndex,
-            startIndex: Math.max(0, spec?.levels.findIndex((row) => row.id === gradeWindow.start) ?? baseIndex),
-            roundsPlayed: child.rounds,
-            boss,
-            bounds,
-          }),
-    ),
-  );
+  const ladderRef = useRef<Ladder>(startLadder(openAt));
   const handsRef = useRef<Set<number>>(new Set());
   const returnsRef = useRef<Map<number, RoundSlot>>(new Map());
   menuRef.current = menu;
@@ -604,7 +601,11 @@ export function PlayScreen({
           : speechFor(slot)
         : "";
   const total = boss ? questions.length || BOSS_LENGTH : cards;
+  const canSpeed = speedRoundOffer(child.grade, game, roundLevel, boss);
   const showSpeed = canSpeed && speed;
+  const stepLabel = calm
+    ? cardStepLabel(index, total)
+    : t(`Question ${Math.min(total, index + 1)} of ${total}`, `Pregunta ${Math.min(total, index + 1)} de ${total}`);
 
   useEffect(() => {
     if (!showSpeed) return;
@@ -772,6 +773,7 @@ export function PlayScreen({
           <button
             type="button"
             className={cx("ac-speed", speed && "is-on")}
+            data-speed={speed ? "on" : "off"}
             aria-pressed={speed}
             onClick={() => {
               setSpeed((on) => {
@@ -780,8 +782,12 @@ export function PlayScreen({
               });
             }}
           >
-            {show("Speed")}
+            {show("Speed round")}
           </button>
+        ) : calm && !boss ? (
+          <span className="ac-cards-chip" data-cards={total}>
+            {cardsRoundLabel(total)}
+          </span>
         ) : (
           <span className="ac-speed-gap" />
         )}
@@ -959,7 +965,7 @@ export function PlayScreen({
               "ac-stage",
               spec?.layout === "wide" && phase !== "teach" && slot.kind === "choice" && "is-time",
               phase === "feedback" && "is-yes",
-              phase === "feedback" && combo >= 3 && "is-streak",
+              phase === "feedback" && combo >= 3 && "is-glow",
               phase === "teach" && "is-teach",
               hintOn && asking && "is-hint",
               boss && fightPhase === "cards" && "is-cards",
@@ -1043,10 +1049,7 @@ export function PlayScreen({
             aria-valuemin={0}
             aria-valuemax={total}
             aria-valuenow={filled}
-            aria-label={t(
-              `Question ${Math.min(total, index + 1)} of ${total}`,
-              `Pregunta ${Math.min(total, index + 1)} de ${total}`,
-            )}
+            aria-label={stepLabel}
           >
             <span style={{ width: `${(filled / total) * 100}%` }} />
           </div>
@@ -1059,11 +1062,11 @@ export function PlayScreen({
                 aria-valuemin={0}
                 aria-valuemax={5}
                 aria-valuenow={Math.min(5, combo)}
-                aria-label={combo >= 2 ? t(`Combo ${combo}`, `Racha ${combo}`) : show("Combo")}
+                aria-label={combo >= 2 ? t(`Combo ${combo}`, `Combo ${combo}`) : show("Combo")}
               >
                 <span style={{ width: `${Math.min(100, (combo / 5) * 100)}%` }} />
               </div>
-              <small>{combo >= 2 ? t(`Combo ×${combo}`, `Racha ×${combo}`) : show("Combo")}</small>
+              <small>{combo >= 2 ? t(`Combo ×${combo}`, `Combo ×${combo}`) : show("Combo")}</small>
             </div>
           )}
           <div className="ac-qdots" aria-hidden="true">
@@ -1073,18 +1076,7 @@ export function PlayScreen({
               return <i key={i} className={cls} />;
             })}
           </div>
-          <p className="ac-qmeta">
-            {t(
-              `Question ${Math.min(total, index + 1)} of ${total}`,
-              `Pregunta ${Math.min(total, index + 1)} de ${total}`,
-            )}
-            {!calm && combo >= 2 ? (
-              <>
-                {" "}
-                · <Flame /> {t("nice streak", "buena racha")}
-              </>
-            ) : null}
-          </p>
+          <p className="ac-qmeta">{stepLabel}</p>
         </>
       ) : null}
 

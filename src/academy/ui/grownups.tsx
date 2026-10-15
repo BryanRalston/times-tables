@@ -9,7 +9,7 @@ import { gradeText, show, t } from "../i18n";
 import { activeChild, addChild } from "../storage";
 import { LanguageToggle, withLang } from "./lang";
 import { BackupPanel } from "./backup-panel";
-import { BackLink, Flame, Foot, Logo, SquisheeImg, cx } from "./bits";
+import { BackLink, Foot, Logo, SquisheeImg, cx } from "./bits";
 import { InstallTip } from "./install-tip";
 
 const GATE_KEY = "squishee-academy-gate";
@@ -199,11 +199,9 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
       ) : null}
 
       <div className="ac-stats3 ac-no-print">
-        <article className="ac-statcard">
-          <strong>
-            <Flame /> {child.streak}
-          </strong>
-          <span>{show("day streak")}</span>
+        <article className="ac-statcard" data-days={card.days}>
+          <strong>{card.days}</strong>
+          <span>{card.days === 1 ? show("day this week") : show("days this week")}</span>
         </article>
         <article className="ac-statcard">
           <strong>{card.minutesLabel}</strong>

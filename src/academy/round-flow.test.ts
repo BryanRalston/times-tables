@@ -1,8 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
 import { clockMatches, dragClock, makeClockTask, makePayTask, payMatches, stepClock } from "./hands";
 import { emptyPile } from "./games/money-model";
-import { handsOnSlots, planReturn, scheduleMiss, similarSlot, weekStickers, type RoundSlot } from "./round-flow";
+import { daysPlayedCaption, daysPlayedThisWeek, handsOnSlots, planReturn, scheduleMiss, similarSlot, weekStickers, type RoundSlot } from "./round-flow";
+import { setLocale } from "./i18n";
 
 describe("hands-on cards", () => {
   it("puts at least three hands-on cards in a round of ten", () => {
@@ -78,6 +79,8 @@ describe("a miss comes back before card 10", () => {
   });
 });
 
+afterEach(() => setLocale("en"));
+
 describe("weekly stickers", () => {
   it("marks played days and never calls a quiet day broken", () => {
     const days = weekStickers({ "2026-10-05": 40 }, "2026-10-09");
@@ -87,5 +90,15 @@ describe("weekly stickers", () => {
     const text = JSON.stringify(days).toLowerCase();
     expect(text).not.toContain("broken");
     expect(text).not.toContain("streak");
+    expect(daysPlayedThisWeek({ "2026-10-05": 40, "2026-09-01": 90 }, "2026-10-09")).toBe(1);
+    expect(daysPlayedCaption(0).toLowerCase()).not.toMatch(/broken|streak|miss/);
+    expect(daysPlayedCaption(0)).toBe("Days played this week");
+    expect(daysPlayedCaption(1)).toBe("1 day played this week");
+    expect(daysPlayedCaption(3)).toBe("3 days played this week");
+    setLocale("es");
+    expect(daysPlayedCaption(0)).toBe("Días jugados esta semana");
+    expect(daysPlayedCaption(1)).toBe("1 día jugado esta semana");
+    expect(daysPlayedCaption(4)).toBe("4 días jugados esta semana");
+    setLocale("en");
   });
 });

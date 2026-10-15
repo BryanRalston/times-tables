@@ -141,14 +141,6 @@ export function Star({ filled }: { filled?: boolean }) {
   );
 }
 
-export function Flame() {
-  return (
-    <svg className="ac-flame" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 2s2.2 3.2 2.2 5.4c0 1.2-.6 2-1.3 2.4.9-.2 2.3-.1 3.2 1 1.6 1.9 1.4 5-1.2 7.2C12.6 20.2 9 20 7.2 17.6 5.2 14.8 5.6 11 8 8.4c.3 1.5 1.2 2.4 2.2 2.6C10 8.8 10.2 6.2 12 2Z" />
-    </svg>
-  );
-}
-
 export function LockIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

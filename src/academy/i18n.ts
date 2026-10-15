@@ -43,6 +43,20 @@ export function yourTurnLine(prompt: string): string {
   return t(`Your turn. ${prompt}`, `Te toca. ${prompt}`);
 }
 
+/** Round size for little kids. A countdown is not part of this label. */
+export function cardsRoundLabel(count: number): string {
+  const n = Math.max(0, Math.floor(count));
+  if (n === 1) return t("1 card", "1 tarjeta");
+  return t(`${n} cards`, `${n} tarjetas`);
+}
+
+/** Card step for Pre-K, kindergarten, and grade 1. */
+export function cardStepLabel(index: number, total: number): string {
+  const safeTotal = Math.max(1, Math.floor(total));
+  const at = Math.min(safeTotal, Math.max(1, Math.floor(index) + 1));
+  return t(`Card ${at} of ${safeTotal}`, `Tarjeta ${at} de ${safeTotal}`);
+}
+
 export function gradeText(grade: Grade): string {
   if (locale !== "es") return gradeLabel(grade);
   if (grade === "PK") return "Prekínder";

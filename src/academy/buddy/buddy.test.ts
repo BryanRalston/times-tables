@@ -140,7 +140,10 @@ describe("buddy reactions", () => {
       point: "example",
       line: "work",
     });
-    expect(buddyReaction({ phase: "feedback", ok: true, stars: 2, hintOn: false, combo: 3 }).line).toBe("streak");
+    const comboCheer = buddyReaction({ phase: "feedback", ok: true, stars: 2, hintOn: false, combo: 3 });
+    expect(comboCheer).toEqual({ mood: "dance", point: null, line: "cheer" });
+    expect(bubbleText(comboCheer.line, "frog").toLowerCase()).not.toContain("streak");
+    expect(buddyReaction({ phase: "ask", ok: false, stars: 1, hintOn: false, combo: 4 }).line).toBe("cheer");
     expect(buddyReaction({ phase: "ask", ok: false, stars: 1, hintOn: false, counting: true }).line).toBe("count");
     expect(buddyReaction({ phase: "done", ok: true, stars: 3, hintOn: false })).toEqual({
       mood: "dance",
@@ -150,7 +153,8 @@ describe("buddy reactions", () => {
     expect(buddyReaction({ phase: "done", ok: true, stars: 2, hintOn: false }).mood).toBe("cheer");
     expect(bubbleText("miss", "frog")).toBe("Let's look together.");
     expect(bubbleText("cheer", "frog")).toBe("Hop to it!");
-    expect(bubbleText("streak", "frog")).toBe("Hop, hop, streak!");
+    expect(bubbleText("streak", "frog")).toBe("Hop to it!");
+    expect(bubbleText("streak", "frog").toLowerCase()).not.toContain("streak");
     expect(bubbleText("count", "panda")).toContain("group");
     expect(bubbleText("work", "owl")).toContain("Sound");
     expect(bubbleText("ready", "frog")).toBe("");
