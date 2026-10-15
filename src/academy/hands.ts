@@ -1,7 +1,7 @@
 import type { Rng } from "@/lib/rng";
 import { t } from "./i18n";
 import { emptyPile, formatCents, pileCents, type CoinPile } from "./games/money-model";
-import { TIME_MINUTES, isTimeLevel, timeTalk, type TimeLevel } from "./games/time";
+import { TIME_MINUTES, isTimeLevel, preferredMinute, timeTalk, type TimeLevel } from "./games/time";
 import type { ChoiceQ, CoinKind } from "./games/types";
 import { greedyCoins, speakable } from "./teach";
 
@@ -113,17 +113,18 @@ function minutesFor(level: TimeLevel, rng: Rng): number {
   return rng.pick([...choices]);
 }
 
-export function makeClockTask(level: string, rng: Rng, avoid?: string): ClockTask {
+export function makeClockTask(level: string, rng: Rng, avoid?: string, prefer: readonly string[] = []): ClockTask {
   const safe: TimeLevel = isTimeLevel(level) ? level : "hour";
   const snap = clockSnap(safe);
   let hours = rng.int(1, 12);
-  let minutes = minutesFor(safe, rng);
+  const pinned = preferredMinute(safe, prefer);
+  let minutes = pinned ?? minutesFor(safe, rng);
   let fact = `${hours}:${minutes}`;
   let guard = 0;
   while (avoid && fact === avoid && guard < 16) {
     guard += 1;
     hours = rng.int(1, 12);
-    if (guard % 3 === 0) minutes = minutesFor(safe, rng);
+    if (pinned == null && guard % 3 === 0) minutes = minutesFor(safe, rng);
     fact = `${hours}:${minutes}`;
   }
   const phrase = timeTalk(hours, minutes);

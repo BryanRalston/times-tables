@@ -141,6 +141,23 @@ export function fourTimeChoices(rng: Rng, hours: number, minutes: number): strin
   return rng.shuffle([correct, ...pool.slice(0, 3)]);
 }
 
+const MINUTE_BY_IDEA: Record<string, number> = {
+  oclock: 0,
+  halfpast: 30,
+  quarterpast: 15,
+  quarterto: 45,
+};
+
+/** The minute a weak idea asks for, when this level can show it. */
+export function preferredMinute(level: TimeLevel, prefer: readonly string[]): number | null {
+  const allowed = new Set<number>(TIME_MINUTES[level]);
+  for (const key of prefer) {
+    const minute = MINUTE_BY_IDEA[key];
+    if (minute != null && allowed.has(minute)) return minute;
+  }
+  return null;
+}
+
 function timeTags(minutes: number): string[] {
   if (minutes === 0) return ["oclock"];
   if (minutes === 30) return ["halfpast"];
@@ -149,10 +166,10 @@ function timeTags(minutes: number): string[] {
   return ["fives"];
 }
 
-export function makeTimeQuestion(rng: Rng, level: TimeLevel): ChoiceQ {
+export function makeTimeQuestion(rng: Rng, level: TimeLevel, prefer: readonly string[] = []): ChoiceQ {
   if (level === "elapsed") return makeElapsedQuestion(rng);
   const hours = rng.int(1, 12);
-  const minutes = rng.pick(TIME_MINUTES[level]);
+  const minutes = preferredMinute(level, prefer) ?? rng.pick(TIME_MINUTES[level]);
   const phrase = timeTalk(hours, minutes);
   const answer = formatClockTime(hours, minutes);
   return {
@@ -240,7 +257,7 @@ export const timeGame = {
   sheetDefaultLevel: "half",
   isLevel: isTimeLevel,
   pill: (level) => t(`Telling Time · ${level.label}`, `La hora · ${show(level.label)}`),
-  makeQuestion: (rng, level) => makeTimeQuestion(rng, isTimeLevel(level) ? level : "hour"),
+  makeQuestion: (rng, level, prefer) => makeTimeQuestion(rng, isTimeLevel(level) ? level : "hour", prefer),
   makeSheetItem: sheetItem,
   Prompt: TimePrompt,
   Aside: TimeAside,

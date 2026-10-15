@@ -55,6 +55,10 @@ describe("grown-ups report", () => {
       sheetQuery: "?level=blends",
     });
     expect(practiceTip("Maya", { "add:within20": { ok: 2, miss: 5 } }).sheetSlug).toBe("addition-within-20");
+    const quarter = practiceTip("Maya", { quarterpast: { ok: 0, miss: 4 } });
+    expect(quarter.text).toContain("Quarter past");
+    expect(quarter.sheetSlug).toBe("telling-time-quarter-hour");
+    expect(quarter.text).not.toMatch(CALM);
     const clock = practiceTip("Maya", {
       "time:quarter": { ok: 0, miss: 5 },
       "fact:2×5": { ok: 8, miss: 1 },

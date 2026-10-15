@@ -254,6 +254,20 @@ export function masteredChips(skills: Record<string, SkillStat>): string[] {
   return chips;
 }
 
+/** Tags such as quarter past that still need another look. Worst first. */
+export function dueIdeas(skills: Record<string, SkillStat>): string[] {
+  const rows: { key: string; score: number }[] = [];
+  for (const [key, stat] of Object.entries(skills)) {
+    if (key.includes(":")) continue;
+    const n = stat.ok + stat.miss;
+    if (n < 2 || stat.miss < 1) continue;
+    if (stat.ok / n >= 0.8) continue;
+    rows.push({ key, score: stat.miss / n + stat.miss * 0.01 });
+  }
+  rows.sort((a, b) => b.score - a.score || a.key.localeCompare(b.key));
+  return rows.map((row) => row.key);
+}
+
 export function weakTimesFacts(skills: Record<string, SkillStat>): string[] {
   const rows: { key: string; score: number }[] = [];
   for (const [key, stat] of Object.entries(skills)) {

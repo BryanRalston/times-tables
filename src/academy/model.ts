@@ -108,6 +108,15 @@ export function roundLength(grade: Grade): number {
   return ROUND_LENGTH;
 }
 
+/** First visit is a short round inside a normal game. Later rounds use the grade length. */
+export const PLACEMENT_LENGTH = 6;
+
+export function cardsThisRound(grade: Grade, roundsPlayed: number, boss = false): number {
+  if (boss) return BOSS_LENGTH;
+  if (roundsPlayed <= 0) return PLACEMENT_LENGTH;
+  return roundLength(grade);
+}
+
 export interface RoundResult {
   game: string;
   correct: number;

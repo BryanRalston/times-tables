@@ -134,6 +134,9 @@ describe("academy question generators", () => {
         expect(q.praise.startsWith("Yes!")).toBe(true);
       }
     }
+    const past = makeTimeQuestion(rngFromSeed("prefer-past"), "quarter", ["quarterpast"]);
+    expect(past.visual.kind).toBe("time");
+    if (past.visual.kind === "time") expect(past.visual.minutes).toBe(15);
     const half = makeTimeQuestion(rngFromSeed("half-fixed"), "half");
     if (half.visual.kind === "time" && half.visual.minutes === 30) {
       expect(half.hint).toContain("half past");
