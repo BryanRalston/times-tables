@@ -374,6 +374,12 @@ function TakePicture({ board }: { board: VariableBoard }) {
 
 function VariablePicture({ board }: { board: VariableBoard }) {
   const kind = pictureKind(board);
+  const art = pictureArt(kind, board);
+  if (!art) return null;
+  return <div aria-hidden="true">{art}</div>;
+}
+
+function pictureArt(kind: PictureKind, board: VariableBoard) {
   switch (kind) {
     case "holes":
       return <AddendPicture board={board} />;
@@ -418,7 +424,7 @@ export function VariableEquation({
 function EqSlot({ value, blank, blankText }: { value: number | null; blank: boolean; blankText: string }) {
   if (!blank) return <span>{value}</span>;
   return (
-    <span className="ac-eq-box">
+    <span className="ac-eq-box" aria-label={blankText ? undefined : "blank"}>
       {blankText || (
         <span className="ac-eq-mark" aria-hidden="true">
           ?

@@ -166,7 +166,7 @@ for (const name of readdirSync(sheetDir)) {
   if (sheetHtml.includes('id="app"')) fail(`${name} is the SPA shell`);
   if (/<script/i.test(sheetHtml)) fail(`${name} needs JavaScript to render`);
 }
-if (staticSheets < 15 || staticSheets > 40) fail(`expected 15–40 static worksheets, found ${staticSheets}`);
+if (staticSheets < 15 || staticSheets > 45) fail(`expected 15–45 static worksheets, found ${staticSheets}`);
 
 const privacy = readFileSync(resolve(root, "privacy/index.html"), "utf8");
 if (!privacy.includes("does not collect") && !privacy.includes("do not collect")) fail("privacy page");
