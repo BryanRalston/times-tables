@@ -16,6 +16,7 @@ import { nextPlacement } from "./placement";
 import { blankChild } from "./storage";
 import type { Board } from "./games/boards";
 import type { ChoiceQ } from "./games/types";
+import { variableAnswer } from "./games/variables";
 
 const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4"];
 const SAMPLES = 200;
@@ -137,6 +138,56 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
         expect(board.emoji.length).toBeGreaterThan(0);
       }
       break;
+    case "variables": {
+      expect(question.answer).toBe(String(variableAnswer(board)));
+      if (board.mode === "addend") {
+        expect(board.op).toBe("+");
+        expect(board.a).toBeGreaterThanOrEqual(1);
+        expect(board.b).toBeGreaterThanOrEqual(1);
+        expect(board.a + board.b).toBeLessThanOrEqual(10);
+        expect(board.box === "left" || board.box === "right").toBe(true);
+      }
+      if (board.mode === "either" && board.op === "+") {
+        expect(board.a).toBeGreaterThanOrEqual(1);
+        expect(board.b).toBeGreaterThanOrEqual(1);
+        expect(board.a + board.b).toBeLessThanOrEqual(20);
+      }
+      if (board.mode === "either" && board.op === "-") {
+        expect(board.a).toBeLessThanOrEqual(20);
+        expect(board.b).toBeGreaterThanOrEqual(1);
+        expect(board.b).toBeLessThan(board.a);
+      }
+      if (board.mode === "factor") {
+        expect(board.op).toBe("×");
+        expect(board.a).toBeGreaterThanOrEqual(1);
+        expect(board.b).toBeGreaterThanOrEqual(1);
+        expect(board.a).toBeLessThanOrEqual(5);
+        expect(board.b).toBeLessThanOrEqual(5);
+        expect(board.box === "left" || board.box === "right").toBe(true);
+      }
+      if (board.mode === "times") {
+        expect(board.b).toBeGreaterThanOrEqual(1);
+        expect(board.b).toBeLessThanOrEqual(10);
+        if (board.op === "×") expect(board.a).toBeLessThanOrEqual(10);
+        if (board.op === "÷") {
+          expect(board.a % board.b).toBe(0);
+          expect(board.a / board.b).toBeLessThanOrEqual(10);
+          expect(board.a).toBeLessThanOrEqual(100);
+        }
+      }
+      if (board.mode === "steps") {
+        expect(board.op).toBe("×");
+        expect(board.c).toBeGreaterThanOrEqual(1);
+        const product = board.a * board.b;
+        const total = board.extraOp === "+" ? product + board.c : product - board.c;
+        expect(total).toBeGreaterThanOrEqual(1);
+        expect(total).toBeLessThanOrEqual(30);
+      }
+      if (grade === "K" || grade === "1") expect(board.mode).toBe("addend");
+      if (grade === "2") expect(["addend", "either", "factor"]).toContain(board.mode);
+      if (grade === "3") expect(["either", "factor", "times"]).toContain(board.mode);
+      break;
+    }
     default: {
       const neverBoard: never = board;
       throw new Error(String(neverBoard));
@@ -226,6 +277,22 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
       if (grade === "K" || grade === "1") expect(["join", "take"]).toContain(task.mode);
       if (grade !== "3") expect(task.mode).not.toBe("share");
       if (task.mode === "join") expect(task.a + task.b).toBeLessThanOrEqual(10);
+      break;
+    case "blank":
+      expect(task.tiles).toContain(task.answer);
+      expect(new Set(task.tiles).size).toBe(task.tiles.length);
+      if (task.mode === "addend") {
+        expect(task.op).toBe("+");
+        expect(task.a + task.b).toBeLessThanOrEqual(10);
+        expect(task.box === "left" || task.box === "right").toBe(true);
+      }
+      if (task.mode === "factor") {
+        expect(task.op).toBe("×");
+        expect(task.a).toBeLessThanOrEqual(5);
+        expect(task.b).toBeLessThanOrEqual(5);
+        expect(task.box === "left" || task.box === "right").toBe(true);
+      }
+      if (grade === "PK" || grade === "K" || grade === "1") expect(task.mode).toBe("addend");
       break;
     default: {
       const neverTask: never = task;

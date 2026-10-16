@@ -14,6 +14,7 @@ import { sightGame } from "./sight";
 import { spellingGame } from "./spelling";
 import { timeGame } from "./time";
 import { timesGame } from "./times";
+import { variablesGame } from "./variables";
 import type { GameModule, LevelDef } from "./types";
 
 /**
@@ -34,6 +35,7 @@ export const GAMES = [
   measureGame,
   phonicsGame,
   problemsGame,
+  variablesGame,
 ] as const;
 
 export type GameId = (typeof GAMES)[number]["id"];

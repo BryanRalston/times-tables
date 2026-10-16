@@ -5,6 +5,7 @@ import { TIMES_SPEC, type TimesLevel } from "./games/times";
 import { FRACTION_DENOMINATORS } from "./grade-map";
 import {
   arrayMatches,
+  blankMatches,
   blocksMatches,
   countMatches,
   frameMatches,
@@ -19,6 +20,7 @@ import {
   sightMatches,
   storyMatches,
   type ArrayTask,
+  type BlankTask,
   type BlocksTask,
   type BuildTask,
   type CountTask,
@@ -73,6 +75,8 @@ function builtOf(task: BuildTask): boolean {
       return shapeMatches(task, task.answer);
     case "story":
       return storyMatches(task, rightStory(task));
+    case "blank":
+      return blankMatches(task, task.answer);
     default: {
       const neverTask: never = task;
       return neverTask;
@@ -107,6 +111,8 @@ function wrongOf(task: BuildTask): boolean {
       return shapeMatches(task, null);
     case "story":
       return storyMatches(task, { groups: [task.a + 9], away: 0, bins: [[1]] });
+    case "blank":
+      return blankMatches(task, task.answer + 1);
     default: {
       const neverTask: never = task;
       return neverTask;
@@ -176,11 +182,57 @@ function assertBounds(task: HandsTask, level: string): void {
     case "story":
       assertStory(task, level);
       break;
+    case "blank":
+      assertBlank(task, level);
+      break;
     default: {
       const neverTask: never = task;
       throw new Error(String(neverTask));
     }
   }
+}
+
+function hiddenValue(task: BlankTask): number {
+  switch (task.box) {
+    case "left":
+      return task.a;
+    case "right":
+      return task.b;
+    case "extra":
+      return task.c;
+    case "result":
+      if (task.mode === "steps") return task.extraOp === "+" ? task.a * task.b + task.c : task.a * task.b - task.c;
+      if (task.op === "+") return task.a + task.b;
+      if (task.op === "-") return task.a - task.b;
+      if (task.op === "×") return task.a * task.b;
+      return task.a / task.b;
+    default: {
+      const neverBox: never = task.box;
+      return neverBox;
+    }
+  }
+}
+
+function assertBlank(task: BlankTask, level: string): void {
+  expect(task.mode).toBe(level);
+  expect(task.tiles).toHaveLength(4);
+  expect(new Set(task.tiles).size).toBe(4);
+  expect(task.tiles).toContain(task.answer);
+  expect(hiddenValue(task)).toBe(task.answer);
+  if (level === "addend") {
+    expect(task.op).toBe("+");
+    expect(task.a).toBeGreaterThanOrEqual(1);
+    expect(task.b).toBeGreaterThanOrEqual(1);
+    expect(task.a + task.b).toBeLessThanOrEqual(10);
+    expect(task.box === "left" || task.box === "right").toBe(true);
+  }
+  if (level === "factor") {
+    expect(task.op).toBe("×");
+    expect(task.a).toBeLessThanOrEqual(5);
+    expect(task.b).toBeLessThanOrEqual(5);
+    expect(task.box === "left" || task.box === "right").toBe(true);
+  }
+  if (level === "steps") expect(task.a * task.b + (task.extraOp === "+" ? task.c : -task.c)).toBeLessThanOrEqual(30);
 }
 
 function assertArray(task: ArrayTask, level: string): void {

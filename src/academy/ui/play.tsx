@@ -711,7 +711,8 @@ export function PlayScreen({
       (slot.question.visual.kind === "scene" &&
         (slot.question.visual.board.game === "count" ||
           slot.question.visual.board.game === "problems" ||
-          slot.question.visual.board.game === "place")));
+          slot.question.visual.board.game === "place" ||
+          slot.question.visual.board.game === "variables")));
   const buddyCue = buddyReaction({
     phase: phase === "intro" ? "ask" : phase,
     ok,

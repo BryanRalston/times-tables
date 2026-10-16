@@ -559,6 +559,48 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["4.OA.A.3"],
     }),
   },
+  variables: {
+    PK: band({
+      levels: ["addend"],
+      start: "addend",
+      offer: "later",
+      standards: ["K.OA.A.4"],
+    }),
+    K: band({
+      levels: ["addend"],
+      start: "addend",
+      offer: "play",
+      cap: "addend",
+      standards: ["K.OA.A.4"],
+    }),
+    "1": band({
+      levels: ["addend"],
+      start: "addend",
+      offer: "play",
+      cap: "addend",
+      standards: ["1.OA.D.8"],
+    }),
+    "2": band({
+      levels: ["either", "factor"],
+      start: "either",
+      offer: "play",
+      cap: "factor",
+      standards: ["1.OA.D.8", "2.OA.C.4"],
+    }),
+    "3": band({
+      levels: ["factor", "times"],
+      start: "times",
+      offer: "play",
+      cap: "times",
+      standards: ["3.OA.A.4"],
+    }),
+    "4": band({
+      levels: ["steps"],
+      start: "steps",
+      offer: "play",
+      standards: ["4.OA.A.2", "4.OA.A.3"],
+    }),
+  },
 };
 
 export function bandFor(gameId: string, grade: Grade): GradeBand | undefined {

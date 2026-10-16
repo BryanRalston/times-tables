@@ -319,6 +319,28 @@ function expectFresh(item: StaticItem) {
     expect(item.answer).toBe(`$${(sum / 100).toFixed(2)}`);
     return;
   }
+  if (item.prompt.includes("__")) {
+    expect(item.prompt.match(/__/g)).toHaveLength(1);
+    const filled = item.prompt.replace("__", item.answer);
+    const steps = filled.match(/^(\d+) × (\d+) ([+−]) (\d+) = (\d+)$/);
+    if (steps) {
+      const product = Number(steps[1]) * Number(steps[2]);
+      const total = steps[3] === "+" ? product + Number(steps[4]) : product - Number(steps[4]);
+      expect(total).toBe(Number(steps[5]));
+      return;
+    }
+    const plain = filled.match(/^(\d+) ([+−×÷]) (\d+) = (\d+)$/);
+    expect(plain).toBeTruthy();
+    const left = Number(plain?.[1]);
+    const op = plain?.[2];
+    const right = Number(plain?.[3]);
+    const result = Number(plain?.[4]);
+    if (op === "+") expect(left + right).toBe(result);
+    if (op === "−") expect(left - right).toBe(result);
+    if (op === "×") expect(left * right).toBe(result);
+    if (op === "÷") expect(left / right).toBe(result);
+    return;
+  }
   throw new Error(`unchecked worksheet prompt: ${item.prompt}`);
 }
 

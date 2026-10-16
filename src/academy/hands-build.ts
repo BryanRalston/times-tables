@@ -9,9 +9,19 @@ import { isMeasureLevel } from "./games/measure";
 import { PHONEME, RHYME_FAMILIES, SOUND_BANK, blendOf, isPhonicsLevel } from "./games/phonics";
 import { isPlaceLevel } from "./games/place";
 import { isProblemLevel } from "./games/problems";
+import {
+  isVariableLevel,
+  praiseFor,
+  rollVariable,
+  variableAnswer,
+  variableCaptions,
+  variableKey,
+  type VariableLevel,
+} from "./games/variables";
 import { isShapeLevel } from "./games/shapes";
 import { sightWords, type SightList } from "./games/sight-data";
 import { isSpellLevel, spellWords } from "./games/spell-data";
+import { fourChoices } from "./games/choices";
 import { MINUS, type ChoiceQ } from "./games/types";
 import { isTimesLevel, nextTimesFact } from "./games/times";
 import { makeClockTask, makePayTask, type ClockTask, type PayTask } from "./hands";
@@ -150,6 +160,23 @@ export interface StoryPiece {
   size: number;
 }
 
+export interface BlankTask {
+  kind: "blank";
+  mode: VariableLevel;
+  op: "+" | "-" | "×" | "÷";
+  extraOp: "+" | "-";
+  a: number;
+  b: number;
+  c: number;
+  box: "left" | "right" | "result" | "extra";
+  answer: number;
+  tiles: number[];
+  speech: string;
+  skill: string;
+  factKey: string;
+  praise: string;
+}
+
 export interface StoryTask {
   kind: "story";
   mode: "join" | "take" | "groups" | "share";
@@ -176,7 +203,8 @@ export type BuildTask =
   | PhonicsTask
   | MeasureTask
   | ShapeTask
-  | StoryTask;
+  | StoryTask
+  | BlankTask;
 
 export type HandsTask = ClockTask | PayTask | BuildTask;
 
@@ -1085,6 +1113,35 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
   }, (task) => task.factKey);
 }
 
+export function blankMatches(task: BlankTask, placed: number | null): boolean {
+  return placed === task.answer;
+}
+
+function makeBlankTask(level: string, rng: Rng, avoid?: string): BlankTask {
+  const safe: VariableLevel = isVariableLevel(level) ? level : "addend";
+  return fresh(
+    avoid,
+    () => {
+      const board = rollVariable(rng, safe);
+      const answer = variableAnswer(board);
+      return {
+        kind: "blank" as const,
+        mode: safe,
+        op: board.op,
+        extraOp: board.extraOp,
+        a: board.a,
+        b: board.b,
+        c: board.c,
+        box: board.box,
+        answer,
+        tiles: fourChoices(rng, answer, [answer - 1, answer + 1, answer + 2]).map(Number),
+        ...base("variables", safe, variableKey(board), t("Tap the missing number!", "¡Toca el número que falta!"), praiseFor(board)),
+      };
+    },
+    (task) => task.factKey,
+  );
+}
+
 export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: string): BuildTask {
   switch (game) {
     case "times":
@@ -1109,6 +1166,8 @@ export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: str
       return makeShapeTask(level, rng, avoid);
     case "problems":
       return makeStoryTask(level, rng, avoid);
+    case "variables":
+      return makeBlankTask(level, rng, avoid);
     default:
       throw new Error(`No hands-on card for ${game}`);
   }
@@ -1248,6 +1307,25 @@ export function handsExample(task: BuildTask): WorkedExample {
               ? Array.from({ length: task.b }, () => task.a / task.b)
               : [task.a - task.b];
       return modeled([{ art: { type: "groups", sizes }, caption: task.praise.replace(/^(?:Yes!|¡Sí!)\s*/, "") }]);
+    }
+    case "blank": {
+      const groups =
+        task.op === "×"
+          ? Array.from({ length: Math.max(1, Math.min(task.a, 5)) }, () => Math.max(1, Math.min(task.b, 5)))
+          : task.op === "÷"
+            ? Array.from(
+                { length: Math.max(1, Math.min(task.b, 5)) },
+                () => Math.max(1, Math.min(Math.floor(task.a / Math.max(task.b, 1)), 5)),
+              )
+            : null;
+      return modeled(
+        variableCaptions(task).map((caption) => ({
+          art: groups
+            ? { type: "groups" as const, sizes: groups }
+            : { type: "counters" as const, n: Math.max(1, Math.min(task.answer, 10)), frame: task.mode === "addend" },
+          caption,
+        })),
+      );
     }
     default: {
       const neverTask: never = task;
