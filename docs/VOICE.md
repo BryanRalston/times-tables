@@ -28,7 +28,7 @@ python3 scripts/render-voice.py
 
 ## Spanish
 
-Spanish uses the same Kokoro model and the same line-splitting as English. The voice is `ef_dora` (`lang="es"`), also Apache-2.0. Clips live in `academy/public/voice/es/` and are not part of the English precache. The manifest is a separate chunk (`src/academy/voice/manifest-es.ts`) loaded only when the language is Español, so an English player does not download the Spanish files.
+Spanish uses the same Kokoro model and the same line-splitting as English. The voice is `ef_dora` (`lang="es"`), also Apache-2.0. Clips live in `academy/public/voice/es/`. The install cache includes the Spanish clips for Add & Subtract, Times Tables, and Telling Time (prompts, numbers through 1,000, clock words, praise, and Almost), plus buddy lines and the home. Sight words, spelling, phonics, money, and the other games are saved the first time they play. The manifest is a separate chunk (`src/academy/voice/manifest-es.ts`) loaded only when the language is Español, so the English script bundle does not include the Spanish map.
 
 Number clips do not share filenames with English. “7” is `siete` in Spanish and `seven` in English.
 

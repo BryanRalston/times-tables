@@ -25,6 +25,7 @@ export interface ClipSpec {
   key: string;
   say: string;
   core: boolean;
+  games: readonly string[];
 }
 
 const SAMPLES = 32;
@@ -169,6 +170,17 @@ function coreKey(key: string, games: ReadonlySet<string>): boolean {
   return false;
 }
 
+/**
+ * Spanish clips that install with the app. Same lines as English core voice,
+ * plus Times Tables prompts and every number through 1,000 that Add and Times
+ * can say. Other games stay on the runtime cache.
+ */
+export function isSpanishPrecacheKey(key: string, games: ReadonlySet<string>): boolean {
+  if (coreKey(key, games)) return true;
+  if (/^\d+$/.test(key) && Number(key) <= NUMBER_MAX) return true;
+  return games.has("times");
+}
+
 /** Phrase clips for known lines, plus every word, number, and minute those lines compose from. */
 export function collectClipSpecs(lines: readonly SpokenLine[] = collectSpokenLines()): ClipSpec[] {
   const games = new Map<string, Set<string>>();
@@ -190,7 +202,7 @@ export function collectClipSpecs(lines: readonly SpokenLine[] = collectSpokenLin
   }
   const specs: ClipSpec[] = [];
   for (const [key, used] of games) {
-    specs.push({ key, say: spokenText(key), core: coreKey(key, used) });
+    specs.push({ key, say: spokenText(key), core: coreKey(key, used), games: [...used].sort() });
   }
   specs.sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
   return specs;
