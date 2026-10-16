@@ -197,6 +197,19 @@ if (!manifestList.some((url) => typeof url === "string" && url.startsWith("/asse
 if (!manifestList.some((url) => typeof url === "string" && url.startsWith("/assets/") && url.endsWith(".css"))) {
   fail("precache missing app css");
 }
+const esPrecache = JSON.parse(readFileSync(resolve("src/academy/voice/es-precache.json"), "utf8"));
+if (!Array.isArray(esPrecache) || esPrecache.length < 100) fail("Spanish precache list is empty");
+const esUrls = manifestList.filter((url) => typeof url === "string" && url.startsWith("/voice/es/"));
+if (esUrls.length !== esPrecache.length) fail(`Spanish precache has ${esUrls.length} urls, list has ${esPrecache.length}`);
+for (const rel of esPrecache) {
+  if (typeof rel !== "string" || !rel.startsWith("es/") || !manifestList.includes(`/voice/${rel}`)) {
+    fail(`precache missing Spanish clip ${rel}`);
+  }
+}
+const esDir = resolve(root, "voice/es");
+if (!existsSync(esDir)) fail("voice/es missing from domain build");
+const esOnDisk = readdirSync(esDir).filter((name) => name.endsWith(".mp3"));
+if (esUrls.length >= esOnDisk.length) fail("Spanish precache includes every clip");
 for (const url of manifestList) {
   if (typeof url !== "string" || !url.startsWith("/")) fail(`bad precache url ${url}`);
   let rel = url.slice(1);

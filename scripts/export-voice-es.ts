@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { setLocale } from "../src/academy/i18n";
-import { collectClipSpecs, collectSpokenLines, lineChunkErrors } from "../src/academy/voice/catalog";
+import { collectClipSpecs, collectSpokenLines, isSpanishPrecacheKey, lineChunkErrors } from "../src/academy/voice/catalog";
 import { spokenText } from "../src/academy/voice/pronounce";
 
 setLocale("es");
@@ -49,4 +49,10 @@ export const VOICE_FILES_ES: Record<string, string> = ${JSON.stringify(files, nu
 
 writeFileSync(resolve("src/academy/voice/manifest-es.ts"), body);
 writeFileSync("/tmp/voice-jobs-es.json", `${JSON.stringify(jobs)}\n`);
-console.log(`${lines.length} Spanish lines, ${jobs.length} clips, all under voice/es/`);
+const precache = specs
+  .filter((spec) => isSpanishPrecacheKey(spec.key, new Set(spec.games)))
+  .map((spec) => files[spec.key])
+  .filter((file): file is string => Boolean(file))
+  .sort();
+writeFileSync(resolve("src/academy/voice/es-precache.json"), `${JSON.stringify(precache, null, 2)}\n`);
+console.log(`${lines.length} Spanish lines, ${jobs.length} clips, ${precache.length} precached, all under voice/es/`);

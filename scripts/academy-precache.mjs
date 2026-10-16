@@ -49,6 +49,10 @@ export const WARDROBE_FILES = SQUAD_IDS.flatMap((id) => WARDROBE_IDS.map((look) 
 export const COIN_FILES = ["penny.png", "nickel.png", "dime.png", "quarter.png", "dollar.png", "five.png"];
 
 const PRECACHE_EXT = /\.(?:html|js|css|svg|png|webp|woff2?|webmanifest|mp3|wav|ogg|m4a|mp4)$/i;
+/** Spanish clips for core games and Times Tables. Other `voice/es/` files stay on the runtime cache. */
+const ES_PRECACHE_FILES = new Set(
+  JSON.parse(readFileSync(new URL("../src/academy/voice/es-precache.json", import.meta.url), "utf8")),
+);
 const POKE_NAME = /[a-z0-9]+(?:-[a-z0-9]+)*-poke(?:-strip)?\.(?:mp4|png)/g;
 const SKIP_COPY = /^(?:squishees|cosmetics|money)\//;
 
@@ -106,7 +110,7 @@ export function isPrecacheFile(rel) {
   if (rel === SHARE_IMAGE_PATH.slice(1)) return false;
   // Game clips load on first play and stay in the runtime cache. Core clips precache on install.
   if (rel.startsWith("voice/lazy/")) return false;
-  if (rel.startsWith("voice/es/")) return false;
+  if (rel.startsWith("voice/es/")) return ES_PRECACHE_FILES.has(rel.slice("voice/".length));
   return PRECACHE_EXT.test(rel);
 }
 
@@ -232,7 +236,7 @@ self.addEventListener("activate", (event) => {
 
 export function subpathServiceWorker() {
   return `/* Academy-only offline cache. Registered with scope /times-tables/academy/ so Squishee Math is not controlled. */
-const CACHE = "squishee-academy-v5";
+const CACHE = "squishee-academy-v6";
 ${PRECACHE_RUNTIME}
 function isMathShell(pathname) {
   return pathname === "/times-tables" || pathname === "/times-tables/" || pathname === "/times-tables/index.html";
@@ -272,7 +276,7 @@ self.addEventListener("fetch", (event) => {
 
 export function domainServiceWorker() {
   return `/* Squishee Academy offline cache. Served from the domain root so scope is /. */
-const CACHE = "squishee-academy-root-v5";
+const CACHE = "squishee-academy-root-v6";
 const SHARE_IMAGE = ${JSON.stringify(SHARE_IMAGE_PATH)};
 ${PRECACHE_RUNTIME}
 self.addEventListener("fetch", (event) => {
