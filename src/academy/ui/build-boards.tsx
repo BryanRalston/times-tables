@@ -2,7 +2,7 @@ import type { RoundSlot } from "../round-flow";
 import { ClockBoard, PayBoard } from "./hands";
 import { ArrayBoard, BlocksBoard, CountBoard, FrameBoard, ShadeBoard } from "./number-boards";
 import { LetterBoard, PhonicsBoard, SightBoard } from "./word-boards";
-import { MeasureBoard, ShapeBoard, StoryBoard } from "./world-boards";
+import { BlankBoard, MeasureBoard, ShapeBoard, StoryBoard } from "./world-boards";
 
 export function HandsBoard({
   task,
@@ -38,6 +38,8 @@ export function HandsBoard({
       return <ShapeBoard task={task} onAnswer={onAnswer} />;
     case "story":
       return <StoryBoard task={task} onAnswer={onAnswer} />;
+    case "blank":
+      return <BlankBoard task={task} onAnswer={onAnswer} />;
     default: {
       const neverTask: never = task;
       return neverTask;

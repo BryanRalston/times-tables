@@ -319,13 +319,35 @@ function expectFresh(item: StaticItem) {
     expect(item.answer).toBe(`$${(sum / 100).toFixed(2)}`);
     return;
   }
+  if (item.prompt.includes("__")) {
+    expect(item.prompt.match(/__/g)).toHaveLength(1);
+    const filled = item.prompt.replace("__", item.answer);
+    const steps = filled.match(/^(\d+) × (\d+) ([+−]) (\d+) = (\d+)$/);
+    if (steps) {
+      const product = Number(steps[1]) * Number(steps[2]);
+      const total = steps[3] === "+" ? product + Number(steps[4]) : product - Number(steps[4]);
+      expect(total).toBe(Number(steps[5]));
+      return;
+    }
+    const plain = filled.match(/^(\d+) ([+−×÷]) (\d+) = (\d+)$/);
+    expect(plain).toBeTruthy();
+    const left = Number(plain?.[1]);
+    const op = plain?.[2];
+    const right = Number(plain?.[3]);
+    const result = Number(plain?.[4]);
+    if (op === "+") expect(left + right).toBe(result);
+    if (op === "−") expect(left - right).toBe(result);
+    if (op === "×") expect(left * right).toBe(result);
+    if (op === "÷") expect(left / right).toBe(result);
+    return;
+  }
   throw new Error(`unchecked worksheet prompt: ${item.prompt}`);
 }
 
 describe("printable worksheets", () => {
-  it("publishes 15 to 40 static sheets search engines can read", () => {
+  it("publishes 15 to 45 static sheets search engines can read", () => {
     expect(WORKSHEETS.length).toBeGreaterThanOrEqual(15);
-    expect(WORKSHEETS.length).toBeLessThanOrEqual(40);
+    expect(WORKSHEETS.length).toBeLessThanOrEqual(45);
     const slugs = WORKSHEETS.map((sheet) => sheet.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
     expect(slugs).toEqual(expect.arrayContaining(["telling-time-quarter-hour", "counting-coins", "multiplication-7s"]));

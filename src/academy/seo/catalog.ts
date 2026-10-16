@@ -1,6 +1,6 @@
 import { formatClockTime } from "../../lib/clock";
 
-export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems";
+export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables";
 
 export interface CoinCounts {
   penny?: number;
@@ -570,6 +570,25 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       { prompt: "Fox has 12 cookies shared with 3 friends. How many cookies does each friend get?", answer: "4" },
       { prompt: "Fox has 10 cookies shared with 2 friends. How many cookies does each friend get?", answer: "5" },
       { prompt: "Peach has 6 apples. Frog brings 3 more. How many apples?", answer: "9" },
+    ],
+  },
+  {
+    slug: "missing-number-equations",
+    title: "Free Missing Number Worksheet (K–4) | Squishee Academy",
+    description: "Print a free missing-number worksheet for kindergarten through grade 4. Find the box in addition, subtraction, multiplication, and two-step equations. Answer key included. No signup.",
+    h1: "Missing number equations",
+    game: "variables",
+    items: [
+      { prompt: "3 + __ = 7", answer: "4" },
+      { prompt: "__ + 4 = 9", answer: "5" },
+      { prompt: "8 − 3 = __", answer: "5" },
+      { prompt: "9 − __ = 4", answer: "5" },
+      { prompt: "3 × __ = 12", answer: "4" },
+      { prompt: "__ × 5 = 20", answer: "4" },
+      { prompt: "12 ÷ 3 = __", answer: "4" },
+      { prompt: "3 × 4 + __ = 15", answer: "3" },
+      { prompt: "2 × __ + 1 = 9", answer: "4" },
+      { prompt: "4 × 3 − 2 = __", answer: "10" },
     ],
   },
   {

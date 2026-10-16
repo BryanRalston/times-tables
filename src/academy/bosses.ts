@@ -190,6 +190,19 @@ const AUTHORED: readonly IslandBoss[] = [
     trophyId: "trophy-clue",
     trophyName: "Clue trophy",
   },
+  {
+    gameId: "variables",
+    name: "Captain Oddbox",
+    taunt: "What number is hiding?",
+    friendly: "Yes! Tap the missing number!",
+    personality: "An otter captain whose treasure box only opens for a missing number.",
+    face: "otter",
+    look: "cape",
+    cosmeticId: "box-cape",
+    cosmeticName: "Box cape",
+    trophyId: "trophy-box",
+    trophyName: "Box trophy",
+  },
 ];
 
 const LOOKS: readonly BossLook[] = ["crown", "cape", "armor", "clock", "coins", "spell"];

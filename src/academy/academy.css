@@ -1543,6 +1543,7 @@ button.ac-go.ac-play-main {
 .ac-card.is-aqua, .ac-island.is-aqua { background: #d7f4f8; }
 .ac-card.is-lilac, .ac-island.is-lilac { background: #f3e8ff; }
 .ac-card.is-rose, .ac-island.is-rose { background: #ffe0ea; }
+.ac-card.is-iris, .ac-island.is-iris { background: #e6e4ff; }
 .ac-timer.is-count span { background: linear-gradient(90deg, #ffd0c2, #ff7a59); }
 .ac-timer.is-place span { background: linear-gradient(90deg, #d8f5c8, #5aaa45); }
 .ac-timer.is-shapes span { background: linear-gradient(90deg, #f8d0ea, #d4539a); }
@@ -1550,6 +1551,91 @@ button.ac-go.ac-play-main {
 .ac-timer.is-measure span { background: linear-gradient(90deg, #c8f4f8, #2aa8c4); }
 .ac-timer.is-phonics span { background: linear-gradient(90deg, #eadcff, #8a63d2); }
 .ac-timer.is-problems span { background: linear-gradient(90deg, #ffd0dc, #e85a86); }
+.ac-timer.is-variables span { background: linear-gradient(90deg, #ddd9ff, #7a6ad4); }
+
+.ac-eq-var { align-items: center; }
+.ac-eq-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  min-height: 64px;
+  padding: 0 10px;
+  border: 3px dashed #7a6ad4;
+  border-radius: 16px;
+  background: #fff;
+  color: #3d2a55;
+}
+.ac-eq-mark { color: #7a6ad4; }
+.ac-var-pic {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 8px auto;
+  max-width: 360px;
+}
+.ac-var-faces, .ac-var-holes, .ac-var-cluster {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  max-width: 168px;
+}
+.ac-var-holes i {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px dashed #7a6ad4;
+}
+.ac-var-cluster.is-box {
+  padding: 6px;
+  border: 3px dashed #7a6ad4;
+  border-radius: 16px;
+}
+.ac-blank-well {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+.ac-num-bank {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 72px;
+}
+.ac-num-drag {
+  min-width: 64px;
+  min-height: 64px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 4px 0 #d9d4f2;
+  font-family: Fredoka, Nunito, sans-serif;
+  font-size: 28px;
+  line-height: 1;
+  touch-action: none;
+}
+.ac-num-drag.is-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.ac-num-clear {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 14px;
+  background: #fff;
+  font-weight: 800;
+}
 
 .ac-big-num, .ac-letter {
   margin: 8px 0;

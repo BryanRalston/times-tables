@@ -123,7 +123,7 @@ const bundle = jsChunks.join("\n");
 if (!bundle.includes("/academy-sw.js")) fail("bundle does not register /academy-sw.js");
 if (!bundle.includes('scope:"/"') && !bundle.includes('scope: "/"')) fail("bundle service worker scope is not /");
 
-for (const sheet of ["times-tables", "add-subtract", "telling-time", "sight-words", "spelling", "counting", "place-value", "shapes", "fractions", "measurement", "phonics", "word-problems"]) {
+for (const sheet of ["times-tables", "add-subtract", "telling-time", "sight-words", "spelling", "counting", "place-value", "shapes", "fractions", "measurement", "phonics", "word-problems", "missing-numbers"]) {
   const sheetPath = resolve(root, "worksheets", sheet, "index.html");
   if (!existsSync(sheetPath)) fail(`missing worksheet ${sheet}`);
   const sheetHtml = readFileSync(sheetPath, "utf8");
@@ -166,7 +166,7 @@ for (const name of readdirSync(sheetDir)) {
   if (sheetHtml.includes('id="app"')) fail(`${name} is the SPA shell`);
   if (/<script/i.test(sheetHtml)) fail(`${name} needs JavaScript to render`);
 }
-if (staticSheets < 15 || staticSheets > 40) fail(`expected 15–40 static worksheets, found ${staticSheets}`);
+if (staticSheets < 15 || staticSheets > 45) fail(`expected 15–45 static worksheets, found ${staticSheets}`);
 
 const privacy = readFileSync(resolve(root, "privacy/index.html"), "utf8");
 if (!privacy.includes("does not collect") && !privacy.includes("do not collect")) fail("privacy page");

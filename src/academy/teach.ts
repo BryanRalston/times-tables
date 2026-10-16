@@ -1,5 +1,6 @@
 import { coinAsA, getLocale, spanishFraction, t } from "./i18n";
 import type { Board, CountBoard, FractionBoard, MeasureBoard, PhonicsBoard, PlaceBoard, ProblemBoard, ShapeBoard } from "./games/boards";
+import { variableCaptions } from "./games/variables";
 import { COIN_CENTS, COIN_NAME, emptyPile, formatCents, pileCents } from "./games/money-model";
 import { timeTalk } from "./games/time";
 import type { AddVisual, ChoiceQ, CoinKind, CoinPile, MoneyVisual, TimeVisual, TimesVisual } from "./games/types";
@@ -678,6 +679,8 @@ function sceneFrames(question: ChoiceQ, board: Board): SceneFrame[] {
       return phonicsTeach(board, solved);
     case "problems":
       return problemTeach(board);
+    case "variables":
+      return captions(variableCaptions(board));
     default: {
       const neverBoard: never = board;
       return neverBoard;

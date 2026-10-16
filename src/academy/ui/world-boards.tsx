@@ -1,9 +1,10 @@
 import { useRef, useState } from "react";
 import { show } from "../i18n";
-import type { ShapeName } from "../games/boards";
+import type { ShapeName, VariableBoard } from "../games/boards";
 import { ShapeFig } from "../games/scene-ui";
-import type { MeasureTask, ShapeTask, StoryTask } from "../hands-build";
-import { measureMatches, shapeMatches, storyMatches } from "../hands-build";
+import { VariableEquation } from "../games/variables";
+import type { BlankTask, MeasureTask, ShapeTask, StoryTask } from "../hands-build";
+import { blankMatches, measureMatches, shapeMatches, storyMatches } from "../hands-build";
 import { CastFace, DragGhost, HandsShell, inside, useTrayDrag } from "./hands-kit";
 
 const SHAPE_NAMES: readonly ShapeName[] = [
@@ -409,6 +410,74 @@ function ShareStory({ task, onAnswer }: { task: StoryTask; onAnswer: (ok: boolea
       {ghost ? (
         <DragGhost x={ghost.x} y={ghost.y}>
           <CastFace />
+        </DragGhost>
+      ) : null}
+    </HandsShell>
+  );
+}
+
+function blankBoard(task: BlankTask): VariableBoard {
+  const total =
+    task.mode === "steps"
+      ? task.extraOp === "+"
+        ? task.a * task.b + task.c
+        : task.a * task.b - task.c
+      : task.op === "+"
+        ? task.a + task.b
+        : task.op === "-"
+          ? task.a - task.b
+          : task.op === "×"
+            ? task.a * task.b
+            : task.b === 0
+              ? 0
+              : task.a / task.b;
+  return {
+    game: "variables",
+    mode: task.mode,
+    op: task.op,
+    extraOp: task.extraOp,
+    a: task.a,
+    b: task.b,
+    c: task.c,
+    box: task.box,
+    left: task.box === "left" ? null : task.a,
+    right: task.box === "right" ? null : task.b,
+    result: task.box === "result" ? null : total,
+    extra: task.mode === "steps" ? (task.box === "extra" ? null : task.c) : null,
+  };
+}
+
+/** Drag one number into the empty box. A tap drops it too. */
+export function BlankBoard({ task, onAnswer }: { task: BlankTask; onAnswer: (ok: boolean) => void }) {
+  const [placed, setPlaced] = useState<number | null>(null);
+  const wellRef = useRef<HTMLDivElement>(null);
+  const { ghost, pointerProps } = useTrayDrag((id, point, tapped) => {
+    if (!tapped && !inside(wellRef.current, point.x, point.y)) return;
+    setPlaced(Number(id));
+  });
+  const board = blankBoard(task);
+  return (
+    <HandsShell kind="blank" fact={task.factKey} caption={task.speech} onDone={() => onAnswer(blankMatches(task, placed))}>
+      <div ref={wellRef} className="ac-blank-well">
+        <VariableEquation board={board} blankText={placed == null ? "" : String(placed)} />
+        {placed == null ? null : (
+          <button type="button" className="ac-num-clear" onClick={() => setPlaced(null)}>
+            {show("Put back")}
+          </button>
+        )}
+      </div>
+      <div className="ac-num-bank" aria-label={show("Numbers")}>
+        {task.tiles
+          .filter((tile) => tile !== placed)
+          .map((tile) => (
+            <button key={tile} type="button" className="ac-num-drag" data-piece={String(tile)} aria-label={String(tile)} {...pointerProps(String(tile))}>
+              {tile}
+            </button>
+          ))}
+      </div>
+      {ghost ? (
+        <DragGhost x={ghost.x} y={ghost.y}>
+          <span className="ac-num-drag is-ghost">{ghost.id}</span>
         </DragGhost>
       ) : null}
     </HandsShell>

@@ -255,3 +255,20 @@ Every story has a picture. Kindergarten and grade 1 hear the story as well as se
 | 4 | Play | Two-step stories | Two-step stories | One level down (picture stories) | 4.OA.A.3 |
 
 Kindergarten and grade 1 do not see multiply or share stories.
+
+## What is missing
+
+Levels: addend within 10, blank within 20, missing factor, times blank, two-step blank.
+
+Pre-K missing numbers are coming later. Kindergarten and grade 1 stay on a missing addend within 10, with a picture of the known part and empty holes for the box. Grade 2 opens any position in addition or subtraction within 20, and a missing factor from 1 to 5. Grade 3 finds an unknown in multiplication or division through 10×10, and is capped before two-step equations. Grade 4 fills one blank in a two-step equation.
+
+| Grade | Offer | Start | Core levels | Cap without challenge | Standards |
+|---|---|---|---|---|---|
+| Pre-K | Coming later | — | — | — | Missing numbers wait |
+| K | Play | Addend within 10 | Addend within 10 | Addend within 10 | K.OA.A.4 |
+| 1 | Play | Addend within 10 | Addend within 10 | Addend within 10 | 1.OA.D.8 |
+| 2 | Play | Blank within 20 | Blank within 20, missing factor | Missing factor | 1.OA.D.8, 2.OA.C.4 |
+| 3 | Play | Times blank | Missing factor, times blank | Times blank | 3.OA.A.4 |
+| 4 | Play | Two-step blank | Two-step blank | One level down (times blank) | 4.OA.A.2, 4.OA.A.3 |
+
+Kindergarten and grade 1 do not see subtraction blanks, missing factors, or two-step equations.

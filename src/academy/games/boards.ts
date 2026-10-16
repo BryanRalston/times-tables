@@ -98,7 +98,26 @@ export interface ProblemBoard {
   extra?: number;
 }
 
-export type Board = CountBoard | PlaceBoard | ShapeBoard | FractionBoard | MeasureBoard | PhonicsBoard | ProblemBoard;
+export type VariableMode = "addend" | "either" | "factor" | "times" | "steps";
+export type VariableBox = "left" | "right" | "result" | "extra";
+
+/** One unknown in an equation. `a`, `b`, and `c` are the true numbers. A null slot is the box. */
+export interface VariableBoard {
+  game: "variables";
+  mode: VariableMode;
+  op: "+" | "-" | "×" | "÷";
+  extraOp: "+" | "-";
+  a: number;
+  b: number;
+  c: number;
+  box: VariableBox;
+  left: number | null;
+  right: number | null;
+  result: number | null;
+  extra: number | null;
+}
+
+export type Board = CountBoard | PlaceBoard | ShapeBoard | FractionBoard | MeasureBoard | PhonicsBoard | ProblemBoard | VariableBoard;
 
 export function countName(name: string, n: number): string {
   if (n === 1 && name.endsWith("s")) return name.slice(0, -1);

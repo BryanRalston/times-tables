@@ -449,6 +449,13 @@ export const BOSS_ES: Record<string, BossEs> = {
     cosmeticName: "Casco de pistas",
     trophyName: "Trofeo de pistas",
   },
+  variables: {
+    taunt: "¿Qué número se esconde?",
+    friendly: "¡Sí! ¡Toca el número que falta!",
+    personality: "Una capitana nutria cuya caja del tesoro solo se abre con el número que falta.",
+    cosmeticName: "Capa de la caja",
+    trophyName: "Trofeo de la caja",
+  },
 };
 
 export const TRAIT_ES: Record<string, string> = {
@@ -478,6 +485,7 @@ export const ES: Record<string, string> = {
   Measurement: "Medidas",
   Phonics: "Sonidos",
   "Word Problems": "Problemas",
+  "What is missing": "Qué falta",
   "Grade 2–3": "Grado 2 a 3",
   "Grade 1–3": "Grado 1 a 3",
   "K–3": "K a 3",
@@ -954,4 +962,12 @@ export const ES: Record<string, string> = {
   "Multi-digit multiply": "Multiplicación de varios dígitos",
   "Division with remainders": "División con residuo",
   "Two-step stories": "Historias de dos pasos",
+  "Addend within 10": "Sumando hasta el 10",
+  "Blank within 20": "Hueco hasta el 20",
+  "Missing factor": "Factor que falta",
+  "Times blank": "Hueco de multiplicar",
+  "Two-step blank": "Dos pasos",
+  Numbers: "Números",
+  "Free missing-number equations for kindergarten through grade 4. Find the box in an addition, subtraction, multiplication, or two-step equation. A first look at variables. No signup.":
+    "Ecuaciones con un número que falta, de kínder a grado 4. Busca la caja en una suma, resta, multiplicación o dos pasos. Un primer vistazo a las variables. Sin cuenta.",
 };
