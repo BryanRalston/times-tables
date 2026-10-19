@@ -1,12 +1,50 @@
 import { squisheeById } from "@/lib/squishees";
 import type { Board } from "../games/boards";
 import type { Visual } from "../games/types";
-import { getLocale } from "../i18n";
+import { getLocale, thingName } from "../i18n";
 import type { RoundSlot } from "../round-flow";
 import { personaOf } from "./persona";
 
 function nameOf(id: string, fallback: string): string {
   return squisheeById(id)?.name ?? fallback;
+}
+
+function pals(n: number): string {
+  const word = n === 1 ? "squishee" : "squishees";
+  return `${n} ${thingName("squishees", n, word)}`;
+}
+
+/** Name only the numbers the equation shows. A hidden addend stays hidden. */
+function addStory(visual: Extract<Visual, { kind: "add" }>, buddy: string, host: string, trait: string, es: boolean): string {
+  const total = visual.pink + visual.teal;
+  if (visual.op === "+") {
+    if (visual.result == null) {
+      return es
+        ? `${buddy}, ${trait}, tiene ${pals(visual.pink)}. ${host} trae ${pals(visual.teal)}. ¿Cuántos hay en total?`
+        : `${buddy} the ${trait} has ${pals(visual.pink)}. ${host} brings ${pals(visual.teal)}. How many in all?`;
+    }
+    if (visual.right == null) {
+      return es
+        ? `${buddy}, ${trait}, tiene ${pals(visual.pink)}. Juntos tienen ${pals(total)}. ¿Cuántos trajo ${host}?`
+        : `${buddy} the ${trait} has ${pals(visual.pink)}. Together they have ${pals(total)}. How many did ${host} bring?`;
+    }
+    return es
+      ? `${host} trae ${pals(visual.teal)}. Juntos tienen ${pals(total)}. ¿Con cuántos empezó ${buddy}?`
+      : `${host} brings ${pals(visual.teal)}. Together they have ${pals(total)}. How many did ${buddy} start with?`;
+  }
+  if (visual.result == null) {
+    return es
+      ? `${buddy}, ${trait}, tiene ${pals(total)} y comparte ${pals(visual.teal)} con ${host}. ¿Cuántos quedan?`
+      : `${buddy} the ${trait} has ${pals(total)} and shares ${pals(visual.teal)} with ${host}. How many are left?`;
+  }
+  if (visual.right == null) {
+    return es
+      ? `${buddy}, ${trait}, tiene ${pals(total)} y le quedan ${pals(visual.pink)}. ¿Cuántos compartió con ${host}?`
+      : `${buddy} the ${trait} has ${pals(total)} and has ${pals(visual.pink)} left. How many did ${buddy} share with ${host}?`;
+  }
+  return es
+    ? `${buddy}, ${trait}, comparte ${pals(visual.teal)} con ${host} y le quedan ${pals(visual.pink)}. ¿Con cuántos empezó?`
+    : `${buddy} the ${trait} shares ${pals(visual.teal)} with ${host} and has ${pals(visual.pink)} left. How many did ${buddy} start with?`;
 }
 
 export function storyLine(visual: Visual, buddyId: string, hostId: string): string {
@@ -26,17 +64,10 @@ export function storyLine(visual: Visual, buddyId: string, hostId: string): stri
         return es ? `${host} reparte ${visual.a} en grupos de ${visual.b}.` : `${host} shares ${visual.a} into groups of ${visual.b}.`;
       }
       return es
-        ? `${host} pone ${visual.a} grupos de ${visual.b} squishees. ¿Cuántos hay?`
-        : `${host} sets out ${visual.a} groups of ${visual.b} squishees. How many?`;
+        ? `${host} pone ${visual.a} grupos de ${pals(visual.b)}. ¿Cuántos hay?`
+        : `${host} sets out ${visual.a} groups of ${pals(visual.b)}. How many?`;
     case "add":
-      if (visual.op === "+") {
-        return es
-          ? `${buddy}, ${trait}, tiene ${visual.pink} squishees. ${host} trae ${visual.teal} más. ¿Cuántos hay en total?`
-          : `${buddy} the ${trait} has ${visual.pink} squishees. ${host} brings ${visual.teal} more. How many in all?`;
-      }
-      return es
-        ? `${buddy}, ${trait}, tiene ${visual.pink + visual.teal} squishees y comparte ${visual.teal} con ${host}. ¿Cuántos quedan?`
-        : `${buddy} the ${trait} has ${visual.pink + visual.teal} squishees and shares ${visual.teal} with ${host}. How many are left?`;
+      return addStory(visual, buddy, host, trait, es);
     case "time":
       return es ? `${host} mira el reloj. ¿Qué hora es?` : `${host} checks the clock. What time is it?`;
     case "money":

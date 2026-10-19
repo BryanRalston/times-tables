@@ -156,6 +156,14 @@ export function thingName(name: string, n: number, english: string): string {
   return n === 1 ? pair[0] : pair[1];
 }
 
+/** English vowel labels such as "short i". Letter patterns stay as written. */
+export function patternName(label: string): string {
+  if (locale !== "es") return label;
+  const short = /^short ([aeiou])$/.exec(label);
+  if (short?.[1]) return `${short[1]} corta`;
+  return label;
+}
+
 const COIN_ES: Record<string, { one: string; many: string }> = {
   penny: { one: "centavo", many: "centavos" },
   nickel: { one: "níquel", many: "níqueles" },

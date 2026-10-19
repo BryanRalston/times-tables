@@ -79,6 +79,13 @@ describe("squish pointer", () => {
     expect(buddyDrag.stopPropagation).toBe(true);
   });
 
+  it("restarts the squash after the click so a buddy inside a button still activates it", () => {
+    const src = readFileSync(new URL("../ui/squishy.tsx", import.meta.url), "utf8");
+    const poke = src.slice(src.indexOf("function playCountedPoke"), src.indexOf("function stopClip"));
+    expect(poke.indexOf("setTimeout")).toBeGreaterThan(0);
+    expect(poke.indexOf("setPokeTick")).toBeGreaterThan(poke.indexOf("setTimeout"));
+  });
+
   it("cancels without counting a squish", () => {
     const down = applyPointer(gestureStart(), { kind: "down", x: 5, y: 5, t: 0 }, "buddy");
     const cancel = applyPointer(down.gesture, { kind: "cancel", x: 5, y: 5, t: 30 }, "buddy");

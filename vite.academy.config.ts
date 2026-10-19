@@ -1,5 +1,5 @@
 import react from "@vitejs/plugin-react";
-import { cpSync, createReadStream, existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { cpSync, createReadStream, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { dirname, join, normalize, resolve, sep } from "node:path";
 import { defineConfig } from "vite";
@@ -86,6 +86,38 @@ function academyOpenGraphPlugin() {
   };
 }
 
+/** Dev serves the repo-root index unless this answers first. That index is Squishee Math. */
+function academyDevIndex() {
+  const indexPaths = domain
+    ? new Set(["/", "/index.html"])
+    : new Set(["/times-tables/academy", "/times-tables/academy/", "/times-tables/academy/index.html"]);
+  return {
+    name: "academy-dev-index",
+    apply: "serve" as const,
+    configureServer(server: {
+      transformIndexHtml: (url: string, html: string, originalUrl?: string) => Promise<string>;
+      middlewares: { use: (fn: (req: IncomingMessage, res: ServerResponse, next: (err?: unknown) => void) => void) => void };
+    }) {
+      server.middlewares.use(async (req, res, next) => {
+        const pathOnly = (req.url ?? "").split("?")[0] ?? "";
+        if (!indexPaths.has(pathOnly)) {
+          next();
+          return;
+        }
+        try {
+          const raw = readFileSync(resolve("academy/index.html"), "utf8").replaceAll("%BASE_URL%", "/");
+          const html = await server.transformIndexHtml("/index.html", raw);
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "text/html");
+          res.end(html);
+        } catch (err) {
+          next(err);
+        }
+      });
+    },
+  };
+}
+
 function academySeoPlugin(dir: string) {
   return {
     name: "academy-seo-pages",
@@ -105,6 +137,7 @@ export default defineConfig({
   publicDir: "academy/public",
   plugins: [
     react(),
+    academyDevIndex(),
     sharedPublic(),
     ...(domain ? academyDomainPlugins(outDir) : [hoistAcademyHtml(outDir)]),
     ...(domain ? [academyOpenGraphPlugin()] : []),

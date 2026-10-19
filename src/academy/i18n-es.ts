@@ -636,6 +636,7 @@ export const ES: Record<string, string> = {
   Sound: "Sonido",
   "Coming later for this grade.": "Más adelante para este grado.",
   "Coming later": "Más adelante",
+  Later: "Luego",
   "Outfit shop": "Tienda de disfraces",
   "Spend coins you earn. Never real money.": "Gasta las monedas que ganas. Nunca es dinero de verdad.",
   "No outfit": "Sin disfraz",

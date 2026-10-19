@@ -1729,9 +1729,16 @@ button.ac-go.ac-play-main {
   align-items: center;
   justify-content: center;
   gap: 4px;
+  min-width: 0;
   min-height: 96px;
   font-size: 16px;
   line-height: 1.2;
+}
+.ac-choice.is-card .ac-shape,
+.ac-choice.is-card .ac-part {
+  width: 100%;
+  max-width: 112px;
+  margin: 0 auto;
 }
 .ac-pic-emoji { font-size: 28px; line-height: 1.15; }
 .ac-len { display: block; height: 16px; min-width: 18px; border-radius: 8px; background: #12a394; }

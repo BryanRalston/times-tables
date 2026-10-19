@@ -19,6 +19,8 @@ describe("grown-ups report", () => {
     expect(ui).toContain("GROWNUP_HOLD_MS");
     expect(ui).toContain("gateAnswerMatches");
     expect(ui).toContain("Press and hold");
+    expect(ui).toContain("setPointerCapture");
+    expect(ui).not.toContain("onPointerLeave");
     expect(ui).toContain("BackupPanel");
     expect(ui).toContain("InstallTip");
     expect(ui).toContain("Print this week");

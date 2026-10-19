@@ -9,7 +9,7 @@ function fail(msg) {
 }
 
 const SHARE_IMAGE = "https://squisheeacademy.com/og/squishee-academy.png";
-const SHARE_ALT = "Squishee Academy. Free learning games for K-3.";
+const SHARE_ALT = "Squishee Academy. Free learning games for Pre-K to grade 4.";
 
 function assertShareCard(label, html) {
   const title = html.match(/<title>([^<]*)<\/title>/)?.[1];
@@ -226,7 +226,7 @@ if (!existsSync(resolve(root, "money/penny.png"))) fail("money/penny.png missing
 
 assertShareCard("index.html", html);
 if (!html.includes('property="og:title" content="Squishee Academy"')) fail("home og:title");
-if (!html.includes('content="Free K-3 learning games with squishees. No ads, no accounts."')) fail("home description");
+if (!html.includes('content="Free Pre-K to grade 4 learning games with squishees. No ads, no accounts."')) fail("home description");
 if (!html.includes('property="og:url" content="https://squisheeacademy.com/"')) fail("home og:url");
 if (!html.includes('rel="apple-touch-icon" href="/apple-touch-icon.png"')) fail("home apple touch icon");
 for (const page of [

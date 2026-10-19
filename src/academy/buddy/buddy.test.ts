@@ -76,6 +76,43 @@ describe("squishee unlocks", () => {
     const line = storyLine({ kind: "times", a: 3, b: 4, hidden: 12, solved: "3 × 4 = 12" }, "peach", "panda");
     expect(line).toContain("3 groups of 4 squishees");
     expect(line).toContain("Panda");
+    const hidden = storyLine(
+      {
+        kind: "add",
+        op: "+",
+        left: 1,
+        right: null,
+        result: 3,
+        pink: 1,
+        teal: 2,
+        max: 10,
+        hidden: 2,
+        solved: "1 + 2 = 3",
+      },
+      "peach",
+      "bear",
+    );
+    expect(hidden).toContain("1 squishee");
+    expect(hidden).toContain("3 squishees");
+    expect(hidden).not.toContain("2");
+    const one = storyLine(
+      {
+        kind: "add",
+        op: "+",
+        left: 1,
+        right: 0,
+        result: null,
+        pink: 1,
+        teal: 0,
+        max: 5,
+        hidden: 1,
+        solved: "1 + 0 = 1",
+      },
+      "peach",
+      "bear",
+    );
+    expect(one).toContain("1 squishee");
+    expect(one).not.toContain("1 squishees");
     const book = bookEntries();
     expect(book.length).toBeGreaterThan(24);
     for (const entry of book) {
