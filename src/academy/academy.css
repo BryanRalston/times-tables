@@ -1682,6 +1682,19 @@ button.ac-go.ac-play-main {
   stroke-width: 3;
 }
 .ac-shape .is-shine { fill: #fff; stroke: none; }
+.ac-geo { width: min(200px, 72vw); height: auto; display: block; margin: 8px auto; }
+.ac-geo polygon, .ac-geo rect, .ac-geo circle, .ac-geo ellipse, .ac-geo path {
+  fill: #7ad7c8;
+  stroke: #0e7d72;
+  stroke-width: 3;
+}
+.ac-geo .is-line { fill: none; stroke: #2a2430; stroke-width: 2.5; stroke-dasharray: 5 4; }
+.ac-geo .is-star { fill: #f6c945; stroke: #8a6a12; }
+.ac-geo .is-box { fill: #fff7fb; }
+.ac-geo .is-unit { fill: #e21870; stroke: #9d124e; }
+.ac-geo .is-off { fill: #fff; }
+.ac-choice .ac-geo, .ac-mini-shape .ac-geo, .ac-teach .ac-geo { width: min(108px, 32vw); margin: 0; }
+.ac-num-tile { font-size: 32px; font-weight: 800; line-height: 1; }
 .ac-frac { display: flex; gap: 4px; justify-content: center; width: min(320px, 100%); margin: 8px auto; }
 .ac-frac i, .ac-frac-btn {
   flex: 1;
@@ -2146,7 +2159,7 @@ body:has(.ac-boss-intro) { background: #3c2448; }
 }
 .ac-compare-pair { display: flex; flex-direction: column; gap: 8px; align-items: center; }
 .ac-mini-shape { display: flex; align-items: center; justify-content: center; }
-.ac-mini-shape .ac-shape, .ac-mini-shape .ac-part { width: 72px; margin: 0; }
+.ac-mini-shape .ac-shape, .ac-mini-shape .ac-part, .ac-mini-shape .ac-geo { width: 72px; margin: 0; }
 .ac-hands .ac-part rect { fill: #7ad7c8; stroke: #0e7d72; stroke-width: 2; }
 .ac-hands .ac-part rect.is-soft { fill: #f8d7ea; }
 .ac-shape-prompt {

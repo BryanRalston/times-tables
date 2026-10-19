@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { show } from "../i18n";
 import type { ShapeName } from "../games/boards";
-import { ShapeFig } from "../games/scene-ui";
+import { GeoMark, ShapeFig } from "../games/scene-ui";
 import { emptyPile, formatCents } from "../games/money-model";
 import type { ModelArt, TeachFrame, WorkedExample } from "../teach";
 import { AnalogClock, cx } from "./bits";
@@ -64,6 +64,7 @@ function TeachArt({ frame }: { frame: TeachFrame }) {
     case "spell":
       return <p className="ac-sight-word">{frame.show}</p>;
     case "scene":
+      if (frame.show.startsWith("geo:")) return <GeoMark code={frame.show} />;
       return <p className="ac-teach-pic">{frame.show}</p>;
     case "model":
       return <ModelArtView art={frame.art} />;
@@ -288,7 +289,10 @@ function ModelArtView({ art }: { art: ModelArt }) {
       );
     case "shape":
       if (art.part) return <p className="ac-sight-word">{art.name}</p>;
+      if (art.name.startsWith("geo:")) return <GeoMark code={art.name} />;
       return isShapeName(art.name) ? <ShapeFig name={art.name} /> : <p className="ac-sight-word">{art.name}</p>;
+    case "grid":
+      return <GeoMark code={`geo:grid:${art.rows}x${art.cols}`} />;
     case "groups":
       return (
         <div className="ac-groups" aria-hidden="true">

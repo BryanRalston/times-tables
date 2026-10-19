@@ -30,6 +30,14 @@ export type ShapeColor = "red" | "blue" | "yellow" | "green";
 
 export type AngleKind = "acute" | "right" | "obtuse" | "straight";
 
+export type PositionWord = "above" | "below" | "beside" | "behind";
+
+export type FlatKind = "circle" | "triangle" | "square" | "rectangle";
+
+export type QuadName = "rhombus" | "rectangle" | "square" | "trapezoid";
+
+export type FoldFig = "square" | "rectangle" | "triangle" | "circle";
+
 export type ShapeBoard =
   | { game: "shapes"; mode: "flat" | "solid"; shape: ShapeName }
   | { game: "shapes"; mode: "sides"; shape: ShapeName; ask: "sides" | "corners" }
@@ -38,7 +46,16 @@ export type ShapeBoard =
   | { game: "shapes"; mode: "color"; color: ShapeColor }
   | { game: "shapes"; mode: "match"; shape: ShapeName }
   | { game: "shapes"; mode: "pattern"; items: ShapeColor[]; next: ShapeColor }
-  | { game: "shapes"; mode: "angles"; kind: AngleKind; ask: "kind" | "degrees" };
+  | { game: "shapes"; mode: "angles"; kind: AngleKind; ask: "kind" | "degrees" }
+  | { game: "shapes"; mode: "position"; place: PositionWord }
+  | { game: "shapes"; mode: "sort"; shape: ShapeName; ask: "flat" | "solid" }
+  | { game: "shapes"; mode: "traits"; shape: FlatKind; color: ShapeColor; big: boolean; turn: boolean }
+  | { game: "shapes"; mode: "compose"; made: "rectangle" | "square" | "circle" }
+  | { game: "shapes"; mode: "faces"; kind: "net" | "name" }
+  | { game: "shapes"; mode: "rows" | "cover"; rows: number; cols: number }
+  | { game: "shapes"; mode: "quads"; shape: QuadName }
+  | { game: "shapes"; mode: "share"; den: 2 | 3 | 4 }
+  | { game: "shapes"; mode: "fold"; fig: FoldFig; mirror: boolean };
 
 export type FractionBoard =
   | { game: "fractions"; mode: "parts" | "unit" | "shade"; num: number; den: number }

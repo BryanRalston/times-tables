@@ -1,5 +1,5 @@
 import react from "@vitejs/plugin-react";
-import { cpSync, createReadStream, existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { cpSync, createReadStream, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { dirname, join, normalize, resolve, sep } from "node:path";
 import { defineConfig } from "vite";
@@ -77,6 +77,39 @@ function sharedPublic() {
   };
 }
 
+/** Dev serves the repo root index (Squishee Math) unless this swaps in the Academy page. */
+function academyDevIndex() {
+  return {
+    name: "academy-dev-index",
+    configureServer(server: {
+      middlewares: { use: (fn: (req: IncomingMessage, res: ServerResponse, next: () => void) => void) => void };
+      transformIndexHtml: (url: string, html: string) => Promise<string>;
+    }) {
+      server.middlewares.use((req, res, next) => {
+        const pathOnly = decodeURIComponent((req.url ?? "/").split("?")[0] ?? "/");
+        const index =
+          pathOnly === "/" ||
+          pathOnly === "/index.html" ||
+          pathOnly === "/times-tables/academy" ||
+          pathOnly === "/times-tables/academy/" ||
+          pathOnly === "/times-tables/academy/index.html";
+        if (!index) {
+          next();
+          return;
+        }
+        void server
+          .transformIndexHtml(req.url ?? "/", readFileSync(resolve("academy/index.html"), "utf8"))
+          .then((html) => {
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "text/html");
+            res.end(html);
+          })
+          .catch(() => next());
+      });
+    },
+  };
+}
+
 function academyOpenGraphPlugin() {
   return {
     name: "academy-domain-open-graph",
@@ -105,6 +138,7 @@ export default defineConfig({
   publicDir: "academy/public",
   plugins: [
     react(),
+    academyDevIndex(),
     sharedPublic(),
     ...(domain ? academyDomainPlugins(outDir) : [hoistAcademyHtml(outDir)]),
     ...(domain ? [academyOpenGraphPlugin()] : []),

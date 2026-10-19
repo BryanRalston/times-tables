@@ -142,6 +142,23 @@ function expectFresh(item: StaticItem) {
     expect(item.answer).toBe(shapeNames[item.prompt]);
     return;
   }
+  const tiled = item.prompt.match(/^A rectangle has (\d+) rows of (\d+) squares\. How many squares\?$/);
+  if (tiled) {
+    expect(item.answer).toBe(String(Number(tiled[1]) * Number(tiled[2])));
+    return;
+  }
+  if (item.prompt === "A cube net is made of squares. How many squares?") {
+    expect(item.answer).toBe("6");
+    return;
+  }
+  if (item.prompt === "Name the quadrilateral with 4 equal sides and 4 square corners.") {
+    expect(item.answer).toBe("square");
+    return;
+  }
+  if (item.prompt === "The star sits over the box. Name the position.") {
+    expect(item.answer).toBe("above");
+    return;
+  }
   const sides = item.prompt.match(/^How many sides does a (\w+) have\?$/);
   if (sides) {
     const count: Record<string, string> = { pentagon: "5", hexagon: "6", triangle: "3", square: "4" };

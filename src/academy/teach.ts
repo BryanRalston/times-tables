@@ -1,5 +1,6 @@
 import { coinAsA, getLocale, spanishFraction, t } from "./i18n";
 import type { Board, CountBoard, FractionBoard, MeasureBoard, PhonicsBoard, PlaceBoard, ProblemBoard, ShapeBoard } from "./games/boards";
+import { geometryArt } from "./games/geometry";
 import { variableCaptions } from "./games/variables";
 import { COIN_CENTS, COIN_NAME, emptyPile, formatCents, pileCents } from "./games/money-model";
 import { timeTalk } from "./games/time";
@@ -61,6 +62,7 @@ export type ModelArt =
   | { type: "ruler"; inches: number }
   | { type: "bars"; count: number; emoji: string }
   | { type: "shape"; name: string; part: boolean }
+  | { type: "grid"; rows: number; cols: number }
   | { type: "groups"; sizes: number[] };
 
 export interface ModelFrame {
@@ -546,6 +548,19 @@ function shapeTeach(board: ShapeBoard, solved: string): SceneFrame[] {
       return captions([t("Say the pattern", "Di el patrón"), solved]);
     case "angles":
       return captions([t("A right angle is a square corner", "Un ángulo recto es una esquina cuadrada"), solved]);
+    case "position":
+    case "sort":
+    case "traits":
+    case "compose":
+    case "faces":
+    case "rows":
+    case "quads":
+    case "share":
+    case "cover":
+    case "fold": {
+      const code = geometryArt(board) ?? solved;
+      return [{ kind: "scene", show: code, caption: solved }];
+    }
     default: {
       const neverBoard: never = board;
       return neverBoard;

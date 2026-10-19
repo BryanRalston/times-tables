@@ -71,7 +71,31 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
     }
     case "shapes":
       if (board.mode === "sides") expect(Number(question.answer)).toBeGreaterThanOrEqual(3);
-      if (grade === "K") expect(board.mode).not.toBe("parts");
+      if (board.mode === "position") expect(["above", "below", "beside", "behind"]).toContain(question.answer);
+      if (board.mode === "rows") {
+        expect(board.rows * board.cols).toBe(Number(question.answer));
+        expect(board.rows).toBeLessThanOrEqual(3);
+        expect(board.cols).toBeLessThanOrEqual(4);
+        expect(Number(question.answer)).toBeLessThanOrEqual(12);
+      }
+      if (board.mode === "cover") {
+        expect(board.rows * board.cols).toBe(Number(question.answer));
+        expect(Math.max(board.rows, board.cols)).toBeGreaterThanOrEqual(4);
+        expect(Number(question.answer)).toBeLessThanOrEqual(25);
+      }
+      if (board.mode === "share") {
+        expect([2, 3, 4]).toContain(board.den);
+        expect(question.answer).toBe(`1/${board.den}`);
+      }
+      if (board.mode === "faces" && board.kind === "net") expect(question.answer).toBe("6");
+      if (board.mode === "faces" && board.kind === "name") expect(question.answer).toBe("cube");
+      if (board.mode === "fold") expect(board.mirror).toBe(true);
+      if (grade === "PK") expect(["color", "match", "pattern", "flat"]).toContain(board.mode);
+      if (grade === "K") expect(["pattern", "flat", "solid", "position", "sort"]).toContain(board.mode);
+      if (grade === "1") expect(["sort", "traits", "compose", "sides"]).toContain(board.mode);
+      if (grade === "2") expect(["sides", "faces", "rows", "symmetry"]).toContain(board.mode);
+      if (grade === "3") expect(["symmetry", "quads", "share", "parts", "cover"]).toContain(board.mode);
+      if (grade === "4") expect(["cover", "fold", "angles"]).toContain(board.mode);
       break;
     case "fractions": {
       if (board.mode === "decimals") {
@@ -269,8 +293,19 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
       if (task.mode === "ruler") expect(task.speech).not.toMatch(/\d/);
       break;
     case "shapes":
-      expect(task.options).toContain(task.answer);
-      if (grade === "K") expect(task.mode).not.toBe("parts");
+      if (task.mode === "join") {
+        expect(task.pieces?.slice().sort().join("+")).toBe(task.answer);
+      } else {
+        expect(task.options).toContain(task.answer);
+      }
+      if (task.mode === "grid") {
+        expect(Number(task.answer)).toBe((task.rows ?? 0) * (task.cols ?? 0));
+        if (level === "rows") expect(Number(task.answer)).toBeLessThanOrEqual(12);
+        if (level === "cover") expect(Number(task.answer)).toBeLessThanOrEqual(25);
+      }
+      if (grade === "K" || grade === "PK") expect(task.mode).not.toBe("parts");
+      if (grade === "K") expect(task.mode === "name" || task.mode === "place").toBe(true);
+      if (grade === "2" && task.mode === "grid") expect(Number(task.answer)).toBeLessThanOrEqual(12);
       break;
     case "story":
       if (grade === "K") expect(task.mode).toBe("join");

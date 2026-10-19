@@ -480,7 +480,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   {
     slug: "naming-shapes",
     title: "Free Shapes Worksheet (K–3) | Squishee Academy",
-    description: "Print a free shapes worksheet for grades K–3. Name flat and solid shapes, count sides, and find lines of symmetry. Answer key included. No signup.",
+    description: "Print a free shapes worksheet for grades K–4. Name flat and solid shapes, count sides, tile a rectangle, and find lines of symmetry. Answer key included. No signup.",
     h1: "Naming shapes",
     game: "shapes",
     items: [
@@ -494,6 +494,12 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       { prompt: "How many sides does a pentagon have?", answer: "5" },
       { prompt: "How many sides does a hexagon have?", answer: "6" },
       { prompt: "How many lines of symmetry does a square have?", answer: "4" },
+      { prompt: "A rectangle has 2 rows of 3 squares. How many squares?", answer: "6" },
+      { prompt: "A rectangle has 3 rows of 4 squares. How many squares?", answer: "12" },
+      { prompt: "A cube net is made of squares. How many squares?", answer: "6" },
+      { prompt: "Name the quadrilateral with 4 equal sides and 4 square corners.", answer: "square" },
+      { prompt: "The star sits over the box. Name the position.", answer: "above" },
+      { prompt: "1 of 3 equal parts is shaded. What unit fraction?", answer: "1/3" },
     ],
   },
   {

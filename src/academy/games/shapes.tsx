@@ -5,10 +5,31 @@ import { buddyName, pickTalk } from "./flavor";
 import { sideCount, symmetryAnswer, type ShapeBoard, type ShapeName } from "./boards";
 import { nearChoices, sceneQuestion, uniqueChoices } from "./pick";
 import { makeAngleQuestion, makeColorQuestion, makeMatchQuestion, makePatternQuestion, spanSheet } from "./span";
-import { AngleFig, ColorSwatch, SceneCard, ShapeFig, sceneModule } from "./scene-ui";
+import { geometryArt, geometrySheet, makeGeometryQuestion } from "./geometry";
+import { AngleFig, ColorSwatch, GeoMark, SceneCard, ShapeFig, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
-export const SHAPE_LEVELS = ["color", "match", "pattern", "flat", "solid", "sides", "symmetry", "parts", "angles"] as const;
+export const SHAPE_LEVELS = [
+  "color",
+  "match",
+  "pattern",
+  "flat",
+  "solid",
+  "position",
+  "sort",
+  "traits",
+  "compose",
+  "sides",
+  "faces",
+  "rows",
+  "symmetry",
+  "quads",
+  "share",
+  "parts",
+  "cover",
+  "fold",
+  "angles",
+] as const;
 export type ShapeLevel = (typeof SHAPE_LEVELS)[number];
 
 const LEVELS = [
@@ -17,10 +38,20 @@ const LEVELS = [
   { id: "pattern", label: "Patterns", num: 3 },
   { id: "flat", label: "Flat shapes", num: 4 },
   { id: "solid", label: "Solid shapes", num: 5 },
-  { id: "sides", label: "Sides and corners", num: 6 },
-  { id: "symmetry", label: "Symmetry", num: 7 },
-  { id: "parts", label: "Halves, thirds, fourths", num: 8 },
-  { id: "angles", label: "Angles", num: 9 },
+  { id: "position", label: "Position", num: 6 },
+  { id: "sort", label: "Flat or solid", num: 7 },
+  { id: "traits", label: "What matters", num: 8 },
+  { id: "compose", label: "Join shapes", num: 9 },
+  { id: "sides", label: "Sides and corners", num: 10 },
+  { id: "faces", label: "Faces", num: 11 },
+  { id: "rows", label: "Rows of squares", num: 12 },
+  { id: "symmetry", label: "Symmetry", num: 13 },
+  { id: "quads", label: "Quadrilaterals", num: 14 },
+  { id: "share", label: "Unit fractions", num: 15 },
+  { id: "parts", label: "Halves, thirds, fourths", num: 16 },
+  { id: "cover", label: "Cover the rectangle", num: 17 },
+  { id: "fold", label: "Line of symmetry", num: 18 },
+  { id: "angles", label: "Angles", num: 19 },
 ] as const;
 
 const BARS = [
@@ -29,9 +60,19 @@ const BARS = [
   { key: "shapes:pattern", label: "Patterns" },
   { key: "shapes:flat", label: "Flat shapes" },
   { key: "shapes:solid", label: "Solid shapes" },
+  { key: "shapes:position", label: "Position" },
+  { key: "shapes:sort", label: "Flat or solid" },
+  { key: "shapes:traits", label: "What matters" },
+  { key: "shapes:compose", label: "Join shapes" },
   { key: "shapes:sides", label: "Sides and corners" },
+  { key: "shapes:faces", label: "Faces" },
+  { key: "shapes:rows", label: "Rows of squares" },
   { key: "shapes:symmetry", label: "Symmetry" },
+  { key: "shapes:quads", label: "Quadrilaterals" },
+  { key: "shapes:share", label: "Unit fractions" },
   { key: "shapes:parts", label: "Equal parts" },
+  { key: "shapes:cover", label: "Cover the rectangle" },
+  { key: "shapes:fold", label: "Line of symmetry" },
   { key: "shapes:angles", label: "Angles" },
 ];
 
@@ -56,11 +97,11 @@ function defaultLevel(grade: Grade): ShapeLevel {
     case "K":
       return "flat";
     case "1":
-      return "solid";
+      return "traits";
     case "2":
-      return "sides";
+      return "faces";
     case "3":
-      return "parts";
+      return "quads";
     case "4":
       return "angles";
     default: {
@@ -208,6 +249,17 @@ export function makeShapeQuestion(rng: Rng, level: ShapeLevel): ChoiceQ {
       return makeParts(rng);
     case "angles":
       return makeAngleQuestion(rng);
+    case "position":
+    case "sort":
+    case "traits":
+    case "compose":
+    case "faces":
+    case "rows":
+    case "quads":
+    case "share":
+    case "cover":
+    case "fold":
+      return makeGeometryQuestion(rng, level);
     default: {
       const neverLevel: never = level;
       return neverLevel;
@@ -279,6 +331,17 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         answer: symmetryAnswer(shape),
       };
     }
+    case "position":
+    case "sort":
+    case "traits":
+    case "compose":
+    case "faces":
+    case "rows":
+    case "quads":
+    case "share":
+    case "cover":
+    case "fold":
+      return geometrySheet(rng, safe);
     case "parts": {
       const part = rng.pick(PARTS);
       const equal = part.id === "halves" ? "2" : part.id === "thirds" ? "3" : part.id === "fourths" ? "4" : "";
@@ -344,6 +407,19 @@ function ShapeArt({ board }: { board: ShapeBoard }) {
       return <p className="ac-big-num">{t("Find it", "Búscala")}</p>;
     case "angles":
       return <AngleFig kind={board.kind} />;
+    case "position":
+    case "sort":
+    case "traits":
+    case "compose":
+    case "faces":
+    case "rows":
+    case "quads":
+    case "share":
+    case "cover":
+    case "fold": {
+      const code = geometryArt(board);
+      return code ? <GeoMark code={code} /> : null;
+    }
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -361,7 +437,7 @@ export const shapesGame = sceneModule({
   sheetSlug: "shapes",
   sheetScreen: "sheet-shapes",
   blurb:
-    "Free geometry practice for grades K–3. Name flat and solid shapes, count sides and corners, find lines of symmetry, and split shapes into halves, thirds, and fourths.",
+    "Free geometry for Pre-K to grade 4. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.",
   levels: [...LEVELS],
   defaultLevel,
   sheetDefaultLevel: "flat",

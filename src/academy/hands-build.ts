@@ -145,7 +145,7 @@ export interface MeasureTask {
 
 export interface ShapeTask {
   kind: "shapes";
-  mode: "name" | "sides" | "parts" | "symmetry";
+  mode: "name" | "sides" | "parts" | "symmetry" | "place" | "grid" | "join";
   answer: string;
   prompt: string;
   options: string[];
@@ -153,6 +153,9 @@ export interface ShapeTask {
   skill: string;
   factKey: string;
   praise: string;
+  rows?: number;
+  cols?: number;
+  pieces?: string[];
 }
 
 export interface StoryPiece {
@@ -924,9 +927,174 @@ function withAnswer(options: readonly string[], answer: string, rng: Rng): strin
   return rng.shuffle([answer, ...rng.shuffle(rest).slice(0, 2)]);
 }
 
+function shapePraise(shape: string): string {
+  return t(`Yes! ${shape}.`, `¡Sí! ${shapeWithArticle(shape)}.`);
+}
+
 function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
   const safe = isShapeLevel(level) ? level : "flat";
   return fresh(avoid, () => {
+    if (safe === "position") {
+      const answer = rng.pick(["above", "below", "beside", "behind"]);
+      return {
+        kind: "shapes" as const,
+        mode: "place" as const,
+        answer,
+        prompt: `geo:pos:${answer}`,
+        options: rng.shuffle(["above", "below", "beside", "behind"]),
+        ...base(
+          "shapes",
+          safe,
+          answer,
+          t("Find the same shape.", "Busca la misma figura."),
+          t("Yes! Find the same shape.", "¡Sí! Busca la misma figura."),
+        ),
+      };
+    }
+    if (safe === "sort") {
+      const flat = rng.next() < 0.5;
+      const flats = ["circle", "triangle", "square", "rectangle"];
+      const solids = ["cube", "sphere", "cone", "cylinder"];
+      const answer = rng.pick(flat ? flats : solids);
+      const options = rng.shuffle([answer, ...rng.shuffle(flat ? solids : flats).slice(0, 2)]);
+      return {
+        kind: "shapes" as const,
+        mode: "name" as const,
+        answer,
+        prompt: "",
+        options,
+        ...base(
+          "shapes",
+          safe,
+          `${flat ? "flat" : "solid"}:${answer}`,
+          flat
+            ? t("A flat shape sits on the page.", "Una figura plana se queda en la hoja.")
+            : t("A solid shape you could hold.", "Un cuerpo que puedes sostener."),
+          shapePraise(answer),
+        ),
+      };
+    }
+    if (safe === "traits" || safe === "quads" || safe === "fold") {
+      const pool =
+        safe === "traits"
+          ? ["circle", "triangle", "square", "rectangle"]
+          : safe === "quads"
+            ? ["rhombus", "rectangle", "square", "trapezoid"]
+            : ["square:yes", "rectangle:yes", "triangle:yes", "circle:yes"];
+      const answer = safe === "fold" ? rng.pick(pool) : rng.pick(pool);
+      const options = withAnswer(pool, answer, rng);
+      const prompt =
+        safe === "traits"
+          ? `geo:trait:${answer}:blue:big:turn`
+          : safe === "quads"
+            ? `geo:quad:${answer}`
+            : `geo:fold:${answer}`;
+      return {
+        kind: "shapes" as const,
+        mode: "name" as const,
+        answer,
+        prompt,
+        options,
+        ...base(
+          "shapes",
+          safe,
+          `${safe}:${answer}`,
+          safe === "fold"
+            ? t("A line of symmetry makes two matching halves.", "Una línea de simetría hace dos mitades iguales.")
+            : t("What shape is this?", "¿Qué figura es esta?"),
+          safe === "fold"
+            ? t("Yes! Find the same shape.", "¡Sí! Busca la misma figura.")
+            : answer === "rectangle" || answer === "square" || answer === "circle" || answer === "triangle"
+              ? shapePraise(answer)
+              : t("Yes! Find the same shape.", "¡Sí! Busca la misma figura."),
+        ),
+      };
+    }
+    if (safe === "compose") {
+      const made = rng.pick(["rectangle", "square", "circle"] as const);
+      const pieces = made === "circle" ? ["half-a", "half-b"] : ["tri-a", "tri-b"];
+      const extra = made === "circle" ? "square" : "half-a";
+      return {
+        kind: "shapes" as const,
+        mode: "join" as const,
+        answer: [...pieces].sort().join("+"),
+        prompt: `geo:join:${made}`,
+        options: rng.shuffle([...pieces, extra]),
+        pieces,
+        ...base(
+          "shapes",
+          safe,
+          made,
+          t("What shape is this?", "¿Qué figura es esta?"),
+          shapePraise(made),
+        ),
+      };
+    }
+    if (safe === "faces") {
+      const counting = avoid === "cube" || (avoid !== "6" && rng.next() < 0.5);
+      if (counting) {
+        return {
+          kind: "shapes" as const,
+          mode: "name" as const,
+          answer: "6",
+          prompt: "geo:net",
+          options: rng.shuffle(["4", "5", "6", "8"]),
+          ...base("shapes", safe, "6", t("Count the squares.", "Cuenta los cuadritos."), t("Yes! 6 square units.", "¡Sí! 6 unidades cuadradas.")),
+        };
+      }
+      return {
+        kind: "shapes" as const,
+        mode: "name" as const,
+        answer: "cube",
+        prompt: "geo:net",
+        options: withAnswer(["cube", "sphere", "cone", "cylinder"], "cube", rng),
+        ...base("shapes", safe, "cube", t("What shape is this?", "¿Qué figura es esta?"), t("Yes! It is a cube.", "¡Sí! Es el cubo.")),
+      };
+    }
+    if (safe === "rows" || safe === "cover") {
+      const rows = safe === "rows" ? rng.int(2, 3) : rng.int(4, 5);
+      const cols = safe === "rows" ? rng.int(2, 4) : rng.int(4, 5);
+      const product = rows * cols;
+      const options = [String(product), String(product + 1), String(Math.max(1, product - 1))];
+      return {
+        kind: "shapes" as const,
+        mode: "grid" as const,
+        answer: String(product),
+        prompt: `geo:grid:${rows}x${cols}`,
+        options: rng.shuffle(options),
+        rows,
+        cols,
+        ...base(
+          "shapes",
+          safe,
+          `${rows}x${cols}`,
+          t(`${rows} rows of ${cols}. Count the squares.`, `${rows} filas de ${cols}. Cuenta los cuadritos.`),
+          t(`Yes! ${product} square units.`, `¡Sí! ${product} unidades cuadradas.`),
+        ),
+      };
+    }
+    if (safe === "share") {
+      const den = rng.pick([2, 3, 4]);
+      const answer = `1/${den}`;
+      return {
+        kind: "shapes" as const,
+        mode: "parts" as const,
+        answer,
+        prompt: `geo:share:${den}`,
+        options: rng.shuffle(["1/2", "1/3", "1/4"]),
+        ...base(
+          "shapes",
+          safe,
+          answer,
+          t("What unit fraction is shaded?", "¿Qué fracción unitaria está sombreada?"),
+          den === 3
+            ? t("Yes! One third.", "¡Sí! Un tercio.")
+            : den === 4
+              ? t("Yes! One fourth is shaded.", "¡Sí! Un cuarto está sombreada.")
+              : t("Yes! One half is shaded.", "¡Sí! Un medio está sombreada."),
+        ),
+      };
+    }
     if (safe === "parts") {
       const answer = rng.pick(["halves", "thirds", "fourths"]);
       return {
@@ -1291,6 +1459,17 @@ export function handsExample(task: BuildTask): WorkedExample {
         },
       ]);
     case "shapes":
+      if (task.mode === "grid") {
+        return modeled([
+          {
+            art: { type: "grid", rows: task.rows ?? 2, cols: task.cols ?? 2 },
+            caption: task.answer,
+          },
+        ]);
+      }
+      if (task.prompt.startsWith("geo:")) {
+        return modeled([{ art: { type: "shape", name: task.prompt, part: false }, caption: task.answer }]);
+      }
       return modeled([
         {
           art: { type: "shape", name: task.answer, part: task.mode === "parts" },

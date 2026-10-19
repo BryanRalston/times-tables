@@ -57,6 +57,41 @@ describe("shape questions", () => {
             if (board.ask === "degrees") expect(["90", "180"]).toContain(q.answer);
             else expect(["acute", "right", "obtuse", "straight"]).toContain(q.answer);
             break;
+          case "position":
+            expect(["above", "below", "beside", "behind"]).toContain(q.answer);
+            expect(q.visual.labels[q.answer]).toBe("");
+            expect(q.visual.pictures?.[q.answer]).toBe(`geo:pos:${q.answer}`);
+            break;
+          case "sort":
+            if (board.ask === "flat") expect(["circle", "triangle", "square", "rectangle"]).toContain(q.answer);
+            else expect(["cube", "sphere", "cone", "cylinder"]).toContain(q.answer);
+            break;
+          case "traits":
+            expect(["circle", "triangle", "square", "rectangle"]).toContain(q.answer);
+            expect(q.answer).toBe(board.shape);
+            break;
+          case "compose":
+            expect(["rectangle", "square", "circle"]).toContain(q.answer);
+            expect(q.answer).toBe(board.made);
+            break;
+          case "faces":
+            expect(q.answer).toBe(board.kind === "net" ? "6" : "cube");
+            break;
+          case "rows":
+          case "cover":
+            expect(q.answer).toBe(String(board.rows * board.cols));
+            break;
+          case "quads":
+            expect(["rhombus", "rectangle", "square", "trapezoid"]).toContain(q.answer);
+            expect(q.visual.labels[q.answer]?.length).toBeGreaterThan(0);
+            break;
+          case "share":
+            expect(q.answer).toBe(`1/${board.den}`);
+            break;
+          case "fold":
+            expect(q.answer.endsWith(":yes")).toBe(true);
+            expect(board.mirror).toBe(true);
+            break;
           default: {
             const neverBoard: never = board;
             throw new Error(String(neverBoard));
@@ -75,6 +110,15 @@ describe("shape questions", () => {
           expect(row.answer).toBe(LINES[found?.[1] ?? ""]);
         }
         if (level.id === "parts") expect(["halves", "thirds", "fourths", "not equal"]).toContain(row.answer);
+        if (level.id === "position") expect(["above", "below", "beside", "behind"]).toContain(row.answer);
+        if (level.id === "faces") expect(row.answer).toBe("6");
+        if (level.id === "rows" || level.id === "cover") {
+          const found = row.prompt.match(/(\d+) rows of (\d+)/);
+          expect(row.answer).toBe(String(Number(found?.[1]) * Number(found?.[2])));
+        }
+        if (level.id === "share") expect(["1/2", "1/3", "1/4"]).toContain(row.answer);
+        if (level.id === "quads") expect(["rhombus", "rectangle", "square", "trapezoid"]).toContain(row.answer);
+        if (level.id === "fold") expect(row.answer).toBe("square");
       }
       const points = TRIANGLE_POINTS.split(/[\s,]+/).map(Number);
       const corners: Array<[number, number]> = [];

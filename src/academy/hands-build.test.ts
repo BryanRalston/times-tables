@@ -383,10 +383,20 @@ function assertMeasure(task: MeasureTask, level: string): void {
 }
 
 function assertShapes(task: ShapeTask): void {
-  expect(task.options).toContain(task.answer);
   expect(new Set(task.options).size).toBe(task.options.length);
   expect(task.options.length).toBeGreaterThanOrEqual(2);
-  if (task.mode === "parts") expect(["halves", "thirds", "fourths"]).toContain(task.answer);
+  if (task.mode === "join") {
+    expect(task.pieces?.slice().sort().join("+")).toBe(task.answer);
+    for (const piece of task.pieces ?? []) expect(task.options).toContain(piece);
+    return;
+  }
+  expect(task.options).toContain(task.answer);
+  if (task.mode === "parts") {
+    if (task.answer.includes("/")) expect(["1/2", "1/3", "1/4"]).toContain(task.answer);
+    else expect(["halves", "thirds", "fourths"]).toContain(task.answer);
+  }
+  if (task.mode === "grid") expect(Number(task.answer)).toBe((task.rows ?? 0) * (task.cols ?? 0));
+  if (task.mode === "place") expect(["above", "below", "beside", "behind"]).toContain(task.answer);
 }
 
 function assertStory(task: StoryTask, level: string): void {

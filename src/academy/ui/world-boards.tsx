@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { show } from "../i18n";
 import type { ShapeName, VariableBoard } from "../games/boards";
-import { ShapeFig } from "../games/scene-ui";
+import { GeoMark, ShapeFig } from "../games/scene-ui";
 import { VariableEquation } from "../games/variables";
 import type { BlankTask, MeasureTask, ShapeTask, StoryTask } from "../hands-build";
 import { blankMatches, measureMatches, shapeMatches, storyMatches } from "../hands-build";
@@ -72,10 +72,27 @@ function PartTile({ name }: { name: string }) {
   );
 }
 
+function pieceCode(name: string): string | null {
+  if (name === "tri-a" || name === "tri-b") return "geo:piece:triangle";
+  if (name === "half-a" || name === "half-b") return "geo:piece:half";
+  if (name.startsWith("geo:")) return name;
+  return null;
+}
+
 function ShapeTile({ name, part }: { name: string; part: boolean }) {
-  if (part) return <PartTile name={name} />;
+  if (part && !name.includes("/")) return <PartTile name={name} />;
+  const code = pieceCode(name);
+  if (code) return <GeoMark code={code} />;
+  if (name === "rhombus" || name === "trapezoid") return <GeoMark code={`geo:quad:${name}`} />;
   if (isShapeName(name)) return <ShapeFig name={name} />;
-  return <span>{name}</span>;
+  if (name.startsWith("geo:quad:")) return <GeoMark code={name} />;
+  if (name.startsWith("geo:fold:") || name.includes(":yes") || name.includes(":no")) {
+    return <GeoMark code={name.startsWith("geo:") ? name : `geo:fold:${name}`} />;
+  }
+  if (name === "above" || name === "below" || name === "beside" || name === "behind") {
+    return <GeoMark code={`geo:pos:${name}`} />;
+  }
+  return <span className="ac-num-tile">{name}</span>;
 }
 
 export function MeasureBoard({ task, onAnswer }: { task: MeasureTask; onAnswer: (ok: boolean) => void }) {
@@ -154,6 +171,12 @@ export function MeasureBoard({ task, onAnswer }: { task: MeasureTask; onAnswer: 
 }
 
 export function ShapeBoard({ task, onAnswer }: { task: ShapeTask; onAnswer: (ok: boolean) => void }) {
+  if (task.mode === "join") return <JoinShapes task={task} onAnswer={onAnswer} />;
+  if (task.mode === "grid") return <GridCount task={task} onAnswer={onAnswer} />;
+  return <PickShape task={task} onAnswer={onAnswer} />;
+}
+
+function PickShape({ task, onAnswer }: { task: ShapeTask; onAnswer: (ok: boolean) => void }) {
   const [placed, setPlaced] = useState<string | null>(null);
   const wellRef = useRef<HTMLDivElement>(null);
   const part = task.mode === "parts";
@@ -163,8 +186,8 @@ export function ShapeBoard({ task, onAnswer }: { task: ShapeTask; onAnswer: (ok:
   });
   return (
     <HandsShell kind="shapes" fact={task.factKey} caption={task.speech} onDone={() => onAnswer(shapeMatches(task, placed))}>
-      <div ref={wellRef} className="ac-tray ac-shape-well" aria-label={task.prompt}>
-        <p className="ac-shape-prompt">{task.prompt}</p>
+      <div ref={wellRef} className="ac-tray ac-shape-well" aria-label={task.speech}>
+        {task.prompt.startsWith("geo:") ? <GeoMark code={task.prompt} /> : task.prompt ? <p className="ac-shape-prompt">{task.prompt}</p> : null}
         {placed ? (
           <button type="button" className="ac-shape-drag is-in ac-placed" aria-label={`Remove ${placed}`} onClick={() => setPlaced(null)}>
             <span className="ac-mini-shape">
@@ -191,6 +214,86 @@ export function ShapeBoard({ task, onAnswer }: { task: ShapeTask; onAnswer: (ok:
           <span className="ac-mini-shape">
             <ShapeTile name={ghost.id} part={part} />
           </span>
+        </DragGhost>
+      ) : null}
+    </HandsShell>
+  );
+}
+
+function JoinShapes({ task, onAnswer }: { task: ShapeTask; onAnswer: (ok: boolean) => void }) {
+  const [placed, setPlaced] = useState<string[]>([]);
+  const wellRef = useRef<HTMLDivElement>(null);
+  const { ghost, pointerProps } = useTrayDrag((id, point, tapped) => {
+    if (!tapped && !inside(wellRef.current, point.x, point.y)) return;
+    setPlaced((current) => (current.includes(id) ? current : [...current, id]));
+  });
+  const built = [...placed].sort().join("+");
+  return (
+    <HandsShell kind="shapes" fact={task.factKey} caption={task.speech} onDone={() => onAnswer(shapeMatches(task, built))}>
+      {task.prompt.startsWith("geo:") ? <GeoMark code={task.prompt} /> : null}
+      <div ref={wellRef} className="ac-tray ac-shape-well" aria-label={show("Drag the shape")}>
+        {placed.length === 0 ? <span className="ac-tray-empty">{show("Drag the shape")}</span> : null}
+        {placed.map((name) => (
+          <button key={name} type="button" className="ac-shape-drag is-in ac-placed" aria-label={`Remove ${name}`} onClick={() => setPlaced((current) => current.filter((item) => item !== name))}>
+            <span className="ac-mini-shape">
+              <ShapeTile name={name} part={false} />
+            </span>
+          </button>
+        ))}
+      </div>
+      <div className="ac-bank" aria-label={show("Shapes")}>
+        {task.options
+          .filter((name) => !placed.includes(name))
+          .map((name) => (
+            <button key={name} type="button" className="ac-shape-drag" data-piece={name} aria-label={name} {...pointerProps(name)}>
+              <span className="ac-mini-shape">
+                <ShapeTile name={name} part={false} />
+              </span>
+            </button>
+          ))}
+      </div>
+      {ghost ? (
+        <DragGhost x={ghost.x} y={ghost.y}>
+          <span className="ac-mini-shape">
+            <ShapeTile name={ghost.id} part={false} />
+          </span>
+        </DragGhost>
+      ) : null}
+    </HandsShell>
+  );
+}
+
+function GridCount({ task, onAnswer }: { task: ShapeTask; onAnswer: (ok: boolean) => void }) {
+  const [placed, setPlaced] = useState<string | null>(null);
+  const wellRef = useRef<HTMLDivElement>(null);
+  const { ghost, pointerProps } = useTrayDrag((id, point, tapped) => {
+    if (!tapped && !inside(wellRef.current, point.x, point.y)) return;
+    setPlaced(id);
+  });
+  return (
+    <HandsShell kind="shapes" fact={task.factKey} caption={task.speech} onDone={() => onAnswer(shapeMatches(task, placed))}>
+      {task.prompt.startsWith("geo:") ? <GeoMark code={task.prompt} /> : null}
+      <div ref={wellRef} className="ac-tray ac-shape-well" aria-label={task.speech}>
+        {placed ? (
+          <button type="button" className="ac-shape-drag is-in ac-placed" aria-label={show("Put back")} onClick={() => setPlaced(null)}>
+            <span className="ac-num-tile">{placed}</span>
+          </button>
+        ) : (
+          <span className="ac-tray-empty">{show("Drag the shape")}</span>
+        )}
+      </div>
+      <div className="ac-bank" aria-label={show("Shapes")}>
+        {task.options
+          .filter((name) => name !== placed)
+          .map((name) => (
+            <button key={name} type="button" className="ac-shape-drag" data-piece={name} aria-label={name} {...pointerProps(name)}>
+              <span className="ac-num-tile">{name}</span>
+            </button>
+          ))}
+      </div>
+      {ghost ? (
+        <DragGhost x={ghost.x} y={ghost.y}>
+          <span className="ac-num-tile">{ghost.id}</span>
         </DragGhost>
       ) : null}
     </HandsShell>

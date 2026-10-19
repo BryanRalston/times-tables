@@ -171,22 +171,22 @@ Grade 1 does not climb into expanded form. Grade 2 can drift back to the blocks 
 
 ## Shapes
 
-Levels: colors, matching, simple patterns, flat shapes, solid shapes, sides and corners, symmetry, halves thirds and fourths, angles.
+Levels: colors, matching, simple patterns, flat shapes, solid shapes, position, flat or solid, what matters, join shapes, sides and corners, faces, rows of squares, symmetry, quadrilaterals, unit fractions, halves thirds and fourths, cover the rectangle, line of symmetry, angles.
 
-Pre-K colors, matching, and patterns are pictures with empty labels. Kindergarten can drift one level down into patterns. Angles (acute, right, obtuse, straight, and 90 or 180 degrees) are grade 4 (4.G.A.1, 4.MD.C.5). Grade 3 is capped at equal parts.
+Pre-K colors, matching, and patterns are pictures with empty labels. Kindergarten can drift one level down into patterns and is capped at flat or solid, so position words stay in kindergarten. Angles (acute, right, obtuse, straight, and 90 or 180 degrees) are grade 4 (4.G.A.1, 4.MD.C.5). Grade 3 is capped at covering a rectangle, so it does not reach angles.
 
-Halves and fourths of a shape for grade 1 live in Fractions. This game's partition level is the grade 3 shape partition (3.G.A.2).
+Halves and fourths of a shape for grade 1 live in Fractions. This game's equal-parts level is still the grade 3 picture sort (3.G.A.2). Unit fractions of equal areas are the new share level. Rows of squares count a small tiled rectangle (2.G.A.2). Cover the rectangle uses larger rows and ties the count to multiplication (3.MD.C.5, 3.MD.C.7). Area and perimeter formulas stay in Measurement, grade 4.
 
 | Grade | Offer | Start | Core levels | Standards |
 |---|---|---|---|---|
 | Pre-K | Play | Colors | Colors, matching, patterns, flat shapes | K.G.A.1, K.G.A.2 |
-| K | Play | Flat shapes | Flat shapes, solid shapes | K.G.A.2, K.G.B.4 |
-| 1 | Play | Solid shapes | Solid shapes, sides and corners | 1.G.A.1 |
-| 2 | Play | Sides and corners | Sides and corners, symmetry | 2.G.A.1 |
-| 3 | Play | Halves, thirds, fourths | That level | 3.G.A.2 |
-| 4 | Play | Angles | Angles | 4.G.A.1, 4.MD.C.5 |
+| K | Play | Flat shapes | Flat shapes, solid shapes, position, flat or solid | K.G.A.1, K.G.A.2, K.G.B.4 |
+| 1 | Play | What matters | What matters, join shapes, sides and corners | 1.G.A.1, 1.G.A.2 |
+| 2 | Play | Faces | Faces, rows of squares, symmetry | 2.G.A.1, 2.G.A.2 |
+| 3 | Play | Quadrilaterals | Quadrilaterals, unit fractions, equal parts, cover the rectangle | 3.G.A.1, 3.G.A.2, 3.MD.C.5, 3.MD.C.7 |
+| 4 | Play | Angles | Line of symmetry, angles | 4.G.A.1, 4.G.A.3, 4.MD.C.5 |
 
-Kindergarten can drift to sides and corners. They do not partition shapes unless challenge ahead is on.
+Kindergarten does not count sides unless challenge ahead is on. Grade 1 can drift down to flat or solid and does not count cube faces. Grade 2 can drift down to sides and corners. Grade 4 can drift down to covering a rectangle.
 
 ## Fractions
 
