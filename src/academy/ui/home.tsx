@@ -127,7 +127,7 @@ export function HomeScreen({
                 }}
               >
                 <span className="ac-soon">
-                  <LockIcon /> Later
+                  <LockIcon /> {show("Later")}
                 </span>
                 <SquisheeImg id={game.mascot} />
                 <h2>{show(game.title)}</h2>
@@ -194,7 +194,7 @@ export function HomeScreen({
             <h2>{show("Daily gift!")}</h2>
             <PrizeBody prize={prize} />
             <button type="button" className="ac-go" onClick={() => setPrize(null)}>
-              Nice!
+              {show("Nice!")}
             </button>
           </div>
         </div>

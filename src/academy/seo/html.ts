@@ -3,13 +3,13 @@ import { WORKSHEETS, type StaticItem, type StaticSheet } from "./catalog";
 export const CANONICAL_ORIGIN = "https://squisheeacademy.com";
 
 export const HOME_TITLE = "Squishee Academy";
-export const HOME_DESCRIPTION = "Free K-3 learning games with squishees. No ads, no accounts.";
+export const HOME_DESCRIPTION = "Free Pre-K to grade 4 learning games with squishees. No ads, no accounts.";
 
 /** Stable path in the domain build. Crawlers fetch this file directly. */
 export const SHARE_IMAGE_PATH = "/og/squishee-academy.png";
 export const SHARE_IMAGE_WIDTH = 1200;
 export const SHARE_IMAGE_HEIGHT = 630;
-export const SHARE_IMAGE_ALT = "Squishee Academy. Free learning games for K-3.";
+export const SHARE_IMAGE_ALT = "Squishee Academy. Free learning games for Pre-K to grade 4.";
 
 export function shareImageUrl(): string {
   return `${CANONICAL_ORIGIN}${SHARE_IMAGE_PATH}`;

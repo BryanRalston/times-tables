@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { gamePill, t } from "../i18n";
+import { gamePill, t, thingName } from "../i18n";
 import type { Grade } from "../model";
 import { SquisheeImg, cx } from "../ui/bits";
 import { CountToken } from "../ui/count-token";
@@ -313,7 +313,7 @@ export function PictureGraph({ items }: { items: MeasureItem[] }) {
       {items.map((item) => (
         <p key={item.name}>
           <span>
-            {item.emoji} {item.name}
+            {item.emoji} {thingName(item.name, 1, item.name)}
           </span>
           <span>{item.emoji.repeat(item.value)}</span>
         </p>
@@ -330,7 +330,7 @@ export function BarGraph({ items }: { items: MeasureItem[] }) {
           <i style={{ height: item.value * 12 }} />
           <span>
             {item.emoji}
-            <small>{item.name}</small>
+            <small>{thingName(item.name, 1, item.name)}</small>
           </span>
         </div>
       ))}
@@ -963,7 +963,7 @@ function TenBuilder({
       </div>
       <p className="ac-tile-note">{note}</p>
       <button type="button" className="ac-check" onClick={check}>
-        Check
+        {t("Check", "Revisar")}
       </button>
     </div>
   );
@@ -992,12 +992,12 @@ function BlockBuilder({ answer, onChoose }: { answer: string; onChoose: ChoicePr
     <div className="ac-build">
       <BaseTen n={value} />
       <div className="ac-steppers">
-        <Stepper label="tens" value={tens} onChange={setTens} max={9} />
-        <Stepper label="ones" value={ones} onChange={setOnes} max={9} />
+        <Stepper label={t("tens", "decenas")} value={tens} onChange={setTens} max={9} />
+        <Stepper label={t("ones", "unidades")} value={ones} onChange={setOnes} max={9} />
       </div>
       <p className="ac-tile-note">{note}</p>
       <button type="button" className="ac-check" onClick={check}>
-        Check
+        {t("Check", "Revisar")}
       </button>
     </div>
   );
@@ -1016,13 +1016,13 @@ function Stepper({
 }) {
   return (
     <div className="ac-stepper">
-      <button type="button" aria-label={`Fewer ${label}`} onClick={() => onChange(Math.max(0, value - 1))}>
+      <button type="button" aria-label={t(`Fewer ${label}`, `Menos ${label}`)} onClick={() => onChange(Math.max(0, value - 1))}>
         −
       </button>
       <span>
         {value} {label}
       </span>
-      <button type="button" aria-label={`More ${label}`} onClick={() => onChange(Math.min(max, value + 1))}>
+      <button type="button" aria-label={t(`More ${label}`, `Más ${label}`)} onClick={() => onChange(Math.min(max, value + 1))}>
         +
       </button>
     </div>
@@ -1076,7 +1076,7 @@ function ShadeBuilder({
       </div>
       <p className="ac-tile-note">{note}</p>
       <button type="button" className="ac-check" onClick={check}>
-        Check
+        {t("Check", "Revisar")}
       </button>
     </div>
   );
@@ -1096,12 +1096,12 @@ function LengthChoices({
           key={item.name}
           type="button"
           className="ac-choice is-card"
-          aria-label={item.name}
+          aria-label={thingName(item.name, 1, item.name)}
           onClick={() => onChoose(item.name)}
         >
           <i className="ac-len" style={{ width: `${item.value * 18}px` }} aria-hidden="true" />
           <small>
-            {item.emoji} {item.name}
+            {item.emoji} {thingName(item.name, 1, item.name)}
           </small>
         </button>
       ))}

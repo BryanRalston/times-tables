@@ -1,6 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import { gamePill, t } from "../i18n";
-import { buddyName, pickTalk } from "./flavor";
+import { pickTalk } from "./flavor";
 import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
 import { DotModel, Equation, SquisheeImg, cx } from "../ui/bits";
@@ -175,18 +175,17 @@ export function makeAddQuestion(rng: Rng, level: AddLevel): ChoiceQ {
 }
 
 function addTitle(rng: Rng, op: "+" | "-"): string {
-  const who = buddyName(rng);
   if (op === "+") {
     return pickTalk(rng, [
       ["Tap the missing number!", "¡Toca el número que falta!"],
-      [`${who} adds some more. What is missing?`, `${who} suma un poco más. ¿Qué falta?`],
       ["Count on. Tap the missing number!", "Sigue contando. ¡Toca el número que falta!"],
+      ["What number is hiding?", "¿Qué número se esconde?"],
     ]);
   }
   return pickTalk(rng, [
     ["Tap the missing number!", "¡Toca el número que falta!"],
-    [`${who} takes some away. What is missing?`, `${who} quita algunos. ¿Qué falta?`],
     ["What number is hiding?", "¿Qué número se esconde?"],
+    ["Count on. Tap the missing number!", "Sigue contando. ¡Toca el número que falta!"],
   ]);
 }
 

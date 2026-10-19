@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Rng } from "@/lib/rng";
-import { gamePill, t } from "../i18n";
+import { gamePill, patternName, t } from "../i18n";
 import { buddyName, pickTalk } from "./flavor";
 import { bandFor } from "../grade-map";
 import type { Grade } from "../model";
@@ -90,7 +90,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
   const word = rng.pick(list);
   if (rng.next() < 0.6) {
     return {
-      prompt: t(`Trace and write · ${word.patternLabel}`, `Traza y escribe · ${word.patternLabel}`),
+      prompt: t(`Trace and write · ${word.patternLabel}`, `Traza y escribe · ${patternName(word.patternLabel)}`),
       answer: word.word,
       trace: word.word,
     };
@@ -141,7 +141,7 @@ export function SpellingPrompt({
     <section className="ac-qcard" data-mode="spell" data-answer={visual.word} data-solution={question.answer}>
       <h1>{question.title}</h1>
       <SquisheeImg id={mascot} className={cx("ac-mascot", happy && "is-happy")} />
-      <p className="ac-pattern">{visual.patternLabel}</p>
+      <p className="ac-pattern">{patternName(visual.patternLabel)}</p>
       <SpeakerBar
         text={visual.spoken}
         fallback={visual.fallback}

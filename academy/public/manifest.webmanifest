@@ -1,7 +1,7 @@
 {
   "name": "Squishee Academy",
   "short_name": "Academy",
-  "description": "2-minute K–3 math games. Nothing leaves this device.",
+  "description": "2-minute learning games for Pre-K to grade 4. Nothing leaves this device.",
   "start_url": "/times-tables/academy/",
   "scope": "/times-tables/academy/",
   "display": "standalone",

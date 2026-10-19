@@ -9,11 +9,10 @@ import { GAMES } from "./games/registry";
 import { SQUAD_IDS } from "./model";
 import { setLocale } from "./i18n";
 import { ES } from "./i18n-es";
-import { learningLooks } from "./buddy/bond";
+import { learningLooks, studyCount } from "./buddy/bond";
 import { parseChild } from "./storage";
 import { AcademyPal } from "./ui/bits";
 import {
-  STUDY_REWARDS,
   WARDROBE,
   giftOutfitIds,
   looksCrossingStars,
@@ -37,7 +36,9 @@ describe("academy wardrobe", () => {
       const shop = shopItems().find((row) => row.id === item.id);
       expect(shop).toMatchObject({ price: item.price, slot: item.slot });
     }
-    expect(Math.max(...STUDY_REWARDS.map((row) => row.study))).toBeLessThanOrEqual(GAMES.length);
+    expect(WARDROBE.find((item) => item.id === "star-glasses")?.study).toBe(GAMES.length);
+    expect(studyCount(Object.fromEntries(GAMES.map((game) => [game.id, 3])))).toBe(GAMES.length);
+    expect(studyCount({ variables: 3 })).toBe(1);
     for (const face of SQUAD_IDS) {
       for (const item of WARDROBE) {
         const file = join(HERE, "../../public/wardrobe/fitted", `${face}-${item.id}.webp`);

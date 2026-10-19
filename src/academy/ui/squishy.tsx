@@ -4,6 +4,7 @@ import { pokeMotion, pokePlayback, type PokePlayback } from "@/components/poke-p
 import { PokeStrip, SquashOnPoke } from "@/components/poke-squash";
 import { playTap } from "@/lib/sound";
 import { catchphrase } from "../buddy/lines";
+import { t } from "../i18n";
 import { squisheeMediaUrl } from "../paths";
 import { applyPointer, gestureStart, type Gesture, type SquishRole } from "../squish/gesture";
 import { bumpSquishCount, getSquishCount, squishFlourish, subscribeSquish } from "../squish/rewards";
@@ -38,6 +39,7 @@ export function Squishy({
   const pointer = useRef<number | null>(null);
   const localSquish = useRef(0);
   const popTimer = useRef(0);
+  const pokeTimer = useRef(0);
   const reduced = useReducedMotion();
   const reducedRef = useRef(reduced);
   reducedRef.current = reduced;
@@ -54,7 +56,10 @@ export function Squishy({
   const motion = pokeMotion(reduced, academyPoke(id));
 
   useEffect(() => {
-    return () => window.clearTimeout(popTimer.current);
+    return () => {
+      window.clearTimeout(popTimer.current);
+      window.clearTimeout(pokeTimer.current);
+    };
   }, []);
 
   function showFlourish(nextRole: SquishRole) {
@@ -70,14 +75,19 @@ export function Squishy({
 
   function playCountedPoke() {
     const next = pokeMotion(reducedRef.current, academyPoke(id));
-    setPokeTick((n) => n + 1);
-    setPoking(next.squash);
-    setClipReady(false);
-    setClipOn(Boolean(next.clip));
-    setStripOn(Boolean(next.strip));
     if (soundRef.current) playTap();
     bumpSquishCount();
     showFlourish(role);
+    // The squash remounts its node. Doing that inside pointerup drops the click,
+    // so a tap on a buddy inside Play, a game card, or a link never activates.
+    window.clearTimeout(pokeTimer.current);
+    pokeTimer.current = window.setTimeout(() => {
+      setPokeTick((n) => n + 1);
+      setPoking(next.squash);
+      setClipReady(false);
+      setClipOn(Boolean(next.clip));
+      setStripOn(Boolean(next.strip));
+    }, 0);
   }
 
   function stopClip() {
@@ -229,7 +239,7 @@ export function SquishTally() {
   if (count <= 0) return null;
   return (
     <p className="ac-squish-tally" data-squish-count={count}>
-      Squish! {count}
+      {t(`Squish! ${count}`, `¡Aprieta! ${count}`)}
     </p>
   );
 }

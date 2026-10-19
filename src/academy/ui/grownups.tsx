@@ -109,11 +109,15 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
               className={cx("ac-hold", holding && "is-on")}
               onPointerDown={(e) => {
                 e.preventDefault();
+                try {
+                  e.currentTarget.setPointerCapture(e.pointerId);
+                } catch {
+                  /* A pointer that already ended has nothing to capture. The hold still starts. */
+                }
                 beginHold();
               }}
               onPointerUp={clearHold}
               onPointerCancel={clearHold}
-              onPointerLeave={clearHold}
               onContextMenu={(e) => e.preventDefault()}
               onKeyDown={(e) => {
                 if (e.repeat) return;

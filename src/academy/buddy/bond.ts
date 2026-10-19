@@ -1,7 +1,7 @@
 import { show } from "../i18n";
 import type { Child } from "../model";
 import { BOND_REWARDS, STUDY_REWARDS } from "../wardrobe";
-import { STUDY_PALS } from "./persona";
+import { GAMES } from "../games/registry";
 
 /** A few practice rounds, not a long grind. */
 export const BOND_FRIEND = 3;
@@ -54,8 +54,8 @@ export function bondHearts(tier: 0 | 1 | 2 | 3): string {
 
 export function studyCount(bestStars: Record<string, number>): number {
   let n = 0;
-  for (const game of Object.keys(STUDY_PALS)) {
-    if ((bestStars[game] ?? 0) >= 3) n += 1;
+  for (const game of GAMES) {
+    if ((bestStars[game.id] ?? 0) >= 3) n += 1;
   }
   return n;
 }
