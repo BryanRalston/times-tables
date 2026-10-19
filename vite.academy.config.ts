@@ -77,39 +77,6 @@ function sharedPublic() {
   };
 }
 
-/** Dev serves the repo root index (Squishee Math) unless this swaps in the Academy page. */
-function academyDevIndex() {
-  return {
-    name: "academy-dev-index",
-    configureServer(server: {
-      middlewares: { use: (fn: (req: IncomingMessage, res: ServerResponse, next: () => void) => void) => void };
-      transformIndexHtml: (url: string, html: string) => Promise<string>;
-    }) {
-      server.middlewares.use((req, res, next) => {
-        const pathOnly = decodeURIComponent((req.url ?? "/").split("?")[0] ?? "/");
-        const index =
-          pathOnly === "/" ||
-          pathOnly === "/index.html" ||
-          pathOnly === "/times-tables/academy" ||
-          pathOnly === "/times-tables/academy/" ||
-          pathOnly === "/times-tables/academy/index.html";
-        if (!index) {
-          next();
-          return;
-        }
-        void server
-          .transformIndexHtml(req.url ?? "/", readFileSync(resolve("academy/index.html"), "utf8"))
-          .then((html) => {
-            res.statusCode = 200;
-            res.setHeader("Content-Type", "text/html");
-            res.end(html);
-          })
-          .catch(() => next());
-      });
-    },
-  };
-}
-
 function academyOpenGraphPlugin() {
   return {
     name: "academy-domain-open-graph",
@@ -121,9 +88,13 @@ function academyOpenGraphPlugin() {
 
 /** Dev serves the repo-root index unless this answers first. That index is Squishee Math. */
 function academyDevIndex() {
-  const indexPaths = domain
-    ? new Set(["/", "/index.html"])
-    : new Set(["/times-tables/academy", "/times-tables/academy/", "/times-tables/academy/index.html"]);
+  const indexPaths = new Set([
+    "/",
+    "/index.html",
+    "/times-tables/academy",
+    "/times-tables/academy/",
+    "/times-tables/academy/index.html",
+  ]);
   return {
     name: "academy-dev-index",
     apply: "serve" as const,
