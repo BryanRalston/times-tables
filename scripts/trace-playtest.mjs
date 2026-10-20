@@ -124,7 +124,7 @@ async function traceBoard(page, pointerType) {
   });
   const raw = await svg.locator("polyline").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("points") ?? ""));
   for (const points of raw) {
-    if (await page.locator(".ac-trace.is-complete").isVisible().catch(() => false)) break;
+    if (await page.locator(".ac-finger.is-complete").isVisible().catch(() => false)) break;
     const parsed = points
       .trim()
       .split(/\s+/)
@@ -136,8 +136,8 @@ async function traceBoard(page, pointerType) {
     await sleep(80);
   }
   try {
-    await page.locator(".ac-trace.is-complete, .ac-feedback, .ac-choice").first().waitFor({ timeout: 2500 });
-    if (await page.locator(".ac-trace.is-complete").isVisible().catch(() => false)) return;
+    await page.locator(".ac-finger.is-complete, .ac-feedback, .ac-choice").first().waitFor({ timeout: 2500 });
+    if (await page.locator(".ac-finger.is-complete").isVisible().catch(() => false)) return;
     if (!(await page.locator("[data-hands='trace']").isVisible().catch(() => false))) return;
   } catch {
     /* report the gesture below */

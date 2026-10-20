@@ -129,7 +129,7 @@ export function TraceBoard({ task, onAnswer }: { task: TraceTask; onAnswer: (ok:
   const showCue = !complete && hint;
 
   return (
-    <div className={cx("ac-trace", complete && "is-complete")} data-hands="trace" data-fact={task.factKey} data-glyph={task.glyph}>
+    <div className={cx("ac-finger", complete && "is-complete")} data-hands="trace" data-fact={task.factKey} data-glyph={task.glyph}>
       <p className="ac-hands-cap">{task.speech}</p>
       <div
         ref={stageRef}

@@ -872,7 +872,7 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
 }
 .ac-hello-lang .ac-grade { min-width: 118px; }
 .ac-hello-grades { justify-content: center; margin: 10px 0 14px; }
-.ac-trace {
+.ac-finger {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -910,7 +910,7 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
 }
 .ac-trace-path.is-on { stroke: #f09ab8; stroke-width: 8; }
 .ac-trace-path.is-done { stroke: #b7e6de; stroke-dasharray: none; stroke-width: 8; }
-.ac-trace.is-complete .ac-trace-path {
+.ac-finger.is-complete .ac-trace-path {
   stroke: #12988a;
   stroke-dasharray: none;
   stroke-width: 8.5;
@@ -932,7 +932,7 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
 }
 @media (prefers-reduced-motion: reduce) {
   .ac-trace-ring { animation: none; opacity: 0.55; }
-  .ac-trace.is-complete .ac-trace-path { transition: none; }
+  .ac-finger.is-complete .ac-trace-path { transition: none; }
 }
 .ac-hello-grades .ac-grade {
   min-width: 58px;
@@ -1298,7 +1298,7 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   .ac-paper { border: 0; box-shadow: none; width: auto; }
   .ac-key { break-before: page; }
   .ac-problems li, .ac-clock-grid figure, .ac-word-sheet li { break-inside: avoid; }
-  .ac-clock, .ac-dot, .ac-rod, .ac-hour, .ac-minute, .ac-trace { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .ac-clock, .ac-dot, .ac-rod, .ac-hour, .ac-minute, .ac-trace, .ac-finger { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .ac-shell.ac-mid { width: auto; max-width: none; padding: 0; }
   .ac-report {
     border: 0;
