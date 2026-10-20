@@ -55,17 +55,53 @@ async function readBook(width) {
   await page.locator("[data-stories='open']").click();
   await page.locator("[data-story-id='pk-peach-cat']").click();
   await page.locator("[data-story-phase='page']").waitFor();
-  const line = await page.locator(".ac-story-line").innerText();
+  const line = (await page.locator(".ac-story-line").innerText()).replace(/\s+/g, " ").trim();
   if (!line.toLowerCase().includes("peach can see a cat")) throw new Error(`page text ${line}`);
+  const laidOut = await page.evaluate(() => {
+    const words = [...document.querySelectorAll(".ac-story-word")].map((el) => {
+      const box = el.getBoundingClientRect();
+      return { y: Math.round(box.y), h: Math.round(box.height) };
+    });
+    const ys = new Set(words.map((word) => word.y));
+    return { words: words.length, rows: ys.size, tall: words.some((word) => word.h < 44) };
+  });
+  if (laidOut.words < 4) throw new Error(`words ${JSON.stringify(laidOut)}`);
+  if (laidOut.rows > 2) throw new Error(`words stacked ${JSON.stringify(laidOut)}`);
+  if (laidOut.tall) throw new Error(`tap target ${JSON.stringify(laidOut)}`);
+  const stage = await page.evaluate(() => {
+    const scene = document.querySelector(".ac-story-scene")?.getBoundingClientRect();
+    const pals = [...document.querySelectorAll(".ac-story-pal")].map((el) => {
+      const box = el.getBoundingClientRect();
+      return {
+        w: Math.round(box.width),
+        h: Math.round(box.height),
+        top: Math.round(box.top),
+        bottom: Math.round(box.bottom),
+        natural: el instanceof HTMLImageElement ? el.naturalWidth : 0,
+      };
+    });
+    return {
+      scene: scene ? { top: Math.round(scene.top), bottom: Math.round(scene.bottom), h: Math.round(scene.height) } : null,
+      pals,
+    };
+  });
+  if (!stage.scene || stage.pals.length < 2) throw new Error(`stage ${JSON.stringify(stage)}`);
+  for (const pal of stage.pals) {
+    if (pal.natural < 64) throw new Error(`pal art ${JSON.stringify(stage)}`);
+    if (pal.h < 140) throw new Error(`pal size ${JSON.stringify(stage)}`);
+    if (pal.top < stage.scene.top - 1 || pal.bottom > stage.scene.bottom + 1) throw new Error(`pal clipped ${JSON.stringify(stage)}`);
+  }
+  await page.screenshot({ path: `/workspace/story-${width}.png`, fullPage: true });
   await page.locator("[data-story-word='peach']").click();
   await page.locator("[data-story-read]").click();
   const pages = await page.locator(".ac-story-count i").count();
   if (pages < 4) throw new Error(`pages ${pages}`);
   for (let i = 0; i < pages; i += 1) await page.locator("[data-story-next]").click();
   await page.locator("[data-story-phase='check']").waitFor();
+  if (width === 390) await page.screenshot({ path: "/workspace/story-check.png", fullPage: true });
   await page.locator("[data-story-choice='pig']").click();
   await page.locator("[data-story-phase='page']").waitFor();
-  const again = await page.locator(".ac-story-line").innerText();
+  const again = (await page.locator(".ac-story-line").innerText()).replace(/\s+/g, " ").trim();
   if (!again.toLowerCase().includes("peach can see a cat")) throw new Error(`reteach ${again}`);
   await page.locator("[data-story-next]").click();
   await page.locator("[data-story-check='0']").waitFor();
@@ -73,6 +109,13 @@ async function readBook(width) {
   await page.locator("[data-story-check='1']").waitFor();
   await page.locator("[data-story-choice='cat']").click();
   await page.locator("[data-story-phase='done']").waitFor({ timeout: 8000 });
+  if (width === 390) await page.screenshot({ path: "/workspace/story-done.png", fullPage: true });
+  await page.waitForFunction(() => {
+    const raw = localStorage.getItem("squishee-academy-v1");
+    const save = raw ? JSON.parse(raw) : null;
+    const child = save?.children?.find((row) => row.id === save.activeId) ?? save?.children?.[0];
+    return (child?.stars ?? 0) > 0;
+  });
   const stars = await page.evaluate(() => {
     const raw = localStorage.getItem("squishee-academy-v1");
     const save = raw ? JSON.parse(raw) : null;
@@ -98,30 +141,47 @@ try {
   await readBook(820);
 
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto(`${base}#/stories/pk-peach-cat`, { waitUntil: "networkidle" });
-  await page.locator("[data-story-word='cat']").click();
-  await page.waitForResponse((res) => res.url().includes("/voice/") && res.ok(), { timeout: 8000 });
+  await page.locator("[data-story-phase='done'] a.ac-go").click();
+  await page.locator("[data-stories='open']").waitFor();
+  await page.locator("[data-story-id='pk-peach-cat']").click();
+  await page.locator("[data-story-phase='page']").waitFor();
   await page.evaluate(async () => navigator.serviceWorker.ready);
+  await page.reload({ waitUntil: "networkidle" });
+  const controlling = await page.evaluate(() => Boolean(navigator.serviceWorker.controller));
+  if (!controlling) throw new Error("service worker did not control the page");
+  await page.locator("[data-story-phase='page']").waitFor();
+  const voiceWait = page.waitForResponse((res) => res.url().includes("/voice/") && res.ok(), { timeout: 8000 });
+  await page.locator("[data-story-word='peach']").click();
+  const voice = await voiceWait;
+  const voiceUrl = voice.url();
+  await page.waitForFunction(
+    async (url) => {
+      const names = await caches.keys();
+      for (const name of names) {
+        const hit = await (await caches.open(name)).match(url);
+        if (hit) return true;
+      }
+      return false;
+    },
+    voiceUrl,
+    { timeout: 8000 },
+  );
   if (server) server.kill();
   await sleep(200);
   await page.context().setOffline(true);
   const offline = await page.reload({ waitUntil: "domcontentloaded" });
   if (!offline || !offline.ok()) throw new Error(`offline reload status ${offline?.status()}`);
   await page.locator(".ac-story-line").waitFor({ timeout: 8000 });
-  const offlineText = await page.locator(".ac-story-line").innerText();
+  const offlineText = (await page.locator(".ac-story-line").innerText()).replace(/\s+/g, " ");
   if (!offlineText.toLowerCase().includes("peach")) throw new Error(`offline text ${offlineText}`);
-  const clip = await page.evaluate(async () => {
-    const word = document.querySelector("[data-story-word]");
-    word?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    const src = document.querySelector("[data-story-word='peach']");
-    const key = src instanceof HTMLElement ? src.dataset.storyWord : "";
-    const links = performance.getEntriesByType("resource").map((row) => row.name).filter((name) => name.includes("/voice/"));
-    const sample = links[links.length - 1];
-    if (!sample) return { key, ok: false, status: 0 };
-    const res = await fetch(sample);
-    return { key, ok: res.ok, status: res.status };
-  });
-  if (!clip.ok) throw new Error(`offline clip ${JSON.stringify(clip)}`);
+  await page.locator("[data-story-word='peach']").click();
+  await page.locator("[data-story-word='peach'].is-now").waitFor({ timeout: 8000 });
+  const clip = await page.evaluate(async (url) => {
+    const res = await fetch(url);
+    const bytes = res.ok ? (await res.arrayBuffer()).byteLength : 0;
+    return { ok: res.ok, status: res.status, bytes };
+  }, voiceUrl);
+  if (!clip.ok || clip.bytes < 200) throw new Error(`offline clip ${JSON.stringify(clip)}`);
   if (failures.length) throw new Error(failures.join("\n"));
   if (foreign.length) throw new Error(`off-device request ${foreign[0]}`);
   console.log("stories playtest ok");

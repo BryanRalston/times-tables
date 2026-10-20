@@ -162,15 +162,17 @@ export function StoryScene({
     <div className={`ac-story-scene is-${mood}`} aria-hidden="true">
       {sky}
       <span className="ac-story-ground" />
-      {prop ? (
-        <span className="ac-story-prop">
-          <PropArt id={prop} />
-        </span>
-      ) : null}
-      <div className="ac-story-pals">
-        {pals.map((id) => (
-          <SquisheeImg key={id} id={id} className="ac-story-pal" squish="off" />
-        ))}
+      <div className="ac-story-stage">
+        <div className="ac-story-pals">
+          {pals.map((id) => (
+            <SquisheeImg key={id} id={id} className="ac-story-pal" squish="off" />
+          ))}
+        </div>
+        {prop ? (
+          <span className="ac-story-prop">
+            <PropArt id={prop} />
+          </span>
+        ) : null}
       </div>
     </div>
   );
