@@ -166,7 +166,7 @@ async function skipCard(page) {
 }
 
 async function findAndTrace(page, pointerType, shot) {
-  for (let step = 0; step < 40; step += 1) {
+  for (let step = 0; step < 80; step += 1) {
     if (await page.getByRole("button", { name: "Play again" }).isVisible().catch(() => false)) {
       await page.getByRole("button", { name: "Play again" }).click();
       await sleep(400);
