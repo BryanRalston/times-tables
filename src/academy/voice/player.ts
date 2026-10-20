@@ -5,6 +5,35 @@ let audioCtx: AudioContext | null = null;
 let generation = 0;
 const active: AudioBufferSourceNode[] = [];
 const buffers = new Map<string, Promise<AudioBuffer>>();
+const timers: ReturnType<typeof setTimeout>[] = [];
+
+export interface WordCue {
+  key: string;
+  gapAfterMs: number;
+}
+
+/**
+ * When each clip starts, in milliseconds. `leadMs` is the offset before the
+ * first word, matching the audio schedule in `startWordClips`.
+ */
+export function clipStartMs(durationsMs: readonly number[], gapsAfterMs: readonly number[], leadMs = 0): number[] {
+  const starts: number[] = [];
+  let at = leadMs;
+  for (let i = 0; i < durationsMs.length; i += 1) {
+    starts.push(at);
+    at += Math.max(0, durationsMs[i] ?? 0) + Math.max(0, gapsAfterMs[i] ?? 0);
+  }
+  return starts;
+}
+
+function clearTimers(): void {
+  if (typeof window === "undefined") {
+    timers.length = 0;
+    return;
+  }
+  for (const id of timers) window.clearTimeout(id);
+  timers.length = 0;
+}
 
 function context(): AudioContext | null {
   if (typeof window === "undefined") return null;
@@ -46,6 +75,7 @@ export function clipsCover(text: string): boolean {
 
 export function stopClipSpeech(): void {
   generation += 1;
+  clearTimers();
   for (const src of active) {
     try {
       src.stop();
@@ -98,6 +128,77 @@ async function run(plan: SpeechPiece[], rate: number, mine: number, audio: Audio
     active.push(src);
     when += buffer.duration / rate + piece.gapMs / 1000;
   }
+}
+
+const WORD_LEAD_MS = 40;
+
+async function runWords(
+  words: readonly WordCue[],
+  mine: number,
+  audio: AudioContext,
+  onWord: (index: number) => void,
+  onEnd: () => void,
+): Promise<void> {
+  if (audio.state === "suspended") await audio.resume();
+  if (mine !== generation) return;
+  const clips = await Promise.all(words.map((word) => loadBuffer(word.key, audio)));
+  if (mine !== generation) return;
+  const durations = clips.map((buffer) => (buffer ? buffer.duration * 1000 : 0));
+  const gaps = words.map((word) => word.gapAfterMs);
+  const starts = clipStartMs(durations, gaps, WORD_LEAD_MS);
+  const last = words.length - 1;
+  const endAt = (starts[last] ?? WORD_LEAD_MS) + (durations[last] ?? 0) + (gaps[last] ?? 0);
+  let when = audio.currentTime + WORD_LEAD_MS / 1000;
+  for (let i = 0; i < words.length; i += 1) {
+    const word = words[i];
+    const buffer = clips[i];
+    if (!word || !buffer) return;
+    const src = audio.createBufferSource();
+    src.buffer = buffer;
+    src.connect(audio.destination);
+    src.start(when);
+    src.onended = () => {
+      const at = active.indexOf(src);
+      if (at >= 0) active.splice(at, 1);
+    };
+    active.push(src);
+    const delay = starts[i] ?? 0;
+    timers.push(
+      window.setTimeout(() => {
+        if (mine !== generation) return;
+        onWord(i);
+      }, delay),
+    );
+    when += buffer.duration + word.gapAfterMs / 1000;
+  }
+  timers.push(
+    window.setTimeout(() => {
+      if (mine !== generation) return;
+      onEnd();
+    }, endAt),
+  );
+}
+
+/**
+ * Play one clip per word and report the word index as each clip starts.
+ * Returns false when a clip is missing. Does not use the device voice.
+ */
+export function startWordClips(
+  words: readonly WordCue[],
+  onWord: (index: number) => void,
+  onEnd: () => void,
+  onFail: () => void,
+): boolean {
+  stopClipSpeech();
+  if (words.length === 0 || words.some((word) => !hasVoiceClip(word.key))) return false;
+  const audio = context();
+  if (!audio) return false;
+  const mine = generation;
+  void runWords(words, mine, audio, onWord, onEnd).catch(() => {
+    if (mine !== generation) return;
+    onFail();
+  });
+  return true;
 }
 
 /**

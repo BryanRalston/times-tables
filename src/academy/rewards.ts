@@ -196,6 +196,48 @@ export function applyRound(child: Child, result: RoundResult, today: string): Ch
   ]);
 }
 
+export interface StoryFinish {
+  id: string;
+  correct: number;
+  total: number;
+  seconds: number;
+}
+
+/**
+ * Finishing a book pays the same stars, coins, and friendship as a round.
+ * It does not move the island. A miss still finishes: stars follow the
+ * first-try count, and the lowest star is one.
+ */
+export function applyStory(child: Child, result: StoryFinish, today: string): Child {
+  const total = Math.max(1, Math.floor(result.total) || 1);
+  const correct = Math.max(0, Math.min(total, Math.floor(result.correct)));
+  const stars = starsForRound(correct, total);
+  const streak = nextStreak({ count: child.streak, lastPlayed: child.lastPlayed }, today);
+  const skills: Record<string, SkillStat> = { ...child.skills };
+  noteMark(skills, { skill: `story:${result.id}`, tags: [], ok: true });
+  const secondsByDay = { ...child.secondsByDay };
+  const add = Math.max(0, Math.min(180, Math.round(result.seconds)));
+  secondsByDay[today] = Math.min(DAY_CAP_SECONDS, (secondsByDay[today] ?? 0) + add);
+  const prevBond = bondScore(child.bonds, child.avatarId);
+  const nextBond = Math.min(9999, prevBond + 1);
+  const study = studyCount(child.bestStars);
+  const daily = withDailyRound(child, today);
+  const next: Child = {
+    ...child,
+    stars: child.stars + stars,
+    streak: streak.count,
+    lastPlayed: streak.lastPlayed,
+    skills,
+    secondsByDay,
+    bonds: { ...child.bonds, [child.avatarId]: nextBond },
+    rounds: child.rounds + 1,
+    coins: Math.min(1_000_000, child.coins + coinsForRound(correct, total, 0, false)),
+    ...daily,
+  };
+  const starLooks = looksCrossingStars(child.stars, child.stars + stars);
+  return withLearningLooks(next, [...learningLooks(prevBond, nextBond, study, study), ...starLooks]);
+}
+
 export function secondsThisWeek(map: Record<string, number>, today: string): number {
   return weekDates(today).reduce((sum, day) => sum + (map[day] ?? 0), 0);
 }

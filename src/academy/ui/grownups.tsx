@@ -277,6 +277,18 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
         </div>
       </section>
 
+      <section className="ac-panel ac-no-print" data-stories-report={report.stories.finishes}>
+        <h2>{t("Stories", "Cuentos")}</h2>
+        <p>{report.stories.line}</p>
+        {report.stories.titles.length > 0 ? (
+          <ul className="ac-report-list">
+            {report.stories.titles.map((title) => (
+              <li key={title}>{title}</li>
+            ))}
+          </ul>
+        ) : null}
+      </section>
+
       <section className="ac-panel ac-no-print">
         <h2>{show("By game")}</h2>
         {games.length === 0 ? (
