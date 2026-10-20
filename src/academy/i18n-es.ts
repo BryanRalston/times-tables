@@ -627,6 +627,8 @@ export const ES: Record<string, string> = {
     "Valor posicional para los grados 1 a 3. Decenas y unidades, forma desarrollada, comparar y redondear a 10 o a 100.",
   Settings: "Ajustes",
   "Grown-ups": "Adultos",
+  Stories: "Cuentos",
+  "Read along": "Lee conmigo",
   "Free worksheets": "Hojas para imprimir",
   Island: "Isla",
   "Squishee Book": "Libro de squishees",

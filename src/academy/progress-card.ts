@@ -1,4 +1,4 @@
-import { gameAccuracy, practiceTip, stuckLabels, winLabels, type GameAccuracy } from "./family-report";
+import { gameAccuracy, practiceTip, storyBrief, stuckLabels, winLabels, type GameAccuracy, type StoryBrief } from "./family-report";
 import { t, weekdayLetter, weekdayName } from "./i18n";
 import { weekDates, type Child } from "./model";
 import { formatMinutes, masteredChips, secondsThisWeek } from "./rewards";
@@ -92,6 +92,7 @@ export function weeklyCard(child: Pick<Child, "name" | "secondsByDay" | "streak"
 export interface FamilyBrief {
   card: WeeklyCard;
   games: GameAccuracy[];
+  stories: StoryBrief;
 }
 
 /** What a grown-up sees after school: the week, every game played, and one calm next step. */
@@ -99,5 +100,6 @@ export function familyBrief(child: Pick<Child, "name" | "secondsByDay" | "streak
   return {
     card: weeklyCard(child, today),
     games: gameAccuracy(child.skills),
+    stories: storyBrief(child.skills),
   };
 }

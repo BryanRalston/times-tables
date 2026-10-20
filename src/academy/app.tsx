@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { gameForScreen, isGameId, type GameId } from "./games/registry";
 import { todayIso, type RoundResult, type Save } from "./model";
 import { openEgg } from "./buddy/unlock";
-import { acknowledgeUnlocks, applyRound, claimDailyGift } from "./rewards";
+import { acknowledgeUnlocks, applyRound, applyStory, claimDailyGift } from "./rewards";
 import { setLocale, show } from "./i18n";
 import { activeChild, loadSave, mapActive, withLevel, writeSave } from "./storage";
 import { warmVoices } from "./voice";
@@ -11,7 +11,9 @@ import { GrownupsScreen } from "./ui/grownups";
 import { HomeScreen } from "./ui/home";
 import { MapScreen } from "./ui/map";
 import { PlayScreen } from "./ui/play";
+import { StoriesShelf, StoryReader } from "./ui/stories";
 import { WorksheetPage } from "./ui/worksheet";
+import { storiesOffered, knownStory } from "./stories/engine";
 import { SoundContext } from "./ui/sound-context";
 
 type Route =
@@ -21,7 +23,9 @@ type Route =
   | { name: "settings" }
   | { name: "shelf" }
   | { name: "sheets" }
-  | { name: "map" };
+  | { name: "map" }
+  | { name: "stories" }
+  | { name: "story"; id: string };
 
 function parseRoute(hash: string): Route {
   const path = hash.replace(/^#/, "").replace(/^\//, "");
@@ -32,6 +36,8 @@ function parseRoute(hash: string): Route {
   if (head === "shelf") return { name: "shelf" };
   if (head === "sheets") return { name: "sheets" };
   if (head === "map") return { name: "map" };
+  if (head === "stories" && tail) return { name: "story", id: tail };
+  if (head === "stories") return { name: "stories" };
   return { name: "home" };
 }
 
@@ -82,6 +88,8 @@ function AcademyApp() {
       shelf: `${show("Squishees")} · Squishee Academy`,
       sheets: `${show("Free worksheets")} · Squishee Academy`,
       map: `${show("Island")} · Squishee Academy`,
+      stories: `${show("Stories")} · Squishee Academy`,
+      story: `${show("Stories")} · Squishee Academy`,
     };
     document.title = titles[route.name];
   }, [route, save.lang]);
@@ -119,6 +127,24 @@ function AcademyApp() {
     body = <ShelfScreen save={save} onSave={setSave} />;
   } else if (route.name === "sheets") {
     body = <SheetsScreen />;
+  } else if (route.name === "stories" || (route.name === "story" && !storiesOffered())) {
+    body = <StoriesShelf grade={child.grade} skills={child.skills} />;
+  } else if (route.name === "story") {
+    const story = knownStory(route.id);
+    body = story ? (
+      <StoryReader
+        key={story.id}
+        story={story}
+        grade={child.grade}
+        sound={save.sound}
+        onFinish={(result) => {
+          const today = todayIso();
+          setSave((current) => mapActive(current, (row) => applyStory(row, result, today)));
+        }}
+      />
+    ) : (
+      <StoriesShelf grade={child.grade} skills={child.skills} />
+    );
   } else if (route.name === "map") {
     body = (
       <MapScreen

@@ -1,8 +1,9 @@
 import { barKeys, chipKeys, GAMES, gameById, skillLabel, type GameId } from "./games/registry";
-import { show, t } from "./i18n";
+import { getLocale, show, t } from "./i18n";
 import type { SkillStat } from "./model";
 import { isMastered, skillPercent } from "./rewards";
 import { gameIdForSkill, sheetForSkill, sheetTitle, sheetUrl, timesFactorOf } from "./sheet-match";
+import { STORIES } from "./stories/catalog";
 
 export interface PracticeTip {
   text: string;
@@ -307,4 +308,35 @@ export function practiceTip(name: string, skills: Record<string, SkillStat>): Pr
     return tipFrom(who, names, match, timesFactorOf(top.key));
   }
   return reviewTip(who, skills) ?? emptyTip(who);
+}
+
+export interface StoryBrief {
+  finishes: number;
+  /** English titles. Empty in Spanish so the report does not show untranslated books. */
+  titles: readonly string[];
+  line: string;
+}
+
+/** Books finished on this device. Spanish keeps the count and hides the English titles. */
+export function storyBrief(skills: Record<string, SkillStat>): StoryBrief {
+  const titles: string[] = [];
+  let finishes = 0;
+  for (const story of STORIES) {
+    const n = skills[`story:${story.id}`]?.ok ?? 0;
+    if (n <= 0) continue;
+    finishes += n;
+    titles.push(story.title);
+  }
+  if (getLocale() === "es") {
+    const line =
+      finishes === 0
+        ? "Los cuentos están en inglés por ahora."
+        : finishes === 1
+          ? "1 cuento leído en inglés."
+          : `${finishes} cuentos leídos en inglés.`;
+    return { finishes, titles: [], line };
+  }
+  const line =
+    finishes === 0 ? "No stories finished yet." : finishes === 1 ? "1 story finished." : `${finishes} stories finished.`;
+  return { finishes, titles, line };
 }

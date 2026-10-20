@@ -133,6 +133,24 @@ CVC, digraphs, blends, and long-vowel words are spoken. The sentence is not prin
 | 4 | Grade 4 words | Grade 4 words | One level down (patterns) | RF.4.3.A, L.4.2 |
 | Pre-K | Coming later | — | — | Spelling waits |
 
+## Read-along stories
+
+Stories are short books, not an island game. Pre-K, kindergarten, grade 1, and grade 2 each have books. Grade 3 and grade 4 can still open every book. A child sees books at their grade and every easier book.
+
+Each page is read from recorded word clips, with the current word lit. A miss on the picture check shows that page again. There is no timer and no fail screen. Finishing adds stars, coins, and friendship the same way a round does, and the grown-ups report lists the books.
+
+A word in a book has to be one of these:
+
+- a sight word at or below the book’s grade (Pre-K is pre-primer, kindergarten goes through primer, grade 1 through 1st grade, grade 2 through 2nd grade)
+- a phonics picture noun from the sound bank
+- a CVC word from the rhyme families
+- a spelling word at or below the book’s grade (Pre-K has none, kindergarten is CVC, grade 1 goes through long vowels, grade 2 goes through patterns)
+- the single-word name of a squishee in that book
+
+Grade 3 sight words, grade 4 vocabulary, and grade 4 spelling stay out. `src/academy/stories/stories.test.ts` checks every page, question, and clip.
+
+Spanish hides the books instead of showing the English words. See `docs/LANGUAGE.md`.
+
 ## Counting
 
 Levels: count squishees to 10, count to 20, more or less, before and after, dot patterns, ten-frames, build a ten-frame.

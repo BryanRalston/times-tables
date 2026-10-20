@@ -14,6 +14,7 @@ import { rollGift, type GiftRoll } from "../rewards";
 import { outfitLabel } from "../wardrobe";
 import { chime } from "../sound";
 import { WeekStickers } from "./stickers";
+import { storiesOffered } from "../stories/engine";
 import { AcademyPal, Foot, GiftBox, LockIcon, Logo, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
 import { PalWithLook } from "./boss-figure";
 
@@ -150,6 +151,16 @@ export function HomeScreen({
           );
         })}
       </div>
+
+      {storiesOffered() ? (
+        <a className="ac-stories-card" href="#/stories" data-stories="open">
+          <SquisheeImg id="owl" squish="off" />
+          <span>
+            <strong>{show("Stories")}</strong>
+            <small>{show("Read along")}</small>
+          </span>
+        </a>
+      ) : null}
 
       <div className="ac-meters">
         <a className="ac-meter" href="#/shelf">
