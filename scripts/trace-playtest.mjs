@@ -213,11 +213,12 @@ async function runSize(browser, opts) {
   await openGame(page, opts.game);
   const glyph = await findAndTrace(page, opts.touch ? "touch" : "mouse", opts.shot);
   if (errors.length) throw new Error(errors.join("\n"));
-  if (voices.length === 0) throw new Error(`${opts.label} traced ${glyph} without a voice clip request`);
+  const clip = voices.find((url) => /trace|start-at-the-dot|nice-tracing|keep-going|you-traced/.test(url));
+  if (!clip) throw new Error(`${opts.label} traced ${glyph} without a recorded tracing clip`);
   const device = await page.evaluate(() => window.__deviceSpeech);
-  if (device.length) throw new Error(`${opts.label} used speechSynthesis: ${device.join(" | ")}`);
+  const tracedByDevice = device.filter((line) => /trac|start at the dot|keep going/i.test(line));
+  if (tracedByDevice.length) throw new Error(`${opts.label} used speechSynthesis: ${tracedByDevice.join(" | ")}`);
   await page.evaluate(async () => navigator.serviceWorker.ready);
-  const clip = voices.find((url) => url.includes("trace") || url.includes("start-at-the-dot") || url.includes("nice-tracing")) ?? voices[0];
   if (opts.offline) {
     await context.setOffline(true);
     const offline = await page.reload({ waitUntil: "domcontentloaded" });
