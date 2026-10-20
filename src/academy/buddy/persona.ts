@@ -53,6 +53,7 @@ export const STUDY_PALS: Record<string, string> = {
   measure: "sushi",
   phonics: "axolotl",
   problems: "taco",
+  variables: "toast",
 };
 
 const PEOPLE: Record<string, Persona> = {
@@ -97,6 +98,7 @@ const PEOPLE: Record<string, Persona> = {
   sushi: person("Line them up.", "Sushi lines bites up to measure.", "measure", "tidy", "Tidy streak!", "Count the pieces.", "Start at the end.", "sway"),
   axolotl: person("Frill and a sound.", "Axolotl frills when a sound matches.", "phonics", "frilly", "Frilly streak!", "Count the sounds.", "Say the sound.", "wiggle"),
   taco: person("A story in a shell.", "Taco tucks a story in every shell.", "problems", "crunchy", "Crunchy streak!", "Count the story.", "Use the picture.", "spin"),
+  toast: person("Find the missing bite!", "Toast keeps a spot for the missing number.", "variables", "toasty", "Toasty streak!", "Count the bites.", "Look in the box.", "bounce"),
 };
 
 function person(

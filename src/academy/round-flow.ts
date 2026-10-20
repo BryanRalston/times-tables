@@ -155,7 +155,7 @@ export function similarSlot(game: string, slot: RoundSlot, rng: Rng): RoundSlot 
     default: {
       const prefix = `${game}:`;
       const level = slot.skill.startsWith(prefix) ? slot.skill.slice(prefix.length) : slot.skill;
-      return makeBuildTask(game, level, rng, slot.factKey);
+      return makeBuildTask(game, level, rng, slot.factKey, slot.kind);
     }
   }
 }

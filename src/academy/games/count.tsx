@@ -354,7 +354,7 @@ export const countGame = sceneModule({
   sheetSlug: "counting",
   sheetScreen: "sheet-count",
   blurb:
-    "Free counting practice for kindergarten through grade 3. Count objects to 20, compare groups, find the number before and after, read dot patterns, and fill a ten-frame.",
+    "Free counting practice for Pre-K through grade 4. Count objects to 20, compare groups, find the number before and after, read dot patterns, and fill a ten-frame.",
   levels: [...LEVELS],
   defaultLevel,
   sheetDefaultLevel: "objects",

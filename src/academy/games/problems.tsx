@@ -426,7 +426,7 @@ export const problemsGame = sceneModule({
   sheetSlug: "word-problems",
   sheetScreen: "sheet-problems",
   blurb:
-    "Free word problems for kindergarten through grade 3. Short add, subtract, multiply, and share stories with a picture, read aloud for children who are still learning to read.",
+    "Free word problems for Pre-K through grade 4. Short add, subtract, multiply, share, and two-step stories with a picture, read aloud for children who are still learning to read.",
   levels: [...LEVELS],
   defaultLevel,
   sheetDefaultLevel: "add",

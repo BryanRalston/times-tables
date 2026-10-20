@@ -13,6 +13,7 @@ import { makeClockTask, makePayTask } from "../hands";
 import { exampleFor } from "../round-flow";
 import { hintCue, promptSpeech, speakable, workedExample } from "../teach";
 import type { ChoiceQ } from "../games/types";
+import { traceLines } from "../trace/lines";
 import { idealPieces, speechChunkError } from "./plan";
 import { spokenText } from "./pronounce";
 
@@ -101,6 +102,7 @@ function explicitLines(): SpokenLine[] {
     push(lines, `${row.letter.toLowerCase()} ${row.phoneme}`, "phonics");
     push(lines, t(`${row.letter} says ${row.phoneme}, like ${row.word}`, `${row.letter} dice ${row.phoneme}, como ${row.word}`), "phonics");
   }
+  for (const row of traceLines()) push(lines, t(row.en, row.es), row.game);
   for (const family of RHYME_FAMILIES) {
     for (const word of family.words) {
       push(lines, word, "phonics");

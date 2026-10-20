@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
+import { setLocale } from "../i18n";
 import { RULER_INCH } from "./scene-ui";
 import { MEASURE_LEVELS, makeMeasureQuestion, measureGame } from "./measure";
 import type { ChoiceQ } from "./types";
@@ -12,6 +13,21 @@ function expectChoices(q: ChoiceQ) {
 }
 
 describe("measurement questions", () => {
+  afterEach(() => setLocale("en"));
+
+  it("asks cuántas for carrots and snakes", () => {
+    setLocale("es");
+    const seen = new Set<string>();
+    for (let seed = 0; seed < 160; seed += 1) {
+      const title = makeMeasureQuestion(rngFromSeed(`more-gender-${seed}`), "more").title.toLowerCase();
+      expect(title).not.toContain("cuántos zanahoria");
+      expect(title).not.toContain("cuántos serpiente");
+      if (title.includes("cuántas zanahoria")) seen.add("carrot");
+      if (title.includes("cuántas serpiente")) seen.add("snake");
+    }
+    expect([...seen].sort()).toEqual(["carrot", "snake"]);
+  });
+
   it("compares lengths, reads a 12-inch ruler, and reads graphs", () => {
     for (let seed = 0; seed < 24; seed += 1) {
       for (const level of MEASURE_LEVELS) {

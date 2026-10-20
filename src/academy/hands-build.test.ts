@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
 import { GAMES } from "./games/registry";
+import { guideInk, traceMatches } from "./trace/score";
 import { TIMES_SPEC, type TimesLevel } from "./games/times";
 import { FRACTION_DENOMINATORS } from "./grade-map";
 import {
@@ -18,6 +19,7 @@ import {
   shadeMatches,
   shapeMatches,
   sightMatches,
+  type TraceTask,
   storyMatches,
   type ArrayTask,
   type BlankTask,
@@ -77,6 +79,8 @@ function builtOf(task: BuildTask): boolean {
       return storyMatches(task, rightStory(task));
     case "blank":
       return blankMatches(task, task.answer);
+    case "trace":
+      return traceMatches(task.glyph, guideInk(task.glyph));
     default: {
       const neverTask: never = task;
       return neverTask;
@@ -113,6 +117,8 @@ function wrongOf(task: BuildTask): boolean {
       return storyMatches(task, { groups: [task.a + 9], away: 0, bins: [[1]] });
     case "blank":
       return blankMatches(task, task.answer + 1);
+    case "trace":
+      return traceMatches(task.glyph, [[{ x: 2, y: 2 }]]);
     default: {
       const neverTask: never = task;
       return neverTask;
@@ -185,6 +191,9 @@ function assertBounds(task: HandsTask, level: string): void {
     case "blank":
       assertBlank(task, level);
       break;
+    case "trace":
+      assertTrace(task, level);
+      break;
     default: {
       const neverTask: never = task;
       throw new Error(String(neverTask));
@@ -210,6 +219,18 @@ function hiddenValue(task: BlankTask): number {
       const neverBox: never = task.box;
       return neverBox;
     }
+  }
+}
+
+function assertTrace(task: TraceTask, level: string): void {
+  expect(task.glyph.length).toBe(1);
+  if (level === "objects") {
+    expect(task.form).toBe("numeral");
+    expect(task.glyph).toMatch(/^[0-9]$/);
+  }
+  if (level === "letters" || level === "sounds" || level === "begin") {
+    expect(task.form === "upper" || task.form === "lower").toBe(true);
+    expect(task.glyph).toMatch(/^[A-Za-z]$/);
   }
 }
 

@@ -7,7 +7,7 @@ import { bookEntries, catchphrase } from "../buddy/cast";
 import { palOwned, withBuddy } from "../buddy/unlock";
 import { GAMES, sheetHref } from "../games/registry";
 import { playWindow } from "../grade-map";
-import { prefersSpanish, setLocale, show, t } from "../i18n";
+import { setLocale, show, t } from "../i18n";
 import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type AppLang, type Grade, type Save } from "../model";
 import { buyOutfit, wearOutfit } from "../rewards";
 import { outfitHint, outfitLabel, outfitPrice, shopSections } from "../wardrobe";
@@ -26,7 +26,6 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
   const [grade, setGrade] = useState<Grade>(DEFAULT_START_GRADE);
   const [buddy, setBuddy] = useState<string>(STARTERS[0] ?? "peach");
   const [lang, setLang] = useState<AppLang>(save.lang);
-  const offerSpanish = !save.langChosen && prefersSpanish();
 
   useEffect(() => {
     speak(t("Pick a buddy!", "¡Elige un amigo!"), sound);
@@ -49,34 +48,30 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
         }}
       >
         <h1 className="ac-sr">{show("Pick a buddy")}</h1>
-        {offerSpanish ? (
-          <div className="ac-panel">
-            <p>¿Quieres jugar en español?</p>
-            <p className="ac-hint">Play in Spanish? You can switch any time in Settings.</p>
-            <div className="ac-grades">
-              <button
-                type="button"
-                className={cx("ac-grade", lang === "en" && "is-on")}
-                onClick={() => {
-                  setLang("en");
-                  setLocale("en");
-                }}
-              >
-                English
-              </button>
-              <button
-                type="button"
-                className={cx("ac-grade", lang === "es" && "is-on")}
-                onClick={() => {
-                  setLang("es");
-                  setLocale("es");
-                }}
-              >
-                Español
-              </button>
-            </div>
-          </div>
-        ) : null}
+        <div className="ac-hello-lang" role="group" aria-label={show("Language")}>
+          <button
+            type="button"
+            className={cx("ac-grade", lang === "en" && "is-on")}
+            aria-pressed={lang === "en"}
+            onClick={() => {
+              setLang("en");
+              setLocale("en");
+            }}
+          >
+            English
+          </button>
+          <button
+            type="button"
+            className={cx("ac-grade", lang === "es" && "is-on")}
+            aria-pressed={lang === "es"}
+            onClick={() => {
+              setLang("es");
+              setLocale("es");
+            }}
+          >
+            Español
+          </button>
+        </div>
         <div className="ac-buddy-picks" role="radiogroup" aria-label={show("Pick a buddy")}>
           {STARTERS.map((id) => (
             <button

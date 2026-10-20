@@ -338,6 +338,14 @@ export const PERSONA_ES: Record<string, PersonaEs> = {
     count: "Cuenta los sonidos.",
     work: "Di el sonido.",
   },
+  toast: {
+    line: "¡Busca el bocado!",
+    fact: "Toast guarda el número que falta.",
+    trait: "el tostado",
+    streak: "¡Racha tostada!",
+    count: "Cuenta los bocados.",
+    work: "Mira la caja.",
+  },
   taco: {
     line: "Una historia en la tortilla.",
     fact: "Taco guarda una historia en cada tortilla.",
@@ -599,32 +607,32 @@ export const ES: Record<string, string> = {
   "Multiply stories": "Historias de multiplicar",
   "Share stories": "Historias de repartir",
   "Picture stories": "Historias con dibujos",
-  "Free printable multiplication practice for grades K–3. Random problems and an answer key. No signup.":
-    "Práctica de multiplicar para imprimir, de K a 3. Problemas nuevos y la hoja de respuestas. Sin cuenta.",
-  "Free printable addition and subtraction for grades K–3. Facts within 5, 10, 20, or 100, plus an answer key.":
-    "Sumas y restas para imprimir, de K a 3. Hasta el 5, el 10, el 20 o el 100, con la hoja de respuestas.",
-  "Free fraction practice for grades 1–3. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, and equivalent fractions with pictures.":
-    "Fracciones para los grados 1 a 3. Partes de un entero, fracciones unitarias, la recta numérica, comparar y fracciones equivalentes con dibujos.",
-  "Free spelling for grades K–3. Hear a word in a sentence, then build it from letter tiles. Lists move from CVC words to digraphs, blends, long vowels, and common grade 2 and 3 patterns.":
-    "Deletreo para K a 3. Escuchas una palabra en inglés y la armas con letras. Empieza con palabras cortas y sigue con patrones de grado 2 y 3.",
-  "Free measurement and data practice for kindergarten through grade 3. Compare longer and shorter, measure inches on a ruler, and read picture graphs and bar graphs.":
-    "Medidas y datos, de kínder a grado 3. Compara largo y corto, mide pulgadas con una regla y lee gráficas.",
-  "Free Dolch and Fry sight word practice for grades K–3. Hear a word, match a picture, and fill a sentence. Trace the list, then check the answer key.":
-    "Palabras frecuentes en inglés, de K a 3. Escucha la palabra, une el dibujo y completa la oración. Las palabras se quedan en inglés.",
-  "Free printable coin practice for grades K–3. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change within $1, and read dollars and cents.":
-    "Monedas para imprimir, de K a 3. Nombra, cuenta, forma una cantidad, da el cambio hasta $1 y lee dólares y centavos.",
-  "Free printable telling-time practice for grades K–3. Analog clocks to the hour, half hour, quarter hour, and 5 minutes, with an answer key.":
-    "La hora para imprimir, de K a 3. Relojes en punto, y media, y cuarto y de 5 en 5, con la hoja de respuestas.",
-  "Free counting practice for kindergarten through grade 3. Count objects to 20, compare groups, find the number before and after, read dot patterns, and fill a ten-frame.":
-    "Contar, de kínder a grado 3. Hasta 20, compara grupos, el número de antes y después, puntos de un vistazo y el tablero de diez.",
-  "Free word problems for kindergarten through grade 3. Short add, subtract, multiply, and share stories with a picture, read aloud for children who are still learning to read.":
-    "Problemas cortos, de kínder a grado 3. Sumar, restar, multiplicar y repartir, con un dibujo y la voz en alto.",
-  "Free phonics practice for kindergarten through grade 3. Letter sounds, beginning sounds with pictures, rhyming words, and CVC blending. A speaker reads the sound, with the sound written out when a voice is not available.":
-    "Sonidos del inglés, de kínder a grado 3. La letra, el sonido del principio, palabras que riman y unir sonidos. La voz dice el sonido.",
-  "Free geometry practice for grades K–3. Name flat and solid shapes, count sides and corners, find lines of symmetry, and split shapes into halves, thirds, and fourths.":
-    "Figuras para K a 3. Planas y con volumen, lados y esquinas, simetría, y mitades, tercios y cuartos.",
-  "Free place value practice for grades 1–3. Tens and ones with base-ten blocks, expanded form, comparing numbers, and rounding to the nearest 10 or 100.":
-    "Valor posicional para los grados 1 a 3. Decenas y unidades, forma desarrollada, comparar y redondear a 10 o a 100.",
+  "Free printable multiplication practice for Pre-K to grade 4. Facts, multi-digit problems, and an answer key. No signup.":
+    "Práctica de multiplicar para imprimir, de prekínder a grado 4. Las tablas, problemas de varios dígitos y la hoja de respuestas. Sin cuenta.",
+  "Free printable addition and subtraction for Pre-K to grade 4. Facts within 5, 10, 20, 100, or the thousands, plus an answer key.":
+    "Sumas y restas para imprimir, de prekínder a grado 4. Hasta el 5, el 10, el 20, el 100 o los millares, con la hoja de respuestas.",
+  "Free fraction practice for grades 1–4. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.":
+    "Fracciones para los grados 1 a 4. Partes de un entero, fracciones unitarias, la recta numérica, comparar, fracciones equivalentes con dibujos y decimales.",
+  "Free spelling for Pre-K to grade 4. Hear a word in a sentence, then build it from letter tiles. Lists move from CVC words to digraphs, blends, long vowels, and grade 4 words.":
+    "Deletreo de prekínder a grado 4. Escuchas una palabra en inglés y la armas con letras. Empieza con palabras cortas y llega a palabras de grado 4.",
+  "Free measurement and data practice for Pre-K through grade 4. Compare longer and shorter, measure inches on a ruler, read picture graphs and bar graphs, and find area.":
+    "Medidas y datos, de prekínder a grado 4. Compara largo y corto, mide pulgadas, lee gráficas y halla el área.",
+  "Free Dolch and Fry sight word practice for Pre-K to grade 4. Hear a word, match a picture, and fill a sentence. Trace the list, then check the answer key.":
+    "Palabras frecuentes en inglés, de prekínder a grado 4. Escucha la palabra, une el dibujo y completa la oración. Las palabras se quedan en inglés.",
+  "Free printable coin practice for Pre-K to grade 4. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.":
+    "Monedas para imprimir, de prekínder a grado 4. Nombra, cuenta, forma una cantidad, da el cambio, lee dólares y centavos y resuelve problemas de dinero.",
+  "Free printable telling-time practice for Pre-K to grade 4. Analog clocks to the hour, half hour, quarter hour, and 5 minutes, plus elapsed time, with an answer key.":
+    "La hora para imprimir, de prekínder a grado 4. Relojes en punto, y media, y cuarto, de 5 en 5 y el tiempo transcurrido, con la hoja de respuestas.",
+  "Free counting practice for Pre-K through grade 4. Count objects to 20, compare groups, find the number before and after, read dot patterns, and fill a ten-frame.":
+    "Contar, de prekínder a grado 4. Hasta 20, compara grupos, el número de antes y después, puntos de un vistazo y el tablero de diez.",
+  "Free word problems for Pre-K through grade 4. Short add, subtract, multiply, share, and two-step stories with a picture, read aloud for children who are still learning to read.":
+    "Problemas cortos, de prekínder a grado 4. Sumar, restar, multiplicar, repartir y dos pasos, con un dibujo y la voz en alto.",
+  "Free phonics practice for Pre-K through grade 4. Letter sounds, beginning sounds with pictures, rhyming words, and CVC blending. A speaker reads the sound, with the sound written out when a voice is not available.":
+    "Sonidos del inglés, de prekínder a grado 4. La letra, el sonido del principio, palabras que riman y unir sonidos. La voz dice el sonido.",
+  "Free geometry for Pre-K to grade 4. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.":
+    "Figuras de prekínder a grado 4. Nombra las formas, palabras de lugar, une figuras, cuenta caras y cuadrados, y ordena cuadriláteros.",
+  "Free place value practice for grades 1–4. Tens and ones with base-ten blocks, expanded form, comparing numbers, rounding, and thousands up to a million.":
+    "Valor posicional para los grados 1 a 4. Decenas y unidades, forma desarrollada, comparar, redondear y millares hasta el millón.",
   Settings: "Ajustes",
   "Grown-ups": "Adultos",
   Stories: "Cuentos",

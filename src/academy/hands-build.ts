@@ -25,6 +25,7 @@ import { fourChoices } from "./games/choices";
 import { MINUS, type ChoiceQ } from "./games/types";
 import { isTimesLevel, nextTimesFact } from "./games/times";
 import { makeClockTask, makePayTask, type ClockTask, type PayTask } from "./hands";
+import { tracePraise, traceSpeech } from "./trace/lines";
 import { workedExample, type ModelArt, type WorkedExample } from "./teach";
 import { blankOut, buildTiles, countWord, extraLetters } from "./games/words";
 
@@ -163,6 +164,16 @@ export interface StoryPiece {
   size: number;
 }
 
+export interface TraceTask {
+  kind: "trace";
+  glyph: string;
+  form: "numeral" | "upper" | "lower";
+  speech: string;
+  skill: string;
+  factKey: string;
+  praise: string;
+}
+
 export interface BlankTask {
   kind: "blank";
   mode: VariableLevel;
@@ -207,7 +218,8 @@ export type BuildTask =
   | MeasureTask
   | ShapeTask
   | StoryTask
-  | BlankTask;
+  | BlankTask
+  | TraceTask;
 
 export type HandsTask = ClockTask | PayTask | BuildTask;
 
@@ -1310,13 +1322,51 @@ function makeBlankTask(level: string, rng: Rng, avoid?: string): BlankTask {
   );
 }
 
-export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: string): BuildTask {
+const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+function makeNumeralTrace(level: string, rng: Rng, avoid?: string): TraceTask {
+  return fresh(
+    avoid,
+    () => {
+      const glyph = rng.pick([...DIGITS]);
+      return {
+        kind: "trace" as const,
+        glyph,
+        form: "numeral" as const,
+        ...base("count", level, `num:${glyph}`, traceSpeech("numeral"), tracePraise()),
+      };
+    },
+    (task) => task.factKey,
+  );
+}
+
+function makeLetterTrace(level: string, rng: Rng, avoid?: string): TraceTask {
+  return fresh(
+    avoid,
+    () => {
+      const upper = rng.next() < 0.5;
+      const glyph = upper ? rng.pick(LETTERS) : rng.pick(LETTERS).toLowerCase();
+      const form = upper ? ("upper" as const) : ("lower" as const);
+      return {
+        kind: "trace" as const,
+        glyph,
+        form,
+        ...base("phonics", level, `let:${glyph}`, traceSpeech(form), tracePraise()),
+      };
+    },
+    (task) => task.factKey,
+  );
+}
+
+export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: string, kind?: BuildTask["kind"]): BuildTask {
   switch (game) {
     case "times":
       return makeArrayTask(level, rng, avoid);
     case "add":
       return makeFrameTask(level, rng, avoid);
     case "count":
+      if (level === "objects" && (kind === "trace" || (kind !== "count" && rng.next() < 0.55))) return makeNumeralTrace(level, rng, avoid);
       return makeCountTask(level, rng, avoid);
     case "place":
       return makeBlocksTask(level, rng, avoid);
@@ -1327,6 +1377,11 @@ export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: str
     case "sight":
       return makeSightTask(level, rng, avoid);
     case "phonics":
+      if (
+        (level === "letters" || level === "sounds" || level === "begin") &&
+        (kind === "trace" || (kind !== "phonics" && rng.next() < 0.55))
+      )
+        return makeLetterTrace(level, rng, avoid);
       return makePhonicsTask(level, rng, avoid);
     case "measure":
       return makeMeasureTask(level, rng, avoid);
@@ -1487,6 +1542,8 @@ export function handsExample(task: BuildTask): WorkedExample {
               : [task.a - task.b];
       return modeled([{ art: { type: "groups", sizes }, caption: task.praise.replace(/^(?:Yes!|¡Sí!)\s*/, "") }]);
     }
+    case "trace":
+      return modeled([{ art: { type: "word", text: task.glyph }, caption: task.praise }]);
     case "blank": {
       const groups =
         task.op === "×"

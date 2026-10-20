@@ -217,7 +217,8 @@ export const timesGame = {
   mascot: "peach",
   sheetSlug: "times-tables",
   sheetScreen: "sheet-times",
-  blurb: "Free printable multiplication practice for grades K–3. Random problems and an answer key. No signup.",
+  blurb:
+    "Free printable multiplication practice for Pre-K to grade 4. Facts, multi-digit problems, and an answer key. No signup.",
   sheetCount: 16,
   layout: "card",
   levels: [...LEVELS],

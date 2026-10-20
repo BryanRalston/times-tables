@@ -145,6 +145,8 @@ function handsStory(kind: Exclude<RoundSlot, { kind: "choice" }>["kind"], buddy:
       return es ? `${buddy} y ${host} actúan la historia.` : `${buddy} and ${host} act out the story.`;
     case "blank":
       return es ? `${buddy} y ${host} llenan la caja.` : `${buddy} and ${host} fill the box.`;
+    case "trace":
+      return es ? `${buddy} y ${host} trazan juntos.` : `${buddy} and ${host} trace together.`;
     default: {
       const neverKind: never = kind;
       return neverKind;

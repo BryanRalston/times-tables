@@ -76,8 +76,8 @@ function timesSheet(factor: number): StaticSheet {
   }
   return {
     slug: `multiplication-${factor}s`,
-    title: `Free Multiplication by ${factor}s Worksheet (K–3) | Squishee Academy`,
-    description: `Print a free ${factor}s times table for grades K–3. Ten problems, an answer key, and no signup.`,
+    title: `Free Multiplication by ${factor}s Worksheet (Pre-K–4) | Squishee Academy`,
+    description: `Print a free ${factor}s times table for Pre-K to grade 4. Ten problems, an answer key, and no signup.`,
     h1: `Multiplication by ${factor}s`,
     game: "times",
     items,
@@ -157,8 +157,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   timesSheet(10),
   {
     slug: "multiplication-mixed",
-    title: "Free Mixed Multiplication Worksheet (K–3) | Squishee Academy",
-    description: "Print a free mixed times table worksheet for grades K–3. Facts through the 9s, with an answer key. No signup.",
+    title: "Free Mixed Multiplication Worksheet (Pre-K–4) | Squishee Academy",
+    description: "Print a free mixed times table worksheet for Pre-K to grade 4. Facts through the 9s, with an answer key. No signup.",
     h1: "Mixed multiplication facts",
     game: "times",
     items: MIXED_PRODUCTS.map(([a, b]) => ({ prompt: `${a} × ${b} =`, answer: String(a * b) })),
@@ -166,7 +166,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   arithmeticSheet(
     {
       slug: "addition-within-10",
-      title: "Free Addition Within 10 Worksheet (K–3) | Squishee Academy",
+      title: "Free Addition Within 10 Worksheet (Pre-K–4) | Squishee Academy",
       description: "Print a free addition worksheet for sums within 10. Made for kindergarten and grade 1, with an answer key. No signup.",
       h1: "Addition within 10",
       game: "add",
@@ -187,8 +187,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   arithmeticSheet(
     {
       slug: "addition-within-20",
-      title: "Free Addition Within 20 Worksheet (K–3) | Squishee Academy",
-      description: "Print a free addition worksheet for sums within 20. Grades K–3, with an answer key. No signup.",
+      title: "Free Addition Within 20 Worksheet (Pre-K–4) | Squishee Academy",
+      description: "Print a free addition worksheet for sums within 20. Pre-K to grade 4, with an answer key. No signup.",
       h1: "Addition within 20",
       game: "add",
     },
@@ -208,8 +208,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   arithmeticSheet(
     {
       slug: "subtraction-within-10",
-      title: "Free Subtraction Within 10 Worksheet (K–3) | Squishee Academy",
-      description: "Print a free subtraction worksheet for facts within 10. Grades K–3, with an answer key. No signup.",
+      title: "Free Subtraction Within 10 Worksheet (Pre-K–4) | Squishee Academy",
+      description: "Print a free subtraction worksheet for facts within 10. Pre-K to grade 4, with an answer key. No signup.",
       h1: "Subtraction within 10",
       game: "add",
     },
@@ -229,8 +229,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   arithmeticSheet(
     {
       slug: "subtraction-within-20",
-      title: "Free Subtraction Within 20 Worksheet (K–3) | Squishee Academy",
-      description: "Print a free subtraction worksheet for facts within 20. Grades K–3, with an answer key. No signup.",
+      title: "Free Subtraction Within 20 Worksheet (Pre-K–4) | Squishee Academy",
+      description: "Print a free subtraction worksheet for facts within 20. Pre-K to grade 4, with an answer key. No signup.",
       h1: "Subtraction within 20",
       game: "add",
     },
@@ -250,8 +250,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   arithmeticSheet(
     {
       slug: "addition-and-subtraction",
-      title: "Free Addition and Subtraction Worksheet (K–3) | Squishee Academy",
-      description: "Print a free mixed addition and subtraction worksheet for grades K–3. An answer key is on the page. No signup.",
+      title: "Free Addition and Subtraction Worksheet (Pre-K–4) | Squishee Academy",
+      description: "Print a free mixed addition and subtraction worksheet for Pre-K to grade 4. An answer key is on the page. No signup.",
       h1: "Addition and subtraction",
       game: "add",
     },
@@ -271,8 +271,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   timeSheet(
     {
       slug: "telling-time-to-the-hour",
-      title: "Free Telling Time to the Hour Worksheet (K–3) | Squishee Academy",
-      description: "Print a free o'clock worksheet for grades K–3. Analog clocks and an answer key. No signup.",
+      title: "Free Telling Time to the Hour Worksheet (Pre-K–4) | Squishee Academy",
+      description: "Print a free o'clock worksheet for Pre-K to grade 4. Analog clocks and an answer key. No signup.",
       h1: "Telling time to the hour",
     },
     [
@@ -291,8 +291,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   timeSheet(
     {
       slug: "telling-time-half-hour",
-      title: "Free Half Hour Worksheet (K–3) | Squishee Academy",
-      description: "Print a free half-hour clock worksheet for grades K–3. Analog clocks and an answer key. No signup.",
+      title: "Free Half Hour Worksheet (Pre-K–4) | Squishee Academy",
+      description: "Print a free half-hour clock worksheet for Pre-K to grade 4. Analog clocks and an answer key. No signup.",
       h1: "Telling time to the half hour",
     },
     [
@@ -311,8 +311,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   timeSheet(
     {
       slug: "telling-time-quarter-hour",
-      title: "Free Quarter Hour Worksheet (K–3) | Squishee Academy",
-      description: "Print a free quarter-hour clock worksheet for grades K–3. :00, :15, :30, and :45, with an answer key. No signup.",
+      title: "Free Quarter Hour Worksheet (Pre-K–4) | Squishee Academy",
+      description: "Print a free quarter-hour clock worksheet for Pre-K to grade 4. :00, :15, :30, and :45, with an answer key. No signup.",
       h1: "Telling time to the quarter hour",
     },
     [
@@ -331,8 +331,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   timeSheet(
     {
       slug: "telling-time-five-minutes",
-      title: "Free Telling Time to Five Minutes Worksheet (K–3) | Squishee Academy",
-      description: "Print a free five-minute clock worksheet for grades K–3. Analog clocks and an answer key. No signup.",
+      title: "Free Telling Time to Five Minutes Worksheet (Pre-K–4) | Squishee Academy",
+      description: "Print a free five-minute clock worksheet for Pre-K to grade 4. Analog clocks and an answer key. No signup.",
       h1: "Telling time to five minutes",
     },
     [
@@ -353,8 +353,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   moneySheet(
     {
       slug: "counting-coins",
-      title: "Free Counting Coins Worksheet (K–3) | Squishee Academy",
-      description: "Print a free coin-counting worksheet for grades K–3. Pennies, nickels, dimes, and quarters, with an answer key. No signup.",
+      title: "Free Counting Coins Worksheet (Pre-K–4) | Squishee Academy",
+      description: "Print a free coin-counting worksheet for Pre-K to grade 4. Pennies, nickels, dimes, and quarters, with an answer key. No signup.",
       h1: "Counting coins",
     },
     [
@@ -373,8 +373,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   moneySheet(
     {
       slug: "counting-pennies-and-nickels",
-      title: "Free Pennies and Nickels Worksheet (K–3) | Squishee Academy",
-      description: "Print a free pennies and nickels worksheet for grades K–3. Count the coins and check the answer key. No signup.",
+      title: "Free Pennies and Nickels Worksheet (Pre-K–4) | Squishee Academy",
+      description: "Print a free pennies and nickels worksheet for Pre-K to grade 4. Count the coins and check the answer key. No signup.",
       h1: "Counting pennies and nickels",
     },
     [
@@ -393,8 +393,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   moneySheet(
     {
       slug: "counting-dimes-and-quarters",
-      title: "Free Dimes and Quarters Worksheet (K–3) | Squishee Academy",
-      description: "Print a free dimes and quarters worksheet for grades K–3. An answer key is on the page. No signup.",
+      title: "Free Dimes and Quarters Worksheet (Pre-K–4) | Squishee Academy",
+      description: "Print a free dimes and quarters worksheet for Pre-K to grade 4. An answer key is on the page. No signup.",
       h1: "Counting dimes and quarters",
     },
     [
@@ -413,8 +413,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   moneySheet(
     {
       slug: "making-change",
-      title: "Free Making Change Worksheet (K–3) | Squishee Academy",
-      description: "Print a free making-change worksheet for grades K–3. Pay with one dollar and find the change. Answer key included. No signup.",
+      title: "Free Making Change Worksheet (Pre-K–4) | Squishee Academy",
+      description: "Print a free making-change worksheet for Pre-K to grade 4. Pay with one dollar and find the change. Answer key included. No signup.",
       h1: "Making change from a dollar",
     },
     [65, 40, 25, 99, 30, 10, 80, 45, 15, 50].map(changeItem),
@@ -422,8 +422,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   moneySheet(
     {
       slug: "dollars-and-cents",
-      title: "Free Dollars and Cents Worksheet (K–3) | Squishee Academy",
-      description: "Print a free dollars and cents worksheet for grades 2–3. Bills and coins, with an answer key. No signup.",
+      title: "Free Dollars and Cents Worksheet (Pre-K–4) | Squishee Academy",
+      description: "Print a free dollars and cents worksheet for grades 2–4. Bills, coins, and money problems, with an answer key. No signup.",
       h1: "Dollars and cents",
     },
     [
@@ -441,8 +441,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   ),
   {
     slug: "counting-to-20",
-    title: "Free Counting to 20 Worksheet (K–3) | Squishee Academy",
-    description: "Print a free counting worksheet for kindergarten through grade 3. Count to 20, compare more and less, and find the number before and after. Answer key included. No signup.",
+    title: "Free Counting to 20 Worksheet (Pre-K–4) | Squishee Academy",
+    description: "Print a free counting worksheet for Pre-K through grade 4. Count to 20, compare more and less, and find the number before and after. Answer key included. No signup.",
     h1: "Counting to 20",
     game: "count",
     items: [
@@ -460,8 +460,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "place-value-blocks",
-    title: "Free Place Value Worksheet (Grades 1–3) | Squishee Academy",
-    description: "Print a free place value worksheet for grades 1–3. Tens and ones, expanded form, comparing numbers, and rounding. Answer key included. No signup.",
+    title: "Free Place Value Worksheet (Grades 1–4) | Squishee Academy",
+    description: "Print a free place value worksheet for grades 1–4. Tens and ones, expanded form, comparing numbers, rounding, and thousands. Answer key included. No signup.",
     h1: "Place value blocks",
     game: "place",
     items: [
@@ -479,8 +479,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "naming-shapes",
-    title: "Free Shapes Worksheet (K–3) | Squishee Academy",
-    description: "Print a free shapes worksheet for grades K–4. Name flat and solid shapes, count sides, tile a rectangle, and find lines of symmetry. Answer key included. No signup.",
+    title: "Free Shapes Worksheet (Pre-K–4) | Squishee Academy",
+    description: "Print a free shapes worksheet for Pre-K to grade 4. Name flat and solid shapes, count sides, tile a rectangle, and find lines of symmetry. Answer key included. No signup.",
     h1: "Naming shapes",
     game: "shapes",
     items: [
@@ -504,8 +504,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "fractions-of-a-whole",
-    title: "Free Fractions Worksheet (Grades 1–3) | Squishee Academy",
-    description: "Print a free fractions worksheet for grades 1–3. Parts of a whole, comparing fractions, and equivalent fractions. Answer key included. No signup.",
+    title: "Free Fractions Worksheet (Grades 1–4) | Squishee Academy",
+    description: "Print a free fractions worksheet for grades 1–4. Parts of a whole, comparing fractions, equivalent fractions, and decimals. Answer key included. No signup.",
     h1: "Fractions of a whole",
     game: "fractions",
     items: [
@@ -523,8 +523,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "measuring-length",
-    title: "Free Measurement Worksheet (K–3) | Squishee Academy",
-    description: "Print a free measurement worksheet for kindergarten through grade 3. Compare length, read a ruler, and read a graph. Answer key included. No signup.",
+    title: "Free Measurement Worksheet (Pre-K–4) | Squishee Academy",
+    description: "Print a free measurement worksheet for Pre-K through grade 4. Compare length, read a ruler, read a graph, and find area. Answer key included. No signup.",
     h1: "Measuring length",
     game: "measure",
     items: [
@@ -542,8 +542,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "phonics-beginning-sounds",
-    title: "Free Phonics Worksheet (K–3) | Squishee Academy",
-    description: "Print a free phonics worksheet for kindergarten through grade 3. Beginning sounds, rhymes, and CVC blending. Answer key included. No signup.",
+    title: "Free Phonics Worksheet (Pre-K–4) | Squishee Academy",
+    description: "Print a free phonics worksheet for Pre-K through grade 4. Beginning sounds, rhymes, and CVC blending. Answer key included. No signup.",
     h1: "Beginning sounds",
     game: "phonics",
     items: [
@@ -561,8 +561,8 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "addition-word-problems",
-    title: "Free Word Problems Worksheet (K–3) | Squishee Academy",
-    description: "Print a free word problem worksheet for kindergarten through grade 3. Add, subtract, multiply, and share stories with an answer key. No signup.",
+    title: "Free Word Problems Worksheet (Pre-K–4) | Squishee Academy",
+    description: "Print a free word problem worksheet for Pre-K through grade 4. Add, subtract, multiply, share, and two-step stories with an answer key. No signup.",
     h1: "Addition word problems",
     game: "problems",
     items: [

@@ -493,7 +493,7 @@ export const fractionsGame = sceneModule({
   sheetSlug: "fractions",
   sheetScreen: "sheet-fractions",
   blurb:
-    "Free fraction practice for grades 1–3. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, and equivalent fractions with pictures.",
+    "Free fraction practice for grades 1–4. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.",
   levels: [...LEVELS],
   defaultLevel,
   sheetDefaultLevel: "parts",

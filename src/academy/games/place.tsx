@@ -346,7 +346,7 @@ export const placeGame = sceneModule({
   sheetSlug: "place-value",
   sheetScreen: "sheet-place",
   blurb:
-    "Free place value practice for grades 1–3. Tens and ones with base-ten blocks, expanded form, comparing numbers, and rounding to the nearest 10 or 100.",
+    "Free place value practice for grades 1–4. Tens and ones with base-ten blocks, expanded form, comparing numbers, rounding, and thousands up to a million.",
   levels: [...LEVELS],
   defaultLevel,
   sheetDefaultLevel: "blocks",

@@ -37,7 +37,7 @@ Vite `base` is `/times-tables/`. GitHub Action builds `dist` on push to `main`. 
 
 ## Squishee Academy
 
-K–3 games (times tables, add & subtract, telling time, money). Canonical site:
+Pre-K to grade 4 games (times tables, add & subtract, telling time, money, and more). Canonical site:
 
 https://squisheeacademy.com/
 

@@ -249,7 +249,7 @@ export const timeGame = {
   sheetSlug: "telling-time",
   sheetScreen: "sheet-time",
   blurb:
-    "Free printable telling-time practice for grades K–3. Analog clocks to the hour, half hour, quarter hour, and 5 minutes, with an answer key.",
+    "Free printable telling-time practice for Pre-K to grade 4. Analog clocks to the hour, half hour, quarter hour, and 5 minutes, plus elapsed time, with an answer key.",
   sheetCount: 6,
   layout: "wide",
   levels: [...LEVELS],

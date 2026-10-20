@@ -329,6 +329,17 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
       }
       if (grade === "PK" || grade === "K" || grade === "1") expect(task.mode).toBe("addend");
       break;
+    case "trace":
+      expect(task.glyph.length).toBe(1);
+      if (task.form === "numeral") {
+        expect(level).toBe("objects");
+        expect(Number(task.glyph)).toBeGreaterThanOrEqual(0);
+        expect(Number(task.glyph)).toBeLessThanOrEqual(9);
+      } else {
+        expect(["letters", "sounds", "begin"]).toContain(level);
+        expect(task.glyph).toMatch(/^[A-Za-z]$/);
+      }
+      break;
     default: {
       const neverTask: never = task;
       throw new Error(String(neverTask));

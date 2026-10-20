@@ -1,5 +1,5 @@
 import type { Rng } from "@/lib/rng";
-import { howManyPhrase, longShortOf, t, thingName } from "../i18n";
+import { howManyMorePhrase, howManyPhrase, longShortOf, t, thingName } from "../i18n";
 import type { Grade } from "../model";
 import { buddyName, pickTalk } from "./flavor";
 import type { MeasureBoard, MeasureItem } from "./boards";
@@ -176,7 +176,7 @@ function makeMore(rng: Rng): ChoiceQ {
     game: "measure",
     title: t(
       `How many more ${pluralName(items[0]!.name)} than ${pluralName(items[1]!.name)}?`,
-      `¿Cuántos ${thingName(items[0]!.name, 2, pluralName(items[0]!.name))} más que ${thingName(items[1]!.name, 2, pluralName(items[1]!.name))}?`,
+      `¿${howManyMorePhrase(items[0]!.name, pluralName(items[0]!.name))} más que ${thingName(items[1]!.name, 2, pluralName(items[1]!.name))}?`,
     ),
     hint: t("Subtract the smaller number", "Resta el número más chico"),
     answer: String(answer),
@@ -334,7 +334,7 @@ export const measureGame = sceneModule({
   sheetSlug: "measurement",
   sheetScreen: "sheet-measure",
   blurb:
-    "Free measurement and data practice for kindergarten through grade 3. Compare longer and shorter, measure inches on a ruler, and read picture graphs and bar graphs.",
+    "Free measurement and data practice for Pre-K through grade 4. Compare longer and shorter, measure inches on a ruler, read picture graphs and bar graphs, and find area.",
   levels: [...LEVELS],
   defaultLevel,
   sheetDefaultLevel: "compare",

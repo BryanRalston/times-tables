@@ -308,6 +308,15 @@ export function gamePill(title: string, num: number): string {
   return t(`${title} · Level ${num}`, `${show(title)} · Nivel ${num}`);
 }
 
+/** "cuántos plátanos" or "cuántas zanahorias" in a how-many-more question. */
+export function howManyMorePhrase(name: string, englishPlural: string): string {
+  if (locale !== "es") return englishPlural;
+  const one = thingName(name, 1, name);
+  const word = thingName(name, 2, englishPlural);
+  const lead = FEMININE.has(one) ? "Cuántas" : "Cuántos";
+  return `${lead} ${word}`;
+}
+
 /** "bananas" / "cuántos plátanos" or "cuántas zanahorias". */
 export function howManyPhrase(name: string, n: number, englishPlural: string): string {
   if (locale !== "es") return englishPlural;

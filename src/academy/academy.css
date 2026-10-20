@@ -864,7 +864,76 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   white-space: nowrap;
   border: 0;
 }
+.ac-hello-lang {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+.ac-hello-lang .ac-grade { min-width: 118px; }
 .ac-hello-grades { justify-content: center; margin: 10px 0 14px; }
+.ac-trace {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: min(440px, 100%);
+}
+.ac-trace-stage {
+  position: relative;
+  width: min(360px, 92vw);
+  aspect-ratio: 1;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #fffdfb 0%, #fff4f8 100%);
+  box-shadow: inset 0 0 0 2px #f3d5e3, 0 12px 28px rgba(60, 36, 72, 0.06);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.ac-trace-guide,
+.ac-trace-ink {
+  position: absolute;
+  inset: 7%;
+  width: 86%;
+  height: 86%;
+  touch-action: none;
+}
+.ac-trace-guide { pointer-events: none; }
+.ac-trace-ink { pointer-events: none; }
+.ac-trace-path {
+  fill: none;
+  stroke: #efc6d8;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 0.2 7.4;
+}
+.ac-trace-path.is-on { stroke: #f09ab8; stroke-width: 8; }
+.ac-trace-path.is-done { stroke: #b7e6de; stroke-dasharray: none; stroke-width: 8; }
+.ac-trace.is-complete .ac-trace-path {
+  stroke: #12988a;
+  stroke-dasharray: none;
+  stroke-width: 8.5;
+  transition: stroke 280ms ease;
+}
+.ac-trace-dot { fill: #12988a; }
+.ac-trace-dot-core { fill: #fffdfb; }
+.ac-trace-ring {
+  fill: none;
+  stroke: #12988a;
+  stroke-width: 1.6;
+  animation: ac-trace-ring 1.8s ease-in-out infinite;
+}
+.ac-trace-arrow { fill: #0e7d72; }
+.ac-trace-again { min-height: 44px; }
+@keyframes ac-trace-ring {
+  0%, 100% { opacity: 0.28; }
+  50% { opacity: 0.85; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ac-trace-ring { animation: none; opacity: 0.55; }
+  .ac-trace.is-complete .ac-trace-path { transition: none; }
+}
 .ac-hello-grades .ac-grade {
   min-width: 58px;
   min-height: 64px;

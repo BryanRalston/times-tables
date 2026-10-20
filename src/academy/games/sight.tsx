@@ -269,7 +269,7 @@ export const sightGame = {
   sheetSlug: "sight-words",
   sheetScreen: "sheet-sight",
   blurb:
-    "Free Dolch and Fry sight word practice for grades K–3. Hear a word, match a picture, and fill a sentence. Trace the list, then check the answer key.",
+    "Free Dolch and Fry sight word practice for Pre-K to grade 4. Hear a word, match a picture, and fill a sentence. Trace the list, then check the answer key.",
   sheetCount: 12,
   layout: "card",
   levels: [...LEVELS],

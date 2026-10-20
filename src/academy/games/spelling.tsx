@@ -276,7 +276,7 @@ export const spellingGame = {
   sheetSlug: "spelling",
   sheetScreen: "sheet-spelling",
   blurb:
-    "Free spelling for grades K–3. Hear a word in a sentence, then build it from letter tiles. Lists move from CVC words to digraphs, blends, long vowels, and common grade 2 and 3 patterns.",
+    "Free spelling for Pre-K to grade 4. Hear a word in a sentence, then build it from letter tiles. Lists move from CVC words to digraphs, blends, long vowels, and grade 4 words.",
   sheetCount: 12,
   layout: "card",
   levels: [...LEVELS],

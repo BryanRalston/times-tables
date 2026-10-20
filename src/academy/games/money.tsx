@@ -412,7 +412,7 @@ export const moneyGame = {
   sheetSlug: "money",
   sheetScreen: "sheet-money",
   blurb:
-    "Free printable coin practice for grades K–3. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change within $1, and read dollars and cents.",
+    "Free printable coin practice for Pre-K to grade 4. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.",
   sheetCount: 12,
   layout: "card",
   levels: [...LEVELS],

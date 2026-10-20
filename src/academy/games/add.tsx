@@ -305,7 +305,8 @@ export const addGame = {
   mascot: "frog",
   sheetSlug: "add-subtract",
   sheetScreen: "sheet-add",
-  blurb: "Free printable addition and subtraction for grades K–3. Facts within 5, 10, 20, or 100, plus an answer key.",
+  blurb:
+    "Free printable addition and subtraction for Pre-K to grade 4. Facts within 5, 10, 20, 100, or the thousands, plus an answer key.",
   sheetCount: 16,
   layout: "card",
   levels: [...LEVELS],

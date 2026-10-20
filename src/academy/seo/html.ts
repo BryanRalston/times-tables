@@ -244,9 +244,9 @@ export function worksheetIndexHtml(): string {
     .map((slug) => `<a href="${slug}/">${slug}</a>`)
     .join(" · ");
   return documentPage({
-    title: "Free K–3 Math Worksheets | Squishee Academy",
+    title: "Free Pre-K to Grade 4 Math Worksheets | Squishee Academy",
     description:
-      "Free printable math worksheets for grades K–3. Times tables, addition, subtraction, telling time, and counting coins. Answer keys included. No signup.",
+      "Free printable math worksheets for Pre-K to grade 4. Times tables, addition, subtraction, elapsed time, counting coins, money problems, thousands, and area. Answer keys included. No signup.",
     path: "worksheets",
     depth: 1,
     body: `<h1>Free worksheets</h1>

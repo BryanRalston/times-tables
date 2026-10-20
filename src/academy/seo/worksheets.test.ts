@@ -418,8 +418,8 @@ describe("printable worksheets", () => {
     const index = worksheetIndexHtml();
     expectShareCard(
       index,
-      "Free K–3 Math Worksheets | Squishee Academy",
-      "Free printable math worksheets for grades K–3. Times tables, addition, subtraction, telling time, and counting coins. Answer keys included. No signup.",
+      "Free Pre-K to Grade 4 Math Worksheets | Squishee Academy",
+      "Free printable math worksheets for Pre-K to grade 4. Times tables, addition, subtraction, elapsed time, counting coins, money problems, thousands, and area. Answer keys included. No signup.",
       "https://squisheeacademy.com/worksheets/",
     );
     const privacy = privacyHtml();
@@ -439,8 +439,8 @@ describe("printable worksheets", () => {
     const practice = withOpenGraph(rewriteDomainSource(readFileSync("academy/worksheets/times-tables/index.html", "utf8")));
     expectShareCard(
       practice,
-      "Free Times Tables Worksheet (K–3) | Squishee Academy",
-      "Print a free times tables worksheet for grades K–3. Random multiplication problems and an answer key. No signup.",
+      "Free Times Tables Worksheet (Pre-K–4) | Squishee Academy",
+      "Print a free times tables worksheet for Pre-K to grade 4. Random multiplication problems and an answer key. No signup.",
       "https://squisheeacademy.com/worksheets/times-tables/",
     );
   });

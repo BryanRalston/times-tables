@@ -463,7 +463,7 @@ export const phonicsGame = sceneModule({
   sheetSlug: "phonics",
   sheetScreen: "sheet-phonics",
   blurb:
-    "Free phonics practice for kindergarten through grade 3. Letter sounds, beginning sounds with pictures, rhyming words, and CVC blending. A speaker reads the sound, with the sound written out when a voice is not available.",
+    "Free phonics practice for Pre-K through grade 4. Letter sounds, beginning sounds with pictures, rhyming words, and CVC blending. A speaker reads the sound, with the sound written out when a voice is not available.",
   levels: [...LEVELS],
   defaultLevel,
   sheetDefaultLevel: "sounds",

@@ -1,4 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { existsSync } from "node:fs";
+import { afterEach, describe, expect, it } from "vitest";
+import { setLocale } from "../i18n";
 import type { Child, RoundResult } from "../model";
 import { applyRound } from "../rewards";
 import { blankChild, parseSave, SAVE_VERSION } from "../storage";
@@ -27,6 +29,8 @@ function round(partial: Partial<RoundResult> = {}): RoundResult {
 }
 
 describe("squishee unlocks", () => {
+  afterEach(() => setLocale("en"));
+
   it("starts with three buddies and befriends an island host only after a boss win", () => {
     const fresh = child();
     expect(palOwned(fresh, "peach")).toBe(true);
@@ -131,6 +135,23 @@ describe("squishee unlocks", () => {
       expect(entry.fact.length).toBeLessThan(90);
       expect(entry.favorite.length).toBeGreaterThan(2);
     }
+  });
+
+  it("gives variables a study pal with a spoken line and existing art", () => {
+    expect(STUDY_PALS.variables).toBe("toast");
+    expect(findBlurb("toast").kind).toBe("study");
+    expect(findBlurb("toast").text).toContain("What is missing");
+    expect(catchphrase("toast")).toBe("Find the missing bite!");
+    setLocale("es");
+    expect(catchphrase("toast")).toBe("¡Busca el bocado!");
+    setLocale("en");
+    expect(existsSync("public/squishees/toast.png")).toBe(true);
+    expect(existsSync("public/squishees/toast-cheer-strip.png")).toBe(true);
+    expect(existsSync("public/cosmetics/toast-bow.png")).toBe(true);
+    let row = child();
+    expect(palOwned(row, "toast")).toBe(false);
+    row = applyRound(row, round({ game: "variables", correct: 10, total: 10 }), "2026-10-09");
+    expect(palOwned(row, "toast")).toBe(true);
   });
 
   it("grows a friendship from practice and befriends a study pal after 3 stars", () => {
