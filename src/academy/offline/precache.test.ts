@@ -100,7 +100,7 @@ describe("offline precache", () => {
     expect(domainSw).toContain(`const SHARE_IMAGE = ${JSON.stringify(SHARE_IMAGE_PATH)}`);
     expect(domainSw).toContain("if (url.pathname === SHARE_IMAGE) return;");
     expect(domainSw).toContain('caches.match("/index.html")');
-    expect(domainSw).toContain('const CACHE = "squishee-academy-root-v6"');
+    expect(domainSw).toContain('const CACHE = "squishee-academy-root-v7"');
   });
 
   it("precaches Spanish clips for an Add, Times, and Telling Time round", () => {

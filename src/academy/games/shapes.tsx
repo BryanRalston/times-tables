@@ -1,7 +1,7 @@
 import type { Rng } from "@/lib/rng";
 import { partPhrase, shapeWithArticle, shapeWord, t } from "../i18n";
-import type { Grade } from "../model";
 import { buddyName, pickTalk } from "./flavor";
+import { shapesCard } from "./cards";
 import { sideCount, symmetryAnswer, type ShapeBoard, type ShapeName } from "./boards";
 import { nearChoices, sceneQuestion, uniqueChoices } from "./pick";
 import { makeAngleQuestion, makeColorQuestion, makeMatchQuestion, makePatternQuestion, spanSheet } from "./span";
@@ -32,50 +32,6 @@ export const SHAPE_LEVELS = [
 ] as const;
 export type ShapeLevel = (typeof SHAPE_LEVELS)[number];
 
-const LEVELS = [
-  { id: "color", label: "Colors", num: 1 },
-  { id: "match", label: "Matching", num: 2 },
-  { id: "pattern", label: "Patterns", num: 3 },
-  { id: "flat", label: "Flat shapes", num: 4 },
-  { id: "solid", label: "Solid shapes", num: 5 },
-  { id: "position", label: "Position", num: 6 },
-  { id: "sort", label: "Flat or solid", num: 7 },
-  { id: "traits", label: "What matters", num: 8 },
-  { id: "compose", label: "Join shapes", num: 9 },
-  { id: "sides", label: "Sides and corners", num: 10 },
-  { id: "faces", label: "Faces", num: 11 },
-  { id: "rows", label: "Rows of squares", num: 12 },
-  { id: "symmetry", label: "Symmetry", num: 13 },
-  { id: "quads", label: "Quadrilaterals", num: 14 },
-  { id: "share", label: "Unit fractions", num: 15 },
-  { id: "parts", label: "Halves, thirds, fourths", num: 16 },
-  { id: "cover", label: "Cover the rectangle", num: 17 },
-  { id: "fold", label: "Line of symmetry", num: 18 },
-  { id: "angles", label: "Angles", num: 19 },
-] as const;
-
-const BARS = [
-  { key: "shapes:color", label: "Colors" },
-  { key: "shapes:match", label: "Matching" },
-  { key: "shapes:pattern", label: "Patterns" },
-  { key: "shapes:flat", label: "Flat shapes" },
-  { key: "shapes:solid", label: "Solid shapes" },
-  { key: "shapes:position", label: "Position" },
-  { key: "shapes:sort", label: "Flat or solid" },
-  { key: "shapes:traits", label: "What matters" },
-  { key: "shapes:compose", label: "Join shapes" },
-  { key: "shapes:sides", label: "Sides and corners" },
-  { key: "shapes:faces", label: "Faces" },
-  { key: "shapes:rows", label: "Rows of squares" },
-  { key: "shapes:symmetry", label: "Symmetry" },
-  { key: "shapes:quads", label: "Quadrilaterals" },
-  { key: "shapes:share", label: "Unit fractions" },
-  { key: "shapes:parts", label: "Equal parts" },
-  { key: "shapes:cover", label: "Cover the rectangle" },
-  { key: "shapes:fold", label: "Line of symmetry" },
-  { key: "shapes:angles", label: "Angles" },
-];
-
 const FLAT: ShapeName[] = ["circle", "triangle", "square", "rectangle"];
 const SOLID: ShapeName[] = ["cube", "sphere", "cone", "cylinder"];
 const POLYGONS: ShapeName[] = ["triangle", "square", "rectangle", "pentagon", "hexagon"];
@@ -88,27 +44,6 @@ const PARTS = [
 
 export function isShapeLevel(value: unknown): value is ShapeLevel {
   return typeof value === "string" && (SHAPE_LEVELS as readonly string[]).includes(value);
-}
-
-function defaultLevel(grade: Grade): ShapeLevel {
-  switch (grade) {
-    case "PK":
-      return "color";
-    case "K":
-      return "flat";
-    case "1":
-      return "traits";
-    case "2":
-      return "faces";
-    case "3":
-      return "quads";
-    case "4":
-      return "angles";
-    default: {
-      const neverGrade: never = grade;
-      return neverGrade;
-    }
-  }
 }
 
 function nameQuestion(rng: Rng, shape: ShapeName, pool: ShapeName[], level: "flat" | "solid"): ChoiceQ {
@@ -428,22 +363,8 @@ function ShapeArt({ board }: { board: ShapeBoard }) {
 }
 
 export const shapesGame = sceneModule({
-  id: "shapes",
-  title: "Shapes",
+  ...shapesCard,
   short: "Shapes",
-  audience: "Pre-K–4",
-  tint: "berry",
-  mascot: "cat",
-  sheetSlug: "shapes",
-  sheetScreen: "sheet-shapes",
-  blurb:
-    "Free geometry for Pre-K to grade 4. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.",
-  levels: [...LEVELS],
-  defaultLevel,
-  sheetDefaultLevel: "flat",
-  isLevel: isShapeLevel,
-  bars: BARS,
-  chips: BARS,
   makeQuestion: (rng, level) => makeShapeQuestion(rng, isShapeLevel(level) ? level : "flat"),
   makeSheetItem: sheetItem,
   Prompt: ShapesPrompt,

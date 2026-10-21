@@ -1,7 +1,7 @@
 import { show } from "../i18n";
 import type { Child } from "../model";
 import { BOND_REWARDS, STUDY_REWARDS } from "../wardrobe";
-import { GAMES } from "../games/registry";
+import { GAME_CARDS as GAMES } from "../games/catalog";
 
 /** A few practice rounds, not a long grind. */
 export const BOND_FRIEND = 3;

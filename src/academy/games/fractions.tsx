@@ -1,7 +1,7 @@
 import type { Rng } from "@/lib/rng";
 import { t } from "../i18n";
-import type { Grade } from "../model";
 import { buddyName, pickTalk } from "./flavor";
+import { fractionsCard } from "./cards";
 import { fractionText, type FractionBoard } from "./boards";
 import { sceneQuestion, uniqueChoices } from "./pick";
 import { makeAddLikeQuestion, makeDecimalQuestion, spanSheet } from "./span";
@@ -10,28 +10,6 @@ import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
 export const FRACTION_LEVELS = ["parts", "unit", "line", "compare", "equivalent", "shade", "addLike", "decimals"] as const;
 export type FractionLevel = (typeof FRACTION_LEVELS)[number];
-
-const LEVELS = [
-  { id: "parts", label: "Parts of a whole", num: 1 },
-  { id: "unit", label: "Unit fractions", num: 2 },
-  { id: "line", label: "Number line", num: 3 },
-  { id: "compare", label: "Compare fractions", num: 4 },
-  { id: "equivalent", label: "Equivalent fractions", num: 5 },
-  { id: "shade", label: "Shade a fraction", num: 6 },
-  { id: "addLike", label: "Add like fractions", num: 7 },
-  { id: "decimals", label: "Decimals", num: 8 },
-] as const;
-
-const BARS = [
-  { key: "fractions:parts", label: "Parts of a whole" },
-  { key: "fractions:unit", label: "Unit fractions" },
-  { key: "fractions:line", label: "Fractions on a line" },
-  { key: "fractions:compare", label: "Compare fractions" },
-  { key: "fractions:equivalent", label: "Equivalent fractions" },
-  { key: "fractions:shade", label: "Shade a fraction" },
-  { key: "fractions:addLike", label: "Add like fractions" },
-  { key: "fractions:decimals", label: "Decimals" },
-];
 
 const PAIRS: Array<[number, number, number, number]> = [
   [1, 2, 2, 4],
@@ -50,25 +28,6 @@ const PAIRS: Array<[number, number, number, number]> = [
 
 export function isFractionLevel(value: unknown): value is FractionLevel {
   return typeof value === "string" && (FRACTION_LEVELS as readonly string[]).includes(value);
-}
-
-function defaultLevel(grade: Grade): FractionLevel {
-  switch (grade) {
-    case "PK":
-    case "K":
-    case "1":
-      return "parts";
-    case "2":
-      return "line";
-    case "3":
-      return "equivalent";
-    case "4":
-      return "addLike";
-    default: {
-      const neverGrade: never = grade;
-      return neverGrade;
-    }
-  }
 }
 
 const HALF_FOURTHS = ["1/2", "2/2", "1/4", "2/4", "3/4", "4/4"];
@@ -484,22 +443,8 @@ function FractionArt({ board }: { board: FractionBoard }) {
 }
 
 export const fractionsGame = sceneModule({
-  id: "fractions",
-  title: "Fractions",
+  ...fractionsCard,
   short: "Fractions",
-  audience: "1–4",
-  tint: "sand",
-  mascot: "panda",
-  sheetSlug: "fractions",
-  sheetScreen: "sheet-fractions",
-  blurb:
-    "Free fraction practice for grades 1–4. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.",
-  levels: [...LEVELS],
-  defaultLevel,
-  sheetDefaultLevel: "parts",
-  isLevel: isFractionLevel,
-  bars: BARS,
-  chips: BARS,
   makeQuestion: (rng, level) => makeFractionQuestion(rng, isFractionLevel(level) ? level : "parts"),
   makeSheetItem: sheetItem,
   Prompt: FractionsPrompt,

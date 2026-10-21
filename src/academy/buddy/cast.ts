@@ -1,6 +1,6 @@
 import { squisheeById } from "@/lib/squishees";
 import { show, t } from "../i18n";
-import { GAMES } from "../games/registry";
+import { GAME_CARDS as GAMES } from "../games/catalog";
 import { SQUAD_IDS } from "../model";
 import { starsNeeded } from "../rewards";
 import { EGG_IDS } from "./egg";

@@ -1,7 +1,7 @@
 import type { Rng } from "@/lib/rng";
 import { howManyMorePhrase, howManyPhrase, longShortOf, t, thingName } from "../i18n";
-import type { Grade } from "../model";
 import { buddyName, pickTalk } from "./flavor";
+import { measureCard } from "./cards";
 import type { MeasureBoard, MeasureItem } from "./boards";
 import { distinctInts, nearChoices, sceneQuestion, uniqueChoices } from "./pick";
 import { makeAreaQuestion, makeSizeQuestion, spanSheet } from "./span";
@@ -10,28 +10,6 @@ import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
 export const MEASURE_LEVELS = ["size", "compare", "picture", "bar", "ruler", "more", "area", "perimeter"] as const;
 export type MeasureLevel = (typeof MEASURE_LEVELS)[number];
-
-const LEVELS = [
-  { id: "size", label: "Bigger and smaller", num: 1 },
-  { id: "compare", label: "Longer or shorter", num: 2 },
-  { id: "picture", label: "Picture graph", num: 3 },
-  { id: "bar", label: "Bar graph", num: 4 },
-  { id: "ruler", label: "Measure with a ruler", num: 5 },
-  { id: "more", label: "How many more", num: 6 },
-  { id: "area", label: "Area", num: 7 },
-  { id: "perimeter", label: "Perimeter", num: 8 },
-] as const;
-
-const BARS = [
-  { key: "measure:size", label: "Bigger and smaller" },
-  { key: "measure:compare", label: "Longer or shorter" },
-  { key: "measure:ruler", label: "Measure with a ruler" },
-  { key: "measure:picture", label: "Picture graph" },
-  { key: "measure:bar", label: "Bar graph" },
-  { key: "measure:more", label: "How many more" },
-  { key: "measure:area", label: "Area" },
-  { key: "measure:perimeter", label: "Perimeter" },
-];
 
 const THINGS = [
   { name: "banana", emoji: "🍌" },
@@ -50,27 +28,6 @@ function pluralName(name: string): string {
 
 export function isMeasureLevel(value: unknown): value is MeasureLevel {
   return typeof value === "string" && (MEASURE_LEVELS as readonly string[]).includes(value);
-}
-
-function defaultLevel(grade: Grade): MeasureLevel {
-  switch (grade) {
-    case "PK":
-      return "size";
-    case "K":
-      return "compare";
-    case "1":
-      return "picture";
-    case "2":
-      return "ruler";
-    case "3":
-      return "bar";
-    case "4":
-      return "area";
-    default: {
-      const neverGrade: never = grade;
-      return neverGrade;
-    }
-  }
 }
 
 function namedItems(rng: Rng, count: number, values: number[]): MeasureItem[] {
@@ -325,22 +282,8 @@ function MeasureArt({ board }: { board: MeasureBoard }) {
 }
 
 export const measureGame = sceneModule({
-  id: "measure",
-  title: "Measurement",
+  ...measureCard,
   short: "Measurement",
-  audience: "Pre-K–4",
-  tint: "aqua",
-  mascot: "penguin",
-  sheetSlug: "measurement",
-  sheetScreen: "sheet-measure",
-  blurb:
-    "Free measurement and data practice for Pre-K through grade 4. Compare longer and shorter, measure inches on a ruler, read picture graphs and bar graphs, and find area.",
-  levels: [...LEVELS],
-  defaultLevel,
-  sheetDefaultLevel: "compare",
-  isLevel: isMeasureLevel,
-  bars: BARS,
-  chips: BARS,
   makeQuestion: (rng, level) => makeMeasureQuestion(rng, isMeasureLevel(level) ? level : "compare"),
   makeSheetItem: sheetItem,
   Prompt: MeasurePrompt,

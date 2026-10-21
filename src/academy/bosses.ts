@@ -1,4 +1,4 @@
-import { gameById } from "./games/registry";
+import { gameCard as gameById } from "./games/catalog";
 import { getLocale, show, t } from "./i18n";
 import { BOSS_ES } from "./i18n-es";
 

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { rngFromSeed } from "@/lib/rng";
 import { gameById } from "../games/registry";
 import { setLocale, show, t } from "../i18n";
-import { makeSheet } from "../questions";
+import { makeSheet } from "../games/round";
 import { loadSave } from "../storage";
 
 export function WorksheetPage({ game: gameId }: { game: string }) {

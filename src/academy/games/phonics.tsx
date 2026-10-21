@@ -1,7 +1,7 @@
 import type { Rng } from "@/lib/rng";
 import { t } from "../i18n";
-import type { Grade } from "../model";
 import { buddyName, pickTalk } from "./flavor";
+import { phonicsCard } from "./cards";
 import type { PhonicsBoard } from "./boards";
 import { sceneQuestion, uniqueChoices } from "./pick";
 import { makeLetterQuestion, spanSheet } from "./span";
@@ -11,24 +11,6 @@ import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
 export const PHONICS_LEVELS = ["letters", "sounds", "begin", "rhyme", "cvc", "end"] as const;
 export type PhonicsLevel = (typeof PHONICS_LEVELS)[number];
-
-const LEVELS = [
-  { id: "letters", label: "Letter names", num: 1 },
-  { id: "sounds", label: "Letter sounds", num: 2 },
-  { id: "begin", label: "Beginning sounds", num: 3 },
-  { id: "rhyme", label: "Rhyming words", num: 4 },
-  { id: "cvc", label: "CVC blending", num: 5 },
-  { id: "end", label: "Ending sounds", num: 6 },
-] as const;
-
-const BARS = [
-  { key: "phonics:letters", label: "Letter names" },
-  { key: "phonics:sounds", label: "Letter sounds" },
-  { key: "phonics:begin", label: "Beginning sounds" },
-  { key: "phonics:rhyme", label: "Rhyming words" },
-  { key: "phonics:cvc", label: "CVC blending" },
-  { key: "phonics:end", label: "Ending sounds" },
-];
 
 export const SOUND_BANK = [
   { letter: "M", phoneme: "mmm", word: "moon", emoji: "🌙" },
@@ -104,27 +86,6 @@ type SoundRow = (typeof SOUND_BANK)[number];
 
 export function isPhonicsLevel(value: unknown): value is PhonicsLevel {
   return typeof value === "string" && (PHONICS_LEVELS as readonly string[]).includes(value);
-}
-
-function defaultLevel(grade: Grade): PhonicsLevel {
-  switch (grade) {
-    case "PK":
-      return "letters";
-    case "K":
-      return "sounds";
-    case "1":
-      return "begin";
-    case "2":
-      return "cvc";
-    case "3":
-      return "cvc";
-    case "4":
-      return "end";
-    default: {
-      const neverGrade: never = grade;
-      return neverGrade;
-    }
-  }
 }
 
 function pickSounds(rng: Rng, count: number): SoundRow[] {
@@ -454,22 +415,8 @@ function PhonicsArt({ board }: { board: PhonicsBoard }) {
 }
 
 export const phonicsGame = sceneModule({
-  id: "phonics",
-  title: "Phonics",
+  ...phonicsCard,
   short: "Phonics",
-  audience: "Pre-K–4",
-  tint: "lilac",
-  mascot: "bunny",
-  sheetSlug: "phonics",
-  sheetScreen: "sheet-phonics",
-  blurb:
-    "Free phonics practice for Pre-K through grade 4. Letter sounds, beginning sounds with pictures, rhyming words, and CVC blending. A speaker reads the sound, with the sound written out when a voice is not available.",
-  levels: [...LEVELS],
-  defaultLevel,
-  sheetDefaultLevel: "sounds",
-  isLevel: isPhonicsLevel,
-  bars: BARS,
-  chips: BARS,
   makeQuestion: (rng, level) => makePhonicsQuestion(rng, isPhonicsLevel(level) ? level : "sounds"),
   makeSheetItem: sheetItem,
   Prompt: PhonicsPrompt,

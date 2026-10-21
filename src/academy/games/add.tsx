@@ -1,8 +1,7 @@
 import type { Rng } from "@/lib/rng";
-import { gamePill, t } from "../i18n";
+import { t } from "../i18n";
 import { pickTalk } from "./flavor";
-import { bandFor } from "../grade-map";
-import type { Grade } from "../model";
+import { addCard } from "./cards";
 import { DotModel, Equation, SquisheeImg, cx } from "../ui/bits";
 import { fourChoices, qid } from "./choices";
 import { makeBigAddQuestion, spanSheet } from "./span";
@@ -21,61 +20,8 @@ export const ADD_MAX: Record<AddLevel, number> = {
   thousands: 9999,
 };
 
-const LEVELS = [
-  { id: "within5", label: "Within 5", num: 1 },
-  { id: "within10", label: "Within 10", num: 2 },
-  { id: "within20", label: "Within 20", num: 3 },
-  { id: "tens", label: "Tens and ones", num: 4 },
-  { id: "within100", label: "Within 100", num: 5 },
-  { id: "within1000", label: "Within 1000", num: 6 },
-  { id: "thousands", label: "Thousands", num: 7 },
-] as const;
-
-const BARS = [
-  { key: "add:within5", label: "Add within 5" },
-  { key: "add:within10", label: "Add within 10" },
-  { key: "add:within20", label: "Add within 20" },
-  { key: "add:tens", label: "Tens and ones" },
-  { key: "add:within100", label: "Add within 100" },
-  { key: "add:within1000", label: "Add within 1000" },
-  { key: "add:thousands", label: "Add thousands" },
-];
-
-const CHIPS = [
-  { key: "doubles", label: "Doubles" },
-  { key: "make10", label: "Make 10" },
-  { key: "add:within5", label: "Within 5" },
-  { key: "add:within10", label: "Within 10" },
-  { key: "add:within20", label: "Within 20" },
-  { key: "add:tens", label: "Tens and ones" },
-  { key: "add:within100", label: "Within 100" },
-];
-
 export function isAddLevel(v: unknown): v is AddLevel {
   return typeof v === "string" && (ADD_LEVELS as readonly string[]).includes(v);
-}
-
-function defaultLevel(grade: Grade): AddLevel {
-  const start = bandFor("add", grade)?.start;
-  if (isAddLevel(start)) return start;
-  switch (grade) {
-    case "PK":
-      return "within5";
-    case "K":
-      return "within5";
-    case "1":
-      return "within10";
-    case "2":
-      return "within20";
-    case "3":
-      return "within100";
-    case "4":
-      return "within1000";
-    default: {
-      const neverGrade: never = grade;
-      return neverGrade;
-    }
-  }
 }
 
 /** Two-digit plus a one-digit or a multiple of 10. Sums stay within 100. */
@@ -271,10 +217,6 @@ function sheetItem(rng: Rng, level: string): SheetItem {
   return { prompt: `${a} + ${b} =`, answer: String(sum) };
 }
 
-function labelFor(rows: { key: string; label: string }[], key: string): string | null {
-  return rows.find((row) => row.key === key)?.label ?? null;
-}
-
 export function AddPrompt({ question, reveal, mascot, happy }: { question: ChoiceQ; reveal: boolean; mascot: string; happy: boolean }) {
   return (
     <section className="ac-qcard">
@@ -298,28 +240,9 @@ export function AddSheet({ items }: { items: SheetItem[] }) {
 }
 
 export const addGame = {
-  id: "add",
-  title: "Add & Subtract",
-  audience: "K–4",
-  tint: "mint",
-  mascot: "frog",
-  sheetSlug: "add-subtract",
-  sheetScreen: "sheet-add",
-  blurb:
-    "Free printable addition and subtraction for Pre-K to grade 4. Facts within 5, 10, 20, 100, or the thousands, plus an answer key.",
-  sheetCount: 16,
-  layout: "card",
-  levels: [...LEVELS],
-  defaultLevel,
-  sheetDefaultLevel: "within20",
-  isLevel: isAddLevel,
-  pill: (level) => gamePill("Add & Subtract", level.num),
+  ...addCard,
   makeQuestion: (rng, level) => makeAddQuestion(rng, isAddLevel(level) ? level : "within5"),
   makeSheetItem: sheetItem,
   Prompt: AddPrompt,
   SheetBody: AddSheet,
-  bars: BARS,
-  chips: CHIPS,
-  skillLabel: (key) => labelFor(BARS, key) ?? labelFor(CHIPS, key),
-  chipLabel: (key) => labelFor(CHIPS, key),
 } satisfies GameModule;

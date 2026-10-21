@@ -1,11 +1,10 @@
 import { parseTimesKey, timesKey } from "@/lib/practice";
 import { makeFluencyItem } from "@/lib/questions";
 import type { Rng } from "@/lib/rng";
-import { gamePill, t } from "../i18n";
+import { t } from "../i18n";
 import { buddyName, pickTalk } from "./flavor";
 import type { FluencyData, Question } from "@/lib/types";
-import { bandFor } from "../grade-map";
-import type { Grade } from "../model";
+import { timesCard } from "./cards";
 import { makeDivideQuestion, makeFactorQuestion, makeMultiQuestion, spanSheet } from "./span";
 import { Equation, Groups, SquisheeImg, cx } from "../ui/bits";
 import { fourChoices, qid } from "./choices";
@@ -27,43 +26,8 @@ export const TIMES_SPEC: Record<TimesLevel, { factors: number[]; max: number }> 
 /** 6, 7, 8, and 9 are grade 3 facts (3.OA). Earlier levels may still use 10. */
 const LATER_FACTORS = [6, 7, 8, 9];
 
-const LEVELS = [
-  { id: "count", label: "2s, 5s, 10s · small", num: 1 },
-  { id: "twos", label: "2s, 5s, 10s", num: 2 },
-  { id: "mix", label: "Mix through 5s", num: 3 },
-  { id: "toTen", label: "Up to 10s", num: 4 },
-  { id: "factors", label: "Factors and multiples", num: 5 },
-  { id: "multi", label: "Multi-digit multiply", num: 6 },
-  { id: "divide", label: "Division with remainders", num: 7 },
-] as const;
-
-const BARS = ["2", "5", "10", "3", "4", "6", "7", "8", "9"].map((n) => ({ key: `table:${n}`, label: `×${n}` }));
-const CHIPS = ["2", "3", "4", "5", "6", "7", "8", "9", "10"].map((n) => ({ key: `table:${n}`, label: `×${n}` }));
-
 export function isTimesLevel(v: unknown): v is TimesLevel {
   return typeof v === "string" && (TIMES_LEVELS as readonly string[]).includes(v);
-}
-
-function defaultLevel(grade: Grade): TimesLevel {
-  const start = bandFor("times", grade)?.start;
-  if (isTimesLevel(start)) return start;
-  switch (grade) {
-    case "PK":
-    case "K":
-      return "count";
-    case "1":
-      return "count";
-    case "2":
-      return "twos";
-    case "3":
-      return "toTen";
-    case "4":
-      return "factors";
-    default: {
-      const neverGrade: never = grade;
-      return neverGrade;
-    }
-  }
 }
 
 function fluencyTimes(q: Question): { a: number; b: number } | null {
@@ -182,11 +146,6 @@ function sheetItem(rng: Rng, level: string, focus?: number): SheetItem {
   return { prompt: `${fact.a} ${TIMES} ${fact.b} =`, answer: String(fact.a * fact.b) };
 }
 
-function labelFor(key: string): string | null {
-  const row = BARS.find((bar) => bar.key === key) ?? CHIPS.find((chip) => chip.key === key);
-  return row?.label ?? null;
-}
-
 export function TimesPrompt({ question, reveal, mascot, happy }: { question: ChoiceQ; reveal: boolean; mascot: string; happy: boolean }) {
   return (
     <section className="ac-qcard">
@@ -210,41 +169,9 @@ export function TimesSheet({ items }: { items: SheetItem[] }) {
 }
 
 export const timesGame = {
-  id: "times",
-  title: "Times Tables",
-  audience: "Grade 2–4",
-  tint: "pink",
-  mascot: "peach",
-  sheetSlug: "times-tables",
-  sheetScreen: "sheet-times",
-  blurb:
-    "Free printable multiplication practice for Pre-K to grade 4. Facts, multi-digit problems, and an answer key. No signup.",
-  sheetCount: 16,
-  layout: "card",
-  levels: [...LEVELS],
-  defaultLevel,
-  sheetDefaultLevel: "toTen",
-  isLevel: isTimesLevel,
-  pill: (level) => gamePill("Times Tables", level.num),
+  ...timesCard,
   makeQuestion: (rng, level, prefer) => makeTimesQuestion(rng, isTimesLevel(level) ? level : "count", prefer),
   makeSheetItem: sheetItem,
   Prompt: TimesPrompt,
   SheetBody: TimesSheet,
-  focus: {
-    param: "factor",
-    label: "Table",
-    blank: "Mix",
-    options: Array.from({ length: 9 }, (_, i) => {
-      const n = i + 2;
-      return { value: String(n), label: `×${n}` };
-    }),
-    read: (raw: string | null) => {
-      const n = Number(raw);
-      return Number.isInteger(n) && n >= 2 && n <= 12 ? n : undefined;
-    },
-  },
-  bars: BARS,
-  chips: CHIPS,
-  skillLabel: labelFor,
-  chipLabel: () => null,
 } satisfies GameModule;

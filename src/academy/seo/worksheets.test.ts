@@ -439,8 +439,8 @@ describe("printable worksheets", () => {
     const practice = withOpenGraph(rewriteDomainSource(readFileSync("academy/worksheets/times-tables/index.html", "utf8")));
     expectShareCard(
       practice,
-      "Free Times Tables Worksheet (Pre-K–4) | Squishee Academy",
-      "Print a free times tables worksheet for Pre-K to grade 4. Random multiplication problems and an answer key. No signup.",
+      "Free Times Tables Worksheet (Grades 2–4) | Squishee Academy",
+      "Print a free times tables worksheet for grades 2–4. Random multiplication problems and an answer key. No signup.",
       "https://squisheeacademy.com/worksheets/times-tables/",
     );
   });

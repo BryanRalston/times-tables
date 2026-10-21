@@ -1,9 +1,8 @@
 import { formatClockTime } from "@/lib/clock";
 import type { Rng } from "@/lib/rng";
-import { getLocale, show, t } from "../i18n";
+import { getLocale, t } from "../i18n";
 import { buddyName, pickTalk } from "./flavor";
-import { bandFor } from "../grade-map";
-import type { Grade } from "../model";
+import { timeCard } from "./cards";
 import { AnalogClock, SquisheeImg, cx } from "../ui/bits";
 import { qid } from "./choices";
 import { makeElapsedQuestion } from "./span";
@@ -20,58 +19,8 @@ export const TIME_MINUTES: Record<TimeLevel, readonly number[]> = {
   elapsed: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55],
 };
 
-const LEVELS = [
-  { id: "hour", label: "Hours", num: 1 },
-  { id: "half", label: "Half hours", num: 2 },
-  { id: "quarter", label: "Quarter hours", num: 3 },
-  { id: "fives", label: "5 minutes", num: 4 },
-  { id: "elapsed", label: "Elapsed time", num: 5 },
-] as const;
-
-const BARS = [
-  { key: "time:hour", label: "Time: hours" },
-  { key: "time:half", label: "Time: half hour" },
-  { key: "time:quarter", label: "Time: quarter hour" },
-  { key: "time:fives", label: "Time: 5 minutes" },
-  { key: "time:elapsed", label: "Elapsed time" },
-];
-
-const CHIPS = [
-  { key: "oclock", label: "O'clock" },
-  { key: "halfpast", label: "Half past" },
-  { key: "quarterpast", label: "Quarter past" },
-  { key: "quarterto", label: "Quarter to" },
-  { key: "time:hour", label: "Hours" },
-  { key: "time:half", label: "Half hours" },
-  { key: "time:quarter", label: "Quarter hours" },
-  { key: "time:fives", label: "5 minutes" },
-];
-
 export function isTimeLevel(v: unknown): v is TimeLevel {
   return typeof v === "string" && (TIME_LEVELS as readonly string[]).includes(v);
-}
-
-function defaultLevel(grade: Grade): TimeLevel {
-  const start = bandFor("time", grade)?.start;
-  if (isTimeLevel(start)) return start;
-  switch (grade) {
-    case "K":
-      return "hour";
-    case "1":
-      return "half";
-    case "2":
-      return "quarter";
-    case "3":
-      return "fives";
-    case "PK":
-      return "hour";
-    case "4":
-      return "elapsed";
-    default: {
-      const neverGrade: never = grade;
-      return neverGrade;
-    }
-  }
 }
 
 function capPhrase(phrase: string): string {
@@ -204,10 +153,6 @@ function sheetItem(rng: Rng, level: string): SheetItem {
   };
 }
 
-function labelFor(rows: { key: string; label: string }[], key: string): string | null {
-  return rows.find((row) => row.key === key)?.label ?? null;
-}
-
 export function TimeAside({ question }: { question: ChoiceQ }) {
   if (question.visual.kind !== "time") return null;
   return <AnalogClock hours={question.visual.hours} minutes={question.visual.minutes} />;
@@ -241,29 +186,10 @@ export function TimeSheet({ items }: { items: SheetItem[] }) {
 }
 
 export const timeGame = {
-  id: "time",
-  title: "Telling Time",
-  audience: "Grade 1–4",
-  tint: "sun",
-  mascot: "melon",
-  sheetSlug: "telling-time",
-  sheetScreen: "sheet-time",
-  blurb:
-    "Free printable telling-time practice for Pre-K to grade 4. Analog clocks to the hour, half hour, quarter hour, and 5 minutes, plus elapsed time, with an answer key.",
-  sheetCount: 6,
-  layout: "wide",
-  levels: [...LEVELS],
-  defaultLevel,
-  sheetDefaultLevel: "half",
-  isLevel: isTimeLevel,
-  pill: (level) => t(`Telling Time · ${level.label}`, `La hora · ${show(level.label)}`),
+  ...timeCard,
   makeQuestion: (rng, level, prefer) => makeTimeQuestion(rng, isTimeLevel(level) ? level : "hour", prefer),
   makeSheetItem: sheetItem,
   Prompt: TimePrompt,
   Aside: TimeAside,
   SheetBody: TimeSheet,
-  bars: BARS,
-  chips: CHIPS,
-  skillLabel: (key) => labelFor(BARS, key) ?? labelFor(CHIPS, key),
-  chipLabel: (key) => labelFor(CHIPS, key),
 } satisfies GameModule;

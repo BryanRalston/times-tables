@@ -1,5 +1,5 @@
 import { getLocale } from "../i18n";
-import { speakable } from "../teach";
+import { speakable } from "./speakable";
 
 export interface SpeechPiece {
   key: string;

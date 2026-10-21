@@ -1,5 +1,5 @@
 import { bandFor } from "./grade-map";
-import { GAMES, gameById } from "./games/registry";
+import { GAME_CARDS as GAMES, gameCard as gameById } from "./games/catalog";
 import {
   BOSS_PASS,
   DAILY_GOAL,

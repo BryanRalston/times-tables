@@ -6,15 +6,11 @@ A new game is one module plus a worksheet page. Rounds, stars, streaks, unlocks,
 
 Create `src/academy/games/<id>.tsx` that exports a `GameModule` (see `src/academy/games/types.ts`).
 
-The module owns:
+The module owns the question and board code: `makeQuestion`, `makeSheetItem`, `Prompt` (and `Aside`, for a wide layout like the clock), and `SheetBody`.
 
-- metadata: id, title, audience, tint, mascot, worksheet slug
-- grade levels: the list, which level each grade starts on, and the play-pill text
-- `makeQuestion` and `makeSheetItem`
-- `Prompt` (and `Aside`, for a wide layout like the clock) and `SheetBody`
-- parent-page bars and chips (`bars`, `chips`, `skillLabel`, `chipLabel`)
+Home metadata lives in `src/academy/games/cards.ts`: id, title, audience, tint, mascot, worksheet slug, the level list, which level each grade starts on, the play-pill text, the blurb, and the parent-page bars and chips. The game module spreads that card and adds the methods. Put the card in `GAME_CARDS` and the module in `GAMES`. Do not put question code in `cards.ts`. Home, the island map, and settings read the card list, so a new game does not enlarge the first download.
 
-Copy `times.tsx`, `add.tsx`, `time.tsx`, or `money.tsx` as the starting point. Register it in `src/academy/games/registry.ts` by appending it to `GAMES`. Home, the island map, settings, worksheets, today’s game, and the grown-ups skill list read that list. Append only. The map stores a game id, and inserting a game in front would move families who are mid-island.
+Copy `times.tsx`, `add.tsx`, `time.tsx`, or `money.tsx` as the starting point. Register the module in `src/academy/games/registry.ts` by appending it to `GAMES`. Play, worksheets, and the grown-ups skill list read that registry. Append only. The map stores a game id, and inserting a game in front would move families who are mid-island.
 
 Do not put a half-built game in the registry. A locked “coming soon” card can stay on the home screen until the module exists.
 
