@@ -11,6 +11,16 @@ export interface SkillStat {
   miss: number;
 }
 
+/** Practice for one skill inside one calendar month. */
+export interface SkillMonth {
+  ok: number;
+  miss: number;
+  /** Rounds that included this skill. */
+  rounds: number;
+  /** Seconds from those rounds, split across the skills in the round. */
+  seconds: number;
+}
+
 /** Per-word memory for sight words and spelling. A miss resets `box` so the word is due again. */
 export interface WordCard {
   box: number;
@@ -39,6 +49,15 @@ export interface Child {
   /** How many squad slots the child has already met. Starters count as met. */
   opened: number;
   skills: Record<string, SkillStat>;
+  /** `yyyy-mm` → skill key → practice recorded that month. */
+  history: Record<string, Record<string, SkillMonth>>;
+  /** Completed rounds per `yyyy-mm`. */
+  roundsByMonth: Record<string, number>;
+  /**
+   * Month that holds skill totals saved before month-by-month history.
+   * Empty when every month was recorded on its own, or practice fits in one month.
+   */
+  foldedMonth: string;
   secondsByDay: Record<string, number>;
   bestStars: Record<string, number>;
   rounds: number;

@@ -5,12 +5,14 @@ import { GROWNUP_HOLD_MS, gateAnswerMatches, grownupGate } from "../grownup-gate
 import { familyBrief } from "../progress-card";
 import { attemptLabel } from "../family-report";
 import { masteredChips, parentBrief } from "../rewards";
+import { standardLine } from "../standards";
 import { gradeText, show, t } from "../i18n";
 import { activeChild, addChild } from "../storage";
 import { LanguageToggle, withLang } from "./lang";
 import { BackupPanel } from "./backup-panel";
 import { BackLink, Foot, Logo, SquisheeImg, cx } from "./bits";
 import { GradeChips } from "./grade-chips";
+import { HistoryPanel, useWeekPrint } from "./history-panel";
 import { InstallTip } from "./install-tip";
 
 const GATE_KEY = "squishee-academy-gate";
@@ -34,6 +36,7 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
   const [armed, setArmed] = useState(false);
   const [holding, setHolding] = useState(false);
   const timer = useRef<number | null>(null);
+  const { weekPrint, printWeek } = useWeekPrint();
 
   useEffect(() => {
     return () => {
@@ -152,7 +155,7 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
   const showPractice = card.days > 0 || card.wins.length > 0 || card.stuck.length > 0;
 
   return (
-    <div className="ac-shell ac-mid">
+    <div className={cx("ac-shell ac-mid", weekPrint && "is-print-week")}>
       <header className="ac-parent-top ac-no-print">
         <h1>{show("Grown-ups")}</h1>
         <LanguageToggle lang={save.lang} onLang={(lang) => onSave(withLang(save, lang))} />
@@ -272,11 +275,13 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
                 : show("Print the worksheet")}
             </a>
           ) : null}
-          <button type="button" onClick={() => window.print()}>
+          <button type="button" onClick={printWeek}>
             {show("Print this week")}
           </button>
         </div>
       </section>
+
+      <HistoryPanel child={child} />
 
       <section className="ac-panel ac-no-print" data-stories-report={report.stories.finishes}>
         <h2>{t("Stories", "Cuentos")}</h2>
@@ -320,6 +325,7 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
                     <i className={row.pct < 70 ? "is-low" : ""} style={{ width: `${row.pct}%` }} />
                   </div>
                   <small>{attemptLabel(row.attempts)}</small>
+                  {standardLine(row.key) ? <small className="ac-standard">{standardLine(row.key)}</small> : null}
                 </div>
               ))}
             </div>
