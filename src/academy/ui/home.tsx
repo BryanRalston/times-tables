@@ -15,7 +15,7 @@ import { outfitLabel } from "../wardrobe";
 import { chime } from "../sound";
 import { WeekStickers } from "./stickers";
 import { storiesOffered } from "../stories/offer";
-import { AcademyPal, Foot, GiftBox, LockIcon, Logo, PlayMark, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
+import { AcademyPal, Foot, GiftBox, LockIcon, Logo, Pips, PlayMark, ProgressRing, SquisheeImg, cx } from "./bits";
 import { PalWithLook } from "./boss-figure";
 
 export function HomeScreen({
@@ -56,17 +56,36 @@ export function HomeScreen({
       </header>
 
       <section className="ac-hero">
-        <div className="ac-pals">
-          <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="is-mid" label={child.name} />
-        </div>
-        <p className="ac-bubble">{catchphrase(child.avatarId)}</p>
-        <p className="ac-bond" data-bond={palTier}>
-          {squisheeById(child.avatarId)?.name ?? show("Buddy")} · {bondName(palTier)}
-        </p>
         <h1>
           {t(`Hi ${child.name}! Ready to play?`, `¡Hola ${child.name}! ¿Listo para jugar?`)}
         </h1>
         <p className="ac-lede">{show("Short games · hop the island · collect squishees")}</p>
+        <div className="ac-play-stage">
+          <div className="ac-play-pal">
+            <div className="ac-pals">
+              <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="is-mid" label={child.name} />
+            </div>
+            <p className="ac-bubble">{catchphrase(child.avatarId)}</p>
+            <p className="ac-bond" data-bond={palTier}>
+              {squisheeById(child.avatarId)?.name ?? show("Buddy")} · {bondName(palTier)}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="ac-go ac-play-main"
+            data-placement={place.reason}
+            data-play-game={playId}
+            data-play-level={playLevel}
+            aria-label={`${playAction}. ${todayLine}`}
+            onClick={() => onPlay(playId, playLevel)}
+          >
+            <PlayMark />
+            <span className="ac-play-copy">
+              <strong>{playAction}</strong>
+              <small>{todayLine}</small>
+            </span>
+          </button>
+        </div>
         <div className="ac-daily" data-daily-rounds={daily.rounds} data-daily-goal={daily.goal} data-gift={daily.ready ? "closed" : daily.claimed ? "open" : "none"}>
           <ProgressRing
             value={daily.rounds}
@@ -91,21 +110,6 @@ export function HomeScreen({
           </button>
         </div>
         <WeekStickers secondsByDay={child.secondsByDay} today={todayId} />
-        <button
-          type="button"
-          className="ac-go ac-play-main"
-          data-placement={place.reason}
-          data-play-game={playId}
-          data-play-level={playLevel}
-          aria-label={`${playAction}. ${todayLine}`}
-          onClick={() => onPlay(playId, playLevel)}
-        >
-          <PlayMark />
-          <span className="ac-play-copy">
-            <strong>{playAction}</strong>
-            <small>{todayLine}</small>
-          </span>
-        </button>
         <a className="ac-map-link" href="#/map">
           {show("Island map")}
         </a>
@@ -146,7 +150,7 @@ export function HomeScreen({
               <SquisheeImg id={game.mascot} />
               <h2>{show(game.title)}</h2>
               <p>{offer === "intro" ? show("Gentle intro") : show(game.audience)}</p>
-              <Stars value={child.bestStars[game.id] ?? 0} />
+              <Pips value={child.bestStars[game.id] ?? 0} />
             </a>
           );
         })}

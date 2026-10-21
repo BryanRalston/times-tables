@@ -27,12 +27,15 @@ export function Squishy({
   role = "toy",
   lines = true,
   className,
+  pulse = 0,
   children,
 }: {
   id: string;
   role?: SquishRole;
   lines?: boolean;
   className?: string;
+  /** Plays the poke squash once. No hearts, line, or clip. */
+  pulse?: number;
   children: ReactNode;
 }) {
   const gesture = useRef<Gesture>(gestureStart());
@@ -61,6 +64,15 @@ export function Squishy({
       window.clearTimeout(pokeTimer.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (!pulse || reducedRef.current) return;
+    setPokeTick((n) => n + 1);
+    setPoking(true);
+    setClipReady(false);
+    setClipOn(false);
+    setStripOn(false);
+  }, [pulse]);
 
   function showFlourish(nextRole: SquishRole) {
     localSquish.current += 1;

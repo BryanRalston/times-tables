@@ -40,4 +40,8 @@ Question text, grade bands, and the squishee pictures were left alone. Emoji tha
 
 ## Left as they were
 
-Squishee files, costumes, and the poke squash are unchanged. No faces, stickers, or overlays were added to the art. Question generators and grade bands are unchanged. The app is still on-device: no accounts, ads, or tracking. The offline cache name moved from v7 to v8 because the styled files changed.
+Squishee files, costumes, and the poke squash are unchanged. No faces, stickers, or overlays were added to the art. Question generators and grade bands are unchanged. The app is still on-device: no accounts, ads, or tracking. The offline cache name moved from v7 to v8 because the styled files changed, then to v9 when the layout pass landed.
+
+## Layout pass
+
+The first token pass was too close to the old screens. Question cards now stretch to the phone: the prompt, the buddy, and the answer tiles share one column, and a correct answer keeps that layout while the buddy plays the existing poke squash. Home leads with a play stage, illustrated game tiles, thick progress pips, and a footer of real buttons. Stories, tracing, the grown-ups gate and report, and the privacy page use the same cards, type, and lips.

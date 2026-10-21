@@ -236,7 +236,7 @@ self.addEventListener("activate", (event) => {
 
 export function subpathServiceWorker() {
   return `/* Academy-only offline cache. Registered with scope /times-tables/academy/ so Squishee Math is not controlled. */
-const CACHE = "squishee-academy-v8";
+const CACHE = "squishee-academy-v9";
 ${PRECACHE_RUNTIME}
 function isMathShell(pathname) {
   return pathname === "/times-tables" || pathname === "/times-tables/" || pathname === "/times-tables/index.html";
@@ -276,7 +276,7 @@ self.addEventListener("fetch", (event) => {
 
 export function domainServiceWorker() {
   return `/* Squishee Academy offline cache. Served from the domain root so scope is /. */
-const CACHE = "squishee-academy-root-v8";
+const CACHE = "squishee-academy-root-v9";
 const SHARE_IMAGE = ${JSON.stringify(SHARE_IMAGE_PATH)};
 ${PRECACHE_RUNTIME}
 self.addEventListener("fetch", (event) => {

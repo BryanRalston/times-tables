@@ -10,10 +10,12 @@ export function RoundBuddy({
   id,
   cosmetic,
   reaction,
+  pulse = 0,
 }: {
   id: string;
   cosmetic?: string;
   reaction: BuddyReaction;
+  pulse?: number;
 }) {
   const reduced = useReducedMotion();
   const text = bubbleText(reaction.line, id);
@@ -29,7 +31,7 @@ export function RoundBuddy({
     >
       {text ? <span className="ac-bubble">{text}</span> : null}
       {reaction.point ? <span className="ac-buddy-point" /> : null}
-      <AcademyPal id={id} cosmetic={cosmetic} className="ac-buddy-img" squish="buddy" />
+      <AcademyPal id={id} cosmetic={cosmetic} className="ac-buddy-img" squish="buddy" pulse={pulse} />
     </div>
   );
 }
