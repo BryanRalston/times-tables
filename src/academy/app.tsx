@@ -59,7 +59,14 @@ function goHome() {
 function ScreenFallback() {
   return (
     <div className="ac-shell">
-      <p className="ac-lede">{show("Loading…")}</p>
+      <div className="ac-loading" role="status">
+        <span className="ac-loading-dots" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </span>
+        <p className="ac-lede">{show("Loading…")}</p>
+      </div>
     </div>
   );
 }
@@ -75,9 +82,11 @@ class ScreenBoundary extends Component<{ children: ReactNode }, { failed: boolea
     if (this.state.failed) {
       return (
         <div className="ac-shell">
-          <p className="ac-lede">
-            {show("This page is not saved on this device yet. Connect once, then open Academy again.")}
-          </p>
+          <section className="ac-panel">
+            <p className="ac-lede">
+              {show("This page is not saved on this device yet. Connect once, then open Academy again.")}
+            </p>
+          </section>
         </div>
       );
     }

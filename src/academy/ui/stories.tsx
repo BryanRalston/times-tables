@@ -56,7 +56,7 @@ export function StoriesShelf({ grade, skills }: { grade: Grade; skills: Record<s
               const done = (skills[`story:${story.id}`]?.ok ?? 0) > 0;
               const pal = story.cast[0] ?? "peach";
               return (
-                <a key={story.id} className="ac-story-card" href={`#/stories/${story.id}`} data-story-id={story.id}>
+                <a key={story.id} className="ac-story-card" href={`#/stories/${story.id}`} data-story-id={story.id} data-read={done ? "yes" : "no"}>
                   <SquisheeImg id={pal} className="ac-story-card-pal" squish="off" />
                   <span>
                     <strong>{story.title}</strong>

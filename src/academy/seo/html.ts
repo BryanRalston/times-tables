@@ -87,17 +87,17 @@ const PAGE_STYLE = `
 body {
   margin: 0;
   color: #3c2448;
-  background: #fff7fb;
+  background: linear-gradient(180deg, #fff1f7, #f3fbf8 280px);
   font: 700 18px/1.45 Nunito, "Trebuchet MS", sans-serif;
 }
-main { width: min(760px, calc(100% - 28px)); margin: 0 auto; padding: 22px 0 48px; }
+main { width: min(760px, calc(100% - 32px)); margin: 0 auto; padding: 22px 0 48px; }
 a { color: #12988a; }
-h1, h2 { font-family: Fredoka, Nunito, sans-serif; letter-spacing: -0.02em; line-height: 1.15; }
+h1, h2 { font-family: Fredoka, Nunito, "Trebuchet MS", sans-serif; letter-spacing: -0.02em; line-height: 1.15; }
 h1 { font-size: 34px; margin: 8px 0; }
-.brand { font-family: Fredoka, Nunito, sans-serif; font-size: 22px; text-decoration: none; }
+.brand { font-family: Fredoka, Nunito, "Trebuchet MS", sans-serif; font-size: 22px; text-decoration: none; }
 .brand b { color: #ff4b93; }
 .brand i { color: #12988a; font-style: normal; }
-.lede, .fine { color: #8b7386; }
+.lede, .fine { color: #5c4566; }
 .name { margin: 16px 0; }
 ol.problems { padding-left: 1.4em; }
 ol.problems li { margin: 14px 0; break-inside: avoid; }
@@ -108,33 +108,52 @@ ol.problems li { margin: 14px 0; break-inside: avoid; }
 .key ol { columns: 2; }
 .play { margin-top: 22px; }
 .play a, .links a {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
   margin: 6px 10px 0 0;
-  background: #ff4b93;
+  background: #e21870;
   color: white;
   text-decoration: none;
   border-radius: 999px;
-  padding: 10px 16px;
+  padding: 12px 18px;
+  box-shadow: 0 4px 0 #b01058;
 }
-.play a.quiet, .links a.quiet { background: white; color: #12988a; box-shadow: 0 3px 0 #f6d0e2; }
+.play a.quiet, .links a.quiet { background: white; color: #12988a; box-shadow: 0 4px 0 #f3d4e4; }
 .cards { display: grid; gap: 12px; }
 .cards a.card {
   display: block;
   background: white;
   color: inherit;
   text-decoration: none;
-  border-radius: 16px;
-  padding: 14px 16px;
-  box-shadow: 0 4px 0 #f6d0e2;
+  border-radius: 22px;
+  padding: 16px;
+  box-shadow: 0 10px 24px -18px rgb(60 36 72 / 0.55);
 }
-.cards small { display: block; color: #8b7386; font-size: 14px; margin-top: 4px; }
-.prose p { margin: 0 0 12px; }
-.contact { background: #fff; border-radius: 16px; padding: 12px 14px; box-shadow: 0 4px 0 #f6d0e2; }
+.cards small { display: block; color: #5c4566; font-size: 15px; margin-top: 4px; }
+.prose p { margin: 0 0 14px; }
+.prose .kicker {
+  margin: 12px 0 0;
+  font-family: Fredoka, Nunito, "Trebuchet MS", sans-serif;
+  font-size: 15px;
+  color: #e21870;
+}
+.prose h1 { font-size: 44px; }
+.promise { display: grid; gap: 10px; margin: 8px 0 18px; }
+.promise p {
+  margin: 0;
+  padding: 16px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 0 #f3d4e4;
+}
+.contact { background: #fff; border-radius: 22px; padding: 14px 16px; box-shadow: 0 4px 0 #f3d4e4; }
 @media print {
   body { background: white; }
   .noprint { display: none !important; }
   .key { break-before: page; }
   a { color: inherit; }
+  .promise p { box-shadow: none; background: white; }
 }
 `;
 
@@ -265,12 +284,15 @@ export function privacyHtml(): string {
     path: "privacy",
     depth: 1,
     body: `<article class="prose">
+      <p class="kicker">On this device</p>
       <h1>Privacy</h1>
+      <div class="promise">
       <p>Squishee Academy is free forever. There are no ads, no accounts, and no analytics.</p>
       <p>We do not collect personal information. A name typed into the app stays on this device. Progress stays on this device. We do not send it to a server. We do not know who is playing.</p>
       <p>This is a COPPA-friendly kids' site. We do not ask children for an email, a photo, a location, or any contact information. We do not let third parties collect data from these pages.</p>
       <p>A backup code is made on this device so a grown-up can move progress to another device. The code is not uploaded. If you copy it, you are the one holding it.</p>
       <p>The games, pictures, and worksheets can be saved on the device the first time you visit, so they still open with the internet off. That copy stays in this browser.</p>
+      </div>
       <p class="contact"><strong>Contact:</strong> <a href="mailto:hello@squisheeacademy.com">hello@squisheeacademy.com</a></p>
       <p class="play noprint"><a href="../#/">Back to games</a> <a class="quiet" href="../worksheets/">Worksheets</a></p>
     </article>`,

@@ -5,14 +5,17 @@ function tone(freq: number, dur: number, delay: number, type: OscillatorType, vo
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   const start = ctx.currentTime + delay;
+  const peak = Math.max(volume, 0.0002);
+  const attack = Math.min(0.02, Math.max(0.008, dur * 0.28));
   osc.type = type;
   osc.frequency.value = freq;
-  gain.gain.setValueAtTime(volume, start);
-  gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  gain.gain.setValueAtTime(0.0001, start);
+  gain.gain.exponentialRampToValueAtTime(peak, start + attack);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + Math.max(dur, attack + 0.02));
   osc.connect(gain);
   gain.connect(ctx.destination);
   osc.start(start);
-  osc.stop(start + dur + 0.02);
+  osc.stop(start + dur + 0.03);
 }
 
 function withAudio(enabled: boolean, play: () => void) {
@@ -36,8 +39,8 @@ export function blip(ok: boolean, enabled: boolean, streak = 0) {
       if (streak >= 3) tone(1174, 0.12, 0.14, "triangle", 0.035);
       return;
     }
-    tone(294, 0.1, 0, "triangle", 0.018);
-    tone(262, 0.12, 0.08, "triangle", 0.014);
+    tone(294, 0.14, 0, "sine", 0.016);
+    tone(262, 0.16, 0.09, "sine", 0.012);
   });
 }
 

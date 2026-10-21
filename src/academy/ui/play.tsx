@@ -216,6 +216,7 @@ export function PlayScreen({
   const [unlockId, setUnlockId] = useState<string | null>(null);
   const [met, setMet] = useState(false);
   const [hintOn, setHintOn] = useState(false);
+  const [cheer, setCheer] = useState(0);
   const [nudge, setNudge] = useState<"up" | "down" | null>(null);
   const [practice, setPractice] = useState<RoundSlot | null>(null);
   const [teachSlot, setTeachSlot] = useState<RoundSlot | null>(null);
@@ -471,7 +472,8 @@ export function PlayScreen({
     }
     phaseRef.current = "feedback";
     setPhase("feedback");
-    waitRef.current = window.setTimeout(() => advance(fromIndex), 620);
+    if (!boss) setCheer((n) => n + 1);
+    waitRef.current = window.setTimeout(() => advance(fromIndex), 880);
   }
 
   function beginTeach(slot: RoundSlot, source: "scored" | "practice") {
@@ -725,6 +727,11 @@ export function PlayScreen({
   const palBond = bondTier(bondScore(child.bonds, child.avatarId));
   const choice = slot?.kind === "choice" ? slot.question : null;
   const filled = dots.filter((dot) => dot != null).length;
+  const playBuddy = boss ? null : (
+    <div className="ac-play-buddy">
+      <RoundBuddy id={child.avatarId} cosmetic={child.equipped} reaction={buddyCue} pulse={phase === "feedback" ? cheer : 0} />
+    </div>
+  );
 
   if (blocked) {
     return (
@@ -956,11 +963,6 @@ export function PlayScreen({
             ) : null}
             <Stars value={liveStars} />
           </div>
-          {boss ? null : (
-            <div className="ac-buddy-row">
-              <RoundBuddy id={child.avatarId} cosmetic={child.equipped} reaction={buddyCue} />
-            </div>
-          )}
           <RoundCastProvider buddyId={child.avatarId} hostId={hostId} equipped={child.equipped}>
           <div
             className={cx(
@@ -974,28 +976,31 @@ export function PlayScreen({
               boss && fightPhase === "super" && "is-super",
             )}
           >
-            {reaction ? (
+            {reaction && phase !== "feedback" ? (
               <span className="ac-react" aria-hidden="true">
                 {reaction}
               </span>
             ) : null}
             {phase === "teach" && example ? (
               <div className="ac-stage-main" key={`${slotFact(teachSlot ?? slot)}-teach`}>
+                {playBuddy}
                 <SquisheeImg id={mascot} className="ac-mascot" label="" />
                 <WorkedExample example={example} onDone={afterTeach} />
               </div>
-            ) : phase === "feedback" ? (
-              <div className="ac-stage-main">
-                <SquisheeImg id={mascot} className="ac-mascot is-happy" label="" />
-                <p className="ac-banner is-yes">{served ? praiseLine(served.slot) : show("Yes!")}</p>
-              </div>
             ) : (
-              <div className="ac-stage-main" key={slotFact(slot) + phase}>
+              <div className="ac-stage-main" key={slotFact(slot)}>
                 {slot.kind !== "choice" ? (
-                  <>
-                    <p className="ac-story">{slotStory(slot, child.avatarId, hostId)}</p>
-                    <HandsBoard task={slot} onAnswer={(good) => answer(good)} />
-                  </>
+                  <div className="ac-hands-layout">
+                    {playBuddy}
+                    {phase === "feedback" ? (
+                      <p className="ac-banner is-yes">{served ? praiseLine(served.slot) : show("Yes!")}</p>
+                    ) : (
+                      <>
+                        <p className="ac-story">{slotStory(slot, child.avatarId, hostId)}</p>
+                        <HandsBoard task={slot} onAnswer={(good) => answer(good)} />
+                      </>
+                    )}
+                  </div>
                 ) : choice ? (
                   <>
                     {spec?.Aside ? <spec.Aside question={choice} /> : null}
@@ -1003,30 +1008,33 @@ export function PlayScreen({
                       <p className="ac-story">{slotStory(slot, child.avatarId, hostId)}</p>
                       {choice.visual.kind === "money" ? <CoinShare buddyId={child.avatarId} hostId={hostId} /> : null}
                       {spec ? (
-                        <spec.Prompt question={choice} reveal={false} mascot={mascot} happy={ok} />
+                        <spec.Prompt question={choice} reveal={phase === "feedback"} mascot={mascot} happy={ok} />
                       ) : null}
+                      {playBuddy}
                       {ChoiceView ? (
                         <ChoiceView
                           question={choice}
-                          reveal={false}
+                          reveal={phase === "feedback"}
                           picked={null}
                           onChoose={(value, hinted) => answer(value === choice.answer, hinted === true)}
                         />
                       ) : (
-                        <div className="ac-choices">
+                        <div className={cx("ac-choices", phase === "feedback" && "is-locked")}>
                           {choice.choices.map((option, choiceIndex) => {
                             const pile = choice.visual.kind === "money" ? choice.visual.piles?.[option] : undefined;
                             const label =
                               choice.visual.kind === "money" && choice.visual.labels?.[option]
                                 ? choice.visual.labels[option]
                                 : option;
+                            const right = phase === "feedback" && option === choice.answer;
                             return (
                               <button
                                 key={option}
                                 ref={choiceIndex === 0 ? retryFocusRef : undefined}
                                 type="button"
-                                className={cx("ac-choice", pile && "is-coins")}
+                                className={cx("ac-choice", pile && "is-coins", right && "is-yes")}
                                 aria-label={label}
+                                disabled={phase === "feedback"}
                                 onClick={() => answer(option === choice.answer)}
                               >
                                 {pile ? <CoinRow pile={pile} label={label} /> : label}
@@ -1035,8 +1043,16 @@ export function PlayScreen({
                           })}
                         </div>
                       )}
-                      <div className={cx("ac-banner", hintOn && "is-hint")} aria-live="polite">
-                        {hintOn ? hintCue(choice).caption : phase === "practice" ? show("Try one like it") : ""}
+                      <div className={cx("ac-banner", phase === "feedback" && "is-yes", hintOn && "is-hint")} aria-live="polite">
+                        {phase === "feedback"
+                          ? served
+                            ? praiseLine(served.slot)
+                            : show("Yes!")
+                          : hintOn
+                            ? hintCue(choice).caption
+                            : phase === "practice"
+                              ? show("Try one like it")
+                              : ""}
                       </div>
                     </div>
                   </>

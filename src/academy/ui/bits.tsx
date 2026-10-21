@@ -16,6 +16,14 @@ export function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(" ");
 }
 
+export function PlayMark() {
+  return (
+    <svg className="ac-play-mark" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M8.2 5.4v13.2L19 12 8.2 5.4z" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function BackLink({ href = "#/", children = "Games" }: { href?: string; children?: ReactNode }) {
   return (
     <a className="ac-back" href={href}>
@@ -52,12 +60,14 @@ export function AcademyPal({
   className,
   label,
   squish = "toy",
+  pulse = 0,
 }: {
   id: string;
   cosmetic?: string;
   className?: string;
   label?: string;
   squish?: SquishMode;
+  pulse?: number;
 }) {
   const s = squisheeById(id);
   if (!s) return null;
@@ -76,7 +86,7 @@ export function AcademyPal({
   );
   if (squish === "off") return art;
   return (
-    <Squishy id={id} role={squish}>
+    <Squishy id={id} role={squish} pulse={pulse}>
       {art}
     </Squishy>
   );
@@ -128,6 +138,17 @@ export function Stars({ value, of = 3, className }: { value: number; of?: number
     <span className={cx("ac-stars", className)} aria-label={`${value} of ${of} stars`}>
       {Array.from({ length: of }, (_, i) => (
         <Star key={i} filled={i < value} />
+      ))}
+    </span>
+  );
+}
+
+export function Pips({ value, of = 3 }: { value: number; of?: number }) {
+  const filled = Math.max(0, Math.min(of, value));
+  return (
+    <span className="ac-pips" role="img" aria-label={`${filled} of ${of} stars`}>
+      {Array.from({ length: of }, (_, i) => (
+        <i key={i} className={i < filled ? "is-on" : ""} />
       ))}
     </span>
   );
