@@ -3,7 +3,7 @@ import { hashSeed } from "@/lib/rng";
 import { noteMark, skillHeat } from "./adapt";
 import { noteMonthRound, recordRoundHistory } from "./history";
 import { grantBossPrize } from "./boss-battle";
-import { GAMES, barKeys, chipKeys, chipLabel as chipText, skillLabel as skillText, type GameId } from "./games/registry";
+import { GAME_CARDS as GAMES, barKeys, chipKeys, chipLabel as chipText, skillLabel as skillText, type GameId } from "./games/catalog";
 import { bondScore, learningLooks, studyCount, withLearningLooks } from "./buddy/bond";
 import { syncEgg } from "./buddy/egg";
 import { friendFromBoss } from "./buddy/hosts";

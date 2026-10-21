@@ -1,5 +1,5 @@
 import { skillHeat, skillKeyForLevel, openingIndex, type SkillHeat } from "./adapt";
-import { GAMES } from "./games/registry";
+import { GAME_CARDS as GAMES } from "./games/catalog";
 import { playWindow } from "./grade-map";
 import { gradeText, t } from "./i18n";
 import type { Grade, SkillStat } from "./model";

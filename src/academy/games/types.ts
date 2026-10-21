@@ -200,3 +200,6 @@ export interface GameModule {
   skillLabel: (key: string) => string | null;
   chipLabel: (key: string) => string | null;
 }
+
+/** Home, map, and saves need this. Question code and boards stay out of the first download. */
+export type GameCard = Omit<GameModule, "makeQuestion" | "makeSheetItem" | "Prompt" | "Choices" | "Aside" | "SheetBody" | "reviewKeys">;

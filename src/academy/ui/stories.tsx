@@ -3,10 +3,11 @@ import { autoSpeakGrade, type Grade, type SkillStat } from "../model";
 import { starsForRound } from "../rewards";
 import { storyGradeLabel } from "../stories/band";
 import type { Story } from "../stories/catalog";
-import { openStory, stepReader, storiesForGrade, storiesOffered, storyScore, type ReaderState } from "../stories/engine";
+import { knownStory, openStory, stepReader, storiesForGrade, storiesOffered, storyScore, type ReaderState } from "../stories/engine";
 import { lineTokens } from "../stories/read";
 import { blip, chime, teachTone } from "../sound";
 import { show, t } from "../i18n";
+import { ensureVoice } from "../voice/clips";
 import { startClipSpeech, startWordClips, stopClipSpeech } from "../voice/player";
 import { BackLink, SquisheeImg, Stars, cx } from "./bits";
 import { StoryPicture, StoryScene } from "./story-scene";
@@ -129,13 +130,15 @@ export function StoryReader({
     if (!sound) return;
     const tokens = lineTokens(text);
     setActive(-1);
-    const startedPlay = startWordClips(
-      tokens.map((token) => ({ key: token.key, gapAfterMs: token.gapAfterMs })),
-      (index) => setActive(index),
-      () => setActive(-1),
-      () => setActive(-1),
-    );
-    if (!startedPlay) setActive(-1);
+    void ensureVoice().then(() => {
+      const startedPlay = startWordClips(
+        tokens.map((token) => ({ key: token.key, gapAfterMs: token.gapAfterMs })),
+        (index) => setActive(index),
+        () => setActive(-1),
+        () => setActive(-1),
+      );
+      if (!startedPlay) setActive(-1);
+    });
   }
 
   useEffect(() => {
@@ -172,7 +175,7 @@ export function StoryReader({
   function speakThen(line: string, follow: string | null) {
     hold.current = true;
     clearWait();
-    if (sound) startClipSpeech(line, 1, () => {});
+    if (sound) void ensureVoice().then(() => startClipSpeech(line, 1, () => {}));
     else stopClipSpeech();
     if (!follow) return;
     wait.current = window.setTimeout(() => {
@@ -322,4 +325,23 @@ export function StoryReader({
       </div>
     </div>
   );
+}
+
+export function StoriesRoute({
+  storyId,
+  grade,
+  skills,
+  sound,
+  onFinish,
+}: {
+  storyId: string;
+  grade: Grade;
+  skills: Record<string, SkillStat>;
+  sound: boolean;
+  onFinish: (result: { id: string; correct: number; total: number; seconds: number }) => void;
+}) {
+  if (!storyId || !storiesOffered()) return <StoriesShelf grade={grade} skills={skills} />;
+  const story = knownStory(storyId);
+  if (!story) return <StoriesShelf grade={grade} skills={skills} />;
+  return <StoryReader key={story.id} story={story} grade={grade} sound={sound} onFinish={onFinish} />;
 }

@@ -1,8 +1,7 @@
 import type { Rng } from "@/lib/rng";
-import { gamePill, t } from "../i18n";
+import { t } from "../i18n";
 import { buddyName, pickTalk } from "./flavor";
-import { bandFor } from "../grade-map";
-import type { Grade } from "../model";
+import { sightCard } from "./cards";
 import { SquisheeImg, cx } from "../ui/bits";
 import { qid } from "./choices";
 import { SpeakerBar } from "./speaker";
@@ -17,26 +16,6 @@ import {
 import type { ChoiceProps, ChoiceQ, GameModule, SheetItem, SightMode } from "./types";
 import { WordSheet } from "./word-sheet";
 import { blankOut, dueWordIds, pickFromPrefer } from "./words";
-
-const LEVELS = [
-  { id: "preprimer", label: "Pre-primer", num: 1 },
-  { id: "primer", label: "Primer", num: 2 },
-  { id: "first", label: "1st grade", num: 3 },
-  { id: "second", label: "2nd grade", num: 4 },
-  { id: "third", label: "3rd grade", num: 5 },
-  { id: "fourth", label: "Grade 4 vocabulary", num: 6 },
-] as const;
-
-const BARS = [
-  { key: "sight:preprimer", label: "Pre-primer words" },
-  { key: "sight:primer", label: "Primer words" },
-  { key: "sight:first", label: "1st grade words" },
-  { key: "sight:second", label: "2nd grade words" },
-  { key: "sight:third", label: "3rd grade words" },
-  { key: "sight:fourth", label: "Grade 4 vocabulary" },
-];
-
-const CHIPS = BARS;
 
 export function pickSightMode(rng: Rng, level: SightList): SightMode {
   const roll = rng.next();
@@ -161,33 +140,6 @@ function sheetItem(rng: Rng, level: string): SheetItem {
   return { prompt: blankOut(word.sentence, word.word), answer: word.word };
 }
 
-function labelFor(rows: { key: string; label: string }[], key: string): string | null {
-  return rows.find((row) => row.key === key)?.label ?? null;
-}
-
-function defaultLevel(grade: Grade): SightList {
-  const start = bandFor("sight", grade)?.start;
-  if (isSightList(start)) return start;
-  switch (grade) {
-    case "K":
-      return "preprimer";
-    case "1":
-      return "primer";
-    case "2":
-      return "second";
-    case "3":
-      return "third";
-    case "PK":
-      return "preprimer";
-    case "4":
-      return "fourth";
-    default: {
-      const neverGrade: never = grade;
-      return neverGrade;
-    }
-  }
-}
-
 function SightCue({ mode, word, sentence }: { mode: SightMode; word: string; sentence: string }) {
   switch (mode) {
     case "hear":
@@ -261,31 +213,12 @@ export function SightChoices({ question, reveal, picked, onChoose }: ChoiceProps
 }
 
 export const sightGame = {
-  id: "sight",
-  title: "Sight Words",
-  audience: "K–4",
-  tint: "lav",
-  mascot: "grape",
-  sheetSlug: "sight-words",
-  sheetScreen: "sheet-sight",
-  blurb:
-    "Free Dolch and Fry sight word practice for Pre-K to grade 4. Hear a word, match a picture, and fill a sentence. Trace the list, then check the answer key.",
-  sheetCount: 12,
-  layout: "card",
-  levels: [...LEVELS],
-  defaultLevel,
-  sheetDefaultLevel: "preprimer",
-  isLevel: isSightList,
-  pill: (level) => gamePill("Sight Words", level.num),
+  ...sightCard,
   makeQuestion: (rng, level, prefer) => makeSightQuestion(rng, isSightList(level) ? level : "preprimer", prefer),
   makeSheetItem: sheetItem,
   Prompt: SightPrompt,
   Choices: SightChoices,
   SheetBody: WordSheet,
-  bars: BARS,
-  chips: CHIPS,
-  skillLabel: (key) => labelFor(BARS, key),
-  chipLabel: (key) => labelFor(CHIPS, key),
   reviewKeys: (words) => dueWordIds(words, ALL_SIGHT.map((word) => word.id)),
 } satisfies GameModule;
 

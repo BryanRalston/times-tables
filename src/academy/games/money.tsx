@@ -1,8 +1,7 @@
 import type { Rng } from "@/lib/rng";
-import { coinAsA, coinButton, gamePill, t } from "../i18n";
+import { coinAsA, coinButton, t } from "../i18n";
 import { buddyName, pickTalk } from "./flavor";
-import { bandFor } from "../grade-map";
-import type { Grade } from "../model";
+import { moneyCard } from "./cards";
 import { CoinRow } from "../ui/coins";
 import { SquisheeImg, cx } from "../ui/bits";
 import { fourChoices, qid } from "./choices";
@@ -24,33 +23,6 @@ import type { ChoiceQ, CoinPile, GameModule, MoneyMode, MoneyVisual, SheetItem }
 export const MONEY_LEVELS = ["name", "count", "make", "change", "dollars", "spend"] as const;
 export type MoneyLevel = (typeof MONEY_LEVELS)[number];
 
-const LEVELS = [
-  { id: "name", label: "Name the coins", num: 1 },
-  { id: "count", label: "Count coins", num: 2 },
-  { id: "make", label: "Make an amount", num: 3 },
-  { id: "change", label: "Make change", num: 4 },
-  { id: "dollars", label: "Dollars and cents", num: 5 },
-  { id: "spend", label: "Money problems", num: 6 },
-] as const;
-
-const BARS = [
-  { key: "money:name", label: "Name coins" },
-  { key: "money:count", label: "Count coins" },
-  { key: "money:make", label: "Make an amount" },
-  { key: "money:change", label: "Make change" },
-  { key: "money:dollars", label: "Dollars and cents" },
-  { key: "money:spend", label: "Money problems" },
-];
-
-const CHIPS = [
-  { key: "money:name", label: "Names coins" },
-  { key: "money:count", label: "Counts coins" },
-  { key: "money:make", label: "Makes an amount" },
-  { key: "money:change", label: "Makes change" },
-  { key: "money:dollars", label: "Dollars and cents" },
-  { key: "money:spend", label: "Money problems" },
-];
-
 const PAYS: CoinPile[] = [
   oneCoin("quarter"),
   { penny: 0, nickel: 0, dime: 0, quarter: 2, dollar: 0 },
@@ -64,29 +36,6 @@ const MAKE_TARGETS = [10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 75];
 
 export function isMoneyLevel(value: unknown): value is MoneyLevel {
   return typeof value === "string" && (MONEY_LEVELS as readonly string[]).includes(value);
-}
-
-function defaultLevel(grade: Grade): MoneyLevel {
-  const start = bandFor("money", grade)?.start;
-  if (isMoneyLevel(start)) return start;
-  switch (grade) {
-    case "K":
-      return "name";
-    case "1":
-      return "count";
-    case "2":
-      return "make";
-    case "3":
-      return "dollars";
-    case "PK":
-      return "name";
-    case "4":
-      return "spend";
-    default: {
-      const neverGrade: never = grade;
-      return neverGrade;
-    }
-  }
 }
 
 function centChoices(rng: Rng, answer: number, preferred: number[]): string[] {
@@ -350,10 +299,6 @@ function sheetItem(rng: Rng, level: string): SheetItem {
   }
 }
 
-function labelFor(rows: { key: string; label: string }[], key: string): string | null {
-  return rows.find((row) => row.key === key)?.label ?? null;
-}
-
 function MoneyArt({ visual, large }: { visual: MoneyVisual; large?: boolean }) {
   const mode: MoneyMode = visual.mode;
   if (mode === "make") return null;
@@ -404,28 +349,9 @@ export function MoneySheet({ items }: { items: SheetItem[] }) {
 }
 
 export const moneyGame = {
-  id: "money",
-  title: "Money",
-  audience: "Pre-K–4",
-  tint: "gold",
-  mascot: "lemon",
-  sheetSlug: "money",
-  sheetScreen: "sheet-money",
-  blurb:
-    "Free printable coin practice for Pre-K to grade 4. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.",
-  sheetCount: 12,
-  layout: "card",
-  levels: [...LEVELS],
-  defaultLevel,
-  sheetDefaultLevel: "count",
-  isLevel: isMoneyLevel,
-  pill: (level) => gamePill("Money", level.num),
+  ...moneyCard,
   makeQuestion: (rng, level) => makeMoneyQuestion(rng, isMoneyLevel(level) ? level : "name"),
   makeSheetItem: sheetItem,
   Prompt: MoneyPrompt,
   SheetBody: MoneySheet,
-  bars: BARS,
-  chips: CHIPS,
-  skillLabel: (key) => labelFor(BARS, key) ?? labelFor(CHIPS, key),
-  chipLabel: (key) => labelFor(CHIPS, key),
 } satisfies GameModule;

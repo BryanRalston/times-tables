@@ -1,7 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import { t, yesDetail } from "../i18n";
-import { bandFor } from "../grade-map";
-import type { Grade } from "../model";
+import { variablesCard } from "./cards";
 import { Groups } from "../ui/bits";
 import { CountToken } from "../ui/count-token";
 import type { VariableBoard, VariableBox, VariableMode } from "./boards";
@@ -12,47 +11,10 @@ import { MINUS, TIMES, type ChoiceQ, type GameModule, type PromptProps, type She
 export const VARIABLE_LEVELS = ["addend", "either", "factor", "times", "steps"] as const;
 export type VariableLevel = (typeof VARIABLE_LEVELS)[number];
 
-const LEVELS = [
-  { id: "addend", label: "Addend within 10", num: 1 },
-  { id: "either", label: "Blank within 20", num: 2 },
-  { id: "factor", label: "Missing factor", num: 3 },
-  { id: "times", label: "Times blank", num: 4 },
-  { id: "steps", label: "Two-step blank", num: 5 },
-] as const;
-
-const BARS = [
-  { key: "variables:addend", label: "Addend within 10" },
-  { key: "variables:either", label: "Blank within 20" },
-  { key: "variables:factor", label: "Missing factor" },
-  { key: "variables:times", label: "Times blank" },
-  { key: "variables:steps", label: "Two-step blank" },
-];
-
 type Truth = Omit<VariableBoard, "game" | "left" | "right" | "result" | "extra">;
 
 export function isVariableLevel(value: unknown): value is VariableLevel {
   return typeof value === "string" && (VARIABLE_LEVELS as readonly string[]).includes(value);
-}
-
-function defaultLevel(grade: Grade): VariableLevel {
-  const start = bandFor("variables", grade)?.start;
-  if (isVariableLevel(start)) return start;
-  switch (grade) {
-    case "PK":
-    case "K":
-    case "1":
-      return "addend";
-    case "2":
-      return "either";
-    case "3":
-      return "times";
-    case "4":
-      return "steps";
-    default: {
-      const neverGrade: never = grade;
-      return neverGrade;
-    }
-  }
 }
 
 function plainResult(fact: Pick<Truth, "op" | "a" | "b">): number {
@@ -446,22 +408,8 @@ export function VariablesPrompt({ question, reveal, mascot, happy }: PromptProps
 }
 
 export const variablesGame: GameModule = sceneModule({
-  id: "variables",
-  title: "What is missing",
+  ...variablesCard,
   short: "What is missing",
-  audience: "K–4",
-  tint: "iris",
-  mascot: "otter",
-  sheetSlug: "missing-numbers",
-  sheetScreen: "sheet-variables",
-  blurb:
-    "Free missing-number equations for kindergarten through grade 4. Find the box in an addition, subtraction, multiplication, or two-step equation. A first look at variables. No signup.",
-  levels: [...LEVELS],
-  defaultLevel,
-  sheetDefaultLevel: "addend",
-  isLevel: isVariableLevel,
-  bars: BARS,
-  chips: BARS,
   makeQuestion: (rng, level) => makeVariableQuestion(rng, isVariableLevel(level) ? level : "addend"),
   makeSheetItem: sheetItem,
   Prompt: VariablesPrompt,

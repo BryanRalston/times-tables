@@ -1,4 +1,6 @@
+import { englishVoiceReady, ensureVoice, spanishVoiceReady } from "../voice/clips";
 import { startClipSpeech, stopClipSpeech } from "../voice/player";
+import { getLocale } from "../i18n";
 
 export interface SpeechProbe {
   synthesis: boolean;
@@ -83,6 +85,13 @@ function cancelDevice(): void {
 
 /** Speak `text` from a clip when one exists. Returns false when nothing can talk, so the caller can show text. */
 export function speakText(text: string, slow: boolean, onFail?: () => void): boolean {
+  const ready = getLocale() === "es" ? spanishVoiceReady() : englishVoiceReady();
+  if (!ready) {
+    void ensureVoice().then(() => {
+      speakText(text, slow, onFail);
+    });
+    return true;
+  }
   cancelDevice();
   const rate = slow ? 0.78 : 1;
   if (

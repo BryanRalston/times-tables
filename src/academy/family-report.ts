@@ -1,4 +1,4 @@
-import { barKeys, chipKeys, GAMES, gameById, skillLabel, type GameId } from "./games/registry";
+import { barKeys, chipKeys, GAME_CARDS as GAMES, gameCard as gameById, skillLabel, type GameId } from "./games/catalog";
 import { getLocale, show, t } from "./i18n";
 import type { SkillStat } from "./model";
 import { isMastered, skillPercent } from "./rewards";

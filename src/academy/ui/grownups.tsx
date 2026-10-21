@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { rngRandom } from "@/lib/rng";
 import { DEFAULT_START_GRADE, cleanName, todayIso, type Grade, type Save } from "../model";
-import { GROWNUP_HOLD_MS, gateAnswerMatches, grownupGate } from "../questions";
+import { GROWNUP_HOLD_MS, gateAnswerMatches, grownupGate } from "../grownup-gate";
 import { familyBrief } from "../progress-card";
 import { attemptLabel } from "../family-report";
 import { masteredChips, parentBrief } from "../rewards";
@@ -11,6 +11,7 @@ import { activeChild, addChild } from "../storage";
 import { LanguageToggle, withLang } from "./lang";
 import { BackupPanel } from "./backup-panel";
 import { BackLink, Foot, Logo, SquisheeImg, cx } from "./bits";
+import { GradeChips } from "./grade-chips";
 import { HistoryPanel, useWeekPrint } from "./history-panel";
 import { InstallTip } from "./install-tip";
 
@@ -369,23 +370,3 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
   );
 }
 
-export function GradeChips({
-  grade,
-  onGrade,
-  className,
-}: {
-  grade: Grade;
-  onGrade: (grade: Grade) => void;
-  className?: string;
-}) {
-  const grades: Grade[] = ["PK", "K", "1", "2", "3", "4"];
-  return (
-    <div className={cx("ac-grades", className)} role="group" aria-label={show("Grade")}>
-      {grades.map((g) => (
-        <button key={g} type="button" className={cx("ac-grade", grade === g && "is-on")} onClick={() => onGrade(g)}>
-          {g === "PK" ? "Pre-K" : g === "K" ? "K" : g}
-        </button>
-      ))}
-    </div>
-  );
-}

@@ -2,7 +2,8 @@ import type { Grade } from "../model";
 import { castToken, gradeCap, storyRank, wordAllowed, type StoryGrade } from "./band";
 import { STORY_PROPS, storyById, STORIES, type Story, type StoryCheck, type StoryProp } from "./catalog";
 import { storyTextError, storyWords } from "./read";
-import { getLocale } from "../i18n";
+
+export { storiesOffered } from "./offer";
 
 export interface ReaderState {
   phase: "page" | "check" | "done";
@@ -78,10 +79,6 @@ export function stepReader(state: ReaderState, action: ReaderAction): ReaderStat
       return neverAction;
     }
   }
-}
-
-export function storiesOffered(): boolean {
-  return getLocale() !== "es";
 }
 
 export function storiesForGrade(grade: Grade): readonly Story[] {

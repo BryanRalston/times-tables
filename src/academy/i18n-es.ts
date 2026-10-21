@@ -607,26 +607,26 @@ export const ES: Record<string, string> = {
   "Multiply stories": "Historias de multiplicar",
   "Share stories": "Historias de repartir",
   "Picture stories": "Historias con dibujos",
-  "Free printable multiplication practice for Pre-K to grade 4. Facts, multi-digit problems, and an answer key. No signup.":
-    "Práctica de multiplicar para imprimir, de prekínder a grado 4. Las tablas, problemas de varios dígitos y la hoja de respuestas. Sin cuenta.",
-  "Free printable addition and subtraction for Pre-K to grade 4. Facts within 5, 10, 20, 100, or the thousands, plus an answer key.":
-    "Sumas y restas para imprimir, de prekínder a grado 4. Hasta el 5, el 10, el 20, el 100 o los millares, con la hoja de respuestas.",
+  "Free printable multiplication practice for grades 2–4. Facts, multi-digit problems, and an answer key. No signup.":
+    "Práctica de multiplicar para imprimir, de grado 2 a grado 4. Las tablas, problemas de varios dígitos y la hoja de respuestas. Sin cuenta.",
+  "Free printable addition and subtraction for kindergarten through grade 4. Facts within 5, 10, 20, 100, or the thousands, plus an answer key.":
+    "Sumas y restas para imprimir, de kínder a grado 4. Hasta el 5, el 10, el 20, el 100 o los millares, con la hoja de respuestas.",
   "Free fraction practice for grades 1–4. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.":
     "Fracciones para los grados 1 a 4. Partes de un entero, fracciones unitarias, la recta numérica, comparar, fracciones equivalentes con dibujos y decimales.",
-  "Free spelling for Pre-K to grade 4. Hear a word in a sentence, then build it from letter tiles. Lists move from CVC words to digraphs, blends, long vowels, and grade 4 words.":
-    "Deletreo de prekínder a grado 4. Escuchas una palabra en inglés y la armas con letras. Empieza con palabras cortas y llega a palabras de grado 4.",
+  "Free spelling for kindergarten through grade 4. Hear a word in a sentence, then build it from letter tiles. Lists move from CVC words to digraphs, blends, long vowels, and grade 4 words.":
+    "Deletreo de kínder a grado 4. Escuchas una palabra en inglés y la armas con letras. Empieza con palabras cortas y llega a palabras de grado 4.",
   "Free measurement and data practice for Pre-K through grade 4. Compare longer and shorter, measure inches on a ruler, read picture graphs and bar graphs, and find area.":
     "Medidas y datos, de prekínder a grado 4. Compara largo y corto, mide pulgadas, lee gráficas y halla el área.",
-  "Free Dolch and Fry sight word practice for Pre-K to grade 4. Hear a word, match a picture, and fill a sentence. Trace the list, then check the answer key.":
-    "Palabras frecuentes en inglés, de prekínder a grado 4. Escucha la palabra, une el dibujo y completa la oración. Las palabras se quedan en inglés.",
+  "Free Dolch and Fry sight word practice for kindergarten through grade 4. Hear a word, match a picture, and fill a sentence. Trace the list, then check the answer key.":
+    "Palabras frecuentes en inglés, de kínder a grado 4. Escucha la palabra, une el dibujo y completa la oración. Las palabras se quedan en inglés.",
   "Free printable coin practice for Pre-K to grade 4. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.":
     "Monedas para imprimir, de prekínder a grado 4. Nombra, cuenta, forma una cantidad, da el cambio, lee dólares y centavos y resuelve problemas de dinero.",
-  "Free printable telling-time practice for Pre-K to grade 4. Analog clocks to the hour, half hour, quarter hour, and 5 minutes, plus elapsed time, with an answer key.":
-    "La hora para imprimir, de prekínder a grado 4. Relojes en punto, y media, y cuarto, de 5 en 5 y el tiempo transcurrido, con la hoja de respuestas.",
+  "Free printable telling-time practice for grades 1–4. Analog clocks to the hour, half hour, quarter hour, and 5 minutes, plus elapsed time, with an answer key.":
+    "La hora para imprimir, de grado 1 a grado 4. Relojes en punto, y media, y cuarto, de 5 en 5 y el tiempo transcurrido, con la hoja de respuestas.",
   "Free counting practice for Pre-K through grade 4. Count objects to 20, compare groups, find the number before and after, read dot patterns, and fill a ten-frame.":
     "Contar, de prekínder a grado 4. Hasta 20, compara grupos, el número de antes y después, puntos de un vistazo y el tablero de diez.",
-  "Free word problems for Pre-K through grade 4. Short add, subtract, multiply, share, and two-step stories with a picture, read aloud for children who are still learning to read.":
-    "Problemas cortos, de prekínder a grado 4. Sumar, restar, multiplicar, repartir y dos pasos, con un dibujo y la voz en alto.",
+  "Free word problems for kindergarten through grade 4. Short add, subtract, multiply, share, and two-step stories with a picture, read aloud for children who are still learning to read.":
+    "Problemas cortos, de kínder a grado 4. Sumar, restar, multiplicar, repartir y dos pasos, con un dibujo y la voz en alto.",
   "Free phonics practice for Pre-K through grade 4. Letter sounds, beginning sounds with pictures, rhyming words, and CVC blending. A speaker reads the sound, with the sound written out when a voice is not available.":
     "Sonidos del inglés, de prekínder a grado 4. La letra, el sonido del principio, palabras que riman y unir sonidos. La voz dice el sonido.",
   "Free geometry for Pre-K to grade 4. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.":
@@ -994,4 +994,7 @@ export const ES: Record<string, string> = {
   Numbers: "Números",
   "Free missing-number equations for kindergarten through grade 4. Find the box in an addition, subtraction, multiplication, or two-step equation. A first look at variables. No signup.":
     "Ecuaciones con un número que falta, de kínder a grado 4. Busca la caja en una suma, resta, multiplicación o dos pasos. Un primer vistazo a las variables. Sin cuenta.",
+  "Loading…": "Cargando…",
+  "This page is not saved on this device yet. Connect once, then open Academy again.":
+    "Esta página todavía no está guardada en este aparato. Conéctate una vez y abre Academy de nuevo.",
 };

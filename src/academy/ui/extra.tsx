@@ -5,7 +5,7 @@ import { bossCosmeticName, bossForGame } from "../bosses";
 import { bondHearts, bondName, bondScore, bondTier } from "../buddy/bond";
 import { bookEntries, catchphrase } from "../buddy/cast";
 import { palOwned, withBuddy } from "../buddy/unlock";
-import { GAMES, sheetHref } from "../games/registry";
+import { GAME_CARDS as GAMES, sheetHref } from "../games/catalog";
 import { playWindow } from "../grade-map";
 import { setLocale, show, t } from "../i18n";
 import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type AppLang, type Grade, type Save } from "../model";
@@ -16,7 +16,7 @@ import { silence, speak } from "../voice";
 import { AcademyPal, BackLink, Foot, FreeNote, Logo, SquisheeImg, cx } from "./bits";
 import { SquishTally } from "./squishy";
 import { BossFigure, PalWithLook } from "./boss-figure";
-import { GradeChips } from "./grownups";
+import { GradeChips } from "./grade-chips";
 import { LanguageToggle, withLang } from "./lang";
 
 const STARTERS = SQUAD_IDS.slice(0, 3);

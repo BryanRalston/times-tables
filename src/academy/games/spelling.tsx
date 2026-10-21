@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { Rng } from "@/lib/rng";
-import { gamePill, patternName, t } from "../i18n";
+import { patternName, t } from "../i18n";
 import { buddyName, pickTalk } from "./flavor";
-import { bandFor } from "../grade-map";
-import type { Grade } from "../model";
+import { spellingCard } from "./cards";
 import { SquisheeImg, cx } from "../ui/bits";
 import { qid } from "./choices";
 import { SpeakerBar } from "./speaker";
@@ -24,26 +23,6 @@ import {
   placedWord,
   type TileBoard,
 } from "./words";
-
-const LEVELS = [
-  { id: "cvc", label: "CVC words", num: 1 },
-  { id: "digraphs", label: "Digraphs", num: 2 },
-  { id: "blends", label: "Blends", num: 3 },
-  { id: "long", label: "Long vowels", num: 4 },
-  { id: "patterns", label: "Grade 2–3 patterns", num: 5 },
-  { id: "grade4", label: "Grade 4 words", num: 6 },
-] as const;
-
-const BARS = [
-  { key: "spell:cvc", label: "CVC words" },
-  { key: "spell:digraphs", label: "Digraphs" },
-  { key: "spell:blends", label: "Blends" },
-  { key: "spell:long", label: "Long vowels" },
-  { key: "spell:patterns", label: "Grade 2–3 patterns" },
-  { key: "spell:grade4", label: "Grade 4 words" },
-];
-
-const CHIPS = BARS;
 
 export function makeSpellingQuestion(rng: Rng, level: SpellLevel, prefer: string[] = []): ChoiceQ {
   const list = spellWords(level);
@@ -96,33 +75,6 @@ function sheetItem(rng: Rng, level: string): SheetItem {
     };
   }
   return { prompt: blankOut(word.sentence, word.word), answer: word.word };
-}
-
-function labelFor(rows: { key: string; label: string }[], key: string): string | null {
-  return rows.find((row) => row.key === key)?.label ?? null;
-}
-
-function defaultLevel(grade: Grade): SpellLevel {
-  const start = bandFor("spelling", grade)?.start;
-  if (isSpellLevel(start)) return start;
-  switch (grade) {
-    case "K":
-      return "cvc";
-    case "1":
-      return "digraphs";
-    case "2":
-      return "long";
-    case "3":
-      return "patterns";
-    case "PK":
-      return "cvc";
-    case "4":
-      return "grade4";
-    default: {
-      const neverGrade: never = grade;
-      return neverGrade;
-    }
-  }
 }
 
 export function SpellingPrompt({
@@ -268,31 +220,12 @@ export function SpellingChoices({ question, reveal, onChoose }: ChoiceProps) {
 }
 
 export const spellingGame = {
-  id: "spelling",
-  title: "Spelling",
-  audience: "K–4",
-  tint: "sky",
-  mascot: "owl",
-  sheetSlug: "spelling",
-  sheetScreen: "sheet-spelling",
-  blurb:
-    "Free spelling for Pre-K to grade 4. Hear a word in a sentence, then build it from letter tiles. Lists move from CVC words to digraphs, blends, long vowels, and grade 4 words.",
-  sheetCount: 12,
-  layout: "card",
-  levels: [...LEVELS],
-  defaultLevel,
-  sheetDefaultLevel: "cvc",
-  isLevel: isSpellLevel,
-  pill: (level) => gamePill("Spelling", level.num),
+  ...spellingCard,
   makeQuestion: (rng, level, prefer) => makeSpellingQuestion(rng, isSpellLevel(level) ? level : "cvc", prefer),
   makeSheetItem: sheetItem,
   Prompt: SpellingPrompt,
   Choices: SpellingChoices,
   SheetBody: WordSheet,
-  bars: BARS,
-  chips: CHIPS,
-  skillLabel: (key) => labelFor(BARS, key),
-  chipLabel: (key) => labelFor(CHIPS, key),
   reviewKeys: (words) => dueWordIds(words, ALL_SPELL.map((word) => word.id)),
 } satisfies GameModule;
 
