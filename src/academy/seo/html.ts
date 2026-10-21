@@ -87,17 +87,17 @@ const PAGE_STYLE = `
 body {
   margin: 0;
   color: #3c2448;
-  background: #fff7fb;
+  background: #fffaf6;
   font: 700 18px/1.45 Nunito, "Trebuchet MS", sans-serif;
 }
-main { width: min(760px, calc(100% - 28px)); margin: 0 auto; padding: 22px 0 48px; }
+main { width: min(760px, calc(100% - 32px)); margin: 0 auto; padding: 22px 0 48px; }
 a { color: #12988a; }
-h1, h2 { font-family: Fredoka, Nunito, sans-serif; letter-spacing: -0.02em; line-height: 1.15; }
+h1, h2 { font-family: Fredoka, Nunito, "Trebuchet MS", sans-serif; letter-spacing: -0.02em; line-height: 1.15; }
 h1 { font-size: 34px; margin: 8px 0; }
-.brand { font-family: Fredoka, Nunito, sans-serif; font-size: 22px; text-decoration: none; }
+.brand { font-family: Fredoka, Nunito, "Trebuchet MS", sans-serif; font-size: 22px; text-decoration: none; }
 .brand b { color: #ff4b93; }
 .brand i { color: #12988a; font-style: normal; }
-.lede, .fine { color: #8b7386; }
+.lede, .fine { color: #5c4566; }
 .name { margin: 16px 0; }
 ol.problems { padding-left: 1.4em; }
 ol.problems li { margin: 14px 0; break-inside: avoid; }
@@ -108,28 +108,31 @@ ol.problems li { margin: 14px 0; break-inside: avoid; }
 .key ol { columns: 2; }
 .play { margin-top: 22px; }
 .play a, .links a {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
   margin: 6px 10px 0 0;
-  background: #ff4b93;
+  background: #e21870;
   color: white;
   text-decoration: none;
   border-radius: 999px;
-  padding: 10px 16px;
+  padding: 12px 18px;
+  box-shadow: 0 4px 0 #b01058;
 }
-.play a.quiet, .links a.quiet { background: white; color: #12988a; box-shadow: 0 3px 0 #f6d0e2; }
+.play a.quiet, .links a.quiet { background: white; color: #12988a; box-shadow: 0 4px 0 #f3d4e4; }
 .cards { display: grid; gap: 12px; }
 .cards a.card {
   display: block;
   background: white;
   color: inherit;
   text-decoration: none;
-  border-radius: 16px;
-  padding: 14px 16px;
-  box-shadow: 0 4px 0 #f6d0e2;
+  border-radius: 22px;
+  padding: 16px;
+  box-shadow: 0 10px 24px -18px rgb(60 36 72 / 0.55);
 }
-.cards small { display: block; color: #8b7386; font-size: 14px; margin-top: 4px; }
-.prose p { margin: 0 0 12px; }
-.contact { background: #fff; border-radius: 16px; padding: 12px 14px; box-shadow: 0 4px 0 #f6d0e2; }
+.cards small { display: block; color: #5c4566; font-size: 15px; margin-top: 4px; }
+.prose p { margin: 0 0 14px; }
+.contact { background: #fff; border-radius: 22px; padding: 14px 16px; box-shadow: 0 4px 0 #f3d4e4; }
 @media print {
   body { background: white; }
   .noprint { display: none !important; }

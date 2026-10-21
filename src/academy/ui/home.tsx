@@ -15,7 +15,7 @@ import { outfitLabel } from "../wardrobe";
 import { chime } from "../sound";
 import { WeekStickers } from "./stickers";
 import { storiesOffered } from "../stories/offer";
-import { AcademyPal, Foot, GiftBox, LockIcon, Logo, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
+import { AcademyPal, Foot, GiftBox, LockIcon, Logo, PlayMark, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
 import { PalWithLook } from "./boss-figure";
 
 export function HomeScreen({
@@ -100,7 +100,7 @@ export function HomeScreen({
           aria-label={`${playAction}. ${todayLine}`}
           onClick={() => onPlay(playId, playLevel)}
         >
-          <span className="ac-play-tri" aria-hidden="true" />
+          <PlayMark />
           <span className="ac-play-copy">
             <strong>{playAction}</strong>
             <small>{todayLine}</small>

@@ -471,7 +471,7 @@ export function PlayScreen({
     }
     phaseRef.current = "feedback";
     setPhase("feedback");
-    waitRef.current = window.setTimeout(() => advance(fromIndex), 620);
+    waitRef.current = window.setTimeout(() => advance(fromIndex), 880);
   }
 
   function beginTeach(slot: RoundSlot, source: "scored" | "practice") {

@@ -13,7 +13,7 @@ import { buyOutfit, wearOutfit } from "../rewards";
 import { outfitHint, outfitLabel, outfitPrice, shopSections } from "../wardrobe";
 import { activeChild, mapActive, withGrade, withLevel } from "../storage";
 import { silence, speak } from "../voice";
-import { AcademyPal, BackLink, Foot, FreeNote, Logo, SquisheeImg, cx } from "./bits";
+import { AcademyPal, BackLink, Foot, FreeNote, Logo, PlayMark, SquisheeImg, cx } from "./bits";
 import { SquishTally } from "./squishy";
 import { BossFigure, PalWithLook } from "./boss-figure";
 import { GradeChips } from "./grade-chips";
@@ -92,7 +92,7 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
         <GradeChips grade={grade} onGrade={setGrade} className="ac-hello-grades" />
         <button type="submit" className="ac-pal-play" aria-label={show("Play")}>
           <SquisheeImg id={buddy} />
-          <span className="ac-play-tri" aria-hidden="true" />
+          <PlayMark />
         </button>
         <label className="ac-field ac-name-opt">
           {show("Name")}
