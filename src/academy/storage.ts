@@ -2,7 +2,7 @@ import { squisheeById } from "@/lib/squishees";
 import { bossForGame } from "./bosses";
 import { hostIdFor } from "./buddy/hosts";
 import { ownedIds, palOwned } from "./buddy/unlock";
-import { defaultLevels, gameById, GAMES, isGameId } from "./games/registry";
+import { defaultLevels, gameCard as gameById, GAME_CARDS as GAMES, isGameId } from "./games/catalog";
 import { levelAllowed } from "./grade-map";
 import { blankJourney, normalizeJourney, parseJourney } from "./journey";
 import { parseEquippedLook, parseOwnedLooks } from "./wardrobe";

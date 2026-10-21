@@ -1,7 +1,7 @@
 import type { Rng } from "@/lib/rng";
 import { STORY_STARS, type StoryStar } from "../buddy/persona";
 import { howManyPhrase, starLead, t, thingName } from "../i18n";
-import type { Grade } from "../model";
+import { problemsCard } from "./cards";
 import { countName, type ProblemBoard } from "./boards";
 import { nearChoices, sceneQuestion, uniqueChoices } from "./pick";
 import { makeStepsQuestion, spanSheet } from "./span";
@@ -10,24 +10,6 @@ import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
 export const PROBLEM_LEVELS = ["add", "sub", "mult", "div", "picture", "steps"] as const;
 export type ProblemLevel = (typeof PROBLEM_LEVELS)[number];
-
-const LEVELS = [
-  { id: "add", label: "Add stories", num: 1 },
-  { id: "sub", label: "Subtract stories", num: 2 },
-  { id: "mult", label: "Multiply stories", num: 3 },
-  { id: "div", label: "Share stories", num: 4 },
-  { id: "picture", label: "Picture stories", num: 5 },
-  { id: "steps", label: "Two-step stories", num: 6 },
-] as const;
-
-const BARS = [
-  { key: "problems:add", label: "Add stories" },
-  { key: "problems:sub", label: "Subtract stories" },
-  { key: "problems:mult", label: "Multiply stories" },
-  { key: "problems:div", label: "Share stories" },
-  { key: "problems:picture", label: "Picture stories" },
-  { key: "problems:steps", label: "Two-step stories" },
-];
 
 const THINGS = [
   { name: "apples", emoji: "🍎" },
@@ -40,25 +22,6 @@ const THINGS = [
 
 export function isProblemLevel(value: unknown): value is ProblemLevel {
   return typeof value === "string" && (PROBLEM_LEVELS as readonly string[]).includes(value);
-}
-
-function defaultLevel(grade: Grade): ProblemLevel {
-  switch (grade) {
-    case "PK":
-    case "K":
-    case "1":
-      return "add";
-    case "2":
-      return "sub";
-    case "3":
-      return "picture";
-    case "4":
-      return "steps";
-    default: {
-      const neverGrade: never = grade;
-      return neverGrade;
-    }
-  }
 }
 
 function storyValue(op: ProblemBoard["op"], a: number, b: number): number {
@@ -417,22 +380,8 @@ function ProblemArt({ board }: { board: ProblemBoard }) {
 }
 
 export const problemsGame = sceneModule({
-  id: "problems",
-  title: "Word Problems",
+  ...problemsCard,
   short: "Word Problems",
-  audience: "K–4",
-  tint: "rose",
-  mascot: "fox",
-  sheetSlug: "word-problems",
-  sheetScreen: "sheet-problems",
-  blurb:
-    "Free word problems for Pre-K through grade 4. Short add, subtract, multiply, share, and two-step stories with a picture, read aloud for children who are still learning to read.",
-  levels: [...LEVELS],
-  defaultLevel,
-  sheetDefaultLevel: "add",
-  isLevel: isProblemLevel,
-  bars: BARS,
-  chips: BARS,
   makeQuestion: (rng, level) => makeProblemQuestion(rng, isProblemLevel(level) ? level : "add"),
   makeSheetItem: sheetItem,
   Prompt: ProblemsPrompt,

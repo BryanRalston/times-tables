@@ -1,4 +1,4 @@
-import { daysPlayedCaption, daysPlayedThisWeek, weekStickers } from "../round-flow";
+import { daysPlayedCaption, daysPlayedThisWeek, weekStickers } from "../week";
 import { cx, Star } from "./bits";
 
 export function WeekStickers({ secondsByDay, today }: { secondsByDay: Record<string, number>; today: string }) {

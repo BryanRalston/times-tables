@@ -40,7 +40,8 @@ import {
   type RoundResult,
   type SkillStat,
 } from "../model";
-import { makeBossRound, makeQuestion, type ChoiceQ } from "../questions";
+import { makeBossRound, makeQuestion } from "../games/round";
+import type { ChoiceQ } from "../games/types";
 import { coinsForRound, dueIdeas, newestUnlock, starsForRound, weakTimesFacts } from "../rewards";
 import {
   exampleFor,

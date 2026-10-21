@@ -1,5 +1,5 @@
 import { squisheeById } from "@/lib/squishees";
-import { GAMES } from "../games/registry";
+import { GAME_CARDS as GAMES } from "../games/catalog";
 
 /**
  * Island residents. Starters (peach, frog, bunny) stay free so a boss

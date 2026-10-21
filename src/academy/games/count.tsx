@@ -1,7 +1,7 @@
 import type { Rng } from "@/lib/rng";
 import { t, thingName } from "../i18n";
-import type { Grade } from "../model";
 import { buddyName, pickTalk } from "./flavor";
+import { countCard } from "./cards";
 import { countName, type CountBoard } from "./boards";
 import { distinctInts, nearChoices, sceneQuestion } from "./pick";
 import { DotClusters, SceneCard, SquisheeRow, TenFrames, sceneModule } from "./scene-ui";
@@ -9,26 +9,6 @@ import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
 export const COUNT_LEVELS = ["objects", "to20", "compare", "neighbor", "subitize", "tenframe", "build"] as const;
 export type CountLevel = (typeof COUNT_LEVELS)[number];
-
-const LEVELS = [
-  { id: "objects", label: "Count to 10", num: 1 },
-  { id: "to20", label: "Count to 20", num: 2 },
-  { id: "compare", label: "More or less", num: 3 },
-  { id: "neighbor", label: "Before and after", num: 4 },
-  { id: "subitize", label: "Dot patterns", num: 5 },
-  { id: "tenframe", label: "Ten-frames", num: 6 },
-  { id: "build", label: "Build a ten-frame", num: 7 },
-] as const;
-
-const BARS = [
-  { key: "count:objects", label: "Count to 10" },
-  { key: "count:to20", label: "Count to 20" },
-  { key: "count:compare", label: "More or less" },
-  { key: "count:neighbor", label: "Before and after" },
-  { key: "count:subitize", label: "Dot patterns" },
-  { key: "count:tenframe", label: "Ten-frames" },
-  { key: "count:build", label: "Build a ten-frame" },
-];
 
 const DOTS: number[][][] = [
   [[1]],
@@ -41,25 +21,6 @@ const DOTS: number[][][] = [
 
 export function isCountLevel(value: unknown): value is CountLevel {
   return typeof value === "string" && (COUNT_LEVELS as readonly string[]).includes(value);
-}
-
-function defaultLevel(grade: Grade): CountLevel {
-  switch (grade) {
-    case "PK":
-    case "K":
-      return "objects";
-    case "1":
-      return "to20";
-    case "2":
-      return "tenframe";
-    case "3":
-    case "4":
-      return "neighbor";
-    default: {
-      const neverGrade: never = grade;
-      return neverGrade;
-    }
-  }
 }
 
 function ask(rng: Rng, spec: Parameters<typeof sceneQuestion>[1]): ChoiceQ {
@@ -345,22 +306,8 @@ function CountArt({ board }: { board: CountBoard }) {
 }
 
 export const countGame = sceneModule({
-  id: "count",
-  title: "Counting",
+  ...countCard,
   short: "Counting",
-  audience: "Pre-K–4",
-  tint: "coral",
-  mascot: "chick",
-  sheetSlug: "counting",
-  sheetScreen: "sheet-count",
-  blurb:
-    "Free counting practice for Pre-K through grade 4. Count objects to 20, compare groups, find the number before and after, read dot patterns, and fill a ten-frame.",
-  levels: [...LEVELS],
-  defaultLevel,
-  sheetDefaultLevel: "objects",
-  isLevel: isCountLevel,
-  bars: BARS,
-  chips: BARS,
   makeQuestion: (rng, level) => makeCountQuestion(rng, isCountLevel(level) ? level : "objects"),
   makeSheetItem: sheetItem,
   Prompt: CountPrompt,

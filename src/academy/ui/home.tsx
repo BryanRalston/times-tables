@@ -4,7 +4,7 @@ import { bondName, bondScore, bondTier } from "../buddy/bond";
 import { bookEntries, catchphrase } from "../buddy/cast";
 import { ownedIds } from "../buddy/unlock";
 import { bossForGame } from "../bosses";
-import { GAMES } from "../games/registry";
+import { GAME_CARDS as GAMES } from "../games/catalog";
 import { bandFor } from "../grade-map";
 import { bossReady, dailySnapshot, normalizeJourney } from "../journey";
 import { show, t } from "../i18n";
@@ -14,7 +14,7 @@ import { rollGift, type GiftRoll } from "../rewards";
 import { outfitLabel } from "../wardrobe";
 import { chime } from "../sound";
 import { WeekStickers } from "./stickers";
-import { storiesOffered } from "../stories/engine";
+import { storiesOffered } from "../stories/offer";
 import { AcademyPal, Foot, GiftBox, LockIcon, Logo, ProgressRing, SquisheeImg, Stars, cx } from "./bits";
 import { PalWithLook } from "./boss-figure";
 

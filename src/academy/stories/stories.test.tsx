@@ -8,7 +8,7 @@ import { storyBrief } from "../family-report";
 import { applyStory } from "../rewards";
 import { blankChild } from "../storage";
 import { clipStartMs } from "../voice/player";
-import { VOICE_FILES } from "../voice/clips";
+import { VOICE_FILES } from "../voice/manifest";
 import { planSpeech } from "../voice/plan";
 import { wordAllowed } from "./band";
 import { STORIES, storyById } from "./catalog";

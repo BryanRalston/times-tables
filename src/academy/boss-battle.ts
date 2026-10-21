@@ -1,5 +1,5 @@
 import { t } from "./i18n";
-import { gameById } from "./games/registry";
+import { gameCard as gameById } from "./games/catalog";
 import { bandFor, playWindow } from "./grade-map";
 import { bossForGame } from "./bosses";
 import { BOSS_LENGTH, BOSS_PASS, type Child, type Grade } from "./model";

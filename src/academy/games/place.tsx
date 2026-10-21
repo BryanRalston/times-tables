@@ -1,7 +1,7 @@
 import type { Rng } from "@/lib/rng";
 import { t } from "../i18n";
-import type { Grade } from "../model";
 import { buddyName, pickTalk } from "./flavor";
+import { placeCard } from "./cards";
 import { blockPhrase, expandedForm, roundHalfUp, type PlaceBoard } from "./boards";
 import { extremeChoices, nearChoices, sceneQuestion, uniqueChoices } from "./pick";
 import { makeBigPlaceQuestion, makeRoundBigQuestion, spanSheet } from "./span";
@@ -11,49 +11,8 @@ import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 export const PLACE_LEVELS = ["blocks", "expanded", "compare", "round10", "round100", "build", "big", "roundBig"] as const;
 export type PlaceLevel = (typeof PLACE_LEVELS)[number];
 
-const LEVELS = [
-  { id: "blocks", label: "Tens and ones", num: 1 },
-  { id: "expanded", label: "Expanded form", num: 2 },
-  { id: "compare", label: "Compare numbers", num: 3 },
-  { id: "round10", label: "Round to 10", num: 4 },
-  { id: "round100", label: "Round to 100", num: 5 },
-  { id: "build", label: "Build a number", num: 6 },
-  { id: "big", label: "Place value to 1,000,000", num: 7 },
-  { id: "roundBig", label: "Round large numbers", num: 8 },
-] as const;
-
-const BARS = [
-  { key: "place:blocks", label: "Tens and ones" },
-  { key: "place:expanded", label: "Expanded form" },
-  { key: "place:compare", label: "Compare numbers" },
-  { key: "place:round10", label: "Round to 10" },
-  { key: "place:round100", label: "Round to 100" },
-  { key: "place:build", label: "Build a number" },
-  { key: "place:big", label: "Place value to 1,000,000" },
-  { key: "place:roundBig", label: "Round large numbers" },
-];
-
 export function isPlaceLevel(value: unknown): value is PlaceLevel {
   return typeof value === "string" && (PLACE_LEVELS as readonly string[]).includes(value);
-}
-
-function defaultLevel(grade: Grade): PlaceLevel {
-  switch (grade) {
-    case "PK":
-    case "K":
-    case "1":
-      return "blocks";
-    case "2":
-      return "expanded";
-    case "3":
-      return "round10";
-    case "4":
-      return "big";
-    default: {
-      const neverGrade: never = grade;
-      return neverGrade;
-    }
-  }
 }
 
 function different(rng: Rng, n: number, lo: number, hi: number): number {
@@ -337,22 +296,8 @@ function PlaceArt({ board }: { board: PlaceBoard }) {
 }
 
 export const placeGame = sceneModule({
-  id: "place",
-  title: "Place Value",
+  ...placeCard,
   short: "Place Value",
-  audience: "1–4",
-  tint: "leaf",
-  mascot: "bear",
-  sheetSlug: "place-value",
-  sheetScreen: "sheet-place",
-  blurb:
-    "Free place value practice for grades 1–4. Tens and ones with base-ten blocks, expanded form, comparing numbers, rounding, and thousands up to a million.",
-  levels: [...LEVELS],
-  defaultLevel,
-  sheetDefaultLevel: "blocks",
-  isLevel: isPlaceLevel,
-  bars: BARS,
-  chips: BARS,
   makeQuestion: (rng, level) => makePlaceQuestion(rng, isPlaceLevel(level) ? level : "blocks"),
   makeSheetItem: sheetItem,
   Prompt: PlacePrompt,

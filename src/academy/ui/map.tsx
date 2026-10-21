@@ -5,7 +5,7 @@ import { hatchPick } from "../buddy/egg";
 import { hostIdFor } from "../buddy/hosts";
 import { ownedIds } from "../buddy/unlock";
 import { bossForGame } from "../bosses";
-import { GAMES, gameById } from "../games/registry";
+import { GAME_CARDS as GAMES, gameCard as gameById } from "../games/catalog";
 import { bandFor } from "../grade-map";
 import { areaIndex, areaOpen, bossReady, normalizeJourney } from "../journey";
 import { show, t } from "../i18n";

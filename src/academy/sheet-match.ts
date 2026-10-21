@@ -1,5 +1,5 @@
 import { t } from "./i18n";
-import { gameById, isGameId, type GameId } from "./games/registry";
+import { gameCard as gameById, isGameId, type GameId } from "./games/catalog";
 import { sheetHref } from "./paths";
 
 /** A free worksheet a parent can open. Static pages use a slug; playable sheets add a query. */

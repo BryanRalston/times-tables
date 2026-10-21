@@ -1,5 +1,5 @@
 import { getLocale } from "./i18n";
-import { loadSpanishVoice } from "./voice/clips";
+import { ensureVoice } from "./voice/clips";
 import { startClipSpeech, stopClipSpeech } from "./voice/player";
 
 /** Spoken prompts. Recorded clips play first. The device voice is only for a line with no clip. */
@@ -104,15 +104,10 @@ export function speak(text: string, enabled: boolean): void {
   const line = text.trim();
   if (!enabled || !line) return;
   cancelDevice();
-  if (getLocale() === "es") {
-    void loadSpanishVoice().then(() => {
-      if (startClipSpeech(line, 1, () => sayWithDevice(line))) return;
-      sayWithDevice(line);
-    });
-    return;
-  }
-  if (startClipSpeech(line, 1, () => sayWithDevice(line))) return;
-  sayWithDevice(line);
+  void ensureVoice().then(() => {
+    if (startClipSpeech(line, 1, () => sayWithDevice(line))) return;
+    sayWithDevice(line);
+  });
 }
 
 function sayWithDevice(line: string): void {
