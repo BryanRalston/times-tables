@@ -4,6 +4,7 @@ import { hostIdFor } from "./buddy/hosts";
 import { ownedIds, palOwned } from "./buddy/unlock";
 import { defaultLevels, gameById, GAMES, isGameId } from "./games/registry";
 import { levelAllowed } from "./grade-map";
+import { foldSkillHistory } from "./history";
 import { blankJourney, normalizeJourney, parseJourney } from "./journey";
 import { parseEquippedLook, parseOwnedLooks } from "./wardrobe";
 import {
@@ -22,7 +23,7 @@ import {
 
 /** Stable key. The schema version lives on the save, not in the key name. */
 export const STORAGE_KEY = "squishee-academy-v1";
-export const SAVE_VERSION = 10;
+export const SAVE_VERSION = 11;
 
 /**
  * Migrations run from the save's version up to SAVE_VERSION.
@@ -38,6 +39,7 @@ const MIGRATIONS: Record<number, (raw: Record<string, unknown>) => Record<string
   7: migrateV7toV8,
   8: migrateV8toV9,
   9: migrateV9toV10,
+  10: migrateV10toV11,
 };
 
 /** A newer app wrote this disk. Don't replace it with an older schema. */
@@ -61,6 +63,9 @@ export function blankChild(opts: { id?: string; name?: string; grade?: Grade; av
     lastPlayed: null,
     opened: 3,
     skills: {},
+    history: {},
+    roundsByMonth: {},
+    foldedMonth: "",
     secondsByDay: {},
     bestStars: Object.fromEntries(GAMES.map((game) => [game.id, 0])),
     rounds: 0,
@@ -223,6 +228,37 @@ function migrateV9toV10(raw: Record<string, unknown>): Record<string, unknown> {
   return { ...raw, version: 10 };
 }
 
+/** Version 10 kept a running total per skill. Month history starts here, and those totals are copied in. */
+function migrateV10toV11(raw: Record<string, unknown>): Record<string, unknown> {
+  const children = Array.isArray(raw.children)
+    ? raw.children.map((row) => {
+        if (!row || typeof row !== "object" || Array.isArray(row)) return row;
+        const child = row as Record<string, unknown>;
+        if (child.history && typeof child.history === "object" && !Array.isArray(child.history)) {
+          return {
+            ...child,
+            roundsByMonth:
+              child.roundsByMonth && typeof child.roundsByMonth === "object" ? child.roundsByMonth : {},
+            foldedMonth: typeof child.foldedMonth === "string" ? child.foldedMonth : "",
+          };
+        }
+        const folded = foldSkillHistory({
+          skills: asRecord(child.skills),
+          secondsByDay: asRecord(child.secondsByDay),
+          lastPlayed: typeof child.lastPlayed === "string" ? child.lastPlayed : null,
+          rounds: typeof child.rounds === "number" ? child.rounds : 0,
+        });
+        return {
+          ...child,
+          history: folded.history,
+          roundsByMonth: folded.roundsByMonth,
+          foldedMonth: folded.foldedMonth,
+        };
+      })
+    : raw.children;
+  return { ...raw, version: 11, children };
+}
+
 function migrateRaw(raw: unknown): unknown {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return raw;
   let current = raw as Record<string, unknown>;
@@ -266,6 +302,46 @@ function parseSkills(raw: unknown): Record<string, SkillStat> {
     if (!key || key.length > 40 || !value || typeof value !== "object") continue;
     const row = value as Record<string, unknown>;
     out[key] = { ok: clampInt(row.ok, 0, 100000), miss: clampInt(row.miss, 0, 100000) };
+  }
+  return out;
+}
+
+const MONTH_KEY = /^\d{4}-\d{2}$/;
+
+function parseHistory(raw: unknown): Child["history"] {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+  const out: Child["history"] = {};
+  for (const [month, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (!MONTH_KEY.test(month)) continue;
+    const monthNum = Number(month.slice(5, 7));
+    if (monthNum < 1 || monthNum > 12 || !value || typeof value !== "object" || Array.isArray(value)) continue;
+    const bucket: Child["history"][string] = {};
+    for (const [key, row] of Object.entries(value as Record<string, unknown>)) {
+      if (!key || key.length > 40 || !row || typeof row !== "object") continue;
+      const stat = row as Record<string, unknown>;
+      const skill = {
+        ok: clampInt(stat.ok, 0, 100000),
+        miss: clampInt(stat.miss, 0, 100000),
+        rounds: clampInt(stat.rounds, 0, 100000),
+        seconds: clampInt(stat.seconds, 0, 4 * 60 * 60 * 31),
+      };
+      if (skill.ok + skill.miss + skill.rounds + skill.seconds <= 0) continue;
+      bucket[key] = skill;
+    }
+    if (Object.keys(bucket).length > 0) out[month] = bucket;
+  }
+  return out;
+}
+
+function parseRoundsByMonth(raw: unknown): Record<string, number> {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+  const out: Record<string, number> = {};
+  for (const [month, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (!MONTH_KEY.test(month)) continue;
+    const monthNum = Number(month.slice(5, 7));
+    if (monthNum < 1 || monthNum > 12) continue;
+    const rounds = clampInt(value, 0, 100000);
+    if (rounds > 0) out[month] = rounds;
   }
   return out;
 }
@@ -403,6 +479,9 @@ export function parseChild(raw: unknown): Child | null {
     lastPlayed,
     opened: clampInt(o.opened, 0, SQUAD_IDS.length, 3),
     skills: parseSkills(o.skills),
+    history: parseHistory(o.history),
+    roundsByMonth: parseRoundsByMonth(o.roundsByMonth),
+    foldedMonth: typeof o.foldedMonth === "string" && MONTH_KEY.test(o.foldedMonth) ? o.foldedMonth : "",
     secondsByDay: parseSeconds(o.secondsByDay),
     bestStars,
     rounds: clampInt(o.rounds, 0, 100000),

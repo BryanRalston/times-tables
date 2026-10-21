@@ -24,6 +24,11 @@ describe("grown-ups report", () => {
     expect(ui).toContain("BackupPanel");
     expect(ui).toContain("InstallTip");
     expect(ui).toContain("Print this week");
+    expect(ui).toContain("HistoryPanel");
+    const history = readFileSync(new URL("./ui/history-panel.tsx", import.meta.url), "utf8");
+    expect(history).toContain("Month by month");
+    expect(history).toContain("Print the report");
+    expect(history).not.toContain("streak");
   });
 
   it("covers math and reading games with a worksheet that exists", () => {
@@ -113,7 +118,7 @@ describe("grown-ups report", () => {
     for (const line of [report.card.line, report.card.suggestion, report.card.deviceNote]) {
       expect(line).not.toMatch(CALM);
     }
-    for (const key of ["Going well", "Still learning", "Tonight", "By game", "Print this week", "No practice"]) {
+    for (const key of ["Going well", "Still learning", "Tonight", "By game", "Print this week", "No practice", "Month by month", "Print the report"]) {
       expect(ES[key]?.length).toBeGreaterThan(0);
     }
   });

@@ -1,6 +1,7 @@
 import { applyBuyCosmetic, isCosmeticId } from "@/lib/cosmetics";
 import { hashSeed } from "@/lib/rng";
 import { noteMark, skillHeat } from "./adapt";
+import { noteMonthRound, recordRoundHistory } from "./history";
 import { grantBossPrize } from "./boss-battle";
 import { GAMES, barKeys, chipKeys, chipLabel as chipText, skillLabel as skillText, type GameId } from "./games/registry";
 import { bondScore, learningLooks, studyCount, withLearningLooks } from "./buddy/bond";
@@ -152,6 +153,8 @@ export function applyRound(child: Child, result: RoundResult, today: string): Ch
   const secondsByDay = { ...child.secondsByDay };
   const add = Math.max(0, Math.min(180, Math.round(result.seconds)));
   secondsByDay[today] = Math.min(DAY_CAP_SECONDS, (secondsByDay[today] ?? 0) + add);
+  const history = recordRoundHistory(child.history ?? {}, today, result.answers, add);
+  const roundsByMonth = noteMonthRound(child.roundsByMonth ?? {}, today);
   const bestCombo = Math.max(0, Math.floor(result.bestCombo ?? 0));
   const boss = result.boss === true;
   const daily = withDailyRound(child, today);
@@ -168,6 +171,8 @@ export function applyRound(child: Child, result: RoundResult, today: string): Ch
     streak: streak.count,
     lastPlayed: streak.lastPlayed,
     skills,
+    history,
+    roundsByMonth,
     secondsByDay,
     bestStars,
     bonds: { ...child.bonds, [child.avatarId]: nextBond },
@@ -218,6 +223,13 @@ export function applyStory(child: Child, result: StoryFinish, today: string): Ch
   const secondsByDay = { ...child.secondsByDay };
   const add = Math.max(0, Math.min(180, Math.round(result.seconds)));
   secondsByDay[today] = Math.min(DAY_CAP_SECONDS, (secondsByDay[today] ?? 0) + add);
+  const history = recordRoundHistory(
+    child.history ?? {},
+    today,
+    [{ skill: `story:${result.id}`, tags: [], ok: true }],
+    add,
+  );
+  const roundsByMonth = noteMonthRound(child.roundsByMonth ?? {}, today);
   const prevBond = bondScore(child.bonds, child.avatarId);
   const nextBond = Math.min(9999, prevBond + 1);
   const study = studyCount(child.bestStars);
@@ -228,6 +240,8 @@ export function applyStory(child: Child, result: StoryFinish, today: string): Ch
     streak: streak.count,
     lastPlayed: streak.lastPlayed,
     skills,
+    history,
+    roundsByMonth,
     secondsByDay,
     bonds: { ...child.bonds, [child.avatarId]: nextBond },
     rounds: child.rounds + 1,

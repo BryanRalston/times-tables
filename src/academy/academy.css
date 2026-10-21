@@ -534,6 +534,20 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   text-align: center;
 }
 .ac-report-actions a { background: #fff6cc; }
+.ac-history { margin-top: 14px; }
+.ac-month { margin-top: 16px; padding-top: 12px; border-top: 2px dashed #f3c3d6; }
+.ac-month h3 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  align-items: baseline;
+  margin-top: 0;
+  font-size: 18px;
+}
+.ac-month h3 span { min-width: 0; }
+.ac-month h3 small { color: var(--ac-muted); font-size: 13px; font-weight: 800; }
+.ac-standard { color: var(--ac-muted); font-size: 12px; font-weight: 700; line-height: 1.35; }
 .ac-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .ac-chip { padding: 6px 10px; border-radius: 999px; background: #e7fbf6; color: #0e7c72; font-weight: 800; }
 .ac-tip { margin-top: 12px; padding: 12px; border-radius: 16px; background: #fff6cc; }
@@ -1307,7 +1321,8 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
     margin: 0;
     padding: 0;
   }
-  .ac-report, .ac-report-list li, .ac-bar-col { break-inside: avoid; }
+  .ac-report, .ac-report-list li, .ac-bar-col, .ac-month { break-inside: avoid; }
+  .ac-shell.is-print-week .ac-history { display: none !important; }
   .ac-bar-plot span, .ac-track, .ac-track i { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }
 
