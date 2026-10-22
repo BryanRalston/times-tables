@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { installPortuguese, setLocale, type Locale } from "./i18n";
+import { installFrench, installPortuguese, setLocale, type Locale } from "./i18n";
+import { BOSS_FR, FR, PERSONA_FALLBACK_FR, PERSONA_FR, TRAIT_FR } from "./i18n-fr";
 import { BOSS_PT, PERSONA_FALLBACK_PT, PERSONA_PT, PT, TRAIT_PT } from "./i18n-pt";
 
 installPortuguese({ PT, PERSONA_PT, PERSONA_FALLBACK_PT, BOSS_PT, TRAIT_PT });
+installFrench({ FR, PERSONA_FR, PERSONA_FALLBACK_FR, BOSS_FR, TRAIT_FR });
 import { rngFromSeed } from "@/lib/rng";
 import { openingIndex, startLadder, stepLadder } from "./adapt";
 import { GAMES } from "./games/registry";
@@ -585,7 +587,7 @@ describe("grade bands", () => {
   });
 
   it("keeps 200 questions inside each grade", () => {
-    const locales: Locale[] = ["en", "es", "pt"];
+    const locales: Locale[] = ["en", "es", "pt", "fr"];
     try {
     for (const locale of locales) {
       setLocale(locale);
@@ -626,5 +628,5 @@ describe("grade bands", () => {
     } finally {
       setLocale("en");
     }
-  }, 45_000);
+  }, 60_000);
 });

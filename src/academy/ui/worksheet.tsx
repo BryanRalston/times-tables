@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { rngFromSeed } from "@/lib/rng";
 import { gameById } from "../games/registry";
-import { getLocale, loadPortuguese, portugueseReady, setLocale, show, t } from "../i18n";
+import { getLocale, loadLocalePack, localePackReady, setLocale, show, t } from "../i18n";
 import { makeSheet } from "../games/round";
 import { loadSave } from "../storage";
 
 export function WorksheetPage({ game: gameId }: { game: string }) {
   setLocale(loadSave().lang);
   const lang = getLocale();
-  const [packReady, setPackReady] = useState(() => lang !== "pt" || portugueseReady());
+  const [packReady, setPackReady] = useState(() => localePackReady(lang));
   useEffect(() => {
-    if (lang !== "pt") return;
+    if (localePackReady(lang)) return;
     let live = true;
-    void loadPortuguese().then(() => {
+    void loadLocalePack(lang).then(() => {
       if (live) setPackReady(true);
     });
     return () => {
@@ -29,7 +29,10 @@ export function WorksheetPage({ game: gameId }: { game: string }) {
   );
 
   if (!spec) return null;
-  if (!packReady) return <p className="ac-note">Carregando…</p>;
+  if (!packReady) {
+    const waiting = lang === "fr" ? "Chargement…" : lang === "pt" ? "Carregando…" : "Loading…";
+    return <p className="ac-note">{waiting}</p>;
+  }
 
   function pushLevel(next: string) {
     const url = new URL(window.location.href);
@@ -50,7 +53,7 @@ export function WorksheetPage({ game: gameId }: { game: string }) {
     setSeed(Date.now() % 1_000_000_000);
   }
 
-  const title = t(`${spec.title} worksheet`, `Hoja de ${show(spec.title)}`, `Folha de ${show(spec.title)}`);
+  const title = t(`${spec.title} worksheet`, `Hoja de ${show(spec.title)}`, `Folha de ${show(spec.title)}`, `Fiche de ${show(spec.title)}`);
 
   return (
     <div className="ac-sheet-page">

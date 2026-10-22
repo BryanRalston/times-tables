@@ -914,18 +914,16 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   white-space: nowrap;
   border: 0;
 }
-.ac-hello-lang {
+.ac-lang-list {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   gap: 8px;
-  margin: 0 0 8px;
+  width: min(100%, 280px);
+  margin: 0 auto 8px;
 }
-.ac-lang-row { flex-wrap: nowrap; }
-.ac-hello-lang .ac-grade,
-.ac-lang-row .ac-grade {
-  flex: 1 1 0;
+.ac-lang-list .ac-grade {
+  width: 100%;
   min-width: 0;
-  padding-inline: 8px;
 }
 .ac-hello-grades { justify-content: center; margin: 10px 0 14px; }
 .ac-finger {

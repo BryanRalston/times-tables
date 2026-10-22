@@ -190,7 +190,7 @@ export function GraphBench({
   return (
     <div className="ac-data" data-graph={spec.mode} data-ready={matched ? "yes" : "no"}>
       {spec.scale > 1 ? (
-        <p className="ac-graph-key">{t(`Each picture is ${spec.scale}`, `Cada dibujo vale ${spec.scale}`)}</p>
+        <p className="ac-graph-key">{t(`Each picture is ${spec.scale}`, `Cada dibujo vale ${spec.scale}`, undefined, `Chaque image vaut ${spec.scale}`)}</p>
       ) : null}
       <div className={spec.mode === "line" ? "ac-graph-line" : "ac-graph-cols"}>
         {Array.from({ length: bins }, (_, index) => {
@@ -235,7 +235,7 @@ export function GraphBench({
                       token.label.includes("/")
                         ? `Devolva ${token.label}`
                         : `Devolva ${nounIsFeminine(token.label) ? "a" : "o"} ${token.label}`,
-                    )}
+                    token.label.includes("/") ? `Remets ${token.label}` : `Remets ${nounIsFeminine(token.label) ? "la" : "le"} ${token.label}`)}
                     disabled={locked}
                     {...tokenProps(token.id)}
                   >

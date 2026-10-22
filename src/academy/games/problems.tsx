@@ -60,71 +60,71 @@ function storyTitle(rng: Rng, level: Exclude<ProblemLevel, "picture">, star: Sto
       return t(
         `${star.name} the ${star.trait} has ${a} ${items}. ${star.pal} brings ${b} more. How many ${thing} now?`,
         `${lead} tiene ${a} ${esItems}. ${star.pal} trae ${b} más. ¿${esMany} hay ahora?`, `${lead} tem ${a} ${esItems}. ${star.pal} traz ${b} a mais. ${esMany} tem agora?`,
-      );
+      `${lead} a ${a} ${esItems}. ${star.pal} en apporte ${b} de plus. ${esMany} y a-t-il maintenant ?`);
     }
     if (roll === 1) {
       return t(
         `${star.name} finds ${a} ${items} and ${star.pal} finds ${b}. How many ${thing} in all?`,
         `${star.name} encuentra ${a} ${esItems} y ${star.pal} encuentra ${b}. ¿${esMany} hay en total?`, `${star.name} encontra ${a} ${esItems} e ${star.pal} encontra ${b}. ${esMany} tem ao todo?`,
-      );
+      `${star.name} trouve ${a} ${esItems} et ${star.pal} trouve ${b}. ${esMany} y a-t-il en tout ?`);
     }
     return t(
       `There are ${a} ${items} with ${star.name} and ${b} with ${star.pal}. How many ${thing} altogether?`,
       `Hay ${a} ${esItems} con ${star.name} y ${b} con ${star.pal}. ¿${esMany} hay en total?`, `Tem ${a} ${esItems} com ${star.name} e ${b} com ${star.pal}. ${esMany} tem ao todo?`,
-    );
+    `Il y a ${a} ${esItems} avec ${star.name} et ${b} avec ${star.pal}. ${esMany} y a-t-il en tout ?`);
   }
   if (level === "sub") {
     if (roll === 0) {
       return t(
         `${star.name} has ${a} ${items} and gives ${b} to ${star.pal}. How many ${thing} are left?`,
         `${star.name} tiene ${a} ${esItems} y le da ${b} a ${star.pal}. ¿${esMany} quedan?`, `${star.name} tem ${a} ${esItems} e dá ${b} para ${star.pal}. ${esMany} sobram?`,
-      );
+      `${star.name} a ${a} ${esItems} et en donne ${b} à ${star.pal}. ${esMany} en reste-t-il ?`);
     }
     if (roll === 1) {
       return t(
         `${star.name} the ${star.trait} sees ${a} ${items}. ${b} go to ${star.pal}. How many ${thing} are left?`,
         `${lead} ve ${a} ${esItems}. ${b} se van con ${star.pal}. ¿${esMany} quedan?`, `${lead} vê ${a} ${esItems}. ${b} vão com ${star.pal}. ${esMany} sobram?`,
-      );
+      `${lead} voit ${a} ${esItems}. ${b} partent avec ${star.pal}. ${esMany} en reste-t-il ?`);
     }
     return t(
       `${star.name} starts with ${a} ${items} and shares ${b} with ${star.pal}. How many ${thing} are left?`,
       `${star.name} empieza con ${a} ${esItems} y comparte ${b} con ${star.pal}. ¿${esMany} quedan?`, `${star.name} começa com ${a} ${esItems} e reparte ${b} com ${star.pal}. ${esMany} sobram?`,
-    );
+    `${star.name} commence avec ${a} ${esItems} et partage ${b} avec ${star.pal}. ${esMany} en reste-t-il ?`);
   }
   if (level === "mult") {
     if (roll === 0) {
       return t(
         `${star.name} has ${a} ${bags} with ${b} ${each} in each bag. How many ${thing}?`,
         `${star.name} tiene ${a} ${esBags} con ${b} ${esEach} en cada bolsa. ¿${esMany} hay?`, `${star.name} tem ${a} ${esBags} com ${b} ${esEach} em cada sacola. ${esMany} tem?`,
-      );
+      `${star.name} a ${a} ${esBags} avec ${b} ${esEach} dans chaque sac. ${esMany} y a-t-il ?`);
     }
     if (roll === 1) {
       return t(
         `${star.name} the ${star.trait} makes ${a} rows of ${b} ${each}. How many ${thing}?`,
         `${lead} hace ${a} filas de ${b} ${esEach}. ¿${esMany} hay?`, `${lead} faz ${a} linhas de ${b} ${esEach}. ${esMany} tem?`,
-      );
+      `${lead} fait ${a} lignes de ${b} ${esEach}. ${esMany} y a-t-il ?`);
     }
     return t(
       `${star.pal} sets out ${a} groups of ${b} ${each} for ${star.name}. How many ${thing}?`,
       `${star.pal} pone ${a} grupos de ${b} ${esEach} para ${star.name}. ¿${esMany} hay?`, `${star.pal} põe ${a} grupos de ${b} ${esEach} para ${star.name}. ${esMany} tem?`,
-    );
+    `${star.pal} pose ${a} groupes de ${b} ${esEach} pour ${star.name}. ${esMany} y a-t-il ?`);
   }
   if (roll === 0) {
     return t(
       `${star.name} has ${a} ${items} shared into ${b} equal groups. How many ${thing} are in each group?`,
       `${star.name} pone ${a} ${esItems} en ${b} grupos iguales. ¿${esMany} hay en cada grupo?`, `${star.name} põe ${a} ${esItems} em ${b} grupos iguais. ${esMany} tem em cada grupo?`,
-    );
+    `${star.name} met ${a} ${esItems} dans ${b} groupes égaux. ${esMany} y a-t-il dans chaque groupe ?`);
   }
   if (roll === 1) {
     return t(
       `${star.name} the ${star.trait} shares ${a} ${items} with ${b} friends. How many ${thing} does each friend get?`,
       `${lead} comparte ${a} ${esItems} con ${b} amigos. ¿${esMany} recibe cada amigo?`, `${lead} reparte ${a} ${esItems} com ${b} amigos. ${esMany} cada amigo recebe?`,
-    );
+    `${lead} partage ${a} ${esItems} avec ${b} copains. ${esMany} chaque copain reçoit-il ?`);
   }
   return t(
     `${star.pal} and ${star.name} split ${a} ${items} into ${b} equal piles. How many ${thing} in each pile?`,
     `${star.pal} y ${star.name} parten ${a} ${esItems} en ${b} montones iguales. ¿${esMany} hay en cada montón?`, `${star.pal} e ${star.name} dividem ${a} ${esItems} em ${b} montes iguais. ${esMany} tem em cada monte?`,
-  );
+  `${star.pal} et ${star.name} partagent ${a} ${esItems} en ${b} tas égaux. ${esMany} y a-t-il dans chaque tas ?`);
 }
 
 function makeStory(rng: Rng, level: Exclude<ProblemLevel, "picture">): ChoiceQ {
@@ -231,17 +231,17 @@ function makePicture(rng: Rng): ChoiceQ {
         ? t(
             `${star.name} the ${star.trait} needs ${groups} groups of ${size} ${countName(thing.name, size)}. Which picture shows that?`,
             `${starLead(star.name, star.trait)} necesita ${groups} grupos de ${size} ${thingName(thing.name, size, countName(thing.name, size))}. ¿Qué dibujo lo muestra?`, `${starLead(star.name, star.trait)} precisa de ${groups} grupos de ${size} ${thingName(thing.name, size, countName(thing.name, size))}. Qual desenho mostra isso?`,
-          )
+          `${starLead(star.name, star.trait)} a besoin de ${groups} groupes de ${size} ${thingName(thing.name, size, countName(thing.name, size))}. Quel dessin montre ça ?`)
         : t(
             `${star.name} draws ${groups} groups of ${size} ${countName(thing.name, size)} for ${star.pal}. Which picture matches?`,
             `${star.name} dibuja ${groups} grupos de ${size} ${thingName(thing.name, size, countName(thing.name, size))} para ${star.pal}. ¿Qué dibujo es igual?`, `${star.name} desenha ${groups} grupos de ${size} ${thingName(thing.name, size, countName(thing.name, size))} para ${star.pal}. Qual desenho é igual?`,
-          ),
+          `${star.name} dessine ${groups} groupes de ${size} ${thingName(thing.name, size, countName(thing.name, size))} pour ${star.pal}. Quel dessin est pareil ?`),
     hint: t("Count the groups and how many are in each group", "Cuenta los grupos y cuántos hay en cada uno"),
     answer: "p0",
     choices: uniqueChoices(rng, "p0", [], ids),
     skill: "problems:picture",
     tags: ["picture"],
-    solved: t(`${groups} groups of ${size}`, `${groups} grupos de ${size}`, `${groups} grupos de ${size}`),
+    solved: t(`${groups} groups of ${size}`, `${groups} grupos de ${size}`, `${groups} grupos de ${size}`, `${groups} groupes de ${size}`),
     picture: groupPicture(thing.emoji, groups, size),
     hands: true,
     quietChoices: false,
@@ -283,7 +283,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         prompt: t(
           `Peach has ${a} ${countName("apples", a)}. Frog brings ${b} more. How many apples?`,
           `Peach tiene ${a} ${thingName("apples", a, countName("apples", a))}. Frog trae ${b} más. ¿Cuántas manzanas hay?`, `Peach tem ${a} ${thingName("apples", a, countName("apples", a))}. Frog traz ${b} a mais. Quantas maçãs tem?`,
-        ),
+        `Peach a ${a} ${thingName("apples", a, countName("apples", a))}. Frog en apporte ${b} de plus. Combien de pommes ?`),
         answer: String(a + b),
       };
     }
@@ -294,7 +294,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         prompt: t(
           `Bear has ${a} fish and gives ${b} to Panda. How many fish are left?`,
           `Bear tiene ${a} ${a === 1 ? "pez" : "peces"} y le da ${b} a Panda. ¿Cuántos peces quedan?`, `Bear tem ${a} ${a === 1 ? "peixe" : "peixes"} e dá ${b} para a Panda. Quantos peixes sobram?`,
-        ),
+        `Bear a ${a} ${a === 1 ? "poisson" : "poissons"} et en donne ${b} à Panda. Combien de poissons reste-t-il ?`),
         answer: String(a - b),
       };
     }
@@ -305,7 +305,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         prompt: t(
           `Panda has ${a} bags with ${b} stars in each bag. How many stars?`,
           `Panda tiene ${a} ${thingName("bags", a, countName("bags", a))} con ${b} ${thingName("stars", b, countName("stars", b))} en cada bolsa. ¿Cuántas estrellas hay?`, `Panda tem ${a} ${thingName("bags", a, countName("bags", a))} com ${b} ${thingName("stars", b, countName("stars", b))} em cada sacola. Quantas estrelas tem?`,
-        ),
+        `Panda a ${a} ${thingName("bags", a, countName("bags", a))} avec ${b} ${thingName("stars", b, countName("stars", b))} dans chaque sac. Combien d'étoiles ?`),
         answer: String(a * b),
       };
     }
@@ -316,7 +316,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         prompt: t(
           `Fox has ${b * q} cookies shared with ${b} friends. How many cookies does each friend get?`,
           `Fox tiene ${b * q} galletas para ${b} amigos. ¿Cuántas galletas recibe cada amigo?`, `Fox tem ${b * q} biscoitos para ${b} amigos. Quantos biscoitos cada amigo recebe?`,
-        ),
+        `Fox a ${b * q} biscuits pour ${b} copains. Combien de biscuits chaque copain reçoit-il ?`),
         answer: String(q),
       };
     }
@@ -327,7 +327,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         prompt: t(
           `Bunny draws ${groups} groups of ${size} frogs. How many frogs?`,
           `Bunny dibuja ${groups} grupos de ${size} ranas. ¿Cuántas ranas hay?`, `Bunny desenha ${groups} grupos de ${size} sapos. Quantos sapos tem?`,
-        ),
+        `Bunny dessine ${groups} groupes de ${size} grenouilles. Combien de grenouilles ?`),
         answer: String(groups * size),
       };
     }

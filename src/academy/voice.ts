@@ -58,14 +58,14 @@ function sayNow(line: string): void {
   synth.cancel();
   const utter = new SpeechSynthesisUtterance(line);
   const locale = getLocale();
-  const prefer = locale === "es" ? "es" : locale === "pt" ? "pt" : "en";
+  const prefer = locale === "es" ? "es" : locale === "pt" ? "pt" : locale === "fr" ? "fr" : "en";
   const voice = pickLocalVoice(deviceVoices(), prefer);
   if (voice) {
     const match = deviceVoices().find((row) => row.lang === voice.lang && row.name === voice.name);
     if (match) utter.voice = match;
     utter.lang = voice.lang;
   } else {
-    utter.lang = locale === "es" ? "es-MX" : locale === "pt" ? "pt-BR" : "en-US";
+    utter.lang = locale === "es" ? "es-MX" : locale === "pt" ? "pt-BR" : locale === "fr" ? "fr-FR" : "en-US";
   }
   utter.rate = 0.95;
   utter.pitch = 1.08;

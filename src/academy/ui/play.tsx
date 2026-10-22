@@ -608,7 +608,7 @@ export function PlayScreen({
   const showSpeed = canSpeed && speed;
   const stepLabel = calm
     ? cardStepLabel(index, total)
-    : t(`Question ${Math.min(total, index + 1)} of ${total}`, `Pregunta ${Math.min(total, index + 1)} de ${total}`, `Pergunta ${Math.min(total, index + 1)} de ${total}`);
+    : t(`Question ${Math.min(total, index + 1)} of ${total}`, `Pregunta ${Math.min(total, index + 1)} de ${total}`, `Pergunta ${Math.min(total, index + 1)} de ${total}`, `Question ${Math.min(total, index + 1)} sur ${total}`);
 
   useEffect(() => {
     if (!showSpeed) return;
@@ -748,7 +748,7 @@ export function PlayScreen({
             {t(
               `${show(spec?.title ?? "This game")} is coming later`,
               `${show(spec?.title ?? "This game")} llega más adelante`, `${show(spec?.title ?? "This game")} chega mais tarde`,
-            )}
+            `${show(spec?.title ?? "This game")} arrive plus tard`)}
           </h1>
           <p className="ac-hint">{show("This grade plays other games first. A grown-up can turn on challenge ahead in settings.")}</p>
           <button type="button" className="ac-go" onClick={onExit}>
@@ -1082,11 +1082,11 @@ export function PlayScreen({
                 aria-valuemin={0}
                 aria-valuemax={5}
                 aria-valuenow={Math.min(5, combo)}
-                aria-label={combo >= 2 ? t(`Combo ${combo}`, `Combo ${combo}`, `Combo ${combo}`) : show("Combo")}
+                aria-label={combo >= 2 ? t(`Combo ${combo}`, `Combo ${combo}`, `Combo ${combo}`, `Combo ${combo}`) : show("Combo")}
               >
                 <span style={{ width: `${Math.min(100, (combo / 5) * 100)}%` }} />
               </div>
-              <small>{combo >= 2 ? t(`Combo ×${combo}`, `Combo ×${combo}`, `Combo ×${combo}`) : show("Combo")}</small>
+              <small>{combo >= 2 ? t(`Combo ×${combo}`, `Combo ×${combo}`, `Combo ×${combo}`, `Combo ×${combo}`) : show("Combo")}</small>
             </div>
           )}
           <div className="ac-qdots" aria-hidden="true">

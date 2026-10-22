@@ -53,8 +53,8 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
             {left === 0
               ? show("Play today to grow the egg.")
               : left === 1
-                ? t(`${left} more round and the egg hatches.`, `${left} ronda más y se abre el huevo.`, `${left} rodada a mais e o ovo abre.`)
-                : t(`${left} more rounds and the egg hatches.`, `${left} rondas más y se abre el huevo.`, `${left} rodadas a mais e o ovo abre.`)}
+                ? t(`${left} more round and the egg hatches.`, `${left} ronda más y se abre el huevo.`, `${left} rodada a mais e o ovo abre.`, `${left} manche de plus et l'œuf éclot.`)
+                : t(`${left} more rounds and the egg hatches.`, `${left} rondas más y se abre el huevo.`, `${left} rodadas a mais e o ovo abre.`, `${left} manches de plus et l'œuf éclot.`)}
           </p>
         )}
       </div>
@@ -82,12 +82,12 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
                       : !open
                         ? show("Locked")
                         : beaten
-                          ? t(`${hostName} is your friend`, `${hostName} es tu amigo`, `${hostName} é seu amigo`)
+                          ? t(`${hostName} is your friend`, `${hostName} es tu amigo`, `${hostName} é seu amigo`, `${hostName} est ton copain`)
                           : current
                             ? show("You are here")
                             : offer === "intro"
                               ? show("Gentle intro")
-                              : t(`${hostName} says hi`, `${hostName} te saluda`, `${hostName} cumprimenta você`)}
+                              : t(`${hostName} says hi`, `${hostName} te saluda`, `${hostName} cumprimenta você`, `${hostName} te dit bonjour`)}
                   </p>
                 </div>
               </div>
@@ -112,7 +112,7 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
               ) : open ? (
                 <div className="ac-island-actions">
                   <a className="ac-quiet" href={`#/play/${game.id}`}>
-                    {atBoss ? t(`Face ${boss.name}`, `Enfrenta a ${boss.name}`, `Enfrente ${boss.name}`) : current ? show("Play") : offer === "intro" ? show("Gentle intro") : t("Practice", "Practica")}
+                    {atBoss ? t(`Face ${boss.name}`, `Enfrenta a ${boss.name}`, `Enfrente ${boss.name}`, `Affronte ${boss.name}`) : current ? show("Play") : offer === "intro" ? show("Gentle intro") : t("Practice", "Practica")}
                   </a>
                   {beaten ? (
                     <a className="ac-quiet" href={`#/play/${game.id}/crown`}>
@@ -126,7 +126,7 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
                   {(() => {
                     const prev = gameById(GAMES[index - 1]?.id)?.title;
                     return prev
-                      ? t(`Beat the ${prev} boss.`, `Vence al jefe de ${show(prev)}.`, `Vença o chefe de ${show(prev)}.`)
+                      ? t(`Beat the ${prev} boss.`, `Vence al jefe de ${show(prev)}.`, `Vença o chefe de ${show(prev)}.`, `Bats le chef de ${show(prev)}.`)
                       : t("Beat the last boss.", "Vence al jefe anterior.");
                   })()}
                 </p>
@@ -145,7 +145,7 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
               {t(
                 `${squisheeById(hatchedId)?.name ?? "A friend"} hatched!`,
                 `¡${squisheeById(hatchedId)?.name ?? "Un amigo"} salió del huevo!`, `${squisheeById(hatchedId)?.name ?? "Um amigo"} saiu do ovo!`,
-              )}
+              `${squisheeById(hatchedId)?.name ?? "Un ami"} vient d'éclore !`)}
             </h2>
             <p className="ac-bubble">{catchphrase(hatchedId)}</p>
             <a className="ac-go" href="#/shelf">

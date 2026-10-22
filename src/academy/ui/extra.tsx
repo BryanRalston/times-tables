@@ -7,7 +7,7 @@ import { bookEntries, catchphrase } from "../buddy/cast";
 import { palOwned, withBuddy } from "../buddy/unlock";
 import { GAME_CARDS as GAMES, sheetHref } from "../games/catalog";
 import { playWindow } from "../grade-map";
-import { loadPortuguese, setLocale, show, t } from "../i18n";
+import { setLocale, show, t } from "../i18n";
 import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type AppLang, type Grade, type Save } from "../model";
 import { buyOutfit, wearOutfit } from "../rewards";
 import { outfitHint, outfitLabel, outfitPrice, shopSections } from "../wardrobe";
@@ -17,7 +17,7 @@ import { AcademyPal, BackLink, Foot, FreeNote, Logo, PlayMark, SquisheeImg, cx }
 import { SquishTally } from "./squishy";
 import { BossFigure, PalWithLook } from "./boss-figure";
 import { GradeChips } from "./grade-chips";
-import { LanguageToggle, withLang } from "./lang";
+import { LanguageList, LanguageToggle, withLang } from "./lang";
 
 const STARTERS = SQUAD_IDS.slice(0, 3);
 
@@ -48,41 +48,13 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
         }}
       >
         <h1 className="ac-sr">{show("Pick a buddy")}</h1>
-        <div className="ac-hello-lang ac-lang-row" role="group" aria-label={show("Language")}>
-          <button
-            type="button"
-            className={cx("ac-grade", lang === "en" && "is-on")}
-            aria-pressed={lang === "en"}
-            onClick={() => {
-              setLang("en");
-              setLocale("en");
-            }}
-          >
-            English
-          </button>
-          <button
-            type="button"
-            className={cx("ac-grade", lang === "es" && "is-on")}
-            aria-pressed={lang === "es"}
-            onClick={() => {
-              setLang("es");
-              setLocale("es");
-            }}
-          >
-            Español
-          </button>
-          <button
-            type="button"
-            className={cx("ac-grade", lang === "pt" && "is-on")}
-            aria-pressed={lang === "pt"}
-            onClick={() => {
-              setLang("pt");
-              void loadPortuguese().then(() => setLocale("pt"));
-            }}
-          >
-            Português
-          </button>
-        </div>
+        <LanguageList
+          lang={lang}
+          onLang={(next) => {
+            setLang(next);
+            setLocale(next);
+          }}
+        />
         <div className="ac-buddy-picks" role="radiogroup" aria-label={show("Pick a buddy")}>
           {STARTERS.map((id) => (
             <button
@@ -251,7 +223,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
         {t(
           `${found} of ${book.length} found · ${child.coins} coins`,
           `${found} de ${book.length} encontrados · ${child.coins} monedas`, `${found} de ${book.length} encontrados · ${child.coins} moedas`,
-        )}
+        `${found} sur ${book.length} trouvés · ${child.coins} pièces`)}
       </p>
       <SquishTally />
       <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="ac-shelf-you" label={show("You")} />
@@ -260,7 +232,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
         {t(
           `${child.cosmetics.length} of ${lookCount} looks · ${child.coins} coins`,
           `${child.cosmetics.length} de ${lookCount} disfraces · ${child.coins} monedas`, `${child.cosmetics.length} de ${lookCount} fantasias · ${child.coins} moedas`,
-        )}
+        `${child.cosmetics.length} sur ${lookCount} déguisements · ${child.coins} pièces`)}
       </p>
       <p className="ac-hint">{show("Spend coins you earn. Never real money.")}</p>
       <p className="ac-hint">{t("Stars and practice unlock looks too.", "Las estrellas y la práctica también dan disfraces.")}</p>
@@ -329,8 +301,8 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
                   onClick={() => onSave(mapActive(save, (row) => wearBossLook(row, wearing ? "" : boss.cosmeticId)))}
                 >
                   {wearing
-                    ? t(`Take off ${bossCosmeticName(boss.cosmeticId)}`, `Quítale ${bossCosmeticName(boss.cosmeticId)}`, `Tire ${bossCosmeticName(boss.cosmeticId)}`)
-                    : t(`Wear ${bossCosmeticName(boss.cosmeticId)}`, `Ponte ${bossCosmeticName(boss.cosmeticId)}`, `Vista ${bossCosmeticName(boss.cosmeticId)}`)}
+                    ? t(`Take off ${bossCosmeticName(boss.cosmeticId)}`, `Quítale ${bossCosmeticName(boss.cosmeticId)}`, `Tire ${bossCosmeticName(boss.cosmeticId)}`, `Enlève ${bossCosmeticName(boss.cosmeticId)}`)
+                    : t(`Wear ${bossCosmeticName(boss.cosmeticId)}`, `Ponte ${bossCosmeticName(boss.cosmeticId)}`, `Vista ${bossCosmeticName(boss.cosmeticId)}`, `Mets ${bossCosmeticName(boss.cosmeticId)}`)}
                 </button>
               ) : null}
             </article>
@@ -353,7 +325,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
               <small>{entry.rarity === "rare" ? show("Rare") : show("Common")}</small>
               <small>{open ? entry.line : entry.find}</small>
               {open ? <small>{entry.fact}</small> : null}
-              {open ? <small>{t(`Loves ${entry.favorite}`, `Le encanta ${entry.favorite}`, `Adora ${entry.favorite}`)}</small> : null}
+              {open ? <small>{t(`Loves ${entry.favorite}`, `Le encanta ${entry.favorite}`, `Adora ${entry.favorite}`, `Adore ${entry.favorite}`)}</small> : null}
               {open ? (
                 <small className="ac-bond-pips" data-bond={bondTier(bondScore(child.bonds, entry.id))}>
                   {bondHearts(bondTier(bondScore(child.bonds, entry.id))) || bondName(0)}

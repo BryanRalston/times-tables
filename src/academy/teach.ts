@@ -104,7 +104,7 @@ export function promptSpeech(question: ChoiceQ): string {
   const visual = question.visual;
   if (visual.kind === "spell") {
     const heard = speakable(visual.spoken);
-    return t(heard, `Deletrea la palabra. ${heard}`, `Soletre a palavra. ${heard}`);
+    return t(heard, `Deletrea la palabra. ${heard}`, `Soletre a palavra. ${heard}`, `Épelle le mot. ${heard}`);
   }
   if (visual.kind === "sight") {
     if (visual.mode === "fill") {
@@ -113,9 +113,10 @@ export function promptSpeech(question: ChoiceQ): string {
       const en = heard.length ? `Listen. ${sentence}. ${heard.join(". ")}` : `Listen. ${sentence}.`;
       const es = heard.length ? `Escucha. ${sentence}. ${heard.join(". ")}` : `Escucha. ${sentence}.`;
       const pt = heard.length ? `Ouça. ${sentence}. ${heard.join(". ")}` : `Ouça. ${sentence}.`;
-      return t(en, es, pt);
+      const fr = heard.length ? `Écoute. ${sentence}. ${heard.join(". ")}` : `Écoute. ${sentence}.`;
+      return t(en, es, pt, fr);
     }
-    return t(`Listen. ${visual.word}.`, `Escucha. ${visual.word}.`, `Ouça. ${visual.word}.`);
+    return t(`Listen. ${visual.word}.`, `Escucha. ${visual.word}.`, `Ouça. ${visual.word}.`, `Écoute. ${visual.word}.`);
   }
   if (visual.kind === "scene" && visual.board.game === "phonics" && visual.board.mode === "cvc") {
     return speakable(`${question.title}. ${visual.board.blend}`);
@@ -153,7 +154,7 @@ function framesFor(question: ChoiceQ): TeachFrame[] {
         {
           kind: "sight",
           show: visual.word,
-          caption: visual.mode === "hear" ? t(`The word is ${visual.word}.`, `La palabra es ${visual.word}.`, `A palavra é ${visual.word}.`) : visual.sentence || visual.word,
+          caption: visual.mode === "hear" ? t(`The word is ${visual.word}.`, `La palabra es ${visual.word}.`, `A palavra é ${visual.word}.`, `Le mot est ${visual.word}.`) : visual.sentence || visual.word,
         },
       ];
     case "spell":
@@ -187,7 +188,7 @@ function addFrames(visual: AddVisual): AddFrame[] {
   const line = total <= 100;
   if (visual.op === "+") {
     const frames: AddFrame[] = [
-      addFrame(visual, 0, 0, ten ? visual.pink : null, blocks, line ? { from: visual.pink, to: visual.pink, max } : null, t(`Start with ${visual.pink}`, `Empieza con ${visual.pink}`, `Comece com ${visual.pink}`)),
+      addFrame(visual, 0, 0, ten ? visual.pink : null, blocks, line ? { from: visual.pink, to: visual.pink, max } : null, t(`Start with ${visual.pink}`, `Empieza con ${visual.pink}`, `Comece com ${visual.pink}`, `Commence avec ${visual.pink}`)),
     ];
     if (visual.teal > 1 && visual.teal <= 4) {
       frames.push(
@@ -216,7 +217,7 @@ function addFrames(visual: AddVisual): AddFrame[] {
     return frames;
   }
   const frames: AddFrame[] = [
-    addFrame(visual, visual.teal, 0, ten ? total : null, blocks, line ? { from: total, to: total, max } : null, t(`Start with ${total}`, `Empieza con ${total}`, `Comece com ${total}`)),
+    addFrame(visual, visual.teal, 0, ten ? total : null, blocks, line ? { from: total, to: total, max } : null, t(`Start with ${total}`, `Empieza con ${total}`, `Comece com ${total}`, `Commence avec ${total}`)),
   ];
   if (visual.teal > 1 && visual.teal <= 4) {
     frames.push(
@@ -279,7 +280,7 @@ function timesFrames(visual: TimesVisual): TimesFrame[] {
       rows,
       cols: visual.b,
       shownRows: shown,
-      caption: shown === rows ? visual.solved : t(`${shown} ${shown === 1 ? "group" : "groups"} of ${visual.b}`, `${shown} ${shown === 1 ? "grupo" : "grupos"} de ${visual.b}`, `${shown} ${shown === 1 ? "grupo" : "grupos"} de ${visual.b}`),
+      caption: shown === rows ? visual.solved : t(`${shown} ${shown === 1 ? "group" : "groups"} of ${visual.b}`, `${shown} ${shown === 1 ? "grupo" : "grupos"} de ${visual.b}`, `${shown} ${shown === 1 ? "grupo" : "grupos"} de ${visual.b}`, `${shown} ${shown === 1 ? "groupe" : "groupes"} de ${visual.b}`),
     });
   }
   return frames;
@@ -337,7 +338,7 @@ function runningFrames(coins: CoinKind[], finalCaption: string): MoneyFrame[] {
         kind: "money",
         coins: [...shown],
         runningCents: running,
-        caption: i === coins.length - 1 ? finalCaption : t(`${formatCents(running)} so far`, `van ${formatCents(running)}`, `vão ${formatCents(running)}`),
+        caption: i === coins.length - 1 ? finalCaption : t(`${formatCents(running)} so far`, `van ${formatCents(running)}`, `vão ${formatCents(running)}`, `${formatCents(running)} pour l'instant`),
       });
     }
   }
@@ -358,7 +359,7 @@ function moneyFrames(visual: MoneyVisual, answer: string): MoneyFrame[] {
           caption: t(
             `A ${COIN_NAME[kind].toLowerCase()} is ${formatCents(cents)}`,
             `${coinAsA(kind, COIN_NAME[kind].toLowerCase()).replace(/^./, (ch) => ch.toUpperCase())} vale ${formatCents(cents)}`, `${coinAsA(kind, COIN_NAME[kind].toLowerCase()).replace(/^./, (ch) => ch.toUpperCase())} vale ${formatCents(cents)}`,
-          ),
+          `${coinAsA(kind, COIN_NAME[kind].toLowerCase()).replace(/^./, (ch) => ch.toUpperCase())} vaut ${formatCents(cents)}`),
         },
       ];
     }
@@ -372,9 +373,9 @@ function moneyFrames(visual: MoneyVisual, answer: string): MoneyFrame[] {
       const price = visual.priceCents ?? 0;
       const change = Math.max(0, paid - price);
       return [
-        { kind: "money", coins: coinsOf(visual.coins), runningCents: paid, caption: t(`You pay ${formatCents(paid)}`, `Pagas ${formatCents(paid)}`, `Você paga ${formatCents(paid)}`) },
-        { kind: "money", coins: [], runningCents: price, caption: t(`The price is ${formatCents(price)}`, `El precio es ${formatCents(price)}`, `O preço é ${formatCents(price)}`) },
-        { kind: "money", coins: greedyCoins(change), runningCents: change, caption: t(`Change is ${formatCents(change)}`, `El cambio es ${formatCents(change)}`, `O troco é ${formatCents(change)}`) },
+        { kind: "money", coins: coinsOf(visual.coins), runningCents: paid, caption: t(`You pay ${formatCents(paid)}`, `Pagas ${formatCents(paid)}`, `Você paga ${formatCents(paid)}`, `Tu paies ${formatCents(paid)}`) },
+        { kind: "money", coins: [], runningCents: price, caption: t(`The price is ${formatCents(price)}`, `El precio es ${formatCents(price)}`, `O preço é ${formatCents(price)}`, `Le prix est ${formatCents(price)}`) },
+        { kind: "money", coins: greedyCoins(change), runningCents: change, caption: t(`Change is ${formatCents(change)}`, `El cambio es ${formatCents(change)}`, `O troco é ${formatCents(change)}`, `La monnaie est ${formatCents(change)}`) },
       ];
     }
     case "count":
@@ -385,12 +386,12 @@ function moneyFrames(visual: MoneyVisual, answer: string): MoneyFrame[] {
       const paid = pileCents(visual.coins);
       if (paid > price && paid > 0) {
         return [
-          { kind: "money", coins: [], runningCents: price, caption: t(`The prices add to ${formatCents(price)}`, `Los precios suman ${formatCents(price)}`, `Os preços somam ${formatCents(price)}`) },
-          { kind: "money", coins: coinsOf(visual.coins), runningCents: paid, caption: t(`You pay ${formatCents(paid)}`, `Pagas ${formatCents(paid)}`, `Você paga ${formatCents(paid)}`) },
-          { kind: "money", coins: [], runningCents: paid - price, caption: t(`Change is ${formatCents(paid - price)}`, `El cambio es ${formatCents(paid - price)}`, `O troco é ${formatCents(paid - price)}`) },
+          { kind: "money", coins: [], runningCents: price, caption: t(`The prices add to ${formatCents(price)}`, `Los precios suman ${formatCents(price)}`, `Os preços somam ${formatCents(price)}`, `Les prix font ${formatCents(price)}`) },
+          { kind: "money", coins: coinsOf(visual.coins), runningCents: paid, caption: t(`You pay ${formatCents(paid)}`, `Pagas ${formatCents(paid)}`, `Você paga ${formatCents(paid)}`, `Tu paies ${formatCents(paid)}`) },
+          { kind: "money", coins: [], runningCents: paid - price, caption: t(`Change is ${formatCents(paid - price)}`, `El cambio es ${formatCents(paid - price)}`, `O troco é ${formatCents(paid - price)}`, `La monnaie est ${formatCents(paid - price)}`) },
         ];
       }
-      return [{ kind: "money", coins: [], runningCents: price, caption: t(`The prices add to ${formatCents(price)}`, `Los precios suman ${formatCents(price)}`, `Os preços somam ${formatCents(price)}`) }];
+      return [{ kind: "money", coins: [], runningCents: price, caption: t(`The prices add to ${formatCents(price)}`, `Los precios suman ${formatCents(price)}`, `Os preços somam ${formatCents(price)}`, `Les prix font ${formatCents(price)}`) }];
     }
     default: {
       const neverMode: never = visual.mode;
@@ -416,7 +417,7 @@ function countSteps(n: number, solved: string): SceneFrame[] {
   } else {
     marks.push("1, 2, 3");
     const mid = Math.min(n - 1, 10);
-    if (mid > 3) marks.push(t(`Count to ${mid}`, `Cuenta hasta ${mid}`, `Conte até ${mid}`));
+    if (mid > 3) marks.push(t(`Count to ${mid}`, `Cuenta hasta ${mid}`, `Conte até ${mid}`, `Compte jusqu'à ${mid}`));
   }
   if (marks[marks.length - 1] !== solved) marks.push(solved);
   return captions(marks);
@@ -432,8 +433,8 @@ function countTeach(board: CountBoard, solved: string): SceneFrame[] {
     case "neighbor":
       return captions([
         board.ask === "before"
-          ? t(`One less than ${board.n}`, `Uno menos que ${board.n}`, `Um a menos que ${board.n}`)
-          : t(`One more than ${board.n}`, `Uno más que ${board.n}`, `Um a mais que ${board.n}`),
+          ? t(`One less than ${board.n}`, `Uno menos que ${board.n}`, `Um a menos que ${board.n}`, `Un de moins que ${board.n}`)
+          : t(`One more than ${board.n}`, `Uno más que ${board.n}`, `Um a mais que ${board.n}`, `Un de plus que ${board.n}`),
         solved,
       ]);
     case "subitize":
@@ -446,7 +447,7 @@ function countTeach(board: CountBoard, solved: string): SceneFrame[] {
       ]);
     }
     case "build":
-      return captions([t(`Fill the frame to ${board.n}`, `Llena el tablero hasta ${board.n}`, `Encha o quadro até ${board.n}`), solved]);
+      return captions([t(`Fill the frame to ${board.n}`, `Llena el tablero hasta ${board.n}`, `Encha o quadro até ${board.n}`, `Remplis la grille jusqu'à ${board.n}`), solved]);
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -459,8 +460,8 @@ function placeTeach(board: PlaceBoard, solved: string): SceneFrame[] {
     case "blocks":
     case "build":
       return captions([
-        t(`${Math.floor(board.n / 10)} tens`, `${Math.floor(board.n / 10)} decenas`, `${Math.floor(board.n / 10)} dezenas`),
-        t(`${board.n % 10} ones`, `${board.n % 10} unidades`, `${board.n % 10} unidades`),
+        t(`${Math.floor(board.n / 10)} tens`, `${Math.floor(board.n / 10)} decenas`, `${Math.floor(board.n / 10)} dezenas`, `${Math.floor(board.n / 10)} dizaines`),
+        t(`${board.n % 10} ones`, `${board.n % 10} unidades`, `${board.n % 10} unidades`, `${board.n % 10} unités`),
         solved,
       ]);
     case "expanded":
@@ -532,12 +533,12 @@ function fractionTeach(board: FractionBoard, solved: string): SceneFrame[] {
     case "unit":
     case "shade":
       return captions([
-        t(`The whole has ${board.den} equal parts`, `El entero tiene ${board.den} partes iguales`, `O inteiro tem ${board.den} partes iguais`),
-        t(`${board.num} part${board.num === 1 ? "" : "s"} shaded`, board.num === 1 ? "1 parte sombreada" : `${board.num} partes sombreadas`, board.num === 1 ? "1 parte pintada" : `${board.num} partes pintadas`),
+        t(`The whole has ${board.den} equal parts`, `El entero tiene ${board.den} partes iguales`, `O inteiro tem ${board.den} partes iguais`, `L'entier a ${board.den} parts égales`),
+        t(`${board.num} part${board.num === 1 ? "" : "s"} shaded`, board.num === 1 ? "1 parte sombreada" : `${board.num} partes sombreadas`, board.num === 1 ? "1 parte pintada" : `${board.num} partes pintadas`, board.num === 1 ? "1 partie coloriée" : `${board.num} parties coloriées`),
         solved,
       ]);
     case "line":
-      return captions([t(`The line is split into ${board.den}`, `La recta está partida en ${board.den}`, `A reta está dividida em ${board.den}`), solved]);
+      return captions([t(`The line is split into ${board.den}`, `La recta está partida en ${board.den}`, `A reta está dividida em ${board.den}`, `La droite numérique est partagée en ${board.den}`), solved]);
     case "compare":
       return captions([t("Compare the same kind of part", "Compara el mismo tipo de parte"), solved]);
     case "equivalent":
@@ -580,16 +581,16 @@ function measureTeach(board: MeasureBoard, solved: string): SceneFrame[] {
 function phonicsTeach(board: PhonicsBoard, solved: string): SceneFrame[] {
   switch (board.mode) {
     case "letters":
-      return captions([t(`The letter is ${board.letter}`, `La letra es ${board.letter}`, `A letra é ${board.letter}`), solved]);
+      return captions([t(`The letter is ${board.letter}`, `La letra es ${board.letter}`, `A letra é ${board.letter}`, `La lettre est ${board.letter}`), solved]);
     case "sounds":
     case "begin":
-      return captions([t(`The sound is ${board.phoneme}`, `El sonido es ${board.phoneme}`, `O som é ${board.phoneme}`), solved]);
+      return captions([t(`The sound is ${board.phoneme}`, `El sonido es ${board.phoneme}`, `O som é ${board.phoneme}`, `Le son est ${board.phoneme}`), solved]);
     case "rhyme":
-      return captions([t(`Listen for the ending of ${board.cue}`, `Escucha el final de ${board.cue}`, `Ouça o final de ${board.cue}`), solved]);
+      return captions([t(`Listen for the ending of ${board.cue}`, `Escucha el final de ${board.cue}`, `Ouça o final de ${board.cue}`, `Écoute la fin de ${board.cue}`), solved]);
     case "cvc":
       return captions([board.blend, solved]);
     case "end":
-      return captions([t(`The last sound in ${board.word}`, `El último sonido de ${board.word}`, `O último som de ${board.word}`), solved]);
+      return captions([t(`The last sound in ${board.word}`, `El último sonido de ${board.word}`, `O último som de ${board.word}`, `Le dernier son de ${board.word}`), solved]);
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -600,31 +601,31 @@ function phonicsTeach(board: PhonicsBoard, solved: string): SceneFrame[] {
 function problemTeach(board: ProblemBoard): SceneFrame[] {
   switch (board.mode) {
     case "add":
-      return captions([t(`Start with ${board.a}`, `Empieza con ${board.a}`, `Comece com ${board.a}`), t(`Add ${board.b}`, `Suma ${board.b}`, `Some ${board.b}`), `${board.a} + ${board.b} = ${board.a + board.b}`]);
+      return captions([t(`Start with ${board.a}`, `Empieza con ${board.a}`, `Comece com ${board.a}`, `Commence avec ${board.a}`), t(`Add ${board.b}`, `Suma ${board.b}`, `Some ${board.b}`, `Ajoute ${board.b}`), `${board.a} + ${board.b} = ${board.a + board.b}`]);
     case "sub":
-      return captions([t(`Start with ${board.a}`, `Empieza con ${board.a}`, `Comece com ${board.a}`), t(`Take away ${board.b}`, `Quita ${board.b}`, `Tire ${board.b}`), `${board.a} - ${board.b} = ${board.a - board.b}`]);
+      return captions([t(`Start with ${board.a}`, `Empieza con ${board.a}`, `Comece com ${board.a}`, `Commence avec ${board.a}`), t(`Take away ${board.b}`, `Quita ${board.b}`, `Tire ${board.b}`, `Enlève ${board.b}`), `${board.a} - ${board.b} = ${board.a - board.b}`]);
     case "mult":
       return captions([
-        t(`${board.a} groups`, `${board.a} grupos`, `${board.a} grupos`),
-        t(`${board.b} in each group`, `${board.b} en cada grupo`, `${board.b} em cada grupo`),
+        t(`${board.a} groups`, `${board.a} grupos`, `${board.a} grupos`, `${board.a} groupes`),
+        t(`${board.b} in each group`, `${board.b} en cada grupo`, `${board.b} em cada grupo`, `${board.b} dans chaque groupe`),
         `${board.a} × ${board.b} = ${board.a * board.b}`,
       ]);
     case "div":
       return captions([
-        t(`${board.a} shared into ${board.b} groups`, `${board.a} repartidos en ${board.b} grupos`, `${board.a} repartidos em ${board.b} grupos`),
+        t(`${board.a} shared into ${board.b} groups`, `${board.a} repartidos en ${board.b} grupos`, `${board.a} repartidos em ${board.b} grupos`, `${board.a} partagés en ${board.b} groupes`),
         `${board.a} ÷ ${board.b} = ${board.a / board.b}`,
       ]);
     case "picture":
       return captions([
-        t(`${board.a} groups`, `${board.a} grupos`, `${board.a} grupos`),
-        t(`${board.b} in each group`, `${board.b} en cada grupo`, `${board.b} em cada grupo`),
-        t(`${board.a} groups of ${board.b}`, `${board.a} grupos de ${board.b}`, `${board.a} grupos de ${board.b}`),
+        t(`${board.a} groups`, `${board.a} grupos`, `${board.a} grupos`, `${board.a} groupes`),
+        t(`${board.b} in each group`, `${board.b} en cada grupo`, `${board.b} em cada grupo`, `${board.b} dans chaque groupe`),
+        t(`${board.a} groups of ${board.b}`, `${board.a} grupos de ${board.b}`, `${board.a} grupos de ${board.b}`, `${board.a} groupes de ${board.b}`),
       ]);
     case "steps": {
       const away = board.extra ?? 0;
       return captions([
-        t(`${board.a} groups of ${board.b}`, `${board.a} grupos de ${board.b}`, `${board.a} grupos de ${board.b}`),
-        t(`Take away ${away}`, `Quita ${away}`, `Tire ${away}`),
+        t(`${board.a} groups of ${board.b}`, `${board.a} grupos de ${board.b}`, `${board.a} grupos de ${board.b}`, `${board.a} groupes de ${board.b}`),
+        t(`Take away ${away}`, `Quita ${away}`, `Tire ${away}`, `Enlève ${away}`),
         `${board.a * board.b} - ${away} = ${board.a * board.b - away}`,
       ]);
     }

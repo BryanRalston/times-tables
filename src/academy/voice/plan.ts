@@ -26,18 +26,30 @@ export function normalizeSpeech(text: string): string {
   line = line.replace(/[…]/g, ". ").replace(/[—–]/g, ", ");
   line = line.replace(/_+/g, " blank ");
   line = speakable(line);
-  if (getLocale() === "es" || getLocale() === "pt") {
-    const and = getLocale() === "pt" ? "e" : "y";
-    const divided = getLocale() === "pt" ? "dividido por" : "dividido entre";
+  if (getLocale() === "es" || getLocale() === "pt" || getLocale() === "fr") {
+    const french = getLocale() === "fr";
+    const and = getLocale() === "es" ? "y" : french ? "et" : "e";
+    const divided = french ? "divisé par" : getLocale() === "pt" ? "dividido por" : "dividido entre";
+    const centWord = french ? "cents" : "centavos";
     line = line.replace(/\$(\d+)\.(\d{2})/g, (_full, dollars: string, cents: string) => {
-      const dollarWord = Number(dollars) === 1 ? "dólar" : "dólares";
-      return `${dollars} ${dollarWord} ${and} ${Number(cents)} centavos`;
+      const dollarWord = french
+        ? Number(dollars) === 1
+          ? "dollar"
+          : "dollars"
+        : Number(dollars) === 1
+          ? "dólar"
+          : "dólares";
+      return `${dollars} ${dollarWord} ${and} ${Number(cents)} ${centWord}`;
     });
     line = line.replace(/\b(\d+) dólares\.(\d{2})\b/g, (_full, dollars: string, cents: string) => {
       return `${dollars} dólares ${and} ${Number(cents)} centavos`;
     });
+    line = line.replace(/\b(\d+) dollars\.(\d{2})\b/g, (_full, dollars: string, cents: string) => {
+      const dollarWord = Number(dollars) === 1 ? "dollar" : "dollars";
+      return `${dollars} ${dollarWord} ${and} ${Number(cents)} cents`;
+    });
     line = line.replace(/÷/g, ` ${divided} `);
-    line = line.replace(/(\d)\s*-\s*(\d)/g, "$1 menos $2");
+    line = line.replace(/(\d)\s*-\s*(\d)/g, french ? "$1 moins $2" : "$1 menos $2");
     line = line.replace(/&/g, ` ${and} `);
   } else {
     line = line.replace(/\$(\d+)\.(\d{2})/g, (_full, dollars: string, cents: string) => {
@@ -107,7 +119,7 @@ function scan(norm: string): { tokens: Token[] | null; error: string | null } {
       i += num[1].length;
       continue;
     }
-    const word = /^([a-záàâãéêíóôõúüçñ]+(?:'[a-záàâãéêíóôõúüçñ]+)?(?:-[a-záàâãéêíóôõúüçñ]+)*)/.exec(rest);
+    const word = /^([a-záàâãäéèêëíïîóôõúùûüÿçñœæ]+(?:'[a-záàâãäéèêëíïîóôõúùûüÿçñœæ]+)?(?:-[a-záàâãäéèêëíïîóôõúùûüÿçñœæ]+)*)/.exec(rest);
     if (word?.[1]) {
       tokens.push({ kind: "word", text: word[1], gapBefore: gap });
       gap = 0;

@@ -1,7 +1,7 @@
 import { WEEKDAY_LETTERS, WEEKDAY_NAMES, gradeLabel, type Grade } from "./model";
 import { ES, TRAIT_ES, type BossEs, type PersonaEs } from "./i18n-es";
 
-export type Locale = "en" | "es" | "pt";
+export type Locale = "en" | "es" | "pt" | "fr";
 
 export interface PortuguesePack {
   PT: Record<string, string>;
@@ -14,15 +14,25 @@ export interface PortuguesePack {
 let locale: Locale = "en";
 let portuguesePack: PortuguesePack | null = null;
 let portugueseLoad: Promise<void> | null = null;
+let frenchPack: FrenchPack | null = null;
+let frenchLoad: Promise<void> | null = null;
+
+export interface FrenchPack {
+  FR: Record<string, string>;
+  PERSONA_FR: Record<string, PersonaEs>;
+  PERSONA_FALLBACK_FR: PersonaEs;
+  BOSS_FR: Record<string, BossEs>;
+  TRAIT_FR: Record<string, string>;
+}
 
 export function getLocale(): Locale {
   return locale;
 }
 
 export function setLocale(next: Locale): void {
-  locale = next === "es" || next === "pt" ? next : "en";
+  locale = next === "es" || next === "pt" || next === "fr" ? next : "en";
   if (typeof document !== "undefined") {
-    document.documentElement.lang = locale === "es" ? "es" : locale === "pt" ? "pt-BR" : "en";
+    document.documentElement.lang = locale === "es" ? "es" : locale === "pt" ? "pt-BR" : locale === "fr" ? "fr" : "en";
   }
 }
 
@@ -45,6 +55,38 @@ export function loadPortuguese(): Promise<void> {
   return portugueseLoad;
 }
 
+/** The French table is a separate chunk. English, Spanish, and Portuguese do not download it. */
+export function installFrench(pack: FrenchPack): void {
+  frenchPack = pack;
+}
+
+export function frenchReady(): boolean {
+  return frenchPack != null;
+}
+
+export function loadFrench(): Promise<void> {
+  if (frenchPack) return Promise.resolve();
+  if (!frenchLoad) {
+    frenchLoad = import("./i18n-fr").then((mod) => {
+      installFrench(mod);
+    });
+  }
+  return frenchLoad;
+}
+
+/** Loads the lazy string pack for a language that is not bundled with the first visit. */
+export function loadLocalePack(lang: Locale): Promise<void> {
+  if (lang === "pt") return loadPortuguese();
+  if (lang === "fr") return loadFrench();
+  return Promise.resolve();
+}
+
+export function localePackReady(lang: Locale): boolean {
+  if (lang === "pt") return portugueseReady();
+  if (lang === "fr") return frenchReady();
+  return true;
+}
+
 /** First visit on a Spanish browser. English stays the default until the child picks. */
 export function prefersSpanish(): boolean {
   if (typeof navigator === "undefined") return false;
@@ -59,9 +101,10 @@ export function prefersPortuguese(): boolean {
   return lang.startsWith("pt");
 }
 
-export function t(en: string, es: string, pt?: string): string {
+export function t(en: string, es: string, pt?: string, fr?: string): string {
   if (locale === "es") return es;
   if (locale === "pt") return pt ?? portuguesePack?.PT[en] ?? en;
+  if (locale === "fr") return fr ?? frenchPack?.FR[en] ?? en;
   return en;
 }
 
@@ -69,36 +112,57 @@ export function t(en: string, es: string, pt?: string): string {
 export function show(en: string): string {
   if (locale === "es") return ES[en] ?? en;
   if (locale === "pt") return portuguesePack?.PT[en] ?? en;
+  if (locale === "fr") return frenchPack?.FR[en] ?? en;
   return en;
 }
 
 export function yesDetail(detail: string): string {
-  return t(`Yes! ${detail}`, `¡Sí! ${detail}`, `Sim! ${detail}`);
+  return t(`Yes! ${detail}`, `¡Sí! ${detail}`, `Sim! ${detail}`, `Oui ! ${detail}`);
 }
 
 export function almostDetail(detail: string): string {
-  return t(`Almost! ${detail}`, `¡Casi! ${detail}`, `Quase! ${detail}`);
+  return t(`Almost! ${detail}`, `¡Casi! ${detail}`, `Quase! ${detail}`, `Presque ! ${detail}`);
 }
 
 export function yourTurnLine(prompt: string): string {
-  return t(`Your turn. ${prompt}`, `Te toca. ${prompt}`, `Sua vez. ${prompt}`);
+  return t(`Your turn. ${prompt}`, `Te toca. ${prompt}`, `Sua vez. ${prompt}`, `À toi. ${prompt}`);
 }
 
 /** Round size for little kids. A countdown is not part of this label. */
 export function cardsRoundLabel(count: number): string {
   const n = Math.max(0, Math.floor(count));
-  if (n === 1) return t("1 card", "1 tarjeta", "1 carta");
-  return t(`${n} cards`, `${n} tarjetas`, `${n} cartas`);
+  if (n === 1) return t("1 card", "1 tarjeta", "1 carta", "1 carte");
+  return t(`${n} cards`, `${n} tarjetas`, `${n} cartas`, `${n} cartes`);
 }
 
 /** Card step for Pre-K, kindergarten, and grade 1. */
 export function cardStepLabel(index: number, total: number): string {
   const safeTotal = Math.max(1, Math.floor(total));
   const at = Math.min(safeTotal, Math.max(1, Math.floor(index) + 1));
-  return t(`Card ${at} of ${safeTotal}`, `Tarjeta ${at} de ${safeTotal}`, `Carta ${at} de ${safeTotal}`);
+  return t(`Card ${at} of ${safeTotal}`, `Tarjeta ${at} de ${safeTotal}`, `Carta ${at} de ${safeTotal}`, `Carte ${at} sur ${safeTotal}`);
 }
 
 export function gradeText(grade: Grade): string {
+  if (locale === "fr") {
+    switch (grade) {
+      case "PK":
+        return "Maternelle";
+      case "K":
+        return "Grande section";
+      case "1":
+        return "CP";
+      case "2":
+        return "CE1";
+      case "3":
+        return "CE2";
+      case "4":
+        return "CM1";
+      default: {
+        const neverGrade: never = grade;
+        return neverGrade;
+      }
+    }
+  }
   if (locale === "pt") {
     if (grade === "PK") return "Pré-escola";
     if (grade === "K") return "Jardim";
@@ -116,6 +180,7 @@ export function weekdayName(index: number): string {
 }
 
 export function weekdayLetter(index: number): string {
+  if (locale === "fr") return ["L", "M", "M", "J", "V", "S", "D"][index] ?? "";
   if (locale === "pt") return ["S", "T", "Q", "Q", "S", "S", "D"][index] ?? "";
   if (locale !== "es") return WEEKDAY_LETTERS[index] ?? "";
   return ["L", "M", "M", "J", "V", "S", "D"][index] ?? "";
@@ -147,13 +212,32 @@ const SHAPES_PT: Record<string, { one: string; article: string }> = {
   cylinder: { one: "cilindro", article: "o" },
 };
 
+const SHAPES_FR: Record<string, { one: string; article: string }> = {
+  circle: { one: "cercle", article: "le" },
+  triangle: { one: "triangle", article: "le" },
+  square: { one: "carré", article: "le" },
+  rectangle: { one: "rectangle", article: "le" },
+  pentagon: { one: "pentagone", article: "le" },
+  hexagon: { one: "hexagone", article: "l'" },
+  cube: { one: "cube", article: "le" },
+  sphere: { one: "sphère", article: "la" },
+  cone: { one: "cône", article: "le" },
+  cylinder: { one: "cylindre", article: "le" },
+};
+
 export function shapeWord(id: string): string {
+  if (locale === "fr") return SHAPES_FR[id]?.one ?? id;
   if (locale === "pt") return SHAPES_PT[id]?.one ?? id;
   if (locale !== "es") return id;
   return SHAPES[id]?.one ?? id;
 }
 
 export function shapeWithArticle(id: string): string {
+  if (locale === "fr") {
+    const row = SHAPES_FR[id];
+    if (!row) return id;
+    return row.article.endsWith("'") ? `${row.article}${row.one}` : `${row.article} ${row.one}`;
+  }
   if (locale === "pt") {
     const row = SHAPES_PT[id];
     if (!row) return id;
@@ -181,7 +265,16 @@ const PARTS_PT: Record<string, string> = {
   "not equal": "que não são iguais",
 };
 
+const PARTS_FR: Record<string, string> = {
+  halves: "les moitiés",
+  thirds: "les tiers",
+  fourths: "les quarts",
+  unequal: "les parties qui ne sont pas égales",
+  "not equal": "qui ne sont pas égales",
+};
+
 export function partPhrase(id: string): string {
+  if (locale === "fr") return PARTS_FR[id] ?? id;
   if (locale === "pt") return PARTS_PT[id] ?? id;
   if (locale !== "es") return id;
   return PARTS[id] ?? id;
@@ -259,8 +352,49 @@ const NOUNS_PT: Record<string, [string, string]> = {
 
 const FEMININE_PT = new Set(["maçã", "estrela", "sacola", "bola", "banana", "cobra", "cenoura"]);
 
-/** English plural helper stays put. Spanish and Portuguese use real singular and plural. */
+const NOUNS_FR: Record<string, [string, string]> = {
+  apple: ["pomme", "pommes"],
+  apples: ["pomme", "pommes"],
+  fish: ["poisson", "poissons"],
+  star: ["étoile", "étoiles"],
+  stars: ["étoile", "étoiles"],
+  cookie: ["biscuit", "biscuits"],
+  cookies: ["biscuit", "biscuits"],
+  frog: ["grenouille", "grenouilles"],
+  frogs: ["grenouille", "grenouilles"],
+  bag: ["sac", "sacs"],
+  bags: ["sac", "sacs"],
+  cat: ["chat", "chats"],
+  cats: ["chat", "chats"],
+  dog: ["chien", "chiens"],
+  dogs: ["chien", "chiens"],
+  squishee: ["squishee", "squishees"],
+  squishees: ["squishee", "squishees"],
+  ball: ["balle", "balles"],
+  balls: ["balle", "balles"],
+  banana: ["banane", "bananes"],
+  bananas: ["banane", "bananes"],
+  snake: ["serpent", "serpents"],
+  snakes: ["serpent", "serpents"],
+  carrot: ["carotte", "carottes"],
+  carrots: ["carotte", "carottes"],
+  bone: ["os", "os"],
+  bones: ["os", "os"],
+  candy: ["bonbon", "bonbons"],
+  candies: ["bonbon", "bonbons"],
+  bug: ["insecte", "insectes"],
+  bugs: ["insecte", "insectes"],
+};
+
+const FEMININE_FR = new Set(["pomme", "étoile", "grenouille", "balle", "banane", "carotte"]);
+
+/** English plural helper stays put. Spanish, Portuguese, and French use real singular and plural. */
 export function thingName(name: string, n: number, english: string): string {
+  if (locale === "fr") {
+    const pair = NOUNS_FR[name];
+    if (!pair) return english;
+    return n === 1 ? pair[0] : pair[1];
+  }
   if (locale === "pt") {
     const pair = NOUNS_PT[name];
     if (!pair) return english;
@@ -274,6 +408,11 @@ export function thingName(name: string, n: number, english: string): string {
 
 /** English vowel labels such as "short i". Letter patterns stay as written. */
 export function patternName(label: string): string {
+  if (locale === "fr") {
+    const short = /^short ([aeiou])$/.exec(label);
+    if (short?.[1]) return `${short[1]} bref`;
+    return label;
+  }
   if (locale === "pt") {
     const short = /^short ([aeiou])$/.exec(label);
     if (short?.[1]) return `${short[1]} curto`;
@@ -301,7 +440,20 @@ const COIN_PT: Record<string, { one: string; many: string }> = {
   dollar: { one: "dólar", many: "dólares" },
 };
 
+const COIN_FR: Record<string, { one: string; many: string }> = {
+  penny: { one: "pièce de 1 cent", many: "pièces de 1 cent" },
+  nickel: { one: "pièce de 5 cents", many: "pièces de 5 cents" },
+  dime: { one: "pièce de 10 cents", many: "pièces de 10 cents" },
+  quarter: { one: "pièce de 25 cents", many: "pièces de 25 cents" },
+  dollar: { one: "dollar", many: "dollars" },
+};
+
 export function coinWord(kind: string, n = 1): string {
+  if (locale === "fr") {
+    const row = COIN_FR[kind];
+    if (!row) return kind;
+    return n === 1 ? row.one : row.many;
+  }
   if (locale === "pt") {
     const row = COIN_PT[kind];
     if (!row) return kind;
@@ -314,7 +466,7 @@ export function coinWord(kind: string, n = 1): string {
 }
 
 export function coinButton(kind: string, english: string): string {
-  const row = locale === "pt" ? COIN_PT[kind] : locale === "es" ? COIN_ES[kind] : undefined;
+  const row = locale === "fr" ? COIN_FR[kind] : locale === "pt" ? COIN_PT[kind] : locale === "es" ? COIN_ES[kind] : undefined;
   if (!row) return english;
   const word = row.one;
   return word.charAt(0).toUpperCase() + word.slice(1);
@@ -322,6 +474,22 @@ export function coinButton(kind: string, english: string): string {
 
 /** "a nickel" / "un níquel" / "uma moeda de 5" for praise lines. */
 export function coinAsA(kind: string, englishLower: string): string {
+  if (locale === "fr") {
+    switch (kind) {
+      case "penny":
+        return "une pièce de 1 cent";
+      case "nickel":
+        return "une pièce de 5 cents";
+      case "dime":
+        return "une pièce de 10 cents";
+      case "quarter":
+        return "une pièce de 25 cents";
+      case "dollar":
+        return "un dollar";
+      default:
+        return englishLower;
+    }
+  }
   if (locale === "pt") {
     switch (kind) {
       case "penny":
@@ -434,13 +602,13 @@ export function spanishNumberWords(n: number): string {
 export function starPlace(place: "above" | "below" | "beside" | "behind"): string {
   switch (place) {
     case "above":
-      return t("The star is above the box", "La estrella está arriba de la caja", "A estrela está em cima da caixa");
+      return t("The star is above the box", "La estrella está arriba de la caja", "A estrela está em cima da caixa", "L'étoile est au-dessus de la boîte");
     case "below":
-      return t("The star is below the box", "La estrella está abajo de la caja", "A estrela está embaixo da caixa");
+      return t("The star is below the box", "La estrella está abajo de la caja", "A estrela está embaixo da caixa", "L'étoile est en dessous de la boîte");
     case "beside":
-      return t("The star is beside the box", "La estrella está al lado de la caja", "A estrela está ao lado da caixa");
+      return t("The star is beside the box", "La estrella está al lado de la caja", "A estrela está ao lado da caixa", "L'étoile est à côté de la boîte");
     case "behind":
-      return t("The star is behind the box", "La estrella está detrás de la caja", "A estrela está atrás da caixa");
+      return t("The star is behind the box", "La estrella está detrás de la caja", "A estrela está atrás da caixa", "L'étoile est derrière la boîte");
     default: {
       const neverPlace: never = place;
       return neverPlace;
@@ -481,23 +649,42 @@ export function spanishFraction(num: number, den: number): string {
 }
 
 function traitWord(trait: string): string {
+  if (locale === "fr") return frenchPack?.TRAIT_FR[trait] ?? trait;
   if (locale === "pt") return portuguesePack?.TRAIT_PT[trait] ?? trait;
   if (locale === "es") return TRAIT_ES[trait] ?? trait;
   return trait;
 }
 
-/** "Peach the sweet" / "Peach, la dulce," / "Peach, a doce," */
+/** "Peach the sweet" / "Peach, la dulce," / "Peach, a doce," / "Peach, la douce," */
 export function starLead(name: string, trait: string): string {
-  return t(`${name} the ${trait}`, `${name}, ${TRAIT_ES[trait] ?? trait},`, `${name}, ${traitWord(trait)},`);
+  const ptTrait = locale === "pt" ? traitWord(trait) : (portuguesePack?.TRAIT_PT[trait] ?? trait);
+  const frTrait = locale === "fr" ? traitWord(trait) : (frenchPack?.TRAIT_FR[trait] ?? trait);
+  return t(`${name} the ${trait}`, `${name}, ${TRAIT_ES[trait] ?? trait},`, `${name}, ${ptTrait},`, `${name}, ${frTrait},`);
 }
 
 export function gamePill(title: string, num: number): string {
-  return t(`${title} · Level ${num}`, `${show(title)} · Nivel ${num}`, `${show(title)} · Nível ${num}`);
+  return t(`${title} · Level ${num}`, `${show(title)} · Nivel ${num}`, `${show(title)} · Nível ${num}`, `${show(title)} · Niveau ${num}`);
+}
+
+/** French elides de/que before a vowel: d'os, qu'étoiles. Combien stays invariable. */
+function frenchVowelStart(word: string): boolean {
+  return /^[aeiouàâäéèêëîïôùûüœæh]/i.test(word);
+}
+
+/** "que pommes" or "qu'os". */
+export function frenchThan(word: string): string {
+  return frenchVowelStart(word) ? `qu'${word}` : `que ${word}`;
+}
+
+/** "de pommes" or "d'os". */
+export function frenchDe(word: string): string {
+  return frenchVowelStart(word) ? `d'${word}` : `de ${word}`;
 }
 
 function howManyLead(name: string, englishPlural: string, count: number): string {
   const one = thingName(name, 1, name);
   const word = thingName(name, Math.max(count, 2), englishPlural);
+  if (locale === "fr") return `Combien ${frenchDe(word)}`;
   if (locale === "pt") {
     const lead = FEMININE_PT.has(one) ? "Quantas" : "Quantos";
     return `${lead} ${word}`;
@@ -508,19 +695,20 @@ function howManyLead(name: string, englishPlural: string, count: number): string
 
 /** "cuántos plátanos" or "quantas cenouras" in a how-many-more question. */
 export function howManyMorePhrase(name: string, englishPlural: string): string {
-  if (locale !== "es" && locale !== "pt") return englishPlural;
+  if (locale !== "es" && locale !== "pt" && locale !== "fr") return englishPlural;
   return howManyLead(name, englishPlural, 2);
 }
 
-/** "cuántos plátanos" or "quantas cenouras" in a how-many-less question. */
+/** "cuántos plátanos", "quantas cenouras", or "combien de pommes" in a how-many-less question. */
 export function howManyLessPhrase(name: string, englishPlural: string): string {
-  if (locale !== "es" && locale !== "pt") return englishPlural;
+  if (locale !== "es" && locale !== "pt" && locale !== "fr") return englishPlural;
   return howManyLead(name, englishPlural, 2);
 }
 
 /** True when the noun uses feminine agreement. English is never feminine here. */
 export function nounIsFeminine(name: string): boolean {
   const one = thingName(name, 1, name);
+  if (locale === "fr") return FEMININE_FR.has(one);
   if (locale === "pt") return FEMININE_PT.has(one);
   if (locale === "es") return FEMININE.has(one);
   return false;
@@ -528,11 +716,12 @@ export function nounIsFeminine(name: string): boolean {
 
 /** "bananas" / "cuántos plátanos" or "quantas cenouras". */
 export function howManyPhrase(name: string, n: number, englishPlural: string): string {
-  if (locale !== "es" && locale !== "pt") return englishPlural;
+  if (locale !== "es" && locale !== "pt" && locale !== "fr") return englishPlural;
   return howManyLead(name, englishPlural, n);
 }
 
 export function longShort(long: boolean): string {
+  if (locale === "fr") return long ? "le plus long" : "le plus court";
   if (locale === "pt") return long ? "mais comprido" : "mais curto";
   if (locale !== "es") return long ? "longest" : "shortest";
   return long ? "más largo" : "más corto";
@@ -540,6 +729,12 @@ export function longShort(long: boolean): string {
 
 /** Adjective agrees with the noun. English stays "longest" / "shortest". */
 export function longShortOf(name: string, long: boolean): string {
+  if (locale === "fr") {
+    const word = thingName(name, 1, name);
+    const fem = FEMININE_FR.has(word);
+    if (long) return fem ? "la plus longue" : "le plus long";
+    return fem ? "la plus courte" : "le plus court";
+  }
   if (locale === "pt") {
     const word = thingName(name, 1, name);
     const fem = FEMININE_PT.has(word);
@@ -662,6 +857,101 @@ export function portugueseMinuteWords(minutes: number): string {
   return `e ${portugueseNumberWords(minutes)}`;
 }
 
+const FR_UNDER_20 = [
+  "zéro",
+  "un",
+  "deux",
+  "trois",
+  "quatre",
+  "cinq",
+  "six",
+  "sept",
+  "huit",
+  "neuf",
+  "dix",
+  "onze",
+  "douze",
+  "treize",
+  "quatorze",
+  "quinze",
+  "seize",
+  "dix-sept",
+  "dix-huit",
+  "dix-neuf",
+] as const;
+
+function frenchUnder100(n: number): string {
+  if (n < 20) return FR_UNDER_20[n] ?? String(n);
+  if (n < 70) {
+    const tens = ["", "", "vingt", "trente", "quarante", "cinquante", "soixante"][Math.floor(n / 10)] ?? "";
+    const ones = n % 10;
+    if (ones === 0) return tens;
+    if (ones === 1) return `${tens} et un`;
+    return `${tens}-${FR_UNDER_20[ones]}`;
+  }
+  if (n < 80) {
+    if (n === 71) return "soixante et onze";
+    return `soixante-${FR_UNDER_20[n - 60]}`;
+  }
+  if (n === 80) return "quatre-vingts";
+  return `quatre-vingt-${FR_UNDER_20[n - 80]}`;
+}
+
+/** Cardinal for a French clip. 80 is "quatre-vingts"; 81 is "quatre-vingt-un". 200 is "deux cents"; 201 is "deux cent un". */
+export function frenchNumberWords(n: number): string {
+  if (!Number.isInteger(n) || n < 0) return String(n);
+  if (n < 100) return frenchUnder100(n);
+  if (n < 1000) {
+    const hundreds = Math.floor(n / 100);
+    const rest = n % 100;
+    const head = hundreds === 1 ? "cent" : `${frenchNumberWords(hundreds)} cent`;
+    if (!rest) return hundreds === 1 ? "cent" : `${head}s`;
+    return `${head} ${frenchUnder100(rest)}`;
+  }
+  if (n === 1000) return "mille";
+  return String(n);
+}
+
+/**
+ * French agreement for a shaded fraction. "Demi" and "quart" are masculine,
+ * and more than one part is plural: "deux quarts sont coloriés".
+ */
+export function frenchShaded(answer: string): string {
+  const match = /^(\d+)\/(\d+)$/.exec(answer);
+  if (!match) return `${answer} est colorié`;
+  const num = Number(match[1]);
+  const den = Number(match[2]);
+  const words = frenchFraction(num, den);
+  const line = num === 1 ? `${words} est colorié` : `${words} sont coloriés`;
+  return line.charAt(0).toUpperCase() + line.slice(1);
+}
+
+/** Fraction speech with no slash: "un demi", "deux quarts". */
+export function frenchFraction(num: number, den: number): string {
+  const head = num === 1 ? "un" : frenchNumberWords(num);
+  const forms: Record<number, [string, string]> = {
+    2: ["demi", "demis"],
+    3: ["tiers", "tiers"],
+    4: ["quart", "quarts"],
+    5: ["cinquième", "cinquièmes"],
+    6: ["sixième", "sixièmes"],
+    8: ["huitième", "huitièmes"],
+    10: ["dixième", "dixièmes"],
+    12: ["douzième", "douzièmes"],
+  };
+  const pair = forms[den];
+  if (!pair) return `${num} sur ${den}`;
+  return `${head} ${num === 1 ? pair[0] : pair[1]}`;
+}
+
+export function frenchMinuteWords(minutes: number): string {
+  if (minutes === 0) return "pile";
+  if (minutes === 15) return "et quart";
+  if (minutes === 30) return "et demie";
+  if (minutes === 45) return "moins le quart";
+  return `et ${frenchNumberWords(minutes)}`;
+}
+
 export function portuguesePersona(id: string, known: boolean): PersonaEs | null {
   if (!portuguesePack) return null;
   return known ? (portuguesePack.PERSONA_PT[id] ?? null) : portuguesePack.PERSONA_FALLBACK_PT;
@@ -669,4 +959,13 @@ export function portuguesePersona(id: string, known: boolean): PersonaEs | null 
 
 export function portugueseBoss(gameId: string): BossEs | null {
   return portuguesePack?.BOSS_PT[gameId] ?? null;
+}
+
+export function frenchPersona(id: string, known: boolean): PersonaEs | null {
+  if (!frenchPack) return null;
+  return known ? (frenchPack.PERSONA_FR[id] ?? null) : frenchPack.PERSONA_FALLBACK_FR;
+}
+
+export function frenchBoss(gameId: string): BossEs | null {
+  return frenchPack?.BOSS_FR[gameId] ?? null;
 }

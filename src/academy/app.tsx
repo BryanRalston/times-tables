@@ -3,7 +3,7 @@ import { gameForScreen, isGameId, type GameId } from "./games/catalog";
 import { todayIso, type RoundResult, type Save } from "./model";
 import { openEgg } from "./buddy/unlock";
 import { acknowledgeUnlocks, applyRound, applyStory, claimDailyGift } from "./rewards";
-import { loadPortuguese, portugueseReady, setLocale, show } from "./i18n";
+import { loadLocalePack, localePackReady, setLocale, show } from "./i18n";
 import { activeChild, loadSave, mapActive, withLevel, writeSave } from "./storage";
 import { warmVoices } from "./voice";
 import { ensureVoice } from "./voice/clips";
@@ -122,17 +122,17 @@ export function AcademyRoot() {
 function AcademyApp() {
   const [save, setSave] = useState<Save>(() => loadSave());
   const route = useRoute();
-  const [packReady, setPackReady] = useState(() => save.lang !== "pt" || portugueseReady());
+  const [packReady, setPackReady] = useState(() => localePackReady(save.lang));
   setLocale(save.lang);
 
   useEffect(() => {
-    if (save.lang !== "pt") {
+    if (localePackReady(save.lang)) {
       setPackReady(true);
       return;
     }
     let live = true;
-    setPackReady(portugueseReady());
-    void loadPortuguese().then(() => {
+    setPackReady(false);
+    void loadLocalePack(save.lang).then(() => {
       if (live) setPackReady(true);
     });
     return () => {
@@ -240,10 +240,11 @@ function AcademyApp() {
     );
   }
 
-  if (save.lang === "pt" && !packReady) {
+  if (!packReady) {
+    const waiting = save.lang === "fr" ? "Chargement…" : save.lang === "pt" ? "Carregando…" : "Loading…";
     return (
       <SoundContext.Provider value={save.sound}>
-        <p className="ac-note">Carregando…</p>
+        <p className="ac-note">{waiting}</p>
       </SoundContext.Provider>
     );
   }

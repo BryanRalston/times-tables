@@ -52,4 +52,17 @@ npx vite-node scripts/export-voice-pt.ts
 VOICE_JOBS=/tmp/voice-jobs-pt.json VOICE_NAME=pf_dora VOICE_LANG=pt-br python3 scripts/render-voice.py
 ```
 
-`src/academy/voice/clips-es.test.ts` fails if any Spanish speakable line has no clip. `src/academy/voice/clips-pt.test.ts` does the same for Portuguese. `VOICE_CLEAN=1` only deletes files in folders named by the current job list, so a Spanish or Portuguese render does not remove English clips.
+`src/academy/voice/clips-es.test.ts` fails if any Spanish speakable line has no clip. `src/academy/voice/clips-pt.test.ts` does the same for Portuguese. `src/academy/voice/clips-fr.test.ts` does the same for French. `VOICE_CLEAN=1` only deletes files in folders named by the current job list, so a Spanish, Portuguese, or French render does not remove English clips.
+
+## French
+
+French from France uses the same Kokoro model and the same line-splitting. The voice is `ff_siwis` (`lang="fr-fr"`), also Apache-2.0. Clips live in `academy/public/voice/fr/`. The install cache includes the French clips for Add & Subtract, Times Tables, and Telling Time, plus buddy lines and the home. The manifest is a separate chunk (`src/academy/voice/manifest-fr.ts`) loaded only when the language is Français. The string table is its own chunk too (`src/academy/i18n-fr.ts`).
+
+Number clips do not share filenames with English, Spanish, or Portuguese. “7” is `sept` in French. 70–99 follow the school forms (`soixante-dix`, `quatre-vingts`, `quatre-vingt-un`).
+
+`ff_siwis` also reads the English words that stay on screen in Phonics, Sight Words, and Spelling. The instruction around them is French.
+
+```bash
+npx vite-node scripts/export-voice-fr.ts
+VOICE_JOBS=/tmp/voice-jobs-fr.json VOICE_NAME=ff_siwis VOICE_LANG=fr-fr python3 scripts/render-voice.py
+```

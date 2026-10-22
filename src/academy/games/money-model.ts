@@ -60,16 +60,17 @@ export function describePile(pile: CoinPile): string {
   for (const kind of order) {
     const n = pile[kind];
     if (n <= 0) continue;
-    if (locale === "es" || locale === "pt") parts.push(`${n} ${coinWord(kind, n)}`);
+    if (locale === "es" || locale === "pt" || locale === "fr") parts.push(`${n} ${coinWord(kind, n)}`);
     else parts.push(`${n} ${n === 1 ? COIN_NAME[kind].toLowerCase() : PLURAL[kind]}`);
   }
   if (parts.length === 0) {
+    if (locale === "fr") return "sans pièces";
     if (locale === "pt") return "sem moedas";
     if (locale === "es") return "sin monedas";
     return "no coins";
   }
   if (parts.length === 1) return parts[0]!;
-  const join = locale === "pt" ? "e" : locale === "es" ? "y" : "and";
+  const join = locale === "es" ? "y" : locale === "pt" ? "e" : locale === "fr" ? "et" : "and";
   return `${parts.slice(0, -1).join(", ")} ${join} ${parts[parts.length - 1]}`;
 }
 

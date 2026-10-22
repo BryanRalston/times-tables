@@ -19,14 +19,15 @@ function StoriesHidden() {
   return (
     <div className="ac-shell ac-mid" data-stories="hidden">
       <header className="ac-top">
-        <BackLink>{t("Back to games", "Volver a los juegos")}</BackLink>
+        <BackLink>{t("Back to games", "Volver a los juegos", "Voltar aos jogos", "Retour aux jeux")}</BackLink>
       </header>
-      <h1>{t("Stories", "Cuentos")}</h1>
+      <h1>{t("Stories", "Cuentos", "Histórias", "Histoires")}</h1>
       <p className="ac-lede">
         {t(
           "Stories are in English.",
           "Los cuentos están en inglés por ahora. Cambia a English en Ajustes para leerlos.",
           "As histórias estão em inglês por enquanto. Mude para English em Ajustes para ler.",
+          "Les histoires sont en anglais pour l'instant. Passe en English dans Réglages pour les lire.",
         )}
       </p>
     </div>
