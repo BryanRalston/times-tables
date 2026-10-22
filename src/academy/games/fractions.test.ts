@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
+import { setLocale } from "../i18n";
 import { FRACTION_LEVELS, fractionsGame, makeFractionQuestion } from "./fractions";
 import type { ChoiceQ } from "./types";
 
@@ -17,6 +18,19 @@ function lineText(num: number, den: number): string {
 }
 
 describe("fraction questions", () => {
+  afterEach(() => setLocale("en"));
+
+  it("agrees sombreado with medio and cuarto", () => {
+    setLocale("es");
+    const bad = /(?:medio|cuarto)s? está sombreada|cuartos está sombreada|medios está sombreada/i;
+    for (let seed = 0; seed < 40; seed += 1) {
+      const q = makeFractionQuestion(rngFromSeed(`shade-gender-${seed}`), "parts");
+      expect(q.praise).not.toMatch(bad);
+      expect(q.praise.toLowerCase()).toMatch(/sombreado/);
+      expect(q.praise).not.toMatch(/\d\/\d/);
+    }
+  });
+
   it("stays inside grade 1–3 denominators and compares with the same numerator or denominator", () => {
     for (let seed = 0; seed < 24; seed += 1) {
       for (const level of FRACTION_LEVELS) {

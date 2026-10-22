@@ -281,6 +281,38 @@ export function spanishNumberWords(n: number): string {
   return String(n);
 }
 
+/** "The star is above the box" / "La estrella está arriba de la caja". */
+export function starPlace(place: "above" | "below" | "beside" | "behind"): string {
+  switch (place) {
+    case "above":
+      return t("The star is above the box", "La estrella está arriba de la caja");
+    case "below":
+      return t("The star is below the box", "La estrella está abajo de la caja");
+    case "beside":
+      return t("The star is beside the box", "La estrella está al lado de la caja");
+    case "behind":
+      return t("The star is behind the box", "La estrella está detrás de la caja");
+    default: {
+      const neverPlace: never = place;
+      return neverPlace;
+    }
+  }
+}
+
+/**
+ * Spanish agreement for a shaded fraction. "Medio" and "cuarto" are masculine,
+ * and more than one part is plural: "dos cuartos están sombreados".
+ */
+export function spanishShaded(answer: string): string {
+  const match = /^(\d+)\/(\d+)$/.exec(answer);
+  if (!match) return `${answer} está sombreado`;
+  const num = Number(match[1]);
+  const den = Number(match[2]);
+  const words = spanishFraction(num, den);
+  const line = num === 1 ? `${words} está sombreado` : `${words} están sombreados`;
+  return line.charAt(0).toUpperCase() + line.slice(1);
+}
+
 /** Fraction speech with no slash: "un medio", "dos tercios". */
 export function spanishFraction(num: number, den: number): string {
   const head = num === 1 ? "un" : spanishNumberWords(num);
