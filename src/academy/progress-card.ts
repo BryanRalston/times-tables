@@ -51,6 +51,7 @@ export function weeklyCard(child: Pick<Child, "name" | "secondsByDay" | "streak"
   const mastered = masteredChips(child.skills).length;
   const dayWord = days === 1 ? "day" : "days";
   const dayEs = days === 1 ? "día" : "días";
+  const dayPt = days === 1 ? "dia" : "dias";
   const tip = practiceTip(child.name, child.skills);
   const wins = winLabels(child.skills);
   const stuck = stuckLabels(child.skills);
@@ -64,19 +65,19 @@ export function weeklyCard(child: Pick<Child, "name" | "secondsByDay" | "streak"
       days === 0
         ? t(
             `${name} has not played yet this week. One short game is a good start.`,
-            `${name} todavía no juega esta semana. Un juego cortito es un buen comienzo.`,
+            `${name} todavía no juega esta semana. Un juego cortito es un buen comienzo.`, `${name} ainda não joga nesta semana. Um jogo curtinho é um bom começo.`,
           )
         : t(
             `${name} practiced ${minutesLabel} on ${days} ${dayWord} this week.`,
-            `${name} practicó ${minutesLabel} en ${days} ${dayEs} esta semana.`,
+            `${name} practicó ${minutesLabel} en ${days} ${dayEs} esta semana.`, `${name} praticou ${minutesLabel} em ${days} ${dayPt} nesta semana.`,
           ),
     headline: named
-      ? t(`What ${named} learned`, `Qué aprendió ${named}`)
+      ? t(`What ${named} learned`, `Qué aprendió ${named}`, `O que ${named} aprendeu`)
       : t("What your child learned", "Qué aprendió tu hijo o hija"),
     deviceNote: t("Saved on this device only.", "Guardado solo en este aparato."),
     streakNote:
       child.streak >= 2
-        ? t(`${name} played ${child.streak} days in a row.`, `${name} jugó ${child.streak} días seguidos.`)
+        ? t(`${name} played ${child.streak} days in a row.`, `${name} jugó ${child.streak} días seguidos.`, `${name} jogou ${child.streak} dias seguidos.`)
         : "",
     dayLines,
     wins,

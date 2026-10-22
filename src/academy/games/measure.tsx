@@ -51,7 +51,7 @@ function makeCompare(rng: Rng): ChoiceQ {
     choices: uniqueChoices(rng, answer, [], items.map((item) => item.name)),
     skill: "measure:compare",
     tags: ["compare"],
-    solved: t(`The ${answer} is the ${askLong ? "longest" : "shortest"}`, `${named} es ${longShortOf(answer, askLong)}`),
+    solved: t(`The ${answer} is the ${askLong ? "longest" : "shortest"}`, `${named} es ${longShortOf(answer, askLong)}`, `${named} é ${longShortOf(answer, askLong)}`),
     picture: items.find((item) => item.name === answer)?.emoji ?? "📏",
     hands: true,
     quietChoices: false,
@@ -69,14 +69,14 @@ function makeRuler(rng: Rng): ChoiceQ {
     game: "measure",
     title: pickTalk(rng, [
       ["How many inches long is the ribbon?", "¿Cuántas pulgadas mide el listón?"],
-      [`${buddy} measures the ribbon. How many inches?`, `${buddy} mide el listón. ¿Cuántas pulgadas son?`],
+      [`${buddy} measures the ribbon. How many inches?`, `${buddy} mide el listón. ¿Cuántas pulgadas son?`, `${buddy} mede a fita. Quantas polegadas?`],
     ]),
     hint: t("Start at 0", "Empieza en el 0"),
     answer: String(inches),
     choices: nearChoices(rng, inches, 1, 12),
     skill: "measure:ruler",
     tags: ["ruler"],
-    solved: t(`${inches} inches`, inches === 1 ? `${inches} pulgada` : `${inches} pulgadas`),
+    solved: t(`${inches} inches`, inches === 1 ? `${inches} pulgada` : `${inches} pulgadas`, inches === 1 ? `${inches} polegada` : `${inches} polegadas`),
     picture: `${inches} in`,
     hands: false,
     quietChoices: false,
@@ -102,8 +102,8 @@ function makeGraph(rng: Rng, mode: "picture" | "bar"): ChoiceQ {
   return sceneQuestion(rng, {
     game: "measure",
     title: askMost
-      ? t(`Which has the most on the ${graph}?`, `¿Cuál tiene más en la ${graphEs}?`)
-      : t(`How many ${many} are on the ${graph}?`, `¿${howMany} hay en la ${graphEs}?`),
+      ? t(`Which has the most on the ${graph}?`, `¿Cuál tiene más en la ${graphEs}?`, `Qual tem mais no ${graphEs}?`)
+      : t(`How many ${many} are on the ${graph}?`, `¿${howMany} hay en la ${graphEs}?`, `${howMany} tem no ${graphEs}?`),
     hint: askMost ? t("Find the tallest or fullest row", "Busca la fila más alta o más llena") : t("Count that row", "Cuenta esa fila"),
     answer,
     choices: askMost
@@ -112,8 +112,8 @@ function makeGraph(rng: Rng, mode: "picture" | "bar"): ChoiceQ {
     skill: `measure:${mode}`,
     tags: [mode],
     solved: askMost
-      ? t(`${answer} has the most`, `${thingName(answer, 1, answer)} tiene más`)
-      : t(`${focusItem.value} ${many}`, `${focusItem.value} ${manyEs}`),
+      ? t(`${answer} has the most`, `${thingName(answer, 1, answer)} tiene más`, `${thingName(answer, 1, answer)} tem mais`)
+      : t(`${focusItem.value} ${many}`, `${focusItem.value} ${manyEs}`, `${focusItem.value} ${manyEs}`),
     picture: focusItem.emoji.repeat(focusItem.value),
     hands: false,
     quietChoices: false,
@@ -133,14 +133,14 @@ function makeMore(rng: Rng): ChoiceQ {
     game: "measure",
     title: t(
       `How many more ${pluralName(items[0]!.name)} than ${pluralName(items[1]!.name)}?`,
-      `¿${howManyMorePhrase(items[0]!.name, pluralName(items[0]!.name))} más que ${thingName(items[1]!.name, 2, pluralName(items[1]!.name))}?`,
+      `¿${howManyMorePhrase(items[0]!.name, pluralName(items[0]!.name))} más que ${thingName(items[1]!.name, 2, pluralName(items[1]!.name))}?`, `${howManyMorePhrase(items[0]!.name, pluralName(items[0]!.name))} a mais que ${thingName(items[1]!.name, 2, pluralName(items[1]!.name))}?`,
     ),
     hint: t("Subtract the smaller number", "Resta el número más chico"),
     answer: String(answer),
     choices: nearChoices(rng, answer, 0, 8),
     skill: "measure:more",
     tags: ["more"],
-    solved: t(`${answer} more`, `${answer} más`),
+    solved: t(`${answer} more`, `${answer} más`, `${answer} a mais`),
     picture: `${high} ${low}`,
     hands: false,
     quietChoices: false,
@@ -192,8 +192,8 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const longer = rng.next() < 0.5;
       return {
         prompt: longer
-          ? t(`Which is longer, ${a} units or ${b} units?`, `¿Cuál es más largo, ${a} unidades o ${b} unidades?`)
-          : t(`Which is shorter, ${a} units or ${b} units?`, `¿Cuál es más corto, ${a} unidades o ${b} unidades?`),
+          ? t(`Which is longer, ${a} units or ${b} units?`, `¿Cuál es más largo, ${a} unidades o ${b} unidades?`, `Qual é mais comprido, ${a} unidades ou ${b} unidades?`)
+          : t(`Which is shorter, ${a} units or ${b} units?`, `¿Cuál es más corto, ${a} unidades o ${b} unidades?`, `Qual é mais curto, ${a} unidades ou ${b} unidades?`),
         answer: String(longer ? Math.max(a, b) : Math.min(a, b)),
       };
     }
@@ -202,7 +202,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       return {
         prompt: t(
           `The ribbon goes from 0 to ${inches} on the ruler. How many inches?`,
-          `El listón va del 0 al ${inches} en la regla. ¿Cuántas pulgadas son?`,
+          `El listón va del 0 al ${inches} en la regla. ¿Cuántas pulgadas son?`, `A fita vai do 0 até o ${inches} na régua. Quantas polegadas são?`,
         ),
         answer: String(inches),
       };
@@ -212,7 +212,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const n = rng.int(1, 8);
       const icon = safe === "picture" ? "🍎" : "▮";
       return {
-        prompt: t(`The graph shows ${icon.repeat(n)} apples. How many apples?`, `La gráfica muestra ${icon.repeat(n)} manzanas. ¿Cuántas manzanas hay?`),
+        prompt: t(`The graph shows ${icon.repeat(n)} apples. How many apples?`, `La gráfica muestra ${icon.repeat(n)} manzanas. ¿Cuántas manzanas hay?`, `O gráfico mostra ${icon.repeat(n)} maçãs. Quantas maçãs tem?`),
         answer: String(n),
       };
     }
@@ -222,7 +222,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       return {
         prompt: t(
           `There are ${cats} cats and ${dogs} dogs. How many more cats?`,
-          `Hay ${cats} gatos y ${dogs} perros. ¿Cuántos gatos más hay?`,
+          `Hay ${cats} gatos y ${dogs} perros. ¿Cuántos gatos más hay?`, `Tem ${cats} gatos e ${dogs} cachorros. Quantos gatos a mais tem?`,
         ),
         answer: String(cats - dogs),
       };

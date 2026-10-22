@@ -37,11 +37,11 @@ export function makeSpellingQuestion(rng: Rng, level: SpellLevel, prefer: string
     game: "spelling",
     title: pickTalk(rng, [
       ["Spell the word you hear", "Deletrea la palabra que escuchas"],
-      [`${buddy} says a word. Spell it.`, `${buddy} dice una palabra. Deletréala.`],
+      [`${buddy} says a word. Spell it.`, `${buddy} dice una palabra. Deletréala.`, `${buddy} diz uma palavra. Soletre.`],
     ]),
     hint: t("Tap letters to build it. Tap a letter again to put it back.", "Toca las letras para armarla. Toca una letra otra vez para devolverla."),
-    praise: t(`Yes! ${word.word}`, `¡Sí! ${word.word}`),
-    almost: t(`Almost! ${word.word}. ${word.sentence}`, `¡Casi! ${word.word}. ${word.sentence}`),
+    praise: t(`Yes! ${word.word}`, `¡Sí! ${word.word}`, `Sim! ${word.word}`),
+    almost: t(`Almost! ${word.word}. ${word.sentence}`, `¡Casi! ${word.word}. ${word.sentence}`, `Quase! ${word.word}. ${word.sentence}`),
     answer: word.word,
     choices,
     skill: `spell:${level}`,
@@ -69,7 +69,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
   const word = rng.pick(list);
   if (rng.next() < 0.6) {
     return {
-      prompt: t(`Trace and write · ${word.patternLabel}`, `Traza y escribe · ${patternName(word.patternLabel)}`),
+      prompt: t(`Trace and write · ${word.patternLabel}`, `Traza y escribe · ${patternName(word.patternLabel)}`, `Trace e escreva · ${patternName(word.patternLabel)}`),
       answer: word.word,
       trace: word.word,
     };
@@ -185,7 +185,7 @@ export function SpellingChoices({ question, reveal, onChoose }: ChoiceProps) {
               key={tile ? tile.id : `slot-${index}`}
               type="button"
               className={cx("ac-slot", locked && "is-lock", !tile && "is-empty")}
-              aria-label={tile ? t(`Remove ${tile.letter}`, `Quita ${tile.letter}`) : t("Empty spot", "Espacio vacío")}
+              aria-label={tile ? t(`Remove ${tile.letter}`, `Quita ${tile.letter}`, `Tire ${tile.letter}`) : t("Empty spot", "Espacio vacío")}
               disabled={reveal || !tile || locked}
               onClick={() => tile && setBoard(liftTile(board, tile.id))}
             >
@@ -201,7 +201,7 @@ export function SpellingChoices({ question, reveal, onChoose }: ChoiceProps) {
             type="button"
             className="ac-tile"
             data-tile={tile.letter}
-            aria-label={t(`Letter ${tile.letter}`, `Letra ${tile.letter}`)}
+            aria-label={t(`Letter ${tile.letter}`, `Letra ${tile.letter}`, `Letra ${tile.letter}`)}
             disabled={reveal}
             onClick={() => setBoard(placeTile(board, tile.id))}
           >

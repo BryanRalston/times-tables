@@ -6,7 +6,7 @@ import { SquisheeImg, cx } from "./bits";
 
 export function BossIntro({ boss, crown, onStart }: { boss: IslandBoss; crown: boolean; onStart: () => void }) {
   return (
-    <div className="ac-boss-intro" role="dialog" aria-label={t(`${boss.name} appears`, `${boss.name} aparece`)} data-boss-intro={boss.gameId}>
+    <div className="ac-boss-intro" role="dialog" aria-label={t(`${boss.name} appears`, `${boss.name} aparece`, `${boss.name} aparece`)} data-boss-intro={boss.gameId}>
       <p className="ac-boss-kicker">{crown ? show("Gold Crown rematch") : show("Boss battle")}</p>
       <BossFigure face={boss.face} look={boss.look} mood="arrive" crown={crown} name={boss.name} size="hero" />
       <p className="ac-boss-banner">{boss.name}</p>

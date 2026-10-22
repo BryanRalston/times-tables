@@ -174,7 +174,7 @@ function traitsQuestion(rng: Rng): ChoiceQ {
   const hint =
     shape === "circle"
       ? t("A flat shape sits on the page", "Una figura plana se queda en la hoja")
-      : t(`A ${shape} has ${sides} sides.`, shape === "triangle" ? `El triángulo tiene ${sides} lados.` : shape === "square" ? `El cuadrado tiene ${sides} lados.` : `El rectángulo tiene ${sides} lados.`);
+      : t(`A ${shape} has ${sides} sides.`, shape === "triangle" ? `El triángulo tiene ${sides} lados.` : shape === "square" ? `El cuadrado tiene ${sides} lados.` : `El rectángulo tiene ${sides} lados.`, shape === "triangle" ? `O triângulo tem ${sides} lados.` : shape === "square" ? `O quadrado tem ${sides} lados.` : `O retângulo tem ${sides} lados.`);
   return ask(rng, {
     level: "traits",
     title: either(rng, t("What shape is this?", "¿Qué figura es esta?"), t("Find the same shape.", "Busca la misma figura.")),
@@ -266,14 +266,14 @@ function gridQuestion(rng: Rng, level: "rows" | "cover"): ChoiceQ {
   const board: ShapeBoard = { game: "shapes", mode: level, rows, cols };
   return ask(rng, {
     level,
-    title: t(`${rows} rows of ${cols}. Count the squares.`, `${rows} filas de ${cols}. Cuenta los cuadritos.`),
+    title: t(`${rows} rows of ${cols}. Count the squares.`, `${rows} filas de ${cols}. Cuenta los cuadritos.`, `${rows} linhas de ${cols}. Conte os quadradinhos.`),
     hint:
       level === "cover"
         ? t("Area is length times width", "El área es largo por ancho")
         : t("Count the squares", "Cuenta los cuadritos"),
     answer: String(product),
     choices: nearChoices(rng, product, 1, 30, [rows, cols, rows + cols, rows * cols]),
-    solved: t(`${product} square units`, `${product} unidades cuadradas`),
+    solved: t(`${product} square units`, `${product} unidades cuadradas`, `${product} unidades quadradas`),
     picture: `geo:grid:${rows}x${cols}`,
     labels: {},
     quiet: false,
@@ -434,7 +434,7 @@ export function geometrySheet(rng: Rng, level: GeometryLevel): SheetItem {
               ? t("next to the box", "junto a la caja")
               : t("in back of the box", "detrás de la caja");
       return {
-        prompt: t(`The star sits ${clue}. Name the position.`, `La estrella está ${clue}. Nombra la posición.`),
+        prompt: t(`The star sits ${clue}. Name the position.`, `La estrella está ${clue}. Nombra la posición.`, `A estrela está ${clue}. Diga a posição.`),
         answer: place,
       };
     }
@@ -461,7 +461,7 @@ export function geometrySheet(rng: Rng, level: GeometryLevel): SheetItem {
       return {
         prompt: t(
           `Color and size do not change a shape. Name the flat shape with ${clue}.`,
-          `El color y el tamaño no cambian la figura. Nombra la figura plana: ${clue}.`,
+          `El color y el tamaño no cambian la figura. Nombra la figura plana: ${clue}.`, `A cor e o tamanho não mudam a figura. Diga a figura plana: ${clue}.`,
         ),
         answer: shape,
       };
@@ -470,7 +470,7 @@ export function geometrySheet(rng: Rng, level: GeometryLevel): SheetItem {
       const made = rng.pick(["rectangle", "square", "circle"] as const);
       const pieces = made === "circle" ? t("two half circles", "dos medios círculos") : t("two triangles", "dos triángulos");
       return {
-        prompt: t(`Join ${pieces}. What shape is the outside?`, `Junta ${pieces}. ¿Qué figura queda afuera?`),
+        prompt: t(`Join ${pieces}. What shape is the outside?`, `Junta ${pieces}. ¿Qué figura queda afuera?`, `Junte ${pieces}. Qual figura fica de fora?`),
         answer: made,
       };
     }
@@ -482,7 +482,7 @@ export function geometrySheet(rng: Rng, level: GeometryLevel): SheetItem {
       return {
         prompt: t(
           `A rectangle has ${rows} rows of ${cols} squares. How many squares?`,
-          `Un rectángulo tiene ${rows} filas de ${cols} cuadrados. ¿Cuántos cuadrados?`,
+          `Un rectángulo tiene ${rows} filas de ${cols} cuadrados. ¿Cuántos cuadrados?`, `Um retângulo tem ${rows} linhas de ${cols} quadrados. Quantos quadrados?`,
         ),
         answer: String(rows * cols),
       };
@@ -498,7 +498,7 @@ export function geometrySheet(rng: Rng, level: GeometryLevel): SheetItem {
               ? t("4 equal sides and 4 square corners", "4 lados iguales y 4 esquinas cuadradas")
               : t("exactly one pair of parallel sides", "exactamente un par de lados paralelos");
       return {
-        prompt: t(`Name the quadrilateral with ${clue}.`, `Nombra el cuadrilátero: ${clue}.`),
+        prompt: t(`Name the quadrilateral with ${clue}.`, `Nombra el cuadrilátero: ${clue}.`, `Diga o quadrilátero: ${clue}.`),
         answer: shape,
       };
     }
@@ -507,7 +507,7 @@ export function geometrySheet(rng: Rng, level: GeometryLevel): SheetItem {
       return {
         prompt: t(
           `A shape is split into ${den} equal parts. One part is shaded. What unit fraction?`,
-          `Una figura está partida en ${den} partes iguales. Una parte está sombreada. ¿Qué fracción unitaria?`,
+          `Una figura está partida en ${den} partes iguales. Una parte está sombreada. ¿Qué fracción unitaria?`, `Uma figura está dividida em ${den} partes iguais. Uma parte está pintada. Que fração unitária?`,
         ),
         answer: `1/${den}`,
       };

@@ -1,4 +1,4 @@
-import { englishVoiceReady, ensureVoice, spanishVoiceReady } from "../voice/clips";
+import { englishVoiceReady, ensureVoice, portugueseVoiceReady, spanishVoiceReady } from "../voice/clips";
 import { startClipSpeech, stopClipSpeech } from "../voice/player";
 import { getLocale } from "../i18n";
 
@@ -58,8 +58,9 @@ function speakWithDevice(text: string, slow: boolean, onFail?: () => void): bool
     synth.cancel();
     const utter = new SpeechSynthesisUtterance(text);
     utter.rate = speakRate(slow);
-    utter.lang = "en-US";
-    const voice = synth.getVoices().find((item) => item.lang.toLowerCase().startsWith("en"));
+    const locale = getLocale();
+    utter.lang = locale === "es" ? "es-MX" : locale === "pt" ? "pt-BR" : "en-US";
+    const voice = synth.getVoices().find((item) => item.lang.toLowerCase().startsWith(locale === "en" ? "en" : locale));
     if (voice) utter.voice = voice;
     utter.onerror = (event) => {
       if (event.error === "not-allowed" || event.error === "interrupted" || event.error === "canceled") return;
@@ -85,7 +86,8 @@ function cancelDevice(): void {
 
 /** Speak `text` from a clip when one exists. Returns false when nothing can talk, so the caller can show text. */
 export function speakText(text: string, slow: boolean, onFail?: () => void): boolean {
-  const ready = getLocale() === "es" ? spanishVoiceReady() : englishVoiceReady();
+  const locale = getLocale();
+  const ready = locale === "es" ? spanishVoiceReady() : locale === "pt" ? portugueseVoiceReady() : englishVoiceReady();
   if (!ready) {
     void ensureVoice().then(() => {
       speakText(text, slow, onFail);

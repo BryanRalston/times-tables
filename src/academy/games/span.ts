@@ -64,7 +64,7 @@ export function makeColorQuestion(rng: Rng): ChoiceQ {
   const word = colorWord(color);
   return sceneQuestion(rng, {
     game: "shapes",
-    title: t(`Which one is ${word}?`, `¿Cuál es ${word}?`),
+    title: t(`Which one is ${word}?`, `¿Cuál es ${word}?`, `Qual é ${word}?`),
     hint: t("Look at the colors", "Mira los colores"),
     answer: color,
     choices: rng.shuffle([...COLORS]),
@@ -120,7 +120,7 @@ export function makePatternQuestion(rng: Rng): ChoiceQ {
   const said = shown.map((color) => colorWord(color)).join(", ");
   return sceneQuestion(rng, {
     game: "shapes",
-    title: t(`${said}. What comes next?`, `${said}. ¿Qué sigue?`),
+    title: t(`${said}. What comes next?`, `${said}. ¿Qué sigue?`, `${said}. O que vem depois?`),
     hint: t("Say the pattern", "Di el patrón"),
     answer: next,
     choices: rng.shuffle([...COLORS]),
@@ -152,7 +152,7 @@ export function makeAngleQuestion(rng: Rng): ChoiceQ {
       choices: uniqueChoices(rng, String(answer), ["45", "90", "180", "360"]),
       skill: "shapes:angles",
       tags: ["angles"],
-      solved: t(`${answer} degrees`, `${answer} grados`),
+      solved: t(`${answer} degrees`, `${answer} grados`, `${answer} graus`),
       picture: kind,
       hands: false,
       quietChoices: false,
@@ -213,10 +213,10 @@ export function makeAreaQuestion(rng: Rng, mode: "area" | "perimeter"): ChoiceQ 
   const board: MeasureBoard = { game: "measure", mode, length, width };
   const title =
     mode === "area"
-      ? t(`A rectangle is ${length} by ${width}. What is the area?`, `Un rectángulo mide ${length} por ${width}. ¿Cuál es el área?`)
+      ? t(`A rectangle is ${length} by ${width}. What is the area?`, `Un rectángulo mide ${length} por ${width}. ¿Cuál es el área?`, `Um retângulo mede ${length} vezes ${width}. Qual é a área?`)
       : t(
           `A rectangle is ${length} by ${width}. What is the perimeter?`,
-          `Un rectángulo mide ${length} por ${width}. ¿Cuál es el perímetro?`,
+          `Un rectángulo mide ${length} por ${width}. ¿Cuál es el perímetro?`, `Um retângulo mede ${length} vezes ${width}. Qual é o perímetro?`,
         );
   return sceneQuestion(rng, {
     game: "measure",
@@ -229,7 +229,7 @@ export function makeAreaQuestion(rng: Rng, mode: "area" | "perimeter"): ChoiceQ 
     choices: nearChoices(rng, answer, 1, 200, [length * width, 2 * (length + width), length + width, length * 2]),
     skill: `measure:${mode}`,
     tags: [mode],
-    solved: mode === "area" ? t(`${answer} square units`, `${answer} unidades cuadradas`) : t(`${answer} units`, `${answer} unidades`),
+    solved: mode === "area" ? t(`${answer} square units`, `${answer} unidades cuadradas`, `${answer} unidades quadradas`) : t(`${answer} units`, `${answer} unidades`, `${answer} unidades`),
     picture: `${length}x${width}`,
     hands: false,
     quietChoices: false,
@@ -246,7 +246,7 @@ export function makeLetterQuestion(rng: Rng): ChoiceQ {
   const board: PhonicsBoard = { game: "phonics", mode: "letters", letter };
   return sceneQuestion(rng, {
     game: "phonics",
-    title: t(`Tap the letter ${letter}`, `Toca la letra ${letter}`),
+    title: t(`Tap the letter ${letter}`, `Toca la letra ${letter}`, `Toque a letra ${letter}`),
     hint: t("Listen for the letter name", "Escucha el nombre de la letra"),
     answer: letter,
     choices: rng.shuffle([letter, ...decoys]),
@@ -281,7 +281,7 @@ export function makeBigPlaceQuestion(rng: Rng): ChoiceQ {
   const distractors = [value * 10, Math.floor(value / 10), digit, place, n].filter((item) => item !== value && item <= 1000000);
   return sceneQuestion(rng, {
     game: "place",
-    title: t(`What is the value of the ${digit} in ${n}?`, `¿Cuál es el valor del ${digit} en ${n}?`),
+    title: t(`What is the value of the ${digit} in ${n}?`, `¿Cuál es el valor del ${digit} en ${n}?`, `Qual é o valor do ${digit} em ${n}?`),
     hint: t("The place tells the value", "El lugar dice el valor"),
     answer: String(value),
     choices: nearChoices(rng, value, 0, 1000000, distractors),
@@ -314,7 +314,7 @@ export function makeRoundBigQuestion(rng: Rng): ChoiceQ {
         : t("hundred thousand", "centena de millar");
   return sceneQuestion(rng, {
     game: "place",
-    title: t(`Round ${n} to the nearest ${placeName}`, `Redondea ${n} al ${placeName} más cercano`),
+    title: t(`Round ${n} to the nearest ${placeName}`, `Redondea ${n} al ${placeName} más cercano`, `Arredonde ${n} para o ${placeName} mais próximo`),
     hint: t("Look at the digit to the right. 5 or more rounds up.", "Mira el dígito de la derecha. 5 o más, sube."),
     answer: String(answer),
     choices: nearChoices(rng, answer, 0, 1000000, [answer + place, Math.max(0, answer - place), n, roundToPlace(n, place === 1000 ? 10000 : 1000)]),
@@ -352,7 +352,7 @@ export function makeAddLikeQuestion(rng: Rng): ChoiceQ {
   for (let n = 0; n <= den; n += 1) sameSize.push(`${n}/${den}`);
   return sceneQuestion(rng, {
     game: "fractions",
-    title: t(`What is ${num}/${den} ${sign} ${num2}/${den}?`, `¿Cuánto es ${num}/${den} ${sign} ${num2}/${den}?`),
+    title: t(`What is ${num}/${den} ${sign} ${num2}/${den}?`, `¿Cuánto es ${num}/${den} ${sign} ${num2}/${den}?`, `Quanto é ${num}/${den} ${sign} ${num2}/${den}?`),
     hint: t("The parts are the same size. Add or subtract the top numbers.", "Las partes son del mismo tamaño. Suma o resta los números de arriba."),
     answer,
     choices: uniqueChoices(rng, answer, [...sameSize, "1/2", "1/3", "1/4", "3/4", "2/3", "1/8", "3/8", "5/8"]),
@@ -379,11 +379,11 @@ function decimalSay(text: string): string {
   const tenths = Number(match[2]);
   const hundredths = Number(match[3]);
   const places = tenths * 10 + hundredths;
-  if (places === 0) return t(whole === 1 ? "one whole" : `${whole} wholes`, whole === 1 ? "un entero" : `${whole} enteros`);
-  if (whole === 0 && hundredths === 0) return t(`${tenths} tenths`, `${tenths} décimos`);
-  if (whole === 0) return t(`${places} hundredths`, `${places} centésimos`);
-  if (hundredths === 0) return t(`${whole} and ${tenths} tenths`, `${whole} y ${tenths} décimos`);
-  return t(`${whole} and ${places} hundredths`, `${whole} y ${places} centésimos`);
+  if (places === 0) return t(whole === 1 ? "one whole" : `${whole} wholes`, whole === 1 ? "un entero" : `${whole} enteros`, whole === 1 ? "um inteiro" : `${whole} inteiros`);
+  if (whole === 0 && hundredths === 0) return t(`${tenths} tenths`, `${tenths} décimos`, `${tenths} décimos`);
+  if (whole === 0) return t(`${places} hundredths`, `${places} centésimos`, `${places} centésimos`);
+  if (hundredths === 0) return t(`${whole} and ${tenths} tenths`, `${whole} y ${tenths} décimos`, `${whole} e ${tenths} décimos`);
+  return t(`${whole} and ${places} hundredths`, `${whole} y ${places} centésimos`, `${whole} e ${places} centésimos`);
 }
 
 function decimalChoices(rng: Rng, answer: string, seeds: readonly string[]): string[] {
@@ -408,8 +408,8 @@ export function makeDecimalQuestion(rng: Rng): ChoiceQ {
     const board: FractionBoard = { game: "fractions", mode: "decimals", whole: 0, tenths, hundredths, ask: "write" };
     const said =
       hundredths === 0
-        ? t(`${tenths} tenths`, `${tenths} décimos`)
-        : t(`${tenths * 10 + hundredths} hundredths`, `${tenths * 10 + hundredths} centésimos`);
+        ? t(`${tenths} tenths`, `${tenths} décimos`, `${tenths} décimos`)
+        : t(`${tenths * 10 + hundredths} hundredths`, `${tenths * 10 + hundredths} centésimos`, `${tenths * 10 + hundredths} centésimos`);
     const wrongs = [
       decimalText(0, tenths, hundredths === 0 ? 1 : 0),
       decimalText(tenths, hundredths, 0),
@@ -419,7 +419,7 @@ export function makeDecimalQuestion(rng: Rng): ChoiceQ {
     const choices = decimalChoices(rng, answer, wrongs);
     return sceneQuestion(rng, {
       game: "fractions",
-      title: t(`Which decimal shows ${said}?`, `¿Qué decimal muestra ${said}?`),
+      title: t(`Which decimal shows ${said}?`, `¿Qué decimal muestra ${said}?`, `Que decimal mostra ${said}?`),
       hint: t("Tenths are the first place. Hundredths are the second.", "Los décimos son el primer lugar. Los centésimos son el segundo."),
       answer,
       choices,
@@ -459,14 +459,14 @@ export function makeDecimalQuestion(rng: Rng): ChoiceQ {
     game: "fractions",
     title: t(
       `Which is greater, ${left} hundredths or ${right} hundredths?`,
-      `¿Cuál es mayor, ${left} centésimos o ${right} centésimos?`,
+      `¿Cuál es mayor, ${left} centésimos o ${right} centésimos?`, `Qual é maior, ${left} centésimos ou ${right} centésimos?`,
     ),
     hint: t("Compare tenths first", "Compara primero los décimos"),
     answer,
     choices,
     skill: "fractions:decimals",
     tags: ["decimals"],
-    solved: t(`${greaterLeft ? left : right} hundredths`, `${greaterLeft ? left : right} centésimos`),
+    solved: t(`${greaterLeft ? left : right} hundredths`, `${greaterLeft ? left : right} centésimos`, `${greaterLeft ? left : right} centésimos`),
     picture: answer,
     hands: false,
     quietChoices: false,
@@ -501,11 +501,11 @@ export function makeElapsedQuestion(rng: Rng): ChoiceQ {
     game: "time",
     title: t(
       `${who} starts at ${start}. It lasts ${delta} minutes. What time is it then?`,
-      `${who} empieza a las ${start}. Dura ${delta} minutos. ¿Qué hora es entonces?`,
+      `${who} empieza a las ${start}. Dura ${delta} minutos. ¿Qué hora es entonces?`, `${who} começa às ${start}. Dura ${delta} minutos. Que horas são então?`,
     ),
     hint: t("Count the minutes past the hour", "Cuenta los minutos después de la hora"),
-    praise: t(`Yes! ${answer}`, `¡Sí! ${answer}`),
-    almost: t(`Almost! ${answer}`, `¡Casi! ${answer}`),
+    praise: t(`Yes! ${answer}`, `¡Sí! ${answer}`, `Sim! ${answer}`),
+    almost: t(`Almost! ${answer}`, `¡Casi! ${answer}`, `Quase! ${answer}`),
     answer,
     choices: uniqueChoices(rng, answer, wrong),
     skill: "time:elapsed",
@@ -534,15 +534,15 @@ export function makeSpendQuestion(rng: Rng): ChoiceQ {
   const b = formatCents(second);
   const pay = formatCents(paid);
   const title = change
-    ? t(`A snack is ${a} and a drink is ${b}. You pay ${pay}. How much change?`, `Una merienda cuesta ${a} y un jugo cuesta ${b}. Pagas ${pay}. ¿Cuánto de cambio?`)
-    : t(`A snack is ${a} and a drink is ${b}. How much altogether?`, `Una merienda cuesta ${a} y un jugo cuesta ${b}. ¿Cuánto es en total?`);
+    ? t(`A snack is ${a} and a drink is ${b}. You pay ${pay}. How much change?`, `Una merienda cuesta ${a} y un jugo cuesta ${b}. Pagas ${pay}. ¿Cuánto de cambio?`, `Um lanche custa ${a} e um suco custa ${b}. Você paga ${pay}. Quanto de troco?`)
+    : t(`A snack is ${a} and a drink is ${b}. How much altogether?`, `Una merienda cuesta ${a} y un jugo cuesta ${b}. ¿Cuánto es en total?`, `Um lanche custa ${a} e um suco custa ${b}. Quanto é ao todo?`);
   return {
     id: qid(rng),
     game: "money",
     title,
     hint: change ? t("Add the prices, then subtract from what you pay", "Suma los precios y réstalos de lo que pagas") : t("Add the two prices", "Suma los dos precios"),
-    praise: t(`Yes! ${formatCents(answer)}`, `¡Sí! ${formatCents(answer)}`),
-    almost: t(`Almost! ${formatCents(answer)}`, `¡Casi! ${formatCents(answer)}`),
+    praise: t(`Yes! ${formatCents(answer)}`, `¡Sí! ${formatCents(answer)}`, `Sim! ${formatCents(answer)}`),
+    almost: t(`Almost! ${formatCents(answer)}`, `¡Casi! ${formatCents(answer)}`, `Quase! ${formatCents(answer)}`),
     answer: formatCents(answer),
     choices: uniqueChoices(
       rng,
@@ -583,14 +583,14 @@ export function makeStepsQuestion(rng: Rng): ChoiceQ {
     game: "problems",
     title: t(
       `${who} has ${groups} bags of ${each} ${thing.name}. ${who} gives away ${away}. How many are left?`,
-      `${who} tiene ${groups} bolsas de ${each} ${thing.name}. ${who} regala ${away}. ¿Cuántos quedan?`,
+      `${who} tiene ${groups} bolsas de ${each} ${thing.name}. ${who} regala ${away}. ¿Cuántos quedan?`, `${who} tem ${groups} sacolas de ${each} ${thing.name}. ${who} dá de presente ${away}. Quantos sobram?`,
     ),
     hint: t("Multiply first, then subtract", "Multiplica primero y luego resta"),
     answer: String(answer),
     choices: nearChoices(rng, answer, 0, 80, [groups * each, groups * each + away, each - away, groups + each]),
     skill: "problems:steps",
     tags: ["steps"],
-    solved: t(`${groups * each} minus ${away} is ${answer}`, `${groups * each} menos ${away} es ${answer}`),
+    solved: t(`${groups * each} minus ${away} is ${answer}`, `${groups * each} menos ${away} es ${answer}`, `${groups * each} menos ${away} é ${answer}`),
     picture: thing.emoji,
     hands: false,
     quietChoices: false,
@@ -618,10 +618,10 @@ export function makeFactorQuestion(rng: Rng): ChoiceQ {
     return {
       id: qid(rng),
       game: "times",
-      title: t(`Which number is a factor of ${n}?`, `¿Qué número es un factor de ${n}?`),
+      title: t(`Which number is a factor of ${n}?`, `¿Qué número es un factor de ${n}?`, `Que número é um fator de ${n}?`),
       hint: t("A factor divides the number with none left over", "Un factor divide el número y no sobra nada"),
-      praise: t(`Yes! ${answer} is a factor of ${n}`, `¡Sí! ${answer} es un factor de ${n}`),
-      almost: t(`Almost! ${answer} is a factor of ${n}`, `¡Casi! ${answer} es un factor de ${n}`),
+      praise: t(`Yes! ${answer} is a factor of ${n}`, `¡Sí! ${answer} es un factor de ${n}`, `Sim! ${answer} é um fator de ${n}`),
+      almost: t(`Almost! ${answer} is a factor of ${n}`, `¡Casi! ${answer} es un factor de ${n}`, `Quase! ${answer} é um fator de ${n}`),
       answer: String(answer),
       choices: fourChoices(rng, answer, decoys),
       skill: "times:factors",
@@ -637,10 +637,10 @@ export function makeFactorQuestion(rng: Rng): ChoiceQ {
   return {
     id: qid(rng),
     game: "times",
-    title: t(`Which number is a multiple of ${base}?`, `¿Qué número es un múltiplo de ${base}?`),
+    title: t(`Which number is a multiple of ${base}?`, `¿Qué número es un múltiplo de ${base}?`, `Que número é um múltiplo de ${base}?`),
     hint: t("Multiples are what you get when you skip count", "Los múltiplos salen al contar de salto"),
-    praise: t(`Yes! ${answer} is a multiple of ${base}`, `¡Sí! ${answer} es un múltiplo de ${base}`),
-    almost: t(`Almost! ${answer} is a multiple of ${base}`, `¡Casi! ${answer} es un múltiplo de ${base}`),
+    praise: t(`Yes! ${answer} is a multiple of ${base}`, `¡Sí! ${answer} es un múltiplo de ${base}`, `Sim! ${answer} é um múltiplo de ${base}`),
+    almost: t(`Almost! ${answer} is a multiple of ${base}`, `¡Casi! ${answer} es un múltiplo de ${base}`, `Quase! ${answer} é um múltiplo de ${base}`),
     answer: String(answer),
     choices: fourChoices(rng, answer, decoys),
     skill: "times:factors",
@@ -660,10 +660,10 @@ export function makeMultiQuestion(rng: Rng): ChoiceQ {
   return {
     id: qid(rng),
     game: "times",
-    title: t(`What is ${a} times ${b}?`, `¿Cuánto es ${a} por ${b}?`),
+    title: t(`What is ${a} times ${b}?`, `¿Cuánto es ${a} por ${b}?`, `Quanto é ${a} vezes ${b}?`),
     hint: t("Break the bigger number into tens and ones", "Separa el número grande en decenas y unidades"),
-    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`),
-    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`),
+    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`, `Sim! ${solved}`),
+    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`, `Quase! ${solved}`),
     answer: String(product),
     choices: fourChoices(rng, product, [a * (b + 1), a * Math.max(1, b - 1), (a + 10) * b, product + a, product - b]),
     skill: "times:multi",
@@ -685,10 +685,10 @@ export function makeDivideQuestion(rng: Rng): ChoiceQ {
   return {
     id: qid(rng),
     game: "times",
-    title: t(`What is ${a} divided by ${b}?`, `¿Cuánto es ${a} dividido entre ${b}?`),
+    title: t(`What is ${a} divided by ${b}?`, `¿Cuánto es ${a} dividido entre ${b}?`, `Quanto é ${a} dividido por ${b}?`),
     hint: t("Find how many groups, then what is left", "Busca cuántos grupos y luego lo que sobra"),
-    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`),
-    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`),
+    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`, `Sim! ${solved}`),
+    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`, `Quase! ${solved}`),
     answer,
     choices: uniqueChoices(rng, answer, decoys),
     skill: "times:divide",
@@ -727,11 +727,11 @@ export function makeBigAddQuestion(rng: Rng, level: "within1000" | "thousands"):
     game: "add",
     title:
       op === "+"
-        ? t(`What is ${pink} plus ${teal}?`, `¿Cuánto es ${pink} más ${teal}?`)
-        : t(`What is ${pink + teal} minus ${teal}?`, `¿Cuánto es ${pink + teal} menos ${teal}?`),
+        ? t(`What is ${pink} plus ${teal}?`, `¿Cuánto es ${pink} más ${teal}?`, `Quanto é ${pink} a mais ${teal}?`)
+        : t(`What is ${pink + teal} minus ${teal}?`, `¿Cuánto es ${pink + teal} menos ${teal}?`, `Quanto é ${pink + teal} menos ${teal}?`),
     hint: t("Line up the places, then add or subtract", "Alinea los lugares y luego suma o resta"),
-    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`),
-    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`),
+    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`, `Sim! ${solved}`),
+    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`, `Quase! ${solved}`),
     answer: String(hidden),
     choices: fourChoices(rng, hidden, [hidden + step, hidden - step, hidden + 1, hidden - 1, hidden + step * 10]),
     skill: `add:${level}`,

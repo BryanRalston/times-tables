@@ -920,7 +920,13 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   gap: 8px;
   margin: 0 0 8px;
 }
-.ac-hello-lang .ac-grade { min-width: 118px; }
+.ac-lang-row { flex-wrap: nowrap; }
+.ac-hello-lang .ac-grade,
+.ac-lang-row .ac-grade {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: 8px;
+}
 .ac-hello-grades { justify-content: center; margin: 10px 0 14px; }
 .ac-finger {
   display: flex;

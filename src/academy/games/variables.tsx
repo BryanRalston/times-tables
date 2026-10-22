@@ -82,8 +82,8 @@ export function variableSolved(fact: Truth): string {
 }
 
 function countLine(n: number, one: string, many: string, oneEs: string, manyEs: string): string {
-  if (n === 1) return t(`1 ${one}`, `1 ${oneEs}`);
-  return t(`${n} ${many}`, `${n} ${manyEs}`);
+  if (n === 1) return t(`1 ${one}`, `1 ${oneEs}`, `1 ${oneEs}`);
+  return t(`${n} ${many}`, `${n} ${manyEs}`, `${n} ${manyEs}`);
 }
 
 /** Step captions a miss can speak from clips that already exist. */
@@ -97,16 +97,16 @@ export function variableCaptions(fact: Truth): string[] {
   if (fact.op === "+") {
     const start = fact.box === "left" ? fact.b : fact.a;
     const add = fact.box === "left" ? fact.a : fact.b;
-    return [t(`Start with ${start}`, `Empieza con ${start}`), t(`Add ${add}`, `Suma ${add}`), solved];
+    return [t(`Start with ${start}`, `Empieza con ${start}`, `Comece com ${start}`), t(`Add ${add}`, `Suma ${add}`, `Some ${add}`), solved];
   }
   if (fact.op === "-") {
-    return [t(`Start with ${fact.a}`, `Empieza con ${fact.a}`), t(`Take away ${fact.b}`, `Quita ${fact.b}`), solved];
+    return [t(`Start with ${fact.a}`, `Empieza con ${fact.a}`, `Comece com ${fact.a}`), t(`Take away ${fact.b}`, `Quita ${fact.b}`, `Tire ${fact.b}`), solved];
   }
   if (fact.op === "×") {
-    return [countLine(fact.a, "group", "groups", "grupo", "grupos"), t(`${fact.b} in each group`, `${fact.b} en cada grupo`), solved];
+    return [countLine(fact.a, "group", "groups", "grupo", "grupos"), t(`${fact.b} in each group`, `${fact.b} en cada grupo`, `${fact.b} em cada grupo`), solved];
   }
   const each = plainResult(fact);
-  return [countLine(fact.b, "group", "groups", "grupo", "grupos"), t(`${each} in each group`, `${each} en cada grupo`), solved];
+  return [countLine(fact.b, "group", "groups", "grupo", "grupos"), t(`${each} in each group`, `${each} en cada grupo`, `${each} em cada grupo`), solved];
 }
 
 export function variableKey(fact: Truth): string {

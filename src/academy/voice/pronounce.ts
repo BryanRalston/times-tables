@@ -1,4 +1,4 @@
-import { getLocale, spanishMinuteWords, spanishNumberWords } from "../i18n";
+import { getLocale, portugueseMinuteWords, portugueseNumberWords, spanishMinuteWords, spanishNumberWords } from "../i18n";
 
 /** How a clip key is read aloud. Runtime never calls this; the generator does. */
 
@@ -228,13 +228,67 @@ function pronounceKeyEs(key: string): string {
  * Text sent to the synthesizer. Longer clauses get a light ending so the
  * melody lands, and short pieces stay open so the next clip can follow.
  */
+const PT_LETTER: Record<string, string> = {
+  a: "a",
+  b: "bê",
+  c: "cê",
+  d: "dê",
+  e: "é",
+  f: "efe",
+  g: "gê",
+  h: "agá",
+  i: "i",
+  j: "jota",
+  k: "cá",
+  l: "ele",
+  m: "eme",
+  n: "ene",
+  o: "ó",
+  p: "pê",
+  q: "quê",
+  r: "erre",
+  s: "esse",
+  t: "tê",
+  u: "u",
+  v: "vê",
+  w: "dáblio",
+  x: "xis",
+  y: "ípsilon",
+  z: "zê",
+};
+
+function pronouncePortugueseWord(word: string, alone: boolean): string {
+  if (word === "thousand") return "mil";
+  if (word === "million") return "milhão";
+  if (word === "hundredths") return "centésimos";
+  if (word === "tenths") return "décimos";
+  if (word === "remainder") return "resto";
+  if (isPhoneme(word)) return PHONEMES[word] ?? word;
+  if (word === "y") return "ípsilon";
+  if (/^[a-z]$/.test(word) && alone) return PT_LETTER[word] ?? word;
+  if (word.includes("-")) return word.replace(/-/g, " ");
+  return word;
+}
+
+function pronounceKeyPt(key: string): string {
+  if (key.startsWith("min:")) {
+    const minutes = Number(key.slice(4));
+    return Number.isInteger(minutes) ? portugueseMinuteWords(minutes) : key;
+  }
+  if (/^\d+$/.test(key)) return portugueseNumberWords(Number(key));
+  const words = key.split(" ").filter((word) => word.length > 0);
+  const alone = words.length === 1;
+  return words.map((word) => pronouncePortugueseWord(word, alone)).join(" ");
+}
+
 export function spokenText(key: string): string {
-  const es = getLocale() === "es";
-  const say = (es ? pronounceKeyEs(key) : pronounceKey(key)).trim();
+  const locale = getLocale();
+  const say = (locale === "es" ? pronounceKeyEs(key) : locale === "pt" ? pronounceKeyPt(key) : pronounceKey(key)).trim();
   if (!say || /[.!?]$/.test(say)) return say;
   const words = say.split(/\s+/);
-  if (!es && words.length >= 3 && /^(what|how|which|where|who|can)\b/i.test(say)) return `${say}?`;
-  if (es && words.length >= 3 && /^(qué|cómo|cuál|cuánto|cuántos|cuántas|dónde|quién|puedes)\b/i.test(say)) return `${say}?`;
+  if (locale === "en" && words.length >= 3 && /^(what|how|which|where|who|can)\b/i.test(say)) return `${say}?`;
+  if (locale === "es" && words.length >= 3 && /^(qué|cómo|cuál|cuánto|cuántos|cuántas|dónde|quién|puedes)\b/i.test(say)) return `${say}?`;
+  if (locale === "pt" && words.length >= 3 && /^(que|como|qual|quais|quanto|quantos|quantas|onde|quem|pode)\b/i.test(say)) return `${say}?`;
   if (words.length >= 5) return `${say}.`;
   return say;
 }

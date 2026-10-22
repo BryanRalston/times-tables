@@ -26,14 +26,14 @@ export function findBlurb(id: string, games: readonly { id: string; title: strin
   const index = (SQUAD_IDS as readonly string[]).indexOf(id);
   if (index >= 0 && index < 3) return { kind: "starter", text: t("Pick this buddy when you start.", "Elige este amigo al empezar.") };
   const hostGame = games.find((game) => hostIdFor(game.id, games) === id);
-  if (hostGame) return { kind: "boss", text: t(`Beat the ${hostGame.title} boss.`, `Vence al jefe de ${show(hostGame.title)}.`) };
+  if (hostGame) return { kind: "boss", text: t(`Beat the ${hostGame.title} boss.`, `Vence al jefe de ${show(hostGame.title)}.`, `Vença o chefe de ${show(hostGame.title)}.`) };
   if ((EGG_IDS as readonly string[]).includes(id)) return { kind: "egg", text: t("Hatch the island egg.", "Abre el huevo de la isla.") };
   const studied = studyGame(id);
   if (studied) {
     const title = games.find((game) => game.id === studied)?.title ?? "a game";
-    return { kind: "study", text: t(`Earn 3 stars in ${title}.`, `Gana 3 estrellas en ${show(title)}.`) };
+    return { kind: "study", text: t(`Earn 3 stars in ${title}.`, `Gana 3 estrellas en ${show(title)}.`, `Ganhe 3 estrelas em ${show(title)}.`) };
   }
-  if (index >= 0) return { kind: "stars", text: t(`Earn ${starsNeeded(index)} stars.`, `Gana ${starsNeeded(index)} estrellas.`) };
+  if (index >= 0) return { kind: "stars", text: t(`Earn ${starsNeeded(index)} stars.`, `Gana ${starsNeeded(index)} estrellas.`, `Ganhe ${starsNeeded(index)} estrelas.`) };
   return { kind: "egg", text: t("Hatch the island egg.", "Abre el huevo de la isla.") };
 }
 

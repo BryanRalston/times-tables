@@ -1,5 +1,5 @@
 import type { Rng } from "@/lib/rng";
-import { getLocale } from "../i18n";
+import { coinWord, getLocale } from "../i18n";
 import type { CoinKind, CoinPile, MoneyMode } from "./types";
 
 export type { CoinKind, CoinPile, MoneyMode };
@@ -53,31 +53,24 @@ export function formatCents(cents: number): string {
   return `$${dollars}.${String(rest).padStart(2, "0")}`;
 }
 
-const COIN_ES: Record<CoinKind, [string, string]> = {
-  penny: ["centavo", "centavos"],
-  nickel: ["níquel", "níqueles"],
-  dime: ["moneda de 10", "monedas de 10"],
-  quarter: ["moneda de 25", "monedas de 25"],
-  dollar: ["dólar", "dólares"],
-};
-
 export function describePile(pile: CoinPile): string {
   const parts: string[] = [];
   const order: CoinKind[] = ["dollar", "quarter", "dime", "nickel", "penny"];
-  const es = getLocale() === "es";
+  const locale = getLocale();
   for (const kind of order) {
     const n = pile[kind];
     if (n <= 0) continue;
-    if (es) {
-      const pair = COIN_ES[kind];
-      parts.push(`${n} ${n === 1 ? pair[0] : pair[1]}`);
-    } else {
-      parts.push(`${n} ${n === 1 ? COIN_NAME[kind].toLowerCase() : PLURAL[kind]}`);
-    }
+    if (locale === "es" || locale === "pt") parts.push(`${n} ${coinWord(kind, n)}`);
+    else parts.push(`${n} ${n === 1 ? COIN_NAME[kind].toLowerCase() : PLURAL[kind]}`);
   }
-  if (parts.length === 0) return es ? "sin monedas" : "no coins";
+  if (parts.length === 0) {
+    if (locale === "pt") return "sem moedas";
+    if (locale === "es") return "sin monedas";
+    return "no coins";
+  }
   if (parts.length === 1) return parts[0]!;
-  return es ? `${parts.slice(0, -1).join(", ")} y ${parts[parts.length - 1]}` : `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
+  const join = locale === "pt" ? "e" : locale === "es" ? "y" : "and";
+  return `${parts.slice(0, -1).join(", ")} ${join} ${parts[parts.length - 1]}`;
 }
 
 export function oneCoin(kind: CoinKind): CoinPile {

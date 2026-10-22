@@ -1,4 +1,4 @@
-import { getLocale, spanishFraction } from "../i18n";
+import { getLocale, portugueseFraction, spanishFraction } from "../i18n";
 
 const NUMBER_WORD = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
 
@@ -19,6 +19,7 @@ function speakFractions(text: string): string {
     const num = Number(numText);
     const den = Number(denText);
     if (getLocale() === "es") return spanishFraction(num, den);
+    if (getLocale() === "pt") return portugueseFraction(num, den);
     const pair = FRACTION_WORD[denText];
     if (!pair) return full;
     const numWord = NUMBER_WORD[num] ?? numText;
@@ -34,6 +35,16 @@ export function speakable(text: string): string {
       .replace(/×/g, " por ")
       .replace(/−/g, " menos ")
       .replace(/\+/g, " más ")
+      .replace(/=/g, " igual ")
+      .replace(/(\d+)¢/g, (_full, n: string) => (Number(n) === 1 ? "1 centavo" : `${n} centavos`))
+      .replace(/¢/g, " centavos")
+      .replace(/\$(\d+)/g, (_full, n: string) => (Number(n) === 1 ? "1 dólar" : `${n} dólares`));
+  }
+  if (getLocale() === "pt") {
+    return fractions
+      .replace(/×/g, " vezes ")
+      .replace(/−/g, " menos ")
+      .replace(/\+/g, " mais ")
       .replace(/=/g, " igual ")
       .replace(/(\d+)¢/g, (_full, n: string) => (Number(n) === 1 ? "1 centavo" : `${n} centavos`))
       .replace(/¢/g, " centavos")

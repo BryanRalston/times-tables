@@ -31,6 +31,17 @@ describe("fraction questions", () => {
     }
   });
 
+  it("agrees pintado with meio and quarto", () => {
+    setLocale("pt");
+    const bad = /(?:meio|quarto)s? está pintada|quartos está pintada|meios está pintada/i;
+    for (let seed = 0; seed < 40; seed += 1) {
+      const q = makeFractionQuestion(rngFromSeed(`shade-gender-pt-${seed}`), "parts");
+      expect(q.praise).not.toMatch(bad);
+      expect(q.praise.toLowerCase()).toMatch(/pintado/);
+      expect(q.praise).not.toMatch(/\d\/\d/);
+    }
+  });
+
   it("stays inside grade 1–3 denominators and compares with the same numerator or denominator", () => {
     for (let seed = 0; seed < 24; seed += 1) {
       for (const level of FRACTION_LEVELS) {

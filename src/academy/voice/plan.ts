@@ -26,17 +26,19 @@ export function normalizeSpeech(text: string): string {
   line = line.replace(/[…]/g, ". ").replace(/[—–]/g, ", ");
   line = line.replace(/_+/g, " blank ");
   line = speakable(line);
-  if (getLocale() === "es") {
+  if (getLocale() === "es" || getLocale() === "pt") {
+    const and = getLocale() === "pt" ? "e" : "y";
+    const divided = getLocale() === "pt" ? "dividido por" : "dividido entre";
     line = line.replace(/\$(\d+)\.(\d{2})/g, (_full, dollars: string, cents: string) => {
       const dollarWord = Number(dollars) === 1 ? "dólar" : "dólares";
-      return `${dollars} ${dollarWord} y ${Number(cents)} centavos`;
+      return `${dollars} ${dollarWord} ${and} ${Number(cents)} centavos`;
     });
     line = line.replace(/\b(\d+) dólares\.(\d{2})\b/g, (_full, dollars: string, cents: string) => {
-      return `${dollars} dólares y ${Number(cents)} centavos`;
+      return `${dollars} dólares ${and} ${Number(cents)} centavos`;
     });
-    line = line.replace(/÷/g, " dividido entre ");
+    line = line.replace(/÷/g, ` ${divided} `);
     line = line.replace(/(\d)\s*-\s*(\d)/g, "$1 menos $2");
-    line = line.replace(/&/g, " y ");
+    line = line.replace(/&/g, ` ${and} `);
   } else {
     line = line.replace(/\$(\d+)\.(\d{2})/g, (_full, dollars: string, cents: string) => {
       return `${dollars} dollars and ${Number(cents)} cents`;
@@ -49,7 +51,8 @@ export function normalizeSpeech(text: string): string {
     line = line.replace(/&/g, " and ");
   }
   line = line.replace(/(\d),(?=\d)/g, "$1");
-  line = line.replace(/[()]/g, " ");
+  line = line.replace(/(\d+)\.º/g, "$1");
+  line = line.replace(/[()·«»]/g, " ");
   return line.toLowerCase().replace(/\s+/g, " ").trim();
 }
 
@@ -104,7 +107,7 @@ function scan(norm: string): { tokens: Token[] | null; error: string | null } {
       i += num[1].length;
       continue;
     }
-    const word = /^([a-záéíóúüñ]+(?:'[a-záéíóúüñ]+)?(?:-[a-záéíóúüñ]+)*)/.exec(rest);
+    const word = /^([a-záàâãéêíóôõúüçñ]+(?:'[a-záàâãéêíóôõúüçñ]+)?(?:-[a-záàâãéêíóôõúüçñ]+)*)/.exec(rest);
     if (word?.[1]) {
       tokens.push({ kind: "word", text: word[1], gapBefore: gap });
       gap = 0;

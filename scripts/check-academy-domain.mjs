@@ -206,6 +206,19 @@ for (const rel of esPrecache) {
     fail(`precache missing Spanish clip ${rel}`);
   }
 }
+const ptPrecache = JSON.parse(readFileSync(resolve("src/academy/voice/pt-precache.json"), "utf8"));
+if (!Array.isArray(ptPrecache) || ptPrecache.length < 100) fail("Portuguese precache list is empty");
+const ptUrls = manifestList.filter((url) => typeof url === "string" && url.startsWith("/voice/pt/"));
+if (ptUrls.length !== ptPrecache.length) fail(`Portuguese precache has ${ptUrls.length} urls, list has ${ptPrecache.length}`);
+for (const rel of ptPrecache) {
+  if (typeof rel !== "string" || !rel.startsWith("pt/") || !manifestList.includes(`/voice/${rel}`)) {
+    fail(`precache missing Portuguese clip ${rel}`);
+  }
+}
+const ptDir = resolve(root, "voice/pt");
+if (!existsSync(ptDir)) fail("voice/pt missing from domain build");
+const ptOnDisk = readdirSync(ptDir).filter((name) => name.endsWith(".mp3"));
+if (ptUrls.length >= ptOnDisk.length) fail("Portuguese precache includes every clip");
 const esDir = resolve(root, "voice/es");
 if (!existsSync(esDir)) fail("voice/es missing from domain build");
 const esOnDisk = readdirSync(esDir).filter((name) => name.endsWith(".mp3"));
