@@ -29,7 +29,8 @@ function walk(dir: string, out: string[] = []): string[] {
       name !== "i18n-es.ts" &&
       name !== "i18n-fr.ts" &&
       name !== "i18n-zh.ts" &&
-      name !== "i18n-hi.ts"
+      name !== "i18n-hi.ts" &&
+      name !== "i18n-ar.ts"
     ) {
       out.push(path);
     }

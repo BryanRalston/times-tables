@@ -121,13 +121,13 @@ export function makeTimesQuestion(rng: Rng, level: TimesLevel, prefer: string[] 
       const buddy = buddyName(rng);
       return pickTalk(rng, [
         ["Tap the answer!", "¡Toca la respuesta!"],
-        [`${buddy} sets out ${a} groups of ${b}. How many?`, `${buddy} pone ${a} grupos de ${b}. ¿Cuántos hay?`, `${buddy} separa ${a} grupos de ${b}. Quantos há?`, `${buddy} pose ${a} groupes de ${b}. Combien ?`, `${buddy}摆了${a}组，每组${b}个。一共有几个？`, `${buddy} ${b} के ${a} समूह रखता है। कितने हैं?`],
-        [`How many is ${a} groups of ${b}?`, `¿Cuántos son ${a} grupos de ${b}?`, `Quantos são ${a} grupos de ${b}?`, `Combien font ${a} groupes de ${b} ?`, `${a}组，每组${b}个，一共有几个？`, `${b} के ${a} समूह कितने होते हैं?`],
+        [`${buddy} sets out ${a} groups of ${b}. How many?`, `${buddy} pone ${a} grupos de ${b}. ¿Cuántos hay?`, `${buddy} separa ${a} grupos de ${b}. Quantos há?`, `${buddy} pose ${a} groupes de ${b}. Combien ?`, `${buddy}摆了${a}组，每组${b}个。一共有几个？`, `${buddy} ${b} के ${a} समूह रखता है। कितने हैं?`, `${buddy} يضع ${a} مجموعات من ${b}. كم العدد؟`],
+        [`How many is ${a} groups of ${b}?`, `¿Cuántos son ${a} grupos de ${b}?`, `Quantos são ${a} grupos de ${b}?`, `Combien font ${a} groupes de ${b} ?`, `${a}组，每组${b}个，一共有几个？`, `${b} के ${a} समूह कितने होते हैं?`, `كم عدد ${a} مجموعات من ${b}؟`],
       ]);
     })(),
-    hint: a <= 6 ? t(`${a} groups of ${b}`, `${a} grupos de ${b}`, `${a} grupos de ${b}`, `${a} groupes de ${b}`, `${a}组，每组${b}个`, `${b} के ${a} समूह`) : t("Tap the product", "Toca el resultado"),
-    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`, `Sim! ${solved}`, `Oui ! ${solved}`, `对！${solved}`, `हाँ! ${solved}`),
-    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`, `Quase! ${solved}`, `Presque ! ${solved}`, `差一点！${solved}`, `लगभग! ${solved}`),
+    hint: a <= 6 ? t(`${a} groups of ${b}`, `${a} grupos de ${b}`, `${a} grupos de ${b}`, `${a} groupes de ${b}`, `${a}组，每组${b}个`, `${b} के ${a} समूह`, `${a} مجموعات من ${b}`) : t("Tap the product", "Toca el resultado"),
+    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`, `Sim! ${solved}`, `Oui ! ${solved}`, `对！${solved}`, `हाँ! ${solved}`, `نعم! ${solved}`),
+    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`, `Quase! ${solved}`, `Presque ! ${solved}`, `差一点！${solved}`, `लगभग! ${solved}`, `تقريبًا! ${solved}`),
     answer: String(product),
     choices: fourChoices(rng, product, [a * (b + 1), a * Math.max(0, b - 1), (a + 1) * b, a + b, product + a]),
     skill: `times:${level}`,

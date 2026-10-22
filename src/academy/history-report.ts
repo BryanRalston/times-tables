@@ -43,13 +43,21 @@ function monthTitle(key: string): string {
   const year = Number(key.slice(0, 4));
   const month = Number(key.slice(5, 7)) - 1;
   const date = new Date(Date.UTC(year, month, 1));
-  const locale = getLocale() === "es" ? "es" : getLocale() === "pt" ? "pt-BR" : getLocale() === "fr" ? "fr-FR" : getLocale() === "zh" ? "zh-CN" : getLocale() === "hi" ? "hi-IN" : "en";
+  const locale = getLocale() === "es" ? "es" : getLocale() === "pt" ? "pt-BR" : getLocale() === "fr" ? "fr-FR" : getLocale() === "zh" ? "zh-CN" : getLocale() === "hi" ? "hi-IN" : getLocale() === "ar" ? "ar" : "en";
   return new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(date);
 }
 
 function roundPhrase(rounds: number): string {
   if (rounds === 1) return t("1 round", "1 ronda", "1 rodada");
-  return t(`${rounds} rounds`, `${rounds} rondas`, `${rounds} rodadas`, `${rounds} manches`, `${rounds}轮`, `${rounds} राउंड`);
+  return t(
+    `${rounds} rounds`,
+    `${rounds} rondas`,
+    `${rounds} rodadas`,
+    `${rounds} manches`,
+    `${rounds}轮`,
+    `${rounds} राउंड`,
+    `${rounds} ${rounds === 2 ? "جولتان" : rounds >= 3 && rounds <= 10 ? "جولات" : "جولة"}`,
+  );
 }
 
 function practiceLine(attempts: number, rounds: number, seconds: number): string {
@@ -186,7 +194,7 @@ export function skillHistoryReport(
       ? t(
           `Older practice is included in ${folded}. New play is kept month by month.`,
           `La práctica anterior está en ${folded}. Lo nuevo se guarda mes a mes.`, `A prática anterior está em ${folded}. O novo fica salvo mês a mês.`,
-        `La pratique d'avant est dans ${folded}. Le nouveau jeu est gardé mois par mois.`, `更早的练习算在${folded}里。新的游玩按月分开保存。`, `पुराना अभ्यास ${folded} में शामिल है। नया खेल महीने दर महीने रहता है।`)
+        `La pratique d'avant est dans ${folded}. Le nouveau jeu est gardé mois par mois.`, `更早的练习算在${folded}里。新的游玩按月分开保存。`, `पुराना अभ्यास ${folded} में शामिल है। नया खेल महीने दर महीने रहता है।`, `الممارسة الأقدم داخلة في ${folded}. اللعب الجديد يُحفظ شهرًا بشهر.`)
       : "",
   };
 }

@@ -52,7 +52,7 @@ npx vite-node scripts/export-voice-pt.ts
 VOICE_JOBS=/tmp/voice-jobs-pt.json VOICE_NAME=pf_dora VOICE_LANG=pt-br python3 scripts/render-voice.py
 ```
 
-`src/academy/voice/clips-es.test.ts` fails if any Spanish speakable line has no clip. `src/academy/voice/clips-pt.test.ts` does the same for Portuguese. `src/academy/voice/clips-fr.test.ts` does the same for French. `src/academy/voice/clips-zh.test.ts` does the same for Mandarin. `src/academy/voice/clips-hi.test.ts` does the same for Hindi. `VOICE_CLEAN=1` only deletes files in folders named by the current job list, so a Spanish, Portuguese, French, or Chinese render does not remove English clips.
+`src/academy/voice/clips-es.test.ts` fails if any Spanish speakable line has no clip. `src/academy/voice/clips-pt.test.ts` does the same for Portuguese. `src/academy/voice/clips-fr.test.ts` does the same for French. `src/academy/voice/clips-zh.test.ts` does the same for Mandarin. `src/academy/voice/clips-hi.test.ts` does the same for Hindi. `src/academy/voice/clips-ar.test.ts` does the same for Arabic. `VOICE_CLEAN=1` only deletes files in folders named by the current job list, so a Spanish, Portuguese, French, or Chinese render does not remove English clips.
 
 ## French
 
@@ -77,6 +77,17 @@ Phonics, Sight Words, and Spelling are hidden in Hindi, so those English-alphabe
 ```bash
 npx vite-node scripts/export-voice-hi.ts
 VOICE_JOBS=/tmp/voice-jobs-hi.json VOICE_NAME=hf_alpha VOICE_LANG=hi python3 scripts/render-voice.py
+```
+
+## Arabic
+
+Modern Standard Arabic does not have a Kokoro voice. Clips use eSpeak NG (`espeak-ng -v ar`), GPL-3.0. Generated clips in `academy/public/voice/ar/` may be shipped with the Academy. They are mono MP3, 22,050 Hz, 32 kbps, the same as the other languages. The install cache includes the Arabic clips for Add & Subtract, Times Tables, and Telling Time, plus buddy lines and the home. The manifest is a separate chunk (`src/academy/voice/manifest-ar.ts`) loaded only when the language is العربية. The string table is its own chunk too (`src/academy/i18n-ar.ts`).
+
+Phonics, Sight Words, and Spelling are hidden in Arabic, so those English-alphabet lines are not recorded. Number words follow school Arabic: 21 is واحد وعشرون, 101 is مئة وواحد, and 2000 is ألفان. Clock speech says الساعة, والربع, والنصف, and إلا ربع for the next hour. Western digits stay in the writing. The page is right to left, and equations, clocks, rulers, and number lines stay left to right. A small Noto Sans Arabic subset draws العربية on the language list. The face used by the rest of the UI is loaded only after Arabic is chosen, and it is left out of the install cache.
+
+```bash
+npx vite-node scripts/export-voice-ar.ts
+VOICE_JOBS=/tmp/voice-jobs-ar.json python3 scripts/render-voice-ar.py
 ```
 
 ```bash

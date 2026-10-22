@@ -23,7 +23,7 @@ export function ArrayBoard({ task, onAnswer }: { task: ArrayTask; onAnswer: (ok:
       kind="array"
       fact={task.factKey}
       caption={task.speech}
-      total={t(`${rows.length} ${rows.length === 1 ? "row" : "rows"}`, `${rows.length} ${rows.length === 1 ? "fila" : "filas"}`, `${rows.length} ${rows.length === 1 ? "linha" : "linhas"}`, `${rows.length} ${rows.length === 1 ? "ligne" : "lignes"}`, `${rows.length}行`, `${rows.length} पंक्ति`)}
+      total={t(`${rows.length} ${rows.length === 1 ? "row" : "rows"}`, `${rows.length} ${rows.length === 1 ? "fila" : "filas"}`, `${rows.length} ${rows.length === 1 ? "linha" : "linhas"}`, `${rows.length} ${rows.length === 1 ? "ligne" : "lignes"}`, `${rows.length}行`, `${rows.length} पंक्ति`, `${rows.length} ${rows.length === 1 ? "صف" : "صفوف"}`)}
       onDone={() => onAnswer(arrayMatches(task, rows))}
     >
       <div ref={trayRef} className="ac-tray ac-array-tray" aria-label={show("Rows in the array")}>
@@ -33,7 +33,7 @@ export function ArrayBoard({ task, onAnswer }: { task: ArrayTask; onAnswer: (ok:
             key={`${width}-${index}`}
             type="button"
             className="ac-row-chip is-in ac-placed"
-            aria-label={t(`Remove a row of ${width}`, `Quita una fila de ${width}`, `Tire uma linha de ${width}`, `Enlève une ligne de ${width}`, `拿走一行，这一行有${width}个`, `${width} की एक पंक्ति हटाओ`)}
+            aria-label={t(`Remove a row of ${width}`, `Quita una fila de ${width}`, `Tire uma linha de ${width}`, `Enlève une ligne de ${width}`, `拿走一行，这一行有${width}个`, `${width} की एक पंक्ति हटाओ`, `أزل صفًا من ${width}`)}
             onClick={() => setRows((current) => current.filter((_, i) => i !== index))}
           >
             {face(width)}
@@ -47,7 +47,7 @@ export function ArrayBoard({ task, onAnswer }: { task: ArrayTask; onAnswer: (ok:
             type="button"
             className="ac-row-chip"
             data-piece={String(width)}
-            aria-label={t(`Row of ${width}`, `Fila de ${width}`, `Linha de ${width}`, `Ligne de ${width}`, `一行${width}个`, `${width} की पंक्ति`)}
+            aria-label={t(`Row of ${width}`, `Fila de ${width}`, `Linha de ${width}`, `Ligne de ${width}`, `一行${width}个`, `${width} की पंक्ति`, `صف من ${width}`)}
             {...pointerProps(String(width))}
           >
             {face(width)}
@@ -150,7 +150,7 @@ function TakeFrame({ task, onAnswer }: { task: FrameTask; onAnswer: (ok: boolean
       kind="frame"
       fact={task.factKey}
       caption={task.speech}
-      total={t(`${away} away`, `${away} afuera`, `${away} para fora`, `${away} dehors`, `拿走${away}个`, `${away} दूर`)}
+      total={t(`${away} away`, `${away} afuera`, `${away} para fora`, `${away} dehors`, `拿走${away}个`, `${away} दूर`, `${away} خارج`)}
       onDone={() => onAnswer(frameMatches(task, away))}
     >
       <div className="ac-ten-stack" aria-label={show("Counters still here")}>
@@ -201,7 +201,7 @@ function RodMath({ task, onAnswer }: { task: FrameTask; onAnswer: (ok: boolean) 
       kind="frame"
       fact={task.factKey}
       caption={task.speech}
-      total={adding ? String(task.start + moved) : t(`${moved} away`, `${moved} afuera`, `${moved} para fora`, `${moved} dehors`, `拿走了${moved}个`, `${moved} दूर`)}
+      total={adding ? String(task.start + moved) : t(`${moved} away`, `${moved} afuera`, `${moved} para fora`, `${moved} dehors`, `拿走了${moved}个`, `${moved} दूर`, `${moved} خارج`)}
       onDone={() => onAnswer(frameMatches(task, moved))}
     >
       <BlockPile tens={Math.floor(task.start / 10)} ones={task.start % 10} />
@@ -366,7 +366,7 @@ export function ShadeBoard({ task, onAnswer }: { task: ShadeTask; onAnswer: (ok:
       kind="shade"
       fact={task.factKey}
       caption={task.speech}
-      total={t(`${shaded} shaded`, `${shaded} pintadas`, `${shaded} pintadas`, `${shaded} coloriées`, `${shaded}份涂了颜色`, `${shaded} रंगा`)}
+      total={t(`${shaded} shaded`, `${shaded} pintadas`, `${shaded} pintadas`, `${shaded} coloriées`, `${shaded}份涂了颜色`, `${shaded} रंगा`, `${shaded} ${shaded === 1 ? "مظللة" : "مظللات"}`)}
       onDone={() => onAnswer(shadeMatches(task, on))}
     >
       <div

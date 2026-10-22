@@ -159,7 +159,7 @@ export function collectSpokenLines(): SpokenLine[] {
     }
   }
   const locale = getLocale();
-  if (locale === "zh" || locale === "hi") return lines.filter((row) => row.game !== "phonics" && row.game !== "sight" && row.game !== "spelling");
+  if (locale === "zh" || locale === "hi" || locale === "ar") return lines.filter((row) => row.game !== "phonics" && row.game !== "sight" && row.game !== "spelling");
   return lines;
 }
 
@@ -212,7 +212,7 @@ export function collectClipSpecs(lines: readonly SpokenLine[] = collectSpokenLin
     }
   }
   for (let n = 0; n <= NUMBER_MAX; n += 1) touch(games, String(n), n <= 100 ? "ui" : "place");
-  if (getLocale() !== "zh" && getLocale() !== "hi") {
+  if (getLocale() !== "zh" && getLocale() !== "hi" && getLocale() !== "ar") {
     touch(games, "thousand", "place");
     touch(games, "million", "place");
   }

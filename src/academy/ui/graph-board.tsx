@@ -190,7 +190,7 @@ export function GraphBench({
   return (
     <div className="ac-data" data-graph={spec.mode} data-ready={matched ? "yes" : "no"}>
       {spec.scale > 1 ? (
-        <p className="ac-graph-key">{t(`Each picture is ${spec.scale}`, `Cada dibujo vale ${spec.scale}`, undefined, `Chaque image vaut ${spec.scale}`, `每个图代表${spec.scale}`, `हर चित्र ${spec.scale} है`)}</p>
+        <p className="ac-graph-key">{t(`Each picture is ${spec.scale}`, `Cada dibujo vale ${spec.scale}`, undefined, `Chaque image vaut ${spec.scale}`, `每个图代表${spec.scale}`, `हर चित्र ${spec.scale} है`, `كل صورة تساوي ${spec.scale}`)}</p>
       ) : null}
       <div className={spec.mode === "line" ? "ac-graph-line" : "ac-graph-cols"}>
         {Array.from({ length: bins }, (_, index) => {
@@ -235,7 +235,7 @@ export function GraphBench({
                       token.label.includes("/")
                         ? `Devolva ${token.label}`
                         : `Devolva ${nounIsFeminine(token.label) ? "a" : "o"} ${token.label}`,
-                    token.label.includes("/") ? `Remets ${token.label}` : `Remets ${nounIsFeminine(token.label) ? "la" : "le"} ${token.label}`, `把${thingName(token.label, 2, token.label)}放回去`, `${token.label} वापस रखो`)}
+                    token.label.includes("/") ? `Remets ${token.label}` : `Remets ${nounIsFeminine(token.label) ? "la" : "le"} ${token.label}`, `把${thingName(token.label, 2, token.label)}放回去`, `${token.label} वापस रखो`, token.label.includes("/") ? `أعد ${token.label}` : `أعد ${thingName(token.label, 2, token.label)}`)}
                     disabled={locked}
                     {...tokenProps(token.id)}
                   >

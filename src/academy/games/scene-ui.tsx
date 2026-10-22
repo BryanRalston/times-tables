@@ -753,7 +753,7 @@ export function pictureAlt(label: string | undefined, choice: string, picture: s
   if (picture.startsWith("sq:")) {
     const n = Number(picture.slice(3));
     if (!Number.isFinite(n)) return t("A group of squishees", "Un grupo de squishees");
-    return t(`${n} ${n === 1 ? "squishee" : "squishees"}`, `${n} ${n === 1 ? "squishee" : "squishees"}`, `${n} ${n === 1 ? "squishee" : "squishees"}`, `${n} ${n === 1 ? "squishee" : "squishees"}`, `${n}个${n === 1 ? "squishee" : "squishees"}`, `${n} ${n === 1 ? "squishee" : "squishees"}`);
+    return t(`${n} ${n === 1 ? "squishee" : "squishees"}`, `${n} ${n === 1 ? "squishee" : "squishees"}`, `${n} ${n === 1 ? "squishee" : "squishees"}`, `${n} ${n === 1 ? "squishee" : "squishees"}`, `${n}个${n === 1 ? "squishee" : "squishees"}`, `${n} ${n === 1 ? "squishee" : "squishees"}`, `${n} ${n === 1 ? "squishee" : "squishees"}`);
   }
   if (picture.startsWith("shape:")) {
     const kind = picture.slice(6);
@@ -1003,13 +1003,13 @@ function Stepper({
 }) {
   return (
     <div className="ac-stepper">
-      <button type="button" aria-label={t(`Fewer ${label}`, `Menos ${label}`, `Menos ${label}`, `Moins de ${label}`, `少一个${label}`, `कम ${label}`)} onClick={() => onChange(Math.max(0, value - 1))}>
+      <button type="button" aria-label={t(`Fewer ${label}`, `Menos ${label}`, `Menos ${label}`, `Moins de ${label}`, `少一个${label}`, `कम ${label}`, `${label} أقل`)} onClick={() => onChange(Math.max(0, value - 1))}>
         −
       </button>
       <span>
         {value} {label}
       </span>
-      <button type="button" aria-label={t(`More ${label}`, `Más ${label}`, `Mais ${label}`, `Plus de ${label}`, `多一个${label}`, `अधिक ${label}`)} onClick={() => onChange(Math.min(max, value + 1))}>
+      <button type="button" aria-label={t(`More ${label}`, `Más ${label}`, `Mais ${label}`, `Plus de ${label}`, `多一个${label}`, `अधिक ${label}`, `${label} أكثر`)} onClick={() => onChange(Math.min(max, value + 1))}>
         +
       </button>
     </div>

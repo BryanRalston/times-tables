@@ -1,5 +1,5 @@
 import { gameCard as gameById } from "./games/catalog";
-import { chineseBoss, frenchBoss, getLocale, hindiBoss, portugueseBoss, show, t } from "./i18n";
+import { arabicBoss, chineseBoss, frenchBoss, getLocale, hindiBoss, portugueseBoss, show, t } from "./i18n";
 import { BOSS_ES } from "./i18n-es";
 
 export type BossLook = "crown" | "cape" | "armor" | "clock" | "coins" | "spell";
@@ -244,7 +244,9 @@ function withLocale(boss: IslandBoss): IslandBoss {
           ? chineseBoss(boss.gameId)
           : locale === "hi"
             ? hindiBoss(boss.gameId)
-            : portugueseBoss(boss.gameId);
+            : locale === "ar"
+              ? arabicBoss(boss.gameId)
+              : portugueseBoss(boss.gameId);
   if (!translated) return boss;
   return { ...boss, ...translated };
 }
@@ -264,19 +266,19 @@ export function bossForGame(gameId: string): IslandBoss {
       `${name} bounced in for a silly showdown. Ready?`,
       `${name} llegó rebotando para un duelo chistoso. ¿Listo?`,
       `${name} chegou pulando para uma disputa divertida. Preparado?`,
-    `${name} arrive en bondissant pour un défi rigolo. C'est parti ?`, `${name}蹦进来，要来一场闹着玩的对决。准备好了吗？`, `${name} एक मज़ेदार मुकाबले के लिए कूद पड़ा। तैयार?`),
-    friendly: t(`${name} wants to be friends!`, `¡${name} quiere ser tu amigo!`, `${name} quer ser seu amigo!`, `${name} veut être ton copain !`, `${name}想和你做朋友！`, `${name} दोस्त बनना चाहता है!`),
+    `${name} arrive en bondissant pour un défi rigolo. C'est parti ?`, `${name}蹦进来，要来一场闹着玩的对决。准备好了吗？`, `${name} एक मज़ेदार मुकाबले के लिए कूद पड़ा। तैयार?`, `${name} وصل قفزًا لمبارزة مرحة. هل أنت مستعد؟`),
+    friendly: t(`${name} wants to be friends!`, `¡${name} quiere ser tu amigo!`, `${name} quer ser seu amigo!`, `${name} veut être ton copain !`, `${name}想和你做朋友！`, `${name} दोस्त बनना चाहता है!`, `${name} يريد أن يكون صديقك!`),
     personality: t(
       `The big boss of ${title}, in a homemade crown.`,
       `El gran jefe de ${shown}, con una corona hecha en casa.`,
       `O grande chefe de ${shown}, com uma coroa feita em casa.`,
-    `Le grand chef de ${shown}, avec une couronne faite maison.`, `${title}的大魔王，戴着自己做的皇冠。`, `${shown} का बड़ा बॉस, घर पर बने ताज में।`),
+    `Le grand chef de ${shown}, avec une couronne faite maison.`, `${title}的大魔王，戴着自己做的皇冠。`, `${shown} का बड़ा बॉस, घर पर बने ताज में।`, `زعيم ${shown} الكبير، بتاج مصنوع في البيت.`),
     face: game?.mascot ?? "peach",
     look,
     cosmeticId: `boss-look-${slug(gameId)}`,
     cosmeticName: t("Boss crown", "Corona de jefe", "Coroa de chefe"),
     trophyId: `trophy-${slug(gameId)}`,
-    trophyName: t(`${title} trophy`, `Trofeo de ${shown}`, `Troféu de ${shown}`, `Trophée de ${shown}`, `${title}奖杯`, `${shown} ट्रॉफी`),
+    trophyName: t(`${title} trophy`, `Trofeo de ${shown}`, `Troféu de ${shown}`, `Trophée de ${shown}`, `${title}奖杯`, `${shown} ट्रॉफी`, `كأس ${shown}`),
   };
 }
 

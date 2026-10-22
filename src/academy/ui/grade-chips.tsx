@@ -3,7 +3,7 @@ import { getLocale, gradeText, show } from "../i18n";
 import { cx } from "./bits";
 
 function chipLabel(grade: Grade): string {
-  if (getLocale() === "hi") return gradeText(grade);
+  if (getLocale() === "hi" || getLocale() === "ar") return gradeText(grade);
   if (grade === "PK") return "Pre-K";
   if (grade === "K") return "K";
   return grade;

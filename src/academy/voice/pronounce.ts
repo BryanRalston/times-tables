@@ -1,4 +1,6 @@
 import {
+  arabicMinuteWords,
+  arabicNumberWords,
   chineseMinuteWords,
   chineseNumberWords,
   hindiMinuteWords,
@@ -346,6 +348,18 @@ function pronounceKeyFr(key: string): string {
   return words.map((word) => pronounceFrenchWord(word, alone)).join(" ");
 }
 
+function pronounceKeyAr(key: string): string {
+  if (key === "more than") return "أكثر من";
+  if (key === "more") return "أكثر";
+  if (key === "than") return "من";
+  if (key.startsWith("min:")) {
+    const minutes = Number(key.slice(4));
+    return Number.isInteger(minutes) ? arabicMinuteWords(minutes) : key;
+  }
+  if (/^\d+$/.test(key)) return arabicNumberWords(Number(key));
+  return key;
+}
+
 function pronounceKeyHi(key: string): string {
   if (key === "more than") return "से अधिक";
   if (key === "more") return "अधिक";
@@ -372,6 +386,13 @@ function pronounceKeyZh(key: string): string {
 
 export function spokenText(key: string): string {
   const locale = getLocale();
+  if (locale === "ar") {
+    const ar = pronounceKeyAr(key).trim();
+    if (!ar || /[؟.!?]$/.test(ar)) return ar;
+    if (/^(كم|ما|هل|أين|من)\b/.test(ar) && ar.length >= 4) return `${ar}؟`;
+    if (ar.length >= 8) return `${ar}.`;
+    return ar;
+  }
   if (locale === "hi") {
     const hi = pronounceKeyHi(key).trim();
     if (!hi || /[।.!?]$/.test(hi)) return hi;
