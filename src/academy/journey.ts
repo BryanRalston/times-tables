@@ -1,5 +1,6 @@
 import { bandFor } from "./grade-map";
 import { GAME_CARDS as GAMES, gameCard as gameById } from "./games/catalog";
+import { gameOffered } from "./games/offer";
 import {
   BOSS_PASS,
   DAILY_GOAL,
@@ -24,6 +25,7 @@ export function areaIndex(journey: Journey): number {
  * Pre-K coin-name intros stay on the home screen and do not gate counting.
  */
 function skipsGate(gameId: string, grade: Grade | undefined): boolean {
+  if (!gameOffered(gameId)) return true;
   if (!grade) return false;
   const offer = bandFor(gameId, grade)?.offer;
   if (offer === "later") return true;

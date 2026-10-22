@@ -11,6 +11,7 @@ describe("hello screen", () => {
     expect(html).toContain("Español");
     expect(html).toContain("Português");
     expect(html).toContain("Français");
+    expect(html).toContain("中文");
     expect(html).toContain('aria-pressed="true"');
   });
 });

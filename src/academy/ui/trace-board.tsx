@@ -135,7 +135,7 @@ export function TraceBoard({ task, onAnswer }: { task: TraceTask; onAnswer: (ok:
         ref={stageRef}
         className="ac-trace-stage"
         role="application"
-        aria-label={t(`Trace ${task.glyph}. Start at the dot.`, `Traza ${task.glyph}. Empieza en el punto.`, `Trace ${task.glyph}. Comece no ponto.`, `Suis le tracé de ${task.glyph}. Commence au point.`)}
+        aria-label={t(`Trace ${task.glyph}. Start at the dot.`, `Traza ${task.glyph}. Empieza en el punto.`, `Trace ${task.glyph}. Comece no ponto.`, `Suis le tracé de ${task.glyph}. Commence au point.`, `描${task.glyph}。从圆点开始。`)}
         onPointerDown={(event) => {
           if (doneRef.current || event.button > 0) return;
           try {

@@ -72,7 +72,7 @@ export function makeSightQuestion(rng: Rng, level: SightList, prefer: string[] =
   const buddy = buddyName(rng);
   let title = pickTalk(rng, [
     ["Tap the word you hear", "Toca la palabra que escuchas"],
-    [`${buddy} says a word. Tap it.`, `${buddy} dice una palabra. Tócala.`, `${buddy} diz uma palavra. Toque nela.`, `${buddy} dit un mot. Touche-le.`],
+    [`${buddy} says a word. Tap it.`, `${buddy} dice una palabra. Tócala.`, `${buddy} diz uma palavra. Toque nela.`, `${buddy} dit un mot. Touche-le.`, `${buddy}说了一个词。点一点它。`],
   ]);
   let hint = t("Tap the speaker to hear it again.", "Toca la bocina para escucharla otra vez.");
   let sentence = "";
@@ -106,8 +106,8 @@ export function makeSightQuestion(rng: Rng, level: SightList, prefer: string[] =
     game: "sight",
     title,
     hint,
-    praise: t(`Yes! ${word.word}`, `¡Sí! ${word.word}`, `Sim! ${word.word}`, `Oui ! ${word.word}`),
-    almost: t(`Almost! The word is ${word.word}.`, `¡Casi! La palabra es ${word.word}.`, `Quase! A palavra é ${word.word}.`, `Presque ! Le mot est ${word.word}.`),
+    praise: t(`Yes! ${word.word}`, `¡Sí! ${word.word}`, `Sim! ${word.word}`, `Oui ! ${word.word}`, `对！${word.word}`),
+    almost: t(`Almost! The word is ${word.word}.`, `¡Casi! La palabra es ${word.word}.`, `Quase! A palavra é ${word.word}.`, `Presque ! Le mot est ${word.word}.`, `差一点！这个词是${word.word}。`),
     answer,
     choices,
     skill: `sight:${level}`,

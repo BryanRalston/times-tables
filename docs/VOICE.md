@@ -52,7 +52,7 @@ npx vite-node scripts/export-voice-pt.ts
 VOICE_JOBS=/tmp/voice-jobs-pt.json VOICE_NAME=pf_dora VOICE_LANG=pt-br python3 scripts/render-voice.py
 ```
 
-`src/academy/voice/clips-es.test.ts` fails if any Spanish speakable line has no clip. `src/academy/voice/clips-pt.test.ts` does the same for Portuguese. `src/academy/voice/clips-fr.test.ts` does the same for French. `VOICE_CLEAN=1` only deletes files in folders named by the current job list, so a Spanish, Portuguese, or French render does not remove English clips.
+`src/academy/voice/clips-es.test.ts` fails if any Spanish speakable line has no clip. `src/academy/voice/clips-pt.test.ts` does the same for Portuguese. `src/academy/voice/clips-fr.test.ts` does the same for French. `src/academy/voice/clips-zh.test.ts` does the same for Mandarin. `VOICE_CLEAN=1` only deletes files in folders named by the current job list, so a Spanish, Portuguese, French, or Chinese render does not remove English clips.
 
 ## French
 
@@ -61,6 +61,12 @@ French from France uses the same Kokoro model and the same line-splitting. The v
 Number clips do not share filenames with English, Spanish, or Portuguese. “7” is `sept` in French. 70–99 follow the school forms (`soixante-dix`, `quatre-vingts`, `quatre-vingt-un`).
 
 `ff_siwis` also reads the English words that stay on screen in Phonics, Sight Words, and Spelling. The instruction around them is French.
+
+## Mandarin
+
+Simplified Mandarin uses the same Kokoro model. The voice is `zf_xiaobei` (`lang="cmn"`), Apache-2.0. `zh` and `zh-cn` are not espeak language codes for this build. Clips live in `academy/public/voice/zh/`. The install cache includes the Chinese clips for Add & Subtract, Times Tables, and Telling Time, plus buddy lines and the home. The manifest is a separate chunk (`src/academy/voice/manifest-zh.ts`) loaded only when the language is 中文. The string table is its own chunk too (`src/academy/i18n-zh.ts`).
+
+Phonics, Sight Words, and Spelling are hidden in Chinese, so those English-alphabet lines are not recorded. Number words follow mainland school reading: 2 is 二, 200 is 二百, 2000 is 两千, and 101 is 一百零一. Clock speech says 点整, 点半, 点一刻, and 差一刻 next hour. Western digits stay in the writing. A small Noto Sans SC subset draws 中文 on the language list. The face used by the rest of the UI is loaded only after Chinese is chosen, and it is left out of the install cache.
 
 ```bash
 npx vite-node scripts/export-voice-fr.ts

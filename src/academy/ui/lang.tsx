@@ -1,4 +1,4 @@
-import { loadFrench, loadPortuguese, setLocale, show } from "../i18n";
+import { loadChinese, loadFrench, loadPortuguese, setLocale, show } from "../i18n";
 import type { AppLang, Save } from "../model";
 import { cx } from "./bits";
 
@@ -7,6 +7,7 @@ export const LANGUAGE_CHOICES: readonly { id: AppLang; label: string }[] = [
   { id: "es", label: "Español" },
   { id: "pt", label: "Português" },
   { id: "fr", label: "Français" },
+  { id: "zh", label: "中文" },
 ];
 
 export function withLang(save: Save, lang: AppLang): Save {
@@ -22,6 +23,10 @@ export function chooseLanguage(lang: AppLang, apply: (lang: AppLang) => void): v
   }
   if (lang === "fr") {
     void loadFrench().then(() => apply("fr"));
+    return;
+  }
+  if (lang === "zh") {
+    void loadChinese().then(() => apply("zh"));
     return;
   }
   apply(lang);

@@ -219,7 +219,7 @@ function migrateV7toV8(raw: Record<string, unknown>): Record<string, unknown> {
 
 /** Version 8 had bonds. Language stays English for families who already play. */
 function migrateV8toV9(raw: Record<string, unknown>): Record<string, unknown> {
-  const lang = raw.lang === "es" || raw.lang === "pt" || raw.lang === "fr" ? raw.lang : "en";
+  const lang = raw.lang === "es" || raw.lang === "pt" || raw.lang === "fr" || raw.lang === "zh" ? raw.lang : "en";
   return { ...raw, version: 9, lang, langChosen: true };
 }
 
@@ -515,7 +515,7 @@ export function parseSave(raw: unknown): Save {
   const children = o.children.map(parseChild).filter((child): child is Child => child != null).slice(0, MAX_CHILDREN);
   if (!children.length) return freshSave();
   const activeId = children.some((child) => child.id === o.activeId) ? String(o.activeId) : children[0]!.id;
-  const lang = o.lang === "es" || o.lang === "pt" || o.lang === "fr" ? o.lang : "en";
+  const lang = o.lang === "es" || o.lang === "pt" || o.lang === "fr" || o.lang === "zh" ? o.lang : "en";
   return { version: SAVE_VERSION, activeId, sound: o.sound !== false, lang, langChosen: o.langChosen === true, children };
 }
 

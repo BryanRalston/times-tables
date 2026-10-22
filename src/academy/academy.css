@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Noto Sans SC";
+  src: url("./fonts/noto-sc-picker.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+  unicode-range: U+4E2D, U+6587;
+}
+
 :root {
   color-scheme: light;
   --ac-ink: #3c2448;
@@ -53,6 +61,16 @@
 
 html, body, #app {
   min-height: 100%;
+}
+
+html[lang="zh-Hans"] {
+  --ac-font: "Noto Sans SC", Nunito, "Trebuchet MS", sans-serif;
+  --ac-display: "Noto Sans SC", Fredoka, Nunito, "Trebuchet MS", sans-serif;
+}
+
+html[lang="zh-Hans"] body,
+html[lang="zh-Hans"] body * {
+  font-family: "Noto Sans SC", Fredoka, Nunito, sans-serif;
 }
 
 body {
@@ -924,6 +942,8 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
 .ac-lang-list .ac-grade {
   width: 100%;
   min-width: 0;
+  /* Picker subset covers 中文. Other labels fall through to Fredoka. */
+  font-family: "Noto Sans SC", Fredoka, Nunito, "Trebuchet MS", sans-serif;
 }
 .ac-hello-grades { justify-content: center; margin: 10px 0 14px; }
 .ac-finger {

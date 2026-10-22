@@ -1,4 +1,4 @@
-import { frenchFraction, getLocale, portugueseFraction, spanishFraction } from "../i18n";
+import { chineseFraction, frenchFraction, getLocale, portugueseFraction, spanishFraction } from "../i18n";
 
 const NUMBER_WORD = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
 
@@ -21,6 +21,7 @@ function speakFractions(text: string): string {
     if (getLocale() === "es") return spanishFraction(num, den);
     if (getLocale() === "pt") return portugueseFraction(num, den);
     if (getLocale() === "fr") return frenchFraction(num, den);
+    if (getLocale() === "zh") return chineseFraction(num, den);
     const pair = FRACTION_WORD[denText];
     if (!pair) return full;
     const numWord = NUMBER_WORD[num] ?? numText;
@@ -60,6 +61,16 @@ export function speakable(text: string): string {
       .replace(/(\d+)¢/g, (_full, n: string) => (Number(n) === 1 ? "1 cent" : `${n} cents`))
       .replace(/¢/g, " cents")
       .replace(/\$(\d+)/g, (_full, n: string) => (Number(n) === 1 ? "1 dollar" : `${n} dollars`));
+  }
+  if (getLocale() === "zh") {
+    return fractions
+      .replace(/×/g, "乘")
+      .replace(/−/g, "减")
+      .replace(/\+/g, "加")
+      .replace(/=/g, "等于")
+      .replace(/(\d+)¢/g, "$1美分")
+      .replace(/¢/g, "美分")
+      .replace(/\$(\d+)/g, "$1美元");
   }
   return fractions
     .replace(/×/g, " times ")

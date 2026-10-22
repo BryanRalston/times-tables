@@ -10,6 +10,8 @@ let portugueseFiles: VoiceMap | null = null;
 let portugueseLoad: Promise<VoiceMap> | null = null;
 let frenchFiles: VoiceMap | null = null;
 let frenchLoad: Promise<VoiceMap> | null = null;
+let chineseFiles: VoiceMap | null = null;
+let chineseLoad: Promise<VoiceMap> | null = null;
 
 /** The English clip map is a large file. It loads on first speech, not with the home screen. */
 export function loadEnglishVoice(): Promise<VoiceMap> {
@@ -75,11 +77,28 @@ export function frenchVoiceReady(): boolean {
   return frenchFiles != null;
 }
 
+/** Chinese clips stay out of the English download. The map loads on first Chinese speech. */
+export function loadChineseVoice(): Promise<VoiceMap> {
+  if (chineseFiles) return Promise.resolve(chineseFiles);
+  if (!chineseLoad) {
+    chineseLoad = import("./manifest-zh").then((mod) => {
+      chineseFiles = mod.VOICE_FILES_ZH;
+      return chineseFiles;
+    });
+  }
+  return chineseLoad;
+}
+
+export function chineseVoiceReady(): boolean {
+  return chineseFiles != null;
+}
+
 function voiceMap(): VoiceMap | null {
   const locale = getLocale();
   if (locale === "es") return spanishFiles;
   if (locale === "pt") return portugueseFiles;
   if (locale === "fr") return frenchFiles;
+  if (locale === "zh") return chineseFiles;
   return englishFiles;
 }
 
@@ -88,6 +107,7 @@ function loadVoiceMap(): Promise<VoiceMap> {
   if (locale === "es") return loadSpanishVoice();
   if (locale === "pt") return loadPortugueseVoice();
   if (locale === "fr") return loadFrenchVoice();
+  if (locale === "zh") return loadChineseVoice();
   return loadEnglishVoice();
 }
 

@@ -1,7 +1,7 @@
 import { WEEKDAY_LETTERS, WEEKDAY_NAMES, gradeLabel, type Grade } from "./model";
 import { ES, TRAIT_ES, type BossEs, type PersonaEs } from "./i18n-es";
 
-export type Locale = "en" | "es" | "pt" | "fr";
+export type Locale = "en" | "es" | "pt" | "fr" | "zh";
 
 export interface PortuguesePack {
   PT: Record<string, string>;
@@ -16,6 +16,16 @@ let portuguesePack: PortuguesePack | null = null;
 let portugueseLoad: Promise<void> | null = null;
 let frenchPack: FrenchPack | null = null;
 let frenchLoad: Promise<void> | null = null;
+let chinesePack: ChinesePack | null = null;
+let chineseLoad: Promise<void> | null = null;
+
+export interface ChinesePack {
+  ZH: Record<string, string>;
+  PERSONA_ZH: Record<string, PersonaEs>;
+  PERSONA_FALLBACK_ZH: PersonaEs;
+  BOSS_ZH: Record<string, BossEs>;
+  TRAIT_ZH: Record<string, string>;
+}
 
 export interface FrenchPack {
   FR: Record<string, string>;
@@ -30,10 +40,24 @@ export function getLocale(): Locale {
 }
 
 export function setLocale(next: Locale): void {
-  locale = next === "es" || next === "pt" || next === "fr" ? next : "en";
+  locale = next === "es" || next === "pt" || next === "fr" || next === "zh" ? next : "en";
   if (typeof document !== "undefined") {
-    document.documentElement.lang = locale === "es" ? "es" : locale === "pt" ? "pt-BR" : locale === "fr" ? "fr" : "en";
+    document.documentElement.lang =
+      locale === "es" ? "es" : locale === "pt" ? "pt-BR" : locale === "fr" ? "fr" : locale === "zh" ? "zh-Hans" : "en";
+    if (locale === "zh") ensureChineseFont();
   }
+}
+
+/** The full Chinese face loads only after Chinese is chosen. The picker uses a two-character subset. */
+function ensureChineseFont(): void {
+  if (document.getElementById("zh-font")) return;
+  const base = import.meta.env.BASE_URL || "/";
+  const prefix = base.endsWith("/") ? base : `${base}/`;
+  const link = document.createElement("link");
+  link.id = "zh-font";
+  link.rel = "stylesheet";
+  link.href = `${prefix}fonts/zh.css`;
+  document.head.appendChild(link);
 }
 
 /** The Portuguese table is a separate chunk. English and Spanish do not download it. */
@@ -74,16 +98,36 @@ export function loadFrench(): Promise<void> {
   return frenchLoad;
 }
 
-/** Loads the lazy string pack for a language that is not bundled with the first visit. */
+/** The Chinese table is a separate chunk. The first visit does not download it. */
+export function installChinese(pack: ChinesePack): void {
+  chinesePack = pack;
+}
+
+export function chineseReady(): boolean {
+  return chinesePack != null;
+}
+
+export function loadChinese(): Promise<void> {
+  if (chinesePack) return Promise.resolve();
+  if (!chineseLoad) {
+    chineseLoad = import("./i18n-zh").then((mod) => {
+      installChinese(mod);
+    });
+  }
+  return chineseLoad;
+}
+
 export function loadLocalePack(lang: Locale): Promise<void> {
   if (lang === "pt") return loadPortuguese();
   if (lang === "fr") return loadFrench();
+  if (lang === "zh") return loadChinese();
   return Promise.resolve();
 }
 
 export function localePackReady(lang: Locale): boolean {
   if (lang === "pt") return portugueseReady();
   if (lang === "fr") return frenchReady();
+  if (lang === "zh") return chineseReady();
   return true;
 }
 
@@ -101,10 +145,11 @@ export function prefersPortuguese(): boolean {
   return lang.startsWith("pt");
 }
 
-export function t(en: string, es: string, pt?: string, fr?: string): string {
+export function t(en: string, es: string, pt?: string, fr?: string, zh?: string): string {
   if (locale === "es") return es;
   if (locale === "pt") return pt ?? portuguesePack?.PT[en] ?? en;
   if (locale === "fr") return fr ?? frenchPack?.FR[en] ?? en;
+  if (locale === "zh") return zh ?? chinesePack?.ZH[en] ?? en;
   return en;
 }
 
@@ -113,36 +158,57 @@ export function show(en: string): string {
   if (locale === "es") return ES[en] ?? en;
   if (locale === "pt") return portuguesePack?.PT[en] ?? en;
   if (locale === "fr") return frenchPack?.FR[en] ?? en;
+  if (locale === "zh") return chinesePack?.ZH[en] ?? en;
   return en;
 }
 
 export function yesDetail(detail: string): string {
-  return t(`Yes! ${detail}`, `¡Sí! ${detail}`, `Sim! ${detail}`, `Oui ! ${detail}`);
+  return t(`Yes! ${detail}`, `¡Sí! ${detail}`, `Sim! ${detail}`, `Oui ! ${detail}`, `对！${detail}`);
 }
 
 export function almostDetail(detail: string): string {
-  return t(`Almost! ${detail}`, `¡Casi! ${detail}`, `Quase! ${detail}`, `Presque ! ${detail}`);
+  return t(`Almost! ${detail}`, `¡Casi! ${detail}`, `Quase! ${detail}`, `Presque ! ${detail}`, `差一点！${detail}`);
 }
 
 export function yourTurnLine(prompt: string): string {
-  return t(`Your turn. ${prompt}`, `Te toca. ${prompt}`, `Sua vez. ${prompt}`, `À toi. ${prompt}`);
+  return t(`Your turn. ${prompt}`, `Te toca. ${prompt}`, `Sua vez. ${prompt}`, `À toi. ${prompt}`, `轮到你了。${prompt}`);
 }
 
 /** Round size for little kids. A countdown is not part of this label. */
 export function cardsRoundLabel(count: number): string {
   const n = Math.max(0, Math.floor(count));
   if (n === 1) return t("1 card", "1 tarjeta", "1 carta", "1 carte");
-  return t(`${n} cards`, `${n} tarjetas`, `${n} cartas`, `${n} cartes`);
+  return t(`${n} cards`, `${n} tarjetas`, `${n} cartas`, `${n} cartes`, `${n}张卡片`);
 }
 
 /** Card step for Pre-K, kindergarten, and grade 1. */
 export function cardStepLabel(index: number, total: number): string {
   const safeTotal = Math.max(1, Math.floor(total));
   const at = Math.min(safeTotal, Math.max(1, Math.floor(index) + 1));
-  return t(`Card ${at} of ${safeTotal}`, `Tarjeta ${at} de ${safeTotal}`, `Carta ${at} de ${safeTotal}`, `Carte ${at} sur ${safeTotal}`);
+  return t(`Card ${at} of ${safeTotal}`, `Tarjeta ${at} de ${safeTotal}`, `Carta ${at} de ${safeTotal}`, `Carte ${at} sur ${safeTotal}`, `第${at}张，共${safeTotal}张`);
 }
 
 export function gradeText(grade: Grade): string {
+  if (locale === "zh") {
+    switch (grade) {
+      case "PK":
+        return "学前班";
+      case "K":
+        return "幼儿园";
+      case "1":
+        return "一年级";
+      case "2":
+        return "二年级";
+      case "3":
+        return "三年级";
+      case "4":
+        return "四年级";
+      default: {
+        const neverGrade: never = grade;
+        return neverGrade;
+      }
+    }
+  }
   if (locale === "fr") {
     switch (grade) {
       case "PK":
@@ -180,6 +246,7 @@ export function weekdayName(index: number): string {
 }
 
 export function weekdayLetter(index: number): string {
+  if (locale === "zh") return ["一", "二", "三", "四", "五", "六", "日"][index] ?? "";
   if (locale === "fr") return ["L", "M", "M", "J", "V", "S", "D"][index] ?? "";
   if (locale === "pt") return ["S", "T", "Q", "Q", "S", "S", "D"][index] ?? "";
   if (locale !== "es") return WEEKDAY_LETTERS[index] ?? "";
@@ -225,7 +292,21 @@ const SHAPES_FR: Record<string, { one: string; article: string }> = {
   cylinder: { one: "cylindre", article: "le" },
 };
 
+const SHAPES_ZH: Record<string, string> = {
+  circle: "圆形",
+  triangle: "三角形",
+  square: "正方形",
+  rectangle: "长方形",
+  pentagon: "五边形",
+  hexagon: "六边形",
+  cube: "正方体",
+  sphere: "球体",
+  cone: "圆锥",
+  cylinder: "圆柱",
+};
+
 export function shapeWord(id: string): string {
+  if (locale === "zh") return SHAPES_ZH[id] ?? id;
   if (locale === "fr") return SHAPES_FR[id]?.one ?? id;
   if (locale === "pt") return SHAPES_PT[id]?.one ?? id;
   if (locale !== "es") return id;
@@ -233,6 +314,7 @@ export function shapeWord(id: string): string {
 }
 
 export function shapeWithArticle(id: string): string {
+  if (locale === "zh") return SHAPES_ZH[id] ?? id;
   if (locale === "fr") {
     const row = SHAPES_FR[id];
     if (!row) return id;
@@ -273,7 +355,16 @@ const PARTS_FR: Record<string, string> = {
   "not equal": "qui ne sont pas égales",
 };
 
+const PARTS_ZH: Record<string, string> = {
+  halves: "二分之一",
+  thirds: "三分之一",
+  fourths: "四分之一",
+  unequal: "不相等的部分",
+  "not equal": "不相等",
+};
+
 export function partPhrase(id: string): string {
+  if (locale === "zh") return PARTS_ZH[id] ?? id;
   if (locale === "fr") return PARTS_FR[id] ?? id;
   if (locale === "pt") return PARTS_PT[id] ?? id;
   if (locale !== "es") return id;
@@ -388,8 +479,55 @@ const NOUNS_FR: Record<string, [string, string]> = {
 
 const FEMININE_FR = new Set(["pomme", "étoile", "grenouille", "balle", "banane", "carotte"]);
 
+/** Noun plus the measure word used in 有几只 / 有几个. */
+const NOUNS_ZH: Record<string, [string, string]> = {
+  apple: ["苹果", "个"],
+  apples: ["苹果", "个"],
+  fish: ["鱼", "条"],
+  star: ["星星", "颗"],
+  stars: ["星星", "颗"],
+  cookie: ["饼干", "块"],
+  cookies: ["饼干", "块"],
+  frog: ["青蛙", "只"],
+  frogs: ["青蛙", "只"],
+  bag: ["袋子", "个"],
+  bags: ["袋子", "个"],
+  cat: ["猫", "只"],
+  cats: ["猫", "只"],
+  dog: ["狗", "只"],
+  dogs: ["狗", "只"],
+  squishee: ["squishee", "个"],
+  squishees: ["squishee", "个"],
+  ball: ["球", "个"],
+  balls: ["球", "个"],
+  banana: ["香蕉", "根"],
+  bananas: ["香蕉", "根"],
+  snake: ["蛇", "条"],
+  snakes: ["蛇", "条"],
+  carrot: ["胡萝卜", "根"],
+  carrots: ["胡萝卜", "根"],
+  bone: ["骨头", "根"],
+  bones: ["骨头", "根"],
+  candy: ["糖果", "颗"],
+  candies: ["糖果", "颗"],
+  bug: ["虫子", "只"],
+  bugs: ["虫子", "只"],
+};
+
+/** "3条鱼". Used only inside Chinese sentences. */
+export function countedNoun(name: string, n: number): string {
+  const row = NOUNS_ZH[name];
+  if (!row) return `${n}个${name}`;
+  return `${n}${row[1]}${row[0]}`;
+}
+
+export function nounMeasure(name: string): string {
+  return NOUNS_ZH[name]?.[1] ?? "个";
+}
+
 /** English plural helper stays put. Spanish, Portuguese, and French use real singular and plural. */
 export function thingName(name: string, n: number, english: string): string {
+  if (locale === "zh") return NOUNS_ZH[name]?.[0] ?? english;
   if (locale === "fr") {
     const pair = NOUNS_FR[name];
     if (!pair) return english;
@@ -448,7 +586,16 @@ const COIN_FR: Record<string, { one: string; many: string }> = {
   dollar: { one: "dollar", many: "dollars" },
 };
 
+const COIN_ZH: Record<string, string> = {
+  penny: "1美分硬币",
+  nickel: "5美分硬币",
+  dime: "10美分硬币",
+  quarter: "25美分硬币",
+  dollar: "美元",
+};
+
 export function coinWord(kind: string, n = 1): string {
+  if (locale === "zh") return COIN_ZH[kind] ?? kind;
   if (locale === "fr") {
     const row = COIN_FR[kind];
     if (!row) return kind;
@@ -466,6 +613,7 @@ export function coinWord(kind: string, n = 1): string {
 }
 
 export function coinButton(kind: string, english: string): string {
+  if (locale === "zh") return COIN_ZH[kind] ?? english;
   const row = locale === "fr" ? COIN_FR[kind] : locale === "pt" ? COIN_PT[kind] : locale === "es" ? COIN_ES[kind] : undefined;
   if (!row) return english;
   const word = row.one;
@@ -474,6 +622,7 @@ export function coinButton(kind: string, english: string): string {
 
 /** "a nickel" / "un níquel" / "uma moeda de 5" for praise lines. */
 export function coinAsA(kind: string, englishLower: string): string {
+  if (locale === "zh") return COIN_ZH[kind] ? `一枚${COIN_ZH[kind]}` : englishLower;
   if (locale === "fr") {
     switch (kind) {
       case "penny":
@@ -649,6 +798,7 @@ export function spanishFraction(num: number, den: number): string {
 }
 
 function traitWord(trait: string): string {
+  if (locale === "zh") return chinesePack?.TRAIT_ZH[trait] ?? trait;
   if (locale === "fr") return frenchPack?.TRAIT_FR[trait] ?? trait;
   if (locale === "pt") return portuguesePack?.TRAIT_PT[trait] ?? trait;
   if (locale === "es") return TRAIT_ES[trait] ?? trait;
@@ -659,11 +809,24 @@ function traitWord(trait: string): string {
 export function starLead(name: string, trait: string): string {
   const ptTrait = locale === "pt" ? traitWord(trait) : (portuguesePack?.TRAIT_PT[trait] ?? trait);
   const frTrait = locale === "fr" ? traitWord(trait) : (frenchPack?.TRAIT_FR[trait] ?? trait);
-  return t(`${name} the ${trait}`, `${name}, ${TRAIT_ES[trait] ?? trait},`, `${name}, ${ptTrait},`, `${name}, ${frTrait},`);
+  const zhTrait = locale === "zh" ? traitWord(trait) : (chinesePack?.TRAIT_ZH[trait] ?? trait);
+  return t(
+    `${name} the ${trait}`,
+    `${name}, ${TRAIT_ES[trait] ?? trait},`,
+    `${name}, ${ptTrait},`,
+    `${name}, ${frTrait},`,
+    `${name}，${zhTrait}，`,
+  );
 }
 
 export function gamePill(title: string, num: number): string {
-  return t(`${title} · Level ${num}`, `${show(title)} · Nivel ${num}`, `${show(title)} · Nível ${num}`, `${show(title)} · Niveau ${num}`);
+  return t(
+    `${title} · Level ${num}`,
+    `${show(title)} · Nivel ${num}`,
+    `${show(title)} · Nível ${num}`,
+    `${show(title)} · Niveau ${num}`,
+    `${show(title)} · 第${num}关`,
+  );
 }
 
 /** French elides de/que before a vowel: d'os, qu'étoiles. Combien stays invariable. */
@@ -684,6 +847,12 @@ export function frenchDe(word: string): string {
 function howManyLead(name: string, englishPlural: string, count: number): string {
   const one = thingName(name, 1, name);
   const word = thingName(name, Math.max(count, 2), englishPlural);
+  if (locale === "zh") {
+    const row = NOUNS_ZH[name];
+    const noun = row?.[0] ?? word;
+    const measure = row?.[1] ?? "个";
+    return `有几${measure}${noun}`;
+  }
   if (locale === "fr") return `Combien ${frenchDe(word)}`;
   if (locale === "pt") {
     const lead = FEMININE_PT.has(one) ? "Quantas" : "Quantos";
@@ -695,13 +864,13 @@ function howManyLead(name: string, englishPlural: string, count: number): string
 
 /** "cuántos plátanos" or "quantas cenouras" in a how-many-more question. */
 export function howManyMorePhrase(name: string, englishPlural: string): string {
-  if (locale !== "es" && locale !== "pt" && locale !== "fr") return englishPlural;
+  if (locale !== "es" && locale !== "pt" && locale !== "fr" && locale !== "zh") return englishPlural;
   return howManyLead(name, englishPlural, 2);
 }
 
 /** "cuántos plátanos", "quantas cenouras", or "combien de pommes" in a how-many-less question. */
 export function howManyLessPhrase(name: string, englishPlural: string): string {
-  if (locale !== "es" && locale !== "pt" && locale !== "fr") return englishPlural;
+  if (locale !== "es" && locale !== "pt" && locale !== "fr" && locale !== "zh") return englishPlural;
   return howManyLead(name, englishPlural, 2);
 }
 
@@ -716,11 +885,12 @@ export function nounIsFeminine(name: string): boolean {
 
 /** "bananas" / "cuántos plátanos" or "quantas cenouras". */
 export function howManyPhrase(name: string, n: number, englishPlural: string): string {
-  if (locale !== "es" && locale !== "pt" && locale !== "fr") return englishPlural;
+  if (locale !== "es" && locale !== "pt" && locale !== "fr" && locale !== "zh") return englishPlural;
   return howManyLead(name, englishPlural, n);
 }
 
 export function longShort(long: boolean): string {
+  if (locale === "zh") return long ? "最长" : "最短";
   if (locale === "fr") return long ? "le plus long" : "le plus court";
   if (locale === "pt") return long ? "mais comprido" : "mais curto";
   if (locale !== "es") return long ? "longest" : "shortest";
@@ -729,6 +899,7 @@ export function longShort(long: boolean): string {
 
 /** Adjective agrees with the noun. English stays "longest" / "shortest". */
 export function longShortOf(name: string, long: boolean): string {
+  if (locale === "zh") return long ? "最长" : "最短";
   if (locale === "fr") {
     const word = thingName(name, 1, name);
     const fem = FEMININE_FR.has(word);
@@ -968,4 +1139,60 @@ export function frenchPersona(id: string, known: boolean): PersonaEs | null {
 
 export function frenchBoss(gameId: string): BossEs | null {
   return frenchPack?.BOSS_FR[gameId] ?? null;
+}
+
+const ZH_DIGIT = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"] as const;
+
+function chineseUnder100(n: number): string {
+  if (n < 10) return ZH_DIGIT[n] ?? String(n);
+  if (n === 10) return "十";
+  if (n < 20) return `十${ZH_DIGIT[n - 10] ?? ""}`;
+  const tens = ZH_DIGIT[Math.floor(n / 10)] ?? "";
+  const ones = n % 10;
+  return ones ? `${tens}十${ZH_DIGIT[ones]}` : `${tens}十`;
+}
+
+/** Mainland school reading. 2 is 二, 200 is 二百, 2000 is 两千, 101 is 一百零一. */
+export function chineseNumberWords(n: number): string {
+  if (!Number.isInteger(n) || n < 0) return String(n);
+  if (n < 100) return chineseUnder100(n);
+  if (n < 1000) {
+    const hundreds = Math.floor(n / 100);
+    const rest = n % 100;
+    const head = `${ZH_DIGIT[hundreds]}百`;
+    if (!rest) return head;
+    if (rest < 10) return `${head}零${ZH_DIGIT[rest]}`;
+    return `${head}${chineseUnder100(rest)}`;
+  }
+  if (n < 10000) {
+    const thousands = Math.floor(n / 1000);
+    const head = `${thousands === 2 ? "两" : ZH_DIGIT[thousands]}千`;
+    const rest = n % 1000;
+    if (!rest) return head;
+    if (rest < 100) return `${head}零${chineseNumberWords(rest)}`;
+    return `${head}${chineseNumberWords(rest)}`;
+  }
+  return String(n);
+}
+
+export function chineseFraction(num: number, den: number): string {
+  if (!Number.isInteger(num) || !Number.isInteger(den) || den <= 0) return `${num}/${den}`;
+  return `${chineseNumberWords(den)}分之${chineseNumberWords(num)}`;
+}
+
+export function chineseMinuteWords(minutes: number): string {
+  if (minutes === 0) return "点整";
+  if (minutes === 15) return "点一刻";
+  if (minutes === 30) return "点半";
+  if (minutes === 45) return "差一刻";
+  return `点${chineseNumberWords(minutes)}分`;
+}
+
+export function chinesePersona(id: string, known: boolean): PersonaEs | null {
+  if (!chinesePack) return null;
+  return known ? (chinesePack.PERSONA_ZH[id] ?? null) : chinesePack.PERSONA_FALLBACK_ZH;
+}
+
+export function chineseBoss(gameId: string): BossEs | null {
+  return chinesePack?.BOSS_ZH[gameId] ?? null;
 }

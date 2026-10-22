@@ -126,8 +126,8 @@ function makeSounds(rng: Rng): ChoiceQ {
   return sceneQuestion(rng, {
     game: "phonics",
     title: pickTalk(rng, [
-      [`Which picture starts with ${target.phoneme}?`, `¿Qué dibujo empieza con ${target.phoneme}?`, `Qual desenho começa com ${target.phoneme}?`, `Quelle image commence par ${target.phoneme} ?`],
-      [`${buddy} says ${target.phoneme}. Which picture starts that way?`, `${buddy} dice ${target.phoneme}. ¿Qué dibujo empieza así?`, `${buddy} diz ${target.phoneme}. Qual desenho começa assim?`, `${buddy} dit ${target.phoneme}. Quelle image commence comme ça ?`],
+      [`Which picture starts with ${target.phoneme}?`, `¿Qué dibujo empieza con ${target.phoneme}?`, `Qual desenho começa com ${target.phoneme}?`, `Quelle image commence par ${target.phoneme} ?`, `哪张图的开头音是${target.phoneme}？`],
+      [`${buddy} says ${target.phoneme}. Which picture starts that way?`, `${buddy} dice ${target.phoneme}. ¿Qué dibujo empieza así?`, `${buddy} diz ${target.phoneme}. Qual desenho começa assim?`, `${buddy} dit ${target.phoneme}. Quelle image commence comme ça ?`, `${buddy}读${target.phoneme}。哪张图是这个开头音？`],
     ]),
     hint: t("Tap the speaker if you want to hear it again", "Toca la bocina si quieres escucharlo otra vez"),
     answer: target.word,
@@ -137,7 +137,7 @@ function makeSounds(rng: Rng): ChoiceQ {
     solved: t(
       `${target.letter} says ${target.phoneme}, like ${target.word}`,
       `${target.letter} dice ${target.phoneme}, como ${target.word}`, `${target.letter} diz ${target.phoneme}, como ${target.word}`,
-    `${target.letter} dit ${target.phoneme}, comme ${target.word}`),
+    `${target.letter} dit ${target.phoneme}, comme ${target.word}`, `${target.letter}读作${target.phoneme}，就像${target.word}`),
     picture: target.letter,
     hands: true,
     quietChoices: false,
@@ -164,15 +164,15 @@ function makeBegin(rng: Rng): ChoiceQ {
   return sceneQuestion(rng, {
     game: "phonics",
     title: pickTalk(rng, [
-      [`Which picture starts with ${target.phoneme}?`, `¿Qué dibujo empieza con ${target.phoneme}?`, `Qual desenho começa com ${target.phoneme}?`, `Quelle image commence par ${target.phoneme} ?`],
-      [`${buddy} says ${target.phoneme}. Which picture is it?`, `${buddy} dice ${target.phoneme}. ¿Qué dibujo es?`, `${buddy} diz ${target.phoneme}. Qual desenho é?`, `${buddy} dit ${target.phoneme}. Quelle image est-ce ?`],
+      [`Which picture starts with ${target.phoneme}?`, `¿Qué dibujo empieza con ${target.phoneme}?`, `Qual desenho começa com ${target.phoneme}?`, `Quelle image commence par ${target.phoneme} ?`, `哪张图的开头音是${target.phoneme}？`],
+      [`${buddy} says ${target.phoneme}. Which picture is it?`, `${buddy} dice ${target.phoneme}. ¿Qué dibujo es?`, `${buddy} diz ${target.phoneme}. Qual desenho é?`, `${buddy} dit ${target.phoneme}. Quelle image est-ce ?`, `${buddy}读${target.phoneme}。是哪张图？`],
     ]),
     hint: t("Listen for the first sound", "Escucha el primer sonido"),
     answer: target.word,
     choices: uniqueChoices(rng, target.word, [], rows.map((row) => row.word)),
     skill: "phonics:begin",
     tags: ["begin"],
-    solved: t(`${target.word} starts with ${target.phoneme}`, `${target.word} empieza con ${target.phoneme}`, `${target.word} começa com ${target.phoneme}`, `${target.word} commence par ${target.phoneme}`),
+    solved: t(`${target.word} starts with ${target.phoneme}`, `${target.word} empieza con ${target.phoneme}`, `${target.word} começa com ${target.phoneme}`, `${target.word} commence par ${target.phoneme}`, `${target.word}的开头音是${target.phoneme}`),
     picture: target.emoji,
     hands: true,
     quietChoices: false,
@@ -193,13 +193,13 @@ function makeRhyme(rng: Rng): ChoiceQ {
   const board: PhonicsBoard = { game: "phonics", mode: "rhyme", cue, family: home.family };
   return sceneQuestion(rng, {
     game: "phonics",
-    title: t(`Which word rhymes with ${cue}?`, `¿Qué palabra rima con ${cue}?`, `Que palavra rima com ${cue}?`, `Quel mot rime avec ${cue} ?`),
+    title: t(`Which word rhymes with ${cue}?`, `¿Qué palabra rima con ${cue}?`, `Que palavra rima com ${cue}?`, `Quel mot rime avec ${cue} ?`, `哪个词和${cue}押韵？`),
     hint: t("The ending sounds the same", "El final suena igual"),
     answer,
     choices: uniqueChoices(rng, answer, [], [answer, ...distractors]),
     skill: "phonics:rhyme",
     tags: ["rhyme"],
-    solved: t(`${answer} rhymes with ${cue}`, `${answer} rima con ${cue}`, `${answer} rima com ${cue}`, `${answer} rime avec ${cue}`),
+    solved: t(`${answer} rhymes with ${cue}`, `${answer} rima con ${cue}`, `${answer} rima com ${cue}`, `${answer} rime avec ${cue}`, `${answer}和${cue}押韵`),
     picture: cue,
     hands: false,
     quietChoices: false,
@@ -228,14 +228,14 @@ function makeCvc(rng: Rng): ChoiceQ {
     game: "phonics",
     title: pickTalk(rng, [
       ["Which word do these sounds make?", "¿Qué palabra forman estos sonidos?"],
-      [`${buddy} says the sounds. Which word is it?`, `${buddy} dice los sonidos. ¿Qué palabra es?`, `${buddy} diz os sons. Qual palavra é?`, `${buddy} dit les sons. Quel mot est-ce ?`],
+      [`${buddy} says the sounds. Which word is it?`, `${buddy} dice los sonidos. ¿Qué palabra es?`, `${buddy} diz os sons. Qual palavra é?`, `${buddy} dit les sons. Quel mot est-ce ?`, `${buddy}在读这些音。是哪个词？`],
     ]),
     hint: t("Say each sound, then put them together", "Di cada sonido y luego júntalos"),
     answer: word,
     choices: uniqueChoices(rng, word, pool),
     skill: "phonics:cvc",
     tags: ["cvc"],
-    solved: t(`${blend} makes ${word}`, `${blend} forma ${word}`, `${blend} forma ${word}`, `${blend} forme ${word}`),
+    solved: t(`${blend} makes ${word}`, `${blend} forma ${word}`, `${blend} forma ${word}`, `${blend} forme ${word}`, `${blend}拼成${word}`),
     picture: letters,
     hands: false,
     quietChoices: true,
@@ -255,13 +255,13 @@ function makeEnd(rng: Rng): ChoiceQ {
   const board: PhonicsBoard = { game: "phonics", mode: "end", letter, phoneme, word };
   return sceneQuestion(rng, {
     game: "phonics",
-    title: t(`Which sound ends ${word}?`, `¿Con qué sonido termina ${word}?`, `Com que som termina ${word}?`, `Quel son termine ${word} ?`),
+    title: t(`Which sound ends ${word}?`, `¿Con qué sonido termina ${word}?`, `Com que som termina ${word}?`, `Quel son termine ${word} ?`, `${word}的结尾音是哪个？`),
     hint: t("Listen to the last sound", "Escucha el último sonido"),
     answer: letter,
     choices: uniqueChoices(rng, letter, [], [letter, ...others.slice(0, 3)]),
     skill: "phonics:end",
     tags: ["end"],
-    solved: t(`${word} ends with ${phoneme}`, `${word} termina con ${phoneme}`, `${word} termina com ${phoneme}`, `${word} termine par ${phoneme}`),
+    solved: t(`${word} ends with ${phoneme}`, `${word} termina con ${phoneme}`, `${word} termina com ${phoneme}`, `${word} termine par ${phoneme}`, `${word}的结尾音是${phoneme}`),
     picture: word,
     hands: false,
     quietChoices: false,
@@ -309,7 +309,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         prompt: t(
           `Which word starts with the ${target.phoneme} sound: ${words}?`,
           `¿Qué palabra empieza con el sonido ${target.phoneme}: ${words}?`, `Que palavra começa com o som ${target.phoneme}: ${words}?`,
-        `Quel mot commence par le son ${target.phoneme} : ${words} ?`),
+        `Quel mot commence par le son ${target.phoneme} : ${words} ?`, `哪个词的开头音是${target.phoneme}：${words}？`),
         answer: target.word,
       };
     }
@@ -324,17 +324,17 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         prompt: t(
           `Which word rhymes with ${cue}: ${[answer, ...others].join(", ")}?`,
           `¿Qué palabra rima con ${cue}: ${[answer, ...others].join(", ")}?`, `Que palavra rima com ${cue}: ${[answer, ...others].join(", ")}?`,
-        `Quel mot rime avec ${cue} : ${[answer, ...others].join(", ")} ?`),
+        `Quel mot rime avec ${cue} : ${[answer, ...others].join(", ")} ?`, `哪个词和${cue}押韵：${[answer, ...others].join(", ")}？`),
         answer,
       };
     }
     case "cvc": {
       const word = rng.pick(CVC_WORDS);
-      return { prompt: t(`Blend ${word.split("").join("-")}.`, `Une los sonidos de ${word.split("").join("-")}.`, `Junte os sons de ${word.split("").join("-")}.`, `Assemble les sons de ${word.split("").join("-")}.`), answer: word };
+      return { prompt: t(`Blend ${word.split("").join("-")}.`, `Une los sonidos de ${word.split("").join("-")}.`, `Junte os sons de ${word.split("").join("-")}.`, `Assemble les sons de ${word.split("").join("-")}.`, `把${word.split("").join("-")}连起来读。`), answer: word };
     }
     case "end": {
       const word = rng.pick(CVC_WORDS);
-      return { prompt: t(`What letter sound ends ${word}?`, `¿Qué sonido de letra termina ${word}?`, `Que som de letra termina ${word}?`, `Quel son de lettre termine ${word} ?`), answer: word[2] ?? "" };
+      return { prompt: t(`What letter sound ends ${word}?`, `¿Qué sonido de letra termina ${word}?`, `Que som de letra termina ${word}?`, `Quel son de lettre termine ${word} ?`, `${word}的结尾是哪个字母的音？`), answer: word[2] ?? "" };
     }
     default: {
       const neverLevel: never = safe;

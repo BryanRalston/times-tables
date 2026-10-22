@@ -1,4 +1,14 @@
-import { frenchMinuteWords, frenchNumberWords, getLocale, portugueseMinuteWords, portugueseNumberWords, spanishMinuteWords, spanishNumberWords } from "../i18n";
+import {
+  chineseMinuteWords,
+  chineseNumberWords,
+  frenchMinuteWords,
+  frenchNumberWords,
+  getLocale,
+  portugueseMinuteWords,
+  portugueseNumberWords,
+  spanishMinuteWords,
+  spanishNumberWords,
+} from "../i18n";
 
 /** How a clip key is read aloud. Runtime never calls this; the generator does. */
 
@@ -334,8 +344,27 @@ function pronounceKeyFr(key: string): string {
   return words.map((word) => pronounceFrenchWord(word, alone)).join(" ");
 }
 
+function pronounceKeyZh(key: string): string {
+  if (key === "more than") return "多于";
+  if (key === "more") return "多";
+  if (key === "than") return "比";
+  if (key.startsWith("min:")) {
+    const minutes = Number(key.slice(4));
+    return Number.isInteger(minutes) ? chineseMinuteWords(minutes) : key;
+  }
+  if (/^\d+$/.test(key)) return chineseNumberWords(Number(key));
+  return key;
+}
+
 export function spokenText(key: string): string {
   const locale = getLocale();
+  if (locale === "zh") {
+    const zh = pronounceKeyZh(key).trim();
+    if (!zh || /[。！？.!?]$/.test(zh)) return zh;
+    if (/[几什么哪多少]/.test(zh) && zh.length >= 4) return `${zh}？`;
+    if (zh.length >= 8) return `${zh}。`;
+    return zh;
+  }
   const say = (locale === "es" ? pronounceKeyEs(key) : locale === "pt" ? pronounceKeyPt(key) : locale === "fr" ? pronounceKeyFr(key) : pronounceKey(key)).trim();
   if (!say || /[.!?]$/.test(say)) return say;
   const words = say.split(/\s+/);
