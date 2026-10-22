@@ -1,5 +1,5 @@
 import { gameCard as gameById } from "./games/catalog";
-import { getLocale, portugueseBoss, show, t } from "./i18n";
+import { frenchBoss, getLocale, portugueseBoss, show, t } from "./i18n";
 import { BOSS_ES } from "./i18n-es";
 
 export type BossLook = "crown" | "cape" | "armor" | "clock" | "coins" | "spell";
@@ -235,7 +235,7 @@ function slug(id: string): string {
 function withLocale(boss: IslandBoss): IslandBoss {
   const locale = getLocale();
   if (locale === "en") return boss;
-  const translated = locale === "es" ? BOSS_ES[boss.gameId] : portugueseBoss(boss.gameId);
+  const translated = locale === "es" ? BOSS_ES[boss.gameId] : locale === "fr" ? frenchBoss(boss.gameId) : portugueseBoss(boss.gameId);
   if (!translated) return boss;
   return { ...boss, ...translated };
 }
@@ -255,19 +255,19 @@ export function bossForGame(gameId: string): IslandBoss {
       `${name} bounced in for a silly showdown. Ready?`,
       `${name} llegó rebotando para un duelo chistoso. ¿Listo?`,
       `${name} chegou pulando para uma disputa divertida. Preparado?`,
-    ),
-    friendly: t(`${name} wants to be friends!`, `¡${name} quiere ser tu amigo!`, `${name} quer ser seu amigo!`),
+    `${name} arrive en bondissant pour un défi rigolo. C'est parti ?`),
+    friendly: t(`${name} wants to be friends!`, `¡${name} quiere ser tu amigo!`, `${name} quer ser seu amigo!`, `${name} veut être ton copain !`),
     personality: t(
       `The big boss of ${title}, in a homemade crown.`,
       `El gran jefe de ${shown}, con una corona hecha en casa.`,
       `O grande chefe de ${shown}, com uma coroa feita em casa.`,
-    ),
+    `Le grand chef de ${shown}, avec une couronne faite maison.`),
     face: game?.mascot ?? "peach",
     look,
     cosmeticId: `boss-look-${slug(gameId)}`,
     cosmeticName: t("Boss crown", "Corona de jefe", "Coroa de chefe"),
     trophyId: `trophy-${slug(gameId)}`,
-    trophyName: t(`${title} trophy`, `Trofeo de ${shown}`, `Troféu de ${shown}`),
+    trophyName: t(`${title} trophy`, `Trofeo de ${shown}`, `Troféu de ${shown}`, `Trophée de ${shown}`),
   };
 }
 

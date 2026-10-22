@@ -219,6 +219,19 @@ const ptDir = resolve(root, "voice/pt");
 if (!existsSync(ptDir)) fail("voice/pt missing from domain build");
 const ptOnDisk = readdirSync(ptDir).filter((name) => name.endsWith(".mp3"));
 if (ptUrls.length >= ptOnDisk.length) fail("Portuguese precache includes every clip");
+const frPrecache = JSON.parse(readFileSync(resolve("src/academy/voice/fr-precache.json"), "utf8"));
+if (!Array.isArray(frPrecache) || frPrecache.length < 100) fail("French precache list is empty");
+const frUrls = manifestList.filter((url) => typeof url === "string" && url.startsWith("/voice/fr/"));
+if (frUrls.length !== frPrecache.length) fail(`French precache has ${frUrls.length} urls, list has ${frPrecache.length}`);
+for (const rel of frPrecache) {
+  if (typeof rel !== "string" || !rel.startsWith("fr/") || !manifestList.includes(`/voice/${rel}`)) {
+    fail(`precache missing French clip ${rel}`);
+  }
+}
+const frDir = resolve(root, "voice/fr");
+if (!existsSync(frDir)) fail("voice/fr missing from domain build");
+const frOnDisk = readdirSync(frDir).filter((name) => name.endsWith(".mp3"));
+if (frUrls.length >= frOnDisk.length) fail("French precache includes every clip");
 const esDir = resolve(root, "voice/es");
 if (!existsSync(esDir)) fail("voice/es missing from domain build");
 const esOnDisk = readdirSync(esDir).filter((name) => name.endsWith(".mp3"));

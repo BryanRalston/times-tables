@@ -85,23 +85,23 @@ function explicitLines(): SpokenLine[] {
     push(lines, word.word, "sight");
     push(lines, word.sentence, "sight");
     push(lines, blankOut(word.sentence, word.word).replaceAll("___", "blank"), "sight");
-    push(lines, t(`Listen. ${word.word}.`, `Escucha. ${word.word}.`, `Ouça. ${word.word}.`), "sight");
-    push(lines, t(`Yes! ${word.word}`, `¡Sí! ${word.word}`, `Sim! ${word.word}`), "sight");
-    push(lines, t(`Almost! The word is ${word.word}.`, `¡Casi! La palabra es ${word.word}.`, `Quase! A palavra é ${word.word}.`), "sight");
+    push(lines, t(`Listen. ${word.word}.`, `Escucha. ${word.word}.`, `Ouça. ${word.word}.`, `Écoute. ${word.word}.`), "sight");
+    push(lines, t(`Yes! ${word.word}`, `¡Sí! ${word.word}`, `Sim! ${word.word}`, `Oui ! ${word.word}`), "sight");
+    push(lines, t(`Almost! The word is ${word.word}.`, `¡Casi! La palabra es ${word.word}.`, `Quase! A palavra é ${word.word}.`, `Presque ! Le mot est ${word.word}.`), "sight");
   }
   for (const word of ALL_SPELL) {
     push(lines, word.word, "spelling");
     push(lines, word.sentence, "spelling");
     push(lines, `${word.word}. ${word.sentence}`, "spelling");
-    push(lines, t(`Yes! ${word.word}`, `¡Sí! ${word.word}`, `Sim! ${word.word}`), "spelling");
-    push(lines, t(`Almost! ${word.word}. ${word.sentence}`, `¡Casi! ${word.word}. ${word.sentence}`, `Quase! ${word.word}. ${word.sentence}`), "spelling");
+    push(lines, t(`Yes! ${word.word}`, `¡Sí! ${word.word}`, `Sim! ${word.word}`, `Oui ! ${word.word}`), "spelling");
+    push(lines, t(`Almost! ${word.word}. ${word.sentence}`, `¡Casi! ${word.word}. ${word.sentence}`, `Quase! ${word.word}. ${word.sentence}`, `Presque ! ${word.word}. ${word.sentence}`), "spelling");
   }
   for (const row of SOUND_BANK) {
     push(lines, row.phoneme, "phonics");
     push(lines, row.word, "phonics");
     push(lines, `${row.letter} ${row.phoneme}`, "phonics");
     push(lines, `${row.letter.toLowerCase()} ${row.phoneme}`, "phonics");
-    push(lines, t(`${row.letter} says ${row.phoneme}, like ${row.word}`, `${row.letter} dice ${row.phoneme}, como ${row.word}`, `${row.letter} diz ${row.phoneme}, como ${row.word}`), "phonics");
+    push(lines, t(`${row.letter} says ${row.phoneme}, like ${row.word}`, `${row.letter} dice ${row.phoneme}, como ${row.word}`, `${row.letter} diz ${row.phoneme}, como ${row.word}`, `${row.letter} dit ${row.phoneme}, comme ${row.word}`), "phonics");
   }
   for (const row of traceLines()) push(lines, t(row.en, row.es), row.game);
   for (const family of RHYME_FAMILIES) {

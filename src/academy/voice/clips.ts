@@ -8,6 +8,8 @@ let spanishFiles: VoiceMap | null = null;
 let spanishLoad: Promise<VoiceMap> | null = null;
 let portugueseFiles: VoiceMap | null = null;
 let portugueseLoad: Promise<VoiceMap> | null = null;
+let frenchFiles: VoiceMap | null = null;
+let frenchLoad: Promise<VoiceMap> | null = null;
 
 /** The English clip map is a large file. It loads on first speech, not with the home screen. */
 export function loadEnglishVoice(): Promise<VoiceMap> {
@@ -57,10 +59,27 @@ export function portugueseVoiceReady(): boolean {
   return portugueseFiles != null;
 }
 
+/** French clips stay out of the English download. The map loads on first French speech. */
+export function loadFrenchVoice(): Promise<VoiceMap> {
+  if (frenchFiles) return Promise.resolve(frenchFiles);
+  if (!frenchLoad) {
+    frenchLoad = import("./manifest-fr").then((mod) => {
+      frenchFiles = mod.VOICE_FILES_FR;
+      return frenchFiles;
+    });
+  }
+  return frenchLoad;
+}
+
+export function frenchVoiceReady(): boolean {
+  return frenchFiles != null;
+}
+
 function voiceMap(): VoiceMap | null {
   const locale = getLocale();
   if (locale === "es") return spanishFiles;
   if (locale === "pt") return portugueseFiles;
+  if (locale === "fr") return frenchFiles;
   return englishFiles;
 }
 
@@ -68,6 +87,7 @@ function loadVoiceMap(): Promise<VoiceMap> {
   const locale = getLocale();
   if (locale === "es") return loadSpanishVoice();
   if (locale === "pt") return loadPortugueseVoice();
+  if (locale === "fr") return loadFrenchVoice();
   return loadEnglishVoice();
 }
 

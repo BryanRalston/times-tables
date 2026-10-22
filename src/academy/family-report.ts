@@ -41,7 +41,7 @@ export interface GameAccuracy {
 export function attemptLabel(n: number): string {
   const count = Math.max(0, Math.floor(n));
   if (count === 1) return t("1 try", "1 intento");
-  return t(`${count} tries`, `${count} intentos`, `${count} tentativas`);
+  return t(`${count} tries`, `${count} intentos`, `${count} tentativas`, `${count} essais`);
 }
 
 export function parentSkillLabel(key: string): string {
@@ -232,12 +232,12 @@ function totalsFor(id: GameId, skills: Record<string, SkillStat>): { ok: number;
 function tipFrom(who: string, names: string[], match: NonNullable<ReturnType<typeof sheetForSkill>>, factor: number | null): PracticeTip {
   const sheet = sheetTitle(match);
   const subject =
-    names.length >= 2 ? t(`${names[0]} and ${names[1]}`, `${names[0]} y ${names[1]}`, `${names[0]} e ${names[1]}`) : (names[0] ?? sheet);
+    names.length >= 2 ? t(`${names[0]} and ${names[1]}`, `${names[0]} y ${names[1]}`, `${names[0]} e ${names[1]}`, `${names[0]} et ${names[1]}`) : (names[0] ?? sheet);
   return {
     text: t(
       `${who} is still learning ${subject}. The free "${sheet}" worksheet is a calm one for tonight.`,
       `${who} todavía está aprendiendo ${subject}. La hoja gratis «${sheet}» es una forma tranquila para esta noche.`, `${who} ainda está aprendendo ${subject}. A folha grátis «${sheet}» é um jeito tranquilo para hoje à noite.`,
-    ),
+    `${who} apprend encore ${subject}. La fiche gratuite « ${sheet} » est tranquille pour ce soir.`),
     factor,
     gameId: match.gameId,
     sheetSlug: match.slug,
@@ -265,7 +265,7 @@ function reviewTip(who: string, skills: Record<string, SkillStat>): PracticeTip 
     text: t(
       `${who} is doing well. The free "${sheet}" worksheet is a calm one if you want a page tonight.`,
       `${who} va bien. La hoja gratis «${sheet}» es una forma tranquila si quieren una página esta noche.`, `${who} vai bem. A folha grátis «${sheet}» é um jeito tranquilo se quiserem uma página hoje à noite.`,
-    ),
+    `${who} va bien. La fiche gratuite « ${sheet} » est tranquille si tu veux une page ce soir.`),
     factor: key ? timesFactorOf(key) : null,
     gameId: match.gameId,
     sheetSlug: match.slug,
@@ -280,7 +280,7 @@ function emptyTip(who: string): PracticeTip {
     text: t(
       `${who} can print a free worksheet and play it together tonight.`,
       `${who} puede imprimir una hoja gratis y jugarla juntos esta noche.`, `${who} pode imprimir uma folha grátis e jogar juntos hoje à noite.`,
-    ),
+    `${who} peut imprimer une fiche gratuite et y jouer ensemble ce soir.`),
     factor: null,
     gameId: null,
     sheetSlug: null,
@@ -327,19 +327,25 @@ export function storyBrief(skills: Record<string, SkillStat>): StoryBrief {
     finishes += n;
     titles.push(story.title);
   }
-  if (getLocale() === "es" || getLocale() === "pt") {
+  if (getLocale() === "es" || getLocale() === "pt" || getLocale() === "fr") {
     const line =
-      getLocale() === "pt"
+      getLocale() === "fr"
         ? finishes === 0
-          ? "As histórias estão em inglês por enquanto."
+          ? "Les histoires sont en anglais pour l'instant."
           : finishes === 1
-            ? "1 história lida em inglês."
-            : `${finishes} histórias lidas em inglês.`
-        : finishes === 0
-          ? "Los cuentos están en inglés por ahora."
-          : finishes === 1
-            ? "1 cuento leído en inglés."
-            : `${finishes} cuentos leídos en inglés.`;
+            ? "1 histoire lue en anglais."
+            : `${finishes} histoires lues en anglais.`
+        : getLocale() === "pt"
+          ? finishes === 0
+            ? "As histórias estão em inglês por enquanto."
+            : finishes === 1
+              ? "1 história lida em inglês."
+              : `${finishes} histórias lidas em inglês.`
+          : finishes === 0
+            ? "Los cuentos están en inglés por ahora."
+            : finishes === 1
+              ? "1 cuento leído en inglés."
+              : `${finishes} cuentos leídos en inglés.`;
     return { finishes, titles: [], line };
   }
   const line =

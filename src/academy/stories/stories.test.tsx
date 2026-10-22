@@ -187,4 +187,23 @@ describe("story rewards", () => {
       expect(shelf).not.toContain(story.pages[0]?.text ?? "");
     }
   });
+
+  it("hides story text when the language is French", () => {
+    const skills = { "story:pk-peach-cat": { ok: 1, miss: 0 } };
+    setLocale("fr");
+    const report = storyBrief(skills);
+    expect(report.titles).toEqual([]);
+    expect(report.line).toContain("anglais");
+    const child = blankChild({ id: "ada", name: "Ada", grade: "2" as Grade });
+    const home = renderToStaticMarkup(
+      <HomeScreen child={child} sound={false} onClaim={() => {}} onPlay={() => {}} />,
+    );
+    const shelf = renderToStaticMarkup(<StoriesShelf grade="2" skills={{}} />);
+    expect(home).not.toContain('href="#/stories"');
+    expect(shelf).toContain("anglais");
+    for (const story of STORIES) {
+      expect(shelf).not.toContain(story.title);
+      expect(shelf).not.toContain(story.pages[0]?.text ?? "");
+    }
+  });
 });

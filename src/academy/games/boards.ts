@@ -203,16 +203,16 @@ export function blockPhrase(n: number): string {
   const tens = Math.floor((n % 100) / 10);
   const ones = n % 10;
   const locale = getLocale();
-  if (locale === "es" || locale === "pt") {
+  if (locale === "es" || locale === "pt" || locale === "fr") {
     const parts: string[] = [];
-    const hundred = locale === "pt" ? (["centena", "centenas"] as const) : (["centena", "centenas"] as const);
-    const ten = locale === "pt" ? (["dezena", "dezenas"] as const) : (["decena", "decenas"] as const);
-    const one = locale === "pt" ? (["unidade", "unidades"] as const) : (["unidad", "unidades"] as const);
+    const hundred = locale === "fr" ? (["centaine", "centaines"] as const) : (["centena", "centenas"] as const);
+    const ten = locale === "fr" ? (["dizaine", "dizaines"] as const) : locale === "pt" ? (["dezena", "dezenas"] as const) : (["decena", "decenas"] as const);
+    const one = locale === "fr" ? (["unité", "unités"] as const) : locale === "pt" ? (["unidade", "unidades"] as const) : (["unidad", "unidades"] as const);
     if (hundreds > 0) parts.push(bitEs(hundreds, hundred[0], hundred[1]));
     if (tens > 0) parts.push(bitEs(tens, ten[0], ten[1]));
     if (ones > 0 || parts.length === 0) parts.push(bitEs(ones, one[0], one[1]));
     if (parts.length === 1) return parts[0]!;
-    const join = locale === "pt" ? "e" : "y";
+    const join = locale === "es" ? "y" : locale === "fr" ? "et" : "e";
     return `${parts.slice(0, -1).join(", ")} ${join} ${parts[parts.length - 1]}`;
   }
   const parts: string[] = [];

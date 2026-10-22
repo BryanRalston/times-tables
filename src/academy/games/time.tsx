@@ -28,7 +28,21 @@ function capPhrase(phrase: string): string {
   return phrase.charAt(0).toUpperCase() + phrase.slice(1);
 }
 
+function frenchHour(hours: number): string {
+  return hours === 1 ? "1 heure" : `${hours} heures`;
+}
+
 export function timeTalk(hours: number, minutes: number): string {
+  if (getLocale() === "fr") {
+    if (minutes === 0) return `${frenchHour(hours)} pile`;
+    if (minutes === 30) return `${frenchHour(hours)} et demie`;
+    if (minutes === 15) return `${frenchHour(hours)} et quart`;
+    if (minutes === 45) {
+      const next = hours === 12 ? 1 : hours + 1;
+      return `${frenchHour(next)} moins le quart`;
+    }
+    return formatClockTime(hours, minutes);
+  }
   if (getLocale() === "pt") {
     if (minutes === 0) return `${hours} em ponto`;
     if (minutes === 30) return `${hours} e meia`;
@@ -62,14 +76,15 @@ export function timeTalk(hours: number, minutes: number): string {
 export function timeHint(_hours: number, minutes: number): string {
   const pointed = Math.round(minutes / 5) % 12;
   const number = pointed === 0 ? 12 : pointed;
-  if (minutes === 30) return t("The long hand points to 6 = half past", "La manecilla larga apunta al 6. Eso es y media.", "O ponteiro grande aponta para o 6. Isso é e meia.");
-  if (minutes === 0) return t("The long hand points to 12 = o'clock", "La manecilla larga apunta al 12. Eso es en punto.", "O ponteiro grande aponta para o 12. Isso é em ponto.");
-  if (minutes === 15) return t("The long hand points to 3 = quarter past", "La manecilla larga apunta al 3. Eso es y cuarto.", "O ponteiro grande aponta para o 3. Isso é e um quarto.");
-  if (minutes === 45) return t("The long hand points to 9 = quarter to", "La manecilla larga apunta al 9. Eso es cuarto para.", "O ponteiro grande aponta para o 9. Isso é quinze para.");
+  if (minutes === 30) return t("The long hand points to 6 = half past", "La manecilla larga apunta al 6. Eso es y media.", "O ponteiro grande aponta para o 6. Isso é e meia.", "La grande aiguille pointe vers le 6. C'est et demie.");
+  if (minutes === 0) return t("The long hand points to 12 = o'clock", "La manecilla larga apunta al 12. Eso es en punto.", "O ponteiro grande aponta para o 12. Isso é em ponto.", "La grande aiguille pointe vers le 12. C'est pile.");
+  if (minutes === 15) return t("The long hand points to 3 = quarter past", "La manecilla larga apunta al 3. Eso es y cuarto.", "O ponteiro grande aponta para o 3. Isso é e um quarto.", "La grande aiguille pointe vers le 3. C'est et quart.");
+  if (minutes === 45) return t("The long hand points to 9 = quarter to", "La manecilla larga apunta al 9. Eso es cuarto para.", "O ponteiro grande aponta para o 9. Isso é quinze para.", "La grande aiguille pointe vers le 9. C'est moins le quart.");
   return t(
     `The long hand points to ${number}. Count by fives.`,
     `La manecilla larga apunta al ${number}. Cuenta de 5 en 5.`,
     `O ponteiro grande aponta para o ${number}. Conte de 5 em 5.`,
+    `La grande aiguille pointe vers le ${number}. Compte de 5 en 5.`,
   );
 }
 
@@ -142,12 +157,12 @@ export function makeTimeQuestion(rng: Rng, level: TimeLevel, prefer: readonly st
       const buddy = buddyName(rng);
       return pickTalk(rng, [
         ["What time is it?", "¿Qué hora es?"],
-        [`${buddy} checks the clock. What time is it?`, `${buddy} mira el reloj. ¿Qué hora es?`, `${buddy} olha o relógio. Que horas são?`],
+        [`${buddy} checks the clock. What time is it?`, `${buddy} mira el reloj. ¿Qué hora es?`, `${buddy} olha o relógio. Que horas são?`, `${buddy} regarde l'horloge. Quelle heure est-il ?`],
       ]);
     })(),
     hint: timeHint(hours, minutes),
-    praise: t(`Yes! ${capPhrase(phrase)}`, `¡Sí! ${capPhrase(phrase)}`, `Sim! ${capPhrase(phrase)}`),
-    almost: t(`Almost! It is ${phrase}.`, `¡Casi! Son las ${phrase}.`, `Quase! São ${phrase}.`),
+    praise: t(`Yes! ${capPhrase(phrase)}`, `¡Sí! ${capPhrase(phrase)}`, `Sim! ${capPhrase(phrase)}`, `Oui ! ${capPhrase(phrase)}`),
+    almost: t(`Almost! It is ${phrase}.`, `¡Casi! Son las ${phrase}.`, `Quase! São ${phrase}.`, `Presque ! Il est ${phrase}.`),
     answer,
     choices: fourTimeChoices(rng, hours, minutes),
     skill: `time:${level}`,

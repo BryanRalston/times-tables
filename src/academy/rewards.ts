@@ -385,26 +385,26 @@ function lessonCopy(who: string, label: string, key: string, stat: SkillStat): {
   const skill = show(label);
   if (n < 3) {
     return {
-      learning: t(`${who} just started ${skill}.`, `${who} acaba de empezar ${skill}.`, `${who} acabou de começar ${skill}.`),
-      next: t(`Play ${skill} a couple more times this week.`, `Jueguen ${skill} un par de veces más esta semana.`, `Joguem ${skill} mais umas vezes nesta semana.`),
+      learning: t(`${who} just started ${skill}.`, `${who} acaba de empezar ${skill}.`, `${who} acabou de começar ${skill}.`, `${who} vient de commencer ${skill}.`),
+      next: t(`Play ${skill} a couple more times this week.`, `Jueguen ${skill} un par de veces más esta semana.`, `Joguem ${skill} mais umas vezes nesta semana.`, `Rejoue ${skill} encore quelques fois cette semaine.`),
     };
   }
   if (heat === "mastered") {
     const next = PRACTICE_NEXT[key];
     return {
-      learning: t(`${who} can do ${skill}.`, `${who} ya puede con ${skill}.`, `${who} já consegue ${skill}.`),
-      next: next ? show(next) : t(`Come back to ${skill} in a few days so it stays easy.`, `Vuelvan a ${skill} en unos días para que siga fácil.`, `Voltem para ${skill} daqui a alguns dias para continuar fácil.`),
+      learning: t(`${who} can do ${skill}.`, `${who} ya puede con ${skill}.`, `${who} já consegue ${skill}.`, `${who} sait déjà faire ${skill}.`),
+      next: next ? show(next) : t(`Come back to ${skill} in a few days so it stays easy.`, `Vuelvan a ${skill} en unos días para que siga fácil.`, `Voltem para ${skill} daqui a alguns dias para continuar fácil.`, `Reprends ${skill} dans quelques jours pour que ça reste facile.`),
     };
   }
   if (ratio < 0.6) {
     return {
-      learning: t(`${who} is learning ${skill}, and some answers still slip.`, `${who} está aprendiendo ${skill} y algunas respuestas se escapan.`, `${who} está aprendendo ${skill} e algumas respostas escapam.`),
+      learning: t(`${who} is learning ${skill}, and some answers still slip.`, `${who} está aprendiendo ${skill} y algunas respuestas se escapan.`, `${who} está aprendendo ${skill} e algumas respostas escapam.`, `${who} apprend ${skill}, et quelques réponses s'échappent encore.`),
       next: t("Use the pictures and count it out loud together.", "Usen los dibujos y cuéntenlo en voz alta juntos."),
     };
   }
   return {
-    learning: t(`${who} is learning ${skill} and getting most of them right.`, `${who} está aprendiendo ${skill} y le salen casi todas.`, `${who} está aprendendo ${skill} e acerta quase todas.`),
-    next: t(`One more short game of ${skill} should lock it in.`, `Un juego cortito más de ${skill} y queda listo.`, `Mais um joguinho de ${skill} e fica pronto.`),
+    learning: t(`${who} is learning ${skill} and getting most of them right.`, `${who} está aprendiendo ${skill} y le salen casi todas.`, `${who} está aprendendo ${skill} e acerta quase todas.`, `${who} apprend ${skill} et réussit presque tout.`),
+    next: t(`One more short game of ${skill} should lock it in.`, `Un juego cortito más de ${skill} y queda listo.`, `Mais um joguinho de ${skill} e fica pronto.`, `Encore un petit jeu de ${skill} et c'est bon.`),
   };
 }
 
@@ -443,8 +443,8 @@ export function parentBrief(child: Pick<Child, "name" | "skills" | "levels">): S
     lessons.push({
       key,
       label,
-      learning: t(`${who} has not played ${title} yet.`, `${who} todavía no juega ${title}.`, `${who} ainda não joga ${title}.`),
-      next: t(`Start with ${label}. It matches this grade.`, `Empiecen con ${label}. Va con este grado.`, `Comecem com ${label}. Combina com este ano.`),
+      learning: t(`${who} has not played ${title} yet.`, `${who} todavía no juega ${title}.`, `${who} ainda não joga ${title}.`, `${who} n'a pas encore joué à ${title}.`),
+      next: t(`Start with ${label}. It matches this grade.`, `Empiecen con ${label}. Va con este grado.`, `Comecem com ${label}. Combina com este ano.`, `Commence par ${label}. Ça va avec cette classe.`),
     });
   }
   return lessons;

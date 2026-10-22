@@ -43,13 +43,13 @@ function monthTitle(key: string): string {
   const year = Number(key.slice(0, 4));
   const month = Number(key.slice(5, 7)) - 1;
   const date = new Date(Date.UTC(year, month, 1));
-  const locale = getLocale() === "es" ? "es" : getLocale() === "pt" ? "pt-BR" : "en";
+  const locale = getLocale() === "es" ? "es" : getLocale() === "pt" ? "pt-BR" : getLocale() === "fr" ? "fr-FR" : "en";
   return new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(date);
 }
 
 function roundPhrase(rounds: number): string {
   if (rounds === 1) return t("1 round", "1 ronda", "1 rodada");
-  return t(`${rounds} rounds`, `${rounds} rondas`, `${rounds} rodadas`);
+  return t(`${rounds} rounds`, `${rounds} rondas`, `${rounds} rodadas`, `${rounds} manches`);
 }
 
 function practiceLine(attempts: number, rounds: number, seconds: number): string {
@@ -186,7 +186,7 @@ export function skillHistoryReport(
       ? t(
           `Older practice is included in ${folded}. New play is kept month by month.`,
           `La práctica anterior está en ${folded}. Lo nuevo se guarda mes a mes.`, `A prática anterior está em ${folded}. O novo fica salvo mês a mês.`,
-        )
+        `La pratique d'avant est dans ${folded}. Le nouveau jeu est gardé mois par mois.`)
       : "",
   };
 }
