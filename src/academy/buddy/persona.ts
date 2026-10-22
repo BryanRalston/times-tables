@@ -1,4 +1,4 @@
-import { getLocale } from "../i18n";
+import { getLocale, portuguesePersona } from "../i18n";
 import { PERSONA_ES, PERSONA_FALLBACK_ES } from "../i18n-es";
 
 export type BuddyMove = "hop" | "wiggle" | "spin" | "bounce" | "sway";
@@ -127,10 +127,19 @@ const FALLBACK: Persona = person(
 
 export function personaOf(id: string): Persona {
   const base = PEOPLE[id] ?? FALLBACK;
-  if (getLocale() !== "es") return base;
-  const es = PEOPLE[id] ? PERSONA_ES[id] : PERSONA_FALLBACK_ES;
-  if (!es) return base;
-  return { ...base, line: es.line, fact: es.fact, trait: es.trait, streak: es.streak, count: es.count, work: es.work };
+  const locale = getLocale();
+  if (locale === "en") return base;
+  const translated = locale === "es" ? (PEOPLE[id] ? PERSONA_ES[id] : PERSONA_FALLBACK_ES) : portuguesePersona(id, Boolean(PEOPLE[id]));
+  if (!translated) return base;
+  return {
+    ...base,
+    line: translated.line,
+    fact: translated.fact,
+    trait: translated.trait,
+    streak: translated.streak,
+    count: translated.count,
+    work: translated.work,
+  };
 }
 
 export function studyGame(id: string): string | null {

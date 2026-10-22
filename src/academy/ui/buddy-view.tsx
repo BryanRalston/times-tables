@@ -53,7 +53,7 @@ export function CoinShare({ buddyId, hostId }: { buddyId: string; hostId: string
   const buddy = squisheeById(buddyId)?.name ?? show("Buddy");
   const host = squisheeById(hostId)?.name ?? show("Friend");
   return (
-    <div className="ac-share" aria-label={t(`${buddy} and ${host} share the coins`, `${buddy} y ${host} comparten las monedas`)}>
+    <div className="ac-share" aria-label={t(`${buddy} and ${host} share the coins`, `${buddy} y ${host} comparten las monedas`, `${buddy} e ${host} compartilham as moedas`)}>
       <AcademyPal id={buddyId} className="ac-share-pal" label="" />
       <AcademyPal id={hostId} className="ac-share-pal" label="" />
     </div>

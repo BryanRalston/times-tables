@@ -133,7 +133,7 @@ export function makeClockTask(level: string, rng: Rng, avoid?: string, prefer: r
     hours,
     minutes,
     snap,
-    speech: t(`Show ${phrase}. Drag the hands.`, `Muestra ${phrase}. Arrastra las manecillas.`),
+    speech: t(`Show ${phrase}. Drag the hands.`, `Muestra ${phrase}. Arrastra las manecillas.`, `Mostre ${phrase}. Arraste os ponteiros.`),
     skill: `time:${safe}`,
     factKey: fact,
   };
@@ -189,7 +189,7 @@ export function makePayTask(level: string, rng: Rng, avoid?: string): PayTask {
     bank: pick.bank,
     speech: t(
       `Pay ${speakable(formatCents(pick.cents))}. Drag the coins.`,
-      `Paga ${speakable(formatCents(pick.cents))}. Arrastra las monedas.`,
+      `Paga ${speakable(formatCents(pick.cents))}. Arrastra las monedas.`, `Pague ${speakable(formatCents(pick.cents))}. Arraste as moedas.`,
     ),
     skill: `money:${level in PAY_PLANS ? level : "count"}`,
     factKey: String(pick.cents),
@@ -207,7 +207,7 @@ export function clockQuestion(task: ClockTask): ChoiceQ {
   return {
     id: `clock-${task.factKey}`,
     game: "time",
-    title: t(`Show ${timeTalk(task.hours, task.minutes)}`, `Muestra ${timeTalk(task.hours, task.minutes)}`),
+    title: t(`Show ${timeTalk(task.hours, task.minutes)}`, `Muestra ${timeTalk(task.hours, task.minutes)}`, `Mostre ${timeTalk(task.hours, task.minutes)}`),
     hint: t("Drag the hands", "Arrastra las manecillas"),
     praise: timeTalk(task.hours, task.minutes),
     almost: timeTalk(task.hours, task.minutes),

@@ -28,6 +28,19 @@ describe("measurement questions", () => {
     expect([...seen].sort()).toEqual(["carrot", "snake"]);
   });
 
+  it("asks quantas for carrots and snakes", () => {
+    setLocale("pt");
+    const seen = new Set<string>();
+    for (let seed = 0; seed < 160; seed += 1) {
+      const title = makeMeasureQuestion(rngFromSeed(`more-gender-pt-${seed}`), "more").title.toLowerCase();
+      expect(title).not.toContain("quantos cenoura");
+      expect(title).not.toContain("quantos cobra");
+      if (title.includes("quantas cenoura")) seen.add("carrot");
+      if (title.includes("quantas cobra")) seen.add("snake");
+    }
+    expect([...seen].sort()).toEqual(["carrot", "snake"]);
+  });
+
   it("compares lengths, reads a 12-inch ruler, and reads graphs", () => {
     for (let seed = 0; seed < 24; seed += 1) {
       for (const level of MEASURE_LEVELS) {

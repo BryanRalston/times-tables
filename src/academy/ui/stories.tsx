@@ -26,6 +26,7 @@ function StoriesHidden() {
         {t(
           "Stories are in English.",
           "Los cuentos están en inglés por ahora. Cambia a English en Ajustes para leerlos.",
+          "As histórias estão em inglês por enquanto. Mude para English em Ajustes para ler.",
         )}
       </p>
     </div>

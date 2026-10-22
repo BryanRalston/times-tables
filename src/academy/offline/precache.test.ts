@@ -5,7 +5,8 @@ import { rngFromSeed } from "@/lib/rng";
 import { GAMES } from "../games/registry";
 import type { ChoiceQ } from "../games/types";
 import { makeClockTask } from "../hands";
-import { setLocale, yourTurnLine } from "../i18n";
+import { installPortuguese, setLocale, yourTurnLine } from "../i18n";
+import { BOSS_PT, PERSONA_FALLBACK_PT, PERSONA_PT, PT, TRAIT_PT } from "../i18n-pt";
 import { SQUAD_IDS } from "../model";
 import { exampleFor } from "../round-flow";
 import { artPaths, buildPrecacheList, domainServiceWorker, isPrecacheFile, pokeMediaFiles, referencedPokeNames, referencedUrls, SHARE_IMAGE_PATH, subpathServiceWorker, WARDROBE_FILES } from "../../../scripts/academy-precache.mjs";
@@ -14,8 +15,12 @@ import { WARDROBE } from "../wardrobe";
 import { SHARE_IMAGE_PATH as htmlShareImage } from "../seo/html";
 import { collectSpokenLines } from "../voice/catalog";
 import { VOICE_FILES_ES } from "../voice/manifest-es";
+import { VOICE_FILES_PT } from "../voice/manifest-pt";
 import { planSpeech } from "../voice/plan";
 import { spanishPrecacheVoiceFiles } from "../voice/precache-es";
+import { portuguesePrecacheVoiceFiles } from "../voice/precache-pt";
+
+installPortuguese({ PT, PERSONA_PT, PERSONA_FALLBACK_PT, BOSS_PT, TRAIT_PT });
 
 describe("offline precache", () => {
   it("lists app files, squad art, outfits, and sounds", () => {
@@ -35,6 +40,10 @@ describe("offline precache", () => {
     expect(isPrecacheFile(`voice/${VOICE_FILES_ES["7"]}`)).toBe(true);
     expect(isPrecacheFile(`voice/${VOICE_FILES_ES["toca la respuesta"]}`)).toBe(true);
     expect(isPrecacheFile(`voice/${VOICE_FILES_ES.elephant}`)).toBe(false);
+    expect(isPrecacheFile(`voice/${VOICE_FILES_PT["7"]}`)).toBe(true);
+    expect(isPrecacheFile(`voice/${VOICE_FILES_PT["toque a resposta"]}`)).toBe(true);
+    expect(isPrecacheFile(`voice/${VOICE_FILES_PT.elephant}`)).toBe(false);
+    expect(isPrecacheFile("voice/pt/not-listed.mp3")).toBe(false);
     expect(isPrecacheFile("squishees/frog.png")).toBe(false);
     expect(isPrecacheFile("precache-manifest.json")).toBe(false);
 
@@ -100,7 +109,7 @@ describe("offline precache", () => {
     expect(domainSw).toContain(`const SHARE_IMAGE = ${JSON.stringify(SHARE_IMAGE_PATH)}`);
     expect(domainSw).toContain("if (url.pathname === SHARE_IMAGE) return;");
     expect(domainSw).toContain('caches.match("/index.html")');
-    expect(domainSw).toContain('const CACHE = "squishee-academy-root-v10"');
+    expect(domainSw).toContain('const CACHE = "squishee-academy-root-v11"');
   });
 
   it("precaches Spanish clips for an Add, Times, and Telling Time round", () => {
@@ -179,6 +188,90 @@ describe("offline precache", () => {
       expect(domain).toContain(`/voice/${VOICE_FILES_ES["7"]}`);
       expect(domain).toContain(`/voice/${VOICE_FILES_ES["toca la respuesta"]}`);
       expect(domain).not.toContain(`/voice/${VOICE_FILES_ES.elephant}`);
+      expect(domain).not.toContain("/voice/lazy/elephant.mp3");
+      expect(gaps.slice(0, 12)).toEqual([]);
+      expect(gaps).toHaveLength(0);
+    } finally {
+      setLocale("en");
+    }
+  });
+
+  it("precaches Portuguese clips for an Add, Times, and Telling Time round", () => {
+    setLocale("pt");
+    try {
+      const listed = JSON.parse(readFileSync("src/academy/voice/pt-precache.json", "utf8")) as string[];
+      const live = portuguesePrecacheVoiceFiles();
+      expect(listed).toEqual(live);
+      expect(live.length).toBeGreaterThan(1000);
+      expect(live.length).toBeLessThan(Object.keys(VOICE_FILES_PT).length / 2);
+      for (const file of live) expect(isPrecacheFile(`voice/${file}`)).toBe(true);
+      expect(live).toContain(VOICE_FILES_PT["7"]);
+      expect(live).toContain(VOICE_FILES_PT["em ponto"]);
+      expect(live).toContain(VOICE_FILES_PT["e meia"]);
+      expect(live).toContain(VOICE_FILES_PT.quase);
+      expect(live).not.toContain(VOICE_FILES_PT.elephant);
+
+      const allowed = new Set(live);
+      const hasPrecache = (key: string) => {
+        const file = VOICE_FILES_PT[key];
+        return typeof file === "string" && allowed.has(file);
+      };
+      const hasClip = (key: string) => Object.prototype.hasOwnProperty.call(VOICE_FILES_PT, key);
+      const gaps: string[] = [];
+      const seen = new Set<string>();
+      const check = (line: string) => {
+        const text = line.trim();
+        if (!text || seen.has(text)) return;
+        seen.add(text);
+        if (!planSpeech(text, hasClip)) return;
+        if (!planSpeech(text, hasPrecache)) gaps.push(text);
+      };
+      const addChoice = (question: ChoiceQ) => {
+        const prompt = promptSpeech(question);
+        check(prompt);
+        check(yourTurnLine(prompt));
+        check(hintCue(question).speech);
+        check(workedExample(question).speech);
+        check(speakable(question.praise));
+        check(speakable(question.almost));
+      };
+
+      for (const row of collectSpokenLines()) {
+        if (row.game === "add" || row.game === "times" || row.game === "time" || row.game === "ui" || row.game === "buddy" || row.game === "boss") {
+          check(row.line);
+        }
+      }
+      const add = GAMES.find((game) => game.id === "add");
+      const times = GAMES.find((game) => game.id === "times");
+      const time = GAMES.find((game) => game.id === "time");
+      for (const game of [add, times]) {
+        if (!game) continue;
+        for (const level of game.levels) {
+          for (let i = 0; i < 24; i += 1) {
+            addChoice(game.makeQuestion(rngFromSeed(`pt-offline:${game.id}:${level.id}:${i}`), level.id, []));
+          }
+        }
+      }
+      if (time) {
+        for (const level of time.levels) {
+          for (let i = 0; i < 16; i += 1) {
+            const task = makeClockTask(level.id, rngFromSeed(`pt-offline:hands:${level.id}:${i}`));
+            check(task.speech);
+            check(yourTurnLine(task.speech));
+            check(exampleFor(task).speech);
+          }
+        }
+      }
+
+      const domain = buildPrecacheList({
+        appPrefix: "",
+        artPrefix: "",
+        files: live.map((file) => `voice/${file}`).concat([`voice/${VOICE_FILES_PT.elephant}`, "voice/lazy/elephant.mp3"]),
+        texts: [],
+      });
+      expect(domain).toContain(`/voice/${VOICE_FILES_PT["7"]}`);
+      expect(domain).toContain(`/voice/${VOICE_FILES_PT["toque a resposta"]}`);
+      expect(domain).not.toContain(`/voice/${VOICE_FILES_PT.elephant}`);
       expect(domain).not.toContain("/voice/lazy/elephant.mp3");
       expect(gaps.slice(0, 12)).toEqual([]);
       expect(gaps).toHaveLength(0);

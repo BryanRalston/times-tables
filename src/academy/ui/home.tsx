@@ -41,7 +41,7 @@ export function HomeScreen({
   const playTitle = GAMES.find((game) => game.id === playId)?.title ?? playId;
   const todayLine = todayPlayLine(show(playTitle), child.grade);
   const playAction = facing
-    ? t(`Face ${bossForGame(playId).name}`, `Enfrenta a ${bossForGame(playId).name}`)
+    ? t(`Face ${bossForGame(playId).name}`, `Enfrenta a ${bossForGame(playId).name}`, `Enfrente ${bossForGame(playId).name}`)
     : show("Play");
   const book = bookEntries();
   const palTier = bondTier(bondScore(child.bonds, child.avatarId));
@@ -57,7 +57,7 @@ export function HomeScreen({
 
       <section className="ac-hero">
         <h1>
-          {t(`Hi ${child.name}! Ready to play?`, `¡Hola ${child.name}! ¿Listo para jugar?`)}
+          {t(`Hi ${child.name}! Ready to play?`, `¡Hola ${child.name}! ¿Listo para jugar?`, `Oi ${child.name}! Vamos jogar?`)}
         </h1>
         <p className="ac-lede">{show("Short games · hop the island · collect squishees")}</p>
         <div className="ac-play-stage">
@@ -90,7 +90,7 @@ export function HomeScreen({
           <ProgressRing
             value={daily.rounds}
             max={daily.goal}
-            label={t(`${daily.rounds} of ${daily.goal} rounds today`, `${daily.rounds} de ${daily.goal} rondas hoy`)}
+            label={t(`${daily.rounds} of ${daily.goal} rounds today`, `${daily.rounds} de ${daily.goal} rondas hoy`, `${daily.rounds} de ${daily.goal} rodadas hoje`)}
           />
           <button
             type="button"
@@ -127,7 +127,7 @@ export function HomeScreen({
                 className={`ac-card is-${game.tint} is-soon`}
                 data-offer="later"
                 onClick={() => {
-                  setToast(t(`${game.title} is coming later for this grade.`, `${show(game.title)} llega más adelante para este grado.`));
+                  setToast(t(`${game.title} is coming later for this grade.`, `${show(game.title)} llega más adelante para este grado.`, `${show(game.title)} chega mais tarde para este ano.`));
                   window.setTimeout(() => setToast(null), 1800);
                 }}
               >
@@ -219,7 +219,7 @@ export function HomeScreen({
 }
 
 function PrizeBody({ prize }: { prize: GiftRoll }) {
-  if (prize.kind === "coins") return <p>{t(`${prize.amount} coins for the shelf.`, `${prize.amount} monedas para la tienda.`)}</p>;
+  if (prize.kind === "coins") return <p>{t(`${prize.amount} coins for the shelf.`, `${prize.amount} monedas para la tienda.`, `${prize.amount} moedas para a loja.`)}</p>;
   if (prize.kind === "cosmetic") {
     return (
       <p>
@@ -232,7 +232,7 @@ function PrizeBody({ prize }: { prize: GiftRoll }) {
   return (
     <p>
       <AcademyPal id={prize.id} className="ac-done-pal" label={pal?.name ?? ""} />
-      {t(`${name} hopped in.`, `${name} llegó de un salto.`)}
+      {t(`${name} hopped in.`, `${name} llegó de un salto.`, `${name} chegou pulando.`)}
     </p>
   );
 }

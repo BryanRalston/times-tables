@@ -163,6 +163,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
         prompt: t(
           `There are ${apples} apples and ${bananas} bananas. How many apples?`,
           `Hay ${apples} manzanas y ${bananas} plátanos. ¿Cuántas manzanas hay?`,
+          `Há ${apples} maçãs e ${bananas} bananas. Quantas maçãs há?`,
         ),
         answer: String(apples),
       };
@@ -176,6 +177,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
           prompt: t(
             `The tally is ${apples} apples, ${bananas} bananas, and ${carrots} carrots. How many in all?`,
             `El conteo es ${apples} manzanas, ${bananas} plátanos y ${carrots} zanahorias. ¿Cuántos hay en total?`,
+            `A contagem é ${apples} maçãs, ${bananas} bananas e ${carrots} cenouras. Quantos há no total?`,
           ),
           answer: String(apples + bananas + carrots),
         };
@@ -188,6 +190,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
             prompt: t(
               `The tally is ${more} apples and ${fewer} bananas. How many more apples than bananas?`,
               `El conteo es ${more} manzanas y ${fewer} plátanos. ¿Cuántas manzanas más que plátanos?`,
+              `A contagem é ${more} maçãs e ${fewer} bananas. Quantas maçãs a mais que bananas?`,
             ),
             answer: String(more - fewer),
           }
@@ -195,6 +198,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
             prompt: t(
               `The tally is ${fewer} apples and ${more} bananas. How many more bananas than apples?`,
               `El conteo es ${fewer} manzanas y ${more} plátanos. ¿Cuántos plátanos más que manzanas?`,
+              `A contagem é ${fewer} maçãs e ${more} bananas. Quantas bananas a mais que maçãs?`,
             ),
             answer: String(more - fewer),
           };
@@ -205,11 +209,13 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
       const bananas = rng.int(1, 5);
       const graph = safe === "picture" ? "picture graph" : "bar graph";
       const graphEs = safe === "picture" ? "gráfica de dibujos" : "gráfica de barras";
+      const graphPt = safe === "picture" ? "gráfico de figuras" : "gráfico de barras";
       if (rng.next() < 0.5) {
         return {
           prompt: t(
             `The ${graph} shows ${apples} apples and ${bananas} bananas. How many in all?`,
             `La ${graphEs} muestra ${apples} manzanas y ${bananas} plátanos. ¿Cuántos hay en total?`,
+            `O ${graphPt} mostra ${apples} maçãs e ${bananas} bananas. Quantos há no total?`,
           ),
           answer: String(apples + bananas),
         };
@@ -222,6 +228,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
             prompt: t(
               `The ${graph} shows ${more} apples and ${fewer} bananas. How many more apples than bananas?`,
               `La ${graphEs} muestra ${more} manzanas y ${fewer} plátanos. ¿Cuántas manzanas más que plátanos?`,
+              `O ${graphPt} mostra ${more} maçãs e ${fewer} bananas. Quantas maçãs a mais que bananas?`,
             ),
             answer: String(more - fewer),
           }
@@ -229,6 +236,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
             prompt: t(
               `The ${graph} shows ${fewer} apples and ${more} bananas. How many more bananas than apples?`,
               `La ${graphEs} muestra ${fewer} manzanas y ${more} plátanos. ¿Cuántos plátanos más que manzanas?`,
+              `O ${graphPt} mostra ${fewer} maçãs e ${more} bananas. Quantas bananas a mais que maçãs?`,
             ),
             answer: String(more - fewer),
           };
@@ -240,6 +248,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
         prompt: t(
           `Each picture stands for ${scale}. The graph shows ${icons} apple pictures. How many apples?`,
           `Cada dibujo vale ${scale}. La gráfica muestra ${icons} dibujos de manzana. ¿Cuántas manzanas hay?`,
+          `Cada figura vale ${scale}. O gráfico mostra ${icons} figuras de maçã. Quantas maçãs há?`,
         ),
         answer: String(scale * icons),
       };
@@ -255,6 +264,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
             prompt: t(
               `The longest is ${high}/${den} and the shortest is ${low}/${den}. How much longer is the longest?`,
               `El más largo mide ${high}/${den} y el más corto mide ${low}/${den}. ¿Cuánto más mide el más largo?`,
+              `O mais comprido mede ${high}/${den} e o mais curto mede ${low}/${den}. Quanto o mais comprido é maior?`,
             ),
             answer: `${high - low}/${den}`,
           }
@@ -262,6 +272,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
             prompt: t(
               `The longest is ${high}/${den} and the shortest is ${low}/${den}. What do they make together?`,
               `El más largo mide ${high}/${den} y el más corto mide ${low}/${den}. ¿Cuánto miden juntos?`,
+              `O mais comprido mede ${high}/${den} e o mais curto mede ${low}/${den}. Quanto medem juntos?`,
             ),
             answer: `${high + low}/${den}`,
           };
@@ -309,8 +320,8 @@ export function graphClipLines(): string[] {
     for (let num = 0; num <= den; num += 1) add(marksTitle(num, den));
     for (let num = 0; num <= den * 2 + 3; num += 1) {
       add(`${num}/${den}`);
-      add(t(`Yes! ${num}/${den}`, `¡Sí! ${num}/${den}`));
-      add(t(`Almost! ${num}/${den}`, `¡Casi! ${num}/${den}`));
+      add(t(`Yes! ${num}/${den}`, `¡Sí! ${num}/${den}`, `Sim! ${num}/${den}`));
+      add(t(`Almost! ${num}/${den}`, `¡Casi! ${num}/${den}`, `Quase! ${num}/${den}`));
     }
   }
   for (const line of HINTS) add(line());
@@ -337,8 +348,8 @@ export function graphClipLines(): string[] {
   add(t("Almost! 2 marks", "¡Casi! 2 marcas"));
   for (const cat of CATS) {
     const word = thingName(cat.name, 2, cat.plural);
-    add(t(`Yes! 3 ${cat.plural}`, `¡Sí! 3 ${word}`));
-    add(t(`Almost! 3 ${cat.plural}`, `¡Casi! 3 ${word}`));
+    add(t(`Yes! 3 ${cat.plural}`, `¡Sí! 3 ${word}`, `Sim! 3 ${word}`));
+    add(t(`Almost! 3 ${cat.plural}`, `¡Casi! 3 ${word}`, `Quase! 3 ${word}`));
   }
   return [...lines];
 }
@@ -518,16 +529,20 @@ function solvedFor(board: GraphsBoard): string {
       return countSolved(focus ?? namedMax(board), n);
     case "total":
     case "join":
-      return t(`${n} in all`, `${n} en total`);
+      return t(`${n} in all`, `${n} en total`, `${n} no total`);
     case "diff":
     case "two":
-      return t(`${n} more`, `${n} más`);
+      return t(`${n} more`, `${n} más`, `${n} a mais`);
     case "less":
-      return t(`${n} less`, `${n} menos`);
+      return t(`${n} less`, `${n} menos`, `${n} a menos`);
     case "apart":
-      return t(`${n} others`, `${n} otros`);
+      return t(`${n} others`, `${n} otros`, `${n} outros`);
     case "marks":
-      return t(`${n} ${n === 1 ? "mark" : "marks"}`, n === 1 ? `${n} marca` : `${n} marcas`);
+      return t(
+        `${n} ${n === 1 ? "mark" : "marks"}`,
+        n === 1 ? `${n} marca` : `${n} marcas`,
+        n === 1 ? `${n} marca` : `${n} marcas`,
+      );
     case "span":
     case "sum":
       return `${n}/${board.den}`;
@@ -541,7 +556,7 @@ function solvedFor(board: GraphsBoard): string {
 function countSolved(cat: GraphCat | undefined, n: number): string {
   if (!cat) return String(n);
   const en = n === 1 ? cat.name : cat.plural;
-  return t(`${n} ${en}`, `${n} ${thingName(cat.name, n, en)}`);
+  return t(`${n} ${en}`, `${n} ${thingName(cat.name, n, en)}`, `${n} ${thingName(cat.name, n, en)}`);
 }
 
 function namedMax(board: GraphsBoard): GraphCat | undefined {
@@ -549,7 +564,7 @@ function namedMax(board: GraphsBoard): GraphCat | undefined {
 }
 
 function countTitle(cat: GraphCat): string {
-  return t(`How many ${cat.plural}?`, `¿${howManyPhrase(cat.name, 2, cat.plural)} hay?`);
+  return t(`How many ${cat.plural}?`, `¿${howManyPhrase(cat.name, 2, cat.plural)} hay?`, `${howManyPhrase(cat.name, 2, cat.plural)} há?`);
 }
 
 function mostTitle(): string {
@@ -564,6 +579,7 @@ function diffTitle(more: GraphCat, less: GraphCat): string {
   return t(
     `How many more ${more.plural} than ${less.plural}?`,
     `¿${howManyMorePhrase(more.name, more.plural)} más que ${thingName(less.name, 2, less.plural)}?`,
+    `${howManyMorePhrase(more.name, more.plural)} a mais que ${thingName(less.name, 2, less.plural)}?`,
   );
 }
 
@@ -571,24 +587,36 @@ function lessTitle(fewer: GraphCat, more: GraphCat): string {
   return t(
     `How many less ${fewer.plural} than ${more.plural}?`,
     `¿${howManyLessPhrase(fewer.name, fewer.plural)} menos que ${thingName(more.name, 2, more.plural)}?`,
+    `${howManyLessPhrase(fewer.name, fewer.plural)} a menos que ${thingName(more.name, 2, more.plural)}?`,
   );
 }
 
 function joinTitle(a: GraphCat, b: GraphCat): string {
   const left = thingName(a.name, 2, a.plural);
   const right = thingName(b.name, 2, b.plural);
-  const lead = nounIsFeminine(a.name) && nounIsFeminine(b.name) ? "Cuántas" : "Cuántos";
-  return t(`How many ${a.plural} and ${b.plural} in all?`, `¿${lead} ${left} y ${right} hay en total?`);
+  const fem = nounIsFeminine(a.name) && nounIsFeminine(b.name);
+  const lead = fem ? "Cuántas" : "Cuántos";
+  const leadPt = fem ? "Quantas" : "Quantos";
+  return t(
+    `How many ${a.plural} and ${b.plural} in all?`,
+    `¿${lead} ${left} y ${right} hay en total?`,
+    `${leadPt} ${left} e ${right} há no total?`,
+  );
 }
 
 function apartTitle(cat: GraphCat): string {
-  return t(`How many are not ${cat.plural}?`, `¿Cuántos no son ${thingName(cat.name, 2, cat.plural)}?`);
+  return t(
+    `How many are not ${cat.plural}?`,
+    `¿Cuántos no son ${thingName(cat.name, 2, cat.plural)}?`,
+    `Quantos não são ${thingName(cat.name, 2, cat.plural)}?`,
+  );
 }
 
 function scaleCountTitle(cat: GraphCat, scale: number): string {
   return t(
     `Each picture stands for ${scale}. How many ${cat.plural}?`,
     `Cada dibujo vale ${scale}. ¿${howManyPhrase(cat.name, 2, cat.plural)} hay?`,
+    `Cada figura vale ${scale}. ${howManyPhrase(cat.name, 2, cat.plural)} há?`,
   );
 }
 
@@ -600,7 +628,7 @@ function twoTitle(): string {
 }
 
 function marksTitle(num: number, den: number): string {
-  return t(`How many are ${num}/${den}?`, `¿Cuántos miden ${num}/${den}?`);
+  return t(`How many are ${num}/${den}?`, `¿Cuántos miden ${num}/${den}?`, `Quantos medem ${num}/${den}?`);
 }
 
 function spanTitle(): string {
@@ -669,7 +697,7 @@ export function graphsTeachCaption(board: GraphsBoard): string {
     case "bar":
       return t("Read the graph", "Lee la gráfica");
     case "scale":
-      return t(`Each picture is ${board.scale}`, `Cada dibujo vale ${board.scale}`);
+      return t(`Each picture is ${board.scale}`, `Cada dibujo vale ${board.scale}`, `Cada figura vale ${board.scale}`);
     case "line":
       return t("Read the line plot", "Lee el diagrama de puntos");
     default: {
@@ -690,7 +718,7 @@ function handsSpeech(mode: GraphLevel, scale: number): string {
     case "bar":
       return t("Make the bar graph.", "Haz la gráfica de barras.");
     case "scale":
-      return t(`Each picture stands for ${scale}. Make the graph.`, `Cada dibujo vale ${scale}. Haz la gráfica.`);
+      return t(`Each picture stands for ${scale}. Make the graph.`, `Cada dibujo vale ${scale}. Haz la gráfica.`, `Cada figura vale ${scale}. Monte o gráfico.`);
     case "line":
       return t("Make the line plot.", "Haz el diagrama de puntos.");
     default: {

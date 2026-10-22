@@ -39,4 +39,17 @@ npx vite-node scripts/export-voice-es.ts
 VOICE_JOBS=/tmp/voice-jobs-es.json VOICE_NAME=ef_dora VOICE_LANG=es python3 scripts/render-voice.py
 ```
 
-`src/academy/voice/clips-es.test.ts` fails if any Spanish speakable line has no clip. `VOICE_CLEAN=1` only deletes files in folders named by the current job list, so a Spanish render does not remove English clips.
+## Portuguese
+
+Brazilian Portuguese uses the same Kokoro model and the same line-splitting. The voice is `pf_dora` (`lang="pt-br"`), also Apache-2.0. Clips live in `academy/public/voice/pt/`. The install cache includes the Portuguese clips for Add & Subtract, Times Tables, and Telling Time, plus buddy lines and the home. The manifest is a separate chunk (`src/academy/voice/manifest-pt.ts`) loaded only when the language is Português. The string table is its own chunk too (`src/academy/i18n-pt.ts`).
+
+Number clips do not share filenames with English or Spanish. “7” is `sete` in Portuguese.
+
+`pf_dora` also reads the English words that stay on screen in Phonics, Sight Words, and Spelling. The instruction around them is Portuguese.
+
+```bash
+npx vite-node scripts/export-voice-pt.ts
+VOICE_JOBS=/tmp/voice-jobs-pt.json VOICE_NAME=pf_dora VOICE_LANG=pt-br python3 scripts/render-voice.py
+```
+
+`src/academy/voice/clips-es.test.ts` fails if any Spanish speakable line has no clip. `src/academy/voice/clips-pt.test.ts` does the same for Portuguese. `VOICE_CLEAN=1` only deletes files in folders named by the current job list, so a Spanish or Portuguese render does not remove English clips.

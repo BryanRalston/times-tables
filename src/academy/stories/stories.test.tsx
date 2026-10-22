@@ -168,4 +168,23 @@ describe("story rewards", () => {
       expect(home).not.toContain(story.title);
     }
   });
+
+  it("hides story text when the language is Portuguese", () => {
+    const skills = { "story:pk-peach-cat": { ok: 1, miss: 0 } };
+    setLocale("pt");
+    const report = storyBrief(skills);
+    expect(report.titles).toEqual([]);
+    expect(report.line).toContain("inglês");
+    const child = blankChild({ id: "ada", name: "Ada", grade: "2" as Grade });
+    const home = renderToStaticMarkup(
+      <HomeScreen child={child} sound={false} onClaim={() => {}} onPlay={() => {}} />,
+    );
+    const shelf = renderToStaticMarkup(<StoriesShelf grade="2" skills={{}} />);
+    expect(home).not.toContain('href="#/stories"');
+    expect(shelf).toContain("inglês");
+    for (const story of STORIES) {
+      expect(shelf).not.toContain(story.title);
+      expect(shelf).not.toContain(story.pages[0]?.text ?? "");
+    }
+  });
 });

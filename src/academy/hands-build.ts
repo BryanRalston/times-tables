@@ -1,6 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import { STORY_STARS } from "./buddy/persona";
-import { getLocale, partPhrase, shapeWithArticle, spanishFraction, spanishShaded, starPlace, t, thingName, yesDetail } from "./i18n";
+import { getLocale, partPhrase, portugueseFraction, shapeWithArticle, spanishFraction, spanishShaded, starPlace, t, thingName, yesDetail } from "./i18n";
 import { blockPhrase, countName, roundHalfUp } from "./games/boards";
 import { isAddLevel } from "./games/add";
 import { isCountLevel } from "./games/count";
@@ -292,17 +292,18 @@ function numberWord(n: number): string {
 function symmetryClue(clue: string): string {
   switch (clue) {
     case "4 lines of symmetry":
-      return "4 líneas de simetría";
+      return t("4 lines of symmetry", "4 líneas de simetría", "4 linhas de simetria");
     case "2 lines of symmetry":
-      return "2 líneas de simetría";
+      return t("2 lines of symmetry", "2 líneas de simetría", "2 linhas de simetria");
     case "3 lines of symmetry":
-      return "3 líneas de simetría";
+      return t("3 lines of symmetry", "3 líneas de simetría", "3 linhas de simetria");
     default:
       return clue;
   }
 }
 
 function fractionPhrase(num: number, den: number): string {
+  if (getLocale() === "pt") return portugueseFraction(num, den);
   if (getLocale() === "es") return spanishFraction(num, den);
   const pair = FRACTION_NAME[den];
   if (!pair) return `${num} of ${den}`;
@@ -386,7 +387,7 @@ function makeArrayTask(level: string, rng: Rng, avoid?: string): ArrayTask {
     const decoy = cols >= 10 ? cols - 1 : cols + 1;
     const praise = t(
       `Yes! ${rows} ${rows === 1 ? "row" : "rows"} of ${cols}.`,
-      `¡Sí! ${rows} ${rows === 1 ? "fila" : "filas"} de ${cols}.`,
+      `¡Sí! ${rows} ${rows === 1 ? "fila" : "filas"} de ${cols}.`, `Sim! ${rows} ${rows === 1 ? "linha" : "linhas"} de ${cols}.`,
     );
     return {
       kind: "array",
@@ -399,7 +400,7 @@ function makeArrayTask(level: string, rng: Rng, avoid?: string): ArrayTask {
         `${rows}x${cols}`,
         t(
           `Make ${rows} ${rows === 1 ? "row" : "rows"} of ${cols}. Drag a row.`,
-          `Haz ${rows} ${rows === 1 ? "fila" : "filas"} de ${cols}. Arrastra una fila.`,
+          `Haz ${rows} ${rows === 1 ? "fila" : "filas"} de ${cols}. Arrastra una fila.`, `Faça ${rows} ${rows === 1 ? "linha" : "linhas"} de ${cols}. Arraste uma linha.`,
         ),
         praise,
       ),
@@ -417,7 +418,7 @@ function makeTenFrame(level: string, rng: Rng, avoid?: string): FrameTask {
       const target = rng.int(2, max);
       const change = rng.int(1, target);
       const start = target - change;
-      const praise = t(`Yes! ${start} + ${change} = ${target}.`, `¡Sí! ${start} + ${change} = ${target}.`);
+      const praise = t(`Yes! ${start} + ${change} = ${target}.`, `¡Sí! ${start} + ${change} = ${target}.`, `Sim! ${start} + ${change} = ${target}.`);
       return {
         kind: "frame" as const,
         op: "+" as const,
@@ -426,13 +427,13 @@ function makeTenFrame(level: string, rng: Rng, avoid?: string): FrameTask {
         target,
         model: "ten" as const,
         cells,
-        ...base("add", safe, `+${start}:${change}`, t(`Start with ${start}. Drag ${change} more.`, `Empieza con ${start}. Arrastra ${change} más.`), praise),
+        ...base("add", safe, `+${start}:${change}`, t(`Start with ${start}. Drag ${change} more.`, `Empieza con ${start}. Arrastra ${change} más.`, `Comece com ${start}. Arraste ${change} a mais.`), praise),
       };
     }
     const start = rng.int(2, max);
     const change = rng.int(1, start);
     const target = start - change;
-    const praise = t(`Yes! ${start} minus ${change} = ${target}.`, `¡Sí! ${start} menos ${change} = ${target}.`);
+    const praise = t(`Yes! ${start} minus ${change} = ${target}.`, `¡Sí! ${start} menos ${change} = ${target}.`, `Sim! ${start} menos ${change} = ${target}.`);
     return {
       kind: "frame" as const,
       op: "-" as const,
@@ -441,7 +442,7 @@ function makeTenFrame(level: string, rng: Rng, avoid?: string): FrameTask {
       target,
       model: "ten" as const,
       cells,
-      ...base("add", safe, `-${start}:${change}`, t(`Start with ${start}. Drag ${change} away.`, `Empieza con ${start}. Arrastra ${change} hacia afuera.`), praise),
+      ...base("add", safe, `-${start}:${change}`, t(`Start with ${start}. Drag ${change} away.`, `Empieza con ${start}. Arrastra ${change} hacia afuera.`, `Comece com ${start}. Arraste ${change} para fora.`), praise),
     };
   }, (task) => task.factKey);
 }
@@ -474,11 +475,11 @@ function makeRodFrame(level: string, rng: Rng, avoid?: string): FrameTask {
     const target = sub ? start - change : start + change;
     const op = sub ? ("-" as const) : ("+" as const);
     const speech = sub
-      ? t(`Start with ${start}. Drag ${change} away.`, `Empieza con ${start}. Arrastra ${change} hacia afuera.`)
-      : t(`Start with ${start}. Drag ${change} more.`, `Empieza con ${start}. Arrastra ${change} más.`);
+      ? t(`Start with ${start}. Drag ${change} away.`, `Empieza con ${start}. Arrastra ${change} hacia afuera.`, `Comece com ${start}. Arraste ${change} para fora.`)
+      : t(`Start with ${start}. Drag ${change} more.`, `Empieza con ${start}. Arrastra ${change} más.`, `Comece com ${start}. Arraste ${change} a mais.`);
     const praise = sub
-      ? t(`Yes! ${start} minus ${change} = ${target}.`, `¡Sí! ${start} menos ${change} = ${target}.`)
-      : t(`Yes! ${start} + ${change} = ${target}.`, `¡Sí! ${start} + ${change} = ${target}.`);
+      ? t(`Yes! ${start} minus ${change} = ${target}.`, `¡Sí! ${start} menos ${change} = ${target}.`, `Sim! ${start} menos ${change} = ${target}.`)
+      : t(`Yes! ${start} + ${change} = ${target}.`, `¡Sí! ${start} + ${change} = ${target}.`, `Sim! ${start} + ${change} = ${target}.`);
     return {
       kind: "frame" as const,
       op,
@@ -507,7 +508,7 @@ function makeCountTask(level: string, rng: Rng, avoid?: string): CountTask {
         kind: "count" as const,
         mode: "ten" as const,
         target,
-        ...base("count", safe, `ten:${target}`, t(`Fill the ten-frame to ${target}.`, `Llena el tablero de diez hasta ${target}.`), t(`Yes! ${target}.`, `¡Sí! ${target}.`)),
+        ...base("count", safe, `ten:${target}`, t(`Fill the ten-frame to ${target}.`, `Llena el tablero de diez hasta ${target}.`, `Encha o quadro de dez até ${target}.`), t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`)),
       };
     }
     if (safe === "to20") {
@@ -521,8 +522,8 @@ function makeCountTask(level: string, rng: Rng, avoid?: string): CountTask {
           "count",
           safe,
           `teen:${target}`,
-          t(`A ten is ready. Drag ${extra} more to make ${target}.`, `Ya hay una decena. Arrastra ${extra} más para formar ${target}.`),
-          t(`Yes! ${target}.`, `¡Sí! ${target}.`),
+          t(`A ten is ready. Drag ${extra} more to make ${target}.`, `Ya hay una decena. Arrastra ${extra} más para formar ${target}.`, `Já tem uma dezena. Arraste ${extra} a mais para formar ${target}.`),
+          t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`),
         ),
       };
     }
@@ -531,13 +532,13 @@ function makeCountTask(level: string, rng: Rng, avoid?: string): CountTask {
       const anchor = rng.int(after ? 1 : 2, after ? 9 : 10);
       const target = after ? anchor + 1 : anchor - 1;
       const speech = after
-        ? t(`What comes after ${anchor}? Make that number.`, `¿Qué número va después de ${anchor}? Forma ese número.`)
-        : t(`What comes before ${anchor}? Make that number.`, `¿Qué número va antes de ${anchor}? Forma ese número.`);
+        ? t(`What comes after ${anchor}? Make that number.`, `¿Qué número va después de ${anchor}? Forma ese número.`, `Que número vem depois de ${anchor}? Monte esse número.`)
+        : t(`What comes before ${anchor}? Make that number.`, `¿Qué número va antes de ${anchor}? Forma ese número.`, `Que número vem antes de ${anchor}? Monte esse número.`);
       return {
         kind: "count" as const,
         mode: "pile" as const,
         target,
-        ...base("count", safe, `near:${anchor}:${target}`, speech, t(`Yes! ${target}.`, `¡Sí! ${target}.`)),
+        ...base("count", safe, `near:${anchor}:${target}`, speech, t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`)),
       };
     }
     if (safe === "compare") {
@@ -547,13 +548,13 @@ function makeCountTask(level: string, rng: Rng, avoid?: string): CountTask {
       const more = rng.next() < 0.5;
       const target = more ? Math.max(left, right) : Math.min(left, right);
       const speech = more
-        ? t(`Which is more, ${left} or ${right}? Make that number.`, `¿Cuál es más, ${left} o ${right}? Forma ese número.`)
-        : t(`Which is less, ${left} or ${right}? Make that number.`, `¿Cuál es menos, ${left} o ${right}? Forma ese número.`);
+        ? t(`Which is more, ${left} or ${right}? Make that number.`, `¿Cuál es más, ${left} o ${right}? Forma ese número.`, `Qual é mais, ${left} ou ${right}? Monte esse número.`)
+        : t(`Which is less, ${left} or ${right}? Make that number.`, `¿Cuál es menos, ${left} o ${right}? Forma ese número.`, `Qual é menos, ${left} ou ${right}? Monte esse número.`);
       return {
         kind: "count" as const,
         mode: "pile" as const,
         target,
-        ...base("count", safe, `cmp:${target}`, speech, t(`Yes! ${target}.`, `¡Sí! ${target}.`)),
+        ...base("count", safe, `cmp:${target}`, speech, t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`)),
       };
     }
     const cap = safe === "subitize" ? 6 : 10;
@@ -562,7 +563,7 @@ function makeCountTask(level: string, rng: Rng, avoid?: string): CountTask {
       kind: "count" as const,
       mode: "pile" as const,
       target,
-      ...base("count", safe, `pile:${target}`, t(`Make ${target}. Drag the counters.`, `Forma ${target}. Arrastra las fichas.`), t(`Yes! ${target}.`, `¡Sí! ${target}.`)),
+      ...base("count", safe, `pile:${target}`, t(`Make ${target}. Drag the counters.`, `Forma ${target}. Arrastra las fichas.`, `Monte ${target}. Arraste as fichas.`), t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`)),
     };
   }, (task) => task.factKey);
 }
@@ -587,8 +588,8 @@ function makeBlocksTask(level: string, rng: Rng, avoid?: string): BlocksTask {
           "place",
           safe,
           `h:${n}`,
-          t(`Round ${n} to the nearest hundred. Drag hundreds.`, `Redondea ${n} a la centena más cercana. Arrastra centenas.`),
-          t(`Yes! ${hundreds * 100}.`, `¡Sí! ${hundreds * 100}.`),
+          t(`Round ${n} to the nearest hundred. Drag hundreds.`, `Redondea ${n} a la centena más cercana. Arrastra centenas.`, `Arredonde ${n} para a centena mais próxima. Arraste as centenas.`),
+          t(`Yes! ${hundreds * 100}.`, `¡Sí! ${hundreds * 100}.`, `Sim! ${hundreds * 100}.`),
         ),
       };
     }
@@ -603,8 +604,8 @@ function makeBlocksTask(level: string, rng: Rng, avoid?: string): BlocksTask {
           "place",
           safe,
           `r10:${n}`,
-          t(`Round ${n} to the nearest ten. Build ${rounded}.`, `Redondea ${n} a la decena más cercana. Forma ${rounded}.`),
-          t(`Yes! ${rounded}.`, `¡Sí! ${rounded}.`),
+          t(`Round ${n} to the nearest ten. Build ${rounded}.`, `Redondea ${n} a la decena más cercana. Forma ${rounded}.`, `Arredonde ${n} para a dezena mais próxima. Monte ${rounded}.`),
+          t(`Yes! ${rounded}.`, `¡Sí! ${rounded}.`, `Sim! ${rounded}.`),
         ),
       };
     }
@@ -621,21 +622,21 @@ function makeBlocksTask(level: string, rng: Rng, avoid?: string): BlocksTask {
           "place",
           safe,
           `gt:${left}:${right}`,
-          t(`Which is greater, ${left} or ${right}? Build it.`, `¿Cuál es mayor, ${left} o ${right}? Fórmalo.`),
-          t(`Yes! ${greater}.`, `¡Sí! ${greater}.`),
+          t(`Which is greater, ${left} or ${right}? Build it.`, `¿Cuál es mayor, ${left} o ${right}? Fórmalo.`, `Qual é maior, ${left} ou ${right}? Monte esse.`),
+          t(`Yes! ${greater}.`, `¡Sí! ${greater}.`, `Sim! ${greater}.`),
         ),
       };
     }
     const tens = rng.int(1, 9);
     const ones = rng.int(0, 9);
     const n = tens * 10 + ones;
-    const speech = safe === "expanded" ? t(`Build ${tens * 10} + ${ones}.`, `Forma ${tens * 10} + ${ones}.`) : t(`Build ${blockPhrase(n)}.`, `Forma ${blockPhrase(n)}.`);
+    const speech = safe === "expanded" ? t(`Build ${tens * 10} + ${ones}.`, `Forma ${tens * 10} + ${ones}.`, `Monte ${tens * 10} + ${ones}.`) : t(`Build ${blockPhrase(n)}.`, `Forma ${blockPhrase(n)}.`, `Monte ${blockPhrase(n)}.`);
     return {
       kind: "blocks" as const,
       hundreds: 0,
       tens,
       ones,
-      ...base("place", safe, `b:${n}`, speech, t(`Yes! ${n}.`, `¡Sí! ${n}.`)),
+      ...base("place", safe, `b:${n}`, speech, t(`Yes! ${n}.`, `¡Sí! ${n}.`, `Sim! ${n}.`)),
     };
   }, (task) => task.factKey);
 }
@@ -670,8 +671,8 @@ function makeShadeTask(level: string, rng: Rng, avoid?: string): ShadeTask {
           "fractions",
           safe,
           `${num}/${den}=${pair[2]}/${pair[3]}`,
-          t(`Shade ${phrase}. That matches ${other}.`, `Sombrea ${phrase}. Eso es igual a ${other}.`),
-          t(`Yes! ${phrase}.`, `¡Sí! ${phrase}.`),
+          t(`Shade ${phrase}. That matches ${other}.`, `Sombrea ${phrase}. Eso es igual a ${other}.`, `Pinte ${phrase}. Isso é igual a ${other}.`),
+          t(`Yes! ${phrase}.`, `¡Sí! ${phrase}.`, `Sim! ${phrase}.`),
         ),
       };
     }
@@ -688,8 +689,8 @@ function makeShadeTask(level: string, rng: Rng, avoid?: string): ShadeTask {
           "fractions",
           safe,
           `cmp:${num}/${den}`,
-          t(`${phrase} is greater than ${smaller}. Shade ${phrase}.`, `${phrase} es mayor que ${smaller}. Sombrea ${phrase}.`),
-          t(`Yes! ${phrase}.`, `¡Sí! ${phrase}.`),
+          t(`${phrase} is greater than ${smaller}. Shade ${phrase}.`, `${phrase} es mayor que ${smaller}. Sombrea ${phrase}.`, `${phrase} é maior que ${smaller}. Pinte ${phrase}.`),
+          t(`Yes! ${phrase}.`, `¡Sí! ${phrase}.`, `Sim! ${phrase}.`),
         ),
       };
     }
@@ -700,7 +701,7 @@ function makeShadeTask(level: string, rng: Rng, avoid?: string): ShadeTask {
       kind: "shade" as const,
       num,
       den,
-      ...base("fractions", safe, `${num}/${den}`, t(`Shade ${phrase}.`, `Sombrea ${phrase}.`), t(`Yes! ${phrase}.`, `¡Sí! ${phrase}.`)),
+      ...base("fractions", safe, `${num}/${den}`, t(`Shade ${phrase}.`, `Sombrea ${phrase}.`, `Pinte ${phrase}.`), t(`Yes! ${phrase}.`, `¡Sí! ${phrase}.`, `Sim! ${phrase}.`)),
     };
   }, (task) => task.factKey);
 }
@@ -716,15 +717,15 @@ function makeLetterTask(level: string, rng: Rng, avoid?: string): LetterTask {
     }));
     const showSentence = safe === "patterns" || safe === "grade4";
     const speech = showSentence
-      ? t(`${row.sentence} Spell ${row.word}.`, `${row.sentence} Deletrea ${row.word}.`)
-      : t(`Spell ${row.word}. Drag the letters.`, `Deletrea ${row.word}. Arrastra las letras.`);
+      ? t(`${row.sentence} Spell ${row.word}.`, `${row.sentence} Deletrea ${row.word}.`, `${row.sentence} Soletre ${row.word}.`)
+      : t(`Spell ${row.word}. Drag the letters.`, `Deletrea ${row.word}. Arrastra las letras.`, `Soletre ${row.word}. Arraste as letras.`);
     return {
       kind: "letters" as const,
       word: row.word,
       tiles,
       sentence: showSentence ? blankOut(row.sentence, row.word) : "",
       showSentence,
-      ...base("spelling", safe, row.word, speech, t(`Yes! ${row.word}.`, `¡Sí! ${row.word}.`)),
+      ...base("spelling", safe, row.word, speech, t(`Yes! ${row.word}.`, `¡Sí! ${row.word}.`, `Sim! ${row.word}.`)),
     };
   }, (task) => task.factKey);
 }
@@ -753,8 +754,8 @@ function makeSightTask(level: string, rng: Rng, avoid?: string): SightTask {
           "sight",
           safe,
           row.word,
-          t(`Drag the missing word. ${row.sentence}`, `Arrastra la palabra que falta. ${row.sentence}`),
-          t(`Yes! ${row.word}.`, `¡Sí! ${row.word}.`),
+          t(`Drag the missing word. ${row.sentence}`, `Arrastra la palabra que falta. ${row.sentence}`, `Arraste a palavra que falta. ${row.sentence}`),
+          t(`Yes! ${row.word}.`, `¡Sí! ${row.word}.`, `Sim! ${row.word}.`),
         ),
       };
     }
@@ -765,7 +766,7 @@ function makeSightTask(level: string, rng: Rng, avoid?: string): SightTask {
       emoji: row.emoji,
       sentence: "",
       choices,
-      ...base("sight", safe, row.word, t(`Drag the word ${row.word}.`, `Arrastra la palabra ${row.word}.`), t(`Yes! ${row.word}.`, `¡Sí! ${row.word}.`)),
+      ...base("sight", safe, row.word, t(`Drag the word ${row.word}.`, `Arrastra la palabra ${row.word}.`, `Arraste a palavra ${row.word}.`), t(`Yes! ${row.word}.`, `¡Sí! ${row.word}.`, `Sim! ${row.word}.`)),
     };
   }, (task) => task.factKey);
 }
@@ -791,8 +792,8 @@ function makePhonicsTask(level: string, rng: Rng, avoid?: string): PhonicsTask {
           "phonics",
           safe,
           `${cue}:${answer}`,
-          t(`Drag the word that rhymes with ${cue}.`, `Arrastra la palabra que rima con ${cue}.`),
-          t(`Yes! ${answer}.`, `¡Sí! ${answer}.`),
+          t(`Drag the word that rhymes with ${cue}.`, `Arrastra la palabra que rima con ${cue}.`, `Arraste a palavra que rima com ${cue}.`),
+          t(`Yes! ${answer}.`, `¡Sí! ${answer}.`, `Sim! ${answer}.`),
         ),
       };
     }
@@ -806,7 +807,7 @@ function makePhonicsTask(level: string, rng: Rng, avoid?: string): PhonicsTask {
         answer: word,
         prompt: "",
         tiles,
-        ...base("phonics", safe, word, t(`Build the word. ${blendOf(word)}.`, `Arma la palabra. ${blendOf(word)}.`), t(`Yes! ${word}.`, `¡Sí! ${word}.`)),
+        ...base("phonics", safe, word, t(`Build the word. ${blendOf(word)}.`, `Arma la palabra. ${blendOf(word)}.`, `Monte a palavra. ${blendOf(word)}.`), t(`Yes! ${word}.`, `¡Sí! ${word}.`, `Sim! ${word}.`)),
       };
     }
     if (safe === "end") {
@@ -827,8 +828,8 @@ function makePhonicsTask(level: string, rng: Rng, avoid?: string): PhonicsTask {
           "phonics",
           safe,
           `${word}:${answer}`,
-          t(`Drag the last sound in ${word}. ${phoneme}.`, `Arrastra el último sonido de ${word}. ${phoneme}.`),
-          t(`Yes! ${word}.`, `¡Sí! ${word}.`),
+          t(`Drag the last sound in ${word}. ${phoneme}.`, `Arrastra el último sonido de ${word}. ${phoneme}.`, `Arraste o último som de ${word}. ${phoneme}.`),
+          t(`Yes! ${word}.`, `¡Sí! ${word}.`, `Sim! ${word}.`),
         ),
       };
     }
@@ -839,8 +840,8 @@ function makePhonicsTask(level: string, rng: Rng, avoid?: string): PhonicsTask {
       .map((item) => item.letter);
     const speech =
       safe === "begin"
-        ? t(`Drag the first sound. ${row.phoneme}.`, `Arrastra el primer sonido. ${row.phoneme}.`)
-        : t(`Drag the letter that says ${row.phoneme}.`, `Arrastra la letra que dice ${row.phoneme}.`);
+        ? t(`Drag the first sound. ${row.phoneme}.`, `Arrastra el primer sonido. ${row.phoneme}.`, `Arraste o primeiro som. ${row.phoneme}.`)
+        : t(`Drag the letter that says ${row.phoneme}.`, `Arrastra la letra que dice ${row.phoneme}.`, `Arraste a letra que diz ${row.phoneme}.`);
     return {
       kind: "phonics" as const,
       mode: "letter" as const,
@@ -852,7 +853,7 @@ function makePhonicsTask(level: string, rng: Rng, avoid?: string): PhonicsTask {
         safe,
         `${row.letter}:${row.word}`,
         speech,
-        t(`Yes! ${row.letter} says ${row.phoneme}.`, `¡Sí! ${row.letter} dice ${row.phoneme}.`),
+        t(`Yes! ${row.letter} says ${row.phoneme}.`, `¡Sí! ${row.letter} dice ${row.phoneme}.`, `Sim! ${row.letter} diz ${row.phoneme}.`),
       ),
     };
   }, (task) => task.factKey);
@@ -875,7 +876,7 @@ function makeMeasureTask(level: string, rng: Rng, avoid?: string): MeasureTask {
           safe,
           `in:${target}`,
           t("How long is the ribbon? Drag the inches.", "¿Qué tan largo es el listón? Arrastra las pulgadas."),
-          t(`Yes! ${target} ${target === 1 ? "inch" : "inches"}.`, `¡Sí! ${target} ${target === 1 ? "pulgada" : "pulgadas"}.`),
+          t(`Yes! ${target} ${target === 1 ? "inch" : "inches"}.`, `¡Sí! ${target} ${target === 1 ? "pulgada" : "pulgadas"}.`, `Sim! ${target} ${target === 1 ? "polegada" : "polegadas"}.`),
         ),
       };
     }
@@ -889,7 +890,7 @@ function makeMeasureTask(level: string, rng: Rng, avoid?: string): MeasureTask {
         bars: [],
         ask: "" as const,
         emoji,
-        ...base("measure", safe, `bar:${target}`, t(`Drag to make a bar of ${target}.`, `Arrastra para hacer una barra de ${target}.`), t(`Yes! ${target}.`, `¡Sí! ${target}.`)),
+        ...base("measure", safe, `bar:${target}`, t(`Drag to make a bar of ${target}.`, `Arrastra para hacer una barra de ${target}.`, `Arraste para fazer uma barra de ${target}.`), t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`)),
       };
     }
     if (safe === "more") {
@@ -907,8 +908,8 @@ function makeMeasureTask(level: string, rng: Rng, avoid?: string): MeasureTask {
           "measure",
           safe,
           `more:${high}:${low}`,
-          t(`${high} apples and ${low} apples. Drag how many more.`, `${high} manzanas y ${low} manzanas. Arrastra cuántas más.`),
-          t(`Yes! ${target} more.`, `¡Sí! ${target} más.`),
+          t(`${high} apples and ${low} apples. Drag how many more.`, `${high} manzanas y ${low} manzanas. Arrastra cuántas más.`, `${high} maçãs e ${low} maçãs. Arraste quantas a mais.`),
+          t(`Yes! ${target} more.`, `¡Sí! ${target} más.`, `Sim! ${target} a mais.`),
         ),
       };
     }
@@ -929,8 +930,8 @@ function makeMeasureTask(level: string, rng: Rng, avoid?: string): MeasureTask {
         "measure",
         safe,
         `${ask}:${target}`,
-        t(`Drag the ${ask} one.`, ask === "longest" ? "Arrastra el más largo." : "Arrastra el más corto."),
-        t(`Yes! The ${ask} one.`, ask === "longest" ? "¡Sí! El más largo." : "¡Sí! El más corto."),
+        t(`Drag the ${ask} one.`, ask === "longest" ? "Arrastra el más largo." : "Arrastra el más corto.", ask === "longest" ? "Arraste o mais comprido." : "Arraste o mais curto."),
+        t(`Yes! The ${ask} one.`, ask === "longest" ? "¡Sí! El más largo." : "¡Sí! El más corto.", ask === "longest" ? "Sim! O mais comprido." : "Sim! O mais curto."),
       ),
     };
   }, (task) => task.factKey);
@@ -942,7 +943,7 @@ function withAnswer(options: readonly string[], answer: string, rng: Rng): strin
 }
 
 function shapePraise(shape: string): string {
-  return t(`Yes! ${shape}.`, `¡Sí! ${shapeWithArticle(shape)}.`);
+  return t(`Yes! ${shape}.`, `¡Sí! ${shapeWithArticle(shape)}.`, `Sim! ${shapeWithArticle(shape)}.`);
 }
 
 function isStarPlace(place: string): place is "above" | "below" | "beside" | "behind" {
@@ -1091,8 +1092,8 @@ function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
           "shapes",
           safe,
           `${rows}x${cols}`,
-          t(`${rows} rows of ${cols}. Count the squares.`, `${rows} filas de ${cols}. Cuenta los cuadritos.`),
-          t(`Yes! ${product} square units.`, `¡Sí! ${product} unidades cuadradas.`),
+          t(`${rows} rows of ${cols}. Count the squares.`, `${rows} filas de ${cols}. Cuenta los cuadritos.`, `${rows} linhas de ${cols}. Conte os quadradinhos.`),
+          t(`Yes! ${product} square units.`, `¡Sí! ${product} unidades cuadradas.`, `Sim! ${product} unidades quadradas.`),
         ),
       };
     }
@@ -1130,8 +1131,8 @@ function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
           "shapes",
           safe,
           answer,
-          t(`Drag the ${answer}.`, `Arrastra ${partPhrase(answer)}.`),
-          t(`Yes! ${answer}.`, `¡Sí! ${partPhrase(answer)}.`),
+          t(`Drag the ${answer}.`, `Arrastra ${partPhrase(answer)}.`, `Arraste ${partPhrase(answer)}.`),
+          t(`Yes! ${answer}.`, `¡Sí! ${partPhrase(answer)}.`, `Sim! ${partPhrase(answer)}.`),
         ),
       };
     }
@@ -1154,8 +1155,8 @@ function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
           "shapes",
           safe,
           `${answer}:${sides}`,
-          t(`Drag the shape with ${sides} sides.`, `Arrastra la figura con ${sides} lados.`),
-          t(`Yes! ${answer}.`, `¡Sí! ${shapeWithArticle(answer)}.`),
+          t(`Drag the shape with ${sides} sides.`, `Arrastra la figura con ${sides} lados.`, `Arraste a figura com ${sides} lados.`),
+          t(`Yes! ${answer}.`, `¡Sí! ${shapeWithArticle(answer)}.`, `Sim! ${shapeWithArticle(answer)}.`),
         ),
       };
     }
@@ -1180,8 +1181,8 @@ function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
           "shapes",
           safe,
           row[0],
-          t(`Drag the shape with ${row[1]}.`, `Arrastra la figura con ${symmetryClue(row[1])}.`),
-          t(`Yes! ${row[0]}.`, `¡Sí! ${shapeWithArticle(row[0])}.`),
+          t(`Drag the shape with ${row[1]}.`, `Arrastra la figura con ${symmetryClue(row[1])}.`, `Arraste a figura com ${symmetryClue(row[1])}.`),
+          t(`Yes! ${row[0]}.`, `¡Sí! ${shapeWithArticle(row[0])}.`, `Sim! ${shapeWithArticle(row[0])}.`),
         ),
       };
     }
@@ -1198,8 +1199,8 @@ function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
         "shapes",
         safe,
         answer,
-        t(`Drag the ${answer}.`, `Arrastra ${shapeWithArticle(answer)}.`),
-        t(`Yes! ${answer}.`, `¡Sí! ${shapeWithArticle(answer)}.`),
+        t(`Drag the ${answer}.`, `Arrastra ${shapeWithArticle(answer)}.`, `Arraste ${shapeWithArticle(answer)}.`),
+        t(`Yes! ${answer}.`, `¡Sí! ${shapeWithArticle(answer)}.`, `Sim! ${shapeWithArticle(answer)}.`),
       ),
     };
   }, (task) => task.factKey);
@@ -1224,7 +1225,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
       const b = rng.int(1, a);
       const speech = t(
         `${star.name} has ${a} ${items(a)} and gives ${b} away. Drag ${b} out of the story.`,
-        `${star.name} tiene ${a} ${items(a)} y regala ${b}. Arrastra ${b} fuera de la historia.`,
+        `${star.name} tiene ${a} ${items(a)} y regala ${b}. Arrastra ${b} fuera de la historia.`, `${star.name} tem ${a} ${items(a)} e dá de presente ${b}. Arraste ${b} para fora da história.`,
       );
       return {
         kind: "story" as const,
@@ -1235,7 +1236,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
         emoji: thing.emoji,
         decoy: 0,
         pieces: [],
-        ...base("problems", safe, `sub:${a}:${b}`, speech, t(`Yes! ${a - b} left.`, `¡Sí! Quedan ${a - b}.`)),
+        ...base("problems", safe, `sub:${a}:${b}`, speech, t(`Yes! ${a - b} left.`, `¡Sí! Quedan ${a - b}.`, `Sim! Sobram ${a - b}.`)),
       };
     }
     if (safe === "div") {
@@ -1244,7 +1245,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
       const a = b * each;
       const speech = t(
         `${star.name} shares ${a} ${items(a)} into ${b} equal groups. Drag them in.`,
-        `${star.name} reparte ${a} ${items(a)} en ${b} grupos iguales. Arrástralos.`,
+        `${star.name} reparte ${a} ${items(a)} en ${b} grupos iguales. Arrástralos.`, `${star.name} reparte ${a} ${items(a)} em ${b} grupos iguais. Arraste.`,
       );
       return {
         kind: "story" as const,
@@ -1255,7 +1256,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
         emoji: thing.emoji,
         decoy: 0,
         pieces: [],
-        ...base("problems", safe, `div:${a}:${b}`, speech, t(`Yes! ${each} in each group.`, `¡Sí! ${each} en cada grupo.`)),
+        ...base("problems", safe, `div:${a}:${b}`, speech, t(`Yes! ${each} in each group.`, `¡Sí! ${each} en cada grupo.`, `Sim! ${each} em cada grupo.`)),
       };
     }
     if (safe === "mult" || safe === "picture" || safe === "steps") {
@@ -1264,7 +1265,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
       const decoy = b >= 4 ? b - 1 : b + 1;
       const speech = t(
         `${star.name} needs ${a} groups of ${b} ${items(b)}. Drag the groups in.`,
-        `${star.name} necesita ${a} grupos de ${b} ${items(b)}. Arrastra los grupos.`,
+        `${star.name} necesita ${a} grupos de ${b} ${items(b)}. Arrastra los grupos.`, `${star.name} precisa de ${a} grupos de ${b} ${items(b)}. Arraste os grupos.`,
       );
       return {
         kind: "story" as const,
@@ -1275,7 +1276,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
         emoji: thing.emoji,
         decoy,
         pieces: [],
-        ...base("problems", safe, `grp:${a}:${b}`, speech, t(`Yes! ${a * b}.`, `¡Sí! ${a * b}.`)),
+        ...base("problems", safe, `grp:${a}:${b}`, speech, t(`Yes! ${a * b}.`, `¡Sí! ${a * b}.`, `Sim! ${a * b}.`)),
       };
     }
     const a = rng.int(1, 5);
@@ -1288,7 +1289,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
     ]);
     const speech = t(
       `${star.name} has ${a} ${items(a)}. ${star.pal} brings ${b}. Drag both groups in.`,
-      `${star.name} tiene ${a} ${items(a)}. ${star.pal} trae ${b}. Arrastra los dos grupos.`,
+      `${star.name} tiene ${a} ${items(a)}. ${star.pal} trae ${b}. Arrastra los dos grupos.`, `${star.name} tem ${a} ${items(a)}. ${star.pal} traz ${b}. Arraste os dois grupos.`,
     );
     return {
       kind: "story" as const,
@@ -1299,7 +1300,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
       emoji: thing.emoji,
       decoy,
       pieces,
-      ...base("problems", safe, `add:${a}:${b}`, speech, t(`Yes! ${a + b}.`, `¡Sí! ${a + b}.`)),
+      ...base("problems", safe, `add:${a}:${b}`, speech, t(`Yes! ${a + b}.`, `¡Sí! ${a + b}.`, `Sim! ${a + b}.`)),
     };
   }, (task) => task.factKey);
 }

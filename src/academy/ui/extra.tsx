@@ -7,7 +7,7 @@ import { bookEntries, catchphrase } from "../buddy/cast";
 import { palOwned, withBuddy } from "../buddy/unlock";
 import { GAME_CARDS as GAMES, sheetHref } from "../games/catalog";
 import { playWindow } from "../grade-map";
-import { setLocale, show, t } from "../i18n";
+import { loadPortuguese, setLocale, show, t } from "../i18n";
 import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type AppLang, type Grade, type Save } from "../model";
 import { buyOutfit, wearOutfit } from "../rewards";
 import { outfitHint, outfitLabel, outfitPrice, shopSections } from "../wardrobe";
@@ -48,7 +48,7 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
         }}
       >
         <h1 className="ac-sr">{show("Pick a buddy")}</h1>
-        <div className="ac-hello-lang" role="group" aria-label={show("Language")}>
+        <div className="ac-hello-lang ac-lang-row" role="group" aria-label={show("Language")}>
           <button
             type="button"
             className={cx("ac-grade", lang === "en" && "is-on")}
@@ -70,6 +70,17 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
             }}
           >
             Español
+          </button>
+          <button
+            type="button"
+            className={cx("ac-grade", lang === "pt" && "is-on")}
+            aria-pressed={lang === "pt"}
+            onClick={() => {
+              setLang("pt");
+              void loadPortuguese().then(() => setLocale("pt"));
+            }}
+          >
+            Português
           </button>
         </div>
         <div className="ac-buddy-picks" role="radiogroup" aria-label={show("Pick a buddy")}>
@@ -239,7 +250,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
       <p className="ac-lede">
         {t(
           `${found} of ${book.length} found · ${child.coins} coins`,
-          `${found} de ${book.length} encontrados · ${child.coins} monedas`,
+          `${found} de ${book.length} encontrados · ${child.coins} monedas`, `${found} de ${book.length} encontrados · ${child.coins} moedas`,
         )}
       </p>
       <SquishTally />
@@ -248,7 +259,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
       <p className="ac-hint">
         {t(
           `${child.cosmetics.length} of ${lookCount} looks · ${child.coins} coins`,
-          `${child.cosmetics.length} de ${lookCount} disfraces · ${child.coins} monedas`,
+          `${child.cosmetics.length} de ${lookCount} disfraces · ${child.coins} monedas`, `${child.cosmetics.length} de ${lookCount} fantasias · ${child.coins} moedas`,
         )}
       </p>
       <p className="ac-hint">{show("Spend coins you earn. Never real money.")}</p>
@@ -318,8 +329,8 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
                   onClick={() => onSave(mapActive(save, (row) => wearBossLook(row, wearing ? "" : boss.cosmeticId)))}
                 >
                   {wearing
-                    ? t(`Take off ${bossCosmeticName(boss.cosmeticId)}`, `Quítale ${bossCosmeticName(boss.cosmeticId)}`)
-                    : t(`Wear ${bossCosmeticName(boss.cosmeticId)}`, `Ponte ${bossCosmeticName(boss.cosmeticId)}`)}
+                    ? t(`Take off ${bossCosmeticName(boss.cosmeticId)}`, `Quítale ${bossCosmeticName(boss.cosmeticId)}`, `Tire ${bossCosmeticName(boss.cosmeticId)}`)
+                    : t(`Wear ${bossCosmeticName(boss.cosmeticId)}`, `Ponte ${bossCosmeticName(boss.cosmeticId)}`, `Vista ${bossCosmeticName(boss.cosmeticId)}`)}
                 </button>
               ) : null}
             </article>
@@ -342,7 +353,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
               <small>{entry.rarity === "rare" ? show("Rare") : show("Common")}</small>
               <small>{open ? entry.line : entry.find}</small>
               {open ? <small>{entry.fact}</small> : null}
-              {open ? <small>{t(`Loves ${entry.favorite}`, `Le encanta ${entry.favorite}`)}</small> : null}
+              {open ? <small>{t(`Loves ${entry.favorite}`, `Le encanta ${entry.favorite}`, `Adora ${entry.favorite}`)}</small> : null}
               {open ? (
                 <small className="ac-bond-pips" data-bond={bondTier(bondScore(child.bonds, entry.id))}>
                   {bondHearts(bondTier(bondScore(child.bonds, entry.id))) || bondName(0)}

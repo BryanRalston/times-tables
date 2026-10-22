@@ -232,6 +232,9 @@ export function GraphBench({
                       token.label.includes("/")
                         ? `Regresa ${token.label}`
                         : `Regresa ${nounIsFeminine(token.label) ? "la" : "el"} ${token.label}`,
+                      token.label.includes("/")
+                        ? `Devolva ${token.label}`
+                        : `Devolva ${nounIsFeminine(token.label) ? "a" : "o"} ${token.label}`,
                     )}
                     disabled={locked}
                     {...tokenProps(token.id)}

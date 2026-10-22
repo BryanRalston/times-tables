@@ -54,7 +54,7 @@ export function ClockBoard({ task, onAnswer }: { task: ClockTask; onAnswer: (ok:
         tabIndex={0}
         aria-label={t(
           `${timeTalk(hours, minutes)}. Drag the hands. Arrow keys move them.`,
-          `${timeTalk(hours, minutes)}. Arrastra las manecillas. Las flechas las mueven.`,
+          `${timeTalk(hours, minutes)}. Arrastra las manecillas. Las flechas las mueven.`, `${timeTalk(hours, minutes)}. Arraste os ponteiros. As setas os movem.`,
         )}
         onPointerDown={(event) => {
           dragging.current = true;
@@ -131,7 +131,7 @@ export function PayBoard({ task, onAnswer }: { task: PayTask; onAnswer: (ok: boo
             key={kind}
             type="button"
             className="ac-coin-drag"
-            aria-label={t(`Drag ${COIN_NAME[kind].toLowerCase()}`, `Arrastra ${coinWord(kind)}`)}
+            aria-label={t(`Drag ${COIN_NAME[kind].toLowerCase()}`, `Arrastra ${coinWord(kind)}`, `Arraste ${coinWord(kind)}`)}
             onPointerDown={(event) => {
               drag.current = { kind, x: event.clientX, y: event.clientY };
               event.currentTarget.setPointerCapture(event.pointerId);
@@ -162,7 +162,7 @@ export function PayBoard({ task, onAnswer }: { task: PayTask; onAnswer: (ok: boo
             key={`${kind}-${index}`}
             type="button"
             className="ac-coin-drag is-in"
-            aria-label={t(`Remove ${COIN_NAME[kind].toLowerCase()}`, `Quita ${coinWord(kind)}`)}
+            aria-label={t(`Remove ${COIN_NAME[kind].toLowerCase()}`, `Quita ${coinWord(kind)}`, `Tire ${coinWord(kind)}`)}
             onClick={() => remove(kind)}
           >
             <CoinRow pile={oneCoin(kind)} label="" />

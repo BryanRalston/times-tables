@@ -121,13 +121,13 @@ export function makeTimesQuestion(rng: Rng, level: TimesLevel, prefer: string[] 
       const buddy = buddyName(rng);
       return pickTalk(rng, [
         ["Tap the answer!", "¡Toca la respuesta!"],
-        [`${buddy} sets out ${a} groups of ${b}. How many?`, `${buddy} pone ${a} grupos de ${b}. ¿Cuántos hay?`],
-        [`How many is ${a} groups of ${b}?`, `¿Cuántos son ${a} grupos de ${b}?`],
+        [`${buddy} sets out ${a} groups of ${b}. How many?`, `${buddy} pone ${a} grupos de ${b}. ¿Cuántos hay?`, `${buddy} separa ${a} grupos de ${b}. Quantos há?`],
+        [`How many is ${a} groups of ${b}?`, `¿Cuántos son ${a} grupos de ${b}?`, `Quantos são ${a} grupos de ${b}?`],
       ]);
     })(),
-    hint: a <= 6 ? t(`${a} groups of ${b}`, `${a} grupos de ${b}`) : t("Tap the product", "Toca el resultado"),
-    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`),
-    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`),
+    hint: a <= 6 ? t(`${a} groups of ${b}`, `${a} grupos de ${b}`, `${a} grupos de ${b}`) : t("Tap the product", "Toca el resultado"),
+    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`, `Sim! ${solved}`),
+    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`, `Quase! ${solved}`),
     answer: String(product),
     choices: fourChoices(rng, product, [a * (b + 1), a * Math.max(0, b - 1), (a + 1) * b, a + b, product + a]),
     skill: `times:${level}`,
