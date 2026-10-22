@@ -666,10 +666,20 @@ export function gamePill(title: string, num: number): string {
   return t(`${title} · Level ${num}`, `${show(title)} · Nivel ${num}`, `${show(title)} · Nível ${num}`, `${show(title)} · Niveau ${num}`);
 }
 
+/** French elides de/que before a vowel: d'os, qu'étoiles. Combien stays invariable. */
+function frenchVowelStart(word: string): boolean {
+  return /^[aeiouàâäéèêëîïôùûüœæh]/i.test(word);
+}
+
+/** "que pommes" or "qu'os". */
+export function frenchThan(word: string): string {
+  return frenchVowelStart(word) ? `qu'${word}` : `que ${word}`;
+}
+
 function howManyLead(name: string, englishPlural: string, count: number): string {
   const one = thingName(name, 1, name);
   const word = thingName(name, Math.max(count, 2), englishPlural);
-  if (locale === "fr") return `Combien de ${word}`;
+  if (locale === "fr") return frenchVowelStart(word) ? `Combien d'${word}` : `Combien de ${word}`;
   if (locale === "pt") {
     const lead = FEMININE_PT.has(one) ? "Quantas" : "Quantos";
     return `${lead} ${word}`;

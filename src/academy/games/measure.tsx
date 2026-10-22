@@ -1,5 +1,5 @@
 import type { Rng } from "@/lib/rng";
-import { howManyMorePhrase, howManyPhrase, longShortOf, t, thingName } from "../i18n";
+import { frenchThan, howManyMorePhrase, howManyPhrase, longShortOf, t, thingName } from "../i18n";
 import { buddyName, pickTalk } from "./flavor";
 import { measureCard } from "./cards";
 import type { MeasureBoard, MeasureItem } from "./boards";
@@ -96,14 +96,15 @@ function makeGraph(rng: Rng, mode: "picture" | "bar"): ChoiceQ {
   const board: MeasureBoard = { game: "measure", mode, items, ask: askMost ? "most" : "count", focus };
   const graph = mode === "picture" ? "picture graph" : "bar graph";
   const graphEs = mode === "picture" ? "gráfica de dibujos" : "gráfica de barras";
+  const graphFr = mode === "picture" ? "graphique à images" : "graphique en barres";
   const many = pluralName(focusItem.name);
   const manyEs = thingName(focusItem.name, focusItem.value, many);
   const howMany = howManyPhrase(focusItem.name, focusItem.value, many);
   return sceneQuestion(rng, {
     game: "measure",
     title: askMost
-      ? t(`Which has the most on the ${graph}?`, `¿Cuál tiene más en la ${graphEs}?`, `Qual tem mais no ${graphEs}?`, `Lequel en a le plus sur le ${graphEs} ?`)
-      : t(`How many ${many} are on the ${graph}?`, `¿${howMany} hay en la ${graphEs}?`, `${howMany} tem no ${graphEs}?`, `${howMany} y a-t-il sur le ${graphEs} ?`),
+      ? t(`Which has the most on the ${graph}?`, `¿Cuál tiene más en la ${graphEs}?`, `Qual tem mais no ${graphEs}?`, `Lequel en a le plus sur le ${graphFr} ?`)
+      : t(`How many ${many} are on the ${graph}?`, `¿${howMany} hay en la ${graphEs}?`, `${howMany} tem no ${graphEs}?`, `${howMany} y a-t-il sur le ${graphFr} ?`),
     hint: askMost ? t("Find the tallest or fullest row", "Busca la fila más alta o más llena") : t("Count that row", "Cuenta esa fila"),
     answer,
     choices: askMost
@@ -134,7 +135,7 @@ function makeMore(rng: Rng): ChoiceQ {
     title: t(
       `How many more ${pluralName(items[0]!.name)} than ${pluralName(items[1]!.name)}?`,
       `¿${howManyMorePhrase(items[0]!.name, pluralName(items[0]!.name))} más que ${thingName(items[1]!.name, 2, pluralName(items[1]!.name))}?`, `${howManyMorePhrase(items[0]!.name, pluralName(items[0]!.name))} a mais que ${thingName(items[1]!.name, 2, pluralName(items[1]!.name))}?`,
-    `${howManyMorePhrase(items[0]!.name, pluralName(items[0]!.name))} de plus que ${thingName(items[1]!.name, 2, pluralName(items[1]!.name))} ?`),
+    `${howManyMorePhrase(items[0]!.name, pluralName(items[0]!.name))} de plus ${frenchThan(thingName(items[1]!.name, 2, pluralName(items[1]!.name)))} ?`),
     hint: t("Subtract the smaller number", "Resta el número más chico"),
     answer: String(answer),
     choices: nearChoices(rng, answer, 0, 8),

@@ -1,5 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import {
+  frenchThan,
   howManyLessPhrase,
   howManyMorePhrase,
   howManyPhrase,
@@ -581,7 +582,7 @@ function diffTitle(more: GraphCat, less: GraphCat): string {
     `How many more ${more.plural} than ${less.plural}?`,
     `¿${howManyMorePhrase(more.name, more.plural)} más que ${thingName(less.name, 2, less.plural)}?`,
     `${howManyMorePhrase(more.name, more.plural)} a mais que ${thingName(less.name, 2, less.plural)}?`,
-  `${howManyMorePhrase(more.name, more.plural)} de plus que ${thingName(less.name, 2, less.plural)} ?`);
+  `${howManyMorePhrase(more.name, more.plural)} de plus ${frenchThan(thingName(less.name, 2, less.plural))} ?`);
 }
 
 function lessTitle(fewer: GraphCat, more: GraphCat): string {
@@ -589,7 +590,7 @@ function lessTitle(fewer: GraphCat, more: GraphCat): string {
     `How many less ${fewer.plural} than ${more.plural}?`,
     `¿${howManyLessPhrase(fewer.name, fewer.plural)} menos que ${thingName(more.name, 2, more.plural)}?`,
     `${howManyLessPhrase(fewer.name, fewer.plural)} a menos que ${thingName(more.name, 2, more.plural)}?`,
-  `${howManyLessPhrase(fewer.name, fewer.plural)} de moins que ${thingName(more.name, 2, more.plural)} ?`);
+  `${howManyLessPhrase(fewer.name, fewer.plural)} de moins ${frenchThan(thingName(more.name, 2, more.plural))} ?`);
 }
 
 function joinTitle(a: GraphCat, b: GraphCat): string {

@@ -55,6 +55,9 @@ describe("French copy", () => {
     expect(howManyPhrase("carrots", 2, "carrots")).toBe("Combien de carottes");
     expect(howManyPhrase("snakes", 3, "snakes")).toBe("Combien de serpents");
     expect(howManyPhrase("fish", 2, "fish")).toBe("Combien de poissons");
+    expect(howManyPhrase("bones", 2, "bones")).toBe("Combien d'os");
+    expect(howManyPhrase("bugs", 2, "bugs")).toBe("Combien d'insectes");
+    expect(howManyPhrase("stars", 2, "stars")).toBe("Combien d'étoiles");
     expect(thingName("apples", 1, "apple")).toBe("pomme");
     expect(longShortOf("snake", true)).toBe("le plus long");
     expect(longShortOf("snake", false)).toBe("le plus court");
