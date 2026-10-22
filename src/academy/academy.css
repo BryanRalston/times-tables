@@ -14,6 +14,14 @@
   unicode-range: U+0926, U+0928, U+0939, U+093F, U+0940, U+094D;
 }
 
+@font-face {
+  font-family: "Noto Sans Arabic";
+  src: url("./fonts/noto-arab-picker.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+  unicode-range: U+0627, U+0628, U+0629, U+0631, U+0639, U+0644, U+064A;
+}
+
 :root {
   color-scheme: light;
   --ac-ink: #3c2448;
@@ -89,6 +97,34 @@ html[lang="hi"] {
 html[lang="hi"] body,
 html[lang="hi"] body * {
   font-family: "Noto Sans Devanagari", Fredoka, Nunito, sans-serif;
+}
+
+html[lang="ar"] {
+  direction: rtl;
+  --ac-font: "Noto Sans Arabic", Nunito, "Trebuchet MS", sans-serif;
+  --ac-display: "Noto Sans Arabic", Fredoka, Nunito, "Trebuchet MS", sans-serif;
+}
+
+html[lang="ar"] body,
+html[lang="ar"] body * {
+  font-family: "Noto Sans Arabic", Fredoka, Nunito, sans-serif;
+}
+
+html[lang="ar"] .ac-eq,
+html[lang="ar"] .ac-eq-var,
+html[lang="ar"] .ac-eq-box,
+html[lang="ar"] svg.ac-line,
+html[lang="ar"] .ac-ruler,
+html[lang="ar"] .ac-ruler-read,
+html[lang="ar"] .ac-ruler-wrap,
+html[lang="ar"] .ac-clock,
+html[lang="ar"] .ac-clock-wrap,
+html[lang="ar"] .ac-clock-drag,
+html[lang="ar"] .ac-clock-read,
+html[lang="ar"] .ac-clock-grid,
+html[lang="ar"] .ac-money-price {
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 
 body {
@@ -961,7 +997,7 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   width: 100%;
   min-width: 0;
   /* Picker subset covers 中文. Other labels fall through to Fredoka. */
-  font-family: "Noto Sans SC", "Noto Sans Devanagari", Fredoka, Nunito, "Trebuchet MS", sans-serif;
+  font-family: "Noto Sans SC", "Noto Sans Devanagari", "Noto Sans Arabic", Fredoka, Nunito, "Trebuchet MS", sans-serif;
 }
 .ac-hello-grades { justify-content: center; margin: 10px 0 14px; }
 .ac-finger {
@@ -1032,7 +1068,8 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   font-size: 20px;
   padding: 0 6px;
 }
-html[lang="hi"] .ac-hello-grades .ac-grade {
+html[lang="hi"] .ac-hello-grades .ac-grade,
+html[lang="ar"] .ac-hello-grades .ac-grade {
   font-size: 15px;
   min-width: 76px;
 }

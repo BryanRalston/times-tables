@@ -64,7 +64,7 @@ export function makeColorQuestion(rng: Rng): ChoiceQ {
   const word = colorWord(color);
   return sceneQuestion(rng, {
     game: "shapes",
-    title: t(`Which one is ${word}?`, `¿Cuál es ${word}?`, `Qual é ${word}?`, `Lequel est ${word} ?`, `哪个是${word}？`, `कौن ${word} है?`, `أي واحد هو ${word}؟`),
+    title: t(`Which one is ${word}?`, `¿Cuál es ${word}?`, `Qual é ${word}?`, `Lequel est ${word} ?`, `哪个是${word}？`, `कौन ${word} है?`, `أي واحد هو ${word}؟`),
     hint: t("Look at the colors", "Mira los colores"),
     answer: color,
     choices: rng.shuffle([...COLORS]),

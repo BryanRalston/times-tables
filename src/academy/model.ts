@@ -179,7 +179,7 @@ export interface RoundResult {
   crown?: boolean;
 }
 
-export type AppLang = "en" | "es" | "pt" | "fr" | "zh" | "hi";
+export type AppLang = "en" | "es" | "pt" | "fr" | "zh" | "hi" | "ar";
 
 export interface Save {
   /** Schema version. Bump it in storage.ts and add a migration. */

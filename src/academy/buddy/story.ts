@@ -14,7 +14,7 @@ function pals(n: number): string {
   return `${n} ${thingName("squishees", n, word)}`;
 }
 
-function say(en: string, es: string, pt: string, fr?: string, zh?: string, hi?: string): string {
+function say(en: string, es: string, pt: string, fr?: string, zh?: string, hi?: string, ar?: string): string {
   const locale: Locale = getLocale();
   switch (locale) {
     case "es":
@@ -27,6 +27,8 @@ function say(en: string, es: string, pt: string, fr?: string, zh?: string, hi?: 
       return zh ?? en;
     case "hi":
       return hi ?? en;
+    case "ar":
+      return ar ?? en;
     case "en":
       return en;
     default: {

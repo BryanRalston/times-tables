@@ -235,7 +235,7 @@ export function GraphBench({
                       token.label.includes("/")
                         ? `Devolva ${token.label}`
                         : `Devolva ${nounIsFeminine(token.label) ? "a" : "o"} ${token.label}`,
-                    token.label.includes("/") ? `Remets ${token.label}` : `Remets ${nounIsFeminine(token.label) ? "la" : "le"} ${token.label}`, `把${thingName(token.label, 2, token.label)}放回去`, `${token.label} वापस रखो`, `أعد ${token.label}`)}
+                    token.label.includes("/") ? `Remets ${token.label}` : `Remets ${nounIsFeminine(token.label) ? "la" : "le"} ${token.label}`, `把${thingName(token.label, 2, token.label)}放回去`, `${token.label} वापस रखो`, token.label.includes("/") ? `أعد ${token.label}` : `أعد ${thingName(token.label, 2, token.label)}`)}
                     disabled={locked}
                     {...tokenProps(token.id)}
                   >

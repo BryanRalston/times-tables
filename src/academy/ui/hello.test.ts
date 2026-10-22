@@ -13,6 +13,7 @@ describe("hello screen", () => {
     expect(html).toContain("Français");
     expect(html).toContain("中文");
     expect(html).toContain("हिन्दी");
+    expect(html).toContain("العربية");
     expect(html).toContain('aria-pressed="true"');
   });
 });

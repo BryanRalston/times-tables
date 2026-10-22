@@ -1,7 +1,7 @@
 import { WEEKDAY_LETTERS, WEEKDAY_NAMES, gradeLabel, type Grade } from "./model";
 import { ES, TRAIT_ES, type BossEs, type PersonaEs } from "./i18n-es";
 
-export type Locale = "en" | "es" | "pt" | "fr" | "zh" | "hi";
+export type Locale = "en" | "es" | "pt" | "fr" | "zh" | "hi" | "ar";
 
 export interface PortuguesePack {
   PT: Record<string, string>;
@@ -20,6 +20,16 @@ let chinesePack: ChinesePack | null = null;
 let chineseLoad: Promise<void> | null = null;
 let hindiPack: HindiPack | null = null;
 let hindiLoad: Promise<void> | null = null;
+let arabicPack: ArabicPack | null = null;
+let arabicLoad: Promise<void> | null = null;
+
+export interface ArabicPack {
+  AR: Record<string, string>;
+  PERSONA_AR: Record<string, PersonaEs>;
+  PERSONA_FALLBACK_AR: PersonaEs;
+  BOSS_AR: Record<string, BossEs>;
+  TRAIT_AR: Record<string, string>;
+}
 
 export interface HindiPack {
   HI: Record<string, string>;
@@ -50,13 +60,27 @@ export function getLocale(): Locale {
 }
 
 export function setLocale(next: Locale): void {
-  locale = next === "es" || next === "pt" || next === "fr" || next === "zh" || next === "hi" ? next : "en";
+  locale = next === "es" || next === "pt" || next === "fr" || next === "zh" || next === "hi" || next === "ar" ? next : "en";
   if (typeof document !== "undefined") {
     document.documentElement.lang =
-      locale === "es" ? "es" : locale === "pt" ? "pt-BR" : locale === "fr" ? "fr" : locale === "zh" ? "zh-Hans" : locale === "hi" ? "hi" : "en";
+      locale === "es" ? "es" : locale === "pt" ? "pt-BR" : locale === "fr" ? "fr" : locale === "zh" ? "zh-Hans" : locale === "hi" ? "hi" : locale === "ar" ? "ar" : "en";
+    document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
     if (locale === "zh") ensureChineseFont();
     if (locale === "hi") ensureHindiFont();
+    if (locale === "ar") ensureArabicFont();
   }
+}
+
+/** The full Arabic face loads only after Arabic is chosen. The picker uses a small subset. */
+function ensureArabicFont(): void {
+  if (document.getElementById("ar-font")) return;
+  const base = import.meta.env.BASE_URL || "/";
+  const prefix = base.endsWith("/") ? base : `${base}/`;
+  const link = document.createElement("link");
+  link.id = "ar-font";
+  link.rel = "stylesheet";
+  link.href = `${prefix}fonts/ar.css`;
+  document.head.appendChild(link);
 }
 
 /** The full Hindi face loads only after Hindi is chosen. The picker uses a small Devanagari subset. */
@@ -159,11 +183,31 @@ export function loadHindi(): Promise<void> {
   return hindiLoad;
 }
 
+/** The Arabic table is a separate chunk. The first visit does not download it. */
+export function installArabic(pack: ArabicPack): void {
+  arabicPack = pack;
+}
+
+export function arabicReady(): boolean {
+  return arabicPack != null;
+}
+
+export function loadArabic(): Promise<void> {
+  if (arabicPack) return Promise.resolve();
+  if (!arabicLoad) {
+    arabicLoad = import("./i18n-ar").then((mod) => {
+      installArabic(mod);
+    });
+  }
+  return arabicLoad;
+}
+
 export function loadLocalePack(lang: Locale): Promise<void> {
   if (lang === "pt") return loadPortuguese();
   if (lang === "fr") return loadFrench();
   if (lang === "zh") return loadChinese();
   if (lang === "hi") return loadHindi();
+  if (lang === "ar") return loadArabic();
   return Promise.resolve();
 }
 
@@ -172,6 +216,7 @@ export function localePackReady(lang: Locale): boolean {
   if (lang === "fr") return frenchReady();
   if (lang === "zh") return chineseReady();
   if (lang === "hi") return hindiReady();
+  if (lang === "ar") return arabicReady();
   return true;
 }
 
@@ -189,12 +234,13 @@ export function prefersPortuguese(): boolean {
   return lang.startsWith("pt");
 }
 
-export function t(en: string, es: string, pt?: string, fr?: string, zh?: string, hi?: string): string {
+export function t(en: string, es: string, pt?: string, fr?: string, zh?: string, hi?: string, ar?: string): string {
   if (locale === "es") return es;
   if (locale === "pt") return pt ?? portuguesePack?.PT[en] ?? en;
   if (locale === "fr") return fr ?? frenchPack?.FR[en] ?? en;
   if (locale === "zh") return zh ?? chinesePack?.ZH[en] ?? en;
   if (locale === "hi") return hi ?? hindiPack?.HI[en] ?? en;
+  if (locale === "ar") return ar ?? arabicPack?.AR[en] ?? en;
   return en;
 }
 
@@ -205,32 +251,34 @@ export function show(en: string): string {
   if (locale === "fr") return frenchPack?.FR[en] ?? en;
   if (locale === "zh") return chinesePack?.ZH[en] ?? en;
   if (locale === "hi") return hindiPack?.HI[en] ?? en;
+  if (locale === "ar") return arabicPack?.AR[en] ?? en;
   return en;
 }
 
-/** Choice ids stay English, like "6 remainder 2". Hindi reads the school word. */
+/** Choice ids stay English, like "6 remainder 2". Hindi and Arabic read the school word. */
 export function remainderShown(text: string): string {
-  if (locale !== "hi") return text;
-  return text.replace(/\bremainder\b/g, "शेष");
+  if (locale === "hi") return text.replace(/\bremainder\b/g, "शेष");
+  if (locale === "ar") return text.replace(/\bremainder\b/g, "الباقي");
+  return text;
 }
 
 export function yesDetail(detail: string): string {
-  return t(`Yes! ${detail}`, `¡Sí! ${detail}`, `Sim! ${detail}`, `Oui ! ${detail}`, `对！${detail}`, `हाँ! ${detail}`);
+  return t(`Yes! ${detail}`, `¡Sí! ${detail}`, `Sim! ${detail}`, `Oui ! ${detail}`, `对！${detail}`, `हाँ! ${detail}`, `نعم! ${detail}`);
 }
 
 export function almostDetail(detail: string): string {
-  return t(`Almost! ${detail}`, `¡Casi! ${detail}`, `Quase! ${detail}`, `Presque ! ${detail}`, `差一点！${detail}`, `लगभग! ${detail}`);
+  return t(`Almost! ${detail}`, `¡Casi! ${detail}`, `Quase! ${detail}`, `Presque ! ${detail}`, `差一点！${detail}`, `लगभग! ${detail}`, `تقريبًا! ${detail}`);
 }
 
 export function yourTurnLine(prompt: string): string {
-  return t(`Your turn. ${prompt}`, `Te toca. ${prompt}`, `Sua vez. ${prompt}`, `À toi. ${prompt}`, `轮到你了。${prompt}`, `अब तुम्हारी बारी। ${prompt}`);
+  return t(`Your turn. ${prompt}`, `Te toca. ${prompt}`, `Sua vez. ${prompt}`, `À toi. ${prompt}`, `轮到你了。${prompt}`, `अब तुम्हारी बारी। ${prompt}`, `دورك. ${prompt}`);
 }
 
 /** Round size for little kids. A countdown is not part of this label. */
 export function cardsRoundLabel(count: number): string {
   const n = Math.max(0, Math.floor(count));
-  if (n === 1) return t("1 card", "1 tarjeta", "1 carta", "1 carte", undefined, "1 कार्ड");
-  return t(`${n} cards`, `${n} tarjetas`, `${n} cartas`, `${n} cartes`, `${n}张卡片`, `${n} कार्ड`);
+  if (n === 1) return t("1 card", "1 tarjeta", "1 carta", "1 carte", undefined, "1 कार्ड", "بطاقة واحدة");
+  return t(`${n} cards`, `${n} tarjetas`, `${n} cartas`, `${n} cartes`, `${n}张卡片`, `${n} कार्ड`, `${n} بطاقات`);
 }
 
 /** Card step for Pre-K, kindergarten, and grade 1. */
@@ -244,10 +292,31 @@ export function cardStepLabel(index: number, total: number): string {
     `Carte ${at} sur ${safeTotal}`,
     `第${at}张，共${safeTotal}张`,
     `कार्ड ${at}, कुल ${safeTotal}`,
+    `البطاقة ${at} من ${safeTotal}`,
   );
 }
 
 export function gradeText(grade: Grade): string {
+  if (locale === "ar") {
+    switch (grade) {
+      case "PK":
+        return "روضة";
+      case "K":
+        return "تمهيدي";
+      case "1":
+        return "الصف 1";
+      case "2":
+        return "الصف 2";
+      case "3":
+        return "الصف 3";
+      case "4":
+        return "الصف 4";
+      default: {
+        const neverGrade: never = grade;
+        return neverGrade;
+      }
+    }
+  }
   if (locale === "hi") {
     switch (grade) {
       case "PK":
@@ -325,7 +394,8 @@ export function weekdayName(index: number): string {
 }
 
 export function weekdayLetter(index: number): string {
-  if (locale === "hi") return ["सो", "मं", "बु", "गु", "शु", "श", "र"][index] ?? "";
+  if (locale === "ar") return ["ن", "ث", "ر", "خ", "ج", "س", "ح"][index] ?? "";
+  if (locale === "hi") return ["सो", "मं", "बु", "गु", "शु", "श", "ر"][index] ?? "";
   if (locale === "zh") return ["一", "二", "三", "四", "五", "六", "日"][index] ?? "";
   if (locale === "fr") return ["L", "M", "M", "J", "V", "S", "D"][index] ?? "";
   if (locale === "pt") return ["S", "T", "Q", "Q", "S", "S", "D"][index] ?? "";
@@ -385,6 +455,19 @@ const SHAPES_ZH: Record<string, string> = {
   cylinder: "圆柱",
 };
 
+const SHAPES_AR: Record<string, string> = {
+  circle: "دائرة",
+  triangle: "مثلث",
+  square: "مربع",
+  rectangle: "مستطيل",
+  pentagon: "خماسي",
+  hexagon: "سداسي",
+  cube: "مكعب",
+  sphere: "كرة",
+  cone: "مخروط",
+  cylinder: "أسطوانة",
+};
+
 const SHAPES_HI: Record<string, string> = {
   circle: "वृत्त",
   triangle: "त्रिभुज",
@@ -399,6 +482,7 @@ const SHAPES_HI: Record<string, string> = {
 };
 
 export function shapeWord(id: string): string {
+  if (locale === "ar") return SHAPES_AR[id] ?? id;
   if (locale === "hi") return SHAPES_HI[id] ?? id;
   if (locale === "zh") return SHAPES_ZH[id] ?? id;
   if (locale === "fr") return SHAPES_FR[id]?.one ?? id;
@@ -408,6 +492,7 @@ export function shapeWord(id: string): string {
 }
 
 export function shapeWithArticle(id: string): string {
+  if (locale === "ar") return SHAPES_AR[id] ?? id;
   if (locale === "hi") return SHAPES_HI[id] ?? id;
   if (locale === "zh") return SHAPES_ZH[id] ?? id;
   if (locale === "fr") {
@@ -458,6 +543,14 @@ const PARTS_ZH: Record<string, string> = {
   "not equal": "不相等",
 };
 
+const PARTS_AR: Record<string, string> = {
+  halves: "أنصاف",
+  thirds: "أثلاث",
+  fourths: "أرباع",
+  unequal: "أجزاء غير متساوية",
+  "not equal": "غير متساوية",
+};
+
 const PARTS_HI: Record<string, string> = {
   halves: "आधे भाग",
   thirds: "तिहाई",
@@ -467,6 +560,7 @@ const PARTS_HI: Record<string, string> = {
 };
 
 export function partPhrase(id: string): string {
+  if (locale === "ar") return PARTS_AR[id] ?? id;
   if (locale === "hi") return PARTS_HI[id] ?? id;
   if (locale === "zh") return PARTS_ZH[id] ?? id;
   if (locale === "fr") return PARTS_FR[id] ?? id;
@@ -629,6 +723,41 @@ export function nounMeasure(name: string): string {
   return NOUNS_ZH[name]?.[1] ?? "个";
 }
 
+/** singular, plural, gender. Used for Arabic agreement. */
+const NOUNS_AR: Record<string, [string, string, "m" | "f"]> = {
+  apple: ["تفاحة", "تفاحات", "f"],
+  apples: ["تفاحة", "تفاحات", "f"],
+  fish: ["سمكة", "أسماك", "f"],
+  star: ["نجمة", "نجوم", "f"],
+  stars: ["نجمة", "نجوم", "f"],
+  cookie: ["بسكويت", "بسكويت", "m"],
+  cookies: ["بسكويت", "بسكويت", "m"],
+  frog: ["ضفدع", "ضفادع", "m"],
+  frogs: ["ضفدع", "ضفادع", "m"],
+  bag: ["كيس", "أكياس", "m"],
+  bags: ["كيس", "أكياس", "m"],
+  cat: ["قطة", "قطط", "f"],
+  cats: ["قطة", "قطط", "f"],
+  dog: ["كلب", "كلاب", "m"],
+  dogs: ["كلب", "كلاب", "m"],
+  squishee: ["squishee", "squishees", "m"],
+  squishees: ["squishee", "squishees", "m"],
+  ball: ["كرة", "كرات", "f"],
+  balls: ["كرة", "كرات", "f"],
+  banana: ["موزة", "موز", "f"],
+  bananas: ["موزة", "موز", "f"],
+  snake: ["ثعبان", "ثعابين", "m"],
+  snakes: ["ثعبان", "ثعابين", "m"],
+  carrot: ["جزرة", "جزر", "f"],
+  carrots: ["جزرة", "جزر", "f"],
+  bone: ["عظمة", "عظام", "f"],
+  bones: ["عظمة", "عظام", "f"],
+  candy: ["حلوى", "حلويات", "f"],
+  candies: ["حلوى", "حلويات", "f"],
+  bug: ["حشرة", "حشرات", "f"],
+  bugs: ["حشرة", "حشرات", "f"],
+};
+
 /** singular, plural, gender. Used only for Hindi agreement. */
 const NOUNS_HI: Record<string, [string, string, "m" | "f"]> = {
   apple: ["सेब", "सेब", "m"],
@@ -666,6 +795,11 @@ const NOUNS_HI: Record<string, [string, string, "m" | "f"]> = {
 
 /** English plural helper stays put. Spanish, Portuguese, and French use real singular and plural. */
 export function thingName(name: string, n: number, english: string): string {
+  if (locale === "ar") {
+    const row = NOUNS_AR[name];
+    if (!row) return english;
+    return n === 1 ? row[0] : row[1];
+  }
   if (locale === "hi") {
     const row = NOUNS_HI[name];
     if (!row) return english;
@@ -738,6 +872,14 @@ const COIN_ZH: Record<string, string> = {
   dollar: "美元",
 };
 
+const COIN_AR: Record<string, string> = {
+  penny: "سنت",
+  nickel: "5 سنتات",
+  dime: "10 سنتات",
+  quarter: "25 سنتًا",
+  dollar: "دولار",
+};
+
 const COIN_HI: Record<string, string> = {
   penny: "1 सेंट का सिक्का",
   nickel: "5 सेंट का सिक्का",
@@ -747,6 +889,7 @@ const COIN_HI: Record<string, string> = {
 };
 
 export function coinWord(kind: string, n = 1): string {
+  if (locale === "ar") return COIN_AR[kind] ?? kind;
   if (locale === "hi") return COIN_HI[kind] ?? kind;
   if (locale === "zh") return COIN_ZH[kind] ?? kind;
   if (locale === "fr") {
@@ -766,6 +909,7 @@ export function coinWord(kind: string, n = 1): string {
 }
 
 export function coinButton(kind: string, english: string): string {
+  if (locale === "ar") return COIN_AR[kind] ?? english;
   if (locale === "hi") return COIN_HI[kind] ?? english;
   if (locale === "zh") return COIN_ZH[kind] ?? english;
   const row = locale === "fr" ? COIN_FR[kind] : locale === "pt" ? COIN_PT[kind] : locale === "es" ? COIN_ES[kind] : undefined;
@@ -776,6 +920,22 @@ export function coinButton(kind: string, english: string): string {
 
 /** "a nickel" / "un níquel" / "uma moeda de 5" for praise lines. */
 export function coinAsA(kind: string, englishLower: string): string {
+  if (locale === "ar") {
+    switch (kind) {
+      case "penny":
+        return "سنت واحد";
+      case "nickel":
+        return "قطعة من 5 سنتات";
+      case "dime":
+        return "قطعة من 10 سنتات";
+      case "quarter":
+        return "قطعة من 25 سنتًا";
+      case "dollar":
+        return "دولار واحد";
+      default:
+        return englishLower;
+    }
+  }
   if (locale === "hi") return COIN_HI[kind] ? `एक ${COIN_HI[kind]}` : englishLower;
   if (locale === "zh") return COIN_ZH[kind] ? `一枚${COIN_ZH[kind]}` : englishLower;
   if (locale === "fr") {
@@ -953,6 +1113,7 @@ export function spanishFraction(num: number, den: number): string {
 }
 
 function traitWord(trait: string): string {
+  if (locale === "ar") return arabicPack?.TRAIT_AR[trait] ?? trait;
   if (locale === "hi") return hindiPack?.TRAIT_HI[trait] ?? trait;
   if (locale === "zh") return chinesePack?.TRAIT_ZH[trait] ?? trait;
   if (locale === "fr") return frenchPack?.TRAIT_FR[trait] ?? trait;
@@ -967,6 +1128,7 @@ export function starLead(name: string, trait: string): string {
   const frTrait = locale === "fr" ? traitWord(trait) : (frenchPack?.TRAIT_FR[trait] ?? trait);
   const zhTrait = locale === "zh" ? traitWord(trait) : (chinesePack?.TRAIT_ZH[trait] ?? trait);
   const hiTrait = locale === "hi" ? traitWord(trait) : (hindiPack?.TRAIT_HI[trait] ?? trait);
+  const arTrait = locale === "ar" ? traitWord(trait) : (arabicPack?.TRAIT_AR[trait] ?? trait);
   return t(
     `${name} the ${trait}`,
     `${name}, ${TRAIT_ES[trait] ?? trait},`,
@@ -974,6 +1136,7 @@ export function starLead(name: string, trait: string): string {
     `${name}, ${frTrait},`,
     `${name}，${zhTrait}，`,
     `${name}, ${hiTrait},`,
+    `${name} ${arTrait}`,
   );
 }
 
@@ -985,6 +1148,7 @@ export function gamePill(title: string, num: number): string {
     `${show(title)} · Niveau ${num}`,
     `${show(title)} · 第${num}关`,
     `${show(title)} · स्तर ${num}`,
+    `${show(title)} · المستوى ${num}`,
   );
 }
 
@@ -1012,6 +1176,11 @@ function howManyLead(name: string, englishPlural: string, count: number): string
     const measure = row?.[1] ?? "个";
     return `有几${measure}${noun}`;
   }
+  if (locale === "ar") {
+    const row = NOUNS_AR[name];
+    const noun = row ? (count === 1 ? row[0] : row[1]) : word;
+    return `كم ${noun}`;
+  }
   if (locale === "hi") {
     const row = NOUNS_HI[name];
     const noun = row ? (count === 1 ? row[0] : row[1]) : word;
@@ -1029,19 +1198,20 @@ function howManyLead(name: string, englishPlural: string, count: number): string
 
 /** "cuántos plátanos" or "quantas cenouras" in a how-many-more question. */
 export function howManyMorePhrase(name: string, englishPlural: string): string {
-  if (locale !== "es" && locale !== "pt" && locale !== "fr" && locale !== "zh" && locale !== "hi") return englishPlural;
+  if (locale !== "es" && locale !== "pt" && locale !== "fr" && locale !== "zh" && locale !== "hi" && locale !== "ar") return englishPlural;
   return howManyLead(name, englishPlural, 2);
 }
 
 /** "cuántos plátanos", "quantas cenouras", or "combien de pommes" in a how-many-less question. */
 export function howManyLessPhrase(name: string, englishPlural: string): string {
-  if (locale !== "es" && locale !== "pt" && locale !== "fr" && locale !== "zh" && locale !== "hi") return englishPlural;
+  if (locale !== "es" && locale !== "pt" && locale !== "fr" && locale !== "zh" && locale !== "hi" && locale !== "ar") return englishPlural;
   return howManyLead(name, englishPlural, 2);
 }
 
 /** True when the noun uses feminine agreement. English is never feminine here. */
 export function nounIsFeminine(name: string): boolean {
   const one = thingName(name, 1, name);
+  if (locale === "ar") return NOUNS_AR[name]?.[2] === "f" || NOUNS_AR[one]?.[2] === "f";
   if (locale === "hi") return NOUNS_HI[name]?.[2] === "f" || NOUNS_HI[one]?.[2] === "f";
   if (locale === "fr") return FEMININE_FR.has(one);
   if (locale === "pt") return FEMININE_PT.has(one);
@@ -1051,11 +1221,12 @@ export function nounIsFeminine(name: string): boolean {
 
 /** "bananas" / "cuántos plátanos" or "quantas cenouras". */
 export function howManyPhrase(name: string, n: number, englishPlural: string): string {
-  if (locale !== "es" && locale !== "pt" && locale !== "fr" && locale !== "zh" && locale !== "hi") return englishPlural;
+  if (locale !== "es" && locale !== "pt" && locale !== "fr" && locale !== "zh" && locale !== "hi" && locale !== "ar") return englishPlural;
   return howManyLead(name, englishPlural, n);
 }
 
 export function longShort(long: boolean): string {
+  if (locale === "ar") return long ? "الأطول" : "الأقصر";
   if (locale === "hi") return long ? "सबसे लंबा" : "सबसे छोटा";
   if (locale === "zh") return long ? "最长" : "最短";
   if (locale === "fr") return long ? "le plus long" : "le plus court";
@@ -1066,6 +1237,7 @@ export function longShort(long: boolean): string {
 
 /** Adjective agrees with the noun. English stays "longest" / "shortest". */
 export function longShortOf(name: string, long: boolean): string {
+  if (locale === "ar") return long ? "الأطول" : "الأقصر";
   if (locale === "hi") {
     const fem = nounIsFeminine(name);
     if (long) return fem ? "सबसे लंबी" : "सबसे लंबा";
@@ -1431,4 +1603,72 @@ export function hindiPersona(id: string, known: boolean): PersonaEs | null {
 
 export function hindiBoss(gameId: string): BossEs | null {
   return hindiPack?.BOSS_HI[gameId] ?? null;
+}
+
+const AR_ONES = ["صفر", "واحد", "اثنان", "ثلاثة", "أربعة", "خمسة", "ستة", "سبعة", "ثمانية", "تسعة"] as const;
+const AR_TEENS = ["عشرة", "أحد عشر", "اثنا عشر", "ثلاثة عشر", "أربعة عشر", "خمسة عشر", "ستة عشر", "سبعة عشر", "ثمانية عشر", "تسعة عشر"] as const;
+const AR_TENS = ["", "", "عشرون", "ثلاثون", "أربعون", "خمسون", "ستون", "سبعون", "ثمانون", "تسعون"] as const;
+const AR_HUNDREDS = ["", "مئة", "مئتان", "ثلاثمئة", "أربعمئة", "خمسمئة", "ستمئة", "سبعمئة", "ثمانمئة", "تسعمئة"] as const;
+
+function arUnder100(n: number): string {
+  if (n < 10) return AR_ONES[n] ?? String(n);
+  if (n < 20) return AR_TEENS[n - 10] ?? String(n);
+  const tens = AR_TENS[Math.floor(n / 10)] ?? "";
+  const ones = n % 10;
+  return ones ? `${AR_ONES[ones]} و${tens}` : tens;
+}
+
+/** School Arabic. 21 is واحد وعشرون, 101 is مئة وواحد, 2000 is ألفان. */
+export function arabicNumberWords(n: number): string {
+  if (!Number.isInteger(n) || n < 0) return String(n);
+  if (n < 100) return arUnder100(n);
+  if (n < 1000) {
+    const hundreds = Math.floor(n / 100);
+    const rest = n % 100;
+    const head = AR_HUNDREDS[hundreds] ?? String(n);
+    return rest ? `${head} و${arUnder100(rest)}` : head;
+  }
+  if (n < 1_000_000) {
+    const thousands = Math.floor(n / 1000);
+    const rest = n % 1000;
+    let head: string;
+    if (thousands === 1) head = "ألف";
+    else if (thousands === 2) head = "ألفان";
+    else if (thousands >= 3 && thousands <= 10) head = `${arUnder100(thousands)} آلاف`;
+    else head = `${arabicNumberWords(thousands)} ألفًا`;
+    return rest ? `${head} و${arabicNumberWords(rest)}` : head;
+  }
+  return String(n);
+}
+
+/** "واحد على ثلاثة". Half, third, and quarter use the school names. */
+export function arabicFraction(num: number, den: number): string {
+  if (!Number.isInteger(num) || !Number.isInteger(den) || den <= 0) return `${num}/${den}`;
+  if (num === 1 && den === 2) return "نصف";
+  if (num === 1 && den === 3) return "ثلث";
+  if (num === 2 && den === 3) return "ثلثان";
+  if (num === 1 && den === 4) return "ربع";
+  if (num === 3 && den === 4) return "ثلاثة أرباع";
+  if (num === 1 && den === 5) return "خُمس";
+  if (num === 1 && den === 6) return "سُدس";
+  if (num === 1 && den === 8) return "ثُمن";
+  if (num === 1 && den === 10) return "عُشر";
+  return `${arabicNumberWords(num)} على ${arabicNumberWords(den)}`;
+}
+
+export function arabicMinuteWords(minutes: number): string {
+  if (minutes === 0) return "تمامًا";
+  if (minutes === 15) return "والربع";
+  if (minutes === 30) return "والنصف";
+  if (minutes === 45) return "إلا ربع";
+  return `و${arabicNumberWords(minutes)}`;
+}
+
+export function arabicPersona(id: string, known: boolean): PersonaEs | null {
+  if (!arabicPack) return null;
+  return known ? (arabicPack.PERSONA_AR[id] ?? null) : arabicPack.PERSONA_FALLBACK_AR;
+}
+
+export function arabicBoss(gameId: string): BossEs | null {
+  return arabicPack?.BOSS_AR[gameId] ?? null;
 }

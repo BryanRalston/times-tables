@@ -25,6 +25,8 @@ function alphabetGameNote(): string {
       return "这个游戏是英语字母游戏。请在设置里换成 English。";
     case "hi":
       return "यह खेल अंग्रेज़ी के अक्षरों का है। सेटिंग में English चुनो।";
+    case "ar":
+      return "هذه اللعبة لحروف الإنجليزية. اختر English من الإعدادات.";
     case "en":
     case "es":
     case "pt":
@@ -274,7 +276,7 @@ function AcademyApp() {
 
   if (!packReady) {
     const waiting =
-      save.lang === "zh" ? "加载中…" : save.lang === "hi" ? "लोड हो रहा है…" : save.lang === "fr" ? "Chargement…" : save.lang === "pt" ? "Carregando…" : "Loading…";
+      save.lang === "zh" ? "加载中…" : save.lang === "hi" ? "लोड हो रहा है…" : save.lang === "ar" ? "جارٍ التحميل…" : save.lang === "fr" ? "Chargement…" : save.lang === "pt" ? "Carregando…" : "Loading…";
     return (
       <SoundContext.Provider value={save.sound}>
         <p className="ac-note">{waiting}</p>

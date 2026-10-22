@@ -5,9 +5,10 @@ import { rngFromSeed } from "@/lib/rng";
 import { GAMES } from "../games/registry";
 import type { ChoiceQ } from "../games/types";
 import { makeClockTask } from "../hands";
-import { installChinese, installFrench, installHindi, installPortuguese, setLocale, yourTurnLine } from "../i18n";
+import { installArabic, installChinese, installFrench, installHindi, installPortuguese, setLocale, yourTurnLine } from "../i18n";
 import { BOSS_FR, FR, PERSONA_FALLBACK_FR, PERSONA_FR, TRAIT_FR } from "../i18n-fr";
 import { BOSS_PT, PERSONA_FALLBACK_PT, PERSONA_PT, PT, TRAIT_PT } from "../i18n-pt";
+import { AR, BOSS_AR, PERSONA_AR, PERSONA_FALLBACK_AR, TRAIT_AR } from "../i18n-ar";
 import { BOSS_HI, HI, PERSONA_FALLBACK_HI, PERSONA_HI, TRAIT_HI } from "../i18n-hi";
 import { BOSS_ZH, PERSONA_FALLBACK_ZH, PERSONA_ZH, TRAIT_ZH, ZH } from "../i18n-zh";
 import { SQUAD_IDS } from "../model";
@@ -20,11 +21,13 @@ import { collectSpokenLines } from "../voice/catalog";
 import { VOICE_FILES_ES } from "../voice/manifest-es";
 import { VOICE_FILES_FR } from "../voice/manifest-fr";
 import { VOICE_FILES_PT } from "../voice/manifest-pt";
+import { VOICE_FILES_AR } from "../voice/manifest-ar";
 import { VOICE_FILES_HI } from "../voice/manifest-hi";
 import { VOICE_FILES_ZH } from "../voice/manifest-zh";
 import { planSpeech } from "../voice/plan";
 import { spanishPrecacheVoiceFiles } from "../voice/precache-es";
 import { frenchPrecacheVoiceFiles } from "../voice/precache-fr";
+import { arabicPrecacheVoiceFiles } from "../voice/precache-ar";
 import { hindiPrecacheVoiceFiles } from "../voice/precache-hi";
 import { chinesePrecacheVoiceFiles } from "../voice/precache-zh";
 import { portuguesePrecacheVoiceFiles } from "../voice/precache-pt";
@@ -33,6 +36,7 @@ installPortuguese({ PT, PERSONA_PT, PERSONA_FALLBACK_PT, BOSS_PT, TRAIT_PT });
 installFrench({ FR, PERSONA_FR, PERSONA_FALLBACK_FR, BOSS_FR, TRAIT_FR });
 installChinese({ ZH, PERSONA_ZH, PERSONA_FALLBACK_ZH, BOSS_ZH, TRAIT_ZH });
 installHindi({ HI, PERSONA_HI, PERSONA_FALLBACK_HI, BOSS_HI, TRAIT_HI });
+installArabic({ AR, PERSONA_AR, PERSONA_FALLBACK_AR, BOSS_AR, TRAIT_AR });
 
 describe("offline precache", () => {
   it("lists app files, squad art, outfits, and sounds", () => {
@@ -130,7 +134,7 @@ describe("offline precache", () => {
     expect(domainSw).toContain(`const SHARE_IMAGE = ${JSON.stringify(SHARE_IMAGE_PATH)}`);
     expect(domainSw).toContain("if (url.pathname === SHARE_IMAGE) return;");
     expect(domainSw).toContain('caches.match("/index.html")');
-    expect(domainSw).toContain('const CACHE = "squishee-academy-root-v14"');
+    expect(domainSw).toContain('const CACHE = "squishee-academy-root-v15"');
   });
 
   it("precaches Spanish clips for an Add, Times, and Telling Time round", () => {
@@ -414,6 +418,25 @@ describe("offline precache", () => {
       for (const file of live) expect(isPrecacheFile(`voice/${file}`)).toBe(true);
       expect(live).toContain(VOICE_FILES_HI["7"]);
       const extra = Object.values(VOICE_FILES_HI).find((file) => !live.includes(file));
+      expect(extra).toBeTruthy();
+      expect(isPrecacheFile(`voice/${extra}`)).toBe(false);
+    } finally {
+      setLocale("en");
+    }
+  });
+
+  it("precaches Arabic clips for core games without the whole voice folder", () => {
+    setLocale("ar");
+    try {
+      const listed = JSON.parse(readFileSync("src/academy/voice/ar-precache.json", "utf8")) as string[];
+      const live = arabicPrecacheVoiceFiles();
+      expect(listed).toEqual(live);
+      expect(live.length).toBeGreaterThan(100);
+      expect(live.length).toBeLessThan(Object.keys(VOICE_FILES_AR).length);
+      for (const file of live) expect(isPrecacheFile(`voice/${file}`)).toBe(true);
+      expect(live).toContain(VOICE_FILES_AR["7"]);
+      expect(isPrecacheFile("voice/ar/not-listed.mp3")).toBe(false);
+      const extra = Object.values(VOICE_FILES_AR).find((file) => !live.includes(file));
       expect(extra).toBeTruthy();
       expect(isPrecacheFile(`voice/${extra}`)).toBe(false);
     } finally {

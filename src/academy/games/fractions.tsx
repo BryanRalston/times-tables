@@ -220,7 +220,7 @@ function makeCompare(rng: Rng): ChoiceQ {
         ])
       : pickTalk(rng, [
           ["Which shaded fraction is less?", "¿Qué fracción sombreada es menor?"],
-          [`${buddy} asks which shaded fraction is less`, `${buddy} pregunta qué fracción sombreada es menor`, `${buddy} pergunta qual fração pintada é menor`, `${buddy} demande quelle fraction coloriée est la plus petite`, `${buddy}问，涂了颜色的哪个分数更小`, `${buddy} पूछता है कौन सा रंगा भिन्न छोटा है`, `${buddy} يسأل أي كسر مظلّल أصغر`],
+          [`${buddy} asks which shaded fraction is less`, `${buddy} pregunta qué fracción sombreada es menor`, `${buddy} pergunta qual fração pintada é menor`, `${buddy} demande quelle fraction coloriée est la plus petite`, `${buddy}问，涂了颜色的哪个分数更小`, `${buddy} पूछता है कौन सा रंगा भिन्न छोटा है`, `${buddy} يسأل أي كسر مظلّل أصغر`],
         ]),
     hint: sameDen
       ? t("Same denominator. More parts are greater.", "El mismo denominador. Más partes es mayor.")

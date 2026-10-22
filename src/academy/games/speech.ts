@@ -1,4 +1,4 @@
-import { chineseVoiceReady, englishVoiceReady, ensureVoice, frenchVoiceReady, hindiVoiceReady, portugueseVoiceReady, spanishVoiceReady } from "../voice/clips";
+import { arabicVoiceReady, chineseVoiceReady, englishVoiceReady, ensureVoice, frenchVoiceReady, hindiVoiceReady, portugueseVoiceReady, spanishVoiceReady } from "../voice/clips";
 import { startClipSpeech, stopClipSpeech } from "../voice/player";
 import { getLocale } from "../i18n";
 
@@ -59,7 +59,7 @@ function speakWithDevice(text: string, slow: boolean, onFail?: () => void): bool
     const utter = new SpeechSynthesisUtterance(text);
     utter.rate = speakRate(slow);
     const locale = getLocale();
-    utter.lang = locale === "es" ? "es-MX" : locale === "pt" ? "pt-BR" : locale === "fr" ? "fr-FR" : locale === "zh" ? "zh-CN" : locale === "hi" ? "hi-IN" : "en-US";
+    utter.lang = locale === "es" ? "es-MX" : locale === "pt" ? "pt-BR" : locale === "fr" ? "fr-FR" : locale === "zh" ? "zh-CN" : locale === "hi" ? "hi-IN" : locale === "ar" ? "ar" : "en-US";
     const voice = synth.getVoices().find((item) => item.lang.toLowerCase().startsWith(locale === "en" ? "en" : locale));
     if (voice) utter.voice = voice;
     utter.onerror = (event) => {
@@ -87,7 +87,7 @@ function cancelDevice(): void {
 /** Speak `text` from a clip when one exists. Returns false when nothing can talk, so the caller can show text. */
 export function speakText(text: string, slow: boolean, onFail?: () => void): boolean {
   const locale = getLocale();
-  const ready = locale === "es" ? spanishVoiceReady() : locale === "pt" ? portugueseVoiceReady() : locale === "fr" ? frenchVoiceReady() : locale === "zh" ? chineseVoiceReady() : locale === "hi" ? hindiVoiceReady() : englishVoiceReady();
+  const ready = locale === "es" ? spanishVoiceReady() : locale === "pt" ? portugueseVoiceReady() : locale === "fr" ? frenchVoiceReady() : locale === "zh" ? chineseVoiceReady() : locale === "hi" ? hindiVoiceReady() : locale === "ar" ? arabicVoiceReady() : englishVoiceReady();
   if (!ready) {
     void ensureVoice().then(() => {
       speakText(text, slow, onFail);
