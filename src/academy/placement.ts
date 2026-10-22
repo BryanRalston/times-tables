@@ -32,7 +32,7 @@ interface SkillRow {
 
 /** The line on the one Play button. The title is already in the child's language. */
 export function todayPlayLine(title: string, grade: Grade): string {
-  return t(`Today: ${title} · ${gradeText(grade)}`, `Hoy: ${title} · ${gradeText(grade)}`, `Hoje: ${title} · ${gradeText(grade)}`, `Aujourd'hui : ${title} · ${gradeText(grade)}`, `今天：${title} · ${gradeText(grade)}`, `आज: ${title} · ${gradeText(grade)}`);
+  return t(`Today: ${title} · ${gradeText(grade)}`, `Hoy: ${title} · ${gradeText(grade)}`, `Hoje: ${title} · ${gradeText(grade)}`, `Aujourd'hui : ${title} · ${gradeText(grade)}`, `今天：${title} · ${gradeText(grade)}`, `आज: ${title} · ${gradeText(grade)}`, `اليوم: ${title} · ${gradeText(grade)}`);
 }
 
 function dueStats(stat: SkillStat | undefined): { acc: number; miss: number; n: number } | null {

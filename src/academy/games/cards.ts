@@ -241,7 +241,7 @@ export const timeCard: GameCard = {
   },
   sheetDefaultLevel: "half",
   isLevel: (value) => isId(TIME_IDS, value),
-  pill: (level) => t(`Telling Time · ${level.label}`, `La hora · ${show(level.label)}`, `As horas · ${show(level.label)}`, `L'heure · ${show(level.label)}`, `认识钟表 · ${show(level.label)}`, `समय देखना · ${show(level.label)}`),
+  pill: (level) => t(`Telling Time · ${level.label}`, `La hora · ${show(level.label)}`, `As horas · ${show(level.label)}`, `L'heure · ${show(level.label)}`, `认识钟表 · ${show(level.label)}`, `समय देखना · ${show(level.label)}`, `قراءة الساعة · ${show(level.label)}`),
   bars: TIME_BARS,
   chips: TIME_CHIPS,
   skillLabel: (key) => labelFor(TIME_BARS, key) ?? labelFor(TIME_CHIPS, key),

@@ -224,7 +224,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
         {t(
           `${found} of ${book.length} found · ${child.coins} coins`,
           `${found} de ${book.length} encontrados · ${child.coins} monedas`, `${found} de ${book.length} encontrados · ${child.coins} moedas`,
-        `${found} sur ${book.length} trouvés · ${child.coins} pièces`, `找到${found}个，一共${book.length}个 · ${child.coins}个金币`, `${book.length} में से ${found} मिले · ${child.coins} सिक्के`)}
+        `${found} sur ${book.length} trouvés · ${child.coins} pièces`, `找到${found}个，一共${book.length}个 · ${child.coins}个金币`, `${book.length} में से ${found} मिले · ${child.coins} सिक्के`, `عُثر على ${found} من ${book.length} · ${child.coins} عملات`)}
       </p>
       <SquishTally />
       <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="ac-shelf-you" label={show("You")} />
@@ -233,7 +233,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
         {t(
           `${child.cosmetics.length} of ${lookCount} looks · ${child.coins} coins`,
           `${child.cosmetics.length} de ${lookCount} disfraces · ${child.coins} monedas`, `${child.cosmetics.length} de ${lookCount} fantasias · ${child.coins} moedas`,
-        `${child.cosmetics.length} sur ${lookCount} déguisements · ${child.coins} pièces`, `装扮${child.cosmetics.length}套，一共${lookCount}套 · ${child.coins}个金币`, `${lookCount} में से ${child.cosmetics.length} रूप · ${child.coins} सिक्के`)}
+        `${child.cosmetics.length} sur ${lookCount} déguisements · ${child.coins} pièces`, `装扮${child.cosmetics.length}套，一共${lookCount}套 · ${child.coins}个金币`, `${lookCount} में से ${child.cosmetics.length} रूप · ${child.coins} सिक्के`, `${child.cosmetics.length} من ${lookCount} أزياء · ${child.coins} عملات`)}
       </p>
       <p className="ac-hint">{show("Spend coins you earn. Never real money.")}</p>
       <p className="ac-hint">{t("Stars and practice unlock looks too.", "Las estrellas y la práctica también dan disfraces.")}</p>
@@ -302,8 +302,8 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
                   onClick={() => onSave(mapActive(save, (row) => wearBossLook(row, wearing ? "" : boss.cosmeticId)))}
                 >
                   {wearing
-                    ? t(`Take off ${bossCosmeticName(boss.cosmeticId)}`, `Quítale ${bossCosmeticName(boss.cosmeticId)}`, `Tire ${bossCosmeticName(boss.cosmeticId)}`, `Enlève ${bossCosmeticName(boss.cosmeticId)}`, `取下${bossCosmeticName(boss.cosmeticId)}`, `${bossCosmeticName(boss.cosmeticId)} उतारो`)
-                    : t(`Wear ${bossCosmeticName(boss.cosmeticId)}`, `Ponte ${bossCosmeticName(boss.cosmeticId)}`, `Vista ${bossCosmeticName(boss.cosmeticId)}`, `Mets ${bossCosmeticName(boss.cosmeticId)}`, `戴上${bossCosmeticName(boss.cosmeticId)}`, `${bossCosmeticName(boss.cosmeticId)} पहनो`)}
+                    ? t(`Take off ${bossCosmeticName(boss.cosmeticId)}`, `Quítale ${bossCosmeticName(boss.cosmeticId)}`, `Tire ${bossCosmeticName(boss.cosmeticId)}`, `Enlève ${bossCosmeticName(boss.cosmeticId)}`, `取下${bossCosmeticName(boss.cosmeticId)}`, `${bossCosmeticName(boss.cosmeticId)} उतारो`, `اخلع ${bossCosmeticName(boss.cosmeticId)}`)
+                    : t(`Wear ${bossCosmeticName(boss.cosmeticId)}`, `Ponte ${bossCosmeticName(boss.cosmeticId)}`, `Vista ${bossCosmeticName(boss.cosmeticId)}`, `Mets ${bossCosmeticName(boss.cosmeticId)}`, `戴上${bossCosmeticName(boss.cosmeticId)}`, `${bossCosmeticName(boss.cosmeticId)} पहनो`, `ارتدِ ${bossCosmeticName(boss.cosmeticId)}`)}
                 </button>
               ) : null}
             </article>
@@ -326,7 +326,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
               <small>{entry.rarity === "rare" ? show("Rare") : show("Common")}</small>
               <small>{open ? entry.line : entry.find}</small>
               {open ? <small>{entry.fact}</small> : null}
-              {open ? <small>{t(`Loves ${entry.favorite}`, `Le encanta ${entry.favorite}`, `Adora ${entry.favorite}`, `Adore ${entry.favorite}`, `最喜欢${entry.favorite}`, `${entry.favorite} पसंद है`)}</small> : null}
+              {open ? <small>{t(`Loves ${entry.favorite}`, `Le encanta ${entry.favorite}`, `Adora ${entry.favorite}`, `Adore ${entry.favorite}`, `最喜欢${entry.favorite}`, `${entry.favorite} पसंद है`, `يحب ${entry.favorite}`)}</small> : null}
               {open ? (
                 <small className="ac-bond-pips" data-bond={bondTier(bondScore(child.bonds, entry.id))}>
                   {bondHearts(bondTier(bondScore(child.bonds, entry.id))) || bondName(0)}

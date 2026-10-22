@@ -133,7 +133,7 @@ export function makeClockTask(level: string, rng: Rng, avoid?: string, prefer: r
     hours,
     minutes,
     snap,
-    speech: t(`Show ${phrase}. Drag the hands.`, `Muestra ${phrase}. Arrastra las manecillas.`, `Mostre ${phrase}. Arraste os ponteiros.`, `Montre ${phrase}. Glisse les aiguilles.`, `拨出${phrase}。拖动时针和分针。`, `${phrase} दिखाओ। सुइयाँ खींचो।`),
+    speech: t(`Show ${phrase}. Drag the hands.`, `Muestra ${phrase}. Arrastra las manecillas.`, `Mostre ${phrase}. Arraste os ponteiros.`, `Montre ${phrase}. Glisse les aiguilles.`, `拨出${phrase}。拖动时针和分针。`, `${phrase} दिखाओ। सुइयाँ खींचो।`, `أظهر ${phrase}. اسحب العقارب.`),
     skill: `time:${safe}`,
     factKey: fact,
   };
@@ -190,7 +190,7 @@ export function makePayTask(level: string, rng: Rng, avoid?: string): PayTask {
     speech: t(
       `Pay ${speakable(formatCents(pick.cents))}. Drag the coins.`,
       `Paga ${speakable(formatCents(pick.cents))}. Arrastra las monedas.`, `Pague ${speakable(formatCents(pick.cents))}. Arraste as moedas.`,
-    `Paie ${speakable(formatCents(pick.cents))}. Glisse les pièces.`, `付${speakable(formatCents(pick.cents))}。拖动硬币。`, `${speakable(formatCents(pick.cents))} दो। सिक्के खींचो।`),
+    `Paie ${speakable(formatCents(pick.cents))}. Glisse les pièces.`, `付${speakable(formatCents(pick.cents))}。拖动硬币。`, `${speakable(formatCents(pick.cents))} दो। सिक्के खींचो।`, `ادفع ${speakable(formatCents(pick.cents))}. اسحب العملات.`),
     skill: `money:${level in PAY_PLANS ? level : "count"}`,
     factKey: String(pick.cents),
   };
@@ -207,7 +207,7 @@ export function clockQuestion(task: ClockTask): ChoiceQ {
   return {
     id: `clock-${task.factKey}`,
     game: "time",
-    title: t(`Show ${timeTalk(task.hours, task.minutes)}`, `Muestra ${timeTalk(task.hours, task.minutes)}`, `Mostre ${timeTalk(task.hours, task.minutes)}`, `Montre ${timeTalk(task.hours, task.minutes)}`, `拨出${timeTalk(task.hours, task.minutes)}`, `${timeTalk(task.hours, task.minutes)} दिखाओ`),
+    title: t(`Show ${timeTalk(task.hours, task.minutes)}`, `Muestra ${timeTalk(task.hours, task.minutes)}`, `Mostre ${timeTalk(task.hours, task.minutes)}`, `Montre ${timeTalk(task.hours, task.minutes)}`, `拨出${timeTalk(task.hours, task.minutes)}`, `${timeTalk(task.hours, task.minutes)} दिखाओ`, `أظهر ${timeTalk(task.hours, task.minutes)}`),
     hint: t("Drag the hands", "Arrastra las manecillas"),
     praise: timeTalk(task.hours, task.minutes),
     almost: timeTalk(task.hours, task.minutes),
