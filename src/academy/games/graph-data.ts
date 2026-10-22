@@ -168,7 +168,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
           `There are ${apples} apples and ${bananas} bananas. How many apples?`,
           `Hay ${apples} manzanas y ${bananas} plátanos. ¿Cuántas manzanas hay?`,
           `Há ${apples} maçãs e ${bananas} bananas. Quantas maçãs há?`,
-        `Il y a ${apples} pommes et ${bananas} bananes. Combien de pommes ?`, `有${apples}个苹果和${bananas}根香蕉。有几个苹果？`),
+        `Il y a ${apples} pommes et ${bananas} bananes. Combien de pommes ?`, `有${apples}个苹果和${bananas}根香蕉。有几个苹果？`, `${apples} सेब और ${bananas} केले हैं। कितने सेब हैं?`),
         answer: String(apples),
       };
     }
@@ -182,7 +182,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
             `The tally is ${apples} apples, ${bananas} bananas, and ${carrots} carrots. How many in all?`,
             `El conteo es ${apples} manzanas, ${bananas} plátanos y ${carrots} zanahorias. ¿Cuántos hay en total?`,
             `A contagem é ${apples} maçãs, ${bananas} bananas e ${carrots} cenouras. Quantos há no total?`,
-          `Le compte est ${apples} pommes, ${bananas} bananes et ${carrots} carottes. Combien en tout ?`, `画正字上有${apples}个苹果、${bananas}根香蕉和${carrots}根胡萝卜。一共有几个？`),
+          `Le compte est ${apples} pommes, ${bananas} bananes et ${carrots} carottes. Combien en tout ?`, `画正字上有${apples}个苹果、${bananas}根香蕉和${carrots}根胡萝卜。一共有几个？`, `मिलान चिह्न में ${apples} सेब, ${bananas} केले, और ${carrots} गाजर हैं। कुल कितने हैं?`),
           answer: String(apples + bananas + carrots),
         };
       }
@@ -195,7 +195,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
               `The tally is ${more} apples and ${fewer} bananas. How many more apples than bananas?`,
               `El conteo es ${more} manzanas y ${fewer} plátanos. ¿Cuántas manzanas más que plátanos?`,
               `A contagem é ${more} maçãs e ${fewer} bananas. Quantas maçãs a mais que bananas?`,
-            `Le compte est ${more} pommes et ${fewer} bananes. Combien de pommes de plus que de bananes ?`, `画正字上有${more}个苹果和${fewer}根香蕉。苹果比香蕉多几个？`),
+            `Le compte est ${more} pommes et ${fewer} bananes. Combien de pommes de plus que de bananes ?`, `画正字上有${more}个苹果和${fewer}根香蕉。苹果比香蕉多几个？`, `मिलान चिह्न में ${more} सेब और ${fewer} केले हैं। सेब केले से कितने अधिक हैं?`),
             answer: String(more - fewer),
           }
         : {
@@ -203,7 +203,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
               `The tally is ${fewer} apples and ${more} bananas. How many more bananas than apples?`,
               `El conteo es ${fewer} manzanas y ${more} plátanos. ¿Cuántos plátanos más que manzanas?`,
               `A contagem é ${fewer} maçãs e ${more} bananas. Quantas bananas a mais que maçãs?`,
-            `Le compte est ${fewer} pommes et ${more} bananes. Combien de bananes de plus que de pommes ?`, `画正字上有${fewer}个苹果和${more}根香蕉。香蕉比苹果多几根？`),
+            `Le compte est ${fewer} pommes et ${more} bananes. Combien de bananes de plus que de pommes ?`, `画正字上有${fewer}个苹果和${more}根香蕉。香蕉比苹果多几根？`, `मिलान चिह्न में ${fewer} सेब और ${more} केले हैं। केले सेब से कितने अधिक हैं?`),
             answer: String(more - fewer),
           };
     }
@@ -212,6 +212,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
       const apples = rng.int(1, 5);
       const bananas = rng.int(1, 5);
       const graph = safe === "picture" ? "picture graph" : "bar graph";
+      const graphHi = safe === "picture" ? "चित्र आलेख" : "दंड आलेख";
       const graphEs = safe === "picture" ? "gráfica de dibujos" : "gráfica de barras";
       const graphPt = safe === "picture" ? "gráfico de figuras" : "gráfico de barras";
       const graphFr = safe === "picture" ? "graphique à images" : "graphique en barres";
@@ -222,7 +223,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
             `The ${graph} shows ${apples} apples and ${bananas} bananas. How many in all?`,
             `La ${graphEs} muestra ${apples} manzanas y ${bananas} plátanos. ¿Cuántos hay en total?`,
             `O ${graphPt} mostra ${apples} maçãs e ${bananas} bananas. Quantos há no total?`,
-          `Le ${graphFr} montre ${apples} pommes et ${bananas} bananes. Combien en tout ?`, `${graphZh}上有${apples}个苹果和${bananas}根香蕉。一共有几个？`),
+          `Le ${graphFr} montre ${apples} pommes et ${bananas} bananes. Combien en tout ?`, `${graphZh}上有${apples}个苹果和${bananas}根香蕉。一共有几个？`, `${graphHi} ${apples} सेब और ${bananas} केले दिखाता है। कुल कितने हैं?`),
           answer: String(apples + bananas),
         };
       }
@@ -235,7 +236,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
               `The ${graph} shows ${more} apples and ${fewer} bananas. How many more apples than bananas?`,
               `La ${graphEs} muestra ${more} manzanas y ${fewer} plátanos. ¿Cuántas manzanas más que plátanos?`,
               `O ${graphPt} mostra ${more} maçãs e ${fewer} bananas. Quantas maçãs a mais que bananas?`,
-            `Le ${graphFr} montre ${more} pommes et ${fewer} bananes. Combien de pommes de plus que de bananes ?`, `${graphZh}上有${more}个苹果和${fewer}根香蕉。苹果比香蕉多几个？`),
+            `Le ${graphFr} montre ${more} pommes et ${fewer} bananes. Combien de pommes de plus que de bananes ?`, `${graphZh}上有${more}个苹果和${fewer}根香蕉。苹果比香蕉多几个？`, `${graphHi} ${more} सेब और ${fewer} केले दिखाता है। सेब केले से कितने अधिक हैं?`),
             answer: String(more - fewer),
           }
         : {
@@ -243,7 +244,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
               `The ${graph} shows ${fewer} apples and ${more} bananas. How many more bananas than apples?`,
               `La ${graphEs} muestra ${fewer} manzanas y ${more} plátanos. ¿Cuántos plátanos más que manzanas?`,
               `O ${graphPt} mostra ${fewer} maçãs e ${more} bananas. Quantas bananas a mais que maçãs?`,
-            `Le ${graphFr} montre ${fewer} pommes et ${more} bananes. Combien de bananes de plus que de pommes ?`, `${graphZh}上有${fewer}个苹果和${more}根香蕉。香蕉比苹果多几根？`),
+            `Le ${graphFr} montre ${fewer} pommes et ${more} bananes. Combien de bananes de plus que de pommes ?`, `${graphZh}上有${fewer}个苹果和${more}根香蕉。香蕉比苹果多几根？`, `${graphHi} ${fewer} सेब और ${more} केले दिखाता है। केले सेब से कितने अधिक हैं?`),
             answer: String(more - fewer),
           };
     }
@@ -255,7 +256,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
           `Each picture stands for ${scale}. The graph shows ${icons} apple pictures. How many apples?`,
           `Cada dibujo vale ${scale}. La gráfica muestra ${icons} dibujos de manzana. ¿Cuántas manzanas hay?`,
           `Cada figura vale ${scale}. O gráfico mostra ${icons} figuras de maçã. Quantas maçãs há?`,
-        `Chaque image vaut ${scale}. Le graphique montre ${icons} images de pomme. Combien de pommes ?`, `每个图代表${scale}。统计图上有${icons}个苹果图。有几个苹果？`),
+        `Chaque image vaut ${scale}. Le graphique montre ${icons} images de pomme. Combien de pommes ?`, `每个图代表${scale}。统计图上有${icons}个苹果图。有几个苹果？`, `हर चित्र ${scale} दर्शाता है। आलेख में ${icons} सेब के चित्र हैं। कितने सेब हैं?`),
         answer: String(scale * icons),
       };
     }
@@ -271,7 +272,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
               `The longest is ${high}/${den} and the shortest is ${low}/${den}. How much longer is the longest?`,
               `El más largo mide ${high}/${den} y el más corto mide ${low}/${den}. ¿Cuánto más mide el más largo?`,
               `O mais comprido mede ${high}/${den} e o mais curto mede ${low}/${den}. Quanto o mais comprido é maior?`,
-            `Le plus long mesure ${high}/${den} et le plus court mesure ${low}/${den}. De combien le plus long dépasse-t-il le plus court ?`, `最长是${high}/${den}，最短是${low}/${den}。最长比最短长多少？`),
+            `Le plus long mesure ${high}/${den} et le plus court mesure ${low}/${den}. De combien le plus long dépasse-t-il le plus court ?`, `最长是${high}/${den}，最短是${low}/${den}。最长比最短长多少？`, `सबसे लंबा ${high}/${den} है और सबसे छोटा ${low}/${den}। सबसे लंबा कितना अधिक लंबा है?`),
             answer: `${high - low}/${den}`,
           }
         : {
@@ -279,7 +280,7 @@ export function makeGraphsSheet(rng: Rng, level: string): SheetItem {
               `The longest is ${high}/${den} and the shortest is ${low}/${den}. What do they make together?`,
               `El más largo mide ${high}/${den} y el más corto mide ${low}/${den}. ¿Cuánto miden juntos?`,
               `O mais comprido mede ${high}/${den} e o mais curto mede ${low}/${den}. Quanto medem juntos?`,
-            `Le plus long mesure ${high}/${den} et le plus court mesure ${low}/${den}. Combien font-ils ensemble ?`, `最长是${high}/${den}，最短是${low}/${den}。加在一起是多少？`),
+            `Le plus long mesure ${high}/${den} et le plus court mesure ${low}/${den}. Combien font-ils ensemble ?`, `最长是${high}/${den}，最短是${low}/${den}。加在一起是多少？`, `सबसे लंबा ${high}/${den} है और सबसे छोटा ${low}/${den}। दोनों साथ में कितना बनते हैं?`),
             answer: `${high + low}/${den}`,
           };
     }
@@ -326,8 +327,8 @@ export function graphClipLines(): string[] {
     for (let num = 0; num <= den; num += 1) add(marksTitle(num, den));
     for (let num = 0; num <= den * 2 + 3; num += 1) {
       add(`${num}/${den}`);
-      add(t(`Yes! ${num}/${den}`, `¡Sí! ${num}/${den}`, `Sim! ${num}/${den}`, `Oui ! ${num}/${den}`, `对！${num}/${den}`));
-      add(t(`Almost! ${num}/${den}`, `¡Casi! ${num}/${den}`, `Quase! ${num}/${den}`, `Presque ! ${num}/${den}`, `差一点！${num}/${den}`));
+      add(t(`Yes! ${num}/${den}`, `¡Sí! ${num}/${den}`, `Sim! ${num}/${den}`, `Oui ! ${num}/${den}`, `对！${num}/${den}`, `हाँ! ${num}/${den}`));
+      add(t(`Almost! ${num}/${den}`, `¡Casi! ${num}/${den}`, `Quase! ${num}/${den}`, `Presque ! ${num}/${den}`, `差一点！${num}/${den}`, `लगभग! ${num}/${den}`));
     }
   }
   for (const line of HINTS) add(line());
@@ -354,8 +355,8 @@ export function graphClipLines(): string[] {
   add(t("Almost! 2 marks", "¡Casi! 2 marcas"));
   for (const cat of CATS) {
     const word = thingName(cat.name, 2, cat.plural);
-    add(t(`Yes! 3 ${cat.plural}`, `¡Sí! 3 ${word}`, `Sim! 3 ${word}`, `Oui ! 3 ${word}`, `对！${countedNoun(cat.name, 3)}`));
-    add(t(`Almost! 3 ${cat.plural}`, `¡Casi! 3 ${word}`, `Quase! 3 ${word}`, `Presque ! 3 ${word}`, `差一点！${countedNoun(cat.name, 3)}`));
+    add(t(`Yes! 3 ${cat.plural}`, `¡Sí! 3 ${word}`, `Sim! 3 ${word}`, `Oui ! 3 ${word}`, `对！${countedNoun(cat.name, 3)}`, `हाँ! 3 ${thingName(cat.name, 3, cat.plural)}`));
+    add(t(`Almost! 3 ${cat.plural}`, `¡Casi! 3 ${word}`, `Quase! 3 ${word}`, `Presque ! 3 ${word}`, `差一点！${countedNoun(cat.name, 3)}`, `लगभग! 3 ${thingName(cat.name, 3, cat.plural)}`));
   }
   return [...lines];
 }
@@ -535,20 +536,20 @@ function solvedFor(board: GraphsBoard): string {
       return countSolved(focus ?? namedMax(board), n);
     case "total":
     case "join":
-      return t(`${n} in all`, `${n} en total`, `${n} no total`, `${n} en tout`, `一共${n}个`);
+      return t(`${n} in all`, `${n} en total`, `${n} no total`, `${n} en tout`, `一共${n}个`, `कुल ${n}`);
     case "diff":
     case "two":
-      return t(`${n} more`, `${n} más`, `${n} a mais`, `${n} de plus`, `多${n}个`);
+      return t(`${n} more`, `${n} más`, `${n} a mais`, `${n} de plus`, `多${n}个`, `${n} अधिक`);
     case "less":
-      return t(`${n} less`, `${n} menos`, `${n} a menos`, `${n} de moins`, `少${n}个`);
+      return t(`${n} less`, `${n} menos`, `${n} a menos`, `${n} de moins`, `少${n}个`, `${n} कम`);
     case "apart":
-      return t(`${n} others`, `${n} otros`, `${n} outros`, `${n} autres`, `另外${n}个`);
+      return t(`${n} others`, `${n} otros`, `${n} outros`, `${n} autres`, `另外${n}个`, `${n} और`);
     case "marks":
       return t(
         `${n} ${n === 1 ? "mark" : "marks"}`,
         n === 1 ? `${n} marca` : `${n} marcas`,
         n === 1 ? `${n} marca` : `${n} marcas`,
-      n === 1 ? `${n} marque` : `${n} marques`, `${n}笔`);
+      n === 1 ? `${n} marque` : `${n} marques`, `${n}笔`, `${n} चिह्न`);
     case "span":
     case "sum":
       return `${n}/${board.den}`;
@@ -562,7 +563,7 @@ function solvedFor(board: GraphsBoard): string {
 function countSolved(cat: GraphCat | undefined, n: number): string {
   if (!cat) return String(n);
   const en = n === 1 ? cat.name : cat.plural;
-  return t(`${n} ${en}`, `${n} ${thingName(cat.name, n, en)}`, `${n} ${thingName(cat.name, n, en)}`, `${n} ${thingName(cat.name, n, en)}`, countedNoun(cat.name, n));
+  return t(`${n} ${en}`, `${n} ${thingName(cat.name, n, en)}`, `${n} ${thingName(cat.name, n, en)}`, `${n} ${thingName(cat.name, n, en)}`, countedNoun(cat.name, n), `${n} ${thingName(cat.name, n, en)}`);
 }
 
 function namedMax(board: GraphsBoard): GraphCat | undefined {
@@ -570,7 +571,7 @@ function namedMax(board: GraphsBoard): GraphCat | undefined {
 }
 
 function countTitle(cat: GraphCat): string {
-  return t(`How many ${cat.plural}?`, `¿${howManyPhrase(cat.name, 2, cat.plural)} hay?`, `${howManyPhrase(cat.name, 2, cat.plural)} há?`, `${howManyPhrase(cat.name, 2, cat.plural)} y a-t-il ?`, `${howManyPhrase(cat.name, 2, cat.plural)}？`);
+  return t(`How many ${cat.plural}?`, `¿${howManyPhrase(cat.name, 2, cat.plural)} hay?`, `${howManyPhrase(cat.name, 2, cat.plural)} há?`, `${howManyPhrase(cat.name, 2, cat.plural)} y a-t-il ?`, `${howManyPhrase(cat.name, 2, cat.plural)}？`, `${howManyPhrase(cat.name, 2, cat.plural)}?`);
 }
 
 function mostTitle(): string {
@@ -586,7 +587,7 @@ function diffTitle(more: GraphCat, less: GraphCat): string {
     `How many more ${more.plural} than ${less.plural}?`,
     `¿${howManyMorePhrase(more.name, more.plural)} más que ${thingName(less.name, 2, less.plural)}?`,
     `${howManyMorePhrase(more.name, more.plural)} a mais que ${thingName(less.name, 2, less.plural)}?`,
-  `${howManyMorePhrase(more.name, more.plural)} de plus ${frenchThan(thingName(less.name, 2, less.plural))} ?`, `${thingName(more.name, 2, more.plural)}比${thingName(less.name, 2, less.plural)}多几${nounMeasure(more.name)}？`);
+  `${howManyMorePhrase(more.name, more.plural)} de plus ${frenchThan(thingName(less.name, 2, less.plural))} ?`, `${thingName(more.name, 2, more.plural)}比${thingName(less.name, 2, less.plural)}多几${nounMeasure(more.name)}？`, `${thingName(more.name, 2, more.plural)} ${thingName(less.name, 2, less.plural)} से ${nounIsFeminine(more.name) ? "कितनी" : "कितने"} अधिक हैं?`);
 }
 
 function lessTitle(fewer: GraphCat, more: GraphCat): string {
@@ -594,7 +595,7 @@ function lessTitle(fewer: GraphCat, more: GraphCat): string {
     `How many less ${fewer.plural} than ${more.plural}?`,
     `¿${howManyLessPhrase(fewer.name, fewer.plural)} menos que ${thingName(more.name, 2, more.plural)}?`,
     `${howManyLessPhrase(fewer.name, fewer.plural)} a menos que ${thingName(more.name, 2, more.plural)}?`,
-  `${howManyLessPhrase(fewer.name, fewer.plural)} de moins ${frenchThan(thingName(more.name, 2, more.plural))} ?`, `${thingName(fewer.name, 2, fewer.plural)}比${thingName(more.name, 2, more.plural)}少几${nounMeasure(fewer.name)}？`);
+  `${howManyLessPhrase(fewer.name, fewer.plural)} de moins ${frenchThan(thingName(more.name, 2, more.plural))} ?`, `${thingName(fewer.name, 2, fewer.plural)}比${thingName(more.name, 2, more.plural)}少几${nounMeasure(fewer.name)}？`, `${thingName(fewer.name, 2, fewer.plural)} ${thingName(more.name, 2, more.plural)} से ${nounIsFeminine(fewer.name) ? "कितनी" : "कितने"} कम हैं?`);
 }
 
 function joinTitle(a: GraphCat, b: GraphCat): string {
@@ -607,7 +608,7 @@ function joinTitle(a: GraphCat, b: GraphCat): string {
     `How many ${a.plural} and ${b.plural} in all?`,
     `¿${lead} ${left} y ${right} hay en total?`,
     `${leadPt} ${left} e ${right} há no total?`,
-  `Combien ${frenchDe(left)} et ${frenchDe(right)} y a-t-il en tout ?`, `${thingName(a.name, 2, a.plural)}和${thingName(b.name, 2, b.plural)}一共有几个？`);
+  `Combien ${frenchDe(left)} et ${frenchDe(right)} y a-t-il en tout ?`, `${thingName(a.name, 2, a.plural)}和${thingName(b.name, 2, b.plural)}一共有几个？`, `${thingName(a.name, 2, a.plural)} और ${thingName(b.name, 2, b.plural)} कुल ${nounIsFeminine(a.name) && nounIsFeminine(b.name) ? "कितनी" : "कितने"} हैं?`);
 }
 
 function apartTitle(cat: GraphCat): string {
@@ -615,7 +616,7 @@ function apartTitle(cat: GraphCat): string {
     `How many are not ${cat.plural}?`,
     `¿Cuántos no son ${thingName(cat.name, 2, cat.plural)}?`,
     `Quantos não são ${thingName(cat.name, 2, cat.plural)}?`,
-  `Combien ne sont pas des ${thingName(cat.name, 2, cat.plural)} ?`, `不是${thingName(cat.name, 2, cat.plural)}的有几个？`);
+  `Combien ne sont pas des ${thingName(cat.name, 2, cat.plural)} ?`, `不是${thingName(cat.name, 2, cat.plural)}的有几个？`, `${howManyPhrase(cat.name, 2, cat.plural)} नहीं हैं?`);
 }
 
 function scaleCountTitle(cat: GraphCat, scale: number): string {
@@ -623,7 +624,7 @@ function scaleCountTitle(cat: GraphCat, scale: number): string {
     `Each picture stands for ${scale}. How many ${cat.plural}?`,
     `Cada dibujo vale ${scale}. ¿${howManyPhrase(cat.name, 2, cat.plural)} hay?`,
     `Cada figura vale ${scale}. ${howManyPhrase(cat.name, 2, cat.plural)} há?`,
-  `Chaque image vaut ${scale}. ${howManyPhrase(cat.name, 2, cat.plural)} y a-t-il ?`, `每个图代表${scale}。${howManyPhrase(cat.name, 2, cat.plural)}？`);
+  `Chaque image vaut ${scale}. ${howManyPhrase(cat.name, 2, cat.plural)} y a-t-il ?`, `每个图代表${scale}。${howManyPhrase(cat.name, 2, cat.plural)}？`, `हर चित्र ${scale} दर्शाता है। ${howManyPhrase(cat.name, 2, cat.plural)}?`);
 }
 
 function twoTitle(): string {
@@ -634,7 +635,7 @@ function twoTitle(): string {
 }
 
 function marksTitle(num: number, den: number): string {
-  return t(`How many are ${num}/${den}?`, `¿Cuántos miden ${num}/${den}?`, `Quantos medem ${num}/${den}?`, `Combien en mesurent ${num}/${den} ?`, `有几个是${num}/${den}？`);
+  return t(`How many are ${num}/${den}?`, `¿Cuántos miden ${num}/${den}?`, `Quantos medem ${num}/${den}?`, `Combien en mesurent ${num}/${den} ?`, `有几个是${num}/${den}？`, `कितने ${num}/${den} हैं?`);
 }
 
 function spanTitle(): string {
@@ -703,7 +704,7 @@ export function graphsTeachCaption(board: GraphsBoard): string {
     case "bar":
       return t("Read the graph", "Lee la gráfica");
     case "scale":
-      return t(`Each picture is ${board.scale}`, `Cada dibujo vale ${board.scale}`, `Cada figura vale ${board.scale}`, `Chaque image vaut ${board.scale}`, `每个图代表${board.scale}`);
+      return t(`Each picture is ${board.scale}`, `Cada dibujo vale ${board.scale}`, `Cada figura vale ${board.scale}`, `Chaque image vaut ${board.scale}`, `每个图代表${board.scale}`, `हर चित्र ${board.scale} है`);
     case "line":
       return t("Read the line plot", "Lee el diagrama de puntos");
     default: {
@@ -724,7 +725,7 @@ function handsSpeech(mode: GraphLevel, scale: number): string {
     case "bar":
       return t("Make the bar graph.", "Haz la gráfica de barras.");
     case "scale":
-      return t(`Each picture stands for ${scale}. Make the graph.`, `Cada dibujo vale ${scale}. Haz la gráfica.`, `Cada figura vale ${scale}. Monte o gráfico.`, `Chaque image vaut ${scale}. Fais le graphique.`, `每个图代表${scale}。把统计图做出来。`);
+      return t(`Each picture stands for ${scale}. Make the graph.`, `Cada dibujo vale ${scale}. Haz la gráfica.`, `Cada figura vale ${scale}. Monte o gráfico.`, `Chaque image vaut ${scale}. Fais le graphique.`, `每个图代表${scale}。把统计图做出来。`, `हर चित्र ${scale} दर्शाता है। आलेख बनाओ।`);
     case "line":
       return t("Make the line plot.", "Haz el diagrama de puntos.");
     default: {

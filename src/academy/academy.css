@@ -6,6 +6,14 @@
   unicode-range: U+4E2D, U+6587;
 }
 
+@font-face {
+  font-family: "Noto Sans Devanagari";
+  src: url("./fonts/noto-deva-picker.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+  unicode-range: U+0926, U+0928, U+0939, U+093F, U+0940, U+094D;
+}
+
 :root {
   color-scheme: light;
   --ac-ink: #3c2448;
@@ -71,6 +79,16 @@ html[lang="zh-Hans"] {
 html[lang="zh-Hans"] body,
 html[lang="zh-Hans"] body * {
   font-family: "Noto Sans SC", Fredoka, Nunito, sans-serif;
+}
+
+html[lang="hi"] {
+  --ac-font: "Noto Sans Devanagari", Nunito, "Trebuchet MS", sans-serif;
+  --ac-display: "Noto Sans Devanagari", Fredoka, Nunito, "Trebuchet MS", sans-serif;
+}
+
+html[lang="hi"] body,
+html[lang="hi"] body * {
+  font-family: "Noto Sans Devanagari", Fredoka, Nunito, sans-serif;
 }
 
 body {
@@ -943,7 +961,7 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   width: 100%;
   min-width: 0;
   /* Picker subset covers 中文. Other labels fall through to Fredoka. */
-  font-family: "Noto Sans SC", Fredoka, Nunito, "Trebuchet MS", sans-serif;
+  font-family: "Noto Sans SC", "Noto Sans Devanagari", Fredoka, Nunito, "Trebuchet MS", sans-serif;
 }
 .ac-hello-grades { justify-content: center; margin: 10px 0 14px; }
 .ac-finger {
@@ -1013,6 +1031,10 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   min-height: 64px;
   font-size: 20px;
   padding: 0 6px;
+}
+html[lang="hi"] .ac-hello-grades .ac-grade {
+  font-size: 15px;
+  min-width: 76px;
 }
 .is-prek .ac-choice {
   min-height: 112px;

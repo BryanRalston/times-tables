@@ -26,7 +26,16 @@ export function normalizeSpeech(text: string): string {
   line = line.replace(/[…]/g, ". ").replace(/[—–]/g, ", ");
   line = line.replace(/_+/g, " blank ");
   line = speakable(line);
-  if (getLocale() === "zh") {
+  if (getLocale() === "hi") {
+    line = line.replace(/\$(\d+)\.(\d{2})/g, (_full, dollars: string, cents: string) => {
+      return `${dollars} डॉलर और ${Number(cents)} सेंट`;
+    });
+    line = line.replace(/\bremainder\b/gi, "शेष");
+    line = line.replace(/÷/g, " भाग ");
+    line = line.replace(/(\d)\s*-\s*(\d)/g, "$1 घटा $2");
+    line = line.replace(/[\u0900-\u097F]+(?:-[\u0900-\u097F]+)+/g, (word) => word.replace(/-/g, " "));
+    line = line.replace(/&/g, " और ");
+  } else if (getLocale() === "zh") {
     line = line.replace(/\$(\d+)\.(\d{2})/g, (_full, dollars: string, cents: string) => {
       return `${dollars}美元和${Number(cents)}美分`;
     });
@@ -102,7 +111,7 @@ function scan(norm: string): { tokens: Token[] | null; error: string | null } {
       i += 1;
       continue;
     }
-    if (ch === "." || ch === "!" || ch === "?" || ch === "。" || ch === "！" || ch === "？") {
+    if (ch === "." || ch === "!" || ch === "?" || ch === "。" || ch === "！" || ch === "？" || ch === "।") {
       gap = Math.max(gap, SENTENCE_GAP);
       i += 1;
       continue;
@@ -127,7 +136,7 @@ function scan(norm: string): { tokens: Token[] | null; error: string | null } {
       i += num[1].length;
       continue;
     }
-    const word = /^([a-záàâãäéèêëíïîóôõúùûüÿçñœæ\u3400-\u9fff]+(?:'[a-záàâãäéèêëíïîóôõúùûüÿçñœæ]+)?(?:-[a-záàâãäéèêëíïîóôõúùûüÿçñœæ]+)*)/.exec(rest);
+    const word = /^([a-záàâãäéèêëíïîóôõúùûüÿçñœæ\u0900-\u097F\u3400-\u9fff]+(?:'[a-záàâãäéèêëíïîóôõúùûüÿçñœæ]+)?(?:-[a-záàâãäéèêëíïîóôõúùûüÿçñœæ]+)*)/.exec(rest);
     if (word?.[1]) {
       tokens.push({ kind: "word", text: word[1], gapBefore: gap });
       gap = 0;
@@ -148,7 +157,8 @@ function gapAfter(tokens: Token[], index: number): number {
 function numberPieces(token: Token, tokens: Token[], index: number): SpeechPiece[] {
   const n = Number(token.text);
   const gap = gapAfter(tokens, index);
-  if (getLocale() === "zh" || !Number.isFinite(n) || n <= 1000) return [{ key: token.text, gapMs: gap }];
+  const locale = getLocale();
+  if (locale === "zh" || locale === "hi" || !Number.isFinite(n) || n <= 1000) return [{ key: token.text, gapMs: gap }];
   const parts: string[] = [];
   const millions = Math.floor(n / 1_000_000);
   const thousands = Math.floor((n % 1_000_000) / 1000);
@@ -167,6 +177,13 @@ function clockPieces(token: Token, tokens: Token[], index: number): SpeechPiece[
   const [hours, minutes] = token.text.split(":");
   const hour = Number(hours);
   const minute = Number(minutes);
+  if (getLocale() === "hi" && minute === 45) {
+    const nextHour = hour === 12 || hour === 0 ? 1 : (hour % 12) + 1;
+    return [
+      { key: "min:45", gapMs: CLOCK_GAP },
+      { key: String(nextHour), gapMs: gapAfter(tokens, index) },
+    ];
+  }
   if (getLocale() === "zh" && minute === 45) {
     const nextHour = hour === 12 || hour === 0 ? 1 : (hour % 12) + 1;
     return [

@@ -385,26 +385,26 @@ function lessonCopy(who: string, label: string, key: string, stat: SkillStat): {
   const skill = show(label);
   if (n < 3) {
     return {
-      learning: t(`${who} just started ${skill}.`, `${who} acaba de empezar ${skill}.`, `${who} acabou de começar ${skill}.`, `${who} vient de commencer ${skill}.`, `${who}刚开始学${skill}。`),
-      next: t(`Play ${skill} a couple more times this week.`, `Jueguen ${skill} un par de veces más esta semana.`, `Joguem ${skill} mais umas vezes nesta semana.`, `Rejoue ${skill} encore quelques fois cette semaine.`, `这周再玩几次${skill}。`),
+      learning: t(`${who} just started ${skill}.`, `${who} acaba de empezar ${skill}.`, `${who} acabou de começar ${skill}.`, `${who} vient de commencer ${skill}.`, `${who}刚开始学${skill}。`, `${who} ने अभी ${skill} शुरू किया।`),
+      next: t(`Play ${skill} a couple more times this week.`, `Jueguen ${skill} un par de veces más esta semana.`, `Joguem ${skill} mais umas vezes nesta semana.`, `Rejoue ${skill} encore quelques fois cette semaine.`, `这周再玩几次${skill}。`, `इस हफ्ते ${skill} दो-तीन बार और खेलो।`),
     };
   }
   if (heat === "mastered") {
     const next = PRACTICE_NEXT[key];
     return {
-      learning: t(`${who} can do ${skill}.`, `${who} ya puede con ${skill}.`, `${who} já consegue ${skill}.`, `${who} sait déjà faire ${skill}.`, `${who}会做${skill}了。`),
-      next: next ? show(next) : t(`Come back to ${skill} in a few days so it stays easy.`, `Vuelvan a ${skill} en unos días para que siga fácil.`, `Voltem para ${skill} daqui a alguns dias para continuar fácil.`, `Reprends ${skill} dans quelques jours pour que ça reste facile.`, `过几天再回来玩${skill}，就会一直觉得容易。`),
+      learning: t(`${who} can do ${skill}.`, `${who} ya puede con ${skill}.`, `${who} já consegue ${skill}.`, `${who} sait déjà faire ${skill}.`, `${who}会做${skill}了。`, `${who} ${skill} कर सकता है।`),
+      next: next ? show(next) : t(`Come back to ${skill} in a few days so it stays easy.`, `Vuelvan a ${skill} en unos días para que siga fácil.`, `Voltem para ${skill} daqui a alguns dias para continuar fácil.`, `Reprends ${skill} dans quelques jours pour que ça reste facile.`, `过几天再回来玩${skill}，就会一直觉得容易。`, `कुछ दिनों बाद ${skill} पर लौटो, ताकि आसान रहे।`),
     };
   }
   if (ratio < 0.6) {
     return {
-      learning: t(`${who} is learning ${skill}, and some answers still slip.`, `${who} está aprendiendo ${skill} y algunas respuestas se escapan.`, `${who} está aprendendo ${skill} e algumas respostas escapam.`, `${who} apprend ${skill}, et quelques réponses s'échappent encore.`, `${who}正在学${skill}，还有一些答案会错。`),
+      learning: t(`${who} is learning ${skill}, and some answers still slip.`, `${who} está aprendiendo ${skill} y algunas respuestas se escapan.`, `${who} está aprendendo ${skill} e algumas respostas escapam.`, `${who} apprend ${skill}, et quelques réponses s'échappent encore.`, `${who}正在学${skill}，还有一些答案会错。`, `${who} ${skill} सीख रहा है, और कुछ उत्तर अभी फिसल जाते हैं।`),
       next: t("Use the pictures and count it out loud together.", "Usen los dibujos y cuéntenlo en voz alta juntos."),
     };
   }
   return {
-    learning: t(`${who} is learning ${skill} and getting most of them right.`, `${who} está aprendiendo ${skill} y le salen casi todas.`, `${who} está aprendendo ${skill} e acerta quase todas.`, `${who} apprend ${skill} et réussit presque tout.`, `${who}正在学${skill}，大部分都对了。`),
-    next: t(`One more short game of ${skill} should lock it in.`, `Un juego cortito más de ${skill} y queda listo.`, `Mais um joguinho de ${skill} e fica pronto.`, `Encore un petit jeu de ${skill} et c'est bon.`, `再玩一次短短的${skill}，就能记住了。`),
+    learning: t(`${who} is learning ${skill} and getting most of them right.`, `${who} está aprendiendo ${skill} y le salen casi todas.`, `${who} está aprendendo ${skill} e acerta quase todas.`, `${who} apprend ${skill} et réussit presque tout.`, `${who}正在学${skill}，大部分都对了。`, `${who} ${skill} सीख रहा है और ज़्यादातर सही कर रहा है।`),
+    next: t(`One more short game of ${skill} should lock it in.`, `Un juego cortito más de ${skill} y queda listo.`, `Mais um joguinho de ${skill} e fica pronto.`, `Encore un petit jeu de ${skill} et c'est bon.`, `再玩一次短短的${skill}，就能记住了。`, `${skill} का एक और छोटा खेल इसे पक्का कर देगा।`),
   };
 }
 
@@ -443,8 +443,8 @@ export function parentBrief(child: Pick<Child, "name" | "skills" | "levels">): S
     lessons.push({
       key,
       label,
-      learning: t(`${who} has not played ${title} yet.`, `${who} todavía no juega ${title}.`, `${who} ainda não joga ${title}.`, `${who} n'a pas encore joué à ${title}.`, `${who}还没玩过${title}。`),
-      next: t(`Start with ${label}. It matches this grade.`, `Empiecen con ${label}. Va con este grado.`, `Comecem com ${label}. Combina com este ano.`, `Commence par ${label}. Ça va avec cette classe.`, `从${label}开始。它适合这个年级。`),
+      learning: t(`${who} has not played ${title} yet.`, `${who} todavía no juega ${title}.`, `${who} ainda não joga ${title}.`, `${who} n'a pas encore joué à ${title}.`, `${who}还没玩过${title}。`, `${who} ने ${title} अभी नहीं खेला।`),
+      next: t(`Start with ${label}. It matches this grade.`, `Empiecen con ${label}. Va con este grado.`, `Comecem com ${label}. Combina com este ano.`, `Commence par ${label}. Ça va avec cette classe.`, `从${label}开始。它适合这个年级。`, `${label} से शुरू करो। यह इस कक्षा से मेल खाता है।`),
     });
   }
   return lessons;

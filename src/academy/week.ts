@@ -33,5 +33,5 @@ export function daysPlayedCaption(played: number): string {
   const n = Math.max(0, Math.floor(played));
   if (n <= 0) return t("Days played this week", "Días jugados esta semana");
   if (n === 1) return t("1 day played this week", "1 día jugado esta semana");
-  return t(`${n} days played this week`, `${n} días jugados esta semana`, `${n} dias jogados nesta semana`, `${n} jours joués cette semaine`, `这周玩了${n}天`);
+  return t(`${n} days played this week`, `${n} días jugados esta semana`, `${n} dias jogados nesta semana`, `${n} jours joués cette semaine`, `这周玩了${n}天`, `इस हफ्ते ${n} दिन खेले`);
 }

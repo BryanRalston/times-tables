@@ -65,6 +65,10 @@ const FR_PRECACHE_FILES = new Set(
 const ZH_PRECACHE_FILES = new Set(
   JSON.parse(readFileSync(new URL("../src/academy/voice/zh-precache.json", import.meta.url), "utf8")),
 );
+/** Hindi clips for core games and Times Tables. Other `voice/hi/` files stay on the runtime cache. */
+const HI_PRECACHE_FILES = new Set(
+  JSON.parse(readFileSync(new URL("../src/academy/voice/hi-precache.json", import.meta.url), "utf8")),
+);
 const POKE_NAME = /[a-z0-9]+(?:-[a-z0-9]+)*-poke(?:-strip)?\.(?:mp4|png)/g;
 const SKIP_COPY = /^(?:squishees|cosmetics|money)\//;
 
@@ -126,6 +130,7 @@ export function isPrecacheFile(rel) {
   if (rel.startsWith("voice/pt/")) return PT_PRECACHE_FILES.has(rel.slice("voice/".length));
   if (rel.startsWith("voice/fr/")) return FR_PRECACHE_FILES.has(rel.slice("voice/".length));
   if (rel.startsWith("voice/zh/")) return ZH_PRECACHE_FILES.has(rel.slice("voice/".length));
+  if (rel.startsWith("voice/hi/")) return HI_PRECACHE_FILES.has(rel.slice("voice/".length));
   if (rel.startsWith("fonts/")) return false;
   return PRECACHE_EXT.test(rel);
 }
@@ -252,7 +257,7 @@ self.addEventListener("activate", (event) => {
 
 export function subpathServiceWorker() {
   return `/* Academy-only offline cache. Registered with scope /times-tables/academy/ so Squishee Math is not controlled. */
-const CACHE = "squishee-academy-v13";
+const CACHE = "squishee-academy-v14";
 ${PRECACHE_RUNTIME}
 function isMathShell(pathname) {
   return pathname === "/times-tables" || pathname === "/times-tables/" || pathname === "/times-tables/index.html";
@@ -292,7 +297,7 @@ self.addEventListener("fetch", (event) => {
 
 export function domainServiceWorker() {
   return `/* Squishee Academy offline cache. Served from the domain root so scope is /. */
-const CACHE = "squishee-academy-root-v13";
+const CACHE = "squishee-academy-root-v14";
 const SHARE_IMAGE = ${JSON.stringify(SHARE_IMAGE_PATH)};
 ${PRECACHE_RUNTIME}
 self.addEventListener("fetch", (event) => {

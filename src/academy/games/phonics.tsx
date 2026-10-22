@@ -137,7 +137,7 @@ function makeSounds(rng: Rng): ChoiceQ {
     solved: t(
       `${target.letter} says ${target.phoneme}, like ${target.word}`,
       `${target.letter} dice ${target.phoneme}, como ${target.word}`, `${target.letter} diz ${target.phoneme}, como ${target.word}`,
-    `${target.letter} dit ${target.phoneme}, comme ${target.word}`, `${target.letter}读作${target.phoneme}，就像${target.word}`),
+    `${target.letter} dit ${target.phoneme}, comme ${target.word}`, `${target.letter}读作${target.phoneme}，就像${target.word}`, `${target.letter} ${target.phoneme} कहता है, जैसे ${target.word}`),
     picture: target.letter,
     hands: true,
     quietChoices: false,
@@ -172,7 +172,7 @@ function makeBegin(rng: Rng): ChoiceQ {
     choices: uniqueChoices(rng, target.word, [], rows.map((row) => row.word)),
     skill: "phonics:begin",
     tags: ["begin"],
-    solved: t(`${target.word} starts with ${target.phoneme}`, `${target.word} empieza con ${target.phoneme}`, `${target.word} começa com ${target.phoneme}`, `${target.word} commence par ${target.phoneme}`, `${target.word}的开头音是${target.phoneme}`),
+    solved: t(`${target.word} starts with ${target.phoneme}`, `${target.word} empieza con ${target.phoneme}`, `${target.word} começa com ${target.phoneme}`, `${target.word} commence par ${target.phoneme}`, `${target.word}的开头音是${target.phoneme}`, `${target.word} ${target.phoneme} से शुरू होता है`),
     picture: target.emoji,
     hands: true,
     quietChoices: false,
@@ -193,13 +193,13 @@ function makeRhyme(rng: Rng): ChoiceQ {
   const board: PhonicsBoard = { game: "phonics", mode: "rhyme", cue, family: home.family };
   return sceneQuestion(rng, {
     game: "phonics",
-    title: t(`Which word rhymes with ${cue}?`, `¿Qué palabra rima con ${cue}?`, `Que palavra rima com ${cue}?`, `Quel mot rime avec ${cue} ?`, `哪个词和${cue}押韵？`),
+    title: t(`Which word rhymes with ${cue}?`, `¿Qué palabra rima con ${cue}?`, `Que palavra rima com ${cue}?`, `Quel mot rime avec ${cue} ?`, `哪个词和${cue}押韵？`, `कौन सा शब्द ${cue} से तुक मिलाता है?`),
     hint: t("The ending sounds the same", "El final suena igual"),
     answer,
     choices: uniqueChoices(rng, answer, [], [answer, ...distractors]),
     skill: "phonics:rhyme",
     tags: ["rhyme"],
-    solved: t(`${answer} rhymes with ${cue}`, `${answer} rima con ${cue}`, `${answer} rima com ${cue}`, `${answer} rime avec ${cue}`, `${answer}和${cue}押韵`),
+    solved: t(`${answer} rhymes with ${cue}`, `${answer} rima con ${cue}`, `${answer} rima com ${cue}`, `${answer} rime avec ${cue}`, `${answer}和${cue}押韵`, `${answer} ${cue} से तुक मिलाता है`),
     picture: cue,
     hands: false,
     quietChoices: false,
@@ -235,7 +235,7 @@ function makeCvc(rng: Rng): ChoiceQ {
     choices: uniqueChoices(rng, word, pool),
     skill: "phonics:cvc",
     tags: ["cvc"],
-    solved: t(`${blend} makes ${word}`, `${blend} forma ${word}`, `${blend} forma ${word}`, `${blend} forme ${word}`, `${blend}拼成${word}`),
+    solved: t(`${blend} makes ${word}`, `${blend} forma ${word}`, `${blend} forma ${word}`, `${blend} forme ${word}`, `${blend}拼成${word}`, `${blend} ${word} बनाता है`),
     picture: letters,
     hands: false,
     quietChoices: true,
@@ -255,13 +255,13 @@ function makeEnd(rng: Rng): ChoiceQ {
   const board: PhonicsBoard = { game: "phonics", mode: "end", letter, phoneme, word };
   return sceneQuestion(rng, {
     game: "phonics",
-    title: t(`Which sound ends ${word}?`, `¿Con qué sonido termina ${word}?`, `Com que som termina ${word}?`, `Quel son termine ${word} ?`, `${word}的结尾音是哪个？`),
+    title: t(`Which sound ends ${word}?`, `¿Con qué sonido termina ${word}?`, `Com que som termina ${word}?`, `Quel son termine ${word} ?`, `${word}的结尾音是哪个？`, `${word} किस ध्वनि पर खत्म होता है?`),
     hint: t("Listen to the last sound", "Escucha el último sonido"),
     answer: letter,
     choices: uniqueChoices(rng, letter, [], [letter, ...others.slice(0, 3)]),
     skill: "phonics:end",
     tags: ["end"],
-    solved: t(`${word} ends with ${phoneme}`, `${word} termina con ${phoneme}`, `${word} termina com ${phoneme}`, `${word} termine par ${phoneme}`, `${word}的结尾音是${phoneme}`),
+    solved: t(`${word} ends with ${phoneme}`, `${word} termina con ${phoneme}`, `${word} termina com ${phoneme}`, `${word} termine par ${phoneme}`, `${word}的结尾音是${phoneme}`, `${word} ${phoneme} पर खत्म होता है`),
     picture: word,
     hands: false,
     quietChoices: false,
@@ -309,7 +309,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         prompt: t(
           `Which word starts with the ${target.phoneme} sound: ${words}?`,
           `¿Qué palabra empieza con el sonido ${target.phoneme}: ${words}?`, `Que palavra começa com o som ${target.phoneme}: ${words}?`,
-        `Quel mot commence par le son ${target.phoneme} : ${words} ?`, `哪个词的开头音是${target.phoneme}：${words}？`),
+        `Quel mot commence par le son ${target.phoneme} : ${words} ?`, `哪个词的开头音是${target.phoneme}：${words}？`, `कौन सा शब्द ${target.phoneme} ध्वनि से शुरू होता है: ${words}?`),
         answer: target.word,
       };
     }
@@ -324,17 +324,17 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         prompt: t(
           `Which word rhymes with ${cue}: ${[answer, ...others].join(", ")}?`,
           `¿Qué palabra rima con ${cue}: ${[answer, ...others].join(", ")}?`, `Que palavra rima com ${cue}: ${[answer, ...others].join(", ")}?`,
-        `Quel mot rime avec ${cue} : ${[answer, ...others].join(", ")} ?`, `哪个词和${cue}押韵：${[answer, ...others].join(", ")}？`),
+        `Quel mot rime avec ${cue} : ${[answer, ...others].join(", ")} ?`, `哪个词和${cue}押韵：${[answer, ...others].join(", ")}？`, `कौन सा शब्द ${cue} से तुक मिलाता है: ${[answer, ...others].join(", ")}?`),
         answer,
       };
     }
     case "cvc": {
       const word = rng.pick(CVC_WORDS);
-      return { prompt: t(`Blend ${word.split("").join("-")}.`, `Une los sonidos de ${word.split("").join("-")}.`, `Junte os sons de ${word.split("").join("-")}.`, `Assemble les sons de ${word.split("").join("-")}.`, `把${word.split("").join("-")}连起来读。`), answer: word };
+      return { prompt: t(`Blend ${word.split("").join("-")}.`, `Une los sonidos de ${word.split("").join("-")}.`, `Junte os sons de ${word.split("").join("-")}.`, `Assemble les sons de ${word.split("").join("-")}.`, `把${word.split("").join("-")}连起来读。`, `${word.split("").join("-")} जोड़ो।`), answer: word };
     }
     case "end": {
       const word = rng.pick(CVC_WORDS);
-      return { prompt: t(`What letter sound ends ${word}?`, `¿Qué sonido de letra termina ${word}?`, `Que som de letra termina ${word}?`, `Quel son de lettre termine ${word} ?`, `${word}的结尾是哪个字母的音？`), answer: word[2] ?? "" };
+      return { prompt: t(`What letter sound ends ${word}?`, `¿Qué sonido de letra termina ${word}?`, `Que som de letra termina ${word}?`, `Quel son de lettre termine ${word} ?`, `${word}的结尾是哪个字母的音？`, `${word} किस अक्षर ध्वनि पर खत्म होता है?`), answer: word[2] ?? "" };
     }
     default: {
       const neverLevel: never = safe;

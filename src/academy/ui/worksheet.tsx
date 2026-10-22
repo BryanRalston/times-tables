@@ -30,7 +30,8 @@ export function WorksheetPage({ game: gameId }: { game: string }) {
 
   if (!spec) return null;
   if (!packReady) {
-    const waiting = lang === "zh" ? "加载中…" : lang === "fr" ? "Chargement…" : lang === "pt" ? "Carregando…" : "Loading…";
+    const waiting =
+      lang === "zh" ? "加载中…" : lang === "hi" ? "लोड हो रहा है…" : lang === "fr" ? "Chargement…" : lang === "pt" ? "Carregando…" : "Loading…";
     return <p className="ac-note">{waiting}</p>;
   }
 
@@ -53,7 +54,7 @@ export function WorksheetPage({ game: gameId }: { game: string }) {
     setSeed(Date.now() % 1_000_000_000);
   }
 
-  const title = t(`${spec.title} worksheet`, `Hoja de ${show(spec.title)}`, `Folha de ${show(spec.title)}`, `Fiche de ${show(spec.title)}`, `${show(spec.title)}练习纸`);
+  const title = t(`${spec.title} worksheet`, `Hoja de ${show(spec.title)}`, `Folha de ${show(spec.title)}`, `Fiche de ${show(spec.title)}`, `${show(spec.title)}练习纸`, `${spec.title} अभ्यास पत्र`);
 
   return (
     <div className="ac-sheet-page">

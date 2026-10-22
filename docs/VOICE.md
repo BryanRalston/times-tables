@@ -52,7 +52,7 @@ npx vite-node scripts/export-voice-pt.ts
 VOICE_JOBS=/tmp/voice-jobs-pt.json VOICE_NAME=pf_dora VOICE_LANG=pt-br python3 scripts/render-voice.py
 ```
 
-`src/academy/voice/clips-es.test.ts` fails if any Spanish speakable line has no clip. `src/academy/voice/clips-pt.test.ts` does the same for Portuguese. `src/academy/voice/clips-fr.test.ts` does the same for French. `src/academy/voice/clips-zh.test.ts` does the same for Mandarin. `VOICE_CLEAN=1` only deletes files in folders named by the current job list, so a Spanish, Portuguese, French, or Chinese render does not remove English clips.
+`src/academy/voice/clips-es.test.ts` fails if any Spanish speakable line has no clip. `src/academy/voice/clips-pt.test.ts` does the same for Portuguese. `src/academy/voice/clips-fr.test.ts` does the same for French. `src/academy/voice/clips-zh.test.ts` does the same for Mandarin. `src/academy/voice/clips-hi.test.ts` does the same for Hindi. `VOICE_CLEAN=1` only deletes files in folders named by the current job list, so a Spanish, Portuguese, French, or Chinese render does not remove English clips.
 
 ## French
 
@@ -67,6 +67,17 @@ Number clips do not share filenames with English, Spanish, or Portuguese. “7�
 Simplified Mandarin uses the same Kokoro model. The voice is `zf_xiaobei` (`lang="cmn"`), Apache-2.0. `zh` and `zh-cn` are not espeak language codes for this build. Clips live in `academy/public/voice/zh/`. The install cache includes the Chinese clips for Add & Subtract, Times Tables, and Telling Time, plus buddy lines and the home. The manifest is a separate chunk (`src/academy/voice/manifest-zh.ts`) loaded only when the language is 中文. The string table is its own chunk too (`src/academy/i18n-zh.ts`).
 
 Phonics, Sight Words, and Spelling are hidden in Chinese, so those English-alphabet lines are not recorded. Number words follow mainland school reading: 2 is 二, 200 is 二百, 2000 is 两千, and 101 is 一百零一. Clock speech says 点整, 点半, 点一刻, and 差一刻 next hour. Western digits stay in the writing. A small Noto Sans SC subset draws 中文 on the language list. The face used by the rest of the UI is loaded only after Chinese is chosen, and it is left out of the install cache.
+
+## Hindi
+
+Hindi uses the same Kokoro model. The voice is `hf_alpha` (`lang="hi"`), Apache-2.0. Clips live in `academy/public/voice/hi/`. The install cache includes the Hindi clips for Add & Subtract, Times Tables, and Telling Time, plus buddy lines and the home. The manifest is a separate chunk (`src/academy/voice/manifest-hi.ts`) loaded only when the language is हिन्दी. The string table is its own chunk too (`src/academy/i18n-hi.ts`).
+
+Phonics, Sight Words, and Spelling are hidden in Hindi, so those English-alphabet lines are not recorded. Number words follow school Hindi, including एक सौ एक for 101 and लाख for 100,000. Clock speech says बजे, साढ़े, सवा, and पौने for the next hour. Western digits stay in the writing. A small Noto Sans Devanagari subset draws हिन्दी on the language list. The face used by the rest of the UI is loaded only after Hindi is chosen, and it is left out of the install cache.
+
+```bash
+npx vite-node scripts/export-voice-hi.ts
+VOICE_JOBS=/tmp/voice-jobs-hi.json VOICE_NAME=hf_alpha VOICE_LANG=hi python3 scripts/render-voice.py
+```
 
 ```bash
 npx vite-node scripts/export-voice-fr.ts

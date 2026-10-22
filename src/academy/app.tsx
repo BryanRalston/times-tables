@@ -4,7 +4,7 @@ import { gameOffered } from "./games/offer";
 import { todayIso, type RoundResult, type Save } from "./model";
 import { openEgg } from "./buddy/unlock";
 import { acknowledgeUnlocks, applyRound, applyStory, claimDailyGift } from "./rewards";
-import { loadLocalePack, localePackReady, setLocale, show } from "./i18n";
+import { getLocale, loadLocalePack, localePackReady, setLocale, show, type Locale } from "./i18n";
 import { activeChild, loadSave, mapActive, withLevel, writeSave } from "./storage";
 import { warmVoices } from "./voice";
 import { ensureVoice } from "./voice/clips";
@@ -17,6 +17,25 @@ const PlayScreen = lazy(() => import("./ui/play").then((mod) => ({ default: mod.
 const GrownupsScreen = lazy(() => import("./ui/grownups").then((mod) => ({ default: mod.GrownupsScreen })));
 const WorksheetPage = lazy(() => import("./ui/worksheet").then((mod) => ({ default: mod.WorksheetPage })));
 const StoriesRoute = lazy(() => import("./ui/stories").then((mod) => ({ default: mod.StoriesRoute })));
+
+function alphabetGameNote(): string {
+  const locale: Locale = getLocale();
+  switch (locale) {
+    case "zh":
+      return "这个游戏是英语字母游戏。请在设置里换成 English。";
+    case "hi":
+      return "यह खेल अंग्रेज़ी के अक्षरों का है। सेटिंग में English चुनो।";
+    case "en":
+    case "es":
+    case "pt":
+    case "fr":
+      return "This game uses the English alphabet. Switch to English in Settings.";
+    default: {
+      const neverLocale: never = locale;
+      return neverLocale;
+    }
+  }
+}
 
 type Route =
   | { name: "home" }
@@ -184,7 +203,7 @@ function AcademyApp() {
           </a>
         </header>
         <h1>{show("Games")}</h1>
-        <p className="ac-lede">这个游戏是英语字母游戏。请在设置里换成 English。</p>
+        <p className="ac-lede">{alphabetGameNote()}</p>
       </div>
     );
   } else if (route.name === "play") {
@@ -254,7 +273,8 @@ function AcademyApp() {
   }
 
   if (!packReady) {
-    const waiting = save.lang === "zh" ? "加载中…" : save.lang === "fr" ? "Chargement…" : save.lang === "pt" ? "Carregando…" : "Loading…";
+    const waiting =
+      save.lang === "zh" ? "加载中…" : save.lang === "hi" ? "लोड हो रहा है…" : save.lang === "fr" ? "Chargement…" : save.lang === "pt" ? "Carregando…" : "Loading…";
     return (
       <SoundContext.Provider value={save.sound}>
         <p className="ac-note">{waiting}</p>

@@ -1,6 +1,8 @@
 import {
   chineseMinuteWords,
   chineseNumberWords,
+  hindiMinuteWords,
+  hindiNumberWords,
   frenchMinuteWords,
   frenchNumberWords,
   getLocale,
@@ -344,6 +346,18 @@ function pronounceKeyFr(key: string): string {
   return words.map((word) => pronounceFrenchWord(word, alone)).join(" ");
 }
 
+function pronounceKeyHi(key: string): string {
+  if (key === "more than") return "से अधिक";
+  if (key === "more") return "अधिक";
+  if (key === "than") return "से";
+  if (key.startsWith("min:")) {
+    const minutes = Number(key.slice(4));
+    return Number.isInteger(minutes) ? hindiMinuteWords(minutes) : key;
+  }
+  if (/^\d+$/.test(key)) return hindiNumberWords(Number(key));
+  return key;
+}
+
 function pronounceKeyZh(key: string): string {
   if (key === "more than") return "多于";
   if (key === "more") return "多";
@@ -358,6 +372,13 @@ function pronounceKeyZh(key: string): string {
 
 export function spokenText(key: string): string {
   const locale = getLocale();
+  if (locale === "hi") {
+    const hi = pronounceKeyHi(key).trim();
+    if (!hi || /[।.!?]$/.test(hi)) return hi;
+    if (/(कितने|कितनी|कितना|क्या|कौन|कहाँ|कहां)/.test(hi) && hi.length >= 4) return `${hi}?`;
+    if (hi.length >= 8) return `${hi}।`;
+    return hi;
+  }
   if (locale === "zh") {
     const zh = pronounceKeyZh(key).trim();
     if (!zh || /[。！？.!?]$/.test(zh)) return zh;

@@ -203,6 +203,14 @@ export function blockPhrase(n: number): string {
   const tens = Math.floor((n % 100) / 10);
   const ones = n % 10;
   const locale = getLocale();
+  if (locale === "hi") {
+    const parts: string[] = [];
+    if (hundreds > 0) parts.push(`${hundreds} सैकड़ा`);
+    if (tens > 0) parts.push(`${tens} दहाई`);
+    if (ones > 0 || parts.length === 0) parts.push(`${ones} इकाई`);
+    if (parts.length === 1) return parts[0]!;
+    return `${parts.slice(0, -1).join(", ")} और ${parts[parts.length - 1]}`;
+  }
   if (locale === "zh") {
     const parts: string[] = [];
     if (hundreds > 0) parts.push(`${hundreds}个百`);

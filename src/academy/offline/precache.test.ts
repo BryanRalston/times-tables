@@ -5,9 +5,10 @@ import { rngFromSeed } from "@/lib/rng";
 import { GAMES } from "../games/registry";
 import type { ChoiceQ } from "../games/types";
 import { makeClockTask } from "../hands";
-import { installChinese, installFrench, installPortuguese, setLocale, yourTurnLine } from "../i18n";
+import { installChinese, installFrench, installHindi, installPortuguese, setLocale, yourTurnLine } from "../i18n";
 import { BOSS_FR, FR, PERSONA_FALLBACK_FR, PERSONA_FR, TRAIT_FR } from "../i18n-fr";
 import { BOSS_PT, PERSONA_FALLBACK_PT, PERSONA_PT, PT, TRAIT_PT } from "../i18n-pt";
+import { BOSS_HI, HI, PERSONA_FALLBACK_HI, PERSONA_HI, TRAIT_HI } from "../i18n-hi";
 import { BOSS_ZH, PERSONA_FALLBACK_ZH, PERSONA_ZH, TRAIT_ZH, ZH } from "../i18n-zh";
 import { SQUAD_IDS } from "../model";
 import { exampleFor } from "../round-flow";
@@ -19,16 +20,19 @@ import { collectSpokenLines } from "../voice/catalog";
 import { VOICE_FILES_ES } from "../voice/manifest-es";
 import { VOICE_FILES_FR } from "../voice/manifest-fr";
 import { VOICE_FILES_PT } from "../voice/manifest-pt";
+import { VOICE_FILES_HI } from "../voice/manifest-hi";
 import { VOICE_FILES_ZH } from "../voice/manifest-zh";
 import { planSpeech } from "../voice/plan";
 import { spanishPrecacheVoiceFiles } from "../voice/precache-es";
 import { frenchPrecacheVoiceFiles } from "../voice/precache-fr";
+import { hindiPrecacheVoiceFiles } from "../voice/precache-hi";
 import { chinesePrecacheVoiceFiles } from "../voice/precache-zh";
 import { portuguesePrecacheVoiceFiles } from "../voice/precache-pt";
 
 installPortuguese({ PT, PERSONA_PT, PERSONA_FALLBACK_PT, BOSS_PT, TRAIT_PT });
 installFrench({ FR, PERSONA_FR, PERSONA_FALLBACK_FR, BOSS_FR, TRAIT_FR });
 installChinese({ ZH, PERSONA_ZH, PERSONA_FALLBACK_ZH, BOSS_ZH, TRAIT_ZH });
+installHindi({ HI, PERSONA_HI, PERSONA_FALLBACK_HI, BOSS_HI, TRAIT_HI });
 
 describe("offline precache", () => {
   it("lists app files, squad art, outfits, and sounds", () => {
@@ -58,6 +62,8 @@ describe("offline precache", () => {
     expect(isPrecacheFile("voice/fr/not-listed.mp3")).toBe(false);
     expect(isPrecacheFile(`voice/${VOICE_FILES_ZH["7"]}`)).toBe(true);
     expect(isPrecacheFile("voice/zh/not-listed.mp3")).toBe(false);
+    expect(isPrecacheFile(`voice/${VOICE_FILES_HI["7"]}`)).toBe(true);
+    expect(isPrecacheFile("voice/hi/not-listed.mp3")).toBe(false);
     expect(isPrecacheFile("fonts/NotoSansSC-subset.woff2")).toBe(false);
     expect(isPrecacheFile("squishees/frog.png")).toBe(false);
     expect(isPrecacheFile("precache-manifest.json")).toBe(false);
@@ -124,7 +130,7 @@ describe("offline precache", () => {
     expect(domainSw).toContain(`const SHARE_IMAGE = ${JSON.stringify(SHARE_IMAGE_PATH)}`);
     expect(domainSw).toContain("if (url.pathname === SHARE_IMAGE) return;");
     expect(domainSw).toContain('caches.match("/index.html")');
-    expect(domainSw).toContain('const CACHE = "squishee-academy-root-v13"');
+    expect(domainSw).toContain('const CACHE = "squishee-academy-root-v14"');
   });
 
   it("precaches Spanish clips for an Add, Times, and Telling Time round", () => {
@@ -390,6 +396,24 @@ describe("offline precache", () => {
       for (const file of live) expect(isPrecacheFile(`voice/${file}`)).toBe(true);
       expect(live).toContain(VOICE_FILES_ZH["7"]);
       const extra = Object.values(VOICE_FILES_ZH).find((file) => !live.includes(file));
+      expect(extra).toBeTruthy();
+      expect(isPrecacheFile(`voice/${extra}`)).toBe(false);
+    } finally {
+      setLocale("en");
+    }
+  });
+
+  it("precaches Hindi clips for core games without the whole voice folder", () => {
+    setLocale("hi");
+    try {
+      const listed = JSON.parse(readFileSync("src/academy/voice/hi-precache.json", "utf8")) as string[];
+      const live = hindiPrecacheVoiceFiles();
+      expect(listed).toEqual(live);
+      expect(live.length).toBeGreaterThan(100);
+      expect(live.length).toBeLessThan(Object.keys(VOICE_FILES_HI).length);
+      for (const file of live) expect(isPrecacheFile(`voice/${file}`)).toBe(true);
+      expect(live).toContain(VOICE_FILES_HI["7"]);
+      const extra = Object.values(VOICE_FILES_HI).find((file) => !live.includes(file));
       expect(extra).toBeTruthy();
       expect(isPrecacheFile(`voice/${extra}`)).toBe(false);
     } finally {

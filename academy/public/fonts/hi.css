@@ -1,0 +1,7 @@
+@font-face {
+  font-family: "Noto Sans Devanagari";
+  src: url("./NotoSansDevanagari-subset.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+  unicode-range: U+0900-097F, U+1CD0-1CF6, U+200C-200D, U+20A8, U+A8E0-A8FF;
+}

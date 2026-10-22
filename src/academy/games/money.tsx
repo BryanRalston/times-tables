@@ -89,12 +89,12 @@ function makeName(rng: Rng): ChoiceQ {
       const buddy = buddyName(rng);
       return pickTalk(rng, [
         ["What coin is this?", "¿Qué moneda es esta?"],
-        [`${buddy} holds up a coin. What coin is it?`, `${buddy} muestra una moneda. ¿Cuál es?`, `${buddy} mostra uma moeda. Qual é?`, `${buddy} montre une pièce. Laquelle est-ce ?`, `${buddy}举起一枚硬币。这是哪种硬币？`],
+        [`${buddy} holds up a coin. What coin is it?`, `${buddy} muestra una moneda. ¿Cuál es?`, `${buddy} mostra uma moeda. Qual é?`, `${buddy} montre une pièce. Laquelle est-ce ?`, `${buddy}举起一枚硬币。这是哪种硬币？`, `${buddy} एक सिक्का दिखाता है। यह कौन सा सिक्का है?`],
       ]);
     })(),
     hint: hintFor(kind),
-    praise: t(`Yes! That is a ${name.toLowerCase()}.`, `¡Sí! Es ${coin}.`, `Sim! É ${coin}.`, `Oui ! C'est ${coin}.`, `对！这是${coin}。`),
-    almost: t(`Almost! That one is a ${name.toLowerCase()}.`, `¡Casi! Esa es ${coin}.`, `Quase! Essa é ${coin}.`, `Presque ! C'est ${coin}.`, `差一点！这枚是${coin}。`),
+    praise: t(`Yes! That is a ${name.toLowerCase()}.`, `¡Sí! Es ${coin}.`, `Sim! É ${coin}.`, `Oui ! C'est ${coin}.`, `对！这是${coin}。`, `हाँ! वह ${coin} है।`),
+    almost: t(`Almost! That one is a ${name.toLowerCase()}.`, `¡Casi! Esa es ${coin}.`, `Quase! Essa é ${coin}.`, `Presque ! C'est ${coin}.`, `差一点！这枚是${coin}。`, `लगभग! वह ${coin} है।`),
     answer: name,
     choices,
     skill: "money:name",
@@ -114,12 +114,12 @@ function makeCount(rng: Rng): ChoiceQ {
       const buddy = buddyName(rng);
       return pickTalk(rng, [
         ["How much money?", "¿Cuánto dinero hay?"],
-        [`${buddy} counts the coins. How much?`, `${buddy} cuenta las monedas. ¿Cuánto es?`, `${buddy} conta as moedas. Quanto é?`, `${buddy} compte les pièces. Combien est-ce ?`, `${buddy}在数硬币。一共多少钱？`],
+        [`${buddy} counts the coins. How much?`, `${buddy} cuenta las monedas. ¿Cuánto es?`, `${buddy} conta as moedas. Quanto é?`, `${buddy} compte les pièces. Combien est-ce ?`, `${buddy}在数硬币。一共多少钱？`, `${buddy} सिक्के गिनता है। कितने पैसे?`],
       ]);
     })(),
     hint: t("Add the coins", "Suma las monedas"),
-    praise: t(`Yes! ${pile} is ${formatCents(total)}.`, `¡Sí! ${pile} son ${formatCents(total)}.`, `Sim! ${pile} são ${formatCents(total)}.`, `Oui ! ${pile} font ${formatCents(total)}.`, `对！${pile}是${formatCents(total)}。`),
-    almost: t(`Almost! ${pile} is ${formatCents(total)}.`, `¡Casi! ${pile} son ${formatCents(total)}.`, `Quase! ${pile} são ${formatCents(total)}.`, `Presque ! ${pile} font ${formatCents(total)}.`, `差一点！${pile}是${formatCents(total)}。`),
+    praise: t(`Yes! ${pile} is ${formatCents(total)}.`, `¡Sí! ${pile} son ${formatCents(total)}.`, `Sim! ${pile} são ${formatCents(total)}.`, `Oui ! ${pile} font ${formatCents(total)}.`, `对！${pile}是${formatCents(total)}。`, `हाँ! ${pile} ${formatCents(total)} है।`),
+    almost: t(`Almost! ${pile} is ${formatCents(total)}.`, `¡Casi! ${pile} son ${formatCents(total)}.`, `Quase! ${pile} são ${formatCents(total)}.`, `Presque ! ${pile} font ${formatCents(total)}.`, `差一点！${pile}是${formatCents(total)}。`, `लगभग! ${pile} ${formatCents(total)} है।`),
     answer: formatCents(total),
     choices: centChoices(rng, total, [total + 1, total - 1, total + 5, total - 5, total + 10]),
     skill: "money:count",
@@ -154,13 +154,13 @@ function makeMake(rng: Rng): ChoiceQ {
     title: (() => {
       const buddy = buddyName(rng);
       return pickTalk(rng, [
-        [`Which coins make ${price}?`, `¿Qué monedas forman ${price}?`, `Quais moedas formam ${price}?`, `Quelles pièces font ${price} ?`, `哪些硬币能凑成${price}？`],
-        [`${buddy} needs ${price}. Which coins make it?`, `${buddy} necesita ${price}. ¿Qué monedas lo forman?`, `${buddy} precisa de ${price}. Quais moedas formam esse valor?`, `${buddy} a besoin de ${price}. Quelles pièces font cette somme ?`, `${buddy}需要${price}。哪些硬币能凑成它？`],
+        [`Which coins make ${price}?`, `¿Qué monedas forman ${price}?`, `Quais moedas formam ${price}?`, `Quelles pièces font ${price} ?`, `哪些硬币能凑成${price}？`, `कौन से सिक्के ${price} बनाते हैं?`],
+        [`${buddy} needs ${price}. Which coins make it?`, `${buddy} necesita ${price}. ¿Qué monedas lo forman?`, `${buddy} precisa de ${price}. Quais moedas formam esse valor?`, `${buddy} a besoin de ${price}. Quelles pièces font cette somme ?`, `${buddy}需要${price}。哪些硬币能凑成它？`, `${buddy} को ${price} चाहिए। कौन से सिक्के यह राशि बनाते हैं?`],
       ]);
     })(),
     hint: t("Count each group", "Cuenta cada grupo"),
-    praise: t(`Yes! ${made} makes ${price}.`, `¡Sí! ${made} forman ${price}.`, `Sim! ${made} formam ${price}.`, `Oui ! ${made} font ${price}.`, `对！${made}能凑成${price}。`),
-    almost: t(`Almost! ${made} makes ${price}.`, `¡Casi! ${made} forman ${price}.`, `Quase! ${made} formam ${price}.`, `Presque ! ${made} font ${price}.`, `差一点！${made}能凑成${price}。`),
+    praise: t(`Yes! ${made} makes ${price}.`, `¡Sí! ${made} forman ${price}.`, `Sim! ${made} formam ${price}.`, `Oui ! ${made} font ${price}.`, `对！${made}能凑成${price}。`, `हाँ! ${made} ${price} बनाता है।`),
+    almost: t(`Almost! ${made} makes ${price}.`, `¡Casi! ${made} forman ${price}.`, `Quase! ${made} formam ${price}.`, `Presque ! ${made} font ${price}.`, `差一点！${made}能凑成${price}。`, `लगभग! ${made} ${price} बनाता है।`),
     answer,
     choices: rng.shuffle(keys),
     skill: "money:make",
@@ -186,12 +186,12 @@ function makeChange(rng: Rng): ChoiceQ {
       const buddy = buddyName(rng);
       return pickTalk(rng, [
         ["How much change?", "¿Cuánto es el cambio?"],
-        [`${buddy} pays. How much change is left?`, `${buddy} paga. ¿Cuánto cambio sobra?`, `${buddy} paga. Quanto sobra de troco?`, `${buddy} paie. Combien de monnaie reste-t-il ?`, `${buddy}付了钱。要找回多少钱？`],
+        [`${buddy} pays. How much change is left?`, `${buddy} paga. ¿Cuánto cambio sobra?`, `${buddy} paga. Quanto sobra de troco?`, `${buddy} paie. Combien de monnaie reste-t-il ?`, `${buddy}付了钱。要找回多少钱？`, `${buddy} पैसे देता है। कितने पैसे वापस मिलेंगे?`],
       ]);
     })(),
-    hint: t(`You pay ${paidLabel}. The price is ${priceLabel}.`, `Pagas ${paidLabel}. El precio es ${priceLabel}.`, `Você paga ${paidLabel}. O preço é ${priceLabel}.`, `Tu paies ${paidLabel}. Le prix est ${priceLabel}.`, `你付${paidLabel}。价格是${priceLabel}。`),
-    praise: t(`Yes! The change is ${changeLabel}.`, `¡Sí! El cambio es ${changeLabel}.`, `Sim! O troco é ${changeLabel}.`, `Oui ! La monnaie est ${changeLabel}.`, `对！找回的是${changeLabel}。`),
-    almost: t(`Almost! The change is ${changeLabel}.`, `¡Casi! El cambio es ${changeLabel}.`, `Quase! O troco é ${changeLabel}.`, `Presque ! La monnaie est ${changeLabel}.`, `差一点！找回的是${changeLabel}。`),
+    hint: t(`You pay ${paidLabel}. The price is ${priceLabel}.`, `Pagas ${paidLabel}. El precio es ${priceLabel}.`, `Você paga ${paidLabel}. O preço é ${priceLabel}.`, `Tu paies ${paidLabel}. Le prix est ${priceLabel}.`, `你付${paidLabel}。价格是${priceLabel}。`, `तुम ${paidLabel} देते हो। कीमत ${priceLabel} है।`),
+    praise: t(`Yes! The change is ${changeLabel}.`, `¡Sí! El cambio es ${changeLabel}.`, `Sim! O troco é ${changeLabel}.`, `Oui ! La monnaie est ${changeLabel}.`, `对！找回的是${changeLabel}。`, `हाँ! बचे पैसे ${changeLabel} हैं।`),
+    almost: t(`Almost! The change is ${changeLabel}.`, `¡Casi! El cambio es ${changeLabel}.`, `Quase! O troco é ${changeLabel}.`, `Presque ! La monnaie est ${changeLabel}.`, `差一点！找回的是${changeLabel}。`, `लगभग! बचे पैसे ${changeLabel} हैं।`),
     answer: formatCents(change),
     choices: centChoices(rng, change, [change + 5, change - 5, change + 10, price, paidCents]),
     skill: "money:change",
@@ -214,12 +214,12 @@ function makeDollars(rng: Rng): ChoiceQ {
       const buddy = buddyName(rng);
       return pickTalk(rng, [
         ["How many dollars and cents?", "¿Cuántos dólares y centavos hay?"],
-        [`${buddy} has dollars and coins. How much?`, `${buddy} tiene dólares y monedas. ¿Cuánto es?`, `${buddy} tem dólares e moedas. Quanto é?`, `${buddy} a des dollars et des pièces. Combien est-ce ?`, `${buddy}有美元和硬币。一共多少钱？`],
+        [`${buddy} has dollars and coins. How much?`, `${buddy} tiene dólares y monedas. ¿Cuánto es?`, `${buddy} tem dólares e moedas. Quanto é?`, `${buddy} a des dollars et des pièces. Combien est-ce ?`, `${buddy}有美元和硬币。一共多少钱？`, `${buddy} के पास डॉलर और सिक्के हैं। कितने पैसे?`],
       ]);
     })(),
     hint: t("Dollars, then cents", "Primero los dólares, luego los centavos"),
-    praise: t(`Yes! That is ${amount}.`, `¡Sí! Son ${amount}.`, `Sim! São ${amount}.`, `Oui ! Ça fait ${amount}.`, `对！是${amount}。`),
-    almost: t(`Almost! That is ${amount}.`, `¡Casi! Son ${amount}.`, `Quase! São ${amount}.`, `Presque ! Ça fait ${amount}.`, `差一点！是${amount}。`),
+    praise: t(`Yes! That is ${amount}.`, `¡Sí! Son ${amount}.`, `Sim! São ${amount}.`, `Oui ! Ça fait ${amount}.`, `对！是${amount}。`, `हाँ! वह ${amount} है।`),
+    almost: t(`Almost! That is ${amount}.`, `¡Casi! Son ${amount}.`, `Quase! São ${amount}.`, `Presque ! Ça fait ${amount}.`, `差一点！是${amount}。`, `लगभग! वह ${amount} है।`),
     answer: formatCents(total),
     choices: centChoices(rng, total, [total + 5, total - 5, total + 10, total - 25, dollars * 100, cents]),
     skill: "money:dollars",
@@ -254,18 +254,18 @@ function sheetItem(rng: Rng, level: string): SheetItem {
   switch (safe) {
     case "name": {
       const kind = rng.pick(nameKinds());
-      return { prompt: t(`Name the coin marked ${COIN_CENTS[kind]}:`, `Nombra la moneda marcada ${COIN_CENTS[kind]}:`, `Diga a moeda marcada ${COIN_CENTS[kind]}:`, `Dis la pièce marquée ${COIN_CENTS[kind]} :`, `标着${COIN_CENTS[kind]}的硬币叫什么：`), answer: COIN_NAME[kind] };
+      return { prompt: t(`Name the coin marked ${COIN_CENTS[kind]}:`, `Nombra la moneda marcada ${COIN_CENTS[kind]}:`, `Diga a moeda marcada ${COIN_CENTS[kind]}:`, `Dis la pièce marquée ${COIN_CENTS[kind]} :`, `标着${COIN_CENTS[kind]}的硬币叫什么：`, `${COIN_CENTS[kind]} वाले सिक्के का नाम बताओ:`), answer: COIN_NAME[kind] };
     }
     case "count": {
       const coins = countPile(rng);
       const pile = describePile(coins);
-      return { prompt: t(`${pile} =`, `${pile} =`, `${pile} =`, `${pile} =`, `${pile} =`), answer: formatCents(pileCents(coins)) };
+      return { prompt: t(`${pile} =`, `${pile} =`, `${pile} =`, `${pile} =`, `${pile} =`, `${pile} =`), answer: formatCents(pileCents(coins)) };
     }
     case "make": {
       const target = rng.pick(MAKE_TARGETS);
       const way = describePile(composePile(rng, target, false));
       const price = formatCents(target);
-      return { prompt: t(`Make ${price}. One way:`, `Forma ${price}. Una forma:`, `Monte ${price}. Um jeito:`, `Forme ${price}. Une façon :`, `凑出${price}。一种办法：`), answer: way };
+      return { prompt: t(`Make ${price}. One way:`, `Forma ${price}. Una forma:`, `Monte ${price}. Um jeito:`, `Forme ${price}. Une façon :`, `凑出${price}。一种办法：`, `${price} बनाओ। एक तरीका:`), answer: way };
     }
     case "change": {
       const paid = rng.int(2, 20) * 5;
@@ -273,7 +273,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const paidLabel = formatCents(paid);
       const priceLabel = formatCents(price);
       return {
-        prompt: t(`Pay ${paidLabel}. Price ${priceLabel}. Change =`, `Pagas ${paidLabel}. Precio ${priceLabel}. Cambio =`, `Você paga ${paidLabel}. Preço ${priceLabel}. Troco =`, `Tu paies ${paidLabel}. Prix ${priceLabel}. Monnaie =`, `你付${paidLabel}。价格${priceLabel}。找回 =`),
+        prompt: t(`Pay ${paidLabel}. Price ${priceLabel}. Change =`, `Pagas ${paidLabel}. Precio ${priceLabel}. Cambio =`, `Você paga ${paidLabel}. Preço ${priceLabel}. Troco =`, `Tu paies ${paidLabel}. Prix ${priceLabel}. Monnaie =`, `你付${paidLabel}。价格${priceLabel}。找回 =`, `${paidLabel} दो। कीमत ${priceLabel}। बचे पैसे =`),
         answer: formatCents(paid - price),
       };
     }
@@ -283,7 +283,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const word = dollars === 1 ? "dollar" : "dollars";
       const esWord = dollars === 1 ? "dólar" : "dólares";
       return {
-        prompt: t(`${dollars} ${word} and ${cents}¢ =`, `${dollars} ${esWord} y ${cents}¢ =`, `${dollars} ${esWord} e ${cents}¢ =`, `${dollars} ${esWord} et ${cents}¢ =`, `${dollars} ${word}和${cents}¢ =`),
+        prompt: t(`${dollars} ${word} and ${cents}¢ =`, `${dollars} ${esWord} y ${cents}¢ =`, `${dollars} ${esWord} e ${cents}¢ =`, `${dollars} ${esWord} et ${cents}¢ =`, `${dollars} ${word}和${cents}¢ =`, `${dollars} ${word} और ${cents}¢ =`),
         answer: formatCents(dollars * 100 + cents),
       };
     }
@@ -308,7 +308,7 @@ function MoneyArt({ visual, large }: { visual: MoneyVisual; large?: boolean }) {
     mode === "name"
       ? t("A coin", "Una moneda")
       : mode === "change" || mode === "spend"
-        ? t(`You pay ${pile}`, `Pagas ${pile}`, `Você paga ${pile}`, `Tu paies ${pile}`, `你付${pile}`)
+        ? t(`You pay ${pile}`, `Pagas ${pile}`, `Você paga ${pile}`, `Tu paies ${pile}`, `你付${pile}`, `तुम ${pile} देते हो`)
         : pile;
   return <CoinRow pile={visual.coins} large={large ?? mode === "name"} label={label} />;
 }

@@ -1,5 +1,5 @@
 import type { Rng } from "@/lib/rng";
-import { partPhrase, shapeWithArticle, shapeWord, t } from "../i18n";
+import { getLocale, partPhrase, shapeWithArticle, shapeWord, t } from "../i18n";
 import { buddyName, pickTalk } from "./flavor";
 import { shapesCard } from "./cards";
 import { sideCount, symmetryAnswer, type ShapeBoard, type ShapeName } from "./boards";
@@ -55,14 +55,14 @@ function nameQuestion(rng: Rng, shape: ShapeName, pool: ShapeName[], level: "fla
     game: "shapes",
     title: pickTalk(rng, [
       ["What shape is this?", "¿Qué figura es esta?"],
-      [`${buddy} holds up a shape. What shape is it?`, `${buddy} muestra una figura. ¿Qué figura es?`, `${buddy} mostra uma figura. Que figura é?`, `${buddy} montre une figure. Quelle figure est-ce ?`, `${buddy}举起一个图形。这是什么图形？`],
+      [`${buddy} holds up a shape. What shape is it?`, `${buddy} muestra una figura. ¿Qué figura es?`, `${buddy} mostra uma figura. Que figura é?`, `${buddy} montre une figure. Quelle figure est-ce ?`, `${buddy}举起一个图形。这是什么图形？`, `${buddy} एक आकृति दिखाता है। वह कौन सी आकृति है?`],
     ]),
     hint: level === "flat" ? t("A flat shape sits on the page", "Una figura plana se queda en la hoja") : t("A solid shape you could hold", "Una figura que puedes tener en la mano"),
     answer: shape,
     choices: uniqueChoices(rng, shape, pool),
     skill: `shapes:${level}`,
     tags: [level],
-    solved: t(`It is a ${shape}`, `Es ${shapeWithArticle(shape)}`, `É ${shapeWithArticle(shape)}`, `C'est ${shapeWithArticle(shape)}`, `这是${shapeWord(shape)}`),
+    solved: t(`It is a ${shape}`, `Es ${shapeWithArticle(shape)}`, `É ${shapeWithArticle(shape)}`, `C'est ${shapeWithArticle(shape)}`, `这是${shapeWord(shape)}`, `यह ${shapeWord(shape)} है`),
     picture: shape,
     hands: false,
     quietChoices: false,
@@ -84,11 +84,11 @@ function makeSides(rng: Rng): ChoiceQ {
     title: askSides
       ? pickTalk(rng, [
           ["How many sides?", "¿Cuántos lados tiene?"],
-          [`${buddy} asks how many sides`, `${buddy} pregunta cuántos lados tiene`, `${buddy} pergunta quantos lados`, `${buddy} demande combien de côtés`, `${buddy}问有几条边`],
+          [`${buddy} asks how many sides`, `${buddy} pregunta cuántos lados tiene`, `${buddy} pergunta quantos lados`, `${buddy} demande combien de côtés`, `${buddy}问有几条边`, `${buddy} पूछता है कितनी भुजाएँ हैं`],
         ])
       : pickTalk(rng, [
           ["How many corners?", "¿Cuántas esquinas tiene?"],
-          [`${buddy} asks how many corners`, `${buddy} pregunta cuántas esquinas tiene`, `${buddy} pergunta quantos cantos`, `${buddy} demande combien de coins`, `${buddy}问有几个角`],
+          [`${buddy} asks how many corners`, `${buddy} pregunta cuántas esquinas tiene`, `${buddy} pergunta quantos cantos`, `${buddy} demande combien de coins`, `${buddy}问有几个角`, `${buddy} पूछता है कितने कोने हैं`],
         ]),
     hint: t("Count around the shape", "Cuenta alrededor de la figura"),
     answer: String(count),
@@ -96,8 +96,8 @@ function makeSides(rng: Rng): ChoiceQ {
     skill: "shapes:sides",
     tags: ["sides"],
     solved: askSides
-      ? t(`A ${shape} has ${count} sides`, `${named} tiene ${count} lados`, `${named} tem ${count} lados`, `${named} a ${count} côtés`, `${shapeWord(shape)}有${count}条边`)
-      : t(`A ${shape} has ${count} corners`, `${named} tiene ${count} esquinas`, `${named} tem ${count} vértices`, `${named} a ${count} sommets`, `${shapeWord(shape)}有${count}个角`),
+      ? t(`A ${shape} has ${count} sides`, `${named} tiene ${count} lados`, `${named} tem ${count} lados`, `${named} a ${count} côtés`, `${shapeWord(shape)}有${count}条边`, `${shapeWord(shape)} की ${count} भुजाएँ होती हैं`)
+      : t(`A ${shape} has ${count} corners`, `${named} tiene ${count} esquinas`, `${named} tem ${count} vértices`, `${named} a ${count} sommets`, `${shapeWord(shape)}有${count}个角`, `${shapeWord(shape)} के ${count} कोने होते हैं`),
     picture: shape,
     hands: false,
     quietChoices: false,
@@ -109,22 +109,25 @@ function makeSides(rng: Rng): ChoiceQ {
 
 function makeSymmetry(rng: Rng): ChoiceQ {
   const shape = rng.pick(["square", "rectangle", "triangle", "circle"] as const);
-  const answer = symmetryAnswer(shape);
+  const rawAnswer = symmetryAnswer(shape);
+  const answer = rawAnswer === "more than 4" && getLocale() === "hi" ? "4 से अधिक" : rawAnswer;
+  const choiceIds = ["1", "2", "3", "4", "more than 4"].map((id) => (id === "more than 4" && getLocale() === "hi" ? "4 से अधिक" : id));
   const zhSymmetry = answer === "more than 4" ? `${shapeWord(shape)}的对称轴多于4条` : `${shapeWord(shape)}有${answer}条对称轴`;
+  const hiSymmetry = answer === "more than 4" ? `${shapeWord(shape)} की 4 से अधिक सममिति रेखाएँ होती हैं` : `${shapeWord(shape)} की ${answer} सममिति रेखाएँ होती हैं`;
   const board: ShapeBoard = { game: "shapes", mode: "symmetry", shape };
   const buddy = buddyName(rng);
   return sceneQuestion(rng, {
     game: "shapes",
     title: pickTalk(rng, [
       ["How many lines of symmetry?", "¿Cuántas líneas de simetría tiene?"],
-      [`${buddy} folds the shape. How many lines of symmetry?`, `${buddy} dobla la figura. ¿Cuántas líneas de simetría tiene?`, `${buddy} dobra a figura. Quantas linhas de simetria?`, `${buddy} plie la figure. Combien de lignes de symétrie ?`, `${buddy}把图形对折。有几条对称轴？`],
+      [`${buddy} folds the shape. How many lines of symmetry?`, `${buddy} dobla la figura. ¿Cuántas líneas de simetría tiene?`, `${buddy} dobra a figura. Quantas linhas de simetria?`, `${buddy} plie la figure. Combien de lignes de symétrie ?`, `${buddy}把图形对折。有几条对称轴？`, `${buddy} आकृति को मोड़ता है। कितनी सममिति रेखाएँ हैं?`],
     ]),
     hint: t("A line of symmetry makes two matching halves", "Una línea de simetría hace dos mitades iguales"),
     answer,
-    choices: uniqueChoices(rng, answer, ["1", "2", "3", "4", "more than 4"]),
+    choices: uniqueChoices(rng, answer, choiceIds),
     skill: "shapes:symmetry",
     tags: ["symmetry"],
-    solved: t(`A ${shape} has ${answer} lines of symmetry`, `${shapeWithArticle(shape)} tiene ${answer === "more than 4" ? "más de 4" : answer} líneas de simetría`, `${shapeWithArticle(shape)} tem ${answer === "more than 4" ? "mais de 4" : answer} linhas de simetria`, `${shapeWithArticle(shape)} a ${answer === "more than 4" ? "plus de 4" : answer} axes de symétrie`, zhSymmetry),
+    solved: t(`A ${shape} has ${answer} lines of symmetry`, `${shapeWithArticle(shape)} tiene ${answer === "more than 4" ? "más de 4" : answer} líneas de simetría`, `${shapeWithArticle(shape)} tem ${answer === "more than 4" ? "mais de 4" : answer} linhas de simetria`, `${shapeWithArticle(shape)} a ${answer === "more than 4" ? "plus de 4" : answer} axes de symétrie`, zhSymmetry, hiSymmetry),
     picture: shape,
     hands: false,
     quietChoices: false,
@@ -148,7 +151,7 @@ function makeParts(rng: Rng): ChoiceQ {
     title:
       part.label === "not equal"
         ? t("Which picture shows parts that are not equal?", "¿Qué dibujo muestra partes que no son iguales?")
-        : t(`Which picture shows ${part.label}?`, `¿Qué dibujo muestra ${partPhrase(part.label)}?`, `Qual desenho mostra ${partPhrase(part.label)}?`, `Quel dessin montre ${partPhrase(part.label)} ?`, `哪张图是${partPhrase(part.label)}？`),
+        : t(`Which picture shows ${part.label}?`, `¿Qué dibujo muestra ${partPhrase(part.label)}?`, `Qual desenho mostra ${partPhrase(part.label)}?`, `Quel dessin montre ${partPhrase(part.label)} ?`, `哪张图是${partPhrase(part.label)}？`, `कौन सा चित्र ${partPhrase(part.label)} दिखाता है?`),
     hint: t("Equal parts are the same size", "Las partes iguales son del mismo tamaño"),
     answer: part.id,
     choices: rng.shuffle(PARTS.map((row) => row.id)),
@@ -232,7 +235,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
             : shape === "square"
               ? t("4 equal sides", "4 lados iguales")
               : t("4 sides and is longer than it is tall", "4 lados y es más largo que alto");
-      return { prompt: t(`Name the flat shape with ${clue}.`, `Nombra la figura plana: ${clue}.`, `Diga a figura plana: ${clue}.`, `Dis la figure plate : ${clue}.`, `说出有${clue}的平面图形。`), answer: shape };
+      return { prompt: t(`Name the flat shape with ${clue}.`, `Nombra la figura plana: ${clue}.`, `Diga a figura plana: ${clue}.`, `Dis la figure plate : ${clue}.`, `说出有${clue}的平面图形。`, `${clue} वाली सपाट आकृति का नाम बताओ।`), answer: shape };
     }
     case "solid": {
       const shape = rng.pick(SOLID);
@@ -244,7 +247,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
             : shape === "cube"
               ? t("6 square faces", "6 caras cuadradas")
               : t("a round top and a round bottom, like a can", "una tapa redonda y una base redonda, como una lata");
-      return { prompt: t(`Name the solid shape with ${clue}.`, `Nombra el cuerpo geométrico: ${clue}.`, `Diga o sólido: ${clue}.`, `Dis le solide : ${clue}.`, `说出有${clue}的立体图形。`), answer: shape };
+      return { prompt: t(`Name the solid shape with ${clue}.`, `Nombra el cuerpo geométrico: ${clue}.`, `Diga o sólido: ${clue}.`, `Dis le solide : ${clue}.`, `说出有${clue}的立体图形。`, `${clue} वाली ठोस आकृति का नाम बताओ।`), answer: shape };
     }
     case "sides": {
       const shape = rng.pick(POLYGONS);
@@ -252,8 +255,8 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       return {
         prompt:
           word === "sides"
-            ? t(`How many sides does a ${shape} have?`, `¿Cuántos lados tiene ${shapeWithArticle(shape)}?`, `Quantos lados tem ${shapeWithArticle(shape)}?`, `Combien de côtés a ${shapeWithArticle(shape)} ?`, `${shapeWord(shape)}有几条边？`)
-            : t(`How many corners does a ${shape} have?`, `¿Cuántas esquinas tiene ${shapeWithArticle(shape)}?`, `Quantos vértices tem ${shapeWithArticle(shape)}?`, `Combien de sommets a ${shapeWithArticle(shape)} ?`, `${shapeWord(shape)}有几个角？`),
+            ? t(`How many sides does a ${shape} have?`, `¿Cuántos lados tiene ${shapeWithArticle(shape)}?`, `Quantos lados tem ${shapeWithArticle(shape)}?`, `Combien de côtés a ${shapeWithArticle(shape)} ?`, `${shapeWord(shape)}有几条边？`, `${shapeWord(shape)} की कितनी भुजाएँ होती हैं?`)
+            : t(`How many corners does a ${shape} have?`, `¿Cuántas esquinas tiene ${shapeWithArticle(shape)}?`, `Quantos vértices tem ${shapeWithArticle(shape)}?`, `Combien de sommets a ${shapeWithArticle(shape)} ?`, `${shapeWord(shape)}有几个角？`, `${shapeWord(shape)} के कितने कोने होते हैं?`),
         answer: String(SIDE_WORDS[shape] ?? sideCount(shape)),
       };
     }
@@ -263,7 +266,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         prompt: t(
           `How many lines of symmetry does a ${shape} have?`,
           `¿Cuántas líneas de simetría tiene ${shapeWithArticle(shape)}?`, `Quantas linhas de simetria tem ${shapeWithArticle(shape)}?`,
-        `Combien d'axes de symétrie a ${shapeWithArticle(shape)} ?`, `${shapeWord(shape)}有几条对称轴？`),
+        `Combien d'axes de symétrie a ${shapeWithArticle(shape)} ?`, `${shapeWord(shape)}有几条对称轴？`, `${shapeWord(shape)} की कितनी सममिति रेखाएँ होती हैं?`),
         answer: symmetryAnswer(shape),
       };
     }
@@ -286,7 +289,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
           ? t(
               `A shape is split into ${equal} equal parts. What are the parts called?`,
               `Una figura está partida en ${equal} partes iguales. ¿Cómo se llaman?`, `Uma figura está dividida em ${equal} partes iguais. Como elas se chamam?`,
-            `Une figure est partagée en ${equal} parts égales. Comment s'appellent ces parts ?`, `一个图形平均分成${equal}份。这些份叫什么？`)
+            `Une figure est partagée en ${equal} parts égales. Comment s'appellent ces parts ?`, `一个图形平均分成${equal}份。这些份叫什么？`, `एक आकृति ${equal} बराबर भागों में बँटी है। इन भागों को क्या कहते हैं?`)
           : t(
               "A shape is split into parts that are not the same size. What do you call those parts?",
               "Una figura está partida en partes que no son del mismo tamaño. ¿Cómo se llaman?",
