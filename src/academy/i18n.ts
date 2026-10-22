@@ -676,10 +676,15 @@ export function frenchThan(word: string): string {
   return frenchVowelStart(word) ? `qu'${word}` : `que ${word}`;
 }
 
+/** "de pommes" or "d'os". */
+export function frenchDe(word: string): string {
+  return frenchVowelStart(word) ? `d'${word}` : `de ${word}`;
+}
+
 function howManyLead(name: string, englishPlural: string, count: number): string {
   const one = thingName(name, 1, name);
   const word = thingName(name, Math.max(count, 2), englishPlural);
-  if (locale === "fr") return frenchVowelStart(word) ? `Combien d'${word}` : `Combien de ${word}`;
+  if (locale === "fr") return `Combien ${frenchDe(word)}`;
   if (locale === "pt") {
     const lead = FEMININE_PT.has(one) ? "Quantas" : "Quantos";
     return `${lead} ${word}`;

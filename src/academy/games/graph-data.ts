@@ -1,5 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import {
+  frenchDe,
   frenchThan,
   howManyLessPhrase,
   howManyMorePhrase,
@@ -603,7 +604,7 @@ function joinTitle(a: GraphCat, b: GraphCat): string {
     `How many ${a.plural} and ${b.plural} in all?`,
     `¿${lead} ${left} y ${right} hay en total?`,
     `${leadPt} ${left} e ${right} há no total?`,
-  `${leadPt} ${left} et ${right} y a-t-il en tout ?`);
+  `Combien ${frenchDe(left)} et ${frenchDe(right)} y a-t-il en tout ?`);
 }
 
 function apartTitle(cat: GraphCat): string {
