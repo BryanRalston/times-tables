@@ -1,5 +1,5 @@
 import type { Rng } from "@/lib/rng";
-import { t } from "../i18n";
+import { spanishShaded, starPlace, t } from "../i18n";
 import type {
   FlatKind,
   FoldFig,
@@ -105,6 +105,10 @@ function namedShape(shape: string): string {
       return t("It is a cone", "Es el cono");
     case "cylinder":
       return t("It is a cylinder", "Es el cilindro");
+    case "rhombus":
+      return t("It is a rhombus", "Es el rombo");
+    case "trapezoid":
+      return t("It is a trapezoid", "Es el trapecio");
     default:
       return t("Find the same shape", "Busca la misma figura");
   }
@@ -117,13 +121,13 @@ function positionQuestion(rng: Rng): ChoiceQ {
     level: "position",
     title: either(
       rng,
-      t("Find the same shape.", "Busca la misma figura."),
-      t("Look at the pictures.", "Mira los dibujos."),
+      t("Where is the star?", "¿Dónde está la estrella?"),
+      t("Where is the star now?", "¿Dónde está la estrella ahora?"),
     ),
     hint: t("Look at the pictures", "Mira los dibujos"),
     answer: place,
     choices: rng.shuffle([...POSITIONS]),
-    solved: t("Find the same shape", "Busca la misma figura"),
+    solved: starPlace(place),
     picture: pictures[place] ?? "geo:pos:above",
     labels: blank(POSITIONS),
     pictures,
@@ -299,15 +303,17 @@ function quadsQuestion(rng: Rng): ChoiceQ {
   const shape = rng.pick([...QUADS]);
   const labels: Record<string, string> = {};
   for (const name of QUADS) labels[name] = quadWord(name);
-  const solved =
-    shape === "rectangle" || shape === "square" ? namedShape(shape) : t("Find the same shape", "Busca la misma figura");
   return ask(rng, {
     level: "quads",
-    title: either(rng, t("What shape is this?", "¿Qué figura es esta?"), t("Find the same shape.", "Busca la misma figura.")),
+    title: either(
+      rng,
+      t("What shape is this?", "¿Qué figura es esta?"),
+      t("Which shape do you see?", "¿Qué figura ves?"),
+    ),
     hint: t("Count around the shape", "Cuenta alrededor de la figura"),
     answer: shape,
     choices: rng.shuffle([...QUADS]),
-    solved,
+    solved: namedShape(shape),
     picture: `geo:quad:${shape}`,
     labels,
     pictures: picturesOf(QUADS, (id) => `geo:quad:${id}`),
@@ -320,11 +326,11 @@ function quadsQuestion(rng: Rng): ChoiceQ {
 function shareSolved(den: 2 | 3 | 4): string {
   switch (den) {
     case 2:
-      return t("One half is shaded", "Un medio está sombreada");
+      return t("One half is shaded", spanishShaded("1/2"));
     case 3:
-      return t("One third", "Un tercio");
+      return t("One third is shaded", spanishShaded("1/3"));
     case 4:
-      return t("One fourth is shaded", "Un cuarto está sombreada");
+      return t("One fourth is shaded", spanishShaded("1/4"));
     default: {
       const neverDen: never = den;
       return neverDen;
@@ -371,9 +377,9 @@ function foldQuestion(rng: Rng): ChoiceQ {
     title: either(
       rng,
       t("A line of symmetry makes two matching halves.", "Una línea de simetría hace dos mitades iguales."),
-      t("Find the same shape.", "Busca la misma figura."),
+      t("Which picture has two matching halves?", "¿Qué dibujo tiene dos mitades iguales?"),
     ),
-    hint: t("Find the same shape", "Busca la misma figura"),
+    hint: t("Look at the pictures", "Mira los dibujos"),
     answer,
     choices: rng.shuffle(ids),
     solved: t("A line of symmetry makes two matching halves", "Una línea de simetría hace dos mitades iguales"),

@@ -1,5 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
+import { setLocale } from "../i18n";
+import { makeHandsTask } from "../hands-build";
 import { TRIANGLE_POINTS } from "./scene-ui";
 import { SHAPE_LEVELS, makeShapeQuestion, shapesGame } from "./shapes";
 import type { ChoiceQ } from "./types";
@@ -15,6 +17,40 @@ const SIDES: Record<string, number> = { triangle: 3, square: 4, rectangle: 4, pe
 const LINES: Record<string, string> = { square: "4", rectangle: "2", triangle: "3", circle: "more than 4" };
 
 describe("shape questions", () => {
+  afterEach(() => setLocale("en"));
+
+  it("asks where the star is, names quadrilaterals, and says the symmetry line", () => {
+    const badTitle = /find the same shape|busca la misma figura/i;
+    const badShade = /(?:medio|cuarto|tercio)s? está sombreada|cuartos está sombreada|medios está sombreada/i;
+    for (const locale of ["en", "es"] as const) {
+      setLocale(locale);
+      for (let seed = 0; seed < 24; seed += 1) {
+        const fold = makeShapeQuestion(rngFromSeed(`prompt-fold-${locale}-${seed}`), "fold");
+        expect(fold.title).not.toMatch(badTitle);
+        expect(fold.hint).not.toMatch(badTitle);
+        expect(fold.title.toLowerCase()).toMatch(/symmetry|simetría|matching halves|mitades iguales/);
+        const place = makeShapeQuestion(rngFromSeed(`prompt-pos-${locale}-${seed}`), "position");
+        expect(place.title).toMatch(/where is the star|dónde está la estrella/i);
+        expect(place.praise.toLowerCase()).toMatch(/star is|estrella está/);
+        expect(place.praise).not.toMatch(badTitle);
+        const quad = makeShapeQuestion(rngFromSeed(`prompt-quad-${locale}-${seed}`), "quads");
+        expect(quad.title).toMatch(/what shape is this|qué figura es esta|which shape do you see|qué figura ves/i);
+        expect(quad.praise).not.toMatch(badTitle);
+        if (quad.answer === "rhombus") expect(quad.praise.toLowerCase()).toMatch(/rhombus|rombo/);
+        if (quad.answer === "trapezoid") expect(quad.praise.toLowerCase()).toMatch(/trapezoid|trapecio/);
+        const share = makeShapeQuestion(rngFromSeed(`prompt-share-${locale}-${seed}`), "share");
+        expect(share.praise).not.toMatch(badShade);
+        if (locale === "es") expect(share.praise.toLowerCase()).toMatch(/sombreado/);
+        for (const level of ["position", "fold", "quads", "share"] as const) {
+          const hands = makeHandsTask("shapes", level, rngFromSeed(`prompt-hands-${locale}-${level}-${seed}`));
+          expect(hands.speech).not.toMatch(badTitle);
+          expect(hands.praise).not.toMatch(badShade);
+          if (level !== "quads" || hands.kind === "shapes") expect(hands.praise).not.toMatch(/busca la misma figura|find the same shape/i);
+        }
+      }
+    }
+  });
+
   it("names shapes and counts sides without a leaked worksheet answer", () => {
     for (let seed = 0; seed < 20; seed += 1) {
       for (const level of SHAPE_LEVELS) {

@@ -1,8 +1,6 @@
 # Academy language
 
-Squishee Academy starts in English. A child can switch to Español in Settings and on the Grown-ups page. The choice is saved on this device (`save.lang`, `save.langChosen`, save version 9).
-
-On a first visit, if the browser language starts with `es` and nobody has chosen a language yet, the hello screen offers Spanish. Existing saves are treated as already chosen, so they stay in English until someone switches.
+Squishee Academy starts in English. The hello screen shows English and Español, and the same choice is in Settings and on the Grown-ups page. The choice is saved on this device (`save.lang`, `save.langChosen`).
 
 The Spanish is Latin American and kid-friendly, with tú. Character names (Peach, Frog, and the bosses) stay as they are. Squishee stays Squishee.
 

@@ -1,5 +1,5 @@
 import type { Rng } from "@/lib/rng";
-import { t } from "../i18n";
+import { spanishShaded, t } from "../i18n";
 import { buddyName, pickTalk } from "./flavor";
 import { fractionsCard } from "./cards";
 import { fractionText, type FractionBoard } from "./boards";
@@ -92,7 +92,7 @@ function makeParts(rng: Rng): ChoiceQ {
     choices: fracChoices(rng, answer, [`${Math.max(1, num - 1)}/${den}`, `${Math.min(den, num + 1)}/${den}`], HALF_FOURTHS),
     skill: "fractions:parts",
     tags: ["parts"],
-    solved: t(`${answer} is shaded`, `${answer} está sombreada`),
+    solved: t(`${answer} is shaded`, spanishShaded(answer)),
     picture: answer,
     hands: false,
     quietChoices: false,
