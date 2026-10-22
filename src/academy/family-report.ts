@@ -41,7 +41,7 @@ export interface GameAccuracy {
 export function attemptLabel(n: number): string {
   const count = Math.max(0, Math.floor(n));
   if (count === 1) return t("1 try", "1 intento");
-  return t(`${count} tries`, `${count} intentos`, `${count} tentativas`, `${count} essais`);
+  return t(`${count} tries`, `${count} intentos`, `${count} tentativas`, `${count} essais`, `试了${count}次`);
 }
 
 export function parentSkillLabel(key: string): string {
@@ -232,12 +232,12 @@ function totalsFor(id: GameId, skills: Record<string, SkillStat>): { ok: number;
 function tipFrom(who: string, names: string[], match: NonNullable<ReturnType<typeof sheetForSkill>>, factor: number | null): PracticeTip {
   const sheet = sheetTitle(match);
   const subject =
-    names.length >= 2 ? t(`${names[0]} and ${names[1]}`, `${names[0]} y ${names[1]}`, `${names[0]} e ${names[1]}`, `${names[0]} et ${names[1]}`) : (names[0] ?? sheet);
+    names.length >= 2 ? t(`${names[0]} and ${names[1]}`, `${names[0]} y ${names[1]}`, `${names[0]} e ${names[1]}`, `${names[0]} et ${names[1]}`, `${names[0]}和${names[1]}`) : (names[0] ?? sheet);
   return {
     text: t(
       `${who} is still learning ${subject}. The free "${sheet}" worksheet is a calm one for tonight.`,
       `${who} todavía está aprendiendo ${subject}. La hoja gratis «${sheet}» es una forma tranquila para esta noche.`, `${who} ainda está aprendendo ${subject}. A folha grátis «${sheet}» é um jeito tranquilo para hoje à noite.`,
-    `${who} apprend encore ${subject}. La fiche gratuite « ${sheet} » est tranquille pour ce soir.`),
+    `${who} apprend encore ${subject}. La fiche gratuite « ${sheet} » est tranquille pour ce soir.`, `${who}还在学${subject}。免费的“${sheet}”练习纸，适合今晚安静地做一做。`),
     factor,
     gameId: match.gameId,
     sheetSlug: match.slug,
@@ -265,7 +265,7 @@ function reviewTip(who: string, skills: Record<string, SkillStat>): PracticeTip 
     text: t(
       `${who} is doing well. The free "${sheet}" worksheet is a calm one if you want a page tonight.`,
       `${who} va bien. La hoja gratis «${sheet}» es una forma tranquila si quieren una página esta noche.`, `${who} vai bem. A folha grátis «${sheet}» é um jeito tranquilo se quiserem uma página hoje à noite.`,
-    `${who} va bien. La fiche gratuite « ${sheet} » est tranquille si tu veux une page ce soir.`),
+    `${who} va bien. La fiche gratuite « ${sheet} » est tranquille si tu veux une page ce soir.`, `${who}学得不错。如果今晚想做一页，免费的“${sheet}”练习纸很合适。`),
     factor: key ? timesFactorOf(key) : null,
     gameId: match.gameId,
     sheetSlug: match.slug,
@@ -280,7 +280,7 @@ function emptyTip(who: string): PracticeTip {
     text: t(
       `${who} can print a free worksheet and play it together tonight.`,
       `${who} puede imprimir una hoja gratis y jugarla juntos esta noche.`, `${who} pode imprimir uma folha grátis e jogar juntos hoje à noite.`,
-    `${who} peut imprimer une fiche gratuite et y jouer ensemble ce soir.`),
+    `${who} peut imprimer une fiche gratuite et y jouer ensemble ce soir.`, `${who}可以打印一张免费练习纸，今晚一起玩。`),
     factor: null,
     gameId: null,
     sheetSlug: null,
@@ -326,6 +326,10 @@ export function storyBrief(skills: Record<string, SkillStat>): StoryBrief {
     if (n <= 0) continue;
     finishes += n;
     titles.push(story.title);
+  }
+  if (getLocale() === "zh") {
+    const line = finishes === 0 ? "故事现在还是英语的。" : finishes === 1 ? "读过1个英语故事。" : `读过${finishes}个英语故事。`;
+    return { finishes, titles: [], line };
   }
   if (getLocale() === "es" || getLocale() === "pt" || getLocale() === "fr") {
     const line =

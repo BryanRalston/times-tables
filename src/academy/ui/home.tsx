@@ -14,6 +14,7 @@ import { rollGift, type GiftRoll } from "../rewards";
 import { outfitLabel } from "../wardrobe";
 import { chime } from "../sound";
 import { WeekStickers } from "./stickers";
+import { gameOffered } from "../games/offer";
 import { storiesOffered } from "../stories/offer";
 import { AcademyPal, Foot, GiftBox, LockIcon, Logo, Pips, PlayMark, ProgressRing, SquisheeImg, cx } from "./bits";
 import { PalWithLook } from "./boss-figure";
@@ -41,7 +42,7 @@ export function HomeScreen({
   const playTitle = GAMES.find((game) => game.id === playId)?.title ?? playId;
   const todayLine = todayPlayLine(show(playTitle), child.grade);
   const playAction = facing
-    ? t(`Face ${bossForGame(playId).name}`, `Enfrenta a ${bossForGame(playId).name}`, `Enfrente ${bossForGame(playId).name}`, `Affronte ${bossForGame(playId).name}`)
+    ? t(`Face ${bossForGame(playId).name}`, `Enfrenta a ${bossForGame(playId).name}`, `Enfrente ${bossForGame(playId).name}`, `Affronte ${bossForGame(playId).name}`, `去见${bossForGame(playId).name}`)
     : show("Play");
   const book = bookEntries();
   const palTier = bondTier(bondScore(child.bonds, child.avatarId));
@@ -57,7 +58,7 @@ export function HomeScreen({
 
       <section className="ac-hero">
         <h1>
-          {t(`Hi ${child.name}! Ready to play?`, `¡Hola ${child.name}! ¿Listo para jugar?`, `Oi ${child.name}! Vamos jogar?`, `Salut ${child.name} ! Tu veux jouer ?`)}
+          {t(`Hi ${child.name}! Ready to play?`, `¡Hola ${child.name}! ¿Listo para jugar?`, `Oi ${child.name}! Vamos jogar?`, `Salut ${child.name} ! Tu veux jouer ?`, `${child.name}，你好！准备好玩了吗？`)}
         </h1>
         <p className="ac-lede">{show("Short games · hop the island · collect squishees")}</p>
         <div className="ac-play-stage">
@@ -90,7 +91,7 @@ export function HomeScreen({
           <ProgressRing
             value={daily.rounds}
             max={daily.goal}
-            label={t(`${daily.rounds} of ${daily.goal} rounds today`, `${daily.rounds} de ${daily.goal} rondas hoy`, `${daily.rounds} de ${daily.goal} rodadas hoje`, `${daily.rounds} sur ${daily.goal} manches aujourd'hui`)}
+            label={t(`${daily.rounds} of ${daily.goal} rounds today`, `${daily.rounds} de ${daily.goal} rondas hoy`, `${daily.rounds} de ${daily.goal} rodadas hoje`, `${daily.rounds} sur ${daily.goal} manches aujourd'hui`, `今天${daily.rounds}轮，一共${daily.goal}轮`)}
           />
           <button
             type="button"
@@ -116,7 +117,7 @@ export function HomeScreen({
       </section>
 
       <div className="ac-grid">
-        {GAMES.map((game) => {
+        {GAMES.filter((game) => gameOffered(game.id)).map((game) => {
           const offer = bandFor(game.id, child.grade)?.offer ?? "play";
           const open = offer !== "later" || child.challengeAhead;
           if (!open) {
@@ -127,7 +128,7 @@ export function HomeScreen({
                 className={`ac-card is-${game.tint} is-soon`}
                 data-offer="later"
                 onClick={() => {
-                  setToast(t(`${game.title} is coming later for this grade.`, `${show(game.title)} llega más adelante para este grado.`, `${show(game.title)} chega mais tarde para este ano.`, `${show(game.title)} arrive plus tard pour cette classe.`));
+                  setToast(t(`${game.title} is coming later for this grade.`, `${show(game.title)} llega más adelante para este grado.`, `${show(game.title)} chega mais tarde para este ano.`, `${show(game.title)} arrive plus tard pour cette classe.`, `这个年级稍后才会有${show(game.title)}。`));
                   window.setTimeout(() => setToast(null), 1800);
                 }}
               >
@@ -219,7 +220,7 @@ export function HomeScreen({
 }
 
 function PrizeBody({ prize }: { prize: GiftRoll }) {
-  if (prize.kind === "coins") return <p>{t(`${prize.amount} coins for the shelf.`, `${prize.amount} monedas para la tienda.`, `${prize.amount} moedas para a loja.`, `${prize.amount} pièces pour la boutique.`)}</p>;
+  if (prize.kind === "coins") return <p>{t(`${prize.amount} coins for the shelf.`, `${prize.amount} monedas para la tienda.`, `${prize.amount} moedas para a loja.`, `${prize.amount} pièces pour la boutique.`, `${prize.amount}个金币放到架子上。`)}</p>;
   if (prize.kind === "cosmetic") {
     return (
       <p>
@@ -232,7 +233,7 @@ function PrizeBody({ prize }: { prize: GiftRoll }) {
   return (
     <p>
       <AcademyPal id={prize.id} className="ac-done-pal" label={pal?.name ?? ""} />
-      {t(`${name} hopped in.`, `${name} llegó de un salto.`, `${name} chegou pulando.`, `${name} arrive d'un bond.`)}
+      {t(`${name} hopped in.`, `${name} llegó de un salto.`, `${name} chegou pulando.`, `${name} arrive d'un bond.`, `${name}跳进来了。`)}
     </p>
   );
 }

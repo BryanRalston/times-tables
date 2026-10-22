@@ -1,4 +1,4 @@
-import { frenchPersona, getLocale, portuguesePersona } from "../i18n";
+import { chinesePersona, frenchPersona, getLocale, portuguesePersona } from "../i18n";
 import { PERSONA_ES, PERSONA_FALLBACK_ES } from "../i18n-es";
 
 export type BuddyMove = "hop" | "wiggle" | "spin" | "bounce" | "sway";
@@ -131,7 +131,15 @@ export function personaOf(id: string): Persona {
   if (locale === "en") return base;
   const known = Boolean(PEOPLE[id]);
   const translated =
-    locale === "es" ? (known ? PERSONA_ES[id] : PERSONA_FALLBACK_ES) : locale === "fr" ? frenchPersona(id, known) : portuguesePersona(id, known);
+    locale === "es"
+      ? known
+        ? PERSONA_ES[id]
+        : PERSONA_FALLBACK_ES
+      : locale === "fr"
+        ? frenchPersona(id, known)
+        : locale === "zh"
+          ? chinesePersona(id, known)
+          : portuguesePersona(id, known);
   if (!translated) return base;
   return {
     ...base,

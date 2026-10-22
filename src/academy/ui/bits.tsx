@@ -248,18 +248,18 @@ export function clockAria(hours: number, minutes: number): string {
   const long = Math.round(minutes / 5) % 12;
   const longN = long === 0 ? 12 : long;
   const short = hours % 12 === 0 ? 12 : hours % 12;
-  if (minutes === 0) return t(`Analog clock. Short hand on ${short}. Long hand on 12.`, `Reloj. La manecilla corta en el ${short}. La larga en el 12.`, `Relógio. O ponteiro pequeno no ${short}. O grande no 12.`, `Horloge à aiguilles. La petite aiguille sur le ${short}. La grande aiguille sur le 12.`);
+  if (minutes === 0) return t(`Analog clock. Short hand on ${short}. Long hand on 12.`, `Reloj. La manecilla corta en el ${short}. La larga en el 12.`, `Relógio. O ponteiro pequeno no ${short}. O grande no 12.`, `Horloge à aiguilles. La petite aiguille sur le ${short}. La grande aiguille sur le 12.`, `钟面。时针指向${short}。分针指向12。`);
   const next = short === 12 ? 1 : short + 1;
   if (minutes >= 25) {
     return t(
       `Analog clock. Short hand between ${short} and ${next}. Long hand on ${longN}.`,
       `Reloj. La manecilla corta entre el ${short} y el ${next}. La larga en el ${longN}.`, `Relógio. O ponteiro pequeno entre o ${short} e o ${next}. O grande no ${longN}.`,
-    `Horloge à aiguilles. La petite aiguille entre le ${short} et le ${next}. La grande aiguille sur le ${longN}.`);
+    `Horloge à aiguilles. La petite aiguille entre le ${short} et le ${next}. La grande aiguille sur le ${longN}.`, `钟面。时针在${short}和${next}之间。分针指向${longN}。`);
   }
   return t(
     `Analog clock. Short hand just after ${short}. Long hand on ${longN}.`,
     `Reloj. La manecilla corta acaba de pasar el ${short}. La larga en el ${longN}.`, `Relógio. O ponteiro pequeno acabou de passar o ${short}. O grande no ${longN}.`,
-  `Horloge à aiguilles. La petite aiguille vient de passer le ${short}. La grande aiguille sur le ${longN}.`);
+  `Horloge à aiguilles. La petite aiguille vient de passer le ${short}. La grande aiguille sur le ${longN}.`, `钟面。时针刚过${short}。分针指向${longN}。`);
 }
 
 export function AnalogClock({

@@ -1,6 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import { STORY_STARS } from "./buddy/persona";
-import { frenchFraction, getLocale, partPhrase, portugueseFraction, shapeWithArticle, spanishFraction, spanishShaded, starPlace, t, thingName, yesDetail } from "./i18n";
+import { countedNoun, frenchFraction, getLocale, partPhrase, portugueseFraction, shapeWithArticle, spanishFraction, spanishShaded, starPlace, t, thingName, yesDetail } from "./i18n";
 import { blockPhrase, countName, roundHalfUp } from "./games/boards";
 import { isAddLevel } from "./games/add";
 import { isCountLevel } from "./games/count";
@@ -389,7 +389,7 @@ function makeArrayTask(level: string, rng: Rng, avoid?: string): ArrayTask {
     const praise = t(
       `Yes! ${rows} ${rows === 1 ? "row" : "rows"} of ${cols}.`,
       `¡Sí! ${rows} ${rows === 1 ? "fila" : "filas"} de ${cols}.`, `Sim! ${rows} ${rows === 1 ? "linha" : "linhas"} de ${cols}.`,
-    `Oui ! ${rows} ${rows === 1 ? "ligne" : "lignes"} de ${cols}.`);
+    `Oui ! ${rows} ${rows === 1 ? "ligne" : "lignes"} de ${cols}.`, `对！${rows}行，每行${cols}个。`);
     return {
       kind: "array",
       rows,
@@ -402,7 +402,7 @@ function makeArrayTask(level: string, rng: Rng, avoid?: string): ArrayTask {
         t(
           `Make ${rows} ${rows === 1 ? "row" : "rows"} of ${cols}. Drag a row.`,
           `Haz ${rows} ${rows === 1 ? "fila" : "filas"} de ${cols}. Arrastra una fila.`, `Faça ${rows} ${rows === 1 ? "linha" : "linhas"} de ${cols}. Arraste uma linha.`,
-        `Fais ${rows} ${rows === 1 ? "ligne" : "lignes"} de ${cols}. Glisse une ligne.`),
+        `Fais ${rows} ${rows === 1 ? "ligne" : "lignes"} de ${cols}. Glisse une ligne.`, `摆出${rows}行，每行${cols}个。拖动一行。`),
         praise,
       ),
     };
@@ -419,7 +419,7 @@ function makeTenFrame(level: string, rng: Rng, avoid?: string): FrameTask {
       const target = rng.int(2, max);
       const change = rng.int(1, target);
       const start = target - change;
-      const praise = t(`Yes! ${start} + ${change} = ${target}.`, `¡Sí! ${start} + ${change} = ${target}.`, `Sim! ${start} + ${change} = ${target}.`, `Oui ! ${start} + ${change} = ${target}.`);
+      const praise = t(`Yes! ${start} + ${change} = ${target}.`, `¡Sí! ${start} + ${change} = ${target}.`, `Sim! ${start} + ${change} = ${target}.`, `Oui ! ${start} + ${change} = ${target}.`, `对！${start} + ${change} = ${target}。`);
       return {
         kind: "frame" as const,
         op: "+" as const,
@@ -428,13 +428,13 @@ function makeTenFrame(level: string, rng: Rng, avoid?: string): FrameTask {
         target,
         model: "ten" as const,
         cells,
-        ...base("add", safe, `+${start}:${change}`, t(`Start with ${start}. Drag ${change} more.`, `Empieza con ${start}. Arrastra ${change} más.`, `Comece com ${start}. Arraste ${change} a mais.`, `Commence avec ${start}. Glisse ${change} de plus.`), praise),
+        ...base("add", safe, `+${start}:${change}`, t(`Start with ${start}. Drag ${change} more.`, `Empieza con ${start}. Arrastra ${change} más.`, `Comece com ${start}. Arraste ${change} a mais.`, `Commence avec ${start}. Glisse ${change} de plus.`, `先放${start}个。再拖${change}个过来。`), praise),
       };
     }
     const start = rng.int(2, max);
     const change = rng.int(1, start);
     const target = start - change;
-    const praise = t(`Yes! ${start} minus ${change} = ${target}.`, `¡Sí! ${start} menos ${change} = ${target}.`, `Sim! ${start} menos ${change} = ${target}.`, `Oui ! ${start} moins ${change} = ${target}.`);
+    const praise = t(`Yes! ${start} minus ${change} = ${target}.`, `¡Sí! ${start} menos ${change} = ${target}.`, `Sim! ${start} menos ${change} = ${target}.`, `Oui ! ${start} moins ${change} = ${target}.`, `对！${start}减去${change}等于${target}。`);
     return {
       kind: "frame" as const,
       op: "-" as const,
@@ -443,7 +443,7 @@ function makeTenFrame(level: string, rng: Rng, avoid?: string): FrameTask {
       target,
       model: "ten" as const,
       cells,
-      ...base("add", safe, `-${start}:${change}`, t(`Start with ${start}. Drag ${change} away.`, `Empieza con ${start}. Arrastra ${change} hacia afuera.`, `Comece com ${start}. Arraste ${change} para fora.`, `Commence avec ${start}. Glisse ${change} dehors.`), praise),
+      ...base("add", safe, `-${start}:${change}`, t(`Start with ${start}. Drag ${change} away.`, `Empieza con ${start}. Arrastra ${change} hacia afuera.`, `Comece com ${start}. Arraste ${change} para fora.`, `Commence avec ${start}. Glisse ${change} dehors.`, `先放${start}个。再拖走${change}个。`), praise),
     };
   }, (task) => task.factKey);
 }
@@ -476,11 +476,11 @@ function makeRodFrame(level: string, rng: Rng, avoid?: string): FrameTask {
     const target = sub ? start - change : start + change;
     const op = sub ? ("-" as const) : ("+" as const);
     const speech = sub
-      ? t(`Start with ${start}. Drag ${change} away.`, `Empieza con ${start}. Arrastra ${change} hacia afuera.`, `Comece com ${start}. Arraste ${change} para fora.`, `Commence avec ${start}. Glisse ${change} dehors.`)
-      : t(`Start with ${start}. Drag ${change} more.`, `Empieza con ${start}. Arrastra ${change} más.`, `Comece com ${start}. Arraste ${change} a mais.`, `Commence avec ${start}. Glisse ${change} de plus.`);
+      ? t(`Start with ${start}. Drag ${change} away.`, `Empieza con ${start}. Arrastra ${change} hacia afuera.`, `Comece com ${start}. Arraste ${change} para fora.`, `Commence avec ${start}. Glisse ${change} dehors.`, `先放${start}个。再拖走${change}个。`)
+      : t(`Start with ${start}. Drag ${change} more.`, `Empieza con ${start}. Arrastra ${change} más.`, `Comece com ${start}. Arraste ${change} a mais.`, `Commence avec ${start}. Glisse ${change} de plus.`, `先放${start}个。再拖${change}个过来。`);
     const praise = sub
-      ? t(`Yes! ${start} minus ${change} = ${target}.`, `¡Sí! ${start} menos ${change} = ${target}.`, `Sim! ${start} menos ${change} = ${target}.`, `Oui ! ${start} moins ${change} = ${target}.`)
-      : t(`Yes! ${start} + ${change} = ${target}.`, `¡Sí! ${start} + ${change} = ${target}.`, `Sim! ${start} + ${change} = ${target}.`, `Oui ! ${start} + ${change} = ${target}.`);
+      ? t(`Yes! ${start} minus ${change} = ${target}.`, `¡Sí! ${start} menos ${change} = ${target}.`, `Sim! ${start} menos ${change} = ${target}.`, `Oui ! ${start} moins ${change} = ${target}.`, `对！${start}减去${change}等于${target}。`)
+      : t(`Yes! ${start} + ${change} = ${target}.`, `¡Sí! ${start} + ${change} = ${target}.`, `Sim! ${start} + ${change} = ${target}.`, `Oui ! ${start} + ${change} = ${target}.`, `对！${start} + ${change} = ${target}。`);
     return {
       kind: "frame" as const,
       op,
@@ -509,7 +509,7 @@ function makeCountTask(level: string, rng: Rng, avoid?: string): CountTask {
         kind: "count" as const,
         mode: "ten" as const,
         target,
-        ...base("count", safe, `ten:${target}`, t(`Fill the ten-frame to ${target}.`, `Llena el tablero de diez hasta ${target}.`, `Encha o quadro de dez até ${target}.`, `Remplis la grille de dix jusqu'à ${target}.`), t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`, `Oui ! ${target}.`)),
+        ...base("count", safe, `ten:${target}`, t(`Fill the ten-frame to ${target}.`, `Llena el tablero de diez hasta ${target}.`, `Encha o quadro de dez até ${target}.`, `Remplis la grille de dix jusqu'à ${target}.`, `把十格框填到${target}。`), t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`, `Oui ! ${target}.`, `对！${target}。`)),
       };
     }
     if (safe === "to20") {
@@ -523,8 +523,8 @@ function makeCountTask(level: string, rng: Rng, avoid?: string): CountTask {
           "count",
           safe,
           `teen:${target}`,
-          t(`A ten is ready. Drag ${extra} more to make ${target}.`, `Ya hay una decena. Arrastra ${extra} más para formar ${target}.`, `Já tem uma dezena. Arraste ${extra} a mais para formar ${target}.`, `Une dizaine est prête. Glisse ${extra} de plus pour faire ${target}.`),
-          t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`, `Oui ! ${target}.`),
+          t(`A ten is ready. Drag ${extra} more to make ${target}.`, `Ya hay una decena. Arrastra ${extra} más para formar ${target}.`, `Já tem uma dezena. Arraste ${extra} a mais para formar ${target}.`, `Une dizaine est prête. Glisse ${extra} de plus pour faire ${target}.`, `一个十好了。再拖${extra}个，凑成${target}。`),
+          t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`, `Oui ! ${target}.`, `对！${target}。`),
         ),
       };
     }
@@ -533,13 +533,13 @@ function makeCountTask(level: string, rng: Rng, avoid?: string): CountTask {
       const anchor = rng.int(after ? 1 : 2, after ? 9 : 10);
       const target = after ? anchor + 1 : anchor - 1;
       const speech = after
-        ? t(`What comes after ${anchor}? Make that number.`, `¿Qué número va después de ${anchor}? Forma ese número.`, `Que número vem depois de ${anchor}? Monte esse número.`, `Quel nombre vient après ${anchor} ? Construis ce nombre.`)
-        : t(`What comes before ${anchor}? Make that number.`, `¿Qué número va antes de ${anchor}? Forma ese número.`, `Que número vem antes de ${anchor}? Monte esse número.`, `Quel nombre vient avant ${anchor} ? Construis ce nombre.`);
+        ? t(`What comes after ${anchor}? Make that number.`, `¿Qué número va después de ${anchor}? Forma ese número.`, `Que número vem depois de ${anchor}? Monte esse número.`, `Quel nombre vient après ${anchor} ? Construis ce nombre.`, `${anchor}后面是几？摆出那个数。`)
+        : t(`What comes before ${anchor}? Make that number.`, `¿Qué número va antes de ${anchor}? Forma ese número.`, `Que número vem antes de ${anchor}? Monte esse número.`, `Quel nombre vient avant ${anchor} ? Construis ce nombre.`, `${anchor}前面是几？摆出那个数。`);
       return {
         kind: "count" as const,
         mode: "pile" as const,
         target,
-        ...base("count", safe, `near:${anchor}:${target}`, speech, t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`, `Oui ! ${target}.`)),
+        ...base("count", safe, `near:${anchor}:${target}`, speech, t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`, `Oui ! ${target}.`, `对！${target}。`)),
       };
     }
     if (safe === "compare") {
@@ -549,13 +549,13 @@ function makeCountTask(level: string, rng: Rng, avoid?: string): CountTask {
       const more = rng.next() < 0.5;
       const target = more ? Math.max(left, right) : Math.min(left, right);
       const speech = more
-        ? t(`Which is more, ${left} or ${right}? Make that number.`, `¿Cuál es más, ${left} o ${right}? Forma ese número.`, `Qual é mais, ${left} ou ${right}? Monte esse número.`, `Lequel est le plus, ${left} ou ${right} ? Construis ce nombre.`)
-        : t(`Which is less, ${left} or ${right}? Make that number.`, `¿Cuál es menos, ${left} o ${right}? Forma ese número.`, `Qual é menos, ${left} ou ${right}? Monte esse número.`, `Lequel est le moins, ${left} ou ${right} ? Construis ce nombre.`);
+        ? t(`Which is more, ${left} or ${right}? Make that number.`, `¿Cuál es más, ${left} o ${right}? Forma ese número.`, `Qual é mais, ${left} ou ${right}? Monte esse número.`, `Lequel est le plus, ${left} ou ${right} ? Construis ce nombre.`, `${left}和${right}，哪个更多？摆出那个数。`)
+        : t(`Which is less, ${left} or ${right}? Make that number.`, `¿Cuál es menos, ${left} o ${right}? Forma ese número.`, `Qual é menos, ${left} ou ${right}? Monte esse número.`, `Lequel est le moins, ${left} ou ${right} ? Construis ce nombre.`, `${left}和${right}，哪个更少？摆出那个数。`);
       return {
         kind: "count" as const,
         mode: "pile" as const,
         target,
-        ...base("count", safe, `cmp:${target}`, speech, t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`, `Oui ! ${target}.`)),
+        ...base("count", safe, `cmp:${target}`, speech, t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`, `Oui ! ${target}.`, `对！${target}。`)),
       };
     }
     const cap = safe === "subitize" ? 6 : 10;
@@ -564,7 +564,7 @@ function makeCountTask(level: string, rng: Rng, avoid?: string): CountTask {
       kind: "count" as const,
       mode: "pile" as const,
       target,
-      ...base("count", safe, `pile:${target}`, t(`Make ${target}. Drag the counters.`, `Forma ${target}. Arrastra las fichas.`, `Monte ${target}. Arraste as fichas.`, `Construis ${target}. Glisse les jetons.`), t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`, `Oui ! ${target}.`)),
+      ...base("count", safe, `pile:${target}`, t(`Make ${target}. Drag the counters.`, `Forma ${target}. Arrastra las fichas.`, `Monte ${target}. Arraste as fichas.`, `Construis ${target}. Glisse les jetons.`, `摆出${target}。拖动小圆片。`), t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`, `Oui ! ${target}.`, `对！${target}。`)),
     };
   }, (task) => task.factKey);
 }
@@ -589,8 +589,8 @@ function makeBlocksTask(level: string, rng: Rng, avoid?: string): BlocksTask {
           "place",
           safe,
           `h:${n}`,
-          t(`Round ${n} to the nearest hundred. Drag hundreds.`, `Redondea ${n} a la centena más cercana. Arrastra centenas.`, `Arredonde ${n} para a centena mais próxima. Arraste as centenas.`, `Arrondis ${n} à la centaine la plus proche. Glisse les centaines.`),
-          t(`Yes! ${hundreds * 100}.`, `¡Sí! ${hundreds * 100}.`, `Sim! ${hundreds * 100}.`, `Oui ! ${hundreds * 100}.`),
+          t(`Round ${n} to the nearest hundred. Drag hundreds.`, `Redondea ${n} a la centena más cercana. Arrastra centenas.`, `Arredonde ${n} para a centena mais próxima. Arraste as centenas.`, `Arrondis ${n} à la centaine la plus proche. Glisse les centaines.`, `把${n}四舍五入到百位。拖动百位积木。`),
+          t(`Yes! ${hundreds * 100}.`, `¡Sí! ${hundreds * 100}.`, `Sim! ${hundreds * 100}.`, `Oui ! ${hundreds * 100}.`, `对！${hundreds * 100}。`),
         ),
       };
     }
@@ -605,8 +605,8 @@ function makeBlocksTask(level: string, rng: Rng, avoid?: string): BlocksTask {
           "place",
           safe,
           `r10:${n}`,
-          t(`Round ${n} to the nearest ten. Build ${rounded}.`, `Redondea ${n} a la decena más cercana. Forma ${rounded}.`, `Arredonde ${n} para a dezena mais próxima. Monte ${rounded}.`, `Arrondis ${n} à la dizaine la plus proche. Construis ${rounded}.`),
-          t(`Yes! ${rounded}.`, `¡Sí! ${rounded}.`, `Sim! ${rounded}.`, `Oui ! ${rounded}.`),
+          t(`Round ${n} to the nearest ten. Build ${rounded}.`, `Redondea ${n} a la decena más cercana. Forma ${rounded}.`, `Arredonde ${n} para a dezena mais próxima. Monte ${rounded}.`, `Arrondis ${n} à la dizaine la plus proche. Construis ${rounded}.`, `把${n}四舍五入到十位。搭出${rounded}。`),
+          t(`Yes! ${rounded}.`, `¡Sí! ${rounded}.`, `Sim! ${rounded}.`, `Oui ! ${rounded}.`, `对！${rounded}。`),
         ),
       };
     }
@@ -623,21 +623,21 @@ function makeBlocksTask(level: string, rng: Rng, avoid?: string): BlocksTask {
           "place",
           safe,
           `gt:${left}:${right}`,
-          t(`Which is greater, ${left} or ${right}? Build it.`, `¿Cuál es mayor, ${left} o ${right}? Fórmalo.`, `Qual é maior, ${left} ou ${right}? Monte esse.`, `Lequel est le plus grand, ${left} ou ${right} ? Construis-le.`),
-          t(`Yes! ${greater}.`, `¡Sí! ${greater}.`, `Sim! ${greater}.`, `Oui ! ${greater}.`),
+          t(`Which is greater, ${left} or ${right}? Build it.`, `¿Cuál es mayor, ${left} o ${right}? Fórmalo.`, `Qual é maior, ${left} ou ${right}? Monte esse.`, `Lequel est le plus grand, ${left} ou ${right} ? Construis-le.`, `${left}和${right}，哪个更大？把它搭出来。`),
+          t(`Yes! ${greater}.`, `¡Sí! ${greater}.`, `Sim! ${greater}.`, `Oui ! ${greater}.`, `对！${greater}。`),
         ),
       };
     }
     const tens = rng.int(1, 9);
     const ones = rng.int(0, 9);
     const n = tens * 10 + ones;
-    const speech = safe === "expanded" ? t(`Build ${tens * 10} + ${ones}.`, `Forma ${tens * 10} + ${ones}.`, `Monte ${tens * 10} + ${ones}.`, `Construis ${tens * 10} + ${ones}.`) : t(`Build ${blockPhrase(n)}.`, `Forma ${blockPhrase(n)}.`, `Monte ${blockPhrase(n)}.`, `Construis ${blockPhrase(n)}.`);
+    const speech = safe === "expanded" ? t(`Build ${tens * 10} + ${ones}.`, `Forma ${tens * 10} + ${ones}.`, `Monte ${tens * 10} + ${ones}.`, `Construis ${tens * 10} + ${ones}.`, `搭出${tens * 10} + ${ones}。`) : t(`Build ${blockPhrase(n)}.`, `Forma ${blockPhrase(n)}.`, `Monte ${blockPhrase(n)}.`, `Construis ${blockPhrase(n)}.`, `搭出${blockPhrase(n)}。`);
     return {
       kind: "blocks" as const,
       hundreds: 0,
       tens,
       ones,
-      ...base("place", safe, `b:${n}`, speech, t(`Yes! ${n}.`, `¡Sí! ${n}.`, `Sim! ${n}.`, `Oui ! ${n}.`)),
+      ...base("place", safe, `b:${n}`, speech, t(`Yes! ${n}.`, `¡Sí! ${n}.`, `Sim! ${n}.`, `Oui ! ${n}.`, `对！${n}。`)),
     };
   }, (task) => task.factKey);
 }
@@ -672,8 +672,8 @@ function makeShadeTask(level: string, rng: Rng, avoid?: string): ShadeTask {
           "fractions",
           safe,
           `${num}/${den}=${pair[2]}/${pair[3]}`,
-          t(`Shade ${phrase}. That matches ${other}.`, `Sombrea ${phrase}. Eso es igual a ${other}.`, `Pinte ${phrase}. Isso é igual a ${other}.`, `Colorie ${phrase}. C'est pareil que ${other}.`),
-          t(`Yes! ${phrase}.`, `¡Sí! ${phrase}.`, `Sim! ${phrase}.`, `Oui ! ${phrase}.`),
+          t(`Shade ${phrase}. That matches ${other}.`, `Sombrea ${phrase}. Eso es igual a ${other}.`, `Pinte ${phrase}. Isso é igual a ${other}.`, `Colorie ${phrase}. C'est pareil que ${other}.`, `把${phrase}涂上颜色。它和${other}一样。`),
+          t(`Yes! ${phrase}.`, `¡Sí! ${phrase}.`, `Sim! ${phrase}.`, `Oui ! ${phrase}.`, `对！${phrase}。`),
         ),
       };
     }
@@ -690,8 +690,8 @@ function makeShadeTask(level: string, rng: Rng, avoid?: string): ShadeTask {
           "fractions",
           safe,
           `cmp:${num}/${den}`,
-          t(`${phrase} is greater than ${smaller}. Shade ${phrase}.`, `${phrase} es mayor que ${smaller}. Sombrea ${phrase}.`, `${phrase} é maior que ${smaller}. Pinte ${phrase}.`, `${phrase} est plus grand que ${smaller}. Colorie ${phrase}.`),
-          t(`Yes! ${phrase}.`, `¡Sí! ${phrase}.`, `Sim! ${phrase}.`, `Oui ! ${phrase}.`),
+          t(`${phrase} is greater than ${smaller}. Shade ${phrase}.`, `${phrase} es mayor que ${smaller}. Sombrea ${phrase}.`, `${phrase} é maior que ${smaller}. Pinte ${phrase}.`, `${phrase} est plus grand que ${smaller}. Colorie ${phrase}.`, `${phrase}比${smaller}大。把${phrase}涂上颜色。`),
+          t(`Yes! ${phrase}.`, `¡Sí! ${phrase}.`, `Sim! ${phrase}.`, `Oui ! ${phrase}.`, `对！${phrase}。`),
         ),
       };
     }
@@ -702,7 +702,7 @@ function makeShadeTask(level: string, rng: Rng, avoid?: string): ShadeTask {
       kind: "shade" as const,
       num,
       den,
-      ...base("fractions", safe, `${num}/${den}`, t(`Shade ${phrase}.`, `Sombrea ${phrase}.`, `Pinte ${phrase}.`, `Colorie ${phrase}.`), t(`Yes! ${phrase}.`, `¡Sí! ${phrase}.`, `Sim! ${phrase}.`, `Oui ! ${phrase}.`)),
+      ...base("fractions", safe, `${num}/${den}`, t(`Shade ${phrase}.`, `Sombrea ${phrase}.`, `Pinte ${phrase}.`, `Colorie ${phrase}.`, `把${phrase}涂上颜色。`), t(`Yes! ${phrase}.`, `¡Sí! ${phrase}.`, `Sim! ${phrase}.`, `Oui ! ${phrase}.`, `对！${phrase}。`)),
     };
   }, (task) => task.factKey);
 }
@@ -718,15 +718,15 @@ function makeLetterTask(level: string, rng: Rng, avoid?: string): LetterTask {
     }));
     const showSentence = safe === "patterns" || safe === "grade4";
     const speech = showSentence
-      ? t(`${row.sentence} Spell ${row.word}.`, `${row.sentence} Deletrea ${row.word}.`, `${row.sentence} Soletre ${row.word}.`, `${row.sentence} Épelle ${row.word}.`)
-      : t(`Spell ${row.word}. Drag the letters.`, `Deletrea ${row.word}. Arrastra las letras.`, `Soletre ${row.word}. Arraste as letras.`, `Épelle ${row.word}. Glisse les lettres.`);
+      ? t(`${row.sentence} Spell ${row.word}.`, `${row.sentence} Deletrea ${row.word}.`, `${row.sentence} Soletre ${row.word}.`, `${row.sentence} Épelle ${row.word}.`, `${row.sentence} 拼写${row.word}。`)
+      : t(`Spell ${row.word}. Drag the letters.`, `Deletrea ${row.word}. Arrastra las letras.`, `Soletre ${row.word}. Arraste as letras.`, `Épelle ${row.word}. Glisse les lettres.`, `拼写${row.word}。拖动字母。`);
     return {
       kind: "letters" as const,
       word: row.word,
       tiles,
       sentence: showSentence ? blankOut(row.sentence, row.word) : "",
       showSentence,
-      ...base("spelling", safe, row.word, speech, t(`Yes! ${row.word}.`, `¡Sí! ${row.word}.`, `Sim! ${row.word}.`, `Oui ! ${row.word}.`)),
+      ...base("spelling", safe, row.word, speech, t(`Yes! ${row.word}.`, `¡Sí! ${row.word}.`, `Sim! ${row.word}.`, `Oui ! ${row.word}.`, `对！${row.word}。`)),
     };
   }, (task) => task.factKey);
 }
@@ -755,8 +755,8 @@ function makeSightTask(level: string, rng: Rng, avoid?: string): SightTask {
           "sight",
           safe,
           row.word,
-          t(`Drag the missing word. ${row.sentence}`, `Arrastra la palabra que falta. ${row.sentence}`, `Arraste a palavra que falta. ${row.sentence}`, `Glisse le mot qui manque. ${row.sentence}`),
-          t(`Yes! ${row.word}.`, `¡Sí! ${row.word}.`, `Sim! ${row.word}.`, `Oui ! ${row.word}.`),
+          t(`Drag the missing word. ${row.sentence}`, `Arrastra la palabra que falta. ${row.sentence}`, `Arraste a palavra que falta. ${row.sentence}`, `Glisse le mot qui manque. ${row.sentence}`, `拖动缺掉的词。${row.sentence}`),
+          t(`Yes! ${row.word}.`, `¡Sí! ${row.word}.`, `Sim! ${row.word}.`, `Oui ! ${row.word}.`, `对！${row.word}。`),
         ),
       };
     }
@@ -767,7 +767,7 @@ function makeSightTask(level: string, rng: Rng, avoid?: string): SightTask {
       emoji: row.emoji,
       sentence: "",
       choices,
-      ...base("sight", safe, row.word, t(`Drag the word ${row.word}.`, `Arrastra la palabra ${row.word}.`, `Arraste a palavra ${row.word}.`, `Glisse le mot ${row.word}.`), t(`Yes! ${row.word}.`, `¡Sí! ${row.word}.`, `Sim! ${row.word}.`, `Oui ! ${row.word}.`)),
+      ...base("sight", safe, row.word, t(`Drag the word ${row.word}.`, `Arrastra la palabra ${row.word}.`, `Arraste a palavra ${row.word}.`, `Glisse le mot ${row.word}.`, `拖动单词${row.word}。`), t(`Yes! ${row.word}.`, `¡Sí! ${row.word}.`, `Sim! ${row.word}.`, `Oui ! ${row.word}.`, `对！${row.word}。`)),
     };
   }, (task) => task.factKey);
 }
@@ -793,8 +793,8 @@ function makePhonicsTask(level: string, rng: Rng, avoid?: string): PhonicsTask {
           "phonics",
           safe,
           `${cue}:${answer}`,
-          t(`Drag the word that rhymes with ${cue}.`, `Arrastra la palabra que rima con ${cue}.`, `Arraste a palavra que rima com ${cue}.`, `Glisse le mot qui rime avec ${cue}.`),
-          t(`Yes! ${answer}.`, `¡Sí! ${answer}.`, `Sim! ${answer}.`, `Oui ! ${answer}.`),
+          t(`Drag the word that rhymes with ${cue}.`, `Arrastra la palabra que rima con ${cue}.`, `Arraste a palavra que rima com ${cue}.`, `Glisse le mot qui rime avec ${cue}.`, `拖动和${cue}押韵的词。`),
+          t(`Yes! ${answer}.`, `¡Sí! ${answer}.`, `Sim! ${answer}.`, `Oui ! ${answer}.`, `对！${answer}。`),
         ),
       };
     }
@@ -808,7 +808,7 @@ function makePhonicsTask(level: string, rng: Rng, avoid?: string): PhonicsTask {
         answer: word,
         prompt: "",
         tiles,
-        ...base("phonics", safe, word, t(`Build the word. ${blendOf(word)}.`, `Arma la palabra. ${blendOf(word)}.`, `Monte a palavra. ${blendOf(word)}.`, `Construis le mot. ${blendOf(word)}.`), t(`Yes! ${word}.`, `¡Sí! ${word}.`, `Sim! ${word}.`, `Oui ! ${word}.`)),
+        ...base("phonics", safe, word, t(`Build the word. ${blendOf(word)}.`, `Arma la palabra. ${blendOf(word)}.`, `Monte a palavra. ${blendOf(word)}.`, `Construis le mot. ${blendOf(word)}.`, `拼出这个词。${blendOf(word)}。`), t(`Yes! ${word}.`, `¡Sí! ${word}.`, `Sim! ${word}.`, `Oui ! ${word}.`, `对！${word}。`)),
       };
     }
     if (safe === "end") {
@@ -829,8 +829,8 @@ function makePhonicsTask(level: string, rng: Rng, avoid?: string): PhonicsTask {
           "phonics",
           safe,
           `${word}:${answer}`,
-          t(`Drag the last sound in ${word}. ${phoneme}.`, `Arrastra el último sonido de ${word}. ${phoneme}.`, `Arraste o último som de ${word}. ${phoneme}.`, `Glisse le dernier son de ${word}. ${phoneme}.`),
-          t(`Yes! ${word}.`, `¡Sí! ${word}.`, `Sim! ${word}.`, `Oui ! ${word}.`),
+          t(`Drag the last sound in ${word}. ${phoneme}.`, `Arrastra el último sonido de ${word}. ${phoneme}.`, `Arraste o último som de ${word}. ${phoneme}.`, `Glisse le dernier son de ${word}. ${phoneme}.`, `拖动${word}的最后一个音。${phoneme}。`),
+          t(`Yes! ${word}.`, `¡Sí! ${word}.`, `Sim! ${word}.`, `Oui ! ${word}.`, `对！${word}。`),
         ),
       };
     }
@@ -841,8 +841,8 @@ function makePhonicsTask(level: string, rng: Rng, avoid?: string): PhonicsTask {
       .map((item) => item.letter);
     const speech =
       safe === "begin"
-        ? t(`Drag the first sound. ${row.phoneme}.`, `Arrastra el primer sonido. ${row.phoneme}.`, `Arraste o primeiro som. ${row.phoneme}.`, `Glisse le premier son. ${row.phoneme}.`)
-        : t(`Drag the letter that says ${row.phoneme}.`, `Arrastra la letra que dice ${row.phoneme}.`, `Arraste a letra que diz ${row.phoneme}.`, `Glisse la lettre qui dit ${row.phoneme}.`);
+        ? t(`Drag the first sound. ${row.phoneme}.`, `Arrastra el primer sonido. ${row.phoneme}.`, `Arraste o primeiro som. ${row.phoneme}.`, `Glisse le premier son. ${row.phoneme}.`, `拖动第一个音。${row.phoneme}。`)
+        : t(`Drag the letter that says ${row.phoneme}.`, `Arrastra la letra que dice ${row.phoneme}.`, `Arraste a letra que diz ${row.phoneme}.`, `Glisse la lettre qui dit ${row.phoneme}.`, `拖动读作${row.phoneme}的字母。`);
     return {
       kind: "phonics" as const,
       mode: "letter" as const,
@@ -854,7 +854,7 @@ function makePhonicsTask(level: string, rng: Rng, avoid?: string): PhonicsTask {
         safe,
         `${row.letter}:${row.word}`,
         speech,
-        t(`Yes! ${row.letter} says ${row.phoneme}.`, `¡Sí! ${row.letter} dice ${row.phoneme}.`, `Sim! ${row.letter} diz ${row.phoneme}.`, `Oui ! ${row.letter} dit ${row.phoneme}.`),
+        t(`Yes! ${row.letter} says ${row.phoneme}.`, `¡Sí! ${row.letter} dice ${row.phoneme}.`, `Sim! ${row.letter} diz ${row.phoneme}.`, `Oui ! ${row.letter} dit ${row.phoneme}.`, `对！${row.letter}读作${row.phoneme}。`),
       ),
     };
   }, (task) => task.factKey);
@@ -877,7 +877,7 @@ function makeMeasureTask(level: string, rng: Rng, avoid?: string): MeasureTask {
           safe,
           `in:${target}`,
           t("How long is the ribbon? Drag the inches.", "¿Qué tan largo es el listón? Arrastra las pulgadas."),
-          t(`Yes! ${target} ${target === 1 ? "inch" : "inches"}.`, `¡Sí! ${target} ${target === 1 ? "pulgada" : "pulgadas"}.`, `Sim! ${target} ${target === 1 ? "polegada" : "polegadas"}.`, `Oui ! ${target} ${target === 1 ? "pouce" : "pouces"}.`),
+          t(`Yes! ${target} ${target === 1 ? "inch" : "inches"}.`, `¡Sí! ${target} ${target === 1 ? "pulgada" : "pulgadas"}.`, `Sim! ${target} ${target === 1 ? "polegada" : "polegadas"}.`, `Oui ! ${target} ${target === 1 ? "pouce" : "pouces"}.`, `对！${target}英寸。`),
         ),
       };
     }
@@ -891,7 +891,7 @@ function makeMeasureTask(level: string, rng: Rng, avoid?: string): MeasureTask {
         bars: [],
         ask: "" as const,
         emoji,
-        ...base("measure", safe, `bar:${target}`, t(`Drag to make a bar of ${target}.`, `Arrastra para hacer una barra de ${target}.`, `Arraste para fazer uma barra de ${target}.`, `Glisse pour faire une barre de ${target}.`), t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`, `Oui ! ${target}.`)),
+        ...base("measure", safe, `bar:${target}`, t(`Drag to make a bar of ${target}.`, `Arrastra para hacer una barra de ${target}.`, `Arraste para fazer uma barra de ${target}.`, `Glisse pour faire une barre de ${target}.`, `拖动，做出${target}长的一条。`), t(`Yes! ${target}.`, `¡Sí! ${target}.`, `Sim! ${target}.`, `Oui ! ${target}.`, `对！${target}。`)),
       };
     }
     if (safe === "more") {
@@ -909,8 +909,8 @@ function makeMeasureTask(level: string, rng: Rng, avoid?: string): MeasureTask {
           "measure",
           safe,
           `more:${high}:${low}`,
-          t(`${high} apples and ${low} apples. Drag how many more.`, `${high} manzanas y ${low} manzanas. Arrastra cuántas más.`, `${high} maçãs e ${low} maçãs. Arraste quantas a mais.`, `${high} pommes et ${low} pommes. Glisse combien de plus.`),
-          t(`Yes! ${target} more.`, `¡Sí! ${target} más.`, `Sim! ${target} a mais.`, `Oui ! ${target} de plus.`),
+          t(`${high} apples and ${low} apples. Drag how many more.`, `${high} manzanas y ${low} manzanas. Arrastra cuántas más.`, `${high} maçãs e ${low} maçãs. Arraste quantas a mais.`, `${high} pommes et ${low} pommes. Glisse combien de plus.`, `${high}个苹果和${low}个苹果。把多出来的拖出来。`),
+          t(`Yes! ${target} more.`, `¡Sí! ${target} más.`, `Sim! ${target} a mais.`, `Oui ! ${target} de plus.`, `对！多${target}个。`),
         ),
       };
     }
@@ -931,8 +931,8 @@ function makeMeasureTask(level: string, rng: Rng, avoid?: string): MeasureTask {
         "measure",
         safe,
         `${ask}:${target}`,
-        t(`Drag the ${ask} one.`, ask === "longest" ? "Arrastra el más largo." : "Arrastra el más corto.", ask === "longest" ? "Arraste o mais comprido." : "Arraste o mais curto.", ask === "longest" ? "Glisse le plus long." : "Glisse le plus court."),
-        t(`Yes! The ${ask} one.`, ask === "longest" ? "¡Sí! El más largo." : "¡Sí! El más corto.", ask === "longest" ? "Sim! O mais comprido." : "Sim! O mais curto.", ask === "longest" ? "Oui ! Le plus long." : "Oui ! Le plus court."),
+        t(`Drag the ${ask} one.`, ask === "longest" ? "Arrastra el más largo." : "Arrastra el más corto.", ask === "longest" ? "Arraste o mais comprido." : "Arraste o mais curto.", ask === "longest" ? "Glisse le plus long." : "Glisse le plus court.", `拖动${ask}的那个。`),
+        t(`Yes! The ${ask} one.`, ask === "longest" ? "¡Sí! El más largo." : "¡Sí! El más corto.", ask === "longest" ? "Sim! O mais comprido." : "Sim! O mais curto.", ask === "longest" ? "Oui ! Le plus long." : "Oui ! Le plus court.", `对！是${ask}的那个。`),
       ),
     };
   }, (task) => task.factKey);
@@ -944,7 +944,7 @@ function withAnswer(options: readonly string[], answer: string, rng: Rng): strin
 }
 
 function shapePraise(shape: string): string {
-  return t(`Yes! ${shape}.`, `¡Sí! ${shapeWithArticle(shape)}.`, `Sim! ${shapeWithArticle(shape)}.`, `Oui ! ${shapeWithArticle(shape)}.`);
+  return t(`Yes! ${shape}.`, `¡Sí! ${shapeWithArticle(shape)}.`, `Sim! ${shapeWithArticle(shape)}.`, `Oui ! ${shapeWithArticle(shape)}.`, `对！${shape}。`);
 }
 
 function isStarPlace(place: string): place is "above" | "below" | "beside" | "behind" {
@@ -1093,8 +1093,8 @@ function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
           "shapes",
           safe,
           `${rows}x${cols}`,
-          t(`${rows} rows of ${cols}. Count the squares.`, `${rows} filas de ${cols}. Cuenta los cuadritos.`, `${rows} linhas de ${cols}. Conte os quadradinhos.`, `${rows} lignes de ${cols}. Compte les petits carrés.`),
-          t(`Yes! ${product} square units.`, `¡Sí! ${product} unidades cuadradas.`, `Sim! ${product} unidades quadradas.`, `Oui ! ${product} unités carrées.`),
+          t(`${rows} rows of ${cols}. Count the squares.`, `${rows} filas de ${cols}. Cuenta los cuadritos.`, `${rows} linhas de ${cols}. Conte os quadradinhos.`, `${rows} lignes de ${cols}. Compte les petits carrés.`, `${rows}行，每行${cols}个。数一数小方格。`),
+          t(`Yes! ${product} square units.`, `¡Sí! ${product} unidades cuadradas.`, `Sim! ${product} unidades quadradas.`, `Oui ! ${product} unités carrées.`, `对！${product}平方单位。`),
         ),
       };
     }
@@ -1132,8 +1132,8 @@ function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
           "shapes",
           safe,
           answer,
-          t(`Drag the ${answer}.`, `Arrastra ${partPhrase(answer)}.`, `Arraste ${partPhrase(answer)}.`, `Glisse ${partPhrase(answer)}.`),
-          t(`Yes! ${answer}.`, `¡Sí! ${partPhrase(answer)}.`, `Sim! ${partPhrase(answer)}.`, `Oui ! ${answer}.`),
+          t(`Drag the ${answer}.`, `Arrastra ${partPhrase(answer)}.`, `Arraste ${partPhrase(answer)}.`, `Glisse ${partPhrase(answer)}.`, `拖动${answer}。`),
+          t(`Yes! ${answer}.`, `¡Sí! ${partPhrase(answer)}.`, `Sim! ${partPhrase(answer)}.`, `Oui ! ${answer}.`, `对！${answer}。`),
         ),
       };
     }
@@ -1156,8 +1156,8 @@ function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
           "shapes",
           safe,
           `${answer}:${sides}`,
-          t(`Drag the shape with ${sides} sides.`, `Arrastra la figura con ${sides} lados.`, `Arraste a figura com ${sides} lados.`, `Glisse la figure avec ${sides} côtés.`),
-          t(`Yes! ${answer}.`, `¡Sí! ${shapeWithArticle(answer)}.`, `Sim! ${shapeWithArticle(answer)}.`, `Oui ! ${answer}.`),
+          t(`Drag the shape with ${sides} sides.`, `Arrastra la figura con ${sides} lados.`, `Arraste a figura com ${sides} lados.`, `Glisse la figure avec ${sides} côtés.`, `拖动有${sides}条边的图形。`),
+          t(`Yes! ${answer}.`, `¡Sí! ${shapeWithArticle(answer)}.`, `Sim! ${shapeWithArticle(answer)}.`, `Oui ! ${answer}.`, `对！${answer}。`),
         ),
       };
     }
@@ -1182,8 +1182,8 @@ function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
           "shapes",
           safe,
           row[0],
-          t(`Drag the shape with ${row[1]}.`, `Arrastra la figura con ${symmetryClue(row[1])}.`, `Arraste a figura com ${symmetryClue(row[1])}.`, `Glisse la figure avec ${symmetryClue(row[1])}.`),
-          t(`Yes! ${row[0]}.`, `¡Sí! ${shapeWithArticle(row[0])}.`, `Sim! ${shapeWithArticle(row[0])}.`, `Oui ! ${shapeWithArticle(row[0])}.`),
+          t(`Drag the shape with ${row[1]}.`, `Arrastra la figura con ${symmetryClue(row[1])}.`, `Arraste a figura com ${symmetryClue(row[1])}.`, `Glisse la figure avec ${symmetryClue(row[1])}.`, `拖动有${row[1]}的图形。`),
+          t(`Yes! ${row[0]}.`, `¡Sí! ${shapeWithArticle(row[0])}.`, `Sim! ${shapeWithArticle(row[0])}.`, `Oui ! ${shapeWithArticle(row[0])}.`, `对！${row[0]}。`),
         ),
       };
     }
@@ -1200,8 +1200,8 @@ function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
         "shapes",
         safe,
         answer,
-        t(`Drag the ${answer}.`, `Arrastra ${shapeWithArticle(answer)}.`, `Arraste ${shapeWithArticle(answer)}.`, `Glisse ${partPhrase(answer)}.`),
-        t(`Yes! ${answer}.`, `¡Sí! ${shapeWithArticle(answer)}.`, `Sim! ${shapeWithArticle(answer)}.`, `Oui ! ${answer}.`),
+        t(`Drag the ${answer}.`, `Arrastra ${shapeWithArticle(answer)}.`, `Arraste ${shapeWithArticle(answer)}.`, `Glisse ${partPhrase(answer)}.`, `拖动${answer}。`),
+        t(`Yes! ${answer}.`, `¡Sí! ${shapeWithArticle(answer)}.`, `Sim! ${shapeWithArticle(answer)}.`, `Oui ! ${answer}.`, `对！${answer}。`),
       ),
     };
   }, (task) => task.factKey);
@@ -1227,7 +1227,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
       const speech = t(
         `${star.name} has ${a} ${items(a)} and gives ${b} away. Drag ${b} out of the story.`,
         `${star.name} tiene ${a} ${items(a)} y regala ${b}. Arrastra ${b} fuera de la historia.`, `${star.name} tem ${a} ${items(a)} e dá de presente ${b}. Arraste ${b} para fora da história.`,
-      `${star.name} a ${a} ${items(a)} et en donne ${b}. Glisse ${b} hors de l'histoire.`);
+      `${star.name} a ${a} ${items(a)} et en donne ${b}. Glisse ${b} hors de l'histoire.`, `${star.name}有${countedNoun(thing.name, a)}，送出${countedNoun(thing.name, b)}。把${countedNoun(thing.name, b)}拖出故事。`);
       return {
         kind: "story" as const,
         mode: "take" as const,
@@ -1237,7 +1237,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
         emoji: thing.emoji,
         decoy: 0,
         pieces: [],
-        ...base("problems", safe, `sub:${a}:${b}`, speech, t(`Yes! ${a - b} left.`, `¡Sí! Quedan ${a - b}.`, `Sim! Sobram ${a - b}.`, `Oui ! Il en reste ${a - b}.`)),
+        ...base("problems", safe, `sub:${a}:${b}`, speech, t(`Yes! ${a - b} left.`, `¡Sí! Quedan ${a - b}.`, `Sim! Sobram ${a - b}.`, `Oui ! Il en reste ${a - b}.`, `对！还剩${a - b}个。`)),
       };
     }
     if (safe === "div") {
@@ -1247,7 +1247,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
       const speech = t(
         `${star.name} shares ${a} ${items(a)} into ${b} equal groups. Drag them in.`,
         `${star.name} reparte ${a} ${items(a)} en ${b} grupos iguales. Arrástralos.`, `${star.name} reparte ${a} ${items(a)} em ${b} grupos iguais. Arraste.`,
-      `${star.name} partage ${a} ${items(a)} en ${b} groupes égaux. Glisse-les.`);
+      `${star.name} partage ${a} ${items(a)} en ${b} groupes égaux. Glisse-les.`, `${star.name}把${countedNoun(thing.name, a)}分成${b}个一样多的组。把它们拖进去。`);
       return {
         kind: "story" as const,
         mode: "share" as const,
@@ -1257,7 +1257,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
         emoji: thing.emoji,
         decoy: 0,
         pieces: [],
-        ...base("problems", safe, `div:${a}:${b}`, speech, t(`Yes! ${each} in each group.`, `¡Sí! ${each} en cada grupo.`, `Sim! ${each} em cada grupo.`, `Oui ! ${each} dans chaque groupe.`)),
+        ...base("problems", safe, `div:${a}:${b}`, speech, t(`Yes! ${each} in each group.`, `¡Sí! ${each} en cada grupo.`, `Sim! ${each} em cada grupo.`, `Oui ! ${each} dans chaque groupe.`, `对！每组${each}个。`)),
       };
     }
     if (safe === "mult" || safe === "picture" || safe === "steps") {
@@ -1267,7 +1267,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
       const speech = t(
         `${star.name} needs ${a} groups of ${b} ${items(b)}. Drag the groups in.`,
         `${star.name} necesita ${a} grupos de ${b} ${items(b)}. Arrastra los grupos.`, `${star.name} precisa de ${a} grupos de ${b} ${items(b)}. Arraste os grupos.`,
-      `${star.name} a besoin de ${a} groupes de ${b} ${items(b)}. Glisse les groupes.`);
+      `${star.name} a besoin de ${a} groupes de ${b} ${items(b)}. Glisse les groupes.`, `${star.name}需要${a}组，每组${countedNoun(thing.name, b)}。把这些组拖进去。`);
       return {
         kind: "story" as const,
         mode: "groups" as const,
@@ -1277,7 +1277,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
         emoji: thing.emoji,
         decoy,
         pieces: [],
-        ...base("problems", safe, `grp:${a}:${b}`, speech, t(`Yes! ${a * b}.`, `¡Sí! ${a * b}.`, `Sim! ${a * b}.`, `Oui ! ${a * b}.`)),
+        ...base("problems", safe, `grp:${a}:${b}`, speech, t(`Yes! ${a * b}.`, `¡Sí! ${a * b}.`, `Sim! ${a * b}.`, `Oui ! ${a * b}.`, `对！${a * b}。`)),
       };
     }
     const a = rng.int(1, 5);
@@ -1291,7 +1291,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
     const speech = t(
       `${star.name} has ${a} ${items(a)}. ${star.pal} brings ${b}. Drag both groups in.`,
       `${star.name} tiene ${a} ${items(a)}. ${star.pal} trae ${b}. Arrastra los dos grupos.`, `${star.name} tem ${a} ${items(a)}. ${star.pal} traz ${b}. Arraste os dois grupos.`,
-    `${star.name} a ${a} ${items(a)}. ${star.pal} apporte ${b}. Glisse les deux groupes.`);
+    `${star.name} a ${a} ${items(a)}. ${star.pal} apporte ${b}. Glisse les deux groupes.`, `${star.name}有${countedNoun(thing.name, a)}。${star.pal}拿来${countedNoun(thing.name, b)}。把两组都拖进去。`);
     return {
       kind: "story" as const,
       mode: "join" as const,
@@ -1301,7 +1301,7 @@ function makeStoryTask(level: string, rng: Rng, avoid?: string): StoryTask {
       emoji: thing.emoji,
       decoy,
       pieces,
-      ...base("problems", safe, `add:${a}:${b}`, speech, t(`Yes! ${a + b}.`, `¡Sí! ${a + b}.`, `Sim! ${a + b}.`, `Oui ! ${a + b}.`)),
+      ...base("problems", safe, `add:${a}:${b}`, speech, t(`Yes! ${a + b}.`, `¡Sí! ${a + b}.`, `Sim! ${a + b}.`, `Oui ! ${a + b}.`, `对！${a + b}。`)),
     };
   }, (task) => task.factKey);
 }

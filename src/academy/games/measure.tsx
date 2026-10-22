@@ -1,5 +1,5 @@
 import type { Rng } from "@/lib/rng";
-import { frenchThan, howManyMorePhrase, howManyPhrase, longShortOf, t, thingName } from "../i18n";
+import { countedNoun, frenchThan, howManyMorePhrase, howManyPhrase, longShortOf, nounMeasure, t, thingName } from "../i18n";
 import { buddyName, pickTalk } from "./flavor";
 import { measureCard } from "./cards";
 import type { MeasureBoard, MeasureItem } from "./boards";
@@ -51,7 +51,7 @@ function makeCompare(rng: Rng): ChoiceQ {
     choices: uniqueChoices(rng, answer, [], items.map((item) => item.name)),
     skill: "measure:compare",
     tags: ["compare"],
-    solved: t(`The ${answer} is the ${askLong ? "longest" : "shortest"}`, `${named} es ${longShortOf(answer, askLong)}`, `${named} é ${longShortOf(answer, askLong)}`, `${named} est ${longShortOf(answer, askLong)}`),
+    solved: t(`The ${answer} is the ${askLong ? "longest" : "shortest"}`, `${named} es ${longShortOf(answer, askLong)}`, `${named} é ${longShortOf(answer, askLong)}`, `${named} est ${longShortOf(answer, askLong)}`, `${named}是${longShortOf(answer, askLong)}`),
     picture: items.find((item) => item.name === answer)?.emoji ?? "📏",
     hands: true,
     quietChoices: false,
@@ -69,14 +69,14 @@ function makeRuler(rng: Rng): ChoiceQ {
     game: "measure",
     title: pickTalk(rng, [
       ["How many inches long is the ribbon?", "¿Cuántas pulgadas mide el listón?"],
-      [`${buddy} measures the ribbon. How many inches?`, `${buddy} mide el listón. ¿Cuántas pulgadas son?`, `${buddy} mede a fita. Quantas polegadas?`, `${buddy} mesure le ruban. Combien de pouces ?`],
+      [`${buddy} measures the ribbon. How many inches?`, `${buddy} mide el listón. ¿Cuántas pulgadas son?`, `${buddy} mede a fita. Quantas polegadas?`, `${buddy} mesure le ruban. Combien de pouces ?`, `${buddy}在量丝带。有几英寸？`],
     ]),
     hint: t("Start at 0", "Empieza en el 0"),
     answer: String(inches),
     choices: nearChoices(rng, inches, 1, 12),
     skill: "measure:ruler",
     tags: ["ruler"],
-    solved: t(`${inches} inches`, inches === 1 ? `${inches} pulgada` : `${inches} pulgadas`, inches === 1 ? `${inches} polegada` : `${inches} polegadas`, inches === 1 ? `${inches} pouce` : `${inches} pouces`),
+    solved: t(`${inches} inches`, inches === 1 ? `${inches} pulgada` : `${inches} pulgadas`, inches === 1 ? `${inches} polegada` : `${inches} polegadas`, inches === 1 ? `${inches} pouce` : `${inches} pouces`, `${inches}英寸`),
     picture: `${inches} in`,
     hands: false,
     quietChoices: false,
@@ -97,14 +97,15 @@ function makeGraph(rng: Rng, mode: "picture" | "bar"): ChoiceQ {
   const graph = mode === "picture" ? "picture graph" : "bar graph";
   const graphEs = mode === "picture" ? "gráfica de dibujos" : "gráfica de barras";
   const graphFr = mode === "picture" ? "graphique à images" : "graphique en barres";
+  const graphZh = mode === "picture" ? "象形统计图" : "条形统计图";
   const many = pluralName(focusItem.name);
   const manyEs = thingName(focusItem.name, focusItem.value, many);
   const howMany = howManyPhrase(focusItem.name, focusItem.value, many);
   return sceneQuestion(rng, {
     game: "measure",
     title: askMost
-      ? t(`Which has the most on the ${graph}?`, `¿Cuál tiene más en la ${graphEs}?`, `Qual tem mais no ${graphEs}?`, `Lequel en a le plus sur le ${graphFr} ?`)
-      : t(`How many ${many} are on the ${graph}?`, `¿${howMany} hay en la ${graphEs}?`, `${howMany} tem no ${graphEs}?`, `${howMany} y a-t-il sur le ${graphFr} ?`),
+      ? t(`Which has the most on the ${graph}?`, `¿Cuál tiene más en la ${graphEs}?`, `Qual tem mais no ${graphEs}?`, `Lequel en a le plus sur le ${graphFr} ?`, `${graphZh}上哪个最多？`)
+      : t(`How many ${many} are on the ${graph}?`, `¿${howMany} hay en la ${graphEs}?`, `${howMany} tem no ${graphEs}?`, `${howMany} y a-t-il sur le ${graphFr} ?`, `${graphZh}上${howMany}？`),
     hint: askMost ? t("Find the tallest or fullest row", "Busca la fila más alta o más llena") : t("Count that row", "Cuenta esa fila"),
     answer,
     choices: askMost
@@ -113,8 +114,8 @@ function makeGraph(rng: Rng, mode: "picture" | "bar"): ChoiceQ {
     skill: `measure:${mode}`,
     tags: [mode],
     solved: askMost
-      ? t(`${answer} has the most`, `${thingName(answer, 1, answer)} tiene más`, `${thingName(answer, 1, answer)} tem mais`, `${thingName(answer, 1, answer)} en a le plus`)
-      : t(`${focusItem.value} ${many}`, `${focusItem.value} ${manyEs}`, `${focusItem.value} ${manyEs}`, `${focusItem.value} ${manyEs}`),
+      ? t(`${answer} has the most`, `${thingName(answer, 1, answer)} tiene más`, `${thingName(answer, 1, answer)} tem mais`, `${thingName(answer, 1, answer)} en a le plus`, `${thingName(answer, 1, answer)}最多`)
+      : t(`${focusItem.value} ${many}`, `${focusItem.value} ${manyEs}`, `${focusItem.value} ${manyEs}`, `${focusItem.value} ${manyEs}`, countedNoun(focusItem.name, focusItem.value)),
     picture: focusItem.emoji.repeat(focusItem.value),
     hands: false,
     quietChoices: false,
@@ -135,13 +136,13 @@ function makeMore(rng: Rng): ChoiceQ {
     title: t(
       `How many more ${pluralName(items[0]!.name)} than ${pluralName(items[1]!.name)}?`,
       `¿${howManyMorePhrase(items[0]!.name, pluralName(items[0]!.name))} más que ${thingName(items[1]!.name, 2, pluralName(items[1]!.name))}?`, `${howManyMorePhrase(items[0]!.name, pluralName(items[0]!.name))} a mais que ${thingName(items[1]!.name, 2, pluralName(items[1]!.name))}?`,
-    `${howManyMorePhrase(items[0]!.name, pluralName(items[0]!.name))} de plus ${frenchThan(thingName(items[1]!.name, 2, pluralName(items[1]!.name)))} ?`),
+    `${howManyMorePhrase(items[0]!.name, pluralName(items[0]!.name))} de plus ${frenchThan(thingName(items[1]!.name, 2, pluralName(items[1]!.name)))} ?`, `${thingName(items[0]!.name, 2, pluralName(items[0]!.name))}比${thingName(items[1]!.name, 2, pluralName(items[1]!.name))}多几${nounMeasure(items[0]!.name)}？`),
     hint: t("Subtract the smaller number", "Resta el número más chico"),
     answer: String(answer),
     choices: nearChoices(rng, answer, 0, 8),
     skill: "measure:more",
     tags: ["more"],
-    solved: t(`${answer} more`, `${answer} más`, `${answer} a mais`, `${answer} de plus`),
+    solved: t(`${answer} more`, `${answer} más`, `${answer} a mais`, `${answer} de plus`, `多${answer}个`),
     picture: `${high} ${low}`,
     hands: false,
     quietChoices: false,
@@ -193,8 +194,8 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const longer = rng.next() < 0.5;
       return {
         prompt: longer
-          ? t(`Which is longer, ${a} units or ${b} units?`, `¿Cuál es más largo, ${a} unidades o ${b} unidades?`, `Qual é mais comprido, ${a} unidades ou ${b} unidades?`, `Lequel est le plus long, ${a} unités ou ${b} unités ?`)
-          : t(`Which is shorter, ${a} units or ${b} units?`, `¿Cuál es más corto, ${a} unidades o ${b} unidades?`, `Qual é mais curto, ${a} unidades ou ${b} unidades?`, `Lequel est le plus court, ${a} unités ou ${b} unités ?`),
+          ? t(`Which is longer, ${a} units or ${b} units?`, `¿Cuál es más largo, ${a} unidades o ${b} unidades?`, `Qual é mais comprido, ${a} unidades ou ${b} unidades?`, `Lequel est le plus long, ${a} unités ou ${b} unités ?`, `${a}单位和${b}单位，哪个更长？`)
+          : t(`Which is shorter, ${a} units or ${b} units?`, `¿Cuál es más corto, ${a} unidades o ${b} unidades?`, `Qual é mais curto, ${a} unidades ou ${b} unidades?`, `Lequel est le plus court, ${a} unités ou ${b} unités ?`, `${a}单位和${b}单位，哪个更短？`),
         answer: String(longer ? Math.max(a, b) : Math.min(a, b)),
       };
     }
@@ -204,7 +205,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         prompt: t(
           `The ribbon goes from 0 to ${inches} on the ruler. How many inches?`,
           `El listón va del 0 al ${inches} en la regla. ¿Cuántas pulgadas son?`, `A fita vai do 0 até o ${inches} na régua. Quantas polegadas são?`,
-        `Le ruban va de 0 jusqu'au ${inches} sur la règle. Combien de pouces ?`),
+        `Le ruban va de 0 jusqu'au ${inches} sur la règle. Combien de pouces ?`, `丝带在尺子上从0到${inches}。有几英寸？`),
         answer: String(inches),
       };
     }
@@ -213,7 +214,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const n = rng.int(1, 8);
       const icon = safe === "picture" ? "🍎" : "▮";
       return {
-        prompt: t(`The graph shows ${icon.repeat(n)} apples. How many apples?`, `La gráfica muestra ${icon.repeat(n)} manzanas. ¿Cuántas manzanas hay?`, `O gráfico mostra ${icon.repeat(n)} maçãs. Quantas maçãs tem?`, `Le graphique montre ${icon.repeat(n)} pommes. Combien de pommes ?`),
+        prompt: t(`The graph shows ${icon.repeat(n)} apples. How many apples?`, `La gráfica muestra ${icon.repeat(n)} manzanas. ¿Cuántas manzanas hay?`, `O gráfico mostra ${icon.repeat(n)} maçãs. Quantas maçãs tem?`, `Le graphique montre ${icon.repeat(n)} pommes. Combien de pommes ?`, `统计图上有${icon.repeat(n)}。有几个苹果？`),
         answer: String(n),
       };
     }
@@ -224,7 +225,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         prompt: t(
           `There are ${cats} cats and ${dogs} dogs. How many more cats?`,
           `Hay ${cats} gatos y ${dogs} perros. ¿Cuántos gatos más hay?`, `Tem ${cats} gatos e ${dogs} cachorros. Quantos gatos a mais tem?`,
-        `Il y a ${cats} chats et ${dogs} chiens. Combien de chats de plus ?`),
+        `Il y a ${cats} chats et ${dogs} chiens. Combien de chats de plus ?`, `有${cats}只猫和${dogs}只狗。猫多几只？`),
         answer: String(cats - dogs),
       };
     }

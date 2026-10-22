@@ -67,18 +67,18 @@ export function weeklyCard(child: Pick<Child, "name" | "secondsByDay" | "streak"
         ? t(
             `${name} has not played yet this week. One short game is a good start.`,
             `${name} todavía no juega esta semana. Un juego cortito es un buen comienzo.`, `${name} ainda não joga nesta semana. Um jogo curtinho é um bom começo.`,
-          `${name} n'a pas encore joué cette semaine. Un petit jeu est un bon début.`)
+          `${name} n'a pas encore joué cette semaine. Un petit jeu est un bon début.`, `${name}这周还没玩。先玩一个短短的游戏就很好。`)
         : t(
             `${name} practiced ${minutesLabel} on ${days} ${dayWord} this week.`,
             `${name} practicó ${minutesLabel} en ${days} ${dayEs} esta semana.`, `${name} praticou ${minutesLabel} em ${days} ${dayPt} nesta semana.`,
-          `${name} a pratiqué ${minutesLabel} pendant ${days} ${dayFr} cette semaine.`),
+          `${name} a pratiqué ${minutesLabel} pendant ${days} ${dayFr} cette semaine.`, `${name}这周练习了${minutesLabel}，共${days}天。`),
     headline: named
-      ? t(`What ${named} learned`, `Qué aprendió ${named}`, `O que ${named} aprendeu`, `Ce que ${named} a appris`)
+      ? t(`What ${named} learned`, `Qué aprendió ${named}`, `O que ${named} aprendeu`, `Ce que ${named} a appris`, `${named}学了什么`)
       : t("What your child learned", "Qué aprendió tu hijo o hija"),
     deviceNote: t("Saved on this device only.", "Guardado solo en este aparato."),
     streakNote:
       child.streak >= 2
-        ? t(`${name} played ${child.streak} days in a row.`, `${name} jugó ${child.streak} días seguidos.`, `${name} jogou ${child.streak} dias seguidos.`, `${name} a joué ${child.streak} jours d'affilée.`)
+        ? t(`${name} played ${child.streak} days in a row.`, `${name} jugó ${child.streak} días seguidos.`, `${name} jogou ${child.streak} dias seguidos.`, `${name} a joué ${child.streak} jours d'affilée.`, `${name}连续玩了${child.streak}天。`)
         : "",
     dayLines,
     wins,

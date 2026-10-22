@@ -271,7 +271,7 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
           {card.sheetHref ? (
             <a href={card.sheetHref}>
               {card.sheetTitle
-                ? t(`Print “${card.sheetTitle}”`, `Imprimir «${card.sheetTitle}»`, `Imprimir «${card.sheetTitle}»`, `Imprimer « ${card.sheetTitle} »`)
+                ? t(`Print “${card.sheetTitle}”`, `Imprimir «${card.sheetTitle}»`, `Imprimir «${card.sheetTitle}»`, `Imprimer « ${card.sheetTitle} »`, `打印“${card.sheetTitle}”`)
                 : show("Print the worksheet")}
             </a>
           ) : null}
@@ -349,7 +349,7 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
           {t(
             `What ${child.name || "your child"} is learning`,
             `Qué está aprendiendo ${child.name || "tu hijo o hija"}`, `O que ${child.name || "seu filho ou sua filha"} está aprendendo`,
-          `Ce que ${child.name || "ton fils ou ta fille"} apprend`)}
+          `Ce que ${child.name || "ton fils ou ta fille"} apprend`, `${child.name || "你的孩子"}正在学什么`)}
         </h2>
         {lessons.map((row) => (
           <article key={row.key} className="ac-lesson">

@@ -1,5 +1,5 @@
 import type { Rng } from "@/lib/rng";
-import { spanishShaded, starPlace, t } from "../i18n";
+import { shapeWord, spanishShaded, starPlace, t } from "../i18n";
 import type {
   FlatKind,
   FoldFig,
@@ -174,7 +174,7 @@ function traitsQuestion(rng: Rng): ChoiceQ {
   const hint =
     shape === "circle"
       ? t("A flat shape sits on the page", "Una figura plana se queda en la hoja")
-      : t(`A ${shape} has ${sides} sides.`, shape === "triangle" ? `El triángulo tiene ${sides} lados.` : shape === "square" ? `El cuadrado tiene ${sides} lados.` : `El rectángulo tiene ${sides} lados.`, shape === "triangle" ? `O triângulo tem ${sides} lados.` : shape === "square" ? `O quadrado tem ${sides} lados.` : `O retângulo tem ${sides} lados.`, shape === "triangle" ? `Le triangle a ${sides} côtés.` : shape === "square" ? `Le carré a ${sides} côtés.` : `Le rectangle a ${sides} côtés.`);
+      : t(`A ${shape} has ${sides} sides.`, shape === "triangle" ? `El triángulo tiene ${sides} lados.` : shape === "square" ? `El cuadrado tiene ${sides} lados.` : `El rectángulo tiene ${sides} lados.`, shape === "triangle" ? `O triângulo tem ${sides} lados.` : shape === "square" ? `O quadrado tem ${sides} lados.` : `O retângulo tem ${sides} lados.`, shape === "triangle" ? `Le triangle a ${sides} côtés.` : shape === "square" ? `Le carré a ${sides} côtés.` : `Le rectangle a ${sides} côtés.`, `${shapeWord(shape)}有${sides}条边。`);
   return ask(rng, {
     level: "traits",
     title: either(rng, t("What shape is this?", "¿Qué figura es esta?"), t("Find the same shape.", "Busca la misma figura.")),
@@ -266,14 +266,14 @@ function gridQuestion(rng: Rng, level: "rows" | "cover"): ChoiceQ {
   const board: ShapeBoard = { game: "shapes", mode: level, rows, cols };
   return ask(rng, {
     level,
-    title: t(`${rows} rows of ${cols}. Count the squares.`, `${rows} filas de ${cols}. Cuenta los cuadritos.`, `${rows} linhas de ${cols}. Conte os quadradinhos.`, `${rows} lignes de ${cols}. Compte les petits carrés.`),
+    title: t(`${rows} rows of ${cols}. Count the squares.`, `${rows} filas de ${cols}. Cuenta los cuadritos.`, `${rows} linhas de ${cols}. Conte os quadradinhos.`, `${rows} lignes de ${cols}. Compte les petits carrés.`, `${rows}行，每行${cols}个。数一数小方格。`),
     hint:
       level === "cover"
         ? t("Area is length times width", "El área es largo por ancho")
         : t("Count the squares", "Cuenta los cuadritos"),
     answer: String(product),
     choices: nearChoices(rng, product, 1, 30, [rows, cols, rows + cols, rows * cols]),
-    solved: t(`${product} square units`, `${product} unidades cuadradas`, `${product} unidades quadradas`, `${product} unités carrées`),
+    solved: t(`${product} square units`, `${product} unidades cuadradas`, `${product} unidades quadradas`, `${product} unités carrées`, `${product}平方单位`),
     picture: `geo:grid:${rows}x${cols}`,
     labels: {},
     quiet: false,
@@ -434,7 +434,7 @@ export function geometrySheet(rng: Rng, level: GeometryLevel): SheetItem {
               ? t("next to the box", "junto a la caja")
               : t("in back of the box", "detrás de la caja");
       return {
-        prompt: t(`The star sits ${clue}. Name the position.`, `La estrella está ${clue}. Nombra la posición.`, `A estrela está ${clue}. Diga a posição.`, `L'étoile est ${clue}. Dis la position.`),
+        prompt: t(`The star sits ${clue}. Name the position.`, `La estrella está ${clue}. Nombra la posición.`, `A estrela está ${clue}. Diga a posição.`, `L'étoile est ${clue}. Dis la position.`, `星星在${clue}。说出这个位置。`),
         answer: place,
       };
     }
@@ -462,7 +462,7 @@ export function geometrySheet(rng: Rng, level: GeometryLevel): SheetItem {
         prompt: t(
           `Color and size do not change a shape. Name the flat shape with ${clue}.`,
           `El color y el tamaño no cambian la figura. Nombra la figura plana: ${clue}.`, `A cor e o tamanho não mudam a figura. Diga a figura plana: ${clue}.`,
-        `La couleur et la taille ne changent pas la figure. Dis la figure plate : ${clue}.`),
+        `La couleur et la taille ne changent pas la figure. Dis la figure plate : ${clue}.`, `颜色和大小不会改变图形。说出有${clue}的平面图形。`),
         answer: shape,
       };
     }
@@ -470,7 +470,7 @@ export function geometrySheet(rng: Rng, level: GeometryLevel): SheetItem {
       const made = rng.pick(["rectangle", "square", "circle"] as const);
       const pieces = made === "circle" ? t("two half circles", "dos medios círculos") : t("two triangles", "dos triángulos");
       return {
-        prompt: t(`Join ${pieces}. What shape is the outside?`, `Junta ${pieces}. ¿Qué figura queda afuera?`, `Junte ${pieces}. Qual figura fica de fora?`, `Assemble ${pieces}. Quelle figure est dehors ?`),
+        prompt: t(`Join ${pieces}. What shape is the outside?`, `Junta ${pieces}. ¿Qué figura queda afuera?`, `Junte ${pieces}. Qual figura fica de fora?`, `Assemble ${pieces}. Quelle figure est dehors ?`, `把${pieces}拼起来。外面是什么图形？`),
         answer: made,
       };
     }
@@ -483,7 +483,7 @@ export function geometrySheet(rng: Rng, level: GeometryLevel): SheetItem {
         prompt: t(
           `A rectangle has ${rows} rows of ${cols} squares. How many squares?`,
           `Un rectángulo tiene ${rows} filas de ${cols} cuadrados. ¿Cuántos cuadrados?`, `Um retângulo tem ${rows} linhas de ${cols} quadrados. Quantos quadrados?`,
-        `Un rectangle a ${rows} lignes de ${cols} carrés. Combien de carrés ?`),
+        `Un rectangle a ${rows} lignes de ${cols} carrés. Combien de carrés ?`, `长方形有${rows}行，每行${cols}个小方格。有几个小方格？`),
         answer: String(rows * cols),
       };
     }
@@ -498,7 +498,7 @@ export function geometrySheet(rng: Rng, level: GeometryLevel): SheetItem {
               ? t("4 equal sides and 4 square corners", "4 lados iguales y 4 esquinas cuadradas")
               : t("exactly one pair of parallel sides", "exactamente un par de lados paralelos");
       return {
-        prompt: t(`Name the quadrilateral with ${clue}.`, `Nombra el cuadrilátero: ${clue}.`, `Diga o quadrilátero: ${clue}.`, `Dis le quadrilatère : ${clue}.`),
+        prompt: t(`Name the quadrilateral with ${clue}.`, `Nombra el cuadrilátero: ${clue}.`, `Diga o quadrilátero: ${clue}.`, `Dis le quadrilatère : ${clue}.`, `说出有${clue}的四边形。`),
         answer: shape,
       };
     }
@@ -508,7 +508,7 @@ export function geometrySheet(rng: Rng, level: GeometryLevel): SheetItem {
         prompt: t(
           `A shape is split into ${den} equal parts. One part is shaded. What unit fraction?`,
           `Una figura está partida en ${den} partes iguales. Una parte está sombreada. ¿Qué fracción unitaria?`, `Uma figura está dividida em ${den} partes iguais. Uma parte está pintada. Que fração unitária?`,
-        `Une figure est partagée en ${den} parts égales. Une part est coloriée. Quelle fraction unitaire ?`),
+        `Une figure est partagée en ${den} parts égales. Une part est coloriée. Quelle fraction unitaire ?`, `一个图形平均分成${den}份。涂了颜色的是1份。是几分之一？`),
         answer: `1/${den}`,
       };
     }

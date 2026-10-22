@@ -1,5 +1,6 @@
 import { Component, lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 import { gameForScreen, isGameId, type GameId } from "./games/catalog";
+import { gameOffered } from "./games/offer";
 import { todayIso, type RoundResult, type Save } from "./model";
 import { openEgg } from "./buddy/unlock";
 import { acknowledgeUnlocks, applyRound, applyStory, claimDailyGift } from "./rewards";
@@ -174,6 +175,18 @@ function AcademyApp() {
   let body: ReactNode;
   if (!child.name) {
     body = <HelloScreen save={save} onSave={setSave} sound={save.sound} />;
+  } else if (route.name === "play" && !gameOffered(route.game)) {
+    body = (
+      <div className="ac-shell ac-mid" data-game="hidden">
+        <header className="ac-top">
+          <a className="ac-quiet" href="#/">
+            {show("Back")}
+          </a>
+        </header>
+        <h1>{show("Games")}</h1>
+        <p className="ac-lede">这个游戏是英语字母游戏。请在设置里换成 English。</p>
+      </div>
+    );
   } else if (route.name === "play") {
     body = (
       <Screen>
@@ -241,7 +254,7 @@ function AcademyApp() {
   }
 
   if (!packReady) {
-    const waiting = save.lang === "fr" ? "Chargement…" : save.lang === "pt" ? "Carregando…" : "Loading…";
+    const waiting = save.lang === "zh" ? "加载中…" : save.lang === "fr" ? "Chargement…" : save.lang === "pt" ? "Carregando…" : "Loading…";
     return (
       <SoundContext.Provider value={save.sound}>
         <p className="ac-note">{waiting}</p>

@@ -2,7 +2,7 @@ import { rngFromSeed } from "@/lib/rng";
 import { bookEntries } from "../buddy/cast";
 import { personaOf, STORY_STARS } from "../buddy/persona";
 import { bossForGame } from "../bosses";
-import { show, starLead, t, yourTurnLine } from "../i18n";
+import { getLocale, show, starLead, t, yourTurnLine } from "../i18n";
 import { ALL_SIGHT } from "../games/sight-data";
 import { blendOf, RHYME_FAMILIES, SOUND_BANK } from "../games/phonics";
 import { ALL_SPELL } from "../games/spell-data";
@@ -85,23 +85,23 @@ function explicitLines(): SpokenLine[] {
     push(lines, word.word, "sight");
     push(lines, word.sentence, "sight");
     push(lines, blankOut(word.sentence, word.word).replaceAll("___", "blank"), "sight");
-    push(lines, t(`Listen. ${word.word}.`, `Escucha. ${word.word}.`, `Ouça. ${word.word}.`, `Écoute. ${word.word}.`), "sight");
-    push(lines, t(`Yes! ${word.word}`, `¡Sí! ${word.word}`, `Sim! ${word.word}`, `Oui ! ${word.word}`), "sight");
-    push(lines, t(`Almost! The word is ${word.word}.`, `¡Casi! La palabra es ${word.word}.`, `Quase! A palavra é ${word.word}.`, `Presque ! Le mot est ${word.word}.`), "sight");
+    push(lines, t(`Listen. ${word.word}.`, `Escucha. ${word.word}.`, `Ouça. ${word.word}.`, `Écoute. ${word.word}.`, `听一听。${word.word}。`), "sight");
+    push(lines, t(`Yes! ${word.word}`, `¡Sí! ${word.word}`, `Sim! ${word.word}`, `Oui ! ${word.word}`, `对！${word.word}`), "sight");
+    push(lines, t(`Almost! The word is ${word.word}.`, `¡Casi! La palabra es ${word.word}.`, `Quase! A palavra é ${word.word}.`, `Presque ! Le mot est ${word.word}.`, `差一点！这个词是${word.word}。`), "sight");
   }
   for (const word of ALL_SPELL) {
     push(lines, word.word, "spelling");
     push(lines, word.sentence, "spelling");
     push(lines, `${word.word}. ${word.sentence}`, "spelling");
-    push(lines, t(`Yes! ${word.word}`, `¡Sí! ${word.word}`, `Sim! ${word.word}`, `Oui ! ${word.word}`), "spelling");
-    push(lines, t(`Almost! ${word.word}. ${word.sentence}`, `¡Casi! ${word.word}. ${word.sentence}`, `Quase! ${word.word}. ${word.sentence}`, `Presque ! ${word.word}. ${word.sentence}`), "spelling");
+    push(lines, t(`Yes! ${word.word}`, `¡Sí! ${word.word}`, `Sim! ${word.word}`, `Oui ! ${word.word}`, `对！${word.word}`), "spelling");
+    push(lines, t(`Almost! ${word.word}. ${word.sentence}`, `¡Casi! ${word.word}. ${word.sentence}`, `Quase! ${word.word}. ${word.sentence}`, `Presque ! ${word.word}. ${word.sentence}`, `差一点！${word.word}。${word.sentence}`), "spelling");
   }
   for (const row of SOUND_BANK) {
     push(lines, row.phoneme, "phonics");
     push(lines, row.word, "phonics");
     push(lines, `${row.letter} ${row.phoneme}`, "phonics");
     push(lines, `${row.letter.toLowerCase()} ${row.phoneme}`, "phonics");
-    push(lines, t(`${row.letter} says ${row.phoneme}, like ${row.word}`, `${row.letter} dice ${row.phoneme}, como ${row.word}`, `${row.letter} diz ${row.phoneme}, como ${row.word}`, `${row.letter} dit ${row.phoneme}, comme ${row.word}`), "phonics");
+    push(lines, t(`${row.letter} says ${row.phoneme}, like ${row.word}`, `${row.letter} dice ${row.phoneme}, como ${row.word}`, `${row.letter} diz ${row.phoneme}, como ${row.word}`, `${row.letter} dit ${row.phoneme}, comme ${row.word}`, `${row.letter}读作${row.phoneme}，就像${row.word}`), "phonics");
   }
   for (const row of traceLines()) push(lines, t(row.en, row.es), row.game);
   for (const family of RHYME_FAMILIES) {
@@ -158,6 +158,7 @@ export function collectSpokenLines(): SpokenLine[] {
       }
     }
   }
+  if (getLocale() === "zh") return lines.filter((row) => row.game !== "phonics" && row.game !== "sight" && row.game !== "spelling");
   return lines;
 }
 
@@ -210,8 +211,10 @@ export function collectClipSpecs(lines: readonly SpokenLine[] = collectSpokenLin
     }
   }
   for (let n = 0; n <= NUMBER_MAX; n += 1) touch(games, String(n), n <= 100 ? "ui" : "place");
-  touch(games, "thousand", "place");
-  touch(games, "million", "place");
+  if (getLocale() !== "zh") {
+    touch(games, "thousand", "place");
+    touch(games, "million", "place");
+  }
   for (let minutes = 0; minutes < 60; minutes += 1) {
     touch(games, `min:${String(minutes).padStart(2, "0")}`, "time");
   }

@@ -11,8 +11,8 @@ export function pickLine(rng: Rng, lines: readonly string[]): string {
   return rng.pick([...lines]);
 }
 
-/** One RNG draw. Spanish is the second string. Portuguese is the third and French is the fourth when the English line is built, not a dictionary key. */
+/** One RNG draw. Later languages are extra strings when the English line is built, not a dictionary key. */
 export function pickTalk(rng: Rng, pairs: readonly (readonly [string, string, ...string[]])[]): string {
   const pair = rng.pick([...pairs]);
-  return t(pair[0], pair[1], pair[2], pair[3]);
+  return t(pair[0], pair[1], pair[2], pair[3], pair[4]);
 }
