@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent, type P
 import { t, nounIsFeminine, thingName } from "../i18n";
 import type { GraphShape } from "../games/boards";
 import { graphsMatches, type GraphBenchSpec, type GraphsTask } from "../games/graph-data";
-import { CastFace, DragGhost, HandsShell, inside, useTrayDrag } from "./hands-kit";
+import { DragGhost, HandsShell, inside, useTrayDrag } from "./hands-kit";
 
 interface GraphToken {
   id: string;
@@ -189,10 +189,6 @@ export function GraphBench({
 
   return (
     <div className="ac-data" data-graph={spec.mode} data-ready={matched ? "yes" : "no"}>
-      <div className="ac-graph-cast" aria-hidden="true">
-        <CastFace />
-        <CastFace who="host" />
-      </div>
       {spec.scale > 1 ? (
         <p className="ac-graph-key">{t(`Each picture is ${spec.scale}`, `Cada dibujo vale ${spec.scale}`)}</p>
       ) : null}
@@ -221,7 +217,7 @@ export function GraphBench({
                 }
               }}
             >
-              <span className="ac-graph-label">{spec.mode === "line" ? label : `${emoji} ${label}`}</span>
+              <span className="ac-graph-label">{label}</span>
               {spec.shape === "tally" || spec.shape === "bar" || spec.shape === "line" ? (
                 <ColumnViz shape={spec.shape} count={here.length} emoji={emoji} />
               ) : null}

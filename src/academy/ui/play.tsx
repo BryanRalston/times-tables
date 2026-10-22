@@ -58,7 +58,7 @@ import { silence, speak } from "../voice";
 import { CoinShare, RoundBuddy } from "./buddy-view";
 import { BossFigure, type BossMood } from "./boss-figure";
 import { BossHud, BossIntro } from "./boss-stage";
-import { SpeakerIcon, SquisheeImg, Stars, cx, fmtSeconds } from "./bits";
+import { AcademyPal, SpeakerIcon, SquisheeImg, Stars, cx, fmtSeconds } from "./bits";
 import { RoundCastProvider } from "./round-cast";
 import { CoinRow } from "./coins";
 import { HandsBoard } from "./build-boards";
@@ -726,10 +726,12 @@ export function PlayScreen({
   });
   const palBond = bondTier(bondScore(child.bonds, child.avatarId));
   const choice = slot?.kind === "choice" ? slot.question : null;
+  const graphPals = choice?.visual.kind === "scene" && choice.visual.board.game === "graphs";
   const filled = dots.filter((dot) => dot != null).length;
   const playBuddy = boss ? null : (
-    <div className="ac-play-buddy">
+    <div className="ac-play-buddy" data-pals={graphPals ? "pair" : "one"}>
       <RoundBuddy id={child.avatarId} cosmetic={child.equipped} reaction={buddyCue} pulse={phase === "feedback" ? cheer : 0} />
+      {graphPals ? <AcademyPal id={hostId} className="ac-buddy-img" squish="buddy" label="" /> : null}
     </div>
   );
 
