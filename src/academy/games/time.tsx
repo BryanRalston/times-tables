@@ -53,6 +53,16 @@ export function timeTalk(hours: number, minutes: number): string {
     }
     return formatClockTime(hours, minutes);
   }
+  if (getLocale() === "ar") {
+    if (minutes === 0) return `الساعة ${hours}`;
+    if (minutes === 30) return `الساعة ${hours} والنصف`;
+    if (minutes === 15) return `الساعة ${hours} والربع`;
+    if (minutes === 45) {
+      const next = hours === 12 ? 1 : hours + 1;
+      return `الساعة ${next} إلا ربع`;
+    }
+    return `الساعة ${hours} و${minutes}`;
+  }
   if (getLocale() === "hi") {
     if (minutes === 0) return `${hours} बजे`;
     if (minutes === 30) return `साढ़े ${hours}`;
@@ -105,7 +115,7 @@ export function timeHint(_hours: number, minutes: number): string {
     `La manecilla larga apunta al ${number}. Cuenta de 5 en 5.`,
     `O ponteiro grande aponta para o ${number}. Conte de 5 em 5.`,
     `La grande aiguille pointe vers le ${number}. Compte de 5 en 5.`,
-  `分针指向${number}。按5个一数。`, `लंबी सुई ${number} पर है। पाँच-पाँच गिनो।`);
+  `分针指向${number}。按5个一数。`, `लंबी सुई ${number} पर है। पाँच-पाँच गिनो।`, `العقرب الطويلة تشير إلى ${number}. عدّ خمسة خمسة.`);
 }
 
 export function fourTimeChoices(rng: Rng, hours: number, minutes: number): string[] {
@@ -177,12 +187,12 @@ export function makeTimeQuestion(rng: Rng, level: TimeLevel, prefer: readonly st
       const buddy = buddyName(rng);
       return pickTalk(rng, [
         ["What time is it?", "¿Qué hora es?"],
-        [`${buddy} checks the clock. What time is it?`, `${buddy} mira el reloj. ¿Qué hora es?`, `${buddy} olha o relógio. Que horas são?`, `${buddy} regarde l'horloge. Quelle heure est-il ?`, `${buddy}看了看钟。现在几点？`, `${buddy} घड़ी देखता है। क्या समय हुआ है?`],
+        [`${buddy} checks the clock. What time is it?`, `${buddy} mira el reloj. ¿Qué hora es?`, `${buddy} olha o relógio. Que horas são?`, `${buddy} regarde l'horloge. Quelle heure est-il ?`, `${buddy}看了看钟。现在几点？`, `${buddy} घड़ी देखता है। क्या समय हुआ है?`, `${buddy} ينظر إلى الساعة. كم الساعة؟`],
       ]);
     })(),
     hint: timeHint(hours, minutes),
-    praise: t(`Yes! ${capPhrase(phrase)}`, `¡Sí! ${capPhrase(phrase)}`, `Sim! ${capPhrase(phrase)}`, `Oui ! ${capPhrase(phrase)}`, `对！${capPhrase(phrase)}`, `हाँ! ${capPhrase(phrase)}`),
-    almost: t(`Almost! It is ${phrase}.`, `¡Casi! Son las ${phrase}.`, `Quase! São ${phrase}.`, `Presque ! Il est ${phrase}.`, `差一点！是${phrase}。`, `लगभग! यह ${phrase} है।`),
+    praise: t(`Yes! ${capPhrase(phrase)}`, `¡Sí! ${capPhrase(phrase)}`, `Sim! ${capPhrase(phrase)}`, `Oui ! ${capPhrase(phrase)}`, `对！${capPhrase(phrase)}`, `हाँ! ${capPhrase(phrase)}`, `نعم! ${capPhrase(phrase)}`),
+    almost: t(`Almost! It is ${phrase}.`, `¡Casi! Son las ${phrase}.`, `Quase! São ${phrase}.`, `Presque ! Il est ${phrase}.`, `差一点！是${phrase}。`, `लगभग! यह ${phrase} है।`, `تقريبًا! ${phrase}.`),
     answer,
     choices: fourTimeChoices(rng, hours, minutes),
     skill: `time:${level}`,

@@ -34,7 +34,7 @@ function makeBlocks(rng: Rng): ChoiceQ {
     game: "place",
     title: pickTalk(rng, [
       ["How many blocks?", "¿Cuántos bloques hay?"],
-      [`${buddy} built with tens and ones. What number is that?`, `${buddy} armó decenas y unidades. ¿Qué número es?`, `${buddy} montou com dezenas e unidades. Que número é esse?`, `${buddy} a construit avec des dizaines et des unités. Quel nombre est-ce ?`, `${buddy}用数位积木搭了十和一。这是哪个数？`, `${buddy} दहाई और इकाई से बनाता है। यह कौन सी संख्या है?`],
+      [`${buddy} built with tens and ones. What number is that?`, `${buddy} armó decenas y unidades. ¿Qué número es?`, `${buddy} montou com dezenas e unidades. Que número é esse?`, `${buddy} a construit avec des dizaines et des unités. Quel nombre est-ce ?`, `${buddy}用数位积木搭了十和一。这是哪个数？`, `${buddy} दहाई और इकाई से बनाता है। यह कौन सी संख्या है?`, `${buddy} بنى بالعشرات والآحاد. ما هذا العدد؟`],
     ]),
     hint: t("A rod is a ten. A cube is a one.", "Una barra es una decena. Un cubo es una unidad."),
     answer: String(n),
@@ -64,7 +64,7 @@ function makeExpanded(rng: Rng): ChoiceQ {
   const board: PlaceBoard = { game: "place", mode: "expanded", n };
   return sceneQuestion(rng, {
     game: "place",
-    title: t(`What is ${n} in expanded form?`, `¿Cómo se escribe ${n} en forma desarrollada?`, `Como se escreve ${n} na forma decomposta?`, `Comment s'écrit ${n} en forme développée ?`, `${n}的展开式是什么？`, `${n} का विस्तारित रूप क्या है?`),
+    title: t(`What is ${n} in expanded form?`, `¿Cómo se escribe ${n} en forma desarrollada?`, `Como se escreve ${n} na forma decomposta?`, `Comment s'écrit ${n} en forme développée ?`, `${n}的展开式是什么？`, `${n} का विस्तारित रूप क्या है?`, `ما الصيغة الموسعة للعدد ${n}؟`),
     hint: t("Hundreds, then tens, then ones", "Primero las centenas, luego las decenas y las unidades"),
     answer,
     choices: uniqueChoices(rng, answer, pool),
@@ -107,7 +107,7 @@ function makeCompare(rng: Rng): ChoiceQ {
     choices,
     skill: "place:compare",
     tags: ["compare"],
-    solved: askGreater ? t(`${answer} is greater`, `${answer} es mayor`, `${answer} é maior`, `${answer} est plus grand`, `${answer}更大`, `${answer} बड़ी है`) : t(`${answer} is less`, `${answer} es menor`, `${answer} é menor`, `${answer} est plus petit`, `${answer}更小`, `${answer} छोटी है`),
+    solved: askGreater ? t(`${answer} is greater`, `${answer} es mayor`, `${answer} é maior`, `${answer} est plus grand`, `${answer}更大`, `${answer} बड़ी है`, `${answer} أكبر`) : t(`${answer} is less`, `${answer} es menor`, `${answer} é menor`, `${answer} est plus petit`, `${answer}更小`, `${answer} छोटी है`, `${answer} أصغر`),
     picture: `${left} ${right}`,
     hands: false,
     quietChoices: false,
@@ -125,7 +125,7 @@ function makeRound(rng: Rng, place: 10 | 100): ChoiceQ {
   const board: PlaceBoard = { game: "place", mode: place === 10 ? "round10" : "round100", n };
   return sceneQuestion(rng, {
     game: "place",
-    title: t(`Round ${n} to the nearest ${place}`, `Redondea ${n} a la ${place === 10 ? "decena" : "centena"} más cercana`, `Arredonde ${n} para a ${place === 10 ? "dezena" : "centena"} mais próxima`, `Arrondis ${n} à la ${place === 10 ? "dizaine" : "centaine"} la plus proche`, `把${n}四舍五入到最近的${place}`, `${n} को निकटतम ${place} तक पूर्णांक बनाओ`),
+    title: t(`Round ${n} to the nearest ${place}`, `Redondea ${n} a la ${place === 10 ? "decena" : "centena"} más cercana`, `Arredonde ${n} para a ${place === 10 ? "dezena" : "centena"} mais próxima`, `Arrondis ${n} à la ${place === 10 ? "dizaine" : "centaine"} la plus proche`, `把${n}四舍五入到最近的${place}`, `${n} को निकटतम ${place} तक पूर्णांक बनाओ`, `قرّب ${n} إلى أقرب ${place}`),
     hint:
       place === 10
         ? t("Look at the ones. 5 or more rounds up.", "Mira las unidades. 5 o más, sube.")
@@ -134,7 +134,7 @@ function makeRound(rng: Rng, place: 10 | 100): ChoiceQ {
     choices: nearChoices(rng, answer, 0, 1000, [n, down, up, answer + place, Math.max(0, answer - place)]),
     skill: place === 10 ? "place:round10" : "place:round100",
     tags: [place === 10 ? "round10" : "round100"],
-    solved: t(`${n} rounds to ${answer}`, `${n} se redondea a ${answer}`, `${n} arredonda para ${answer}`, `${n} s'arrondit à ${answer}`, `${n}四舍五入是${answer}`, `${n} निकटतम ${answer} बनता है`),
+    solved: t(`${n} rounds to ${answer}`, `${n} se redondea a ${answer}`, `${n} arredonda para ${answer}`, `${n} s'arrondit à ${answer}`, `${n}四舍五入是${answer}`, `${n} निकटतम ${answer} बनता है`, `${n} يُقرَّب إلى ${answer}`),
     picture: String(n),
     hands: false,
     quietChoices: false,
@@ -149,7 +149,7 @@ function makeBuild(rng: Rng): ChoiceQ {
   const board: PlaceBoard = { game: "place", mode: "build", n };
   return sceneQuestion(rng, {
     game: "place",
-    title: t(`Build ${n}`, `Forma ${n}`, `Monte ${n}`, `Construis ${n}`, `搭出${n}`, `${n} बनाओ`),
+    title: t(`Build ${n}`, `Forma ${n}`, `Monte ${n}`, `Construis ${n}`, `搭出${n}`, `${n} बनाओ`, `كوّن ${n}`),
     hint: t("Add tens and ones until you make the number", "Agrega decenas y unidades hasta formar el número"),
     answer: String(n),
     choices: nearChoices(rng, n, 0, 120),
@@ -198,13 +198,13 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const tens = rng.int(1, 9);
       const ones = rng.int(0, 9);
       return {
-        prompt: t(`${tens} tens and ${ones} ones =`, `${tens} decenas y ${ones} unidades =`, `${tens} dezenas e ${ones} unidades =`, `${tens} dizaines et ${ones} unités =`, `${tens}个十和${ones}个一 =`, `${tens} दहाई और ${ones} इकाई =`),
+        prompt: t(`${tens} tens and ${ones} ones =`, `${tens} decenas y ${ones} unidades =`, `${tens} dezenas e ${ones} unidades =`, `${tens} dizaines et ${ones} unités =`, `${tens}个十和${ones}个一 =`, `${tens} दहाई और ${ones} इकाई =`, `${tens} عشرات و${ones} آحاد =`),
         answer: String(tens * 10 + ones),
       };
     }
     case "expanded": {
       const n = rng.next() < 0.5 ? rng.int(10, 99) : rng.int(100, 999);
-      return { prompt: t(`Write ${n} in expanded form.`, `Escribe ${n} en forma desarrollada.`, `Escreva ${n} na forma decomposta.`, `Écris ${n} en forme développée.`, `写出${n}的展开式。`, `${n} को विस्तारित रूप में लिखो।`), answer: expandedForm(n) };
+      return { prompt: t(`Write ${n} in expanded form.`, `Escribe ${n} en forma desarrollada.`, `Escreva ${n} na forma decomposta.`, `Écris ${n} en forme développée.`, `写出${n}的展开式。`, `${n} को विस्तारित रूप में लिखो।`, `اكتب ${n} بالصيغة الموسعة.`), answer: expandedForm(n) };
     }
     case "compare": {
       const left = rng.int(10, 99);
@@ -214,18 +214,18 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const b = Math.max(left, right);
       return {
         prompt: greater
-          ? t(`Which is greater, ${a} or ${b}?`, `¿Cuál es mayor, ${a} o ${b}?`, `Qual é maior, ${a} ou ${b}?`, `Lequel est le plus grand, ${a} ou ${b} ?`, `${a}和${b}，哪个更大？`, `${a} या ${b} में से कौन बड़ी है?`)
-          : t(`Which is less, ${a} or ${b}?`, `¿Cuál es menor, ${a} o ${b}?`, `Qual é menor, ${a} ou ${b}?`, `Lequel est le moins, ${a} ou ${b} ?`, `${a}和${b}，哪个更少？`, `${a} या ${b} में से कौन छोटी है?`),
+          ? t(`Which is greater, ${a} or ${b}?`, `¿Cuál es mayor, ${a} o ${b}?`, `Qual é maior, ${a} ou ${b}?`, `Lequel est le plus grand, ${a} ou ${b} ?`, `${a}和${b}，哪个更大？`, `${a} या ${b} में से कौन बड़ी है?`, `أيهما أكبر، ${a} أم ${b}؟`)
+          : t(`Which is less, ${a} or ${b}?`, `¿Cuál es menor, ${a} o ${b}?`, `Qual é menor, ${a} ou ${b}?`, `Lequel est le moins, ${a} ou ${b} ?`, `${a}和${b}，哪个更少？`, `${a} या ${b} में से कौन छोटी है?`, `أيهما أصغر، ${a} أم ${b}؟`),
         answer: String(greater ? b : a),
       };
     }
     case "round10": {
       const n = rng.int(10, 99);
-      return { prompt: t(`Round ${n} to the nearest 10.`, `Redondea ${n} a la decena más cercana.`, `Arredonde ${n} para a dezena mais próxima.`, `Arrondis ${n} à la dizaine la plus proche.`, `把${n}四舍五入到十位。`, `${n} को निकटतम 10 तक पूर्णांक बनाओ।`), answer: String(roundHalfUp(n, 10)) };
+      return { prompt: t(`Round ${n} to the nearest 10.`, `Redondea ${n} a la decena más cercana.`, `Arredonde ${n} para a dezena mais próxima.`, `Arrondis ${n} à la dizaine la plus proche.`, `把${n}四舍五入到十位。`, `${n} को निकटतम 10 तक पूर्णांक बनाओ।`, `قرّب ${n} إلى أقرب 10.`), answer: String(roundHalfUp(n, 10)) };
     }
     case "round100": {
       const n = rng.int(100, 999);
-      return { prompt: t(`Round ${n} to the nearest 100.`, `Redondea ${n} a la centena más cercana.`, `Arredonde ${n} para a centena mais próxima.`, `Arrondis ${n} à la centaine la plus proche.`, `把${n}四舍五入到百位。`, `${n} को निकटतम 100 तक पूर्णांक बनाओ।`), answer: String(roundHalfUp(n, 100)) };
+      return { prompt: t(`Round ${n} to the nearest 100.`, `Redondea ${n} a la centena más cercana.`, `Arredonde ${n} para a centena mais próxima.`, `Arrondis ${n} à la centaine la plus proche.`, `把${n}四舍五入到百位。`, `${n} को निकटतम 100 तक पूर्णांक बनाओ।`, `قرّب ${n} إلى أقرب 100.`), answer: String(roundHalfUp(n, 100)) };
     }
     case "big":
     case "roundBig": {

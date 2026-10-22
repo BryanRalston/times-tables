@@ -85,14 +85,14 @@ function makeParts(rng: Rng): ChoiceQ {
     game: "fractions",
     title: pickTalk(rng, [
       ["What fraction is shaded?", "¿Qué fracción está sombreada?"],
-      [`${buddy} shares a snack. What fraction is shaded?`, `${buddy} comparte un bocadillo. ¿Qué fracción está sombreada?`, `${buddy} reparte um lanche. Que fração está pintada?`, `${buddy} partage un goûter. Quelle fraction est coloriée ?`, `${buddy}在分点心。涂了颜色的是几分之几？`, `${buddy} नाश्ता बाँटता है। कितना भिन्न रंगा है?`],
+      [`${buddy} shares a snack. What fraction is shaded?`, `${buddy} comparte un bocadillo. ¿Qué fracción está sombreada?`, `${buddy} reparte um lanche. Que fração está pintada?`, `${buddy} partage un goûter. Quelle fraction est coloriée ?`, `${buddy}在分点心。涂了颜色的是几分之几？`, `${buddy} नाश्ता बाँटता है। कितना भिन्न रंगा है?`, `${buddy} يقسم وجبة خفيفة. ما الكسر المظلّل؟`],
     ]),
     hint: t("Count the shaded parts and the equal parts", "Cuenta las partes sombreadas y las partes iguales"),
     answer,
     choices: fracChoices(rng, answer, [`${Math.max(1, num - 1)}/${den}`, `${Math.min(den, num + 1)}/${den}`], HALF_FOURTHS),
     skill: "fractions:parts",
     tags: ["parts"],
-    solved: t(`${answer} is shaded`, spanishShaded(answer), portugueseShaded(answer), frenchShaded(answer), `涂了颜色的是${answer}`, `${answer} रंगा है`),
+    solved: t(`${answer} is shaded`, spanishShaded(answer), portugueseShaded(answer), frenchShaded(answer), `涂了颜色的是${answer}`, `${answer} रंगा है`, `${answer} مظلّل`),
     picture: answer,
     hands: false,
     quietChoices: false,
@@ -113,7 +113,7 @@ function makeUnit(rng: Rng): ChoiceQ {
     game: "fractions",
     title: pickTalk(rng, [
       ["What unit fraction is shaded?", "¿Qué fracción unitaria está sombreada?"],
-      [`${buddy} shades one part. What unit fraction is that?`, `${buddy} sombrea una parte. ¿Qué fracción unitaria es?`, `${buddy} pinta uma parte. Que fração unitária é essa?`, `${buddy} colorie une part. Quelle fraction unitaire est-ce ?`, `${buddy}涂了一份。这是几分之一？`, `${buddy} एक भाग रंगता है। यह कौन सा इकाई भिन्न है?`],
+      [`${buddy} shades one part. What unit fraction is that?`, `${buddy} sombrea una parte. ¿Qué fracción unitaria es?`, `${buddy} pinta uma parte. Que fração unitária é essa?`, `${buddy} colorie une part. Quelle fraction unitaire est-ce ?`, `${buddy}涂了一份。这是几分之一？`, `${buddy} एक भाग रंगता है। यह कौन सा इकाई भिन्न है?`, `${buddy} يظلّل جزءًا واحدًا. ما كسر الوحدة؟`],
     ]),
     hint: t("One shaded part", "Una parte sombreada"),
     answer,
@@ -141,14 +141,14 @@ function makeLine(rng: Rng): ChoiceQ {
     game: "fractions",
     title: pickTalk(rng, [
       ["Which fraction is the dot?", "¿Qué fracción es el punto?"],
-      [`${buddy} stands on the line. Which fraction is the dot?`, `${buddy} está en la recta. ¿Qué fracción es el punto?`, `${buddy} está na reta. Que fração é o ponto?`, `${buddy} est sur la droite. Quelle fraction est le point ?`, `${buddy}站在数轴上。这个点是几分之几？`, `${buddy} रेखा पर खड़ा है। बिंदु कौन सा भिन्न है?`],
+      [`${buddy} stands on the line. Which fraction is the dot?`, `${buddy} está en la recta. ¿Qué fracción es el punto?`, `${buddy} está na reta. Que fração é o ponto?`, `${buddy} est sur la droite. Quelle fraction est le point ?`, `${buddy}站在数轴上。这个点是几分之几？`, `${buddy} रेखा पर खड़ा है। बिंदु कौन सा भिन्न है?`, `${buddy} يقف على الخط. أي كسر عند النقطة؟`],
     ]),
     hint: t("Read the tick under the dot", "Lee la marca debajo del punto"),
     answer,
     choices: uniqueChoices(rng, answer, notEquivalent(answer, [...ticks, "1/2", "3/4"])),
     skill: "fractions:line",
     tags: ["line"],
-    solved: t(`The dot is at ${answer}`, `El punto está en ${answer}`, `O ponto está em ${answer}`, `Le point est à ${answer}`, `点在${answer}`, `बिंदु ${answer} पर है`),
+    solved: t(`The dot is at ${answer}`, `El punto está en ${answer}`, `O ponto está em ${answer}`, `Le point est à ${answer}`, `点在${answer}`, `बिंदु ${answer} पर है`, `النقطة عند ${answer}`),
     picture: answer,
     hands: false,
     quietChoices: false,
@@ -216,11 +216,11 @@ function makeCompare(rng: Rng): ChoiceQ {
     title: askGreater
       ? pickTalk(rng, [
           ["Which shaded fraction is greater?", "¿Qué fracción sombreada es mayor?"],
-          [`${buddy} asks which shaded fraction is greater`, `${buddy} pregunta qué fracción sombreada es mayor`, `${buddy} pergunta qual fração pintada é maior`, `${buddy} demande quelle fraction coloriée est la plus grande`, `${buddy}问，涂了颜色的哪个分数更大`, `${buddy} पूछता है कौन सा रंगा भिन्न बड़ा है`],
+          [`${buddy} asks which shaded fraction is greater`, `${buddy} pregunta qué fracción sombreada es mayor`, `${buddy} pergunta qual fração pintada é maior`, `${buddy} demande quelle fraction coloriée est la plus grande`, `${buddy}问，涂了颜色的哪个分数更大`, `${buddy} पूछता है कौन सा रंगा भिन्न बड़ा है`, `${buddy} يسأل أي كسر مظلّل أكبر`],
         ])
       : pickTalk(rng, [
           ["Which shaded fraction is less?", "¿Qué fracción sombreada es menor?"],
-          [`${buddy} asks which shaded fraction is less`, `${buddy} pregunta qué fracción sombreada es menor`, `${buddy} pergunta qual fração pintada é menor`, `${buddy} demande quelle fraction coloriée est la plus petite`, `${buddy}问，涂了颜色的哪个分数更小`, `${buddy} पूछता है कौन सा रंगा भिन्न छोटा है`],
+          [`${buddy} asks which shaded fraction is less`, `${buddy} pregunta qué fracción sombreada es menor`, `${buddy} pergunta qual fração pintada é menor`, `${buddy} demande quelle fraction coloriée est la plus petite`, `${buddy}问，涂了颜色的哪个分数更小`, `${buddy} पूछता है कौन सा रंगा भिन्न छोटा है`, `${buddy} يسأل أي كسر مظلّल أصغر`],
         ]),
     hint: sameDen
       ? t("Same denominator. More parts are greater.", "El mismo denominador. Más partes es mayor.")
@@ -229,7 +229,7 @@ function makeCompare(rng: Rng): ChoiceQ {
     choices,
     skill: "fractions:compare",
     tags: ["compare"],
-    solved: askGreater ? t(`${answer} is greater`, `${answer} es mayor`, `${answer} é maior`, `${answer} est plus grand`, `${answer}更大`, `${answer} बड़ी है`) : t(`${answer} is less`, `${answer} es menor`, `${answer} é menor`, `${answer} est plus petit`, `${answer}更小`, `${answer} छोटी है`),
+    solved: askGreater ? t(`${answer} is greater`, `${answer} es mayor`, `${answer} é maior`, `${answer} est plus grand`, `${answer}更大`, `${answer} बड़ी है`, `${answer} أكبر`) : t(`${answer} is less`, `${answer} es menor`, `${answer} é menor`, `${answer} est plus petit`, `${answer}更小`, `${answer} छोटी है`, `${answer} أصغر`),
     picture: `${left} ${right}`,
     hands: false,
     quietChoices: false,
@@ -248,8 +248,8 @@ function makeEquivalent(rng: Rng): ChoiceQ {
   return sceneQuestion(rng, {
     game: "fractions",
     title: pickTalk(rng, [
-[`Which fraction matches ${shown}?`, `¿Qué fracción es igual a ${shown}?`, `Qual fração é igual a ${shown}?`, `Quelle fraction est égale à ${shown} ?`, `哪个分数和${shown}一样？`, `कौन सा भिन्न ${shown} से मेल खाता है?`],
-          [`${buddy} has ${shown}. Which fraction matches?`, `${buddy} tiene ${shown}. ¿Qué fracción es igual?`, `${buddy} tem ${shown}. Qual fração é igual?`, `${buddy} a ${shown}. Quelle fraction est égale ?`, `${buddy}有${shown}。哪个分数和它一样？`, `${buddy} के पास ${shown} है। कौन सा भिन्न मेल खाता है?`],
+[`Which fraction matches ${shown}?`, `¿Qué fracción es igual a ${shown}?`, `Qual fração é igual a ${shown}?`, `Quelle fraction est égale à ${shown} ?`, `哪个分数和${shown}一样？`, `कौन सा भिन्न ${shown} से मेल खाता है?`, `أي كسر يساوي ${shown}؟`],
+          [`${buddy} has ${shown}. Which fraction matches?`, `${buddy} tiene ${shown}. ¿Qué fracción es igual?`, `${buddy} tem ${shown}. Qual fração é igual?`, `${buddy} a ${shown}. Quelle fraction est égale ?`, `${buddy}有${shown}。哪个分数和它一样？`, `${buddy} के पास ${shown} है। कौन सा भिन्न मेल खाता है?`, `${buddy} لديه ${shown}. أي كسر يساويه؟`],
     ]),
     hint: t("Same amount, different parts", "La misma cantidad, en partes distintas"),
     answer,
@@ -260,7 +260,7 @@ function makeEquivalent(rng: Rng): ChoiceQ {
     ),
     skill: "fractions:equivalent",
     tags: ["equivalent"],
-    solved: t(`${num}/${den} = ${answer}`, `${num}/${den} = ${answer}`, `${num}/${den} = ${answer}`, `${num}/${den} = ${answer}`, `${num}/${den} = ${answer}`, `${num}/${den} = ${answer}`),
+    solved: t(`${num}/${den} = ${answer}`, `${num}/${den} = ${answer}`, `${num}/${den} = ${answer}`, `${num}/${den} = ${answer}`, `${num}/${den} = ${answer}`, `${num}/${den} = ${answer}`, `${num}/${den} = ${answer}`),
     picture: `${num}/${den}`,
     hands: false,
     quietChoices: false,
@@ -279,8 +279,8 @@ function makeShade(rng: Rng): ChoiceQ {
   return sceneQuestion(rng, {
     game: "fractions",
     title: pickTalk(rng, [
-      [`Shade ${num} of the ${den} parts`, `Sombrea ${num} de las ${den} partes`, `Pinte ${num} das ${den} partes`, `Colorie ${num} des ${den} parts`, `把${den}份里的${num}份涂上颜色`, `${den} भागों में से ${num} रंगो`],
-      [`${buddy} says shade ${num} of the ${den} parts`, `${buddy} dice que sombrees ${num} de las ${den} partes`, `${buddy} diz para pintar ${num} das ${den} partes`, `${buddy} dit de colorier ${num} des ${den} parts`, `${buddy}说，把${den}份里的${num}份涂上颜色`, `${buddy} कहता है ${den} भागों में से ${num} रंगो`],
+      [`Shade ${num} of the ${den} parts`, `Sombrea ${num} de las ${den} partes`, `Pinte ${num} das ${den} partes`, `Colorie ${num} des ${den} parts`, `把${den}份里的${num}份涂上颜色`, `${den} भागों में से ${num} रंगो`, `ظلّل ${num} من ${den} أجزاء`],
+      [`${buddy} says shade ${num} of the ${den} parts`, `${buddy} dice que sombrees ${num} de las ${den} partes`, `${buddy} diz para pintar ${num} das ${den} partes`, `${buddy} dit de colorier ${num} des ${den} parts`, `${buddy}说，把${den}份里的${num}份涂上颜色`, `${buddy} कहता है ${den} भागों में से ${num} रंगो`, `${buddy} يقول ظلّل ${num} من ${den} أجزاء`],
     ]),
     hint: t("Tap a part to shade it", "Toca una parte para sombrearla"),
     answer,
@@ -330,14 +330,14 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const den = rng.pick([2, 4]);
       const num = rng.int(1, den);
       return {
-        prompt: t(`${num} of ${den} equal parts are shaded. What fraction?`, `${num} de ${den} partes iguales están sombreadas. ¿Qué fracción es?`, `${num} de ${den} partes iguais estão pintadas. Que fração é?`, `${num} des ${den} parts égales sont coloriées. Quelle fraction est-ce ?`, `${den}等份里涂了${num}份。是几分之几？`, `${den} बराबर भागों में से ${num} रंगे हैं। कौन सा भिन्न है?`),
+        prompt: t(`${num} of ${den} equal parts are shaded. What fraction?`, `${num} de ${den} partes iguales están sombreadas. ¿Qué fracción es?`, `${num} de ${den} partes iguais estão pintadas. Que fração é?`, `${num} des ${den} parts égales sont coloriées. Quelle fraction est-ce ?`, `${den}等份里涂了${num}份。是几分之几？`, `${den} बराबर भागों में से ${num} रंगे हैं। कौन सा भिन्न है?`, `${num} من ${den} أجزاء متساوية مظلّلة. ما الكسر؟`),
         answer: `${num}/${den}`,
       };
     }
     case "unit": {
       const den = rng.pick([2, 3, 4]);
       return {
-        prompt: t(`1 of ${den} equal parts is shaded. What unit fraction?`, `1 de ${den} partes iguales está sombreada. ¿Qué fracción unitaria es?`, `1 de ${den} partes iguais está pintada. Que fração unitária é?`, `1 des ${den} parts égales est coloriée. Quelle fraction unitaire est-ce ?`, `${den}等份里涂了1份。是几分之一？`, `${den} बराबर भागों में से 1 रंगा है। कौन सा इकाई भिन्न है?`),
+        prompt: t(`1 of ${den} equal parts is shaded. What unit fraction?`, `1 de ${den} partes iguales está sombreada. ¿Qué fracción unitaria es?`, `1 de ${den} partes iguais está pintada. Que fração unitária é?`, `1 des ${den} parts égales est coloriée. Quelle fraction unitaire est-ce ?`, `${den}等份里涂了1份。是几分之一？`, `${den} बराबर भागों में से 1 रंगा है। कौन सा इकाई भिन्न है?`, `1 من ${den} أجزاء متساوية مظلّل. ما كسر الوحدة؟`),
         answer: `1/${den}`,
       };
     }
@@ -348,7 +348,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         prompt: t(
           `A number line from 0 to 1 has ${den} equal jumps. The dot is on jump ${num}. What fraction?`,
           `Una recta del 0 al 1 tiene ${den} saltos iguales. El punto está en el salto ${num}. ¿Qué fracción es?`, `Uma reta do 0 ao 1 tem ${den} saltos iguais. O ponto está no salto ${num}. Que fração é?`,
-        `Une droite numérique de 0 à 1 a ${den} sauts égaux. Le point est sur le saut ${num}. Quelle fraction est-ce ?`, `数轴从0到1，平均分成${den}段。点在第${num}段。是几分之几？`, `0 से 1 तक की संख्या रेखा पर ${den} बराबर छलांग हैं। बिंदु छलांग ${num} पर है। कौन सा भिन्न है?`),
+        `Une droite numérique de 0 à 1 a ${den} sauts égaux. Le point est sur le saut ${num}. Quelle fraction est-ce ?`, `数轴从0到1，平均分成${den}段。点在第${num}段。是几分之几？`, `0 से 1 तक की संख्या रेखा पर ${den} बराबर छलांग हैं। बिंदु छलांग ${num} पर है। कौन सा भिन्न है?`, `خط أعداد من 0 إلى 1 فيه ${den} قفزات متساوية. النقطة على القفزة ${num}. ما الكسر؟`),
         answer: fractionText(num, den),
       };
     }
@@ -359,14 +359,14 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       if (num2 === num) num2 = num === 1 ? 2 : num - 1;
       const greater = num > num2 ? `${num}/${den}` : `${num2}/${den}`;
       return {
-        prompt: t(`Which is greater, ${num}/${den} or ${num2}/${den}?`, `¿Cuál es mayor, ${num}/${den} o ${num2}/${den}?`, `Qual é maior, ${num}/${den} ou ${num2}/${den}?`, `Laquelle est la plus grande, ${num}/${den} ou ${num2}/${den} ?`, `${num}/${den}和${num2}/${den}，哪个更大？`, `${num}/${den} या ${num2}/${den} में से कौन बड़ा है?`),
+        prompt: t(`Which is greater, ${num}/${den} or ${num2}/${den}?`, `¿Cuál es mayor, ${num}/${den} o ${num2}/${den}?`, `Qual é maior, ${num}/${den} ou ${num2}/${den}?`, `Laquelle est la plus grande, ${num}/${den} ou ${num2}/${den} ?`, `${num}/${den}和${num2}/${den}，哪个更大？`, `${num}/${den} या ${num2}/${den} में से कौन बड़ा है?`, `أيهما أكبر، ${num}/${den} أم ${num2}/${den}؟`),
         answer: greater,
       };
     }
     case "equivalent": {
       const pair = rng.pick(PAIRS);
       return {
-        prompt: t(`Which fraction matches ${pair[0]}/${pair[1]}?`, `¿Qué fracción es igual a ${pair[0]}/${pair[1]}?`, `Que fração é igual a ${pair[0]}/${pair[1]}?`, `Quelle fraction est égale à ${pair[0]}/${pair[1]} ?`, `哪个分数和${pair[0]}/${pair[1]}一样？`, `कौन सा भिन्न ${pair[0]}/${pair[1]} से मेल खाता है?`),
+        prompt: t(`Which fraction matches ${pair[0]}/${pair[1]}?`, `¿Qué fracción es igual a ${pair[0]}/${pair[1]}?`, `Que fração é igual a ${pair[0]}/${pair[1]}?`, `Quelle fraction est égale à ${pair[0]}/${pair[1]} ?`, `哪个分数和${pair[0]}/${pair[1]}一样？`, `कौन सा भिन्न ${pair[0]}/${pair[1]} से मेल खाता है?`, `أي كسر يساوي ${pair[0]}/${pair[1]}؟`),
         answer: `${pair[2]}/${pair[3]}`,
       };
     }
