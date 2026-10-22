@@ -26,14 +26,14 @@ export function findBlurb(id: string, games: readonly { id: string; title: strin
   const index = (SQUAD_IDS as readonly string[]).indexOf(id);
   if (index >= 0 && index < 3) return { kind: "starter", text: t("Pick this buddy when you start.", "Elige este amigo al empezar.") };
   const hostGame = games.find((game) => hostIdFor(game.id, games) === id);
-  if (hostGame) return { kind: "boss", text: t(`Beat the ${hostGame.title} boss.`, `Vence al jefe de ${show(hostGame.title)}.`, `Vença o chefe de ${show(hostGame.title)}.`, `Bats le chef de ${show(hostGame.title)}.`, `打败${show(hostGame.title)}的首领。`) };
+  if (hostGame) return { kind: "boss", text: t(`Beat the ${hostGame.title} boss.`, `Vence al jefe de ${show(hostGame.title)}.`, `Vença o chefe de ${show(hostGame.title)}.`, `Bats le chef de ${show(hostGame.title)}.`, `打败${show(hostGame.title)}的首领。`, `${show(hostGame.title)} बॉस को हराओ।`) };
   if ((EGG_IDS as readonly string[]).includes(id)) return { kind: "egg", text: t("Hatch the island egg.", "Abre el huevo de la isla.") };
   const studied = studyGame(id);
   if (studied) {
     const title = games.find((game) => game.id === studied)?.title ?? "a game";
-    return { kind: "study", text: t(`Earn 3 stars in ${title}.`, `Gana 3 estrellas en ${show(title)}.`, `Ganhe 3 estrelas em ${show(title)}.`, `Gagne 3 étoiles dans ${show(title)}.`, `在${show(title)}里得到3颗星。`) };
+    return { kind: "study", text: t(`Earn 3 stars in ${title}.`, `Gana 3 estrellas en ${show(title)}.`, `Ganhe 3 estrelas em ${show(title)}.`, `Gagne 3 étoiles dans ${show(title)}.`, `在${show(title)}里得到3颗星。`, `${show(title)} में 3 सितारे कमाओ।`) };
   }
-  if (index >= 0) return { kind: "stars", text: t(`Earn ${starsNeeded(index)} stars.`, `Gana ${starsNeeded(index)} estrellas.`, `Ganhe ${starsNeeded(index)} estrelas.`, `Gagne ${starsNeeded(index)} étoiles.`, `得到${starsNeeded(index)}颗星。`) };
+  if (index >= 0) return { kind: "stars", text: t(`Earn ${starsNeeded(index)} stars.`, `Gana ${starsNeeded(index)} estrellas.`, `Ganhe ${starsNeeded(index)} estrelas.`, `Gagne ${starsNeeded(index)} étoiles.`, `得到${starsNeeded(index)}颗星。`, `${starsNeeded(index)} सितारे कमाओ।`) };
   return { kind: "egg", text: t("Hatch the island egg.", "Abre el huevo de la isla.") };
 }
 

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { show } from "../i18n";
+import { partPhrase, shapeWord, show, t } from "../i18n";
 import type { ShapeName, VariableBoard } from "../games/boards";
 import { GeoMark, ShapeFig } from "../games/scene-ui";
 import { VariableEquation } from "../games/variables";
@@ -22,6 +22,14 @@ const SHAPE_NAMES: readonly ShapeName[] = [
 
 function isShapeName(value: string): value is ShapeName {
   return (SHAPE_NAMES as readonly string[]).includes(value);
+}
+
+function pieceLabel(name: string): string {
+  const shape = shapeWord(name);
+  if (shape !== name) return shape;
+  const part = partPhrase(name);
+  if (part !== name) return part;
+  return name;
 }
 
 function Units({ n, emoji }: { n: number; emoji?: string }) {
@@ -189,7 +197,7 @@ function PickShape({ task, onAnswer }: { task: ShapeTask; onAnswer: (ok: boolean
       <div ref={wellRef} className="ac-tray ac-shape-well" aria-label={task.speech}>
         {task.prompt.startsWith("geo:") ? <GeoMark code={task.prompt} /> : task.prompt ? <p className="ac-shape-prompt">{task.prompt}</p> : null}
         {placed ? (
-          <button type="button" className="ac-shape-drag is-in ac-placed" aria-label={`Remove ${placed}`} onClick={() => setPlaced(null)}>
+          <button type="button" className="ac-shape-drag is-in ac-placed" aria-label={t(`Remove ${placed}`, `Quita ${placed}`, `Tire ${placed}`, `Enlève ${placed}`, `拿走${placed}`, `${pieceLabel(placed)} हटाओ`)} onClick={() => setPlaced(null)}>
             <span className="ac-mini-shape">
               <ShapeTile name={placed} part={part} />
             </span>
@@ -202,7 +210,7 @@ function PickShape({ task, onAnswer }: { task: ShapeTask; onAnswer: (ok: boolean
         {task.options
           .filter((name) => name !== placed)
           .map((name) => (
-            <button key={name} type="button" className="ac-shape-drag" data-piece={name} aria-label={name} {...pointerProps(name)}>
+            <button key={name} type="button" className="ac-shape-drag" data-piece={name} aria-label={pieceLabel(name)} {...pointerProps(name)}>
               <span className="ac-mini-shape">
                 <ShapeTile name={name} part={part} />
               </span>
@@ -234,7 +242,7 @@ function JoinShapes({ task, onAnswer }: { task: ShapeTask; onAnswer: (ok: boolea
       <div ref={wellRef} className="ac-tray ac-shape-well" aria-label={show("Drag the shape")}>
         {placed.length === 0 ? <span className="ac-tray-empty">{show("Drag the shape")}</span> : null}
         {placed.map((name) => (
-          <button key={name} type="button" className="ac-shape-drag is-in ac-placed" aria-label={`Remove ${name}`} onClick={() => setPlaced((current) => current.filter((item) => item !== name))}>
+          <button key={name} type="button" className="ac-shape-drag is-in ac-placed" aria-label={t(`Remove ${name}`, `Quita ${name}`, `Tire ${name}`, `Enlève ${name}`, `拿走${name}`, `${pieceLabel(name)} हटाओ`)} onClick={() => setPlaced((current) => current.filter((item) => item !== name))}>
             <span className="ac-mini-shape">
               <ShapeTile name={name} part={false} />
             </span>
@@ -245,7 +253,7 @@ function JoinShapes({ task, onAnswer }: { task: ShapeTask; onAnswer: (ok: boolea
         {task.options
           .filter((name) => !placed.includes(name))
           .map((name) => (
-            <button key={name} type="button" className="ac-shape-drag" data-piece={name} aria-label={name} {...pointerProps(name)}>
+            <button key={name} type="button" className="ac-shape-drag" data-piece={name} aria-label={pieceLabel(name)} {...pointerProps(name)}>
               <span className="ac-mini-shape">
                 <ShapeTile name={name} part={false} />
               </span>
@@ -286,7 +294,7 @@ function GridCount({ task, onAnswer }: { task: ShapeTask; onAnswer: (ok: boolean
         {task.options
           .filter((name) => name !== placed)
           .map((name) => (
-            <button key={name} type="button" className="ac-shape-drag" data-piece={name} aria-label={name} {...pointerProps(name)}>
+            <button key={name} type="button" className="ac-shape-drag" data-piece={name} aria-label={pieceLabel(name)} {...pointerProps(name)}>
               <span className="ac-num-tile">{name}</span>
             </button>
           ))}

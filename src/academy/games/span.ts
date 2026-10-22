@@ -64,7 +64,7 @@ export function makeColorQuestion(rng: Rng): ChoiceQ {
   const word = colorWord(color);
   return sceneQuestion(rng, {
     game: "shapes",
-    title: t(`Which one is ${word}?`, `¿Cuál es ${word}?`, `Qual é ${word}?`, `Lequel est ${word} ?`, `哪个是${word}？`),
+    title: t(`Which one is ${word}?`, `¿Cuál es ${word}?`, `Qual é ${word}?`, `Lequel est ${word} ?`, `哪个是${word}？`, `कौन ${word} है?`),
     hint: t("Look at the colors", "Mira los colores"),
     answer: color,
     choices: rng.shuffle([...COLORS]),
@@ -120,7 +120,7 @@ export function makePatternQuestion(rng: Rng): ChoiceQ {
   const said = shown.map((color) => colorWord(color)).join(", ");
   return sceneQuestion(rng, {
     game: "shapes",
-    title: t(`${said}. What comes next?`, `${said}. ¿Qué sigue?`, `${said}. O que vem depois?`, `${said}. Qu'est-ce qui vient après ?`, `${said}。接下来是什么？`),
+    title: t(`${said}. What comes next?`, `${said}. ¿Qué sigue?`, `${said}. O que vem depois?`, `${said}. Qu'est-ce qui vient après ?`, `${said}。接下来是什么？`, `${said}। आगे क्या आता है?`),
     hint: t("Say the pattern", "Di el patrón"),
     answer: next,
     choices: rng.shuffle([...COLORS]),
@@ -152,7 +152,7 @@ export function makeAngleQuestion(rng: Rng): ChoiceQ {
       choices: uniqueChoices(rng, String(answer), ["45", "90", "180", "360"]),
       skill: "shapes:angles",
       tags: ["angles"],
-      solved: t(`${answer} degrees`, `${answer} grados`, `${answer} graus`, `${answer} degrés`, `${answer}度`),
+      solved: t(`${answer} degrees`, `${answer} grados`, `${answer} graus`, `${answer} degrés`, `${answer}度`, `${answer} अंश`),
       picture: kind,
       hands: false,
       quietChoices: false,
@@ -213,11 +213,11 @@ export function makeAreaQuestion(rng: Rng, mode: "area" | "perimeter"): ChoiceQ 
   const board: MeasureBoard = { game: "measure", mode, length, width };
   const title =
     mode === "area"
-      ? t(`A rectangle is ${length} by ${width}. What is the area?`, `Un rectángulo mide ${length} por ${width}. ¿Cuál es el área?`, `Um retângulo mede ${length} vezes ${width}. Qual é a área?`, `Un rectangle mesure ${length} fois ${width}. Quelle est l'aire ?`, `长方形的长是${length}，宽是${width}。面积是多少？`)
+      ? t(`A rectangle is ${length} by ${width}. What is the area?`, `Un rectángulo mide ${length} por ${width}. ¿Cuál es el área?`, `Um retângulo mede ${length} vezes ${width}. Qual é a área?`, `Un rectangle mesure ${length} fois ${width}. Quelle est l'aire ?`, `长方形的长是${length}，宽是${width}。面积是多少？`, `एक आयत ${length} गुणा ${width} है। क्षेत्रफल क्या है?`)
       : t(
           `A rectangle is ${length} by ${width}. What is the perimeter?`,
           `Un rectángulo mide ${length} por ${width}. ¿Cuál es el perímetro?`, `Um retângulo mede ${length} vezes ${width}. Qual é o perímetro?`,
-        `Un rectangle mesure ${length} fois ${width}. Quel est le périmètre ?`, `长方形的长是${length}，宽是${width}。周长是多少？`);
+        `Un rectangle mesure ${length} fois ${width}. Quel est le périmètre ?`, `长方形的长是${length}，宽是${width}。周长是多少？`, `एक आयत ${length} गुणा ${width} है। परिमाप क्या है?`);
   return sceneQuestion(rng, {
     game: "measure",
     title,
@@ -229,7 +229,7 @@ export function makeAreaQuestion(rng: Rng, mode: "area" | "perimeter"): ChoiceQ 
     choices: nearChoices(rng, answer, 1, 200, [length * width, 2 * (length + width), length + width, length * 2]),
     skill: `measure:${mode}`,
     tags: [mode],
-    solved: mode === "area" ? t(`${answer} square units`, `${answer} unidades cuadradas`, `${answer} unidades quadradas`, `${answer} unités carrées`, `${answer}平方单位`) : t(`${answer} units`, `${answer} unidades`, `${answer} unidades`, `${answer} unités`, `${answer}单位`),
+    solved: mode === "area" ? t(`${answer} square units`, `${answer} unidades cuadradas`, `${answer} unidades quadradas`, `${answer} unités carrées`, `${answer}平方单位`, `${answer} वर्ग इकाई`) : t(`${answer} units`, `${answer} unidades`, `${answer} unidades`, `${answer} unités`, `${answer}单位`, `${answer} इकाई`),
     picture: `${length}x${width}`,
     hands: false,
     quietChoices: false,
@@ -246,7 +246,7 @@ export function makeLetterQuestion(rng: Rng): ChoiceQ {
   const board: PhonicsBoard = { game: "phonics", mode: "letters", letter };
   return sceneQuestion(rng, {
     game: "phonics",
-    title: t(`Tap the letter ${letter}`, `Toca la letra ${letter}`, `Toque a letra ${letter}`, `Touche la lettre ${letter}`, `点一点字母${letter}`),
+    title: t(`Tap the letter ${letter}`, `Toca la letra ${letter}`, `Toque a letra ${letter}`, `Touche la lettre ${letter}`, `点一点字母${letter}`, `अक्षर ${letter} पर टैप करो`),
     hint: t("Listen for the letter name", "Escucha el nombre de la letra"),
     answer: letter,
     choices: rng.shuffle([letter, ...decoys]),
@@ -281,7 +281,7 @@ export function makeBigPlaceQuestion(rng: Rng): ChoiceQ {
   const distractors = [value * 10, Math.floor(value / 10), digit, place, n].filter((item) => item !== value && item <= 1000000);
   return sceneQuestion(rng, {
     game: "place",
-    title: t(`What is the value of the ${digit} in ${n}?`, `¿Cuál es el valor del ${digit} en ${n}?`, `Qual é o valor do ${digit} em ${n}?`, `Quelle est la valeur du ${digit} dans ${n} ?`, `${n}里面的${digit}表示多少？`),
+    title: t(`What is the value of the ${digit} in ${n}?`, `¿Cuál es el valor del ${digit} en ${n}?`, `Qual é o valor do ${digit} em ${n}?`, `Quelle est la valeur du ${digit} dans ${n} ?`, `${n}里面的${digit}表示多少？`, `${n} में ${digit} का मान क्या है?`),
     hint: t("The place tells the value", "El lugar dice el valor"),
     answer: String(value),
     choices: nearChoices(rng, value, 0, 1000000, distractors),
@@ -314,7 +314,7 @@ export function makeRoundBigQuestion(rng: Rng): ChoiceQ {
         : t("hundred thousand", "centena de millar");
   return sceneQuestion(rng, {
     game: "place",
-    title: t(`Round ${n} to the nearest ${placeName}`, `Redondea ${n} al ${placeName} más cercano`, `Arredonde ${n} para o ${placeName} mais próximo`, `Arrondis ${n} au plus proche ${placeName}`, `把${n}四舍五入到最近的${placeName}`),
+    title: t(`Round ${n} to the nearest ${placeName}`, `Redondea ${n} al ${placeName} más cercano`, `Arredonde ${n} para o ${placeName} mais próximo`, `Arrondis ${n} au plus proche ${placeName}`, `把${n}四舍五入到最近的${placeName}`, `${n} को निकटतम ${placeName} तक पूर्णांक बनाओ`),
     hint: t("Look at the digit to the right. 5 or more rounds up.", "Mira el dígito de la derecha. 5 o más, sube."),
     answer: String(answer),
     choices: nearChoices(rng, answer, 0, 1000000, [answer + place, Math.max(0, answer - place), n, roundToPlace(n, place === 1000 ? 10000 : 1000)]),
@@ -352,7 +352,7 @@ export function makeAddLikeQuestion(rng: Rng): ChoiceQ {
   for (let n = 0; n <= den; n += 1) sameSize.push(`${n}/${den}`);
   return sceneQuestion(rng, {
     game: "fractions",
-    title: t(`What is ${num}/${den} ${sign} ${num2}/${den}?`, `¿Cuánto es ${num}/${den} ${sign} ${num2}/${den}?`, `Quanto é ${num}/${den} ${sign} ${num2}/${den}?`, `Combien font ${num}/${den} ${sign} ${num2}/${den} ?`, `${num}/${den} ${sign} ${num2}/${den}是多少？`),
+    title: t(`What is ${num}/${den} ${sign} ${num2}/${den}?`, `¿Cuánto es ${num}/${den} ${sign} ${num2}/${den}?`, `Quanto é ${num}/${den} ${sign} ${num2}/${den}?`, `Combien font ${num}/${den} ${sign} ${num2}/${den} ?`, `${num}/${den} ${sign} ${num2}/${den}是多少？`, `${num}/${den} ${sign} ${num2}/${den} कितना है?`),
     hint: t("The parts are the same size. Add or subtract the top numbers.", "Las partes son del mismo tamaño. Suma o resta los números de arriba."),
     answer,
     choices: uniqueChoices(rng, answer, [...sameSize, "1/2", "1/3", "1/4", "3/4", "2/3", "1/8", "3/8", "5/8"]),
@@ -379,11 +379,11 @@ function decimalSay(text: string): string {
   const tenths = Number(match[2]);
   const hundredths = Number(match[3]);
   const places = tenths * 10 + hundredths;
-  if (places === 0) return t(whole === 1 ? "one whole" : `${whole} wholes`, whole === 1 ? "un entero" : `${whole} enteros`, whole === 1 ? "um inteiro" : `${whole} inteiros`, whole === 1 ? "un entier" : `${whole} entiers`, whole === 1 ? "一整个" : `${whole}个整份`);
-  if (whole === 0 && hundredths === 0) return t(`${tenths} tenths`, `${tenths} décimos`, `${tenths} décimos`, `${tenths} dixièmes`, `${tenths}个十分之一`);
-  if (whole === 0) return t(`${places} hundredths`, `${places} centésimos`, `${places} centésimos`, `${places} centièmes`, `${places}个百分之一`);
-  if (hundredths === 0) return t(`${whole} and ${tenths} tenths`, `${whole} y ${tenths} décimos`, `${whole} e ${tenths} décimos`, `${whole} et ${tenths} dixièmes`, `${whole}又${tenths}个十分之一`);
-  return t(`${whole} and ${places} hundredths`, `${whole} y ${places} centésimos`, `${whole} e ${places} centésimos`, `${whole} et ${places} centièmes`, `${whole}又${places}个百分之一`);
+  if (places === 0) return t(whole === 1 ? "one whole" : `${whole} wholes`, whole === 1 ? "un entero" : `${whole} enteros`, whole === 1 ? "um inteiro" : `${whole} inteiros`, whole === 1 ? "un entier" : `${whole} entiers`, whole === 1 ? "一整个" : `${whole}个整份`, whole === 1 ? "एक पूरा" : `${whole} पूरे`);
+  if (whole === 0 && hundredths === 0) return t(`${tenths} tenths`, `${tenths} décimos`, `${tenths} décimos`, `${tenths} dixièmes`, `${tenths}个十分之一`, `${tenths} दशांश`);
+  if (whole === 0) return t(`${places} hundredths`, `${places} centésimos`, `${places} centésimos`, `${places} centièmes`, `${places}个百分之一`, `${places} शतांश`);
+  if (hundredths === 0) return t(`${whole} and ${tenths} tenths`, `${whole} y ${tenths} décimos`, `${whole} e ${tenths} décimos`, `${whole} et ${tenths} dixièmes`, `${whole}又${tenths}个十分之一`, `${whole} और ${tenths} दशांश`);
+  return t(`${whole} and ${places} hundredths`, `${whole} y ${places} centésimos`, `${whole} e ${places} centésimos`, `${whole} et ${places} centièmes`, `${whole}又${places}个百分之一`, `${whole} और ${places} शतांश`);
 }
 
 function decimalChoices(rng: Rng, answer: string, seeds: readonly string[]): string[] {
@@ -408,8 +408,8 @@ export function makeDecimalQuestion(rng: Rng): ChoiceQ {
     const board: FractionBoard = { game: "fractions", mode: "decimals", whole: 0, tenths, hundredths, ask: "write" };
     const said =
       hundredths === 0
-        ? t(`${tenths} tenths`, `${tenths} décimos`, `${tenths} décimos`, `${tenths} dixièmes`, `${tenths}个十分之一`)
-        : t(`${tenths * 10 + hundredths} hundredths`, `${tenths * 10 + hundredths} centésimos`, `${tenths * 10 + hundredths} centésimos`, `${tenths * 10 + hundredths} centièmes`, `${tenths * 10 + hundredths}个百分之一`);
+        ? t(`${tenths} tenths`, `${tenths} décimos`, `${tenths} décimos`, `${tenths} dixièmes`, `${tenths}个十分之一`, `${tenths} दशांश`)
+        : t(`${tenths * 10 + hundredths} hundredths`, `${tenths * 10 + hundredths} centésimos`, `${tenths * 10 + hundredths} centésimos`, `${tenths * 10 + hundredths} centièmes`, `${tenths * 10 + hundredths}个百分之一`, `${tenths * 10 + hundredths} शतांश`);
     const wrongs = [
       decimalText(0, tenths, hundredths === 0 ? 1 : 0),
       decimalText(tenths, hundredths, 0),
@@ -419,7 +419,7 @@ export function makeDecimalQuestion(rng: Rng): ChoiceQ {
     const choices = decimalChoices(rng, answer, wrongs);
     return sceneQuestion(rng, {
       game: "fractions",
-      title: t(`Which decimal shows ${said}?`, `¿Qué decimal muestra ${said}?`, `Que decimal mostra ${said}?`, `Quel décimal montre ${said} ?`, `哪个小数表示${said}？`),
+      title: t(`Which decimal shows ${said}?`, `¿Qué decimal muestra ${said}?`, `Que decimal mostra ${said}?`, `Quel décimal montre ${said} ?`, `哪个小数表示${said}？`, `कौन सा दशमलव ${said} दिखाता है?`),
       hint: t("Tenths are the first place. Hundredths are the second.", "Los décimos son el primer lugar. Los centésimos son el segundo."),
       answer,
       choices,
@@ -460,13 +460,13 @@ export function makeDecimalQuestion(rng: Rng): ChoiceQ {
     title: t(
       `Which is greater, ${left} hundredths or ${right} hundredths?`,
       `¿Cuál es mayor, ${left} centésimos o ${right} centésimos?`, `Qual é maior, ${left} centésimos ou ${right} centésimos?`,
-    `Lequel est le plus grand, ${left} centièmes ou ${right} centièmes ?`, `${left}个百分之一和${right}个百分之一，哪个更大？`),
+    `Lequel est le plus grand, ${left} centièmes ou ${right} centièmes ?`, `${left}个百分之一和${right}个百分之一，哪个更大？`, `${left} शतांश या ${right} शतांश में से कौन बड़ा है?`),
     hint: t("Compare tenths first", "Compara primero los décimos"),
     answer,
     choices,
     skill: "fractions:decimals",
     tags: ["decimals"],
-    solved: t(`${greaterLeft ? left : right} hundredths`, `${greaterLeft ? left : right} centésimos`, `${greaterLeft ? left : right} centésimos`, `${greaterLeft ? left : right} centièmes`, `${greaterLeft ? left : right}个百分之一`),
+    solved: t(`${greaterLeft ? left : right} hundredths`, `${greaterLeft ? left : right} centésimos`, `${greaterLeft ? left : right} centésimos`, `${greaterLeft ? left : right} centièmes`, `${greaterLeft ? left : right}个百分之一`, `${greaterLeft ? left : right} शतांश`),
     picture: answer,
     hands: false,
     quietChoices: false,
@@ -502,10 +502,10 @@ export function makeElapsedQuestion(rng: Rng): ChoiceQ {
     title: t(
       `${who} starts at ${start}. It lasts ${delta} minutes. What time is it then?`,
       `${who} empieza a las ${start}. Dura ${delta} minutos. ¿Qué hora es entonces?`, `${who} começa às ${start}. Dura ${delta} minutos. Que horas são então?`,
-    `${who} commence à ${start}. Ça dure ${delta} minutes. Quelle heure est-il ensuite ?`, `${who}从${start}开始。过了${delta}分钟。那时是几点？`),
+    `${who} commence à ${start}. Ça dure ${delta} minutes. Quelle heure est-il ensuite ?`, `${who}从${start}开始。过了${delta}分钟。那时是几点？`, `${who} ${start} पर शुरू होता है। यह ${delta} मिनट चलता है। तब क्या समय होगा?`),
     hint: t("Count the minutes past the hour", "Cuenta los minutos después de la hora"),
-    praise: t(`Yes! ${answer}`, `¡Sí! ${answer}`, `Sim! ${answer}`, `Oui ! ${answer}`, `对！${answer}`),
-    almost: t(`Almost! ${answer}`, `¡Casi! ${answer}`, `Quase! ${answer}`, `Presque ! ${answer}`, `差一点！${answer}`),
+    praise: t(`Yes! ${answer}`, `¡Sí! ${answer}`, `Sim! ${answer}`, `Oui ! ${answer}`, `对！${answer}`, `हाँ! ${answer}`),
+    almost: t(`Almost! ${answer}`, `¡Casi! ${answer}`, `Quase! ${answer}`, `Presque ! ${answer}`, `差一点！${answer}`, `लगभग! ${answer}`),
     answer,
     choices: uniqueChoices(rng, answer, wrong),
     skill: "time:elapsed",
@@ -534,15 +534,15 @@ export function makeSpendQuestion(rng: Rng): ChoiceQ {
   const b = formatCents(second);
   const pay = formatCents(paid);
   const title = change
-    ? t(`A snack is ${a} and a drink is ${b}. You pay ${pay}. How much change?`, `Una merienda cuesta ${a} y un jugo cuesta ${b}. Pagas ${pay}. ¿Cuánto de cambio?`, `Um lanche custa ${a} e um suco custa ${b}. Você paga ${pay}. Quanto de troco?`, `Un goûter coûte ${a} et une boisson coûte ${b}. Tu paies ${pay}. Combien de monnaie ?`, `点心是${a}，饮料是${b}。你付了${pay}。要找回多少钱？`)
-    : t(`A snack is ${a} and a drink is ${b}. How much altogether?`, `Una merienda cuesta ${a} y un jugo cuesta ${b}. ¿Cuánto es en total?`, `Um lanche custa ${a} e um suco custa ${b}. Quanto é ao todo?`, `Un goûter coûte ${a} et une boisson coûte ${b}. Combien en tout ?`, `点心是${a}，饮料是${b}。一共多少钱？`);
+    ? t(`A snack is ${a} and a drink is ${b}. You pay ${pay}. How much change?`, `Una merienda cuesta ${a} y un jugo cuesta ${b}. Pagas ${pay}. ¿Cuánto de cambio?`, `Um lanche custa ${a} e um suco custa ${b}. Você paga ${pay}. Quanto de troco?`, `Un goûter coûte ${a} et une boisson coûte ${b}. Tu paies ${pay}. Combien de monnaie ?`, `点心是${a}，饮料是${b}。你付了${pay}。要找回多少钱？`, `नाश्ता ${a} का है और पेय ${b} का। तुम ${pay} देते हो। कितने पैसे वापस?`)
+    : t(`A snack is ${a} and a drink is ${b}. How much altogether?`, `Una merienda cuesta ${a} y un jugo cuesta ${b}. ¿Cuánto es en total?`, `Um lanche custa ${a} e um suco custa ${b}. Quanto é ao todo?`, `Un goûter coûte ${a} et une boisson coûte ${b}. Combien en tout ?`, `点心是${a}，饮料是${b}。一共多少钱？`, `नाश्ता ${a} का है और पेय ${b} का। कुल कितना?`);
   return {
     id: qid(rng),
     game: "money",
     title,
     hint: change ? t("Add the prices, then subtract from what you pay", "Suma los precios y réstalos de lo que pagas") : t("Add the two prices", "Suma los dos precios"),
-    praise: t(`Yes! ${formatCents(answer)}`, `¡Sí! ${formatCents(answer)}`, `Sim! ${formatCents(answer)}`, `Oui ! ${formatCents(answer)}`, `对！${formatCents(answer)}`),
-    almost: t(`Almost! ${formatCents(answer)}`, `¡Casi! ${formatCents(answer)}`, `Quase! ${formatCents(answer)}`, `Presque ! ${formatCents(answer)}`, `差一点！${formatCents(answer)}`),
+    praise: t(`Yes! ${formatCents(answer)}`, `¡Sí! ${formatCents(answer)}`, `Sim! ${formatCents(answer)}`, `Oui ! ${formatCents(answer)}`, `对！${formatCents(answer)}`, `हाँ! ${formatCents(answer)}`),
+    almost: t(`Almost! ${formatCents(answer)}`, `¡Casi! ${formatCents(answer)}`, `Quase! ${formatCents(answer)}`, `Presque ! ${formatCents(answer)}`, `差一点！${formatCents(answer)}`, `लगभग! ${formatCents(answer)}`),
     answer: formatCents(answer),
     choices: uniqueChoices(
       rng,
@@ -584,13 +584,13 @@ export function makeStepsQuestion(rng: Rng): ChoiceQ {
     title: t(
       `${who} has ${groups} bags of ${each} ${thing.name}. ${who} gives away ${away}. How many are left?`,
       `${who} tiene ${groups} bolsas de ${each} ${thing.name}. ${who} regala ${away}. ¿Cuántos quedan?`, `${who} tem ${groups} sacolas de ${each} ${thing.name}. ${who} dá de presente ${away}. Quantos sobram?`,
-    `${who} a ${groups} sacs de ${each} ${thing.name}. ${who} en donne ${away}. Combien en reste-t-il ?`, `${who}有${countedNoun("bags", groups)}，每个袋子${countedNoun(thing.name, each)}。${who}送出${countedNoun(thing.name, away)}。还剩几${nounMeasure(thing.name)}${thingName(thing.name, 2, thing.name)}？`),
+    `${who} a ${groups} sacs de ${each} ${thing.name}. ${who} en donne ${away}. Combien en reste-t-il ?`, `${who}有${countedNoun("bags", groups)}，每个袋子${countedNoun(thing.name, each)}。${who}送出${countedNoun(thing.name, away)}。还剩几${nounMeasure(thing.name)}${thingName(thing.name, 2, thing.name)}？`, `${who} के पास ${thingName(thing.name, each, thing.name)} के ${groups} थैले हैं। ${who} ${away} दे देता है। कितने बचे?`),
     hint: t("Multiply first, then subtract", "Multiplica primero y luego resta"),
     answer: String(answer),
     choices: nearChoices(rng, answer, 0, 80, [groups * each, groups * each + away, each - away, groups + each]),
     skill: "problems:steps",
     tags: ["steps"],
-    solved: t(`${groups * each} minus ${away} is ${answer}`, `${groups * each} menos ${away} es ${answer}`, `${groups * each} menos ${away} é ${answer}`, `${groups * each} moins ${away} font ${answer}`, `${groups * each}减去${away}是${answer}`),
+    solved: t(`${groups * each} minus ${away} is ${answer}`, `${groups * each} menos ${away} es ${answer}`, `${groups * each} menos ${away} é ${answer}`, `${groups * each} moins ${away} font ${answer}`, `${groups * each}减去${away}是${answer}`, `${groups * each} में से ${away} ${answer} है`),
     picture: thing.emoji,
     hands: false,
     quietChoices: false,
@@ -618,10 +618,10 @@ export function makeFactorQuestion(rng: Rng): ChoiceQ {
     return {
       id: qid(rng),
       game: "times",
-      title: t(`Which number is a factor of ${n}?`, `¿Qué número es un factor de ${n}?`, `Que número é um fator de ${n}?`, `Quel nombre est un facteur de ${n} ?`, `哪个数是${n}的因数？`),
+      title: t(`Which number is a factor of ${n}?`, `¿Qué número es un factor de ${n}?`, `Que número é um fator de ${n}?`, `Quel nombre est un facteur de ${n} ?`, `哪个数是${n}的因数？`, `कौन सी संख्या ${n} का गुणनखंड है?`),
       hint: t("A factor divides the number with none left over", "Un factor divide el número y no sobra nada"),
-      praise: t(`Yes! ${answer} is a factor of ${n}`, `¡Sí! ${answer} es un factor de ${n}`, `Sim! ${answer} é um fator de ${n}`, `Oui ! ${answer} est un facteur de ${n}`, `对！${answer}是${n}的因数`),
-      almost: t(`Almost! ${answer} is a factor of ${n}`, `¡Casi! ${answer} es un factor de ${n}`, `Quase! ${answer} é um fator de ${n}`, `Presque ! ${answer} est un facteur de ${n}`, `差一点！${answer}是${n}的因数`),
+      praise: t(`Yes! ${answer} is a factor of ${n}`, `¡Sí! ${answer} es un factor de ${n}`, `Sim! ${answer} é um fator de ${n}`, `Oui ! ${answer} est un facteur de ${n}`, `对！${answer}是${n}的因数`, `हाँ! ${answer} ${n} का गुणनखंड है`),
+      almost: t(`Almost! ${answer} is a factor of ${n}`, `¡Casi! ${answer} es un factor de ${n}`, `Quase! ${answer} é um fator de ${n}`, `Presque ! ${answer} est un facteur de ${n}`, `差一点！${answer}是${n}的因数`, `लगभग! ${answer} ${n} का गुणनखंड है`),
       answer: String(answer),
       choices: fourChoices(rng, answer, decoys),
       skill: "times:factors",
@@ -637,10 +637,10 @@ export function makeFactorQuestion(rng: Rng): ChoiceQ {
   return {
     id: qid(rng),
     game: "times",
-    title: t(`Which number is a multiple of ${base}?`, `¿Qué número es un múltiplo de ${base}?`, `Que número é um múltiplo de ${base}?`, `Quel nombre est un multiple de ${base} ?`, `哪个数是${base}的倍数？`),
+    title: t(`Which number is a multiple of ${base}?`, `¿Qué número es un múltiplo de ${base}?`, `Que número é um múltiplo de ${base}?`, `Quel nombre est un multiple de ${base} ?`, `哪个数是${base}的倍数？`, `कौन सी संख्या ${base} का गुणज है?`),
     hint: t("Multiples are what you get when you skip count", "Los múltiplos salen al contar de salto"),
-    praise: t(`Yes! ${answer} is a multiple of ${base}`, `¡Sí! ${answer} es un múltiplo de ${base}`, `Sim! ${answer} é um múltiplo de ${base}`, `Oui ! ${answer} est un multiple de ${base}`, `对！${answer}是${base}的倍数`),
-    almost: t(`Almost! ${answer} is a multiple of ${base}`, `¡Casi! ${answer} es un múltiplo de ${base}`, `Quase! ${answer} é um múltiplo de ${base}`, `Presque ! ${answer} est un multiple de ${base}`, `差一点！${answer}是${base}的倍数`),
+    praise: t(`Yes! ${answer} is a multiple of ${base}`, `¡Sí! ${answer} es un múltiplo de ${base}`, `Sim! ${answer} é um múltiplo de ${base}`, `Oui ! ${answer} est un multiple de ${base}`, `对！${answer}是${base}的倍数`, `हाँ! ${answer} ${base} का गुणज है`),
+    almost: t(`Almost! ${answer} is a multiple of ${base}`, `¡Casi! ${answer} es un múltiplo de ${base}`, `Quase! ${answer} é um múltiplo de ${base}`, `Presque ! ${answer} est un multiple de ${base}`, `差一点！${answer}是${base}的倍数`, `लगभग! ${answer} ${base} का गुणज है`),
     answer: String(answer),
     choices: fourChoices(rng, answer, decoys),
     skill: "times:factors",
@@ -660,10 +660,10 @@ export function makeMultiQuestion(rng: Rng): ChoiceQ {
   return {
     id: qid(rng),
     game: "times",
-    title: t(`What is ${a} times ${b}?`, `¿Cuánto es ${a} por ${b}?`, `Quanto é ${a} vezes ${b}?`, `Combien font ${a} fois ${b} ?`, `${a}乘${b}是多少？`),
+    title: t(`What is ${a} times ${b}?`, `¿Cuánto es ${a} por ${b}?`, `Quanto é ${a} vezes ${b}?`, `Combien font ${a} fois ${b} ?`, `${a}乘${b}是多少？`, `${a} गुणा ${b} कितना है?`),
     hint: t("Break the bigger number into tens and ones", "Separa el número grande en decenas y unidades"),
-    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`, `Sim! ${solved}`, `Oui ! ${solved}`, `对！${solved}`),
-    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`, `Quase! ${solved}`, `Presque ! ${solved}`, `差一点！${solved}`),
+    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`, `Sim! ${solved}`, `Oui ! ${solved}`, `对！${solved}`, `हाँ! ${solved}`),
+    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`, `Quase! ${solved}`, `Presque ! ${solved}`, `差一点！${solved}`, `लगभग! ${solved}`),
     answer: String(product),
     choices: fourChoices(rng, product, [a * (b + 1), a * Math.max(1, b - 1), (a + 10) * b, product + a, product - b]),
     skill: "times:multi",
@@ -680,15 +680,16 @@ export function makeDivideQuestion(rng: Rng): ChoiceQ {
   const a = q * b + r;
   const answer = `${q} remainder ${r}`;
   const solved = `${a} ÷ ${b} = ${q} remainder ${r}`;
+  const solvedHi = solved.replace("remainder", "शेष");
   const visual: TimesVisual = { kind: "times", a, b, hidden: q, solved, ask: "divide", remainder: r };
   const decoys = [`${q + 1} remainder ${r}`, `${q} remainder ${Math.max(1, (r + 1) % b || 1)}`, `${q - 1} remainder ${r}`, `${a} remainder 0`];
   return {
     id: qid(rng),
     game: "times",
-    title: t(`What is ${a} divided by ${b}?`, `¿Cuánto es ${a} dividido entre ${b}?`, `Quanto é ${a} dividido por ${b}?`, `Combien font ${a} divisé par ${b} ?`, `${a}除以${b}是多少？`),
+    title: t(`What is ${a} divided by ${b}?`, `¿Cuánto es ${a} dividido entre ${b}?`, `Quanto é ${a} dividido por ${b}?`, `Combien font ${a} divisé par ${b} ?`, `${a}除以${b}是多少？`, `${a} भाग ${b} कितना है?`),
     hint: t("Find how many groups, then what is left", "Busca cuántos grupos y luego lo que sobra"),
-    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`, `Sim! ${solved}`, `Oui ! ${solved}`, `对！${solved}`),
-    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`, `Quase! ${solved}`, `Presque ! ${solved}`, `差一点！${solved}`),
+    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`, `Sim! ${solved}`, `Oui ! ${solved}`, `对！${solved}`, `हाँ! ${solvedHi}`),
+    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`, `Quase! ${solved}`, `Presque ! ${solved}`, `差一点！${solved}`, `लगभग! ${solvedHi}`),
     answer,
     choices: uniqueChoices(rng, answer, decoys),
     skill: "times:divide",
@@ -727,11 +728,11 @@ export function makeBigAddQuestion(rng: Rng, level: "within1000" | "thousands"):
     game: "add",
     title:
       op === "+"
-        ? t(`What is ${pink} plus ${teal}?`, `¿Cuánto es ${pink} más ${teal}?`, `Quanto é ${pink} a mais ${teal}?`, `Combien font ${pink} plus ${teal} ?`, `${pink}加${teal}是多少？`)
-        : t(`What is ${pink + teal} minus ${teal}?`, `¿Cuánto es ${pink + teal} menos ${teal}?`, `Quanto é ${pink + teal} menos ${teal}?`, `Combien font ${pink + teal} moins ${teal} ?`, `${pink + teal}减${teal}是多少？`),
+        ? t(`What is ${pink} plus ${teal}?`, `¿Cuánto es ${pink} más ${teal}?`, `Quanto é ${pink} a mais ${teal}?`, `Combien font ${pink} plus ${teal} ?`, `${pink}加${teal}是多少？`, `${pink} जमा ${teal} कितना है?`)
+        : t(`What is ${pink + teal} minus ${teal}?`, `¿Cuánto es ${pink + teal} menos ${teal}?`, `Quanto é ${pink + teal} menos ${teal}?`, `Combien font ${pink + teal} moins ${teal} ?`, `${pink + teal}减${teal}是多少？`, `${pink + teal} घटा ${teal} कितना है?`),
     hint: t("Line up the places, then add or subtract", "Alinea los lugares y luego suma o resta"),
-    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`, `Sim! ${solved}`, `Oui ! ${solved}`, `对！${solved}`),
-    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`, `Quase! ${solved}`, `Presque ! ${solved}`, `差一点！${solved}`),
+    praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`, `Sim! ${solved}`, `Oui ! ${solved}`, `对！${solved}`, `हाँ! ${solved}`),
+    almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`, `Quase! ${solved}`, `Presque ! ${solved}`, `差一点！${solved}`, `लगभग! ${solved}`),
     answer: String(hidden),
     choices: fourChoices(rng, hidden, [hidden + step, hidden - step, hidden + 1, hidden - 1, hidden + step * 10]),
     skill: `add:${level}`,

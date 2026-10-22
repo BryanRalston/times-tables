@@ -251,7 +251,7 @@ export function SquishTally() {
   if (count <= 0) return null;
   return (
     <p className="ac-squish-tally" data-squish-count={count}>
-      {t(`Squish! ${count}`, `¡Aprieta! ${count}`, `Aperte! ${count}`, `Écrase ! ${count}`, `捏一捏！${count}`)}
+      {t(`Squish! ${count}`, `¡Aprieta! ${count}`, `Aperte! ${count}`, `Écrase ! ${count}`, `捏一捏！${count}`, `दबाओ! ${count}`)}
     </p>
   );
 }

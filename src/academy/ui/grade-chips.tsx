@@ -1,6 +1,13 @@
 import type { Grade } from "../model";
-import { show } from "../i18n";
+import { getLocale, gradeText, show } from "../i18n";
 import { cx } from "./bits";
+
+function chipLabel(grade: Grade): string {
+  if (getLocale() === "hi") return gradeText(grade);
+  if (grade === "PK") return "Pre-K";
+  if (grade === "K") return "K";
+  return grade;
+}
 
 export function GradeChips({
   grade,
@@ -16,7 +23,7 @@ export function GradeChips({
     <div className={cx("ac-grades", className)} role="group" aria-label={show("Grade")}>
       {grades.map((g) => (
         <button key={g} type="button" className={cx("ac-grade", grade === g && "is-on")} onClick={() => onGrade(g)}>
-          {g === "PK" ? "Pre-K" : g === "K" ? "K" : g}
+          {chipLabel(g)}
         </button>
       ))}
     </div>

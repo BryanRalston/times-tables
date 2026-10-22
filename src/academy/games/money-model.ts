@@ -61,18 +61,19 @@ export function describePile(pile: CoinPile): string {
     const n = pile[kind];
     if (n <= 0) continue;
     if (locale === "zh") parts.push(`${n}枚${coinWord(kind, n)}`);
-    else if (locale === "es" || locale === "pt" || locale === "fr") parts.push(`${n} ${coinWord(kind, n)}`);
+    else if (locale === "hi" || locale === "es" || locale === "pt" || locale === "fr") parts.push(`${n} ${coinWord(kind, n)}`);
     else parts.push(`${n} ${n === 1 ? COIN_NAME[kind].toLowerCase() : PLURAL[kind]}`);
   }
   if (parts.length === 0) {
     if (locale === "zh") return "没有硬币";
+    if (locale === "hi") return "कोई सिक्का नहीं";
     if (locale === "fr") return "sans pièces";
     if (locale === "pt") return "sem moedas";
     if (locale === "es") return "sin monedas";
     return "no coins";
   }
   if (parts.length === 1) return parts[0]!;
-  const join = locale === "es" ? "y" : locale === "pt" ? "e" : locale === "fr" ? "et" : locale === "zh" ? "和" : "and";
+  const join = locale === "es" ? "y" : locale === "pt" ? "e" : locale === "fr" ? "et" : locale === "zh" ? "和" : locale === "hi" ? "और" : "and";
   return `${parts.slice(0, -1).join(", ")} ${join} ${parts[parts.length - 1]}`;
 }
 

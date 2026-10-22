@@ -36,7 +36,7 @@ function makeObjects(rng: Rng, max: number, level: "objects" | "to20"): ChoiceQ 
     game: "count",
     title: pickTalk(rng, [
       ["How many squishees?", "¿Cuántos squishees hay?"],
-      [`${buddy} wants to count. How many squishees?`, `${buddy} quiere contar. ¿Cuántos squishees hay?`, `${buddy} quer contar. Quantos squishees há?`, `${buddy} veut compter. Combien de squishees ?`, `${buddy}想数一数。有几个squishee？`],
+      [`${buddy} wants to count. How many squishees?`, `${buddy} quiere contar. ¿Cuántos squishees hay?`, `${buddy} quer contar. Quantos squishees há?`, `${buddy} veut compter. Combien de squishees ?`, `${buddy}想数一数。有几个squishee？`, `${buddy} गिनना चाहता है। कितने squishees?`],
       ["Count each one. How many squishees?", "Cuenta uno por uno. ¿Cuántos squishees hay?"],
     ]),
     hint: t("Count each one", "Cuenta uno por uno"),
@@ -82,7 +82,7 @@ function makeCompare(rng: Rng): ChoiceQ {
     choices: rng.shuffle(ids),
     skill: "count:compare",
     tags: ["compare"],
-    solved: askMore ? t(`${target} is the most`, `${target} es el que tiene más`, `${target} é o que tem mais`, `${target} en a le plus`, `${target}是最多的`) : t(`${target} is the fewest`, `${target} es el que tiene menos`, `${target} é o que tem menos`, `${target} en a le moins`, `${target}是最少的`),
+    solved: askMore ? t(`${target} is the most`, `${target} es el que tiene más`, `${target} é o que tem mais`, `${target} en a le plus`, `${target}是最多的`, `${target} सबसे अधिक है`) : t(`${target} is the fewest`, `${target} es el que tiene menos`, `${target} é o que tem menos`, `${target} en a le moins`, `${target}是最少的`, `${target} सबसे कम है`),
     picture: `sq:${target}`,
     hands: true,
     quietChoices: false,
@@ -103,16 +103,16 @@ function makeNeighbor(rng: Rng): ChoiceQ {
   return ask(rng, {
     game: "count",
     title: askBefore
-      ? t(`What number comes before ${n}?`, `¿Qué número va antes de ${n}?`, `Que número vem antes de ${n}?`, `Quel nombre vient avant ${n} ?`, `${n}前面是哪个数？`)
-      : t(`What number comes after ${n}?`, `¿Qué número va después de ${n}?`, `Que número vem depois de ${n}?`, `Quel nombre vient après ${n} ?`, `${n}后面是哪个数？`),
+      ? t(`What number comes before ${n}?`, `¿Qué número va antes de ${n}?`, `Que número vem antes de ${n}?`, `Quel nombre vient avant ${n} ?`, `${n}前面是哪个数？`, `${n} से पहले कौन सी संख्या आती है?`)
+      : t(`What number comes after ${n}?`, `¿Qué número va después de ${n}?`, `Que número vem depois de ${n}?`, `Quel nombre vient après ${n} ?`, `${n}后面是哪个数？`, `${n} के बाद कौन सी संख्या आती है?`),
     hint: askBefore ? t("One less", "Uno menos") : t("One more", "Uno más"),
     answer: String(answer),
     choices: nearChoices(rng, answer, 0, 20),
     skill: "count:neighbor",
     tags: ["neighbor"],
     solved: askBefore
-      ? t(`${answer} comes before ${n}`, `${answer} va antes de ${n}`, `${answer} vem antes de ${n}`, `${answer} vient avant ${n}`, `${answer}在${n}前面`)
-      : t(`${answer} comes after ${n}`, `${answer} va después de ${n}`, `${answer} vem depois de ${n}`, `${answer} vient après ${n}`, `${answer}在${n}后面`),
+      ? t(`${answer} comes before ${n}`, `${answer} va antes de ${n}`, `${answer} vem antes de ${n}`, `${answer} vient avant ${n}`, `${answer}在${n}前面`, `${answer} ${n} से पहले आता है`)
+      : t(`${answer} comes after ${n}`, `${answer} va después de ${n}`, `${answer} vem depois de ${n}`, `${answer} vient après ${n}`, `${answer}在${n}后面`, `${answer} ${n} के बाद आता है`),
     picture: String(n),
     hands: false,
     quietChoices: false,
@@ -131,14 +131,14 @@ function makeSubitize(rng: Rng): ChoiceQ {
     game: "count",
     title: pickTalk(rng, [
       ["How many dots?", "¿Cuántos puntos hay?"],
-      [`${buddy} sees a dot pattern. How many dots?`, `${buddy} ve un patrón de puntos. ¿Cuántos puntos hay?`, `${buddy} vê um padrão de pontos. Quantos pontos há?`, `${buddy} voit un motif de points. Combien de points ?`, `${buddy}看到一组点点。有几个点？`],
+      [`${buddy} sees a dot pattern. How many dots?`, `${buddy} ve un patrón de puntos. ¿Cuántos puntos hay?`, `${buddy} vê um padrão de pontos. Quantos pontos há?`, `${buddy} voit un motif de points. Combien de points ?`, `${buddy}看到一组点点。有几个点？`, `${buddy} बिंदुओं का पैटर्न देखता है। कितने बिंदु?`],
     ]),
     hint: t("Look at the pattern", "Mira el patrón"),
     answer: String(n),
     choices: nearChoices(rng, n, 1, 8),
     skill: "count:subitize",
     tags: ["subitize"],
-    solved: t(`${n} dots`, n === 1 ? `${n} punto` : `${n} puntos`, n === 1 ? `${n} ponto` : `${n} pontos`, n === 1 ? `${n} point` : `${n} points`, `${n}个点`),
+    solved: t(`${n} dots`, n === 1 ? `${n} punto` : `${n} puntos`, n === 1 ? `${n} ponto` : `${n} pontos`, n === 1 ? `${n} point` : `${n} points`, `${n}个点`, `${n} बिंदु`),
     picture: "●".repeat(n),
     hands: false,
     quietChoices: false,
@@ -178,13 +178,13 @@ function makeBuild(rng: Rng): ChoiceQ {
   const board: CountBoard = { game: "count", mode: "build", n };
   return ask(rng, {
     game: "count",
-    title: t(`Show ${n} on the ten-frame`, `Muestra ${n} en el tablero de diez`, `Mostre ${n} no quadro de dez`, `Montre ${n} sur la grille de dix`, `在十格框上摆出${n}`),
+    title: t(`Show ${n} on the ten-frame`, `Muestra ${n} en el tablero de diez`, `Mostre ${n} no quadro de dez`, `Montre ${n} sur la grille de dix`, `在十格框上摆出${n}`, `दस के खाने पर ${n} दिखाओ`),
     hint: t("Tap a spot for each squishee", "Toca un espacio por cada squishee"),
     answer: String(n),
     choices: nearChoices(rng, n, 0, 10),
     skill: "count:build",
     tags: ["build"],
-    solved: t(`${n} dots`, n === 1 ? `${n} punto` : `${n} puntos`, n === 1 ? `${n} ponto` : `${n} pontos`, n === 1 ? `${n} point` : `${n} points`, `${n}个点`),
+    solved: t(`${n} dots`, n === 1 ? `${n} punto` : `${n} puntos`, n === 1 ? `${n} ponto` : `${n} pontos`, n === 1 ? `${n} point` : `${n} points`, `${n}个点`, `${n} बिंदु`),
     picture: String(n),
     hands: true,
     quietChoices: true,
@@ -223,7 +223,7 @@ function sheetItem(rng: Rng, level: string): SheetItem {
     case "objects":
     case "to20": {
       const n = rng.int(1, safe === "objects" ? 10 : 20);
-      return { prompt: t(`Count the stars: ${"★".repeat(n)}`, `Cuenta las estrellas: ${"★".repeat(n)}`, `Conte as estrelas: ${"★".repeat(n)}`, `Compte les étoiles : ${"★".repeat(n)}`, `数一数星星：${"★".repeat(n)}`), answer: String(n) };
+      return { prompt: t(`Count the stars: ${"★".repeat(n)}`, `Cuenta las estrellas: ${"★".repeat(n)}`, `Conte as estrelas: ${"★".repeat(n)}`, `Compte les étoiles : ${"★".repeat(n)}`, `数一数星星：${"★".repeat(n)}`, `सितारे गिनो: ${"★".repeat(n)}`), answer: String(n) };
     }
     case "compare": {
       const a = rng.int(1, 20);
@@ -233,8 +233,8 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const answer = more ? Math.max(a, b) : Math.min(a, b);
       return {
         prompt: more
-          ? t(`Which is more, ${a} or ${b}?`, `¿Cuál es más, ${a} o ${b}?`, `Qual é mais, ${a} ou ${b}?`, `Lequel est le plus, ${a} ou ${b} ?`, `${a}和${b}，哪个更多？`)
-          : t(`Which is less, ${a} or ${b}?`, `¿Cuál es menos, ${a} o ${b}?`, `Qual é menos, ${a} ou ${b}?`, `Lequel est le moins, ${a} ou ${b} ?`, `${a}和${b}，哪个更少？`),
+          ? t(`Which is more, ${a} or ${b}?`, `¿Cuál es más, ${a} o ${b}?`, `Qual é mais, ${a} ou ${b}?`, `Lequel est le plus, ${a} ou ${b} ?`, `${a}和${b}，哪个更多？`, `${a} या ${b} में से कौन अधिक है?`)
+          : t(`Which is less, ${a} or ${b}?`, `¿Cuál es menos, ${a} o ${b}?`, `Qual é menos, ${a} ou ${b}?`, `Lequel est le moins, ${a} ou ${b} ?`, `${a}和${b}，哪个更少？`, `${a} या ${b} में से कौन छोटी है?`),
         answer: String(answer),
       };
     }
@@ -243,20 +243,20 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const n = rng.int(after ? 0 : 1, after ? 19 : 20);
       return {
         prompt: after
-          ? t(`What number comes after ${n}?`, `¿Qué número va después de ${n}?`, `Que número vem depois de ${n}?`, `Quel nombre vient après ${n} ?`, `${n}后面是哪个数？`)
-          : t(`What number comes before ${n}?`, `¿Qué número va antes de ${n}?`, `Que número vem antes de ${n}?`, `Quel nombre vient avant ${n} ?`, `${n}前面是哪个数？`),
+          ? t(`What number comes after ${n}?`, `¿Qué número va después de ${n}?`, `Que número vem depois de ${n}?`, `Quel nombre vient après ${n} ?`, `${n}后面是哪个数？`, `${n} के बाद कौन सी संख्या आती है?`)
+          : t(`What number comes before ${n}?`, `¿Qué número va antes de ${n}?`, `Que número vem antes de ${n}?`, `Quel nombre vient avant ${n} ?`, `${n}前面是哪个数？`, `${n} से पहले कौन सी संख्या आती है?`),
         answer: String(after ? n + 1 : n - 1),
       };
     }
     case "subitize": {
       const a = rng.int(1, 3);
       const b = rng.int(1, 3);
-      return { prompt: t(`Dot groups: ${a} and ${b}. How many dots?`, `Grupos de puntos: ${a} y ${b}. ¿Cuántos puntos hay?`, `Grupos de pontos: ${a} e ${b}. Quantos pontos tem?`, `Groupes de points : ${a} et ${b}. Combien de points ?`, `点点有两组：${a}和${b}。有几个点？`), answer: String(a + b) };
+      return { prompt: t(`Dot groups: ${a} and ${b}. How many dots?`, `Grupos de puntos: ${a} y ${b}. ¿Cuántos puntos hay?`, `Grupos de pontos: ${a} e ${b}. Quantos pontos tem?`, `Groupes de points : ${a} et ${b}. Combien de points ?`, `点点有两组：${a}和${b}。有几个点？`, `बिंदु समूह: ${a} और ${b}। कितने बिंदु हैं?`), answer: String(a + b) };
     }
     case "tenframe":
     case "build": {
       const n = rng.int(safe === "build" ? 1 : 0, safe === "build" ? 10 : 20);
-      return { prompt: t(`Filled dots: ${"●".repeat(n)}`, `Puntos llenos: ${"●".repeat(n)}`, `Pontos cheios: ${"●".repeat(n)}`, `Points pleins : ${"●".repeat(n)}`, `实心点：${"●".repeat(n)}`), answer: String(n) };
+      return { prompt: t(`Filled dots: ${"●".repeat(n)}`, `Puntos llenos: ${"●".repeat(n)}`, `Pontos cheios: ${"●".repeat(n)}`, `Points pleins : ${"●".repeat(n)}`, `实心点：${"●".repeat(n)}`, `भरे बिंदु: ${"●".repeat(n)}`), answer: String(n) };
     }
     default: {
       const neverLevel: never = safe;

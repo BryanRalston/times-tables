@@ -11,7 +11,7 @@ function walk(dir: string, out: string[] = []): string[] {
   for (const name of readdirSync(dir)) {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) walk(path, out);
-    else if (/\.(ts|tsx)$/.test(name) && !name.includes(".test.") && name !== "i18n-pt.ts" && name !== "i18n-es.ts" && name !== "i18n-fr.ts" && name !== "i18n-zh.ts") out.push(path);
+    else if (/\.(ts|tsx)$/.test(name) && !name.includes(".test.") && name !== "i18n-pt.ts" && name !== "i18n-es.ts" && name !== "i18n-fr.ts" && name !== "i18n-zh.ts" && name !== "i18n-hi.ts") out.push(path);
   }
   return out;
 }

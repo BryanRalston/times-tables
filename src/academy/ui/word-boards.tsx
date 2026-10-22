@@ -31,7 +31,7 @@ export function LetterBoard({ task, onAnswer }: { task: LetterTask; onAnswer: (o
               type="button"
               className={cx("ac-slot", !id && "is-empty", id && "ac-placed")}
               disabled={!id}
-              aria-label={id ? t(`Remove ${letter}`, `Quita ${letter}`, `Tire ${letter}`, `Enlève ${letter}`, `拿走${letter}`) : show("Empty spot")}
+              aria-label={id ? t(`Remove ${letter}`, `Quita ${letter}`, `Tire ${letter}`, `Enlève ${letter}`, `拿走${letter}`, `${letter} हटाओ`) : show("Empty spot")}
               onClick={() => id && setPlaced((current) => current.filter((item) => item !== id))}
             >
               {id ? labelOf(task.tiles, id) : ""}
@@ -41,7 +41,7 @@ export function LetterBoard({ task, onAnswer }: { task: LetterTask; onAnswer: (o
       </div>
       <div className="ac-tiles" aria-label={show("Letters")}>
         {pool.map((tile) => (
-          <button key={tile.id} type="button" className="ac-tile" data-piece={tile.label} aria-label={t(`Letter ${tile.label}`, `Letra ${tile.label}`, `Letra ${tile.label}`, `Lettre ${tile.label}`, `字母${tile.label}`)} {...pointerProps(tile.id)}>
+          <button key={tile.id} type="button" className="ac-tile" data-piece={tile.label} aria-label={t(`Letter ${tile.label}`, `Letra ${tile.label}`, `Letra ${tile.label}`, `Lettre ${tile.label}`, `字母${tile.label}`, `अक्षर ${tile.label}`)} {...pointerProps(tile.id)}>
             {tile.label}
           </button>
         ))}
@@ -63,7 +63,7 @@ export function SightBoard({ task, onAnswer }: { task: SightTask; onAnswer: (ok:
       {task.mode === "picture" ? <p className="ac-sight-emoji" aria-hidden="true">{task.emoji}</p> : <p className="ac-fill-sentence">{task.sentence}</p>}
       <div ref={wellRef} className="ac-tray ac-word-well" aria-label={show("Drop the word")}>
         {placed ? (
-          <button type="button" className="ac-tile is-in ac-placed" aria-label={t(`Remove ${placed}`, `Quita ${placed}`, `Tire ${placed}`, `Enlève ${placed}`, `拿走${placed}`)} onClick={() => setPlaced(null)}>
+          <button type="button" className="ac-tile is-in ac-placed" aria-label={t(`Remove ${placed}`, `Quita ${placed}`, `Tire ${placed}`, `Enlève ${placed}`, `拿走${placed}`, `${placed} हटाओ`)} onClick={() => setPlaced(null)}>
             {placed}
           </button>
         ) : (
@@ -114,7 +114,7 @@ export function PhonicsBoard({ task, onAnswer }: { task: PhonicsTask; onAnswer: 
               type="button"
               className={cx("ac-slot", !id && "is-empty", id && "ac-placed")}
               disabled={!id}
-              aria-label={id ? t(`Remove ${label}`, `Quita ${label}`, `Tire ${label}`, `Enlève ${label}`, `拿走${label}`) : show("Empty spot")}
+              aria-label={id ? t(`Remove ${label}`, `Quita ${label}`, `Tire ${label}`, `Enlève ${label}`, `拿走${label}`, `${label} हटाओ`) : show("Empty spot")}
               onClick={() => id && setPlaced((current) => current.filter((item) => item !== id))}
             >
               {label}

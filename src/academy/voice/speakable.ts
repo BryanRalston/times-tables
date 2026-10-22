@@ -1,4 +1,4 @@
-import { chineseFraction, frenchFraction, getLocale, portugueseFraction, spanishFraction } from "../i18n";
+import { chineseFraction, frenchFraction, getLocale, hindiFraction, portugueseFraction, spanishFraction } from "../i18n";
 
 const NUMBER_WORD = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
 
@@ -22,6 +22,7 @@ function speakFractions(text: string): string {
     if (getLocale() === "pt") return portugueseFraction(num, den);
     if (getLocale() === "fr") return frenchFraction(num, den);
     if (getLocale() === "zh") return chineseFraction(num, den);
+    if (getLocale() === "hi") return hindiFraction(num, den);
     const pair = FRACTION_WORD[denText];
     if (!pair) return full;
     const numWord = NUMBER_WORD[num] ?? numText;
@@ -61,6 +62,16 @@ export function speakable(text: string): string {
       .replace(/(\d+)¢/g, (_full, n: string) => (Number(n) === 1 ? "1 cent" : `${n} cents`))
       .replace(/¢/g, " cents")
       .replace(/\$(\d+)/g, (_full, n: string) => (Number(n) === 1 ? "1 dollar" : `${n} dollars`));
+  }
+  if (getLocale() === "hi") {
+    return fractions
+      .replace(/×/g, " गुणा ")
+      .replace(/−/g, " घटा ")
+      .replace(/\+/g, " जमा ")
+      .replace(/=/g, " बराबर ")
+      .replace(/(\d+)¢/g, "$1 सेंट")
+      .replace(/¢/g, " सेंट")
+      .replace(/\$(\d+)/g, "$1 डॉलर");
   }
   if (getLocale() === "zh") {
     return fractions
