@@ -1,0 +1,1546 @@
+[
+  {
+    "en": "`${name} bounced in for a silly showdown. Ready?`",
+    "fr": "`${name} arrive en bondissant pour un défi rigolo. C'est parti ?`"
+  },
+  {
+    "en": "`${name} wants to be friends!`",
+    "fr": "`${name} veut être ton copain !`"
+  },
+  {
+    "en": "`The big boss of ${title}, in a homemade crown.`",
+    "fr": "`Le grand chef de ${shown}, avec une couronne faite maison.`"
+  },
+  {
+    "en": "`${title} trophy`",
+    "fr": "`Trophée de ${shown}`"
+  },
+  {
+    "en": "`Beat the ${hostGame.title} boss.`",
+    "fr": "`Bats le chef de ${show(hostGame.title)}.`"
+  },
+  {
+    "en": "`Earn 3 stars in ${title}.`",
+    "fr": "`Gagne 3 étoiles dans ${show(title)}.`"
+  },
+  {
+    "en": "`Earn ${starsNeeded(index)} stars.`",
+    "fr": "`Gagne ${starsNeeded(index)} étoiles.`"
+  },
+  {
+    "en": "`${count} tries`",
+    "fr": "`${count} essais`"
+  },
+  {
+    "en": "`${names[0]} and ${names[1]}`",
+    "fr": "`${names[0]} et ${names[1]}`"
+  },
+  {
+    "en": "`${who} is still learning ${subject}. The free \"${sheet}\" worksheet is a calm one for tonight.`",
+    "fr": "`${who} apprend encore ${subject}. La fiche gratuite « ${sheet} » est tranquille pour ce soir.`"
+  },
+  {
+    "en": "`${who} is doing well. The free \"${sheet}\" worksheet is a calm one if you want a page tonight.`",
+    "fr": "`${who} va bien. La fiche gratuite « ${sheet} » est tranquille si tu veux une page ce soir.`"
+  },
+  {
+    "en": "`${who} can print a free worksheet and play it together tonight.`",
+    "fr": "`${who} peut imprimer une fiche gratuite et y jouer ensemble ce soir.`"
+  },
+  {
+    "en": "`Yes! ${solved}`",
+    "fr": "`Oui ! ${solved}`"
+  },
+  {
+    "en": "`Almost! ${solved}`",
+    "fr": "`Presque ! ${solved}`"
+  },
+  {
+    "en": "`Telling Time · ${level.label}`",
+    "fr": "`L'heure · ${show(level.label)}`"
+  },
+  {
+    "en": "`${target} is the most`",
+    "fr": "`${target} en a le plus`"
+  },
+  {
+    "en": "`${target} is the fewest`",
+    "fr": "`${target} en a le moins`"
+  },
+  {
+    "en": "`What number comes before ${n}?`",
+    "fr": "`Quel nombre vient avant ${n} ?`"
+  },
+  {
+    "en": "`What number comes after ${n}?`",
+    "fr": "`Quel nombre vient après ${n} ?`"
+  },
+  {
+    "en": "`${answer} comes before ${n}`",
+    "fr": "`${answer} vient avant ${n}`"
+  },
+  {
+    "en": "`${answer} comes after ${n}`",
+    "fr": "`${answer} vient après ${n}`"
+  },
+  {
+    "en": "`${n} dots`",
+    "fr": "n === 1 ? `${n} point` : `${n} points`"
+  },
+  {
+    "en": "`Show ${n} on the ten-frame`",
+    "fr": "`Montre ${n} sur la grille de dix`"
+  },
+  {
+    "en": "`Count the stars: ${\"★\".repeat(n)}`",
+    "fr": "`Compte les étoiles : ${\"★\".repeat(n)}`"
+  },
+  {
+    "en": "`Which is more, ${a} or ${b}?`",
+    "fr": "`Lequel est le plus, ${a} ou ${b} ?`"
+  },
+  {
+    "en": "`Which is less, ${a} or ${b}?`",
+    "fr": "`Lequel est le moins, ${a} ou ${b} ?`"
+  },
+  {
+    "en": "`Dot groups: ${a} and ${b}. How many dots?`",
+    "fr": "`Groupes de points : ${a} et ${b}. Combien de points ?`"
+  },
+  {
+    "en": "`Filled dots: ${\"●\".repeat(n)}`",
+    "fr": "`Points pleins : ${\"●\".repeat(n)}`"
+  },
+  {
+    "en": "`${answer} is shaded`",
+    "fr": "frenchShaded(answer)"
+  },
+  {
+    "en": "`The dot is at ${answer}`",
+    "fr": "`Le point est à ${answer}`"
+  },
+  {
+    "en": "`${answer} is greater`",
+    "fr": "`${answer} est plus grand`"
+  },
+  {
+    "en": "`${answer} is less`",
+    "fr": "`${answer} est plus petit`"
+  },
+  {
+    "en": "`${num}/${den} = ${answer}`",
+    "fr": "`${num}/${den} = ${answer}`"
+  },
+  {
+    "en": "`${num} of ${den} equal parts are shaded. What fraction?`",
+    "fr": "`${num} des ${den} parts égales sont coloriées. Quelle fraction est-ce ?`"
+  },
+  {
+    "en": "`1 of ${den} equal parts is shaded. What unit fraction?`",
+    "fr": "`1 des ${den} parts égales est coloriée. Quelle fraction unitaire est-ce ?`"
+  },
+  {
+    "en": "`A number line from 0 to 1 has ${den} equal jumps. The dot is on jump ${num}. What fraction?`",
+    "fr": "`Une droite numérique de 0 à 1 a ${den} sauts égaux. Le point est sur le saut ${num}. Quelle fraction est-ce ?`"
+  },
+  {
+    "en": "`Which is greater, ${num}/${den} or ${num2}/${den}?`",
+    "fr": "`Laquelle est la plus grande, ${num}/${den} ou ${num2}/${den} ?`"
+  },
+  {
+    "en": "`Which fraction matches ${pair[0]}/${pair[1]}?`",
+    "fr": "`Quelle fraction est égale à ${pair[0]}/${pair[1]} ?`"
+  },
+  {
+    "en": "`A ${shape} has ${sides} sides.`",
+    "fr": "shape === \"triangle\" ? `Le triangle a ${sides} côtés.` : shape === \"square\" ? `Le carré a ${sides} côtés.` : `Le rectangle a ${sides} côtés.`"
+  },
+  {
+    "en": "`${rows} rows of ${cols}. Count the squares.`",
+    "fr": "`${rows} lignes de ${cols}. Compte les petits carrés.`"
+  },
+  {
+    "en": "`${product} square units`",
+    "fr": "`${product} unités carrées`"
+  },
+  {
+    "en": "`The star sits ${clue}. Name the position.`",
+    "fr": "`L'étoile est ${clue}. Dis la position.`"
+  },
+  {
+    "en": "`Color and size do not change a shape. Name the flat shape with ${clue}.`",
+    "fr": "`La couleur et la taille ne changent pas la figure. Dis la figure plate : ${clue}.`"
+  },
+  {
+    "en": "`Join ${pieces}. What shape is the outside?`",
+    "fr": "`Assemble ${pieces}. Quelle figure est dehors ?`"
+  },
+  {
+    "en": "`A rectangle has ${rows} rows of ${cols} squares. How many squares?`",
+    "fr": "`Un rectangle a ${rows} lignes de ${cols} carrés. Combien de carrés ?`"
+  },
+  {
+    "en": "`Name the quadrilateral with ${clue}.`",
+    "fr": "`Dis le quadrilatère : ${clue}.`"
+  },
+  {
+    "en": "`A shape is split into ${den} equal parts. One part is shaded. What unit fraction?`",
+    "fr": "`Une figure est partagée en ${den} parts égales. Une part est coloriée. Quelle fraction unitaire ?`"
+  },
+  {
+    "en": "`There are ${apples} apples and ${bananas} bananas. How many apples?`",
+    "fr": "`Il y a ${apples} pommes et ${bananas} bananes. Combien de pommes ?`"
+  },
+  {
+    "en": "`The tally is ${apples} apples, ${bananas} bananas, and ${carrots} carrots. How many in all?`",
+    "fr": "`Le compte est ${apples} pommes, ${bananas} bananes et ${carrots} carottes. Combien en tout ?`"
+  },
+  {
+    "en": "`The tally is ${more} apples and ${fewer} bananas. How many more apples than bananas?`",
+    "fr": "`Le compte est ${more} pommes et ${fewer} bananes. Combien de pommes de plus que de bananes ?`"
+  },
+  {
+    "en": "`The tally is ${fewer} apples and ${more} bananas. How many more bananas than apples?`",
+    "fr": "`Le compte est ${fewer} pommes et ${more} bananes. Combien de bananes de plus que de pommes ?`"
+  },
+  {
+    "en": "`The ${graph} shows ${apples} apples and ${bananas} bananas. How many in all?`",
+    "fr": "`Le ${graphPt} montre ${apples} pommes et ${bananas} bananes. Combien en tout ?`"
+  },
+  {
+    "en": "`The ${graph} shows ${more} apples and ${fewer} bananas. How many more apples than bananas?`",
+    "fr": "`Le ${graphPt} montre ${more} pommes et ${fewer} bananes. Combien de pommes de plus que de bananes ?`"
+  },
+  {
+    "en": "`The ${graph} shows ${fewer} apples and ${more} bananas. How many more bananas than apples?`",
+    "fr": "`Le ${graphPt} montre ${fewer} pommes et ${more} bananes. Combien de bananes de plus que de pommes ?`"
+  },
+  {
+    "en": "`Each picture stands for ${scale}. The graph shows ${icons} apple pictures. How many apples?`",
+    "fr": "`Chaque image vaut ${scale}. Le graphique montre ${icons} images de pomme. Combien de pommes ?`"
+  },
+  {
+    "en": "`The longest is ${high}/${den} and the shortest is ${low}/${den}. How much longer is the longest?`",
+    "fr": "`Le plus long mesure ${high}/${den} et le plus court mesure ${low}/${den}. De combien le plus long dépasse-t-il le plus court ?`"
+  },
+  {
+    "en": "`The longest is ${high}/${den} and the shortest is ${low}/${den}. What do they make together?`",
+    "fr": "`Le plus long mesure ${high}/${den} et le plus court mesure ${low}/${den}. Combien font-ils ensemble ?`"
+  },
+  {
+    "en": "`Yes! ${num}/${den}`",
+    "fr": "`Oui ! ${num}/${den}`"
+  },
+  {
+    "en": "`Almost! ${num}/${den}`",
+    "fr": "`Presque ! ${num}/${den}`"
+  },
+  {
+    "en": "`Yes! 3 ${cat.plural}`",
+    "fr": "`Oui ! 3 ${word}`"
+  },
+  {
+    "en": "`Almost! 3 ${cat.plural}`",
+    "fr": "`Presque ! 3 ${word}`"
+  },
+  {
+    "en": "`${n} in all`",
+    "fr": "`${n} en tout`"
+  },
+  {
+    "en": "`${n} more`",
+    "fr": "`${n} de plus`"
+  },
+  {
+    "en": "`${n} less`",
+    "fr": "`${n} de moins`"
+  },
+  {
+    "en": "`${n} others`",
+    "fr": "`${n} autres`"
+  },
+  {
+    "en": "`${n} ${n === 1 ? \"mark\" : \"marks\"}`",
+    "fr": "n === 1 ? `${n} marque` : `${n} marques`"
+  },
+  {
+    "en": "`${n} ${en}`",
+    "fr": "`${n} ${thingName(cat.name, n, en)}`"
+  },
+  {
+    "en": "`How many ${cat.plural}?`",
+    "fr": "`${howManyPhrase(cat.name, 2, cat.plural)} y a-t-il ?`"
+  },
+  {
+    "en": "`How many more ${more.plural} than ${less.plural}?`",
+    "fr": "`${howManyMorePhrase(more.name, more.plural)} de plus que ${thingName(less.name, 2, less.plural)} ?`"
+  },
+  {
+    "en": "`How many less ${fewer.plural} than ${more.plural}?`",
+    "fr": "`${howManyLessPhrase(fewer.name, fewer.plural)} de moins que ${thingName(more.name, 2, more.plural)} ?`"
+  },
+  {
+    "en": "`How many ${a.plural} and ${b.plural} in all?`",
+    "fr": "`${leadPt} ${left} et ${right} y a-t-il en tout ?`"
+  },
+  {
+    "en": "`How many are not ${cat.plural}?`",
+    "fr": "`Combien ne sont pas des ${thingName(cat.name, 2, cat.plural)} ?`"
+  },
+  {
+    "en": "`Each picture stands for ${scale}. How many ${cat.plural}?`",
+    "fr": "`Chaque image vaut ${scale}. ${howManyPhrase(cat.name, 2, cat.plural)} y a-t-il ?`"
+  },
+  {
+    "en": "`How many are ${num}/${den}?`",
+    "fr": "`Combien en mesurent ${num}/${den} ?`"
+  },
+  {
+    "en": "`Each picture is ${board.scale}`",
+    "fr": "`Chaque image vaut ${board.scale}`"
+  },
+  {
+    "en": "`Each picture stands for ${scale}. Make the graph.`",
+    "fr": "`Chaque image vaut ${scale}. Fais le graphique.`"
+  },
+  {
+    "en": "`The ${answer} is the ${askLong ? \"longest\" : \"shortest\"}`",
+    "fr": "`${named} est ${longShortOf(answer, askLong)}`"
+  },
+  {
+    "en": "`${inches} inches`",
+    "fr": "inches === 1 ? `${inches} pouce` : `${inches} pouces`"
+  },
+  {
+    "en": "`Which has the most on the ${graph}?`",
+    "fr": "`Lequel en a le plus sur le ${graphEs} ?`"
+  },
+  {
+    "en": "`How many ${many} are on the ${graph}?`",
+    "fr": "`${howMany} y a-t-il sur le ${graphEs} ?`"
+  },
+  {
+    "en": "`${answer} has the most`",
+    "fr": "`${thingName(answer, 1, answer)} en a le plus`"
+  },
+  {
+    "en": "`${focusItem.value} ${many}`",
+    "fr": "`${focusItem.value} ${manyEs}`"
+  },
+  {
+    "en": "`How many more ${pluralName(items[0]!.name)} than ${pluralName(items[1]!.name)}?`",
+    "fr": "`${howManyMorePhrase(items[0]!.name, pluralName(items[0]!.name))} de plus que ${thingName(items[1]!.name, 2, pluralName(items[1]!.name))} ?`"
+  },
+  {
+    "en": "`${answer} more`",
+    "fr": "`${answer} de plus`"
+  },
+  {
+    "en": "`Which is longer, ${a} units or ${b} units?`",
+    "fr": "`Lequel est le plus long, ${a} unités ou ${b} unités ?`"
+  },
+  {
+    "en": "`Which is shorter, ${a} units or ${b} units?`",
+    "fr": "`Lequel est le plus court, ${a} unités ou ${b} unités ?`"
+  },
+  {
+    "en": "`The ribbon goes from 0 to ${inches} on the ruler. How many inches?`",
+    "fr": "`Le ruban va de 0 jusqu'au ${inches} sur la règle. Combien de pouces ?`"
+  },
+  {
+    "en": "`The graph shows ${icon.repeat(n)} apples. How many apples?`",
+    "fr": "`Le graphique montre ${icon.repeat(n)} pommes. Combien de pommes ?`"
+  },
+  {
+    "en": "`There are ${cats} cats and ${dogs} dogs. How many more cats?`",
+    "fr": "`Il y a ${cats} chats et ${dogs} chiens. Combien de chats de plus ?`"
+  },
+  {
+    "en": "`Yes! That is a ${name.toLowerCase()}.`",
+    "fr": "`Oui ! C'est ${coin}.`"
+  },
+  {
+    "en": "`Almost! That one is a ${name.toLowerCase()}.`",
+    "fr": "`Presque ! C'est ${coin}.`"
+  },
+  {
+    "en": "`Yes! ${pile} is ${formatCents(total)}.`",
+    "fr": "`Oui ! ${pile} font ${formatCents(total)}.`"
+  },
+  {
+    "en": "`Almost! ${pile} is ${formatCents(total)}.`",
+    "fr": "`Presque ! ${pile} font ${formatCents(total)}.`"
+  },
+  {
+    "en": "`Yes! ${made} makes ${price}.`",
+    "fr": "`Oui ! ${made} font ${price}.`"
+  },
+  {
+    "en": "`Almost! ${made} makes ${price}.`",
+    "fr": "`Presque ! ${made} font ${price}.`"
+  },
+  {
+    "en": "`You pay ${paidLabel}. The price is ${priceLabel}.`",
+    "fr": "`Tu paies ${paidLabel}. Le prix est ${priceLabel}.`"
+  },
+  {
+    "en": "`Yes! The change is ${changeLabel}.`",
+    "fr": "`Oui ! La monnaie est ${changeLabel}.`"
+  },
+  {
+    "en": "`Almost! The change is ${changeLabel}.`",
+    "fr": "`Presque ! La monnaie est ${changeLabel}.`"
+  },
+  {
+    "en": "`Yes! That is ${amount}.`",
+    "fr": "`Oui ! Ça fait ${amount}.`"
+  },
+  {
+    "en": "`Almost! That is ${amount}.`",
+    "fr": "`Presque ! Ça fait ${amount}.`"
+  },
+  {
+    "en": "`Name the coin marked ${COIN_CENTS[kind]}:`",
+    "fr": "`Dis la pièce marquée ${COIN_CENTS[kind]} :`"
+  },
+  {
+    "en": "`${pile} =`",
+    "fr": "`${pile} =`"
+  },
+  {
+    "en": "`Make ${price}. One way:`",
+    "fr": "`Forme ${price}. Une façon :`"
+  },
+  {
+    "en": "`Pay ${paidLabel}. Price ${priceLabel}. Change =`",
+    "fr": "`Tu paies ${paidLabel}. Prix ${priceLabel}. Monnaie =`"
+  },
+  {
+    "en": "`${dollars} ${word} and ${cents}¢ =`",
+    "fr": "`${dollars} ${esWord} et ${cents}¢ =`"
+  },
+  {
+    "en": "`You pay ${pile}`",
+    "fr": "`Tu paies ${pile}`"
+  },
+  {
+    "en": "`${target.letter} says ${target.phoneme}, like ${target.word}`",
+    "fr": "`${target.letter} dit ${target.phoneme}, comme ${target.word}`"
+  },
+  {
+    "en": "`${target.word} starts with ${target.phoneme}`",
+    "fr": "`${target.word} commence par ${target.phoneme}`"
+  },
+  {
+    "en": "`Which word rhymes with ${cue}?`",
+    "fr": "`Quel mot rime avec ${cue} ?`"
+  },
+  {
+    "en": "`${answer} rhymes with ${cue}`",
+    "fr": "`${answer} rime avec ${cue}`"
+  },
+  {
+    "en": "`${blend} makes ${word}`",
+    "fr": "`${blend} forme ${word}`"
+  },
+  {
+    "en": "`Which sound ends ${word}?`",
+    "fr": "`Quel son termine ${word} ?`"
+  },
+  {
+    "en": "`${word} ends with ${phoneme}`",
+    "fr": "`${word} termine par ${phoneme}`"
+  },
+  {
+    "en": "`Which word starts with the ${target.phoneme} sound: ${words}?`",
+    "fr": "`Quel mot commence par le son ${target.phoneme} : ${words} ?`"
+  },
+  {
+    "en": "`Which word rhymes with ${cue}: ${[answer, ...others].join(\", \")}?`",
+    "fr": "`Quel mot rime avec ${cue} : ${[answer, ...others].join(\", \")} ?`"
+  },
+  {
+    "en": "`Blend ${word.split(\"\").join(\"-\")}.`",
+    "fr": "`Assemble les sons de ${word.split(\"\").join(\"-\")}.`"
+  },
+  {
+    "en": "`What letter sound ends ${word}?`",
+    "fr": "`Quel son de lettre termine ${word} ?`"
+  },
+  {
+    "en": "`What is ${n} in expanded form?`",
+    "fr": "`Comment s'écrit ${n} en forme développée ?`"
+  },
+  {
+    "en": "`Round ${n} to the nearest ${place}`",
+    "fr": "`Arrondis ${n} à la ${place === 10 ? \"dizaine\" : \"centaine\"} la plus proche`"
+  },
+  {
+    "en": "`${n} rounds to ${answer}`",
+    "fr": "`${n} s'arrondit à ${answer}`"
+  },
+  {
+    "en": "`Build ${n}`",
+    "fr": "`Construis ${n}`"
+  },
+  {
+    "en": "`${tens} tens and ${ones} ones =`",
+    "fr": "`${tens} dizaines et ${ones} unités =`"
+  },
+  {
+    "en": "`Write ${n} in expanded form.`",
+    "fr": "`Écris ${n} en forme développée.`"
+  },
+  {
+    "en": "`Which is greater, ${a} or ${b}?`",
+    "fr": "`Lequel est le plus grand, ${a} ou ${b} ?`"
+  },
+  {
+    "en": "`Round ${n} to the nearest 10.`",
+    "fr": "`Arrondis ${n} à la dizaine la plus proche.`"
+  },
+  {
+    "en": "`Round ${n} to the nearest 100.`",
+    "fr": "`Arrondis ${n} à la centaine la plus proche.`"
+  },
+  {
+    "en": "`${star.name} the ${star.trait} has ${a} ${items}. ${star.pal} brings ${b} more. How many ${thing} now?`",
+    "fr": "`${lead} a ${a} ${esItems}. ${star.pal} en apporte ${b} de plus. ${esMany} y a-t-il maintenant ?`"
+  },
+  {
+    "en": "`${star.name} finds ${a} ${items} and ${star.pal} finds ${b}. How many ${thing} in all?`",
+    "fr": "`${star.name} trouve ${a} ${esItems} et ${star.pal} trouve ${b}. ${esMany} y a-t-il en tout ?`"
+  },
+  {
+    "en": "`There are ${a} ${items} with ${star.name} and ${b} with ${star.pal}. How many ${thing} altogether?`",
+    "fr": "`Il y a ${a} ${esItems} avec ${star.name} et ${b} avec ${star.pal}. ${esMany} y a-t-il en tout ?`"
+  },
+  {
+    "en": "`${star.name} has ${a} ${items} and gives ${b} to ${star.pal}. How many ${thing} are left?`",
+    "fr": "`${star.name} a ${a} ${esItems} et en donne ${b} à ${star.pal}. ${esMany} en reste-t-il ?`"
+  },
+  {
+    "en": "`${star.name} the ${star.trait} sees ${a} ${items}. ${b} go to ${star.pal}. How many ${thing} are left?`",
+    "fr": "`${lead} voit ${a} ${esItems}. ${b} partent avec ${star.pal}. ${esMany} en reste-t-il ?`"
+  },
+  {
+    "en": "`${star.name} starts with ${a} ${items} and shares ${b} with ${star.pal}. How many ${thing} are left?`",
+    "fr": "`${star.name} commence avec ${a} ${esItems} et partage ${b} avec ${star.pal}. ${esMany} en reste-t-il ?`"
+  },
+  {
+    "en": "`${star.name} has ${a} ${bags} with ${b} ${each} in each bag. How many ${thing}?`",
+    "fr": "`${star.name} a ${a} ${esBags} avec ${b} ${esEach} dans chaque sac. ${esMany} y a-t-il ?`"
+  },
+  {
+    "en": "`${star.name} the ${star.trait} makes ${a} rows of ${b} ${each}. How many ${thing}?`",
+    "fr": "`${lead} fait ${a} lignes de ${b} ${esEach}. ${esMany} y a-t-il ?`"
+  },
+  {
+    "en": "`${star.pal} sets out ${a} groups of ${b} ${each} for ${star.name}. How many ${thing}?`",
+    "fr": "`${star.pal} pose ${a} groupes de ${b} ${esEach} pour ${star.name}. ${esMany} y a-t-il ?`"
+  },
+  {
+    "en": "`${star.name} has ${a} ${items} shared into ${b} equal groups. How many ${thing} are in each group?`",
+    "fr": "`${star.name} met ${a} ${esItems} dans ${b} groupes égaux. ${esMany} y a-t-il dans chaque groupe ?`"
+  },
+  {
+    "en": "`${star.name} the ${star.trait} shares ${a} ${items} with ${b} friends. How many ${thing} does each friend get?`",
+    "fr": "`${lead} partage ${a} ${esItems} avec ${b} copains. ${esMany} chaque copain reçoit-il ?`"
+  },
+  {
+    "en": "`${star.pal} and ${star.name} split ${a} ${items} into ${b} equal piles. How many ${thing} in each pile?`",
+    "fr": "`${star.pal} et ${star.name} partagent ${a} ${esItems} en ${b} tas égaux. ${esMany} y a-t-il dans chaque tas ?`"
+  },
+  {
+    "en": "`${star.name} the ${star.trait} needs ${groups} groups of ${size} ${countName(thing.name, size)}. Which picture shows that?`",
+    "fr": "`${starLead(star.name, star.trait)} a besoin de ${groups} groupes de ${size} ${thingName(thing.name, size, countName(thing.name, size))}. Quel dessin montre ça ?`"
+  },
+  {
+    "en": "`${star.name} draws ${groups} groups of ${size} ${countName(thing.name, size)} for ${star.pal}. Which picture matches?`",
+    "fr": "`${star.name} dessine ${groups} groupes de ${size} ${thingName(thing.name, size, countName(thing.name, size))} pour ${star.pal}. Quel dessin est pareil ?`"
+  },
+  {
+    "en": "`${groups} groups of ${size}`",
+    "fr": "`${groups} groupes de ${size}`"
+  },
+  {
+    "en": "`Peach has ${a} ${countName(\"apples\", a)}. Frog brings ${b} more. How many apples?`",
+    "fr": "`Peach a ${a} ${thingName(\"apples\", a, countName(\"apples\", a))}. Frog en apporte ${b} de plus. Combien de pommes ?`"
+  },
+  {
+    "en": "`Bear has ${a} fish and gives ${b} to Panda. How many fish are left?`",
+    "fr": "`Bear a ${a} ${a === 1 ? \"poisson\" : \"poissons\"} et en donne ${b} à Panda. Combien de poissons reste-t-il ?`"
+  },
+  {
+    "en": "`Panda has ${a} bags with ${b} stars in each bag. How many stars?`",
+    "fr": "`Panda a ${a} ${thingName(\"bags\", a, countName(\"bags\", a))} avec ${b} ${thingName(\"stars\", b, countName(\"stars\", b))} dans chaque sac. Combien d'étoiles ?`"
+  },
+  {
+    "en": "`Fox has ${b * q} cookies shared with ${b} friends. How many cookies does each friend get?`",
+    "fr": "`Fox a ${b * q} biscuits pour ${b} copains. Combien de biscuits chaque copain reçoit-il ?`"
+  },
+  {
+    "en": "`Bunny draws ${groups} groups of ${size} frogs. How many frogs?`",
+    "fr": "`Bunny dessine ${groups} groupes de ${size} grenouilles. Combien de grenouilles ?`"
+  },
+  {
+    "en": "`${n} ${n === 1 ? \"squishee\" : \"squishees\"}`",
+    "fr": "`${n} ${n === 1 ? \"squishee\" : \"squishees\"}`"
+  },
+  {
+    "en": "`Fewer ${label}`",
+    "fr": "`Moins de ${label}`"
+  },
+  {
+    "en": "`More ${label}`",
+    "fr": "`Plus de ${label}`"
+  },
+  {
+    "en": "`It is a ${shape}`",
+    "fr": "`C'est ${shapeWithArticle(shape)}`"
+  },
+  {
+    "en": "`A ${shape} has ${count} sides`",
+    "fr": "`${named} a ${count} côtés`"
+  },
+  {
+    "en": "`A ${shape} has ${count} corners`",
+    "fr": "`${named} a ${count} sommets`"
+  },
+  {
+    "en": "`A ${shape} has ${answer} lines of symmetry`",
+    "fr": "`${shapeWithArticle(shape)} a ${answer === \"more than 4\" ? \"plus de 4\" : answer} axes de symétrie`"
+  },
+  {
+    "en": "`Which picture shows ${part.label}?`",
+    "fr": "`Quel dessin montre ${partPhrase(part.label)} ?`"
+  },
+  {
+    "en": "`Name the flat shape with ${clue}.`",
+    "fr": "`Dis la figure plate : ${clue}.`"
+  },
+  {
+    "en": "`Name the solid shape with ${clue}.`",
+    "fr": "`Dis le solide : ${clue}.`"
+  },
+  {
+    "en": "`How many sides does a ${shape} have?`",
+    "fr": "`Combien de côtés a ${shapeWithArticle(shape)} ?`"
+  },
+  {
+    "en": "`How many corners does a ${shape} have?`",
+    "fr": "`Combien de sommets a ${shapeWithArticle(shape)} ?`"
+  },
+  {
+    "en": "`How many lines of symmetry does a ${shape} have?`",
+    "fr": "`Combien d'axes de symétrie a ${shapeWithArticle(shape)} ?`"
+  },
+  {
+    "en": "`A shape is split into ${equal} equal parts. What are the parts called?`",
+    "fr": "`Une figure est partagée en ${equal} parts égales. Comment s'appellent ces parts ?`"
+  },
+  {
+    "en": "`Yes! ${word.word}`",
+    "fr": "`Oui ! ${word.word}`"
+  },
+  {
+    "en": "`Almost! The word is ${word.word}.`",
+    "fr": "`Presque ! Le mot est ${word.word}.`"
+  },
+  {
+    "en": "`Which one is ${word}?`",
+    "fr": "`Lequel est ${word} ?`"
+  },
+  {
+    "en": "`${said}. What comes next?`",
+    "fr": "`${said}. Qu'est-ce qui vient après ?`"
+  },
+  {
+    "en": "`${answer} degrees`",
+    "fr": "`${answer} degrés`"
+  },
+  {
+    "en": "`A rectangle is ${length} by ${width}. What is the area?`",
+    "fr": "`Un rectangle mesure ${length} fois ${width}. Quelle est l'aire ?`"
+  },
+  {
+    "en": "`A rectangle is ${length} by ${width}. What is the perimeter?`",
+    "fr": "`Un rectangle mesure ${length} fois ${width}. Quel est le périmètre ?`"
+  },
+  {
+    "en": "`${answer} square units`",
+    "fr": "`${answer} unités carrées`"
+  },
+  {
+    "en": "`${answer} units`",
+    "fr": "`${answer} unités`"
+  },
+  {
+    "en": "`Tap the letter ${letter}`",
+    "fr": "`Touche la lettre ${letter}`"
+  },
+  {
+    "en": "`What is the value of the ${digit} in ${n}?`",
+    "fr": "`Quelle est la valeur du ${digit} dans ${n} ?`"
+  },
+  {
+    "en": "`Round ${n} to the nearest ${placeName}`",
+    "fr": "`Arrondis ${n} au plus proche ${placeName}`"
+  },
+  {
+    "en": "`What is ${num}/${den} ${sign} ${num2}/${den}?`",
+    "fr": "`Combien font ${num}/${den} ${sign} ${num2}/${den} ?`"
+  },
+  {
+    "en": "whole === 1 ? \"one whole\" : `${whole} wholes`",
+    "fr": "whole === 1 ? \"un entier\" : `${whole} entiers`"
+  },
+  {
+    "en": "`${tenths} tenths`",
+    "fr": "`${tenths} dixièmes`"
+  },
+  {
+    "en": "`${places} hundredths`",
+    "fr": "`${places} centièmes`"
+  },
+  {
+    "en": "`${whole} and ${tenths} tenths`",
+    "fr": "`${whole} et ${tenths} dixièmes`"
+  },
+  {
+    "en": "`${whole} and ${places} hundredths`",
+    "fr": "`${whole} et ${places} centièmes`"
+  },
+  {
+    "en": "`${tenths * 10 + hundredths} hundredths`",
+    "fr": "`${tenths * 10 + hundredths} centièmes`"
+  },
+  {
+    "en": "`Which decimal shows ${said}?`",
+    "fr": "`Quel décimal montre ${said} ?`"
+  },
+  {
+    "en": "`Which is greater, ${left} hundredths or ${right} hundredths?`",
+    "fr": "`Lequel est le plus grand, ${left} centièmes ou ${right} centièmes ?`"
+  },
+  {
+    "en": "`${greaterLeft ? left : right} hundredths`",
+    "fr": "`${greaterLeft ? left : right} centièmes`"
+  },
+  {
+    "en": "`${who} starts at ${start}. It lasts ${delta} minutes. What time is it then?`",
+    "fr": "`${who} commence à ${start}. Ça dure ${delta} minutes. Quelle heure est-il ensuite ?`"
+  },
+  {
+    "en": "`Yes! ${answer}`",
+    "fr": "`Oui ! ${answer}`"
+  },
+  {
+    "en": "`Almost! ${answer}`",
+    "fr": "`Presque ! ${answer}`"
+  },
+  {
+    "en": "`A snack is ${a} and a drink is ${b}. You pay ${pay}. How much change?`",
+    "fr": "`Un goûter coûte ${a} et une boisson coûte ${b}. Tu paies ${pay}. Combien de monnaie ?`"
+  },
+  {
+    "en": "`A snack is ${a} and a drink is ${b}. How much altogether?`",
+    "fr": "`Un goûter coûte ${a} et une boisson coûte ${b}. Combien en tout ?`"
+  },
+  {
+    "en": "`Yes! ${formatCents(answer)}`",
+    "fr": "`Oui ! ${formatCents(answer)}`"
+  },
+  {
+    "en": "`Almost! ${formatCents(answer)}`",
+    "fr": "`Presque ! ${formatCents(answer)}`"
+  },
+  {
+    "en": "`${who} has ${groups} bags of ${each} ${thing.name}. ${who} gives away ${away}. How many are left?`",
+    "fr": "`${who} a ${groups} sacs de ${each} ${thing.name}. ${who} en donne ${away}. Combien en reste-t-il ?`"
+  },
+  {
+    "en": "`${groups * each} minus ${away} is ${answer}`",
+    "fr": "`${groups * each} moins ${away} font ${answer}`"
+  },
+  {
+    "en": "`Which number is a factor of ${n}?`",
+    "fr": "`Quel nombre est un facteur de ${n} ?`"
+  },
+  {
+    "en": "`Yes! ${answer} is a factor of ${n}`",
+    "fr": "`Oui ! ${answer} est un facteur de ${n}`"
+  },
+  {
+    "en": "`Almost! ${answer} is a factor of ${n}`",
+    "fr": "`Presque ! ${answer} est un facteur de ${n}`"
+  },
+  {
+    "en": "`Which number is a multiple of ${base}?`",
+    "fr": "`Quel nombre est un multiple de ${base} ?`"
+  },
+  {
+    "en": "`Yes! ${answer} is a multiple of ${base}`",
+    "fr": "`Oui ! ${answer} est un multiple de ${base}`"
+  },
+  {
+    "en": "`Almost! ${answer} is a multiple of ${base}`",
+    "fr": "`Presque ! ${answer} est un multiple de ${base}`"
+  },
+  {
+    "en": "`What is ${a} times ${b}?`",
+    "fr": "`Combien font ${a} fois ${b} ?`"
+  },
+  {
+    "en": "`What is ${a} divided by ${b}?`",
+    "fr": "`Combien font ${a} divisé par ${b} ?`"
+  },
+  {
+    "en": "`What is ${pink} plus ${teal}?`",
+    "fr": "`Combien font ${pink} plus ${teal} ?`"
+  },
+  {
+    "en": "`What is ${pink + teal} minus ${teal}?`",
+    "fr": "`Combien font ${pink + teal} moins ${teal} ?`"
+  },
+  {
+    "en": "`Almost! ${word.word}. ${word.sentence}`",
+    "fr": "`Presque ! ${word.word}. ${word.sentence}`"
+  },
+  {
+    "en": "`Trace and write · ${word.patternLabel}`",
+    "fr": "`Suis le tracé et écris · ${patternName(word.patternLabel)}`"
+  },
+  {
+    "en": "`Remove ${tile.letter}`",
+    "fr": "`Enlève ${tile.letter}`"
+  },
+  {
+    "en": "`Letter ${tile.letter}`",
+    "fr": "`Lettre ${tile.letter}`"
+  },
+  {
+    "en": "`The long hand points to ${number}. Count by fives.`",
+    "fr": "`La grande aiguille pointe vers le ${number}. Compte de 5 en 5.`"
+  },
+  {
+    "en": "`Yes! ${capPhrase(phrase)}`",
+    "fr": "`Oui ! ${capPhrase(phrase)}`"
+  },
+  {
+    "en": "`Almost! It is ${phrase}.`",
+    "fr": "`Presque ! Il est ${phrase}.`"
+  },
+  {
+    "en": "`${a} groups of ${b}`",
+    "fr": "`${a} groupes de ${b}`"
+  },
+  {
+    "en": "`1 ${one}`",
+    "fr": "`1 ${oneEs}`"
+  },
+  {
+    "en": "`${n} ${many}`",
+    "fr": "`${n} ${manyEs}`"
+  },
+  {
+    "en": "`Start with ${start}`",
+    "fr": "`Commence avec ${start}`"
+  },
+  {
+    "en": "`Add ${add}`",
+    "fr": "`Ajoute ${add}`"
+  },
+  {
+    "en": "`Start with ${fact.a}`",
+    "fr": "`Commence avec ${fact.a}`"
+  },
+  {
+    "en": "`Take away ${fact.b}`",
+    "fr": "`Enlève ${fact.b}`"
+  },
+  {
+    "en": "`${fact.b} in each group`",
+    "fr": "`${fact.b} dans chaque groupe`"
+  },
+  {
+    "en": "`${each} in each group`",
+    "fr": "`${each} dans chaque groupe`"
+  },
+  {
+    "en": "`Yes! ${rows} ${rows === 1 ? \"row\" : \"rows\"} of ${cols}.`",
+    "fr": "`Oui ! ${rows} ${rows === 1 ? \"ligne\" : \"lignes\"} de ${cols}.`"
+  },
+  {
+    "en": "`Make ${rows} ${rows === 1 ? \"row\" : \"rows\"} of ${cols}. Drag a row.`",
+    "fr": "`Fais ${rows} ${rows === 1 ? \"ligne\" : \"lignes\"} de ${cols}. Glisse une ligne.`"
+  },
+  {
+    "en": "`Yes! ${start} + ${change} = ${target}.`",
+    "fr": "`Oui ! ${start} + ${change} = ${target}.`"
+  },
+  {
+    "en": "`Start with ${start}. Drag ${change} more.`",
+    "fr": "`Commence avec ${start}. Glisse ${change} de plus.`"
+  },
+  {
+    "en": "`Yes! ${start} minus ${change} = ${target}.`",
+    "fr": "`Oui ! ${start} moins ${change} = ${target}.`"
+  },
+  {
+    "en": "`Start with ${start}. Drag ${change} away.`",
+    "fr": "`Commence avec ${start}. Glisse ${change} dehors.`"
+  },
+  {
+    "en": "`Fill the ten-frame to ${target}.`",
+    "fr": "`Remplis la grille de dix jusqu'à ${target}.`"
+  },
+  {
+    "en": "`Yes! ${target}.`",
+    "fr": "`Oui ! ${target}.`"
+  },
+  {
+    "en": "`A ten is ready. Drag ${extra} more to make ${target}.`",
+    "fr": "`Une dizaine est prête. Glisse ${extra} de plus pour faire ${target}.`"
+  },
+  {
+    "en": "`What comes after ${anchor}? Make that number.`",
+    "fr": "`Quel nombre vient après ${anchor} ? Construis ce nombre.`"
+  },
+  {
+    "en": "`What comes before ${anchor}? Make that number.`",
+    "fr": "`Quel nombre vient avant ${anchor} ? Construis ce nombre.`"
+  },
+  {
+    "en": "`Which is more, ${left} or ${right}? Make that number.`",
+    "fr": "`Lequel est le plus, ${left} ou ${right} ? Construis ce nombre.`"
+  },
+  {
+    "en": "`Which is less, ${left} or ${right}? Make that number.`",
+    "fr": "`Lequel est le moins, ${left} ou ${right} ? Construis ce nombre.`"
+  },
+  {
+    "en": "`Make ${target}. Drag the counters.`",
+    "fr": "`Construis ${target}. Glisse les jetons.`"
+  },
+  {
+    "en": "`Round ${n} to the nearest hundred. Drag hundreds.`",
+    "fr": "`Arrondis ${n} à la centaine la plus proche. Glisse les centaines.`"
+  },
+  {
+    "en": "`Yes! ${hundreds * 100}.`",
+    "fr": "`Oui ! ${hundreds * 100}.`"
+  },
+  {
+    "en": "`Round ${n} to the nearest ten. Build ${rounded}.`",
+    "fr": "`Arrondis ${n} à la dizaine la plus proche. Construis ${rounded}.`"
+  },
+  {
+    "en": "`Yes! ${rounded}.`",
+    "fr": "`Oui ! ${rounded}.`"
+  },
+  {
+    "en": "`Which is greater, ${left} or ${right}? Build it.`",
+    "fr": "`Lequel est le plus grand, ${left} ou ${right} ? Construis-le.`"
+  },
+  {
+    "en": "`Yes! ${greater}.`",
+    "fr": "`Oui ! ${greater}.`"
+  },
+  {
+    "en": "`Build ${tens * 10} + ${ones}.`",
+    "fr": "`Construis ${tens * 10} + ${ones}.`"
+  },
+  {
+    "en": "`Build ${blockPhrase(n)}.`",
+    "fr": "`Construis ${blockPhrase(n)}.`"
+  },
+  {
+    "en": "`Yes! ${n}.`",
+    "fr": "`Oui ! ${n}.`"
+  },
+  {
+    "en": "`Shade ${phrase}. That matches ${other}.`",
+    "fr": "`Colorie ${phrase}. C'est pareil que ${other}.`"
+  },
+  {
+    "en": "`Yes! ${phrase}.`",
+    "fr": "`Oui ! ${phrase}.`"
+  },
+  {
+    "en": "`${phrase} is greater than ${smaller}. Shade ${phrase}.`",
+    "fr": "`${phrase} est plus grand que ${smaller}. Colorie ${phrase}.`"
+  },
+  {
+    "en": "`Shade ${phrase}.`",
+    "fr": "`Colorie ${phrase}.`"
+  },
+  {
+    "en": "`${row.sentence} Spell ${row.word}.`",
+    "fr": "`${row.sentence} Épelle ${row.word}.`"
+  },
+  {
+    "en": "`Spell ${row.word}. Drag the letters.`",
+    "fr": "`Épelle ${row.word}. Glisse les lettres.`"
+  },
+  {
+    "en": "`Yes! ${row.word}.`",
+    "fr": "`Oui ! ${row.word}.`"
+  },
+  {
+    "en": "`Drag the missing word. ${row.sentence}`",
+    "fr": "`Glisse le mot qui manque. ${row.sentence}`"
+  },
+  {
+    "en": "`Drag the word ${row.word}.`",
+    "fr": "`Glisse le mot ${row.word}.`"
+  },
+  {
+    "en": "`Drag the word that rhymes with ${cue}.`",
+    "fr": "`Glisse le mot qui rime avec ${cue}.`"
+  },
+  {
+    "en": "`Yes! ${answer}.`",
+    "fr": "`Oui ! ${answer}.`"
+  },
+  {
+    "en": "`Build the word. ${blendOf(word)}.`",
+    "fr": "`Construis le mot. ${blendOf(word)}.`"
+  },
+  {
+    "en": "`Yes! ${word}.`",
+    "fr": "`Oui ! ${word}.`"
+  },
+  {
+    "en": "`Drag the last sound in ${word}. ${phoneme}.`",
+    "fr": "`Glisse le dernier son de ${word}. ${phoneme}.`"
+  },
+  {
+    "en": "`Drag the first sound. ${row.phoneme}.`",
+    "fr": "`Glisse le premier son. ${row.phoneme}.`"
+  },
+  {
+    "en": "`Drag the letter that says ${row.phoneme}.`",
+    "fr": "`Glisse la lettre qui dit ${row.phoneme}.`"
+  },
+  {
+    "en": "`Yes! ${row.letter} says ${row.phoneme}.`",
+    "fr": "`Oui ! ${row.letter} dit ${row.phoneme}.`"
+  },
+  {
+    "en": "`Yes! ${target} ${target === 1 ? \"inch\" : \"inches\"}.`",
+    "fr": "`Oui ! ${target} ${target === 1 ? \"pouce\" : \"pouces\"}.`"
+  },
+  {
+    "en": "`Drag to make a bar of ${target}.`",
+    "fr": "`Glisse pour faire une barre de ${target}.`"
+  },
+  {
+    "en": "`${high} apples and ${low} apples. Drag how many more.`",
+    "fr": "`${high} pommes et ${low} pommes. Glisse combien de plus.`"
+  },
+  {
+    "en": "`Yes! ${target} more.`",
+    "fr": "`Oui ! ${target} de plus.`"
+  },
+  {
+    "en": "`Drag the ${ask} one.`",
+    "fr": "ask === \"longest\" ? \"Glisse le plus long.\" : \"Glisse le plus court.\""
+  },
+  {
+    "en": "`Yes! The ${ask} one.`",
+    "fr": "ask === \"longest\" ? \"Oui ! Le plus long.\" : \"Oui ! Le plus court.\""
+  },
+  {
+    "en": "`Yes! ${shape}.`",
+    "fr": "`Oui ! ${shapeWithArticle(shape)}.`"
+  },
+  {
+    "en": "`Yes! ${product} square units.`",
+    "fr": "`Oui ! ${product} unités carrées.`"
+  },
+  {
+    "en": "`Drag the ${answer}.`",
+    "fr": "`Glisse ${partPhrase(answer)}.`"
+  },
+  {
+    "en": "`Drag the shape with ${sides} sides.`",
+    "fr": "`Glisse la figure avec ${sides} côtés.`"
+  },
+  {
+    "en": "`Drag the shape with ${row[1]}.`",
+    "fr": "`Glisse la figure avec ${symmetryClue(row[1])}.`"
+  },
+  {
+    "en": "`Yes! ${row[0]}.`",
+    "fr": "`Oui ! ${shapeWithArticle(row[0])}.`"
+  },
+  {
+    "en": "`${star.name} has ${a} ${items(a)} and gives ${b} away. Drag ${b} out of the story.`",
+    "fr": "`${star.name} a ${a} ${items(a)} et en donne ${b}. Glisse ${b} hors de l'histoire.`"
+  },
+  {
+    "en": "`Yes! ${a - b} left.`",
+    "fr": "`Oui ! Il en reste ${a - b}.`"
+  },
+  {
+    "en": "`${star.name} shares ${a} ${items(a)} into ${b} equal groups. Drag them in.`",
+    "fr": "`${star.name} partage ${a} ${items(a)} en ${b} groupes égaux. Glisse-les.`"
+  },
+  {
+    "en": "`Yes! ${each} in each group.`",
+    "fr": "`Oui ! ${each} dans chaque groupe.`"
+  },
+  {
+    "en": "`${star.name} needs ${a} groups of ${b} ${items(b)}. Drag the groups in.`",
+    "fr": "`${star.name} a besoin de ${a} groupes de ${b} ${items(b)}. Glisse les groupes.`"
+  },
+  {
+    "en": "`Yes! ${a * b}.`",
+    "fr": "`Oui ! ${a * b}.`"
+  },
+  {
+    "en": "`${star.name} has ${a} ${items(a)}. ${star.pal} brings ${b}. Drag both groups in.`",
+    "fr": "`${star.name} a ${a} ${items(a)}. ${star.pal} apporte ${b}. Glisse les deux groupes.`"
+  },
+  {
+    "en": "`Yes! ${a + b}.`",
+    "fr": "`Oui ! ${a + b}.`"
+  },
+  {
+    "en": "`Show ${phrase}. Drag the hands.`",
+    "fr": "`Montre ${phrase}. Glisse les aiguilles.`"
+  },
+  {
+    "en": "`Pay ${speakable(formatCents(pick.cents))}. Drag the coins.`",
+    "fr": "`Paie ${speakable(formatCents(pick.cents))}. Glisse les pièces.`"
+  },
+  {
+    "en": "`Show ${timeTalk(task.hours, task.minutes)}`",
+    "fr": "`Montre ${timeTalk(task.hours, task.minutes)}`"
+  },
+  {
+    "en": "`${rounds} rounds`",
+    "fr": "`${rounds} manches`"
+  },
+  {
+    "en": "`Older practice is included in ${folded}. New play is kept month by month.`",
+    "fr": "`La pratique d'avant est dans ${folded}. Le nouveau jeu est gardé mois par mois.`"
+  },
+  {
+    "en": "`Yes! ${detail}`",
+    "fr": "`Oui ! ${detail}`"
+  },
+  {
+    "en": "`Almost! ${detail}`",
+    "fr": "`Presque ! ${detail}`"
+  },
+  {
+    "en": "`Your turn. ${prompt}`",
+    "fr": "`À toi. ${prompt}`"
+  },
+  {
+    "en": "`${n} cards`",
+    "fr": "`${n} cartes`"
+  },
+  {
+    "en": "`Card ${at} of ${safeTotal}`",
+    "fr": "`Carte ${at} sur ${safeTotal}`"
+  },
+  {
+    "en": "`${name} the ${trait}`",
+    "fr": "`${name}, ${ptTrait},`"
+  },
+  {
+    "en": "`${title} · Level ${num}`",
+    "fr": "`${show(title)} · Niveau ${num}`"
+  },
+  {
+    "en": "`Today: ${title} · ${gradeText(grade)}`",
+    "fr": "`Aujourd'hui : ${title} · ${gradeText(grade)}`"
+  },
+  {
+    "en": "`${name} has not played yet this week. One short game is a good start.`",
+    "fr": "`${name} n'a pas encore joué cette semaine. Un petit jeu est un bon début.`"
+  },
+  {
+    "en": "`${name} practiced ${minutesLabel} on ${days} ${dayWord} this week.`",
+    "fr": "`${name} a pratiqué ${minutesLabel} pendant ${days} ${dayPt} cette semaine.`"
+  },
+  {
+    "en": "`What ${named} learned`",
+    "fr": "`Ce que ${named} a appris`"
+  },
+  {
+    "en": "`${name} played ${child.streak} days in a row.`",
+    "fr": "`${name} a joué ${child.streak} jours d'affilée.`"
+  },
+  {
+    "en": "`${who} just started ${skill}.`",
+    "fr": "`${who} vient de commencer ${skill}.`"
+  },
+  {
+    "en": "`Play ${skill} a couple more times this week.`",
+    "fr": "`Rejoue ${skill} encore quelques fois cette semaine.`"
+  },
+  {
+    "en": "`${who} can do ${skill}.`",
+    "fr": "`${who} sait déjà faire ${skill}.`"
+  },
+  {
+    "en": "`Come back to ${skill} in a few days so it stays easy.`",
+    "fr": "`Reprends ${skill} dans quelques jours pour que ça reste facile.`"
+  },
+  {
+    "en": "`${who} is learning ${skill}, and some answers still slip.`",
+    "fr": "`${who} apprend ${skill}, et quelques réponses s'échappent encore.`"
+  },
+  {
+    "en": "`${who} is learning ${skill} and getting most of them right.`",
+    "fr": "`${who} apprend ${skill} et réussit presque tout.`"
+  },
+  {
+    "en": "`One more short game of ${skill} should lock it in.`",
+    "fr": "`Encore un petit jeu de ${skill} et c'est bon.`"
+  },
+  {
+    "en": "`${who} has not played ${title} yet.`",
+    "fr": "`${who} n'a pas encore joué à ${title}.`"
+  },
+  {
+    "en": "`Start with ${label}. It matches this grade.`",
+    "fr": "`Commence par ${label}. Ça va avec cette classe.`"
+  },
+  {
+    "en": "`Listen. ${visual.word}.`",
+    "fr": "`Écoute. ${visual.word}.`"
+  },
+  {
+    "en": "`The word is ${visual.word}.`",
+    "fr": "`Le mot est ${visual.word}.`"
+  },
+  {
+    "en": "`Start with ${visual.pink}`",
+    "fr": "`Commence avec ${visual.pink}`"
+  },
+  {
+    "en": "`Start with ${total}`",
+    "fr": "`Commence avec ${total}`"
+  },
+  {
+    "en": "`${shown} ${shown === 1 ? \"group\" : \"groups\"} of ${visual.b}`",
+    "fr": "`${shown} ${shown === 1 ? \"groupe\" : \"groupes\"} de ${visual.b}`"
+  },
+  {
+    "en": "`${formatCents(running)} so far`",
+    "fr": "`${formatCents(running)} pour l'instant`"
+  },
+  {
+    "en": "`A ${COIN_NAME[kind].toLowerCase()} is ${formatCents(cents)}`",
+    "fr": "`${coinAsA(kind, COIN_NAME[kind].toLowerCase()).replace(/^./, (ch) => ch.toUpperCase())} vaut ${formatCents(cents)}`"
+  },
+  {
+    "en": "`You pay ${formatCents(paid)}`",
+    "fr": "`Tu paies ${formatCents(paid)}`"
+  },
+  {
+    "en": "`The price is ${formatCents(price)}`",
+    "fr": "`Le prix est ${formatCents(price)}`"
+  },
+  {
+    "en": "`Change is ${formatCents(change)}`",
+    "fr": "`La monnaie est ${formatCents(change)}`"
+  },
+  {
+    "en": "`The prices add to ${formatCents(price)}`",
+    "fr": "`Les prix font ${formatCents(price)}`"
+  },
+  {
+    "en": "`Change is ${formatCents(paid - price)}`",
+    "fr": "`La monnaie est ${formatCents(paid - price)}`"
+  },
+  {
+    "en": "`Count to ${mid}`",
+    "fr": "`Compte jusqu'à ${mid}`"
+  },
+  {
+    "en": "`One less than ${board.n}`",
+    "fr": "`Un de moins que ${board.n}`"
+  },
+  {
+    "en": "`One more than ${board.n}`",
+    "fr": "`Un de plus que ${board.n}`"
+  },
+  {
+    "en": "`Fill the frame to ${board.n}`",
+    "fr": "`Remplis la grille jusqu'à ${board.n}`"
+  },
+  {
+    "en": "`${Math.floor(board.n / 10)} tens`",
+    "fr": "`${Math.floor(board.n / 10)} dizaines`"
+  },
+  {
+    "en": "`${board.n % 10} ones`",
+    "fr": "`${board.n % 10} unités`"
+  },
+  {
+    "en": "`The whole has ${board.den} equal parts`",
+    "fr": "`L'entier a ${board.den} parts égales`"
+  },
+  {
+    "en": "`${board.num} part${board.num === 1 ? \"\" : \"s\"} shaded`",
+    "fr": "board.num === 1 ? \"1 partie coloriée\" : `${board.num} parties coloriées`"
+  },
+  {
+    "en": "`The line is split into ${board.den}`",
+    "fr": "`La droite numérique est partagée en ${board.den}`"
+  },
+  {
+    "en": "`The letter is ${board.letter}`",
+    "fr": "`La lettre est ${board.letter}`"
+  },
+  {
+    "en": "`The sound is ${board.phoneme}`",
+    "fr": "`Le son est ${board.phoneme}`"
+  },
+  {
+    "en": "`Listen for the ending of ${board.cue}`",
+    "fr": "`Écoute la fin de ${board.cue}`"
+  },
+  {
+    "en": "`The last sound in ${board.word}`",
+    "fr": "`Le dernier son de ${board.word}`"
+  },
+  {
+    "en": "`Start with ${board.a}`",
+    "fr": "`Commence avec ${board.a}`"
+  },
+  {
+    "en": "`Add ${board.b}`",
+    "fr": "`Ajoute ${board.b}`"
+  },
+  {
+    "en": "`Take away ${board.b}`",
+    "fr": "`Enlève ${board.b}`"
+  },
+  {
+    "en": "`${board.a} groups`",
+    "fr": "`${board.a} groupes`"
+  },
+  {
+    "en": "`${board.b} in each group`",
+    "fr": "`${board.b} dans chaque groupe`"
+  },
+  {
+    "en": "`${board.a} shared into ${board.b} groups`",
+    "fr": "`${board.a} partagés en ${board.b} groupes`"
+  },
+  {
+    "en": "`${board.a} groups of ${board.b}`",
+    "fr": "`${board.a} groupes de ${board.b}`"
+  },
+  {
+    "en": "`Take away ${away}`",
+    "fr": "`Enlève ${away}`"
+  },
+  {
+    "en": "`Analog clock. Short hand on ${short}. Long hand on 12.`",
+    "fr": "`Horloge à aiguilles. La petite aiguille sur le ${short}. La grande aiguille sur le 12.`"
+  },
+  {
+    "en": "`Analog clock. Short hand between ${short} and ${next}. Long hand on ${longN}.`",
+    "fr": "`Horloge à aiguilles. La petite aiguille entre le ${short} et le ${next}. La grande aiguille sur le ${longN}.`"
+  },
+  {
+    "en": "`Analog clock. Short hand just after ${short}. Long hand on ${longN}.`",
+    "fr": "`Horloge à aiguilles. La petite aiguille vient de passer le ${short}. La grande aiguille sur le ${longN}.`"
+  },
+  {
+    "en": "`${boss.name} appears`",
+    "fr": "`${boss.name} apparaît`"
+  },
+  {
+    "en": "`${buddy} and ${host} share the coins`",
+    "fr": "`${buddy} et ${host} se partagent les pièces`"
+  },
+  {
+    "en": "`${found} of ${book.length} found · ${child.coins} coins`",
+    "fr": "`${found} sur ${book.length} trouvés · ${child.coins} pièces`"
+  },
+  {
+    "en": "`${child.cosmetics.length} of ${lookCount} looks · ${child.coins} coins`",
+    "fr": "`${child.cosmetics.length} sur ${lookCount} déguisements · ${child.coins} pièces`"
+  },
+  {
+    "en": "`Take off ${bossCosmeticName(boss.cosmeticId)}`",
+    "fr": "`Enlève ${bossCosmeticName(boss.cosmeticId)}`"
+  },
+  {
+    "en": "`Wear ${bossCosmeticName(boss.cosmeticId)}`",
+    "fr": "`Mets ${bossCosmeticName(boss.cosmeticId)}`"
+  },
+  {
+    "en": "`Loves ${entry.favorite}`",
+    "fr": "`Adore ${entry.favorite}`"
+  },
+  {
+    "en": "`Each picture is ${spec.scale}`",
+    "fr": "`Chaque image vaut ${spec.scale}`"
+  },
+  {
+    "en": "`Put ${token.label} back`",
+    "fr": "token.label.includes(\"/\") ? `Remets ${token.label}` : `Remets ${nounIsFeminine(token.label) ? \"la\" : \"le\"} ${token.label}`"
+  },
+  {
+    "en": "`Print “${card.sheetTitle}”`",
+    "fr": "`Imprimer « ${card.sheetTitle} »`"
+  },
+  {
+    "en": "`What ${child.name || \"your child\"} is learning`",
+    "fr": "`Ce que ${child.name || \"ton fils ou ta fille\"} apprend`"
+  },
+  {
+    "en": "`${timeTalk(hours, minutes)}. Drag the hands. Arrow keys move them.`",
+    "fr": "`${timeTalk(hours, minutes)}. Glisse les aiguilles. Les flèches les déplacent.`"
+  },
+  {
+    "en": "`Drag ${COIN_NAME[kind].toLowerCase()}`",
+    "fr": "`Glisse ${coinWord(kind)}`"
+  },
+  {
+    "en": "`Remove ${COIN_NAME[kind].toLowerCase()}`",
+    "fr": "`Enlève ${coinWord(kind)}`"
+  },
+  {
+    "en": "`Face ${bossForGame(playId).name}`",
+    "fr": "`Affronte ${bossForGame(playId).name}`"
+  },
+  {
+    "en": "`Hi ${child.name}! Ready to play?`",
+    "fr": "`Salut ${child.name} ! Tu veux jouer ?`"
+  },
+  {
+    "en": "`${daily.rounds} of ${daily.goal} rounds today`",
+    "fr": "`${daily.rounds} sur ${daily.goal} manches aujourd'hui`"
+  },
+  {
+    "en": "`${game.title} is coming later for this grade.`",
+    "fr": "`${show(game.title)} arrive plus tard pour cette classe.`"
+  },
+  {
+    "en": "`${prize.amount} coins for the shelf.`",
+    "fr": "`${prize.amount} pièces pour la boutique.`"
+  },
+  {
+    "en": "`${name} hopped in.`",
+    "fr": "`${name} arrive d'un bond.`"
+  },
+  {
+    "en": "`${left} more round and the egg hatches.`",
+    "fr": "`${left} manche de plus et l'œuf éclot.`"
+  },
+  {
+    "en": "`${left} more rounds and the egg hatches.`",
+    "fr": "`${left} manches de plus et l'œuf éclot.`"
+  },
+  {
+    "en": "`${hostName} is your friend`",
+    "fr": "`${hostName} est ton copain`"
+  },
+  {
+    "en": "`${hostName} says hi`",
+    "fr": "`${hostName} te dit bonjour`"
+  },
+  {
+    "en": "`Face ${boss.name}`",
+    "fr": "`Affronte ${boss.name}`"
+  },
+  {
+    "en": "`Beat the ${prev} boss.`",
+    "fr": "`Bats le chef de ${show(prev)}.`"
+  },
+  {
+    "en": "`${squisheeById(hatchedId)?.name ?? \"A friend\"} hatched!`",
+    "fr": "`${squisheeById(hatchedId)?.name ?? \"Un ami\"} vient d'éclore !`"
+  },
+  {
+    "en": "`${rows.length} ${rows.length === 1 ? \"row\" : \"rows\"}`",
+    "fr": "`${rows.length} ${rows.length === 1 ? \"ligne\" : \"lignes\"}`"
+  },
+  {
+    "en": "`Remove a row of ${width}`",
+    "fr": "`Enlève une ligne de ${width}`"
+  },
+  {
+    "en": "`Row of ${width}`",
+    "fr": "`Ligne de ${width}`"
+  },
+  {
+    "en": "`${away} away`",
+    "fr": "`${away} dehors`"
+  },
+  {
+    "en": "`${moved} away`",
+    "fr": "`${moved} dehors`"
+  },
+  {
+    "en": "`${shaded} shaded`",
+    "fr": "`${shaded} coloriées`"
+  },
+  {
+    "en": "`Question ${Math.min(total, index + 1)} of ${total}`",
+    "fr": "`Question ${Math.min(total, index + 1)} sur ${total}`"
+  },
+  {
+    "en": "`${show(spec?.title ?? \"This game\")} is coming later`",
+    "fr": "`${show(spec?.title ?? \"This game\")} arrive plus tard`"
+  },
+  {
+    "en": "`Combo ${combo}`",
+    "fr": "`Combo ${combo}`"
+  },
+  {
+    "en": "`Combo ×${combo}`",
+    "fr": "`Combo ×${combo}`"
+  },
+  {
+    "en": "`Squish! ${count}`",
+    "fr": "`Écrase ! ${count}`"
+  },
+  {
+    "en": "`Trace ${task.glyph}. Start at the dot.`",
+    "fr": "`Suis le tracé de ${task.glyph}. Commence au point.`"
+  },
+  {
+    "en": "`Remove ${letter}`",
+    "fr": "`Enlève ${letter}`"
+  },
+  {
+    "en": "`Letter ${tile.label}`",
+    "fr": "`Lettre ${tile.label}`"
+  },
+  {
+    "en": "`Remove ${placed}`",
+    "fr": "`Enlève ${placed}`"
+  },
+  {
+    "en": "`Remove ${label}`",
+    "fr": "`Enlève ${label}`"
+  },
+  {
+    "en": "`${spec.title} worksheet`",
+    "fr": "`Fiche de ${show(spec.title)}`"
+  },
+  {
+    "en": "`Listen. ${word.word}.`",
+    "fr": "`Écoute. ${word.word}.`"
+  },
+  {
+    "en": "`${row.letter} says ${row.phoneme}, like ${row.word}`",
+    "fr": "`${row.letter} dit ${row.phoneme}, comme ${row.word}`"
+  },
+  {
+    "en": "`${n} days played this week`",
+    "fr": "`${n} jours joués cette semaine`"
+  }
+]
