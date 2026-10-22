@@ -259,6 +259,7 @@ export function worksheetIndexHtml(): string {
     "phonics",
     "word-problems",
     "missing-numbers",
+    "data",
   ]
     .map((slug) => `<a href="${slug}/">${slug}</a>`)
     .join(" · ");
@@ -319,6 +320,7 @@ export function sitemapXml(): string {
     "worksheets/phonics",
     "worksheets/word-problems",
     "worksheets/missing-numbers",
+    "worksheets/data",
   ];
   const urls = paths
     .map((path) => `  <url><loc>${canonicalUrl(path)}</loc></url>`)

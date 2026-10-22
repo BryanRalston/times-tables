@@ -4,6 +4,7 @@ import { speakable } from "./voice/speakable";
 export { speakable } from "./voice/speakable";
 import type { Board, CountBoard, FractionBoard, MeasureBoard, PhonicsBoard, PlaceBoard, ProblemBoard, ShapeBoard } from "./games/boards";
 import { geometryArt } from "./games/geometry";
+import { graphsTeachCaption } from "./games/graph-data";
 import { variableCaptions } from "./games/variables";
 import { COIN_CENTS, COIN_NAME, emptyPile, formatCents, pileCents } from "./games/money-model";
 import { timeTalk } from "./games/time";
@@ -652,6 +653,8 @@ function sceneFrames(question: ChoiceQ, board: Board): SceneFrame[] {
       return problemTeach(board);
     case "variables":
       return captions(variableCaptions(board));
+    case "graphs":
+      return captions([graphsTeachCaption(board), solved]);
     default: {
       const neverBoard: never = board;
       return neverBoard;

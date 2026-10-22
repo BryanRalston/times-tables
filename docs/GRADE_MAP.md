@@ -240,6 +240,23 @@ Pre-K compares picture sizes and is capped there. Kindergarten can drift one lev
 
 The ruler sits after the graphs, so grade 1 can drift down to longer or shorter and cannot reach the ruler. Grade 2 can drift into the graphs and into how many more.
 
+## Data and graphs
+
+Levels: sort, tally, picture graph, bar graph, scaled graph, line plot.
+
+This is the hands-on data game. The child sorts pictures into the graph, then answers a question about the graph they made. Measurement still has its own read-only picture and bar graphs. Pre-K and kindergarten sort two groups and stay capped there. Grade 1 tallies up to three groups. Grade 2 builds a picture graph and a bar graph with one picture for one thing. Grade 3 reads a scale of 2 or 5. Grade 4 places fractions of a unit on a line plot.
+
+| Grade | Offer | Start | Core levels | Cap without challenge | Standards |
+|---|---|---|---|---|---|
+| Pre-K | Play | Sort | Sort | Sort | K.MD.B.3 |
+| K | Play | Sort | Sort | Sort | K.MD.B.3 |
+| 1 | Play | Tally | Tally | Tally | 1.MD.C.4 |
+| 2 | Play | Picture graph | Picture graph, bar graph | Bar graph | 2.MD.D.10 |
+| 3 | Play | Scaled graph | Scaled graph | Scaled graph | 3.MD.B.3 |
+| 4 | Play | Line plot | Line plot | One level down (scaled graph) | 4.MD.B.4 |
+
+Sort asks how many are in a group, or how many are in the group with more. Tally asks how many, how many in all, and how many more or less. Picture and bar graphs ask for two groups together, the groups that are left, and how many more. A scaled graph asks for the real count, how many more or less, and a two-step compare. A line plot asks how many marks sit on a fraction, how much longer the longest is, and what the longest and shortest make together. Fractions stay in halves, fourths, and eighths, and they are not simplified.
+
 ## Phonics
 
 Levels: letter names, letter sounds, beginning sounds, rhyming words, CVC blending, ending sounds.

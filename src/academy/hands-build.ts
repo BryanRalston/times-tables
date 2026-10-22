@@ -26,6 +26,7 @@ import { MINUS, type ChoiceQ } from "./games/types";
 import { isTimesLevel, nextTimesFact } from "./games/times";
 import { makeClockTask, makePayTask, type ClockTask, type PayTask } from "./hands";
 import { tracePraise, traceSpeech } from "./trace/lines";
+import { makeGraphsTask, type GraphsTask } from "./games/graph-data";
 import { workedExample, type ModelArt, type WorkedExample } from "./teach";
 import { blankOut, buildTiles, countWord, extraLetters } from "./games/words";
 
@@ -219,7 +220,8 @@ export type BuildTask =
   | ShapeTask
   | StoryTask
   | BlankTask
-  | TraceTask;
+  | TraceTask
+  | GraphsTask;
 
 export type HandsTask = ClockTask | PayTask | BuildTask;
 
@@ -1391,6 +1393,8 @@ export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: str
       return makeStoryTask(level, rng, avoid);
     case "variables":
       return makeBlankTask(level, rng, avoid);
+    case "graphs":
+      return makeGraphsTask(level, rng, avoid);
     default:
       throw new Error(`No hands-on card for ${game}`);
   }
@@ -1544,6 +1548,18 @@ export function handsExample(task: BuildTask): WorkedExample {
     }
     case "trace":
       return modeled([{ art: { type: "word", text: task.glyph }, caption: task.praise }]);
+    case "graphs": {
+      const total =
+        task.mode === "line"
+          ? task.stacks.reduce((sum, count) => sum + count, 0)
+          : task.cats.reduce((sum, cat) => sum + cat.icons, 0);
+      return modeled([
+        {
+          art: { type: "bars", count: Math.max(1, Math.min(total, 8)), emoji: task.cats[0]?.emoji ?? "●" },
+          caption: task.speech.replace(/\.$/, ""),
+        },
+      ]);
+    }
     case "blank": {
       const groups =
         task.op === "×"

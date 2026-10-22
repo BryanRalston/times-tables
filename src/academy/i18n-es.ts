@@ -464,6 +464,13 @@ export const BOSS_ES: Record<string, BossEs> = {
     cosmeticName: "Capa de la caja",
     trophyName: "Trofeo de la caja",
   },
+  graphs: {
+    taunt: "Mis dibujos están todos revueltos. ¿Puedes ordenarlos?",
+    friendly: "Leíste cada gráfica. ¡Ven a contar conmigo!",
+    personality: "Una pata con corona de papel a la que le encanta una gráfica ordenada.",
+    cosmeticName: "Corona de papel",
+    trophyName: "Trofeo de la gráfica",
+  },
 };
 
 export const TRAIT_ES: Record<string, string> = {
@@ -494,6 +501,11 @@ export const ES: Record<string, string> = {
   Phonics: "Sonidos",
   "Word Problems": "Problemas",
   "What is missing": "Qué falta",
+  Data: "Datos",
+  Sort: "Ordenar",
+  Tally: "Conteo",
+  "Scaled graph": "Gráfica con escala",
+  "Line plot": "Diagrama de puntos",
   "Grade 2–3": "Grado 2 a 3",
   "Grade 1–3": "Grado 1 a 3",
   "K–3": "K a 3",
@@ -617,6 +629,8 @@ export const ES: Record<string, string> = {
     "Deletreo de kínder a grado 4. Escuchas una palabra en inglés y la armas con letras. Empieza con palabras cortas y llega a palabras de grado 4.",
   "Free measurement and data practice for Pre-K through grade 4. Compare longer and shorter, measure inches on a ruler, read picture graphs and bar graphs, and find area.":
     "Medidas y datos, de prekínder a grado 4. Compara largo y corto, mide pulgadas, lee gráficas y halla el área.",
+  "Free data and graph practice for Pre-K through grade 4. Sort and count, tally up to three groups, build picture and bar graphs, read a scale, and use a line plot with fractions.":
+    "Datos y gráficas, de prekínder a grado 4. Clasifica y cuenta, haz un conteo de hasta tres grupos, arma gráficas de dibujos y de barras, lee una escala y usa un diagrama de puntos con fracciones.",
   "Free Dolch and Fry sight word practice for kindergarten through grade 4. Hear a word, match a picture, and fill a sentence. Trace the list, then check the answer key.":
     "Palabras frecuentes en inglés, de kínder a grado 4. Escucha la palabra, une el dibujo y completa la oración. Las palabras se quedan en inglés.",
   "Free printable coin practice for Pre-K to grade 4. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.":

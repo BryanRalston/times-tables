@@ -26,6 +26,7 @@ const GAME_TITLE_ES: Record<string, string> = {
   phonics: "Sonidos",
   problems: "Problemas",
   variables: "Qué falta",
+  graphs: "Datos",
 };
 
 interface NamedSheet {

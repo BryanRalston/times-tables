@@ -1,6 +1,6 @@
 import { formatClockTime } from "../../lib/clock";
 
-export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables";
+export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables" | "graphs";
 
 export interface CoinCounts {
   penny?: number;
@@ -751,6 +751,28 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       { prompt: "A show starts at 1:20 and lasts 45 minutes. What time does it end?", answer: "2:05" },
       { prompt: "A snack is $1.50 and a drink is $1.25. How much altogether?", answer: "$2.75" },
       { prompt: "A snack is $2.40 and a drink is $1.35. How much altogether?", answer: "$3.75" },
+    ],
+  },
+  {
+    slug: "data-and-graphs",
+    title: "Free Data and Graphs Worksheet (Pre-K–4) | Squishee Academy",
+    description:
+      "Print a free data and graphs worksheet for Pre-K through grade 4. Sort and count, read a tally, compare picture and bar graphs, use a scale, and add fractions from a line plot. No signup.",
+    h1: "Data and graphs",
+    game: "graphs",
+    items: [
+      { prompt: "There are 2 apples and 1 banana. How many apples?", answer: "2" },
+      { prompt: "There are 3 apples and 2 bananas. How many bananas?", answer: "2" },
+      { prompt: "The tally is 2 apples, 3 bananas, and 1 carrot. How many in all?", answer: "6" },
+      { prompt: "The tally is 4 apples, 1 banana, and 2 carrots. How many more apples than bananas?", answer: "3" },
+      { prompt: "The picture graph shows 3 apples and 2 bananas. How many in all?", answer: "5" },
+      { prompt: "The bar graph shows 4 apples and 1 banana. How many more apples than bananas?", answer: "3" },
+      { prompt: "Each picture stands for 2. The graph shows 3 apple pictures. How many apples?", answer: "6" },
+      { prompt: "Each picture stands for 5. The graph shows 2 banana pictures. How many bananas?", answer: "10" },
+      { prompt: "Each picture stands for 2. Apples show 4 pictures and bananas show 1 picture. How many more apples than bananas?", answer: "6" },
+      { prompt: "The line plot has 3 marks at 1/2. How many are 1/2?", answer: "3" },
+      { prompt: "The longest ribbon is 3/4 and the shortest is 1/4. How much longer is the longest?", answer: "2/4" },
+      { prompt: "The longest is 6/8 and the shortest is 2/8. What do they make together?", answer: "8/8" },
     ],
   },
 ];

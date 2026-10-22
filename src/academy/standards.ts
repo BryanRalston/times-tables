@@ -139,6 +139,14 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     times: "3.OA.A.4",
     steps: "4.OA.A.3",
   },
+  graphs: {
+    sort: "K.MD.B.3",
+    tally: "1.MD.C.4",
+    picture: "2.MD.D.10",
+    bar: "2.MD.D.10",
+    scale: "3.MD.B.3",
+    line: "4.MD.B.4",
+  },
 };
 
 const CHIP_SKILL: Record<string, string> = {
@@ -161,6 +169,7 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "K.OA.A.5": { en: "Add and subtract within 5", es: "Sumar y restar hasta el 5" },
   "K.MD.A.1": { en: "Describe length or size", es: "Describir el largo o el tamaño" },
   "K.MD.A.2": { en: "Compare two objects", es: "Comparar dos objetos" },
+  "K.MD.B.3": { en: "Sort and count", es: "Clasificar y contar" },
   "K.G.A.1": { en: "Say where a shape is", es: "Decir dónde está una figura" },
   "K.G.A.2": { en: "Name shapes", es: "Nombrar figuras" },
   "K.G.B.4": { en: "Compare shapes", es: "Comparar figuras" },
@@ -186,6 +195,7 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "2.NBT.A.4": { en: "Compare three-digit numbers", es: "Comparar números de tres cifras" },
   "2.NBT.B.5": { en: "Add and subtract within 100", es: "Sumar y restar hasta el 100" },
   "2.MD.A.1": { en: "Measure length", es: "Medir el largo" },
+  "2.MD.D.10": { en: "Picture and bar graphs", es: "Gráficas de dibujos y de barras" },
   "2.MD.C.7": { en: "Tell time to five minutes", es: "Decir la hora de 5 en 5 minutos" },
   "2.MD.C.8": { en: "Count coins and bills", es: "Contar monedas y billetes" },
   "2.G.A.1": { en: "Name shapes by their sides", es: "Nombrar figuras por sus lados" },
@@ -221,6 +231,7 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "4.NF.C.7": { en: "Compare decimals", es: "Comparar decimales" },
   "4.MD.A.2": { en: "Problems with time, money, or size", es: "Problemas de tiempo, dinero o medida" },
   "4.MD.A.3": { en: "Area and perimeter", es: "Área y perímetro" },
+  "4.MD.B.4": { en: "Line plots with fractions", es: "Diagramas de puntos con fracciones" },
   "4.MD.C.5": { en: "Understand angles", es: "Entender los ángulos" },
   "4.G.A.1": { en: "Lines and angles", es: "Líneas y ángulos" },
   "4.G.A.3": { en: "A line of symmetry", es: "Un eje de simetría" },

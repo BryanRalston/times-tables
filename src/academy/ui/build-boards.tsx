@@ -3,6 +3,7 @@ import { ClockBoard, PayBoard } from "./hands";
 import { ArrayBoard, BlocksBoard, CountBoard, FrameBoard, ShadeBoard } from "./number-boards";
 import { LetterBoard, PhonicsBoard, SightBoard } from "./word-boards";
 import { TraceBoard } from "./trace-board";
+import { GraphsHands } from "./graph-board";
 import { BlankBoard, MeasureBoard, ShapeBoard, StoryBoard } from "./world-boards";
 
 export function HandsBoard({
@@ -43,6 +44,8 @@ export function HandsBoard({
       return <BlankBoard task={task} onAnswer={onAnswer} />;
     case "trace":
       return <TraceBoard task={task} onAnswer={onAnswer} />;
+    case "graphs":
+      return <GraphsHands task={task} onAnswer={onAnswer} />;
     default: {
       const neverTask: never = task;
       return neverTask;

@@ -203,6 +203,19 @@ const AUTHORED: readonly IslandBoss[] = [
     trophyId: "trophy-box",
     trophyName: "Box trophy",
   },
+  {
+    gameId: "graphs",
+    name: "Tally Belle",
+    taunt: "My pictures are all mixed up. Can you sort them?",
+    friendly: "You read every graph. Come count with me!",
+    personality: "A duck in a paper crown who loves a tidy graph.",
+    face: "duck",
+    look: "crown",
+    cosmeticId: "paper-crown",
+    cosmeticName: "Paper crown",
+    trophyId: "trophy-graph",
+    trophyName: "Graph trophy",
+  },
 ];
 
 const LOOKS: readonly BossLook[] = ["crown", "cape", "armor", "clock", "coins", "spell"];

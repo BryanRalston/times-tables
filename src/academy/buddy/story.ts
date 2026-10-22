@@ -107,6 +107,8 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string): s
       return es ? `${buddy}, ${trait}, y ${host} resuelven una historia.` : `${buddy} the ${trait} and ${host} solve a story.`;
     case "variables":
       return es ? `${buddy}, ${trait}, y ${host} buscan el número que falta.` : `${buddy} the ${trait} and ${host} find the missing number.`;
+    case "graphs":
+      return es ? `${buddy} y ${host} ordenan los dibujos y leen la gráfica.` : `${buddy} and ${host} sort the pictures and read the graph.`;
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -147,6 +149,8 @@ function handsStory(kind: Exclude<RoundSlot, { kind: "choice" }>["kind"], buddy:
       return es ? `${buddy} y ${host} llenan la caja.` : `${buddy} and ${host} fill the box.`;
     case "trace":
       return es ? `${buddy} y ${host} trazan juntos.` : `${buddy} and ${host} trace together.`;
+    case "graphs":
+      return es ? `${buddy} y ${host} arman la gráfica.` : `${buddy} and ${host} build the graph.`;
     default: {
       const neverKind: never = kind;
       return neverKind;

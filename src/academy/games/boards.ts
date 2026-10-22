@@ -134,7 +134,44 @@ export interface VariableBoard {
   extra: number | null;
 }
 
-export type Board = CountBoard | PlaceBoard | ShapeBoard | FractionBoard | MeasureBoard | PhonicsBoard | ProblemBoard | VariableBoard;
+export interface GraphCat {
+  name: string;
+  emoji: string;
+  plural: string;
+  /** Actual count. On a scaled graph this is icons times the scale. */
+  value: number;
+}
+
+export type GraphAsk =
+  | "count"
+  | "most"
+  | "total"
+  | "diff"
+  | "less"
+  | "join"
+  | "apart"
+  | "two"
+  | "marks"
+  | "span"
+  | "sum";
+
+export type GraphShape = "bins" | "tally" | "picture" | "bar" | "line";
+
+export interface GraphsBoard {
+  game: "graphs";
+  mode: "sort" | "tally" | "picture" | "bar" | "scale" | "line";
+  items: GraphCat[];
+  ask: GraphAsk;
+  focus: number;
+  other: number;
+  scale: number;
+  shape: GraphShape;
+  den: 2 | 4 | 8;
+  /** One numerator per mark on a line plot. Empty for the other levels. */
+  marks: number[];
+}
+
+export type Board = CountBoard | PlaceBoard | ShapeBoard | FractionBoard | MeasureBoard | PhonicsBoard | ProblemBoard | VariableBoard | GraphsBoard;
 
 export function countName(name: string, n: number): string {
   if (n === 1 && name.endsWith("s")) return name.slice(0, -1);

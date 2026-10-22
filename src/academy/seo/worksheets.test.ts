@@ -41,7 +41,70 @@ function moneyCents(answer: string): number {
   throw new Error(answer);
 }
 
+function expectGraphItem(item: StaticItem): boolean {
+  const apples = item.prompt.match(/^There are (\d+) apples and (\d+) bananas?\. How many apples\?$/);
+  if (apples) {
+    expect(item.answer).toBe(apples[1]);
+    return true;
+  }
+  const bananas = item.prompt.match(/^There are (\d+) apples and (\d+) bananas?\. How many bananas\?$/);
+  if (bananas) {
+    expect(item.answer).toBe(bananas[2]);
+    return true;
+  }
+  const tally = item.prompt.match(/^The tally is (\d+) apples, (\d+) bananas, and (\d+) carrots?\. How many in all\?$/);
+  if (tally) {
+    expect(item.answer).toBe(String(Number(tally[1]) + Number(tally[2]) + Number(tally[3])));
+    return true;
+  }
+  const more = item.prompt.match(/How many more apples than bananas\?$/);
+  if (more && item.prompt.startsWith("The tally is ")) {
+    const nums = [...item.prompt.matchAll(/(\d+)/g)].map((row) => Number(row[1]));
+    expect(item.answer).toBe(String((nums[0] ?? 0) - (nums[1] ?? 0)));
+    return true;
+  }
+  const picture = item.prompt.match(/^The picture graph shows (\d+) apples and (\d+) bananas\. How many in all\?$/);
+  if (picture) {
+    expect(item.answer).toBe(String(Number(picture[1]) + Number(picture[2])));
+    return true;
+  }
+  const bars = item.prompt.match(/^The bar graph shows (\d+) apples and (\d+) bananas?\. How many more apples than bananas\?$/);
+  if (bars) {
+    expect(item.answer).toBe(String(Number(bars[1]) - Number(bars[2])));
+    return true;
+  }
+  const scaled = item.prompt.match(/^Each picture stands for (\d+)\. The graph shows (\d+) (apple|banana) pictures\. How many (apples|bananas)\?$/);
+  if (scaled) {
+    expect(item.answer).toBe(String(Number(scaled[1]) * Number(scaled[2])));
+    return true;
+  }
+  const two = item.prompt.match(
+    /^Each picture stands for (\d+)\. Apples show (\d+) pictures and bananas show (\d+) picture\. How many more apples than bananas\?$/,
+  );
+  if (two) {
+    expect(item.answer).toBe(String(Number(two[1]) * (Number(two[2]) - Number(two[3]))));
+    return true;
+  }
+  const marks = item.prompt.match(/^The line plot has (\d+) marks at (\d+)\/(\d+)\. How many are \2\/\3\?$/);
+  if (marks) {
+    expect(item.answer).toBe(marks[1]);
+    return true;
+  }
+  const longer = item.prompt.match(/^The longest ribbon is (\d+)\/(\d+) and the shortest is (\d+)\/\2\. How much longer is the longest\?$/);
+  if (longer) {
+    expect(item.answer).toBe(`${Number(longer[1]) - Number(longer[3])}/${longer[2]}`);
+    return true;
+  }
+  const together = item.prompt.match(/^The longest is (\d+)\/(\d+) and the shortest is (\d+)\/\2\. What do they make together\?$/);
+  if (together) {
+    expect(item.answer).toBe(`${Number(together[1]) + Number(together[3])}/${together[2]}`);
+    return true;
+  }
+  return false;
+}
+
 function expectItem(item: StaticItem) {
+  if (expectGraphItem(item)) return;
   const times = item.prompt.match(/^(\d+) × (\d+) =$/);
   if (times) {
     expect(item.answer).toBe(String(Number(times[1]) * Number(times[2])));
