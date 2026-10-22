@@ -16,6 +16,7 @@ import { nextPlacement } from "./placement";
 import { blankChild } from "./storage";
 import type { Board } from "./games/boards";
 import type { ChoiceQ } from "./games/types";
+import { graphAnswer } from "./games/graph-data";
 import { variableAnswer } from "./games/variables";
 
 const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4"];
@@ -212,6 +213,48 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if (grade === "3") expect(["either", "factor", "times"]).toContain(board.mode);
       break;
     }
+    case "graphs": {
+      expect(question.answer).toBe(graphAnswer(board));
+      if (board.mode === "sort") {
+        expect(board.items).toHaveLength(2);
+        expect(board.scale).toBe(1);
+        expect(["count", "most"]).toContain(board.ask);
+        for (const item of board.items) {
+          expect(item.value).toBeGreaterThanOrEqual(1);
+          expect(item.value).toBeLessThanOrEqual(3);
+        }
+      }
+      if (board.mode === "tally") {
+        expect(board.items).toHaveLength(3);
+        expect(board.scale).toBe(1);
+        expect(["count", "total", "diff", "less"]).toContain(board.ask);
+      }
+      if (board.mode === "picture" || board.mode === "bar") {
+        expect(board.scale).toBe(1);
+        expect(["join", "apart", "diff"]).toContain(board.ask);
+        expect(board.items).toHaveLength(board.mode === "bar" ? 4 : 3);
+      }
+      if (board.mode === "scale") {
+        expect([2, 5]).toContain(board.scale);
+        expect(["count", "diff", "less", "two"]).toContain(board.ask);
+        for (const item of board.items) expect(item.value % board.scale).toBe(0);
+      }
+      if (board.mode === "line") {
+        expect([2, 4, 8]).toContain(board.den);
+        expect(board.marks).toHaveLength(5);
+        for (const mark of board.marks) {
+          expect(mark).toBeGreaterThanOrEqual(1);
+          expect(mark).toBeLessThanOrEqual(board.den);
+        }
+        expect(["marks", "span", "sum"]).toContain(board.ask);
+      }
+      if (grade === "PK" || grade === "K") expect(board.mode).toBe("sort");
+      if (grade === "1") expect(["sort", "tally"]).toContain(board.mode);
+      if (grade === "2") expect(["tally", "picture", "bar"]).toContain(board.mode);
+      if (grade === "3") expect(["bar", "scale"]).toContain(board.mode);
+      if (grade === "4") expect(["scale", "line"]).toContain(board.mode);
+      break;
+    }
     default: {
       const neverBoard: never = board;
       throw new Error(String(neverBoard));
@@ -340,6 +383,22 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
         expect(task.glyph).toMatch(/^[A-Za-z]$/);
       }
       break;
+    case "graphs": {
+      if (grade === "PK" || grade === "K") {
+        expect(task.mode).toBe("sort");
+        expect(task.cats).toHaveLength(2);
+      }
+      if (grade === "1") expect(["sort", "tally"]).toContain(task.mode);
+      if (task.mode === "scale") expect([2, 5]).toContain(task.scale);
+      if (task.mode === "line") expect([2, 4, 8]).toContain(task.den);
+      const icons =
+        task.mode === "line"
+          ? task.stacks.reduce((sum, count) => sum + count, 0)
+          : task.cats.reduce((sum, cat) => sum + cat.icons, 0);
+      expect(icons).toBeGreaterThan(0);
+      expect(icons).toBeLessThanOrEqual(grade === "PK" || grade === "K" ? 6 : 8);
+      break;
+    }
     default: {
       const neverTask: never = task;
       throw new Error(String(neverTask));

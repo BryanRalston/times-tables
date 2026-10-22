@@ -9,6 +9,8 @@ import { blendOf, RHYME_FAMILIES, SOUND_BANK } from "../games/phonics";
 import { ALL_SPELL } from "../games/spell-data";
 import { GAMES } from "../games/registry";
 import { blankOut } from "../games/words";
+import { graphClipLines } from "../games/graph-data";
+import { makeHandsTask } from "../hands-build";
 import { makeClockTask, makePayTask } from "../hands";
 import { exampleFor } from "../round-flow";
 import { hintCue, promptSpeech, speakable, workedExample } from "../teach";
@@ -109,6 +111,7 @@ function explicitLines(): SpokenLine[] {
       push(lines, blendOf(word), "phonics");
     }
   }
+  for (const line of graphClipLines()) push(lines, line, "graphs");
   return lines;
 }
 
@@ -142,6 +145,17 @@ export function collectSpokenLines(): SpokenLine[] {
         push(lines, task.speech, "money");
         push(lines, yourTurnLine(task.speech), "money");
         push(lines, exampleFor(task).speech, "money");
+      }
+    }
+  }
+  const graphs = GAMES.find((game) => game.id === "graphs");
+  if (graphs) {
+    for (const level of graphs.levels) {
+      for (let i = 0; i < HAND_SAMPLES; i += 1) {
+        const task = makeHandsTask("graphs", level.id, rngFromSeed(`hands:graphs:${level.id}:${i}`));
+        push(lines, task.speech, "graphs");
+        push(lines, yourTurnLine(task.speech), "graphs");
+        push(lines, exampleFor(task).speech, "graphs");
       }
     }
   }

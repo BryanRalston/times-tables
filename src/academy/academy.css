@@ -1668,6 +1668,7 @@ button.ac-go.ac-play-main {
 .ac-card.is-lilac, .ac-island.is-lilac { background: #f3e8ff; }
 .ac-card.is-rose, .ac-island.is-rose { background: #ffe0ea; }
 .ac-card.is-iris, .ac-island.is-iris { background: #e6e4ff; }
+.ac-card.is-chart, .ac-island.is-chart { background: #e7f3d4; }
 .ac-timer.is-count span { background: linear-gradient(90deg, #ffd0c2, #ff7a59); }
 .ac-timer.is-place span { background: linear-gradient(90deg, #d8f5c8, #5aaa45); }
 .ac-timer.is-shapes span { background: linear-gradient(90deg, #f8d0ea, #d4539a); }
@@ -1676,6 +1677,7 @@ button.ac-go.ac-play-main {
 .ac-timer.is-phonics span { background: linear-gradient(90deg, #eadcff, #8a63d2); }
 .ac-timer.is-problems span { background: linear-gradient(90deg, #ffd0dc, #e85a86); }
 .ac-timer.is-variables span { background: linear-gradient(90deg, #ddd9ff, #7a6ad4); }
+.ac-timer.is-graphs span { background: var(--ac-teal); }
 
 .ac-eq-var { align-items: center; }
 .ac-eq-box {
@@ -2747,6 +2749,7 @@ button.ac-go:disabled:active, button.ac-go:disabled { transform: none; }
 .ac-card.is-lilac { --ac-tile: #eadcff; background: #fff; }
 .ac-card.is-rose { --ac-tile: #ffd0dc; background: #fff; }
 .ac-card.is-iris { --ac-tile: #ddd9ff; background: #fff; }
+.ac-card.is-chart { --ac-tile: #e7f3d4; background: #fff; }
 .ac-card.is-soon { opacity: 1; }
 .ac-card.is-soon::before { background: #f3e8ee; }
 .ac-card > .ac-squish { top: 4px; z-index: 1; width: 70px; height: 70px; }
@@ -2944,3 +2947,110 @@ button.ac-go:disabled:active, button.ac-go:disabled { transform: none; }
   .ac-hold.is-on { animation: none; background: #baf3e8; }
   .ac-play-buddy .ac-buddy-img { animation: none; }
 }
+
+.ac-play-buddy[data-pals="pair"] {
+  flex: 0 0 auto;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  min-height: 0;
+}
+.ac-play-buddy[data-pals="pair"] .ac-buddy { flex: none; width: auto; }
+.ac-play-buddy[data-pals="pair"] .ac-buddy .ac-squish,
+.ac-play-buddy[data-pals="pair"] > .ac-squish {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+.ac-play-buddy[data-pals="pair"] .ac-buddy-img,
+.ac-play-buddy[data-pals="pair"] .ac-wear {
+  width: 56px;
+  height: 56px;
+  max-width: none;
+}
+.ac-data { display: flex; flex-direction: column; gap: 8px; }
+.ac-graph-key { margin: 0; font-size: 17px; font-weight: 800; }
+.ac-graph-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(76px, 1fr)); gap: 8px; }
+.ac-graph-line { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.ac-data-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  min-height: 96px;
+  min-width: 0;
+  padding: 8px 4px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--ac-elev-press);
+}
+.ac-graph-line .ac-data-col { min-width: 52px; flex: 0 0 52px; }
+.ac-graph-label {
+  display: block;
+  min-height: 18px;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.ac-graph-plot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 64px;
+  border-bottom: 3px solid var(--ac-ink);
+}
+.ac-graph-bar {
+  display: block;
+  width: 28px;
+  border-radius: 8px 8px 2px 2px;
+  background: var(--ac-teal);
+}
+.ac-graph-pics, .ac-graph-chips, .ac-graph-dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  min-height: 36px;
+}
+.ac-graph-pics { font-size: 28px; }
+.ac-graph-dots i {
+  width: 14px;
+  height: 14px;
+  border-radius: 99px;
+  background: var(--ac-teal);
+}
+.ac-tally { width: 100%; height: 32px; }
+.ac-tally line { stroke: var(--ac-ink); stroke-width: 3; stroke-linecap: round; }
+.ac-graph-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 76px;
+  padding: 8px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--ac-elev-press);
+}
+.ac-graph-token {
+  min-width: 64px;
+  min-height: 64px;
+  padding: 4px;
+  border: 0;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--ac-elev-press);
+  font-size: 28px;
+  line-height: 1;
+  touch-action: none;
+}
+.ac-graph-token.is-chip { min-width: 56px; min-height: 56px; font-size: 22px; }
+.ac-graph-pics .ac-graph-token { min-width: 56px; min-height: 56px; font-size: 32px; }
+.ac-graph-token.is-pick { outline: 3px solid var(--ac-teal); }
+.ac-graph-token:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ac-line); }
+.ac-graph-play .ac-choices { margin-top: 8px; }

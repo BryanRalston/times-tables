@@ -4,6 +4,7 @@ import type { Grade } from "../model";
 import { addGame } from "./add";
 import { countGame } from "./count";
 import { fractionsGame } from "./fractions";
+import { graphsGame } from "./graphs";
 import { measureGame } from "./measure";
 import { moneyGame } from "./money";
 import { phonicsGame } from "./phonics";
@@ -36,6 +37,7 @@ export const GAMES = [
   phonicsGame,
   problemsGame,
   variablesGame,
+  graphsGame,
 ] as const;
 
 export type GameId = (typeof GAMES)[number]["id"];

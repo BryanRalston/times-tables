@@ -902,6 +902,60 @@ export const variablesCard = sceneCard("What is missing", VARIABLE_ROWS, {
   isLevel: (value) => isId(["addend", "either", "factor", "times", "steps"], value),
 });
 
+const GRAPH_ROWS: SkillRow[] = [
+  { key: "graphs:sort", label: "Sort" },
+  { key: "graphs:tally", label: "Tally" },
+  { key: "graphs:picture", label: "Picture graph" },
+  { key: "graphs:bar", label: "Bar graph" },
+  { key: "graphs:scale", label: "Scaled graph" },
+  { key: "graphs:line", label: "Line plot" },
+];
+
+export const graphsCard = sceneCard("Data", GRAPH_ROWS, {
+  id: "graphs",
+  title: "Data",
+  audience: "Pre-K–4",
+  tint: "chart",
+  mascot: "duck",
+  sheetSlug: "data",
+  sheetScreen: "sheet-graphs",
+  blurb:
+    "Free data and graph practice for Pre-K through grade 4. Sort and count, tally up to three groups, build picture and bar graphs, read a scale, and use a line plot with fractions.",
+  levels: [
+    { id: "sort", label: "Sort", num: 1 },
+    { id: "tally", label: "Tally", num: 2 },
+    { id: "picture", label: "Picture graph", num: 3 },
+    { id: "bar", label: "Bar graph", num: 4 },
+    { id: "scale", label: "Scaled graph", num: 5 },
+    { id: "line", label: "Line plot", num: 6 },
+  ],
+  defaultLevel(grade) {
+    const ids = ["sort", "tally", "picture", "bar", "scale", "line"] as const;
+    const fallback = ((): string => {
+      switch (grade) {
+        case "PK":
+        case "K":
+          return "sort";
+        case "1":
+          return "tally";
+        case "2":
+          return "picture";
+        case "3":
+          return "scale";
+        case "4":
+          return "line";
+        default: {
+          const neverGrade: never = grade;
+          return neverGrade;
+        }
+      }
+    })();
+    return bandStart("graphs", grade, ids, fallback);
+  },
+  sheetDefaultLevel: "sort",
+  isLevel: (value) => isId(["sort", "tally", "picture", "bar", "scale", "line"], value),
+});
+
 /** Home-card order is also the island order. Append a game; do not insert one in front. */
 export const GAME_CARDS = [
   timesCard,
@@ -918,6 +972,7 @@ export const GAME_CARDS = [
   phonicsCard,
   problemsCard,
   variablesCard,
+  graphsCard,
 ] as const;
 
 export type GameId = (typeof GAME_CARDS)[number]["id"];

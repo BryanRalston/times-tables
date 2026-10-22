@@ -177,6 +177,7 @@ export default defineConfig({
         sheetPhonics: resolve("academy/worksheets/phonics/index.html"),
         sheetProblems: resolve("academy/worksheets/word-problems/index.html"),
         sheetVariables: resolve("academy/worksheets/missing-numbers/index.html"),
+        sheetData: resolve("academy/worksheets/data/index.html"),
       },
     },
   },

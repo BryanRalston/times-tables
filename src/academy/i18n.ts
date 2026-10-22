@@ -342,11 +342,26 @@ export function gamePill(title: string, num: number): string {
 
 /** "cuántos plátanos" or "cuántas zanahorias" in a how-many-more question. */
 export function howManyMorePhrase(name: string, englishPlural: string): string {
+  return howManyLead(name, englishPlural);
+}
+
+/** "cuántos plátanos" or "cuántas zanahorias" in a how-many-less question. */
+export function howManyLessPhrase(name: string, englishPlural: string): string {
+  return howManyLead(name, englishPlural);
+}
+
+function howManyLead(name: string, englishPlural: string): string {
   if (locale !== "es") return englishPlural;
   const one = thingName(name, 1, name);
   const word = thingName(name, 2, englishPlural);
   const lead = FEMININE.has(one) ? "Cuántas" : "Cuántos";
   return `${lead} ${word}`;
+}
+
+/** True when the Spanish noun uses feminine agreement. English is never feminine here. */
+export function nounIsFeminine(name: string): boolean {
+  if (locale !== "es") return false;
+  return FEMININE.has(thingName(name, 1, name));
 }
 
 /** "bananas" / "cuántos plátanos" or "cuántas zanahorias". */

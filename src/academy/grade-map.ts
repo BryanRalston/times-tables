@@ -478,6 +478,49 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["4.MD.A.3"],
     }),
   },
+  graphs: {
+    PK: band({
+      levels: ["sort"],
+      start: "sort",
+      offer: "play",
+      cap: "sort",
+      standards: ["K.MD.B.3"],
+    }),
+    K: band({
+      levels: ["sort"],
+      start: "sort",
+      offer: "play",
+      cap: "sort",
+      standards: ["K.MD.B.3"],
+    }),
+    "1": band({
+      levels: ["tally"],
+      start: "tally",
+      offer: "play",
+      cap: "tally",
+      standards: ["1.MD.C.4"],
+    }),
+    "2": band({
+      levels: ["picture", "bar"],
+      start: "picture",
+      offer: "play",
+      cap: "bar",
+      standards: ["2.MD.D.10"],
+    }),
+    "3": band({
+      levels: ["scale"],
+      start: "scale",
+      offer: "play",
+      cap: "scale",
+      standards: ["3.MD.B.3"],
+    }),
+    "4": band({
+      levels: ["line"],
+      start: "line",
+      offer: "play",
+      standards: ["4.MD.B.4"],
+    }),
+  },
   phonics: {
     PK: band({
       levels: ["letters", "sounds"],

@@ -36,6 +36,7 @@ import {
   type SightTask,
   type StoryTask,
 } from "./hands-build";
+import { graphsMatches, type GraphsTask } from "./games/graph-data";
 import { exampleFor, similarSlot } from "./round-flow";
 
 const SAMPLES = 24;
@@ -81,6 +82,8 @@ function builtOf(task: BuildTask): boolean {
       return blankMatches(task, task.answer);
     case "trace":
       return traceMatches(task.glyph, guideInk(task.glyph));
+    case "graphs":
+      return graphsMatches(task, task.mode === "line" ? task.stacks : task.cats.map((cat) => cat.icons));
     default: {
       const neverTask: never = task;
       return neverTask;
@@ -119,6 +122,10 @@ function wrongOf(task: BuildTask): boolean {
       return blankMatches(task, task.answer + 1);
     case "trace":
       return traceMatches(task.glyph, [[{ x: 2, y: 2 }]]);
+    case "graphs": {
+      const target = task.mode === "line" ? task.stacks : task.cats.map((cat) => cat.icons);
+      return graphsMatches(task, target.map((count, index) => (index === 0 ? count + 1 : count)));
+    }
     default: {
       const neverTask: never = task;
       return neverTask;
@@ -193,6 +200,9 @@ function assertBounds(task: HandsTask, level: string): void {
       break;
     case "trace":
       assertTrace(task, level);
+      break;
+    case "graphs":
+      assertGraphs(task);
       break;
     default: {
       const neverTask: never = task;
@@ -451,6 +461,20 @@ function assertStory(task: StoryTask, level: string): void {
   );
   expect(task.decoy).not.toBe(task.a);
   expect(task.decoy).not.toBe(task.b);
+}
+
+function assertGraphs(task: GraphsTask): void {
+  if (task.mode === "line") {
+    expect([2, 4, 8]).toContain(task.den);
+    expect(task.stacks).toHaveLength(task.den + 1);
+    expect(task.stacks.reduce((sum, count) => sum + count, 0)).toBeGreaterThan(0);
+    return;
+  }
+  expect(task.cats.length).toBeGreaterThanOrEqual(2);
+  expect(task.cats.length).toBeLessThanOrEqual(3);
+  if (task.mode === "sort") expect(task.cats).toHaveLength(2);
+  if (task.mode === "scale") expect([2, 5]).toContain(task.scale);
+  else expect(task.scale).toBe(1);
 }
 
 describe("hands-on card generators", () => {
