@@ -1,6 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import { STORY_STARS } from "./buddy/persona";
-import { getLocale, partPhrase, shapeWithArticle, spanishFraction, t, thingName } from "./i18n";
+import { getLocale, partPhrase, shapeWithArticle, spanishFraction, spanishShaded, starPlace, t, thingName, yesDetail } from "./i18n";
 import { blockPhrase, countName, roundHalfUp } from "./games/boards";
 import { isAddLevel } from "./games/add";
 import { isCountLevel } from "./games/count";
@@ -945,6 +945,10 @@ function shapePraise(shape: string): string {
   return t(`Yes! ${shape}.`, `¡Sí! ${shapeWithArticle(shape)}.`);
 }
 
+function isStarPlace(place: string): place is "above" | "below" | "beside" | "behind" {
+  return place === "above" || place === "below" || place === "beside" || place === "behind";
+}
+
 function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
   const safe = isShapeLevel(level) ? level : "flat";
   return fresh(avoid, () => {
@@ -960,8 +964,8 @@ function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
           "shapes",
           safe,
           answer,
-          t("Find the same shape.", "Busca la misma figura."),
-          t("Yes! Find the same shape.", "¡Sí! Busca la misma figura."),
+          t("Where is the star?", "¿Dónde está la estrella?"),
+          isStarPlace(answer) ? yesDetail(starPlace(answer)) : t("Yes! Find the same shape.", "¡Sí! Busca la misma figura."),
         ),
       };
     }
@@ -1017,10 +1021,15 @@ function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
             ? t("A line of symmetry makes two matching halves.", "Una línea de simetría hace dos mitades iguales.")
             : t("What shape is this?", "¿Qué figura es esta?"),
           safe === "fold"
-            ? t("Yes! Find the same shape.", "¡Sí! Busca la misma figura.")
+            ? t(
+                "Yes! A line of symmetry makes two matching halves.",
+                "¡Sí! Una línea de simetría hace dos mitades iguales.",
+              )
             : answer === "rectangle" || answer === "square" || answer === "circle" || answer === "triangle"
               ? shapePraise(answer)
-              : t("Yes! Find the same shape.", "¡Sí! Busca la misma figura."),
+              : answer === "rhombus" || answer === "trapezoid"
+                ? yesDetail(answer === "rhombus" ? t("It is a rhombus", "Es el rombo") : t("It is a trapezoid", "Es el trapecio"))
+                : t("Yes! Find the same shape.", "¡Sí! Busca la misma figura."),
         ),
       };
     }
@@ -1102,10 +1111,10 @@ function makeShapeTask(level: string, rng: Rng, avoid?: string): ShapeTask {
           answer,
           t("What unit fraction is shaded?", "¿Qué fracción unitaria está sombreada?"),
           den === 3
-            ? t("Yes! One third.", "¡Sí! Un tercio.")
+            ? t("Yes! One third is shaded.", `¡Sí! ${spanishShaded("1/3")}.`)
             : den === 4
-              ? t("Yes! One fourth is shaded.", "¡Sí! Un cuarto está sombreada.")
-              : t("Yes! One half is shaded.", "¡Sí! Un medio está sombreada."),
+              ? t("Yes! One fourth is shaded.", `¡Sí! ${spanishShaded("1/4")}.`)
+              : t("Yes! One half is shaded.", `¡Sí! ${spanishShaded("1/2")}.`),
         ),
       };
     }

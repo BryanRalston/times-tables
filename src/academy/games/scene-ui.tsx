@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { gamePill, t, thingName } from "../i18n";
+import { gamePill, starPlace, t, thingName } from "../i18n";
 import type { Grade } from "../model";
 import { SquisheeImg, cx } from "../ui/bits";
 import { CountToken } from "../ui/count-token";
@@ -421,20 +421,7 @@ function isFoldFig(value: string): value is FoldFig {
 }
 
 function positionLabel(place: PositionWord): string {
-  switch (place) {
-    case "above":
-      return t("The star is above the box", "La estrella está arriba de la caja");
-    case "below":
-      return t("The star is below the box", "La estrella está abajo de la caja");
-    case "beside":
-      return t("The star is beside the box", "La estrella está al lado de la caja");
-    case "behind":
-      return t("The star is behind the box", "La estrella está detrás de la caja");
-    default: {
-      const neverPlace: never = place;
-      return neverPlace;
-    }
-  }
+  return starPlace(place);
 }
 
 /** Crisp geometry pictures. No filters, and nothing is drawn on the squishee. */
