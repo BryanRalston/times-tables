@@ -7,6 +7,7 @@ import {
   canonicalUrl,
   HOME_DESCRIPTION,
   HOME_HREFLANGS,
+  HOME_TITLE,
   privacyHtml,
   SHARE_IMAGE_ALT,
   shareImageUrl,
@@ -444,13 +445,15 @@ describe("printable worksheets", () => {
       expect(html).toContain(`content="${sheet.description}"`);
       expect(html).toContain(`<h1>${sheet.h1}</h1>`);
       expect(html).toContain("Answer key");
-      expect(html).toContain(`href="../../#/play/${sheet.game}">Play the game</a>`);
+      expect(html).toContain(`href="../../#/play/${sheet.game}">Play free</a>`);
       expect(html).toContain(`<link rel="canonical" href="${canonicalUrl(`worksheets/${sheet.slug}`)}" />`);
       expect(html).toContain('property="og:title"');
       expect(html).toContain('property="og:description"');
       expect(html).toContain(sheet.items[0]!.prompt);
       expect(html).toContain(sheet.items[0]!.answer);
-      expect(html).not.toContain("<script");
+      const scripts = html.match(/<script\b[^>]*>/g) ?? [];
+      expect(scripts.length).toBeGreaterThan(0);
+      expect(scripts.every((tag) => tag.includes('type="application/ld+json"'))).toBe(true);
     }
   });
 
@@ -497,7 +500,7 @@ describe("printable worksheets", () => {
     expect(index).toContain('rel="icon" href="/favicon.ico"');
 
     const home = withOpenGraph(readFileSync("academy/index.html", "utf8"));
-    expectShareCard(home, "Squishee Academy", HOME_DESCRIPTION, "https://squisheeacademy.com/");
+    expectShareCard(home, HOME_TITLE, HOME_DESCRIPTION, "https://squisheeacademy.com/");
     expect(HOME_DESCRIPTION).toContain("Play in 7 languages");
     expect(home).toContain("Play in 7 languages: English, Español, Português, Français, 中文, हिन्दी, العربية.");
     for (const lang of HOME_HREFLANGS) {

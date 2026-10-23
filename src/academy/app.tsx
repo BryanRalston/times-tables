@@ -174,7 +174,7 @@ function AcademyApp() {
 
   useEffect(() => {
     const titles: Record<Route["name"], string> = {
-      home: "Squishee Academy",
+      home: "Free learning games for kids Pre-K to grade 4 | Squishee Academy",
       play: `${show("Play")} · Squishee Academy`,
       grownups: `${show("Grown-ups")} · Squishee Academy`,
       settings: `${show("Settings")} · Squishee Academy`,

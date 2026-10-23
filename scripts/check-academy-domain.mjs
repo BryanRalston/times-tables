@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { hasRootTimesTablesPath, rewriteDomainSource } from "./academy-domain-rewrite.mjs";
@@ -148,23 +149,33 @@ for (const loc of [
   if (!sitemap.includes(`<loc>${loc}</loc>`)) fail(`sitemap missing ${loc}`);
 }
 
+/** JSON-LD is data. Any other script means the page is not crawlable HTML. */
+function needsJs(html) {
+  return /<script(?![^>]*type="application\/ld\+json")/i.test(html);
+}
+
+function hasTracking(html) {
+  return /gtag\(|googletagmanager|google-analytics|GTM-|fbq\(|analytics\.js/.test(html);
+}
+
 const sheetDir = resolve(root, "worksheets");
 let staticSheets = 0;
 for (const name of readdirSync(sheetDir)) {
   const file = join(sheetDir, name, "index.html");
   if (!existsSync(file)) continue;
   const sheetHtml = readFileSync(file, "utf8");
-  if (sheetHtml.includes("<script")) continue;
+  if (needsJs(sheetHtml)) continue;
   staticSheets += 1;
   if (!sheetHtml.includes("<h1>")) fail(`${name} missing h1`);
   if (!sheetHtml.includes("Answer key")) fail(`${name} missing answer key`);
-  if (!sheetHtml.includes("Play the game")) fail(`${name} missing play link`);
+  if (!sheetHtml.includes("Play free")) fail(`${name} missing play link`);
   if (!sheetHtml.includes('property="og:description"')) fail(`${name} missing open graph`);
   if (!sheetHtml.includes(`<link rel="canonical" href="https://squisheeacademy.com/worksheets/${name}/"`)) {
     fail(`${name} canonical`);
   }
   if (sheetHtml.includes('id="app"')) fail(`${name} is the SPA shell`);
-  if (/<script/i.test(sheetHtml)) fail(`${name} needs JavaScript to render`);
+  if (needsJs(sheetHtml)) fail(`${name} needs JavaScript to render`);
+  if (hasTracking(sheetHtml)) fail(`${name} has a tracking script`);
 }
 if (staticSheets < 15 || staticSheets > 45) fail(`expected 15–45 static worksheets, found ${staticSheets}`);
 
@@ -264,13 +275,23 @@ if (!existsSync(resolve(root, "favicon.svg"))) fail("favicon.svg missing");
 if (!existsSync(resolve(root, "money/penny.png"))) fail("money/penny.png missing");
 
 assertShareCard("index.html", html);
-if (!html.includes('property="og:title" content="Squishee Academy"')) fail("home og:title");
-if (!html.includes('content="Free Pre-K to grade 4 learning games with squishees. Play in 7 languages: English, Español, Português, Français, 中文, हिन्दी, العربية. No ads, no accounts."')) {
+if (!html.includes('property="og:title" content="Free learning games for kids Pre-K to grade 4 | Squishee Academy"')) {
+  fail("home og:title");
+}
+if (
+  !html.includes(
+    'content="Free learning games for kids Pre-K to grade 4. Play in 7 languages: English, Español, Português, Français, 中文, हिन्दी, العربية. No ads, no accounts."',
+  )
+) {
   fail("home description");
 }
 for (const lang of ["x-default", "en", "es", "pt-BR", "fr", "zh-Hans", "hi", "ar"]) {
   if (!html.includes(`rel="alternate" hreflang="${lang}" href="https://squisheeacademy.com/"`)) fail(`home hreflang ${lang}`);
 }
+if (!html.includes('href="times-tables-game/"')) fail("home missing times tables landing");
+if (!html.includes('href="graphs-game/"')) fail("home missing graphs landing");
+if (!html.includes('href="privacy/"')) fail("home missing privacy link");
+if (hasTracking(html)) fail("home has a tracking script");
 if (!html.includes('property="og:url" content="https://squisheeacademy.com/"')) fail("home og:url");
 if (!html.includes('rel="apple-touch-icon" href="/apple-touch-icon.png"')) fail("home apple touch icon");
 for (const page of [
@@ -321,5 +342,94 @@ for (const rel of [
 }
 const ico = readFileSync(resolve(root, "favicon.ico"));
 if (ico.readUInt16LE(0) !== 0 || ico.readUInt16LE(2) !== 1 || ico.readUInt16LE(4) < 3) fail("favicon.ico set");
+
+const GAME_LANDINGS = [
+  ["times-tables-game", "Free times tables game for kids (grades 2–4)", "times"],
+  ["telling-time-game", "Free telling time game for kids (grades 1–4)", "time"],
+  ["money-game", "Free counting money game for kids (Pre-K to grade 4)", "money"],
+  ["addition-subtraction-game", "Free addition and subtraction game for kids (kindergarten through grade 4)", "add"],
+  ["fractions-game", "Free fractions game for kids (grades 1–4)", "fractions"],
+  ["graphs-game", "Free graphs game for kids (Pre-K to grade 4)", "graphs"],
+  ["sight-words-game", "Free sight words game for kids (kindergarten through grade 4)", "sight"],
+  ["phonics-game", "Free phonics game for kids (Pre-K to grade 4)", "phonics"],
+  ["shapes-geometry-game", "Free shapes and geometry game for kids (Pre-K to grade 4)", "shapes"],
+];
+for (const [slug, titleStart, gameId] of GAME_LANDINGS) {
+  const pagePath = resolve(root, slug, "index.html");
+  if (!existsSync(pagePath)) fail(`missing landing ${slug}`);
+  const page = readFileSync(pagePath, "utf8");
+  if (!page.includes(`<title>${titleStart} | Squishee Academy</title>`)) fail(`${slug} title`);
+  if (!page.includes("<h1>")) fail(`${slug} missing h1`);
+  if (!page.includes(`href="../#/play/${gameId}">Play free</a>`)) fail(`${slug} play link`);
+  if (!page.includes(`src="/shots/${gameId}.png"`)) fail(`${slug} screenshot`);
+  if (!page.includes("Free, no ads, no accounts, 7 languages.")) fail(`${slug} note`);
+  if (!page.includes('hreflang="x-default"')) fail(`${slug} x-default`);
+  if (!page.includes(`hreflang="ar" href="https://squisheeacademy.com/ar/${slug}/"`)) fail(`${slug} arabic alternate`);
+  if (needsJs(page)) fail(`${slug} needs JavaScript`);
+  if (hasTracking(page)) fail(`${slug} has a tracking script`);
+  if (!sitemap.includes(`<loc>https://squisheeacademy.com/${slug}/</loc>`)) fail(`sitemap missing ${slug}`);
+  const skill = readdirSync(resolve(root, slug)).find((name) => name !== "index.html");
+  if (!skill) fail(`${slug} missing a skill page`);
+  const skillHtml = readFileSync(resolve(root, slug, skill, "index.html"), "utf8");
+  if (!skillHtml.includes("Play free")) fail(`${slug}/${skill} play link`);
+  if (needsJs(skillHtml)) fail(`${slug}/${skill} needs JavaScript`);
+}
+const arabic = readFileSync(resolve(root, "ar/times-tables-game/index.html"), "utf8");
+if (!arabic.includes('<html lang="ar" dir="rtl">')) fail("arabic page is not rtl");
+for (const prefix of ["es", "pt-br", "fr", "zh-hans", "hi", "ar"]) {
+  const localized = resolve(root, prefix, "times-tables-game/index.html");
+  if (!existsSync(localized)) fail(`missing ${prefix} times tables landing`);
+  if (!sitemap.includes(`<loc>https://squisheeacademy.com/${prefix}/times-tables-game/</loc>`)) {
+    fail(`sitemap missing ${prefix} times tables`);
+  }
+}
+
+const sitemapCheck = spawnSync(
+  "python3",
+  [
+    "-c",
+    `import xml.etree.ElementTree as ET
+root = ET.parse("dist-domain/sitemap.xml").getroot()
+ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9", "xhtml": "http://www.w3.org/1999/xhtml"}
+urls = root.findall("sm:url", ns)
+assert urls, "sitemap has no urls"
+for url in urls:
+    loc = url.find("sm:loc", ns)
+    text = "" if loc is None or loc.text is None else loc.text
+    assert text.startswith("https://squisheeacademy.com/"), text
+    links = url.findall("xhtml:link", ns)
+    assert links, text
+    langs = [link.get("hreflang") for link in links]
+    assert "x-default" in langs, text
+    for link in links:
+        href = link.get("href") or ""
+        assert href.startswith("https://squisheeacademy.com/"), href
+print(len(urls))
+`,
+  ],
+  { encoding: "utf8" },
+);
+if (sitemapCheck.status !== 0) fail(`sitemap xml\n${sitemapCheck.stderr || sitemapCheck.stdout}`);
+const sitemapCount = Number(sitemapCheck.stdout.trim());
+if (!Number.isFinite(sitemapCount) || sitemapCount < 100) fail(`sitemap has ${sitemapCount} urls`);
+
+const VERIFY_LINE = "google-site-verification: google2c987beeafe3d9b2.html";
+const verifyPath = resolve(root, "google2c987beeafe3d9b2.html");
+if (!existsSync(verifyPath)) fail("google site verification file missing from dist");
+const verify = readFileSync(verifyPath, "utf8");
+if (verify.trim() !== VERIFY_LINE || verify.split("\n").filter((line) => line.length > 0).length !== 1) {
+  fail("google site verification file contents");
+}
+if (manifestList.includes("/google2c987beeafe3d9b2.html")) fail("precache includes the search console file");
+if (manifestList.some((url) => typeof url === "string" && (url.startsWith("/shots/") || url.includes("-game")))) {
+  fail("precache includes a landing page or screenshot");
+}
+for (const id of ["times", "add", "time", "money", "sight", "spelling", "count", "place", "shapes", "fractions", "measure", "phonics", "problems", "variables", "graphs"]) {
+  const shot = readFileSync(resolve(root, "shots", `${id}.png`));
+  if (shot.subarray(0, 8).toString("hex") !== "89504e470d0a1a0a") fail(`${id} screenshot is not a png`);
+  if (shot.readUInt32BE(16) !== 480 || shot.readUInt32BE(20) !== 720) {
+    fail(`${id} screenshot is ${shot.readUInt32BE(16)}x${shot.readUInt32BE(20)}`);
+  }
+}
 
 console.log("check-academy-domain OK dist-domain");
