@@ -4,3 +4,12 @@
   font-weight: 400 700;
   font-display: swap;
 }
+
+/* Story words that are not in the UI subset. Loaded only when those characters appear. */
+@font-face {
+  font-family: "Noto Sans SC";
+  src: url("./NotoSansSC-story.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+  unicode-range: U+5174, U+57AB, U+591C, U+623F, U+62B1, U+62E5, U+62E9, U+732A, U+767D, U+7B5D, U+843D, U+8C01, U+975E, U+98CE;
+}

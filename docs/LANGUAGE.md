@@ -10,7 +10,7 @@ Phonics, Sight Words, and Spelling teach English reading. The word, the sentence
 
 ## Stories
 
-Read-along books are English only for now. Español, Português, Français, 中文, हिन्दी, and العربية hide the Stories card and the book text. A grown-up report can say how many books were finished, and it does not print the English pages.
+Read-along books play in every language on the shelf. The pictures stay the same. The words are a kid-friendly telling in that language, and character names stay Peach, Frog, and the rest. Each word has its own clip from the same offline voice the games use, so the highlight follows the voice. Arabic pages run right to left, and Next sits on the left. A missing clip is a short silence while the highlight still moves, and the page keeps going. The grown-up report names the books in the language the child was reading.
 
 ## Worksheets
 

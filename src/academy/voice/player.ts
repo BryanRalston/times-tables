@@ -179,6 +179,84 @@ async function runWords(
   );
 }
 
+const MISSING_WORD_MS = 280;
+
+/**
+ * Read a story line one word at a time. A missing clip still moves the
+ * highlight, on a short silent beat, so one gap does not stop the page.
+ * Returns false when no word has a clip. Does not use the device voice.
+ */
+export function startReadAlong(
+  words: readonly WordCue[],
+  onWord: (index: number) => void,
+  onEnd: () => void,
+  onFail: () => void,
+): boolean {
+  stopClipSpeech();
+  if (words.length === 0 || words.every((word) => !hasVoiceClip(word.key))) return false;
+  const audio = context();
+  if (!audio) return false;
+  const mine = generation;
+  void runReadAlong(words, mine, audio, onWord, onEnd).catch(() => {
+    if (mine !== generation) return;
+    onFail();
+  });
+  return true;
+}
+
+async function runReadAlong(
+  words: readonly WordCue[],
+  mine: number,
+  audio: AudioContext,
+  onWord: (index: number) => void,
+  onEnd: () => void,
+): Promise<void> {
+  if (audio.state === "suspended") await audio.resume();
+  if (mine !== generation) return;
+  const clips = await Promise.all(
+    words.map((word) => (hasVoiceClip(word.key) ? loadBuffer(word.key, audio) : Promise.resolve(null))),
+  );
+  if (mine !== generation) return;
+  const durations = clips.map((buffer) => (buffer ? buffer.duration * 1000 : MISSING_WORD_MS));
+  const gaps = words.map((word) => word.gapAfterMs);
+  const starts = clipStartMs(durations, gaps, WORD_LEAD_MS);
+  const last = words.length - 1;
+  const endAt = (starts[last] ?? WORD_LEAD_MS) + (durations[last] ?? 0) + (gaps[last] ?? 0);
+  let when = audio.currentTime + WORD_LEAD_MS / 1000;
+  for (let i = 0; i < words.length; i += 1) {
+    const word = words[i];
+    const buffer = clips[i];
+    if (!word) return;
+    if (buffer) {
+      const src = audio.createBufferSource();
+      src.buffer = buffer;
+      src.connect(audio.destination);
+      src.start(when);
+      src.onended = () => {
+        const at = active.indexOf(src);
+        if (at >= 0) active.splice(at, 1);
+      };
+      active.push(src);
+      when += buffer.duration + word.gapAfterMs / 1000;
+    } else {
+      when += MISSING_WORD_MS / 1000 + word.gapAfterMs / 1000;
+    }
+    const delay = starts[i] ?? 0;
+    timers.push(
+      window.setTimeout(() => {
+        if (mine !== generation) return;
+        onWord(i);
+      }, delay),
+    );
+  }
+  timers.push(
+    window.setTimeout(() => {
+      if (mine !== generation) return;
+      onEnd();
+    }, endAt),
+  );
+}
+
 /**
  * Play one clip per word and report the word index as each clip starts.
  * Returns false when a clip is missing. Does not use the device voice.

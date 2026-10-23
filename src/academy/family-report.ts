@@ -1,9 +1,10 @@
 import { barKeys, chipKeys, GAME_CARDS as GAMES, gameCard as gameById, skillLabel, type GameId } from "./games/catalog";
-import { getLocale, show, t } from "./i18n";
+import { show, t } from "./i18n";
 import type { SkillStat } from "./model";
 import { isMastered, skillPercent } from "./rewards";
 import { gameIdForSkill, sheetForSkill, sheetTitle, sheetUrl, timesFactorOf } from "./sheet-match";
 import { STORIES } from "./stories/catalog";
+import { presentStory } from "./stories/localize";
 
 export interface PracticeTip {
   text: string;
@@ -312,12 +313,12 @@ export function practiceTip(name: string, skills: Record<string, SkillStat>): Pr
 
 export interface StoryBrief {
   finishes: number;
-  /** English titles. Empty in Spanish so the report does not show untranslated books. */
+  /** Titles in the language on screen. */
   titles: readonly string[];
   line: string;
 }
 
-/** Books finished on this device. Spanish keeps the count and hides the English titles. */
+/** Books finished on this device, named in the language the child is reading. */
 export function storyBrief(skills: Record<string, SkillStat>): StoryBrief {
   const titles: string[] = [];
   let finishes = 0;
@@ -325,42 +326,37 @@ export function storyBrief(skills: Record<string, SkillStat>): StoryBrief {
     const n = skills[`story:${story.id}`]?.ok ?? 0;
     if (n <= 0) continue;
     finishes += n;
-    titles.push(story.title);
-  }
-  if (getLocale() === "ar") {
-    const line = finishes === 0 ? "القصص ما زالت بالإنجليزية." : finishes === 1 ? "قُرئت قصة إنجليزية واحدة." : `قُرئت ${finishes} قصص إنجليزية.`;
-    return { finishes, titles: [], line };
-  }
-  if (getLocale() === "hi") {
-    const line = finishes === 0 ? "कहानियाँ अभी अंग्रेज़ी में हैं।" : finishes === 1 ? "1 अंग्रेज़ी कहानी पढ़ी।" : `${finishes} अंग्रेज़ी कहानियाँ पढ़ीं।`;
-    return { finishes, titles: [], line };
-  }
-  if (getLocale() === "zh") {
-    const line = finishes === 0 ? "故事现在还是英语的。" : finishes === 1 ? "读过1个英语故事。" : `读过${finishes}个英语故事。`;
-    return { finishes, titles: [], line };
-  }
-  if (getLocale() === "es" || getLocale() === "pt" || getLocale() === "fr") {
-    const line =
-      getLocale() === "fr"
-        ? finishes === 0
-          ? "Les histoires sont en anglais pour l'instant."
-          : finishes === 1
-            ? "1 histoire lue en anglais."
-            : `${finishes} histoires lues en anglais.`
-        : getLocale() === "pt"
-          ? finishes === 0
-            ? "As histórias estão em inglês por enquanto."
-            : finishes === 1
-              ? "1 história lida em inglês."
-              : `${finishes} histórias lidas em inglês.`
-          : finishes === 0
-            ? "Los cuentos están en inglés por ahora."
-            : finishes === 1
-              ? "1 cuento leído en inglés."
-              : `${finishes} cuentos leídos en inglés.`;
-    return { finishes, titles: [], line };
+    titles.push(presentStory(story).title);
   }
   const line =
-    finishes === 0 ? "No stories finished yet." : finishes === 1 ? "1 story finished." : `${finishes} stories finished.`;
+    finishes === 0
+      ? t(
+          "No stories finished yet.",
+          "Todavía no hay cuentos terminados.",
+          "Nenhuma história terminada ainda.",
+          "Pas encore d'histoire terminée.",
+          "还没有读完的故事。",
+          "अभी कोई कहानी पूरी नहीं हुई।",
+          "لم تكتمل أي قصة بعد.",
+        )
+      : finishes === 1
+        ? t(
+            "1 story finished.",
+            "1 cuento terminado.",
+            "1 história terminada.",
+            "1 histoire terminée.",
+            "读完了1个故事。",
+            "1 कहानी पूरी हुई।",
+            "اكتملت قصة واحدة.",
+          )
+        : t(
+            `${finishes} stories finished.`,
+            `${finishes} cuentos terminados.`,
+            `${finishes} histórias terminadas.`,
+            `${finishes} histoires terminées.`,
+            `读完了${finishes}个故事。`,
+            `${finishes} कहानियाँ पूरी हुईं।`,
+            `اكتملت ${finishes} قصص.`,
+          );
   return { finishes, titles, line };
 }

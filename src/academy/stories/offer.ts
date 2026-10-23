@@ -1,6 +1,4 @@
-import { getLocale } from "../i18n";
-
-/** Storybooks are English for now. Other languages hide the shelf. */
+/** Read-along books are on the shelf in every language the site speaks. */
 export function storiesOffered(): boolean {
-  return getLocale() === "en";
+  return true;
 }

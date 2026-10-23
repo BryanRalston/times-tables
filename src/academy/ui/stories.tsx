@@ -1,41 +1,32 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { autoSpeakGrade, type Grade, type SkillStat } from "../model";
 import { starsForRound } from "../rewards";
 import { storyGradeLabel } from "../stories/band";
 import type { Story } from "../stories/catalog";
 import { knownStory, openStory, stepReader, storiesForGrade, storiesOffered, storyScore, type ReaderState } from "../stories/engine";
+import { presentStory } from "../stories/localize";
 import { lineTokens } from "../stories/read";
 import { blip, chime, teachTone } from "../sound";
-import { show, t } from "../i18n";
+import { getLocale, show, t } from "../i18n";
 import { ensureVoice } from "../voice/clips";
-import { startClipSpeech, startWordClips, stopClipSpeech } from "../voice/player";
+import { startClipSpeech, startReadAlong, stopClipSpeech } from "../voice/player";
 import { BackLink, SquisheeImg, Stars, cx } from "./bits";
 import { StoryPicture, StoryScene } from "./story-scene";
 
-const YES = "Yes!";
-const LOOK = "Let's look together.";
+function storyDir(): "rtl" | "ltr" {
+  return getLocale() === "ar" ? "rtl" : "ltr";
+}
 
-function StoriesHidden() {
-  return (
-    <div className="ac-shell ac-mid" data-stories="hidden">
-      <header className="ac-top">
-        <BackLink>{t("Back to games", "Volver a los juegos", "Voltar aos jogos", "Retour aux jeux")}</BackLink>
-      </header>
-      <h1>{t("Stories", "Cuentos", "Histórias", "Histoires")}</h1>
-      <p className="ac-lede">
-        {t(
-          "Stories are in English.",
-          "Los cuentos están en inglés por ahora. Cambia a English en Ajustes para leerlos.",
-          "As histórias estão em inglês por enquanto. Mude para English em Ajustes para ler.",
-          "Les histoires sont en anglais pour l'instant. Passe en English dans Réglages pour les lire.",
-        )}
-      </p>
-    </div>
-  );
+function storyBack(): string {
+  return t("Back", "Atrás", "Voltar", "Retour", "返回", "वापस", "رجوع");
+}
+
+function storyNext(): string {
+  return t("Next", "Siguiente", "Próxima", "Suivante", "下一页", "अगला", "التالي");
 }
 
 export function StoriesShelf({ grade, skills }: { grade: Grade; skills: Record<string, SkillStat> }) {
-  if (!storiesOffered()) return <StoriesHidden />;
+  if (!storiesOffered()) return null;
   const books = storiesForGrade(grade);
   const groups: { grade: Story["grade"]; books: Story[] }[] = [];
   for (const story of books) {
@@ -44,7 +35,7 @@ export function StoriesShelf({ grade, skills }: { grade: Grade; skills: Record<s
     else last.books.push(story);
   }
   return (
-    <div className="ac-shell" data-stories="open">
+    <div className="ac-shell" data-stories="open" dir={storyDir()} lang={getLocale()}>
       <header className="ac-top">
         <BackLink>{show("Games")}</BackLink>
       </header>
@@ -55,16 +46,17 @@ export function StoriesShelf({ grade, skills }: { grade: Grade; skills: Record<s
           <h2>{storyGradeLabel(group.grade)}</h2>
           <div className="ac-story-list">
             {group.books.map((story) => {
+              const shown = presentStory(story);
               const done = (skills[`story:${story.id}`]?.ok ?? 0) > 0;
               const pal = story.cast[0] ?? "peach";
               return (
                 <a key={story.id} className="ac-story-card" href={`#/stories/${story.id}`} data-story-id={story.id} data-read={done ? "yes" : "no"}>
                   <SquisheeImg id={pal} className="ac-story-card-pal" squish="off" />
                   <span>
-                    <strong>{story.title}</strong>
+                    <strong>{shown.title}</strong>
                     <small>
-                      {story.pages.length} {show("pages")}
-                      {done ? ` · ${show("Read")}` : ""}
+                      {story.pages.length} {t("pages", "páginas", "páginas", "pages", "页", "पृष्ठ", "صفحات")}
+                      {done ? ` · ${t("Read", "Leído", "Lida", "Lue", "读过了", "पढ़ लिया", "قُرئت")}` : ""}
                     </small>
                   </span>
                 </a>
@@ -116,6 +108,8 @@ export function StoryReader({
   sound: boolean;
   onFinish: (result: { id: string; correct: number; total: number; seconds: number }) => void;
 }) {
+  const lang = getLocale();
+  const shown = useMemo(() => presentStory(story), [story, lang]);
   const [state, setState] = useState<ReaderState>(() => openStory(story.checks.length));
   const [active, setActive] = useState(-1);
   const started = useRef(Date.now());
@@ -133,13 +127,15 @@ export function StoryReader({
     const tokens = lineTokens(text);
     setActive(-1);
     void ensureVoice().then(() => {
-      const startedPlay = startWordClips(
-        tokens.map((token) => ({ key: token.key, gapAfterMs: token.gapAfterMs })),
+      const cues = tokens.map((token) => ({ key: token.key, gapAfterMs: token.gapAfterMs }));
+      const startedPlay = startReadAlong(
+        cues,
         (index) => setActive(index),
         () => setActive(-1),
         () => setActive(-1),
       );
-      if (!startedPlay) setActive(-1);
+      if (startedPlay) return;
+      if (!startClipSpeech(text, 1, () => setActive(-1))) setActive(-1);
     });
   }
 
@@ -156,11 +152,11 @@ export function StoryReader({
       return;
     }
     if (state.phase === "done") return;
-    const text = state.phase === "page" ? (story.pages[state.page]?.text ?? "") : (story.checks[state.check]?.prompt ?? "");
+    const text = state.phase === "page" ? (shown.pages[state.page]?.text ?? "") : (shown.checks[state.check]?.prompt ?? "");
     const auto = state.phase === "check" || state.returnTo != null || autoSpeakGrade(grade);
     if (!auto || !text) return;
     playText(text);
-  }, [state.phase, state.page, state.check, state.returnTo, grade, story, sound]);
+  }, [state.phase, state.page, state.check, state.returnTo, grade, shown, sound]);
 
   useEffect(() => {
     if (state.phase !== "done" || sent.current) return;
@@ -177,7 +173,9 @@ export function StoryReader({
   function speakThen(line: string, follow: string | null) {
     hold.current = true;
     clearWait();
-    if (sound) void ensureVoice().then(() => startClipSpeech(line, 1, () => {}));
+    if (sound) void ensureVoice().then(() => {
+      if (!startClipSpeech(line, 1, () => {})) startReadAlong(lineTokens(line).map((token) => ({ key: token.key, gapAfterMs: 40 })), () => {}, () => {}, () => {});
+    });
     else stopClipSpeech();
     if (!follow) return;
     wait.current = window.setTimeout(() => {
@@ -186,16 +184,16 @@ export function StoryReader({
     }, 1400);
   }
 
-  const page = story.pages[state.page] ?? story.pages[0];
+  const page = shown.pages[state.page] ?? shown.pages[0];
   if (!page) return null;
 
   if (state.phase === "done") {
     const score = storyScore(state);
     const stars = starsForRound(score.correct, Math.max(1, score.total));
     return (
-      <div className="ac-shell ac-mid" data-story-phase="done" data-story-id={story.id}>
+      <div className="ac-shell ac-mid" data-story-phase="done" data-story-id={story.id} dir={storyDir()} lang={lang}>
         <StoryScene mood={page.mood} pals={page.pals} prop={page.prop} />
-        <h1>{YES}</h1>
+        <h1>{show("Yes!")}</h1>
         <Stars value={stars} />
         <a className="ac-go" href="#/stories">
           {show("Stories")}
@@ -205,10 +203,10 @@ export function StoryReader({
   }
 
   if (state.phase === "check") {
-    const check = story.checks[state.check];
+    const check = shown.checks[state.check];
     if (!check) return null;
     return (
-      <div className="ac-shell ac-mid" data-story-phase="check" data-story-id={story.id} data-story-check={state.check}>
+      <div className="ac-shell ac-mid" data-story-phase="check" data-story-id={story.id} data-story-check={state.check} dir={storyDir()} lang={lang}>
         <header className="ac-top">
           <a className="ac-back" href="#/stories">
             {show("Stories")}
@@ -220,12 +218,12 @@ export function StoryReader({
           onWord={(index) => {
             const token = lineTokens(check.prompt)[index];
             if (!token || !sound) return;
-            startWordClips(
-              [{ key: token.key, gapAfterMs: 60 }],
-              () => setActive(index),
-              () => setActive(-1),
-              () => setActive(-1),
-            );
+            void ensureVoice().then(() => {
+              const cues = [{ key: token.key, gapAfterMs: 60 }];
+              if (!startReadAlong(cues, () => setActive(index), () => setActive(-1), () => setActive(-1))) {
+                startClipSpeech(token.text, 1, () => setActive(-1));
+              }
+            });
           }}
         />
         <div className="ac-story-choices">
@@ -240,17 +238,17 @@ export function StoryReader({
                 const next = stepReader(state, { type: "answer", choice: choice.id, answer: check.answer, page: check.page });
                 const follow =
                   next.phase === "page"
-                    ? (story.pages[next.page]?.text ?? null)
+                    ? (shown.pages[next.page]?.text ?? null)
                     : next.phase === "check"
-                      ? (story.checks[next.check]?.prompt ?? null)
+                      ? (shown.checks[next.check]?.prompt ?? null)
                       : null;
                 if (choice.id === check.answer) {
                   blip(true, sound);
                   if (next.phase === "done") chime("cheer", sound);
-                  speakThen(YES, follow);
+                  speakThen(show("Yes!"), follow);
                 } else {
                   teachTone(sound);
-                  speakThen(LOOK, follow);
+                  speakThen(show("Let's look together."), follow);
                 }
                 setState(next);
               }}
@@ -266,16 +264,16 @@ export function StoryReader({
 
   const tokens = lineTokens(page.text);
   return (
-    <div className="ac-shell ac-mid" data-story-phase="page" data-story-id={story.id} data-story-page={state.page}>
+    <div className="ac-shell ac-mid" data-story-phase="page" data-story-id={story.id} data-story-page={state.page} dir={storyDir()} lang={lang}>
       <header className="ac-top">
         <a className="ac-back" href="#/stories">
           {show("Stories")}
         </a>
         <span className="ac-story-count">
           <span className="ac-sr">
-            {show("Page")} {state.page + 1} / {story.pages.length}
+            {t("Page", "Página", "Página", "Page", "页", "पृष्ठ", "صفحة")} {state.page + 1} / {shown.pages.length}
           </span>
-          {story.pages.map((_, index) => (
+          {shown.pages.map((_, index) => (
             <i key={index} className={index === state.page ? "is-on" : ""} />
           ))}
         </span>
@@ -287,16 +285,16 @@ export function StoryReader({
         onWord={(index) => {
           const token = tokens[index];
           if (!token || !sound) return;
-          startWordClips(
-            [{ key: token.key, gapAfterMs: token.gapAfterMs }],
-            () => setActive(index),
-            () => setActive(-1),
-            () => setActive(-1),
-          );
+          void ensureVoice().then(() => {
+            const cues = [{ key: token.key, gapAfterMs: token.gapAfterMs }];
+            if (!startReadAlong(cues, () => setActive(index), () => setActive(-1), () => setActive(-1))) {
+              startClipSpeech(token.text, 1, () => setActive(-1));
+            }
+          });
         }}
       />
       <button type="button" className="ac-story-read" data-story-read onClick={() => playText(page.text)}>
-        {show("Read to me")}
+        {t("Read to me", "Léemelo", "Leia para mim", "Lis pour moi", "读给我听", "मुझे पढ़कर सुनाओ", "اقرأ لي")}
       </button>
       <div className="ac-story-nav">
         <button
@@ -307,10 +305,10 @@ export function StoryReader({
           onClick={() => {
             stopClipSpeech();
             clearWait();
-            setState((current) => stepReader(current, { type: "back", pages: story.pages.length }));
+            setState((current) => stepReader(current, { type: "back", pages: shown.pages.length }));
           }}
         >
-          {show("Back")}
+          {storyBack()}
         </button>
         <button
           type="button"
@@ -319,10 +317,10 @@ export function StoryReader({
           onClick={() => {
             stopClipSpeech();
             clearWait();
-            setState((current) => stepReader(current, { type: "next", pages: story.pages.length }));
+            setState((current) => stepReader(current, { type: "next", pages: shown.pages.length }));
           }}
         >
-          {show("Next")}
+          {storyNext()}
         </button>
       </div>
     </div>

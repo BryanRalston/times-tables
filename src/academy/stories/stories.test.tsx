@@ -2,20 +2,51 @@ import { existsSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
-import { setLocale } from "../i18n";
+import { installArabic, installChinese, installFrench, installHindi, installPortuguese, setLocale, type Locale } from "../i18n";
+import * as portuguese from "../i18n-pt";
+import * as french from "../i18n-fr";
+import * as chinese from "../i18n-zh";
+import * as hindi from "../i18n-hi";
+import * as arabic from "../i18n-ar";
 import type { Grade } from "../model";
 import { storyBrief } from "../family-report";
 import { applyStory } from "../rewards";
 import { blankChild } from "../storage";
 import { clipStartMs } from "../voice/player";
 import { VOICE_FILES } from "../voice/manifest";
-import { planSpeech } from "../voice/plan";
+import { VOICE_FILES_ES } from "../voice/manifest-es";
+import { VOICE_FILES_PT } from "../voice/manifest-pt";
+import { VOICE_FILES_FR } from "../voice/manifest-fr";
+import { VOICE_FILES_ZH } from "../voice/manifest-zh";
+import { VOICE_FILES_HI } from "../voice/manifest-hi";
+import { VOICE_FILES_AR } from "../voice/manifest-ar";
+import { idealPieces, planSpeech } from "../voice/plan";
 import { wordAllowed } from "./band";
+import { STORY_COPY, type StoryLang } from "./copy";
 import { STORIES, storyById } from "./catalog";
 import { openStory, stepReader, storiesForGrade, storyScore, storyViolations } from "./engine";
+import { presentStory, storySpeechLines } from "./localize";
 import { lineTokens } from "./read";
 import { HomeScreen } from "../ui/home";
-import { StoriesShelf } from "../ui/stories";
+import { StoriesShelf, StoryReader } from "../ui/stories";
+
+installPortuguese(portuguese);
+installFrench(french);
+installChinese(chinese);
+installHindi(hindi);
+installArabic(arabic);
+
+const VOICE_BY_LANG: Record<Locale, Record<string, string>> = {
+  en: VOICE_FILES,
+  es: VOICE_FILES_ES,
+  pt: VOICE_FILES_PT,
+  fr: VOICE_FILES_FR,
+  zh: VOICE_FILES_ZH,
+  hi: VOICE_FILES_HI,
+  ar: VOICE_FILES_AR,
+};
+
+const STORY_LANGS = ["es", "pt", "fr", "zh", "hi", "ar"] as const satisfies readonly StoryLang[];
 
 const hasClip = (key: string) => Object.prototype.hasOwnProperty.call(VOICE_FILES, key);
 
@@ -138,7 +169,7 @@ describe("story rewards", () => {
     expect(missed.stars).toBe(1);
   });
 
-  it("lists finished books for grown-ups and hides the English titles in Spanish", () => {
+  it("lists finished books for grown-ups in the language on screen", () => {
     const skills = { "story:pk-peach-cat": { ok: 1, miss: 0 }, "story:g2-bear-boat": { ok: 2, miss: 0 } };
     expect(storyBrief(skills)).toMatchObject({
       finishes: 3,
@@ -147,63 +178,110 @@ describe("story rewards", () => {
     setLocale("es");
     const spanish = storyBrief(skills);
     expect(spanish.finishes).toBe(3);
-    expect(spanish.titles).toEqual([]);
-    expect(spanish.line.toLowerCase()).not.toContain("cat");
-    expect(spanish.line.toLowerCase()).not.toContain("boat");
-    expect(spanish.line).toContain("inglés");
+    expect(spanish.titles).toEqual(["La gatita", "El barco"]);
+    expect(spanish.line).toContain("cuentos");
+    expect(spanish.line.toLowerCase()).not.toContain("inglés");
   });
 
-  it("hides story text when the language is Spanish", () => {
+  it("opens the Spanish shelf and the Spanish book from the home language", () => {
     const child = blankChild({ id: "ada", name: "Ada", grade: "2" as Grade });
     setLocale("es");
     const home = renderToStaticMarkup(
       <HomeScreen child={child} sound={false} onClaim={() => {}} onPlay={() => {}} />,
     );
     const shelf = renderToStaticMarkup(<StoriesShelf grade="2" skills={{}} />);
-    expect(home).not.toContain('href="#/stories"');
-    expect(shelf).toContain("inglés");
-    for (const story of STORIES) {
-      expect(shelf).not.toContain(story.title);
-      expect(shelf).not.toContain(story.pages[0]?.text ?? "");
-      expect(home).not.toContain(story.title);
+    expect(home).toContain('href="#/stories"');
+    expect(shelf).toContain('dir="ltr"');
+    expect(shelf).toContain("La gatita");
+    expect(shelf).toContain("El barco");
+    expect(shelf).not.toContain("The cat");
+    const book = renderToStaticMarkup(
+      <StoryReader story={storyById("pk-peach-cat")!} grade="PK" sound={false} onFinish={() => {}} />,
+    );
+    expect(book).toContain("gatita.");
+    expect(book).toContain("Léemelo");
+    expect(book).not.toContain("can see a cat");
+  });
+});
+
+describe("story languages", () => {
+  it("has a full book in every language, with words the clip planner can say", () => {
+    const problems: string[] = [];
+    for (const lang of STORY_LANGS) {
+      setLocale(lang);
+      for (const story of STORIES) {
+        const copy = STORY_COPY[lang][story.id];
+        if (!copy) {
+          problems.push(`${lang} ${story.id} missing`);
+          continue;
+        }
+        if (copy.pages.length !== story.pages.length) problems.push(`${lang} ${story.id} pages`);
+        if (copy.checks.length !== story.checks.length) problems.push(`${lang} ${story.id} checks`);
+        const shown = presentStory(story);
+        expect(shown.title).toBe(copy.title);
+        for (const line of storySpeechLines(story)) {
+          const tokens = lineTokens(line);
+          if (tokens.length === 0) problems.push(`${lang} ${story.id} empty ${line}`);
+          const pieces = idealPieces(line);
+          const planned = pieces?.flatMap((piece) => piece.key.split(" ")) ?? [];
+          if (tokens.map((token) => token.key).join("|") !== planned.join("|")) {
+            problems.push(`${lang} ${line} :: ${tokens.map((token) => token.key).join("|")} != ${planned.join("|")}`);
+          }
+        }
+      }
     }
+    expect(problems).toEqual([]);
   });
 
-  it("hides story text when the language is Portuguese", () => {
-    const skills = { "story:pk-peach-cat": { ok: 1, miss: 0 } };
-    setLocale("pt");
-    const report = storyBrief(skills);
-    expect(report.titles).toEqual([]);
-    expect(report.line).toContain("inglês");
-    const child = blankChild({ id: "ada", name: "Ada", grade: "2" as Grade });
-    const home = renderToStaticMarkup(
-      <HomeScreen child={child} sound={false} onClaim={() => {}} onPlay={() => {}} />,
+  it("keeps Arabic books right to left and Chinese words in their own face", () => {
+    const story = storyById("g2-bear-boat");
+    expect(story).toBeTruthy();
+    if (!story) return;
+    setLocale("ar");
+    const arabic = renderToStaticMarkup(
+      <StoryReader story={story} grade="2" sound={false} onFinish={() => {}} />,
     );
-    const shelf = renderToStaticMarkup(<StoriesShelf grade="2" skills={{}} />);
-    expect(home).not.toContain('href="#/stories"');
-    expect(shelf).toContain("inglês");
-    for (const story of STORIES) {
-      expect(shelf).not.toContain(story.title);
-      expect(shelf).not.toContain(story.pages[0]?.text ?? "");
-    }
+    expect(arabic).toContain('dir="rtl"');
+    expect(arabic).toContain('lang="ar"');
+    expect(arabic).toContain("قاربا");
+    expect(arabic).toContain("التالي");
+    expect(arabic).toContain("رجوع");
+    const backAt = arabic.indexOf('data-story-back');
+    const nextAt = arabic.indexOf('data-story-next');
+    expect(backAt).toBeGreaterThan(0);
+    expect(nextAt).toBeGreaterThan(backAt);
+    setLocale("zh");
+    const chinese = renderToStaticMarkup(
+      <StoryReader story={story} grade="2" sound={false} onFinish={() => {}} />,
+    );
+    expect(chinese).toContain('dir="ltr"');
+    expect(chinese).toContain("看见");
+    expect(chinese).toContain("小船");
+    expect(chinese).toContain("下一页");
   });
 
-  it("hides story text when the language is French", () => {
-    const skills = { "story:pk-peach-cat": { ok: 1, miss: 0 } };
-    setLocale("fr");
-    const report = storyBrief(skills);
-    expect(report.titles).toEqual([]);
-    expect(report.line).toContain("anglais");
-    const child = blankChild({ id: "ada", name: "Ada", grade: "2" as Grade });
-    const home = renderToStaticMarkup(
-      <HomeScreen child={child} sound={false} onClaim={() => {}} onPlay={() => {}} />,
-    );
-    const shelf = renderToStaticMarkup(<StoriesShelf grade="2" skills={{}} />);
-    expect(home).not.toContain('href="#/stories"');
-    expect(shelf).toContain("anglais");
-    for (const story of STORIES) {
-      expect(shelf).not.toContain(story.title);
-      expect(shelf).not.toContain(story.pages[0]?.text ?? "");
+  it("has a recorded word clip for every book in every language", () => {
+    const missing: string[] = [];
+    for (const lang of ["en", ...STORY_LANGS] as const) {
+      setLocale(lang);
+      const files = VOICE_BY_LANG[lang];
+      for (const story of STORIES) {
+        for (const line of storySpeechLines(story)) {
+          const pieces = idealPieces(line);
+          if (!pieces) {
+            missing.push(`${lang} ${story.id} ${line}`);
+            continue;
+          }
+          for (const piece of pieces) {
+            for (const key of piece.key.split(" ")) {
+              const file = files[key];
+              const abs = file ? resolve("academy/public/voice", file) : "";
+              if (!file || !existsSync(abs) || statSync(abs).size <= 200) missing.push(`${lang} ${story.id} ${key}`);
+            }
+          }
+        }
+      }
     }
+    expect(missing).toEqual([]);
   });
 });

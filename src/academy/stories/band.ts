@@ -1,4 +1,5 @@
 import { squisheeById } from "@/lib/squishees";
+import { t } from "../i18n";
 import type { Grade } from "../model";
 import { RHYME_FAMILIES, SOUND_BANK } from "../games/phonics";
 import { ALL_SIGHT, type SightList } from "../games/sight-data";
@@ -82,13 +83,13 @@ export function gradeCap(grade: Grade): number {
 export function storyGradeLabel(grade: StoryGrade): string {
   switch (grade) {
     case "PK":
-      return "Pre-K";
+      return t("Pre-K", "Prekínder", "Pré-escola", "Maternelle", "学前班", "नर्सरी", "روضة");
     case "K":
-      return "K";
+      return t("K", "Kínder", "Infantil", "Grande section", "幼儿园", "केजी", "التمهيدي");
     case "1":
-      return "Grade 1";
+      return t("Grade 1", "Grado 1", "1.º ano", "CP", "一年级", "कक्षा 1", "الصف 1");
     case "2":
-      return "Grade 2";
+      return t("Grade 2", "Grado 2", "2.º ano", "CE1", "二年级", "कक्षा 2", "الصف 2");
     default: {
       const neverGrade: never = grade;
       return neverGrade;

@@ -2679,6 +2679,7 @@ body:has(.ac-boss-intro) { background: #3c2448; }
   font-size: 28px;
   line-height: 1.15;
   color: var(--ac-ink);
+  unicode-bidi: isolate;
 }
 .ac-story-word.is-now {
   background: #fff4c9;

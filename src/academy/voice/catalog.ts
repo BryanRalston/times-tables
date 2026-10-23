@@ -14,6 +14,7 @@ import { makeClockTask, makePayTask } from "../hands";
 import { exampleFor } from "../round-flow";
 import { hintCue, promptSpeech, speakable, workedExample } from "../teach";
 import type { ChoiceQ } from "../games/types";
+import { storySpokenLines } from "../stories/speech";
 import { traceLines } from "../trace/lines";
 import { idealPieces, speechChunkError } from "./plan";
 import { spokenText } from "./pronounce";
@@ -111,6 +112,7 @@ function explicitLines(): SpokenLine[] {
     }
   }
   for (const line of graphClipLines()) push(lines, line, "graphs");
+  for (const line of storySpokenLines()) push(lines, line, "stories");
   return lines;
 }
 
