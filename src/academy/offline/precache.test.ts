@@ -71,6 +71,15 @@ describe("offline precache", () => {
     expect(isPrecacheFile("fonts/NotoSansSC-subset.woff2")).toBe(false);
     expect(isPrecacheFile("squishees/frog.png")).toBe(false);
     expect(isPrecacheFile("precache-manifest.json")).toBe(false);
+    expect(isPrecacheFile("worksheets/multiplication-7s/index.html")).toBe(true);
+    expect(isPrecacheFile("times-tables-game/index.html")).toBe(false);
+    expect(isPrecacheFile("times-tables-game/twos/index.html")).toBe(false);
+    expect(isPrecacheFile("shots/times.png")).toBe(false);
+    expect(isPrecacheFile("es/times-tables-game/index.html")).toBe(false);
+    expect(isPrecacheFile("pt-br/money-game/index.html")).toBe(false);
+    expect(isPrecacheFile("zh-hans/graphs-game/index.html")).toBe(false);
+    expect(isPrecacheFile("ar/phonics-game/index.html")).toBe(false);
+    expect(isPrecacheFile("google2c987beeafe3d9b2.html")).toBe(false);
 
     const list = buildPrecacheList({
       appPrefix: "/times-tables/academy",

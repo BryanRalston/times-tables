@@ -137,6 +137,11 @@ export function isPrecacheFile(rel) {
   if (rel.startsWith("voice/hi/")) return HI_PRECACHE_FILES.has(rel.slice("voice/".length));
   if (rel.startsWith("voice/ar/")) return AR_PRECACHE_FILES.has(rel.slice("voice/".length));
   if (rel.startsWith("fonts/")) return false;
+  // Landing pages, translations, and screenshots are for crawlers. They stay off the first download.
+  if (rel === "google2c987beeafe3d9b2.html") return false;
+  if (rel.startsWith("shots/")) return false;
+  if (/^(?:es|fr|hi|ar|pt-br|zh-hans)\//.test(rel)) return false;
+  if (/(?:^|\/)[a-z0-9]+(?:-[a-z0-9]+)*-game(?:\/|$)/.test(rel)) return false;
   return PRECACHE_EXT.test(rel);
 }
 

@@ -1,10 +1,11 @@
 import { WORKSHEETS, type StaticItem, type StaticSheet } from "./catalog";
+import { landingPages, relativeHref, sheetIndexPages, sheetPages, type SeoPage } from "./landings";
 
 export const CANONICAL_ORIGIN = "https://squisheeacademy.com";
 
-export const HOME_TITLE = "Squishee Academy";
+export const HOME_TITLE = "Free learning games for kids Pre-K to grade 4 | Squishee Academy";
 export const HOME_DESCRIPTION =
-  "Free Pre-K to grade 4 learning games with squishees. Play in 7 languages: English, Español, Português, Français, 中文, हिन्दी, العربية. No ads, no accounts.";
+  "Free learning games for kids Pre-K to grade 4. Play in 7 languages: English, Español, Português, Français, 中文, हिन्दी, العربية. No ads, no accounts.";
 
 /** One URL serves every language. These tell crawlers which languages that page is for. */
 export const HOME_HREFLANGS = ["x-default", "en", "es", "pt-BR", "fr", "zh-Hans", "hi", "ar"] as const;
@@ -143,6 +144,11 @@ ol.problems li { margin: 14px 0; break-inside: avoid; }
   color: #e21870;
 }
 .prose h1 { font-size: 44px; }
+.shot { width: min(100%, 480px); height: auto; border-radius: 22px; display: block; margin: 12px 0; background: #fff; }
+.note, .standards { color: #5c4566; }
+.langs { display: flex; flex-wrap: wrap; gap: 8px 12px; margin-top: 16px; }
+html[dir="rtl"] body { text-align: right; }
+html[dir="rtl"] .play a, html[dir="rtl"] .links a { margin: 6px 0 0 10px; }
 .promise { display: grid; gap: 10px; margin: 8px 0 18px; }
 .promise p {
   margin: 0;
@@ -188,28 +194,78 @@ function answerHtml(item: StaticItem): string {
   return `<li>${escapeHtml(text)}</li>`;
 }
 
+function hreflangLinks(alternates: { hreflang: string; path: string }[]): string {
+  return alternates
+    .map((row) => `  <link rel="alternate" hreflang="${row.hreflang}" href="${canonicalUrl(row.path)}" />`)
+    .join("\n");
+}
+
+function jsonLdScript(data: unknown): string {
+  const json = JSON.stringify(data).replaceAll("<", "\\u003c");
+  return `<script type="application/ld+json">${json}</script>`;
+}
+
+function learningJsonLd(page: SeoPage): string {
+  const url = canonicalUrl(page.path);
+  const learning: Record<string, unknown> = {
+    "@type": ["LearningResource", "EducationalApplication"],
+    name: page.h1,
+    description: page.description,
+    url,
+    inLanguage: page.locale.hreflang,
+    isAccessibleForFree: true,
+    learningResourceType: page.kind === "sheet" || page.kind === "sheet-index" ? "Worksheet" : "Game",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    provider: { "@type": "Organization", name: "Squishee Academy", url: `${CANONICAL_ORIGIN}/` },
+  };
+  if (page.gradesLabel) learning.educationalLevel = page.gradesLabel;
+  if (page.ageRange) learning.typicalAgeRange = page.ageRange;
+  if (page.codes.length > 0) learning.teaches = page.codes;
+  return jsonLdScript({
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        name: "Squishee Academy",
+        url: `${CANONICAL_ORIGIN}/`,
+        description: HOME_DESCRIPTION,
+        inLanguage: ["en", "es", "pt-BR", "fr", "zh-Hans", "hi", "ar"],
+      },
+      learning,
+    ],
+  });
+}
+
 function documentPage(opts: {
   title: string;
   description: string;
   path: string;
   depth: number;
   body: string;
+  lang?: string;
+  dir?: "ltr" | "rtl";
+  alternates?: { hreflang: string; path: string }[];
+  jsonLd?: string;
 }): string {
   const canonical = canonicalUrl(opts.path);
   const home = `${"../".repeat(opts.depth)}#/`;
+  const lang = opts.lang ?? "en";
+  const dir = opts.dir === "rtl" ? ' dir="rtl"' : "";
+  const alternates = opts.alternates?.length ? `${hreflangLinks(opts.alternates)}\n` : "";
+  const jsonLd = opts.jsonLd ? `${opts.jsonLd}\n` : "";
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="${lang}"${dir}>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(opts.title)}</title>
   <meta name="description" content="${escapeHtml(opts.description)}" />
   <link rel="canonical" href="${canonical}" />
-${socialMeta({ title: opts.title, description: opts.description, url: canonical })}
+${alternates}${socialMeta({ title: opts.title, description: opts.description, url: canonical })}
   <meta name="theme-color" content="#fff1f7" />
 ${iconLinks()}
   <style>${PAGE_STYLE}</style>
-</head>
+${jsonLd}</head>
 <body>
   <main>
     <p class="noprint"><a class="brand" href="${home}"><b>Squishee</b> <i>Academy</i></a></p>
@@ -220,65 +276,106 @@ ${iconLinks()}
 `;
 }
 
-export function worksheetHtml(sheet: StaticSheet): string {
-  const problems = sheet.items.map(problemHtml).join("");
-  const answers = sheet.items.map(answerHtml).join("");
-  const play = `../../#/play/${sheet.game}`;
+function crawlableExtras(page: SeoPage): string {
+  const codes = page.codes.length
+    ? `<p class="standards">${escapeHtml(page.ui.standards)}: ${escapeHtml(page.codes.join(", "))}</p>`
+    : "";
+  const related = page.related
+    .map((link) => `<a href="${link.href}">${escapeHtml(link.label)}</a>`)
+    .join(" ");
+  const langs = page.alternates
+    .filter((row) => row.hreflang !== "x-default")
+    .map((row) => `<a href="${relativeHref(page.path, row.path)}" hreflang="${row.hreflang}" lang="${row.hreflang}">${row.hreflang}</a>`)
+    .join(" ");
+  return `${codes}
+      <p class="note">${escapeHtml(page.ui.note)}</p>
+      <p class="play noprint"><a href="${page.playHref}">${escapeHtml(page.ui.play)}</a></p>
+      <img class="shot" src="${page.shot}" width="480" height="720" alt="${escapeHtml(page.shotAlt)}" />
+      <nav class="links" aria-label="${escapeHtml(page.ui.related)}">${related}</nav>
+      <nav class="langs" aria-label="${escapeHtml(page.ui.languages)}">${langs}</nav>
+      <p class="play noprint"><a class="quiet" href="${page.worksheetsHref}">${escapeHtml(page.ui.allSheets)}</a> <a class="quiet" href="${page.privacyHref}">${escapeHtml(page.ui.privacy)}</a></p>`;
+}
+
+function renderSeoPage(page: SeoPage, body: string): string {
   return documentPage({
-    title: sheet.title,
-    description: sheet.description,
-    path: `worksheets/${sheet.slug}`,
-    depth: 2,
-    body: `<article>
-      <h1>${escapeHtml(sheet.h1)}</h1>
-      <p class="lede">${escapeHtml(sheet.description)}</p>
-      <p class="name">Name _______________________ &nbsp;&nbsp; Date ____________</p>
-      <ol class="problems">${problems}</ol>
-      <section class="key">
-        <h2>Answer key</h2>
-        <ol>${answers}</ol>
-      </section>
-      <p class="play noprint"><a href="${play}">Play the game</a> <a class="quiet" href="../">All worksheets</a></p>
-    </article>`,
+    title: page.title,
+    description: page.description,
+    path: page.path,
+    depth: page.path.split("/").filter(Boolean).length,
+    body,
+    lang: page.locale.htmlLang,
+    dir: page.locale.dir,
+    alternates: page.alternates,
+    jsonLd: learningJsonLd(page),
   });
 }
 
+const PRACTICE_SLUGS = [
+  "times-tables",
+  "add-subtract",
+  "telling-time",
+  "money",
+  "sight-words",
+  "spelling",
+  "counting",
+  "place-value",
+  "shapes",
+  "fractions",
+  "measurement",
+  "phonics",
+  "word-problems",
+  "missing-numbers",
+  "data",
+] as const;
+
+function sheetBody(page: SeoPage): string {
+  const sheet = page.sheet;
+  if (!page.sheet) throw new Error(page.path);
+  const problems = sheet!.items.map(problemHtml).join("");
+  const answers = sheet!.items.map(answerHtml).join("");
+  return `<article>
+      <h1>${escapeHtml(page.h1)}</h1>
+      <p class="lede">${escapeHtml(page.lede)}</p>
+      <p class="name">Name _______________________ &nbsp;&nbsp; Date ____________</p>
+      <ol class="problems">${problems}</ol>
+      <section class="key">
+        <h2>${escapeHtml(page.ui.answerKey)}</h2>
+        <ol>${answers}</ol>
+      </section>
+      ${crawlableExtras(page)}
+    </article>`;
+}
+
+export function worksheetHtml(sheet: StaticSheet): string {
+  const page = sheetPages().find((row) => row.locale.id === "en" && row.sheet?.slug === sheet.slug);
+  if (!page) throw new Error(sheet.slug);
+  return renderSeoPage(page, sheetBody(page));
+}
+
 export function worksheetIndexHtml(): string {
+  const page = sheetIndexPages().find((row) => row.locale.id === "en");
+  if (!page) throw new Error("worksheet index");
   const cards = WORKSHEETS.map(
     (sheet) =>
       `<a class="card" href="${sheet.slug}/"><strong>${escapeHtml(sheet.h1)}</strong><small>${escapeHtml(sheet.description)}</small></a>`,
   ).join("");
-  const practice = [
-    "times-tables",
-    "add-subtract",
-    "telling-time",
-    "money",
-    "sight-words",
-    "spelling",
-    "counting",
-    "place-value",
-    "shapes",
-    "fractions",
-    "measurement",
-    "phonics",
-    "word-problems",
-    "missing-numbers",
-    "data",
-  ]
-    .map((slug) => `<a href="${slug}/">${slug}</a>`)
-    .join(" · ");
-  return documentPage({
-    title: "Free Pre-K to Grade 4 Math Worksheets | Squishee Academy",
-    description:
-      "Free printable math worksheets for Pre-K to grade 4. Times tables, addition, subtraction, elapsed time, counting coins, money problems, thousands, and area. Answer keys included. No signup.",
-    path: "worksheets",
-    depth: 1,
-    body: `<h1>Free worksheets</h1>
-      <p class="lede">Print a page. Every sheet has an answer key. Nothing to sign up for.</p>
+  const practice = PRACTICE_SLUGS.map((slug) => `<a href="${slug}/">${slug}</a>`).join(" · ");
+  return renderSeoPage(
+    page,
+    `<h1>${escapeHtml(page.h1)}</h1>
+      <p class="lede">${escapeHtml(page.lede)}</p>
       <div class="cards">${cards}</div>
       <p class="fine">Shuffle a new set in the app: ${practice}.</p>
-      <p class="play noprint"><a href="../#/">Play the games</a> <a class="quiet" href="../privacy/">Privacy</a></p>`,
-  });
+      ${crawlableExtras(page)}`,
+  );
+}
+
+function landingBody(page: SeoPage): string {
+  return `<article>
+      <h1>${escapeHtml(page.h1)}</h1>
+      <p class="lede">${escapeHtml(page.lede)}</p>
+      ${crawlableExtras(page)}
+    </article>`;
 }
 
 export function privacyHtml(): string {
@@ -288,6 +385,10 @@ export function privacyHtml(): string {
       "Squishee Academy collects no personal information. Progress stays on this device. No ads, no accounts, and no analytics.",
     path: "privacy",
     depth: 1,
+    alternates: [
+      { hreflang: "en", path: "privacy" },
+      { hreflang: "x-default", path: "privacy" },
+    ],
     body: `<article class="prose">
       <p class="kicker">On this device</p>
       <h1>Privacy</h1>
@@ -304,32 +405,50 @@ export function privacyHtml(): string {
   });
 }
 
-export function sitemapXml(): string {
-  const paths = [
-    "",
-    "privacy",
-    "worksheets",
-    ...WORKSHEETS.map((sheet) => `worksheets/${sheet.slug}`),
-    "worksheets/times-tables",
-    "worksheets/add-subtract",
-    "worksheets/telling-time",
-    "worksheets/money",
-    "worksheets/sight-words",
-    "worksheets/spelling",
-    "worksheets/counting",
-    "worksheets/place-value",
-    "worksheets/shapes",
-    "worksheets/fractions",
-    "worksheets/measurement",
-    "worksheets/phonics",
-    "worksheets/word-problems",
-    "worksheets/missing-numbers",
-    "worksheets/data",
+interface SitemapNode {
+  path: string;
+  alternates: { hreflang: string; path: string }[];
+}
+
+function sitemapNode(path: string, alternates?: { hreflang: string; path: string }[]): SitemapNode {
+  return {
+    path,
+    alternates: alternates ?? [
+      { hreflang: "en", path },
+      { hreflang: "x-default", path },
+    ],
+  };
+}
+
+export function sitemapNodes(): SitemapNode[] {
+  const pages = [...landingPages(), ...sheetPages(), ...sheetIndexPages()];
+  const seen = new Set<string>();
+  const nodes: SitemapNode[] = [
+    sitemapNode(
+      "",
+      HOME_HREFLANGS.map((hreflang) => ({ hreflang, path: "" })),
+    ),
+    sitemapNode("privacy"),
+    ...PRACTICE_SLUGS.map((slug) => sitemapNode(`worksheets/${slug}`)),
   ];
-  const urls = paths
-    .map((path) => `  <url><loc>${canonicalUrl(path)}</loc></url>`)
+  for (const page of pages) {
+    if (seen.has(page.path)) continue;
+    seen.add(page.path);
+    nodes.push({ path: page.path, alternates: page.alternates });
+  }
+  return nodes;
+}
+
+export function sitemapXml(): string {
+  const urls = sitemapNodes()
+    .map((node) => {
+      const links = node.alternates
+        .map((row) => `    <xhtml:link rel="alternate" hreflang="${row.hreflang}" href="${canonicalUrl(row.path)}" />`)
+        .join("\n");
+      return `  <url>\n    <loc>${canonicalUrl(node.path)}</loc>\n${links}\n  </url>`;
+    })
     .join("\n");
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`;
 }
 
 export function robotsTxt(): string {
@@ -337,14 +456,34 @@ export function robotsTxt(): string {
 }
 
 export function academySeoFiles(): SeoFile[] {
+  const sheets = sheetPages();
+  const indexes = sheetIndexPages();
+  const landings = landingPages();
   return [
     { path: "robots.txt", body: robotsTxt() },
     { path: "sitemap.xml", body: sitemapXml() },
     { path: "privacy/index.html", body: privacyHtml() },
-    { path: "worksheets/index.html", body: worksheetIndexHtml() },
-    ...WORKSHEETS.map((sheet) => ({
-      path: `worksheets/${sheet.slug}/index.html`,
-      body: worksheetHtml(sheet),
-    })),
+    ...indexes.map((page) => ({ path: page.file, body: worksheetIndexHtmlFor(page) })),
+    ...sheets.map((page) => ({ path: page.file, body: renderSeoPage(page, sheetBody(page)) })),
+    ...landings.map((page) => ({ path: page.file, body: renderSeoPage(page, landingBody(page)) })),
   ];
+}
+
+function worksheetIndexHtmlFor(page: SeoPage): string {
+  if (page.locale.id === "en") return worksheetIndexHtml();
+  const cards = WORKSHEETS.map((sheet) => {
+    const localized = sheetPages().find((row) => row.locale.id === page.locale.id && row.sheet?.slug === sheet.slug);
+    const title = localized?.h1 ?? sheet.h1;
+    const description = localized?.description ?? sheet.description;
+    return `<a class="card" href="${sheet.slug}/"><strong>${escapeHtml(title)}</strong><small>${escapeHtml(description)}</small></a>`;
+  }).join("");
+  const practice = PRACTICE_SLUGS.map((slug) => `<a href="${relativeHref(page.path, `worksheets/${slug}`)}">${slug}</a>`).join(" · ");
+  return renderSeoPage(
+    page,
+    `<h1>${escapeHtml(page.h1)}</h1>
+      <p class="lede">${escapeHtml(page.lede)}</p>
+      <div class="cards">${cards}</div>
+      <p class="fine">${practice}</p>
+      ${crawlableExtras(page)}`,
+  );
 }
