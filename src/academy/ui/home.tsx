@@ -8,7 +8,7 @@ import { GAME_CARDS as GAMES } from "../games/catalog";
 import { bandFor } from "../grade-map";
 import { bossReady, dailySnapshot, normalizeJourney } from "../journey";
 import { show, t } from "../i18n";
-import { todayIso, type Child } from "../model";
+import { todayIso, type AppLang, type Child } from "../model";
 import { nextPlacement, todayPlayLine } from "../placement";
 import { rollGift, type GiftRoll } from "../rewards";
 import { outfitLabel } from "../wardrobe";
@@ -17,17 +17,22 @@ import { WeekStickers } from "./stickers";
 import { gameOffered } from "../games/offer";
 import { storiesOffered } from "../stories/offer";
 import { AcademyPal, Foot, GiftBox, LockIcon, Logo, Pips, PlayMark, ProgressRing, SquisheeImg, cx } from "./bits";
+import { LanguageButton, PlayLanguages } from "./lang";
 import { PalWithLook } from "./boss-figure";
 
 export function HomeScreen({
   child,
+  lang,
   sound,
   onClaim,
+  onLang,
   onPlay,
 }: {
   child: Child;
+  lang: AppLang;
   sound: boolean;
   onClaim: () => void;
+  onLang: (lang: AppLang) => void;
   onPlay: (game: string, level: string) => void;
 }) {
   const [prize, setPrize] = useState<GiftRoll | null>(null);
@@ -51,9 +56,12 @@ export function HomeScreen({
     <div className={cx("ac-shell", child.grade === "PK" && "is-prek")}>
       <header className="ac-top">
         <Logo />
-        <a className="ac-island-link" href="#/map">
-          {show("Island")}
-        </a>
+        <div className="ac-top-tools">
+          <LanguageButton lang={lang} onLang={onLang} />
+          <a className="ac-island-link" href="#/map">
+            {show("Island")}
+          </a>
+        </div>
       </header>
 
       <section className="ac-hero">
@@ -61,6 +69,7 @@ export function HomeScreen({
           {t(`Hi ${child.name}! Ready to play?`, `¡Hola ${child.name}! ¿Listo para jugar?`, `Oi ${child.name}! Vamos jogar?`, `Salut ${child.name} ! Tu veux jouer ?`, `${child.name}，你好！准备好玩了吗？`, `नमस्ते ${child.name}! खेलने के लिए तैयार?`, `مرحبًا ${child.name}! هل أنت مستعد للعب؟`)}
         </h1>
         <p className="ac-lede">{show("Short games · hop the island · collect squishees")}</p>
+        <PlayLanguages />
         <div className="ac-play-stage">
           <div className="ac-play-pal">
             <div className="ac-pals">

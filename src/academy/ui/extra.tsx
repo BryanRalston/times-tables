@@ -8,8 +8,8 @@ import { palOwned, withBuddy } from "../buddy/unlock";
 import { GAME_CARDS as GAMES, sheetHref } from "../games/catalog";
 import { gameOffered } from "../games/offer";
 import { playWindow } from "../grade-map";
-import { setLocale, show, t } from "../i18n";
-import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type AppLang, type Grade, type Save } from "../model";
+import { show, t } from "../i18n";
+import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type Grade, type Save } from "../model";
 import { buyOutfit, wearOutfit } from "../rewards";
 import { outfitHint, outfitLabel, outfitPrice, shopSections } from "../wardrobe";
 import { activeChild, mapActive, withGrade, withLevel } from "../storage";
@@ -18,7 +18,7 @@ import { AcademyPal, BackLink, Foot, FreeNote, Logo, PlayMark, SquisheeImg, cx }
 import { SquishTally } from "./squishy";
 import { BossFigure, PalWithLook } from "./boss-figure";
 import { GradeChips } from "./grade-chips";
-import { LanguageList, LanguageToggle, withLang } from "./lang";
+import { LanguageButton, withLang } from "./lang";
 
 const STARTERS = SQUAD_IDS.slice(0, 3);
 
@@ -26,17 +26,17 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
   const [name, setName] = useState("");
   const [grade, setGrade] = useState<Grade>(DEFAULT_START_GRADE);
   const [buddy, setBuddy] = useState<string>(STARTERS[0] ?? "peach");
-  const [lang, setLang] = useState<AppLang>(save.lang);
 
   useEffect(() => {
     speak(t("Pick a buddy!", "¡Elige un amigo!"), sound);
     return () => silence();
-  }, [sound, lang]);
+  }, [sound, save.lang]);
 
   return (
     <div className={cx("ac-shell", grade === "PK" && "is-prek")}>
       <header className="ac-top">
         <Logo />
+        <LanguageButton lang={save.lang} onLang={(lang) => onSave(withLang(save, lang))} />
       </header>
       <form
         className="ac-hero ac-hello"
@@ -44,18 +44,11 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
           e.preventDefault();
           const cleaned = cleanName(name) || "Pal";
           const pick = (STARTERS as readonly string[]).includes(buddy) ? buddy : "peach";
-          onSave(withLang(mapActive(save, (child) => withGrade({ ...child, name: cleaned, avatarId: pick }, grade)), lang));
+          onSave(withLang(mapActive(save, (child) => withGrade({ ...child, name: cleaned, avatarId: pick }, grade)), save.lang));
           window.location.hash = "#/";
         }}
       >
         <h1 className="ac-sr">{show("Pick a buddy")}</h1>
-        <LanguageList
-          lang={lang}
-          onLang={(next) => {
-            setLang(next);
-            setLocale(next);
-          }}
-        />
         <div className="ac-buddy-picks" role="radiogroup" aria-label={show("Pick a buddy")}>
           {STARTERS.map((id) => (
             <button
@@ -103,6 +96,7 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
     <div className="ac-shell">
       <header className="ac-top">
         <Logo />
+        <LanguageButton lang={save.lang} onLang={(lang) => onSave(withLang(save, lang))} />
       </header>
       <h1>{show("Settings")}</h1>
       <form
@@ -122,7 +116,6 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
           {show("Save name")}
         </button>
       </form>
-      <LanguageToggle lang={save.lang} onLang={(lang) => onSave(withLang(save, lang))} />
       <section className="ac-panel">
         <h2>{show("Grade")}</h2>
         <p className="ac-hint">{show("This sets the starting level and the levels each game can use.")}</p>
