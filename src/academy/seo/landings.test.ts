@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { isPrecacheFile } from "../../../scripts/academy-precache.mjs";
 import { landingPages, sheetPages } from "./landings";
+import { GOATCOUNTER_ENDPOINT, GOATCOUNTER_SRC } from "./counter";
 import { academySeoFiles, HOME_DESCRIPTION, HOME_TITLE, sitemapXml, worksheetHtml } from "./html";
 import { WORKSHEETS } from "./catalog";
 
@@ -49,6 +50,8 @@ describe("search landing pages", () => {
       expect(html).toContain('"price":"0"');
       expect(html).toContain(`"typicalAgeRange":"${page?.ageRange}"`);
       expect(html).not.toMatch(TRACKING);
+      expect(html).not.toContain("gc.zgo.at");
+      expect(html).not.toContain("squisheeacademy.goatcounter.com");
       const scripts = html.match(/<script\b[^>]*>/g) ?? [];
       expect(scripts.every((tag) => tag.includes('type="application/ld+json"'))).toBe(true);
     }
@@ -85,6 +88,7 @@ describe("search landing pages", () => {
     const spanish = pageHtml("es/times-tables-game/index.html");
     expect(spanish).toContain('lang="es"');
     expect(spanish).toContain("tablas de multiplicar");
+    expect(spanish).toContain('href="../privacy/">Privacidad</a>');
     const portuguese = pageHtml("pt-br/telling-time-game/index.html");
     expect(portuguese).toContain('hreflang="pt-BR" href="https://squisheeacademy.com/pt-br/telling-time-game/"');
     const sheet = sheetPages().find((page) => page.locale.id === "ar" && page.sheet?.slug === "multiplication-7s");
@@ -136,5 +140,38 @@ describe("search landing pages", () => {
     const sheet = WORKSHEETS.find((row) => row.slug === "multiplication-7s");
     expect(sheet).toBeTruthy();
     expect(worksheetHtml(sheet!)).toContain("Play free");
+  });
+
+  it("allows GoatCounter on the domain build only, once per HTML page", () => {
+    const plain = academySeoFiles();
+    const domain = academySeoFiles({ visitorCounter: true });
+    expect(domain.length).toBe(plain.length);
+    for (const file of plain) {
+      expect(file.body, file.path).not.toContain(GOATCOUNTER_SRC);
+      expect(file.body, file.path).not.toContain(GOATCOUNTER_ENDPOINT);
+    }
+    let pages = 0;
+    for (const file of domain) {
+      if (!file.path.endsWith(".html")) {
+        expect(file.body, file.path).not.toContain(GOATCOUNTER_SRC);
+        continue;
+      }
+      pages += 1;
+      expect(file.body.split(GOATCOUNTER_SRC).length - 1, file.path).toBe(1);
+      expect(file.body.split(GOATCOUNTER_ENDPOINT).length - 1, file.path).toBe(1);
+      expect(file.body, file.path).toContain('nav.doNotTrack === "1"');
+      expect(file.body, file.path).toContain("nav.globalPrivacyControl === true");
+      expect(file.body, file.path).not.toMatch(TRACKING);
+      const tags = file.body.match(/<script\b[^>]*>/g) ?? [];
+      expect(tags.every((tag) => tag.includes('type="application/ld+json"') || tag === "<script>"), file.path).toBe(true);
+      expect(file.body, file.path).not.toMatch(/<script\b[^>]*\ssrc=["'](?:https?:)?\/\//i);
+    }
+    expect(pages).toBeGreaterThan(100);
+    const arabic = domain.find((file) => file.path === "ar/privacy/index.html")?.body ?? "";
+    expect(arabic).toContain('lang="ar" dir="rtl"');
+    expect(arabic).toContain("GoatCounter");
+    expect(arabic).toContain("Do Not Track");
+    expect(arabic).toContain("COPPA");
+    expect(arabic).toContain("hello@squisheeacademy.com");
   });
 });

@@ -3,6 +3,7 @@ import { cpSync, createReadStream, existsSync, mkdirSync, readFileSync, readdirS
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { dirname, join, normalize, resolve, sep } from "node:path";
 import { defineConfig } from "vite";
+import { withVisitorCounter } from "./src/academy/seo/counter";
 import { academySeoFiles, withOpenGraph } from "./src/academy/seo/html";
 import { academyDomainPlugins } from "./scripts/academy-domain-plugin.mjs";
 import { academyPrecachePlugin, isPokeMediaName } from "./scripts/academy-precache.mjs";
@@ -131,16 +132,36 @@ function academyDevIndex() {
   };
 }
 
-function academySeoPlugin(dir: string) {
+/** App shell, 404, and practice worksheets are not part of the SEO file list. */
+function injectVisitorCounter(dir: string) {
+  const root = resolve(dir);
+  const walk = (current: string) => {
+    for (const name of readdirSync(current)) {
+      const file = join(current, name);
+      if (statSync(file).isDirectory()) {
+        walk(file);
+        continue;
+      }
+      if (!name.endsWith(".html")) continue;
+      const raw = readFileSync(file, "utf8");
+      const next = withVisitorCounter(raw);
+      if (next !== raw) writeFileSync(file, next);
+    }
+  };
+  walk(root);
+}
+
+function academySeoPlugin(dir: string, domain: boolean) {
   return {
     name: "academy-seo-pages",
     writeBundle() {
       const root = resolve(dir);
-      for (const file of academySeoFiles()) {
+      for (const file of academySeoFiles({ visitorCounter: domain })) {
         const dest = join(root, file.path);
         mkdirSync(dirname(dest), { recursive: true });
         writeFileSync(dest, file.body);
       }
+      if (domain) injectVisitorCounter(root);
     },
   };
 }
@@ -154,7 +175,7 @@ export default defineConfig({
     sharedPublic(),
     ...(domain ? academyDomainPlugins(outDir) : [hoistAcademyHtml(outDir)]),
     ...(domain ? [academyOpenGraphPlugin()] : []),
-    academySeoPlugin(outDir),
+    academySeoPlugin(outDir, domain),
     academyPrecachePlugin(outDir, {
       appPrefix: domain ? "" : "/times-tables/academy",
       artPrefix: domain ? "" : "/times-tables",
