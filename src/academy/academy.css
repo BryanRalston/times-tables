@@ -167,7 +167,9 @@ p { margin: 0; }
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 10px;
+  row-gap: 8px;
 }
 .ac-top, .ac-parent-top { margin-bottom: 12px; }
 
@@ -986,6 +988,43 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   white-space: nowrap;
   border: 0;
 }
+.ac-top-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-inline-start: auto;
+}
+@media (max-width: 430px) {
+  .ac-top-tools { margin-inline-start: 0; }
+}
+.ac-lang-slot { display: inline-flex; }
+.ac-lang-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--ac-radius-pill);
+  background: #fff;
+  color: var(--ac-ink);
+  box-shadow: var(--ac-elev-press);
+  font-size: 16px;
+  line-height: 1;
+}
+.ac-lang-button svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .ac-lang-list {
   display: flex;
   flex-direction: column;
@@ -996,8 +1035,48 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
 .ac-lang-list .ac-grade {
   width: 100%;
   min-width: 0;
-  /* Picker subset covers 中文. Other labels fall through to Fredoka. */
+  margin: 0;
+}
+.ac-lang-button,
+.ac-lang-names,
+.ac-lang-list .ac-grade,
+html[lang="ar"] .ac-lang-button,
+html[lang="ar"] .ac-lang-names,
+html[lang="ar"] .ac-lang-list .ac-grade,
+html[lang="zh-Hans"] .ac-lang-button,
+html[lang="zh-Hans"] .ac-lang-names,
+html[lang="zh-Hans"] .ac-lang-list .ac-grade,
+html[lang="hi"] .ac-lang-button,
+html[lang="hi"] .ac-lang-names,
+html[lang="hi"] .ac-lang-list .ac-grade {
+  /* Picker subsets cover 中文, हिन्दी, and العربية. Other labels fall through to Fredoka. */
   font-family: "Noto Sans SC", "Noto Sans Devanagari", "Noto Sans Arabic", Fredoka, Nunito, "Trebuchet MS", sans-serif;
+}
+.ac-lang-line {
+  margin: 0 0 12px;
+  color: var(--ac-muted);
+  font-size: var(--ac-text-sm);
+  font-weight: 800;
+  line-height: 1.35;
+}
+.ac-lang-welcome .ac-lang-list {
+  width: min(100%, 420px);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.ac-lang-welcome .ac-lang-list .ac-grade {
+  min-height: 56px;
+  padding: 10px 16px;
+  border-radius: var(--ac-radius-pill);
+  font-size: 22px;
+  box-shadow: var(--ac-elev-press);
+}
+.ac-lang-dialog .ac-lang-list {
+  width: 100%;
+}
+.ac-lang-dialog .ac-lang-list .ac-grade {
+  min-height: 48px;
+  font-size: 18px;
 }
 .ac-hello-grades { justify-content: center; margin: 10px 0 14px; }
 .ac-finger {
@@ -2717,18 +2796,18 @@ body:has(.ac-boss-intro) { background: #3c2448; }
 .ac-timer.is-variables span { background: var(--ac-teal); }
 
 a.ac-go, button.ac-go, .ac-pal-play, .ac-quiet, .ac-choice, .ac-pill, .ac-grade, .ac-level,
-.ac-hold, .ac-island-link, .ac-speaker, .ac-hear, .ac-hint-btn, .ac-speed, .ac-story-read,
+.ac-hold, .ac-island-link, .ac-lang-button, .ac-speaker, .ac-hear, .ac-hint-btn, .ac-speed, .ac-story-read,
 .ac-story-choice, .ac-buddy-pick, button.ac-card, .ac-shelf-card, .ac-meter, .ac-check {
   transition: transform var(--ac-motion-fast) var(--ac-ease), box-shadow var(--ac-motion-fast) var(--ac-ease), background-color var(--ac-motion-fast) linear;
 }
 a.ac-go:active, button.ac-go:active, .ac-pal-play:active, .ac-quiet:active, .ac-pill:active,
-.ac-grade:active, .ac-level:active, .ac-hold:active, .ac-island-link:active, .ac-speaker:active,
+.ac-grade:active, .ac-level:active, .ac-hold:active, .ac-island-link:active, .ac-lang-button:active, .ac-speaker:active,
 .ac-hear:active, .ac-hint-btn:active, .ac-speed:active, .ac-story-read:active, .ac-story-choice:active,
 .ac-buddy-pick:active, button.ac-card:active, .ac-shelf-card:active, .ac-meter:active {
   transform: translateY(3px);
 }
 .ac-quiet:active, .ac-pill:active, .ac-grade:active, .ac-level:active, .ac-hold:active,
-.ac-island-link:active, .ac-hear:active, .ac-hint-btn:active, .ac-speed:active, .ac-story-read:active,
+.ac-island-link:active, .ac-lang-button:active, .ac-hear:active, .ac-hint-btn:active, .ac-speed:active, .ac-story-read:active,
 .ac-buddy-pick:active, .ac-meter:active {
   box-shadow: 0 1px 0 var(--ac-line);
 }
@@ -2753,13 +2832,13 @@ button.ac-go:disabled:active, button.ac-go:disabled { transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   a.ac-go, button.ac-go, .ac-pal-play, .ac-quiet, .ac-choice, .ac-pill, .ac-grade, .ac-level,
-  .ac-hold, .ac-island-link, .ac-speaker, .ac-hear, .ac-hint-btn, .ac-speed, .ac-story-read,
+  .ac-hold, .ac-island-link, .ac-lang-button, .ac-speaker, .ac-hear, .ac-hint-btn, .ac-speed, .ac-story-read,
   .ac-story-choice, .ac-buddy-pick, button.ac-card, .ac-shelf-card, .ac-meter, .ac-check,
   .ac-progress > span, .ac-hour, .ac-minute {
     transition: none;
   }
   a.ac-go:active, button.ac-go:active, .ac-pal-play:active, .ac-quiet:active, .ac-choice:active,
-  .ac-pill:active, .ac-grade:active, .ac-level:active, .ac-hold:active, .ac-island-link:active,
+  .ac-pill:active, .ac-grade:active, .ac-level:active, .ac-hold:active, .ac-island-link:active, .ac-lang-button:active,
   .ac-speaker:active, .ac-hear:active, .ac-hint-btn:active, .ac-speed:active, .ac-story-read:active,
   .ac-story-choice:active, .ac-buddy-pick:active, button.ac-card:active, .ac-shelf-card:active,
   .ac-meter:active, .ac-check:active { transform: none; }

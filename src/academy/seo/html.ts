@@ -3,7 +3,11 @@ import { WORKSHEETS, type StaticItem, type StaticSheet } from "./catalog";
 export const CANONICAL_ORIGIN = "https://squisheeacademy.com";
 
 export const HOME_TITLE = "Squishee Academy";
-export const HOME_DESCRIPTION = "Free Pre-K to grade 4 learning games with squishees. No ads, no accounts.";
+export const HOME_DESCRIPTION =
+  "Free Pre-K to grade 4 learning games with squishees. Play in 7 languages: English, Español, Português, Français, 中文, हिन्दी, العربية. No ads, no accounts.";
+
+/** One URL serves every language. These tell crawlers which languages that page is for. */
+export const HOME_HREFLANGS = ["x-default", "en", "es", "pt-BR", "fr", "zh-Hans", "hi", "ar"] as const;
 
 /** Stable path in the domain build. Crawlers fetch this file directly. */
 export const SHARE_IMAGE_PATH = "/og/squishee-academy.png";

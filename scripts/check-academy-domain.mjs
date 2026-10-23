@@ -265,7 +265,12 @@ if (!existsSync(resolve(root, "money/penny.png"))) fail("money/penny.png missing
 
 assertShareCard("index.html", html);
 if (!html.includes('property="og:title" content="Squishee Academy"')) fail("home og:title");
-if (!html.includes('content="Free Pre-K to grade 4 learning games with squishees. No ads, no accounts."')) fail("home description");
+if (!html.includes('content="Free Pre-K to grade 4 learning games with squishees. Play in 7 languages: English, Español, Português, Français, 中文, हिन्दी, العربية. No ads, no accounts."')) {
+  fail("home description");
+}
+for (const lang of ["x-default", "en", "es", "pt-BR", "fr", "zh-Hans", "hi", "ar"]) {
+  if (!html.includes(`rel="alternate" hreflang="${lang}" href="https://squisheeacademy.com/"`)) fail(`home hreflang ${lang}`);
+}
 if (!html.includes('property="og:url" content="https://squisheeacademy.com/"')) fail("home og:url");
 if (!html.includes('rel="apple-touch-icon" href="/apple-touch-icon.png"')) fail("home apple touch icon");
 for (const page of [

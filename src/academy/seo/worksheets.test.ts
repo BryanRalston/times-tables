@@ -6,6 +6,7 @@ import {
   academySeoFiles,
   canonicalUrl,
   HOME_DESCRIPTION,
+  HOME_HREFLANGS,
   privacyHtml,
   SHARE_IMAGE_ALT,
   shareImageUrl,
@@ -497,6 +498,11 @@ describe("printable worksheets", () => {
 
     const home = withOpenGraph(readFileSync("academy/index.html", "utf8"));
     expectShareCard(home, "Squishee Academy", HOME_DESCRIPTION, "https://squisheeacademy.com/");
+    expect(HOME_DESCRIPTION).toContain("Play in 7 languages");
+    expect(home).toContain("Play in 7 languages: English, Español, Português, Français, 中文, हिन्दी, العربية.");
+    for (const lang of HOME_HREFLANGS) {
+      expect(home).toContain(`rel="alternate" hreflang="${lang}" href="https://squisheeacademy.com/"`);
+    }
     expect(home).toContain('rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png"');
 
     const practice = withOpenGraph(rewriteDomainSource(readFileSync("academy/worksheets/times-tables/index.html", "utf8")));

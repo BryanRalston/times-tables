@@ -8,7 +8,7 @@ import { masteredChips, parentBrief } from "../rewards";
 import { standardLine } from "../standards";
 import { gradeText, show, t } from "../i18n";
 import { activeChild, addChild } from "../storage";
-import { LanguageToggle, withLang } from "./lang";
+import { LanguageButton, withLang } from "./lang";
 import { BackupPanel } from "./backup-panel";
 import { BackLink, Foot, Logo, SquisheeImg, cx } from "./bits";
 import { GradeChips } from "./grade-chips";
@@ -158,7 +158,7 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
     <div className={cx("ac-shell ac-mid", weekPrint && "is-print-week")}>
       <header className="ac-parent-top ac-no-print">
         <h1>{show("Grown-ups")}</h1>
-        <LanguageToggle lang={save.lang} onLang={(lang) => onSave(withLang(save, lang))} />
+        <LanguageButton lang={save.lang} onLang={(lang) => onSave(withLang(save, lang))} />
       </header>
       <div className="ac-kids ac-no-print">
         {save.children.map((kid) => (

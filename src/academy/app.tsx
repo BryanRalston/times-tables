@@ -9,6 +9,7 @@ import { activeChild, loadSave, mapActive, withLevel, writeSave } from "./storag
 import { warmVoices } from "./voice";
 import { ensureVoice } from "./voice/clips";
 import { HelloScreen, SettingsScreen, SheetsScreen, ShelfScreen } from "./ui/extra";
+import { LanguageWelcome, withLang } from "./ui/lang";
 import { HomeScreen } from "./ui/home";
 import { MapScreen } from "./ui/map";
 import { SoundContext } from "./ui/sound-context";
@@ -194,7 +195,9 @@ function AcademyApp() {
   }
 
   let body: ReactNode;
-  if (!child.name) {
+  if (!child.name && !save.langChosen) {
+    body = <LanguageWelcome save={save} onSave={setSave} />;
+  } else if (!child.name) {
     body = <HelloScreen save={save} onSave={setSave} sound={save.sound} />;
   } else if (route.name === "play" && !gameOffered(route.game)) {
     body = (
@@ -263,7 +266,9 @@ function AcademyApp() {
     body = (
       <HomeScreen
         child={child}
+        lang={save.lang}
         sound={save.sound}
+        onLang={(lang) => setSave((current) => withLang(current, lang))}
         onClaim={() => setSave((current) => mapActive(current, (row) => claimDailyGift(row, todayIso())))}
         onPlay={(gameId, nextLevel) => {
           if (!isGameId(gameId)) return;
