@@ -272,13 +272,13 @@ export function bossForGame(gameId: string): IslandBoss {
       `The big boss of ${title}, in a homemade crown.`,
       `El gran jefe de ${shown}, con una corona hecha en casa.`,
       `O grande chefe de ${shown}, com uma coroa feita em casa.`,
-    `Le grand chef de ${shown}, avec une couronne faite maison.`, `${title}的大魔王，戴着自己做的皇冠。`, `${shown} का बड़ा बॉस, घर पर बने ताज में।`, `زعيم ${shown} الكبير، بتاج مصنوع في البيت.`),
+    `Le grand chef de ${shown}, avec une couronne faite maison.`, `${shown}的大魔王，戴着自己做的皇冠。`, `${shown} का बड़ा बॉस, घर पर बने ताज में।`, `زعيم ${shown} الكبير، بتاج مصنوع في البيت.`),
     face: game?.mascot ?? "peach",
     look,
     cosmeticId: `boss-look-${slug(gameId)}`,
     cosmeticName: t("Boss crown", "Corona de jefe", "Coroa de chefe"),
     trophyId: `trophy-${slug(gameId)}`,
-    trophyName: t(`${title} trophy`, `Trofeo de ${shown}`, `Troféu de ${shown}`, `Trophée de ${shown}`, `${title}奖杯`, `${shown} ट्रॉफी`, `كأس ${shown}`),
+    trophyName: t(`${title} trophy`, `Trofeo de ${shown}`, `Troféu de ${shown}`, `Trophée de ${shown}`, `${shown}奖杯`, `${shown} ट्रॉफी`, `كأس ${shown}`),
   };
 }
 

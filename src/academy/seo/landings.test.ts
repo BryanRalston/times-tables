@@ -92,6 +92,14 @@ describe("search landing pages", () => {
     const sheetHtml = pageHtml("ar/worksheets/multiplication-7s/index.html");
     expect(sheetHtml).toContain('dir="rtl"');
     expect(sheetHtml).toContain("مفتاح الإجابات");
+    expect(sheetHtml).toContain('url("../../../fonts/NotoSansArabic-subset.woff2")');
+    const chinese = pageHtml("zh-hans/times-tables-game/index.html");
+    expect(chinese).toContain('url("../../fonts/NotoSansSC-subset.woff2")');
+    expect(chinese).not.toContain("/times-tables/academy/fonts/");
+    const hindi = pageHtml("hi/times-tables-game/index.html");
+    expect(hindi).toContain('url("../../fonts/NotoSansDevanagari-subset.woff2")');
+    const english = pageHtml("times-tables-game/index.html");
+    expect(english).not.toContain("NotoSansSC-subset");
   });
 
   it("lists every landing in the sitemap with hreflang alternates", () => {

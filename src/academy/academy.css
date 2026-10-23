@@ -122,10 +122,22 @@ html[lang="ar"] .ac-clock-wrap,
 html[lang="ar"] .ac-clock-drag,
 html[lang="ar"] .ac-clock-read,
 html[lang="ar"] .ac-clock-grid,
-html[lang="ar"] .ac-money-price {
+html[lang="ar"] .ac-money-price,
+html[lang="ar"] .ac-coin-row,
+html[lang="ar"] .ac-coin,
+html[lang="ar"] .ac-bank,
+html[lang="ar"] .ac-tray,
+html[lang="ar"] .ac-coin-ghost,
+html[lang="ar"] .ac-frac,
+html[lang="ar"] .ac-frac-pair,
+html[lang="ar"] .ac-graph-line,
+html[lang="ar"] .ac-big-num {
   direction: ltr;
   unicode-bidi: isolate;
 }
+
+.ac-back-arrow { display: inline-block; }
+html[lang="ar"] .ac-back-arrow { transform: scaleX(-1); }
 
 body {
   margin: 0;
@@ -270,14 +282,14 @@ button.ac-go:disabled { opacity: 0.45; box-shadow: none; }
   padding: 62px 12px 12px;
   border: 0;
   border-radius: var(--ac-radius-md);
-  text-align: left;
+  text-align: start;
   text-decoration: none;
   color: inherit;
   box-shadow: var(--ac-elev-card);
 }
 .ac-card h2 { font-size: 18px; margin: 0 0 2px; }
 .ac-card p { margin: 0 0 8px; color: #4e3558; font-size: var(--ac-text-sm); }
-.ac-card > .ac-squish { position: absolute; top: 8px; right: 8px; width: 54px; height: 54px; }
+.ac-card > .ac-squish { position: absolute; top: 8px; inset-inline-end: 8px; width: 54px; height: 54px; }
 .ac-card > .ac-squish img { width: 54px; height: 54px; object-fit: contain; }
 .ac-card .ac-star { width: 16px; height: 16px; }
 .ac-card.is-pink { background: #ffe4f2; }
@@ -286,7 +298,7 @@ button.ac-go:disabled { opacity: 0.45; box-shadow: none; }
 .ac-card.is-gold { background: #fff1c9; }
 .ac-card.is-lav { background: #efe4fb; }
 .ac-card.is-soon { opacity: 0.92; }
-button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inherit; }
+button.ac-card { font: inherit; text-align: start; cursor: pointer; color: inherit; }
 .ac-soon {
   display: inline-flex;
   align-items: center;
@@ -297,7 +309,7 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
 .ac-soon {
   position: absolute;
   top: 10px;
-  left: 10px;
+  inset-inline-start: 10px;
   padding: 3px 8px;
   border-radius: 999px;
   background: #fff;
@@ -541,7 +553,7 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   box-shadow: 0 3px 0 #6e0b38;
 }
 .ac-grade { min-width: 48px; min-height: 48px; align-items: center; justify-content: center; }
-.ac-field { display: grid; gap: 6px; text-align: left; font-weight: 800; margin: 8px 0; }
+.ac-field { display: grid; gap: 6px; text-align: start; font-weight: 800; margin: 8px 0; }
 .ac-field input, .ac-gate input, .ac-add-child input, .ac-sheet-bar select {
   width: 100%;
   min-height: 48px;
@@ -552,7 +564,7 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   font-size: 16px;
 }
 .ac-grades, .ac-levels { display: flex; flex-wrap: wrap; gap: 8px; }
-.ac-gate, .ac-panel { padding: 16px; margin-top: 12px; text-align: left; }
+.ac-gate, .ac-panel { padding: 16px; margin-top: 12px; text-align: start; }
 .ac-gate { text-align: center; }
 .ac-gate-q { margin: 12px 0; font-family: Fredoka, sans-serif; font-size: 32px; }
 .ac-gate .ac-go { margin-top: 12px; }
@@ -629,7 +641,7 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
 .ac-report h3 { margin-top: 14px; font-size: 18px; }
 .ac-report p { line-height: 1.45; }
 .ac-report p + p { margin-top: 8px; }
-.ac-report-list { margin: 6px 0 0; padding-left: 1.2em; }
+.ac-report-list { margin: 6px 0 0; padding-inline-start: 1.2em; }
 .ac-report-list li { margin-top: 4px; }
 .ac-report-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .ac-report-actions a, .ac-report-actions button {
@@ -743,7 +755,7 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
 .ac-paper h1 { font-size: 34px; margin: 4px 0 8px; }
 .ac-seo { max-width: 62ch; margin-bottom: 12px; }
 .ac-name-line { margin: 12px 0 18px; }
-.ac-problems { columns: 2; margin: 0; padding-left: 1.2em; font-size: 20px; line-height: 2.1; }
+.ac-problems { columns: 2; margin: 0; padding-inline-start: 1.2em; font-size: 20px; line-height: 2.1; }
 .ac-problems li { break-inside: avoid; }
 .ac-clock-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .ac-clock-grid .ac-clock { width: 180px; }
@@ -1388,7 +1400,7 @@ html[lang="ar"] .ac-hello-grades .ac-grade {
 }
 .ac-buddy .ac-squish { pointer-events: auto; padding: 8px; margin: -8px; }
 .ac-buddy-img { width: 48px; height: 48px; object-fit: contain; }
-.ac-buddy .ac-bubble { font-size: 13px; text-align: left; margin: 0; }
+.ac-buddy .ac-bubble { font-size: 13px; text-align: start; margin: 0; }
 .ac-buddy-point {
   width: 0;
   height: 0;
@@ -2018,7 +2030,7 @@ button.ac-go.ac-play-main {
   margin-left: -1px;
   background: #5c4566;
 }
-.ac-picto { display: grid; gap: 6px; text-align: left; }
+.ac-picto { display: grid; gap: 6px; text-align: start; }
 .ac-picto p { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin: 0; font-size: 18px; }
 .ac-graph { display: flex; align-items: flex-end; justify-content: center; gap: 12px; height: 150px; margin-top: 8px; }
 .ac-graph-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; }
@@ -2857,7 +2869,7 @@ button.ac-go:disabled:active, button.ac-go:disabled { transform: none; }
   border-radius: 28px;
   background: #e5f6ee;
   box-shadow: var(--ac-elev-card);
-  text-align: left;
+  text-align: start;
 }
 .ac-play-pal {
   display: grid;
@@ -2869,13 +2881,13 @@ button.ac-go:disabled:active, button.ac-go:disabled { transform: none; }
 .ac-play-pal .ac-pals img,
 .ac-play-pal .ac-wear.is-mid { width: 96px; height: 96px; }
 .ac-play-pal .ac-bubble,
-.ac-play-pal .ac-bond { margin: 0; text-align: left; }
+.ac-play-pal .ac-bond { margin: 0; text-align: start; }
 .ac-play-stage button.ac-go.ac-play-main {
   min-height: 96px;
   margin-top: 0;
   box-shadow: 0 8px 0 var(--ac-go-deep);
 }
-.ac-play-stage .ac-play-copy { align-items: flex-start; text-align: left; }
+.ac-play-stage .ac-play-copy { align-items: flex-start; text-align: start; }
 .ac-play-stage .ac-play-copy strong { font-size: 34px; }
 .ac-map-link {
   width: 100%;

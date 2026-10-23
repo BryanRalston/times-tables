@@ -59,6 +59,35 @@ export function getLocale(): Locale {
   return locale;
 }
 
+/**
+ * Digits on screen, grouped the way that locale writes large numbers.
+ * Spoken lines stay ungrouped: a space or period would be read as two numbers.
+ * Arabic keeps Western digits.
+ */
+export function groupedNumber(n: number): string {
+  const lang = getLocale();
+  switch (lang) {
+    case "en":
+      return n.toLocaleString("en-US");
+    case "es":
+      return n.toLocaleString("es-MX");
+    case "pt":
+      return n.toLocaleString("pt-BR");
+    case "fr":
+      return n.toLocaleString("fr-FR");
+    case "zh":
+      return n.toLocaleString("zh-Hans-CN");
+    case "hi":
+      return n.toLocaleString("hi-IN");
+    case "ar":
+      return n.toLocaleString("ar-EG-u-nu-latn");
+    default: {
+      const neverLocale: never = lang;
+      return neverLocale;
+    }
+  }
+}
+
 export function setLocale(next: Locale): void {
   locale = next === "es" || next === "pt" || next === "fr" || next === "zh" || next === "hi" || next === "ar" ? next : "en";
   if (typeof document !== "undefined") {

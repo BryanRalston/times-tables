@@ -86,6 +86,21 @@ export function withOpenGraph(html: string): string {
   return html.replace("</head>", `${canonicalTag}${socialMeta({ title, description, url })}\n  </head>`);
 }
 
+/** Landing pages sit at different depths, so the face URL is relative to the page. */
+function localeFace(lang: string, depth: number): string {
+  const prefix = "../".repeat(depth);
+  switch (lang) {
+    case "zh-Hans":
+      return `@font-face{font-family:"Noto Sans SC";src:url("${prefix}fonts/NotoSansSC-subset.woff2") format("woff2");font-weight:400 700;font-display:swap;}html[lang="zh-Hans"] body,html[lang="zh-Hans"] h1,html[lang="zh-Hans"] h2,html[lang="zh-Hans"] .brand{font-family:"Noto Sans SC",Nunito,"Trebuchet MS",sans-serif;}`;
+    case "hi":
+      return `@font-face{font-family:"Noto Sans Devanagari";src:url("${prefix}fonts/NotoSansDevanagari-subset.woff2") format("woff2");font-weight:400 700;font-display:swap;}html[lang="hi"] body,html[lang="hi"] h1,html[lang="hi"] h2,html[lang="hi"] .brand{font-family:"Noto Sans Devanagari",Nunito,"Trebuchet MS",sans-serif;}`;
+    case "ar":
+      return `@font-face{font-family:"Noto Sans Arabic";src:url("${prefix}fonts/NotoSansArabic-subset.woff2") format("woff2");font-weight:400 700;font-display:swap;}html[lang="ar"] body,html[lang="ar"] h1,html[lang="ar"] h2,html[lang="ar"] .brand{font-family:"Noto Sans Arabic",Nunito,"Trebuchet MS",sans-serif;}`;
+    default:
+      return "";
+  }
+}
+
 const PAGE_STYLE = `
 :root { color-scheme: light; }
 * { box-sizing: border-box; }
@@ -264,7 +279,7 @@ function documentPage(opts: {
 ${alternates}${socialMeta({ title: opts.title, description: opts.description, url: canonical })}
   <meta name="theme-color" content="#fff1f7" />
 ${iconLinks()}
-  <style>${PAGE_STYLE}</style>
+  <style>${PAGE_STYLE}${localeFace(lang, opts.depth)}</style>
 ${jsonLd}</head>
 <body>
   <main>

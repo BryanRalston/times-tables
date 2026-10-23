@@ -47,7 +47,7 @@ export function HomeScreen({
   const playTitle = GAMES.find((game) => game.id === playId)?.title ?? playId;
   const todayLine = todayPlayLine(show(playTitle), child.grade);
   const playAction = facing
-    ? t(`Face ${bossForGame(playId).name}`, `Enfrenta a ${bossForGame(playId).name}`, `Enfrente ${bossForGame(playId).name}`, `Affronte ${bossForGame(playId).name}`, `去见${bossForGame(playId).name}`, `फलक ${bossForGame(playId).name}`, `واجه ${bossForGame(playId).name}`)
+    ? t(`Face ${bossForGame(playId).name}`, `Enfrenta a ${bossForGame(playId).name}`, `Enfrente ${bossForGame(playId).name}`, `Affronte ${bossForGame(playId).name}`, `去见${bossForGame(playId).name}`, `${bossForGame(playId).name} का सामना`, `واجه ${bossForGame(playId).name}`)
     : show("Play");
   const book = bookEntries();
   const palTier = bondTier(bondScore(child.bonds, child.avatarId));

@@ -114,7 +114,7 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
               ) : open ? (
                 <div className="ac-island-actions">
                   <a className="ac-quiet" href={`#/play/${game.id}`}>
-                    {atBoss ? t(`Face ${boss.name}`, `Enfrenta a ${boss.name}`, `Enfrente ${boss.name}`, `Affronte ${boss.name}`, `去见${boss.name}`, `फलक ${boss.name}`, `واجه ${boss.name}`) : current ? show("Play") : offer === "intro" ? show("Gentle intro") : t("Practice", "Practica")}
+                    {atBoss ? t(`Face ${boss.name}`, `Enfrenta a ${boss.name}`, `Enfrente ${boss.name}`, `Affronte ${boss.name}`, `去见${boss.name}`, `${boss.name} का सामना`, `واجه ${boss.name}`) : current ? show("Play") : offer === "intro" ? show("Gentle intro") : t("Practice", "Practica")}
                   </a>
                   {beaten ? (
                     <a className="ac-quiet" href={`#/play/${game.id}/crown`}>
@@ -128,7 +128,7 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
                   {(() => {
                     const prev = gameById(GAMES[index - 1]?.id)?.title;
                     return prev
-                      ? t(`Beat the ${prev} boss.`, `Vence al jefe de ${show(prev)}.`, `Vença o chefe de ${show(prev)}.`, `Bats le chef de ${show(prev)}.`, `打败${prev}的大魔王。`, `${show(prev)} बॉस को हराओ।`, `اهزم زعيم ${show(prev)}.`)
+                      ? t(`Beat the ${prev} boss.`, `Vence al jefe de ${show(prev)}.`, `Vença o chefe de ${show(prev)}.`, `Bats le chef de ${show(prev)}.`, `打败${show(prev)}的大魔王。`, `${show(prev)} बॉस को हराओ।`, `اهزم زعيم ${show(prev)}.`)
                       : t("Beat the last boss.", "Vence al jefe anterior.");
                   })()}
                 </p>
