@@ -149,9 +149,17 @@ for (const loc of [
   if (!sitemap.includes(`<loc>${loc}</loc>`)) fail(`sitemap missing ${loc}`);
 }
 
-/** JSON-LD is data. Any other script means the page is not crawlable HTML. */
+const COUNTER_SRC = "//gc.zgo.at/count.js";
+const COUNTER_ENDPOINT = "https://squisheeacademy.goatcounter.com/count";
+
+/** The page-view loader is not content. Pages still render without it. */
+function stripVisitorCounter(html) {
+  return html.replace(/<script>\s*\(function \(\) \{[\s\S]*?gc\.zgo\.at\/count\.js[\s\S]*?<\/script>/g, "");
+}
+
+/** JSON-LD is data. The visitor-counter loader is optional. Any other script means the page is not crawlable HTML. */
 function needsJs(html) {
-  return /<script(?![^>]*type="application\/ld\+json")/i.test(html);
+  return /<script(?![^>]*type="application\/ld\+json")/i.test(stripVisitorCounter(html));
 }
 
 function hasTracking(html) {
@@ -185,7 +193,33 @@ if (!privacy.includes("COPPA")) fail("privacy COPPA");
 if (!privacy.includes('<a href="mailto:hello@squisheeacademy.com">hello@squisheeacademy.com</a>')) {
   fail("privacy contact email");
 }
-if (privacy.includes("<script")) fail("privacy page needs JavaScript");
+if (privacy.includes("no analytics")) fail("privacy still says no analytics");
+if (privacy.includes("third parties collect")) fail("privacy still says third parties collect data");
+if (!privacy.includes("We count page views with GoatCounter")) fail("privacy GoatCounter");
+if (!privacy.includes("sets no cookies")) fail("privacy cookies");
+if (!privacy.includes("It does not store IP addresses.")) fail("privacy IP");
+if (!privacy.includes("It honors Do Not Track.")) fail("privacy Do Not Track");
+if (!privacy.includes("Nothing here is about an individual child.")) fail("privacy children");
+if (needsJs(privacy)) fail("privacy page needs JavaScript");
+const privacyLocales = [
+  ["es/privacy/index.html", "es", ""],
+  ["pt-br/privacy/index.html", "pt-BR", ""],
+  ["fr/privacy/index.html", "fr", ""],
+  ["zh-hans/privacy/index.html", "zh-Hans", ""],
+  ["hi/privacy/index.html", "hi", ""],
+  ["ar/privacy/index.html", "ar", ' dir="rtl"'],
+];
+for (const [rel, lang, dir] of privacyLocales) {
+  const page = readFileSync(resolve(root, rel), "utf8");
+  if (!page.includes(`<html lang="${lang}"${dir}>`)) fail(`${rel} lang`);
+  if (!page.includes("GoatCounter") || !page.includes("Do Not Track") || !page.includes("COPPA") || !page.includes("IP")) {
+    fail(`${rel} privacy wording`);
+  }
+  if (!page.includes('<a href="mailto:hello@squisheeacademy.com">hello@squisheeacademy.com</a>')) {
+    fail(`${rel} contact email`);
+  }
+  if (needsJs(page)) fail(`${rel} needs JavaScript`);
+}
 
 const manifestList = JSON.parse(readFileSync(resolve(root, "precache-manifest.json"), "utf8"));
 if (!Array.isArray(manifestList) || manifestList.length < 20) fail("precache manifest");
@@ -431,5 +465,53 @@ for (const id of ["times", "add", "time", "money", "sight", "spelling", "count",
     fail(`${id} screenshot is ${shot.readUInt32BE(16)}x${shot.readUInt32BE(20)}`);
   }
 }
+
+function walkHtml(dir, out = []) {
+  for (const name of readdirSync(dir)) {
+    const file = join(dir, name);
+    if (statSync(file).isDirectory()) walkHtml(file, out);
+    else if (name.endsWith(".html")) out.push(file);
+  }
+  return out;
+}
+
+let countedPages = 0;
+for (const file of walkHtml(root)) {
+  const rel = file.slice(root.length + 1);
+  const body = readFileSync(file, "utf8");
+  if (rel === "google2c987beeafe3d9b2.html") {
+    if (body.includes(COUNTER_SRC) || body.includes("goatcounter") || body.includes("<script")) {
+      fail("search console file was changed");
+    }
+    continue;
+  }
+  if (!body.includes("<html")) continue;
+  countedPages += 1;
+  const srcCount = body.split(COUNTER_SRC).length - 1;
+  const endpointCount = body.split(COUNTER_ENDPOINT).length - 1;
+  if (srcCount !== 1 || endpointCount !== 1) fail(`${rel} visitor counter src=${srcCount} endpoint=${endpointCount}`);
+  if (!body.includes('nav.doNotTrack === "1"') || !body.includes("nav.globalPrivacyControl === true")) {
+    fail(`${rel} counter ignores Do Not Track or Global Privacy Control`);
+  }
+  if (body.includes("gtag(") || body.includes("googletagmanager") || body.includes("google-analytics") || body.includes("fbq(")) {
+    fail(`${rel} has another tracker`);
+  }
+  for (const match of body.matchAll(/\ssrc=["']([^"']+)["']/gi)) {
+    const src = match[1];
+    if (!/^https?:|^\/\//.test(src)) continue;
+    const host = src.replace(/^https?:/, "").replace(/^\/\//, "").split("/")[0];
+    if (host !== "gc.zgo.at") fail(`${rel} external script ${src}`);
+  }
+}
+if (countedPages < 100) fail(`expected the counter on every HTML page, found ${countedPages}`);
+if (manifestList.some((url) => typeof url === "string" && (url.includes("goatcounter") || url.includes("zgo.at")))) {
+  fail("precache includes the visitor counter");
+}
+if (sw.includes("gc.zgo.at") || sw.includes("goatcounter")) fail("service worker mentions the visitor counter");
+const robotsBody = readFileSync(resolve(root, "robots.txt"), "utf8");
+const sitemapBody = readFileSync(resolve(root, "sitemap.xml"), "utf8");
+if (robotsBody.includes(COUNTER_SRC) || sitemapBody.includes(COUNTER_SRC)) fail("robots or sitemap includes the counter");
+if (!sitemapBody.includes("<loc>https://squisheeacademy.com/privacy/</loc>")) fail("sitemap missing privacy");
+if (!sitemapBody.includes("<loc>https://squisheeacademy.com/ar/privacy/</loc>")) fail("sitemap missing arabic privacy");
 
 console.log("check-academy-domain OK dist-domain");

@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { rewriteDomainSource } from "../../../scripts/academy-domain-rewrite.mjs";
 import { coinCents, formatMoney, WORKSHEETS, type StaticItem } from "./catalog";
+import { PRIVACY_DESCRIPTION_EN } from "./privacy-copy";
 import {
   academySeoFiles,
   canonicalUrl,
@@ -454,6 +455,13 @@ describe("printable worksheets", () => {
       const scripts = html.match(/<script\b[^>]*>/g) ?? [];
       expect(scripts.length).toBeGreaterThan(0);
       expect(scripts.every((tag) => tag.includes('type="application/ld+json"'))).toBe(true);
+      expect(html).not.toContain("gc.zgo.at");
+      const counted = worksheetHtml(sheet, { visitorCounter: true });
+      expect(counted.split("//gc.zgo.at/count.js").length - 1).toBe(1);
+      expect(counted.split("https://squisheeacademy.goatcounter.com/count").length - 1).toBe(1);
+      const countedScripts = counted.match(/<script\b[^>]*>/g) ?? [];
+      expect(countedScripts.every((tag) => tag.includes('type="application/ld+json"') || tag === "<script>")).toBe(true);
+      expect(counted).not.toMatch(/<script\b[^>]*\ssrc=["'](?:https?:)?\/\//i);
     }
   });
 
@@ -461,6 +469,9 @@ describe("printable worksheets", () => {
     const xml = sitemapXml();
     expect(xml).toContain("<loc>https://squisheeacademy.com/worksheets/multiplication-7s/</loc>");
     expect(xml).toContain("<loc>https://squisheeacademy.com/privacy/</loc>");
+    expect(xml).toContain("<loc>https://squisheeacademy.com/es/privacy/</loc>");
+    expect(xml).toContain("<loc>https://squisheeacademy.com/ar/privacy/</loc>");
+    expect(xml).toContain('hreflang="x-default" href="https://squisheeacademy.com/privacy/"');
     const files = academySeoFiles();
     expect(files.find((file) => file.path === "robots.txt")?.body).toContain(
       "Sitemap: https://squisheeacademy.com/sitemap.xml",
@@ -470,6 +481,11 @@ describe("printable worksheets", () => {
     const privacy = files.find((file) => file.path === "privacy/index.html")?.body ?? "";
     expect(privacy).toContain('<a href="mailto:hello@squisheeacademy.com">hello@squisheeacademy.com</a>');
     expect(privacy).not.toContain("[Bryan — add the email families should use]");
+    expect(privacy).toContain("We count page views with GoatCounter");
+    expect(privacy).not.toContain("no analytics");
+    expect(privacy).not.toContain("gc.zgo.at");
+    expect(files.find((file) => file.path === "ar/privacy/index.html")?.body).toContain('dir="rtl"');
+    expect(files.find((file) => file.path === "zh-hans/privacy/index.html")?.body).toContain("GoatCounter");
     expect(files.some((file) => file.path === "worksheets/counting-coins/index.html")).toBe(true);
   });
 
@@ -493,7 +509,7 @@ describe("printable worksheets", () => {
     expectShareCard(
       privacy,
       "Privacy | Squishee Academy",
-      "Squishee Academy collects no personal information. Progress stays on this device. No ads, no accounts, and no analytics.",
+      PRIVACY_DESCRIPTION_EN,
       "https://squisheeacademy.com/privacy/",
     );
     expect(privacy).toContain('rel="apple-touch-icon" href="/apple-touch-icon.png"');

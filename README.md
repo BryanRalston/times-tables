@@ -43,7 +43,7 @@ https://squisheeacademy.com/
 
 `www.squisheeacademy.com` redirects to that apex. The same app also stays at https://bryanralston.github.io/times-tables/academy/ so Squishee Math at https://bryanralston.github.io/times-tables/ is unchanged. Do not set a custom domain on this repo’s Pages site.
 
-Squishee Academy is free for every family. No ads, no accounts, no payment. Unlocks come from playing.
+Squishee Academy is free for every family. No ads, no accounts, no payment. Unlocks come from playing. The site at squisheeacademy.com counts page views with GoatCounter, a privacy-friendly counter that sets no cookies and collects no personal information. It honors Do Not Track. Squishee Math does not use that counter.
 
 `npm run build` emits the subpath app into `dist/academy/`. `npm run build:academy-domain` emits the root site (`base: /`, service worker and manifest scope `/`, `CNAME`) into `dist-domain/`. The domain is served by the Pages site of [`BryanRalston/squishee-academy`](https://github.com/BryanRalston/squishee-academy) (branch `gh-pages`), built from this repo's `main` with `npm run build:academy-domain`. No secrets live here; `scripts/publish-academy-domain.mjs` is a no-op.
 

@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { canDressFace } from "@/lib/cosmetics";
 import { squisheeById } from "@/lib/squishees";
-import { remainderShown, show, t } from "../i18n";
+import { getLocale, remainderShown, show, t } from "../i18n";
+import { privacyPathForLocale } from "../privacy-path";
 import { isWardrobeId, lookShowsOn, wardrobeSrc } from "../wardrobe";
 import { MINUS, TIMES, type AddVisual, type Visual } from "../games/types";
 import { cosmeticCompositeUrl, squisheeUrl } from "../paths";
@@ -226,7 +227,7 @@ export function Foot() {
         <a href="#/settings">
           <IconGear /> {show("Settings")}
         </a>
-        <a href={`${import.meta.env.BASE_URL}privacy/`}>
+        <a href={`${import.meta.env.BASE_URL}${privacyPathForLocale(getLocale())}`}>
           <IconShield /> {show("Privacy")}
         </a>
       </nav>

@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { join, resolve } from "node:path";
 
 const indexPath = resolve("dist/index.html");
 const nojekyll = resolve("dist/.nojekyll");
@@ -54,6 +54,22 @@ for (const rel of [
   if (!academyManifest.includes(url)) fail(`academy precache missing ${url}`);
 }
 if (!existsSync(resolve("dist/squishees/frog-poke.mp4"))) fail("dist/squishees/frog-poke.mp4 missing");
+
+function walkHtml(dir, out = []) {
+  for (const name of readdirSync(dir)) {
+    const file = join(dir, name);
+    if (statSync(file).isDirectory()) walkHtml(file, out);
+    else if (name.endsWith(".html")) out.push(file);
+  }
+  return out;
+}
+
+for (const file of walkHtml(resolve("dist"))) {
+  const body = readFileSync(file, "utf8");
+  if (body.includes("gc.zgo.at") || body.includes("squisheeacademy.goatcounter.com") || body.includes("data-goatcounter")) {
+    fail(`${file} has the Academy visitor counter`);
+  }
+}
 
 console.log("check-pages OK dist/index.html");
 

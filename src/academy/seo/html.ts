@@ -1,5 +1,8 @@
 import { WORKSHEETS, type StaticItem, type StaticSheet } from "./catalog";
-import { landingPages, relativeHref, sheetIndexPages, sheetPages, type SeoPage } from "./landings";
+import { SEO_LOCALES, type SeoLocale } from "./copy";
+import { withVisitorCounter } from "./counter";
+import { landingPages, relativeHref, sheetIndexPages, sheetPages, withLocale, type SeoPage } from "./landings";
+import { privacyCopy } from "./privacy-copy";
 
 export const CANONICAL_ORIGIN = "https://squisheeacademy.com";
 
@@ -23,6 +26,11 @@ export function shareImageUrl(): string {
 export interface SeoFile {
   path: string;
   body: string;
+}
+
+/** The domain build counts page views. The math app and the subpath build do not. */
+export interface AcademySeoOptions {
+  visitorCounter?: boolean;
 }
 
 export function canonicalUrl(path: string): string {
@@ -261,6 +269,7 @@ function documentPage(opts: {
   dir?: "ltr" | "rtl";
   alternates?: { hreflang: string; path: string }[];
   jsonLd?: string;
+  visitorCounter?: boolean;
 }): string {
   const canonical = canonicalUrl(opts.path);
   const home = `${"../".repeat(opts.depth)}#/`;
@@ -268,7 +277,7 @@ function documentPage(opts: {
   const dir = opts.dir === "rtl" ? ' dir="rtl"' : "";
   const alternates = opts.alternates?.length ? `${hreflangLinks(opts.alternates)}\n` : "";
   const jsonLd = opts.jsonLd ? `${opts.jsonLd}\n` : "";
-  return `<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html lang="${lang}"${dir}>
 <head>
   <meta charset="utf-8" />
@@ -289,6 +298,7 @@ ${jsonLd}</head>
 </body>
 </html>
 `;
+  return opts.visitorCounter ? withVisitorCounter(html) : html;
 }
 
 function crawlableExtras(page: SeoPage): string {
@@ -311,7 +321,7 @@ function crawlableExtras(page: SeoPage): string {
       <p class="play noprint"><a class="quiet" href="${page.worksheetsHref}">${escapeHtml(page.ui.allSheets)}</a> <a class="quiet" href="${page.privacyHref}">${escapeHtml(page.ui.privacy)}</a></p>`;
 }
 
-function renderSeoPage(page: SeoPage, body: string): string {
+function renderSeoPage(page: SeoPage, body: string, options?: AcademySeoOptions): string {
   return documentPage({
     title: page.title,
     description: page.description,
@@ -322,6 +332,7 @@ function renderSeoPage(page: SeoPage, body: string): string {
     dir: page.locale.dir,
     alternates: page.alternates,
     jsonLd: learningJsonLd(page),
+    visitorCounter: options?.visitorCounter,
   });
 }
 
@@ -361,13 +372,13 @@ function sheetBody(page: SeoPage): string {
     </article>`;
 }
 
-export function worksheetHtml(sheet: StaticSheet): string {
+export function worksheetHtml(sheet: StaticSheet, options?: AcademySeoOptions): string {
   const page = sheetPages().find((row) => row.locale.id === "en" && row.sheet?.slug === sheet.slug);
   if (!page) throw new Error(sheet.slug);
-  return renderSeoPage(page, sheetBody(page));
+  return renderSeoPage(page, sheetBody(page), options);
 }
 
-export function worksheetIndexHtml(): string {
+export function worksheetIndexHtml(options?: AcademySeoOptions): string {
   const page = sheetIndexPages().find((row) => row.locale.id === "en");
   if (!page) throw new Error("worksheet index");
   const cards = WORKSHEETS.map(
@@ -382,6 +393,7 @@ export function worksheetIndexHtml(): string {
       <div class="cards">${cards}</div>
       <p class="fine">Shuffle a new set in the app: ${practice}.</p>
       ${crawlableExtras(page)}`,
+    options,
   );
 }
 
@@ -393,31 +405,49 @@ function landingBody(page: SeoPage): string {
     </article>`;
 }
 
-export function privacyHtml(): string {
+function privacyPath(locale: SeoLocale): string {
+  return withLocale(locale.prefix, "privacy");
+}
+
+function privacyAlternates(): { hreflang: string; path: string }[] {
+  return [
+    ...SEO_LOCALES.map((locale) => ({ hreflang: locale.hreflang, path: privacyPath(locale) })),
+    { hreflang: "x-default", path: "privacy" },
+  ];
+}
+
+function privacyDocument(locale: SeoLocale, options?: AcademySeoOptions): string {
+  const copy = privacyCopy(locale.id);
+  const path = privacyPath(locale);
+  const depth = path.split("/").filter(Boolean).length;
+  const home = `${"../".repeat(depth)}#/`;
+  const sheets = relativeHref(path, withLocale(locale.prefix, "worksheets"));
+  const paragraphs = copy.paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("\n      ");
   return documentPage({
-    title: "Privacy | Squishee Academy",
-    description:
-      "Squishee Academy collects no personal information. Progress stays on this device. No ads, no accounts, and no analytics.",
-    path: "privacy",
-    depth: 1,
-    alternates: [
-      { hreflang: "en", path: "privacy" },
-      { hreflang: "x-default", path: "privacy" },
-    ],
+    title: copy.title,
+    description: copy.description,
+    path,
+    depth,
+    lang: locale.htmlLang,
+    dir: locale.dir,
+    alternates: privacyAlternates(),
+    visitorCounter: options?.visitorCounter,
     body: `<article class="prose">
-      <p class="kicker">On this device</p>
-      <h1>Privacy</h1>
+      <p class="kicker">${escapeHtml(copy.kicker)}</p>
+      <h1>${escapeHtml(copy.h1)}</h1>
       <div class="promise">
-      <p>Squishee Academy is free forever. There are no ads, no accounts, and no analytics.</p>
-      <p>We do not collect personal information. A name typed into the app stays on this device. Progress stays on this device. We do not send it to a server. We do not know who is playing.</p>
-      <p>This is a COPPA-friendly kids' site. We do not ask children for an email, a photo, a location, or any contact information. We do not let third parties collect data from these pages.</p>
-      <p>A backup code is made on this device so a grown-up can move progress to another device. The code is not uploaded. If you copy it, you are the one holding it.</p>
-      <p>The games, pictures, and worksheets can be saved on the device the first time you visit, so they still open with the internet off. That copy stays in this browser.</p>
+      ${paragraphs}
       </div>
-      <p class="contact"><strong>Contact:</strong> <a href="mailto:hello@squisheeacademy.com">hello@squisheeacademy.com</a></p>
-      <p class="play noprint"><a href="../#/">Back to games</a> <a class="quiet" href="../worksheets/">Worksheets</a></p>
+      <p class="contact"><strong>${escapeHtml(copy.contact)}</strong> <a href="mailto:hello@squisheeacademy.com">hello@squisheeacademy.com</a></p>
+      <p class="play noprint"><a href="${home}">${escapeHtml(copy.back)}</a> <a class="quiet" href="${sheets}">${escapeHtml(copy.sheets)}</a></p>
     </article>`,
   });
+}
+
+export function privacyHtml(options?: AcademySeoOptions): string {
+  const english = SEO_LOCALES.find((locale) => locale.id === "en");
+  if (!english) throw new Error("privacy");
+  return privacyDocument(english, options);
 }
 
 interface SitemapNode {
@@ -443,7 +473,7 @@ export function sitemapNodes(): SitemapNode[] {
       "",
       HOME_HREFLANGS.map((hreflang) => ({ hreflang, path: "" })),
     ),
-    sitemapNode("privacy"),
+    ...SEO_LOCALES.map((locale) => ({ path: privacyPath(locale), alternates: privacyAlternates() })),
     ...PRACTICE_SLUGS.map((slug) => sitemapNode(`worksheets/${slug}`)),
   ];
   for (const page of pages) {
@@ -470,22 +500,25 @@ export function robotsTxt(): string {
   return `User-agent: *\nAllow: /\n\nSitemap: ${CANONICAL_ORIGIN}/sitemap.xml\n`;
 }
 
-export function academySeoFiles(): SeoFile[] {
+export function academySeoFiles(options: AcademySeoOptions = {}): SeoFile[] {
   const sheets = sheetPages();
   const indexes = sheetIndexPages();
   const landings = landingPages();
   return [
     { path: "robots.txt", body: robotsTxt() },
     { path: "sitemap.xml", body: sitemapXml() },
-    { path: "privacy/index.html", body: privacyHtml() },
-    ...indexes.map((page) => ({ path: page.file, body: worksheetIndexHtmlFor(page) })),
-    ...sheets.map((page) => ({ path: page.file, body: renderSeoPage(page, sheetBody(page)) })),
-    ...landings.map((page) => ({ path: page.file, body: renderSeoPage(page, landingBody(page)) })),
+    ...SEO_LOCALES.map((locale) => ({
+      path: `${privacyPath(locale)}/index.html`,
+      body: privacyDocument(locale, options),
+    })),
+    ...indexes.map((page) => ({ path: page.file, body: worksheetIndexHtmlFor(page, options) })),
+    ...sheets.map((page) => ({ path: page.file, body: renderSeoPage(page, sheetBody(page), options) })),
+    ...landings.map((page) => ({ path: page.file, body: renderSeoPage(page, landingBody(page), options) })),
   ];
 }
 
-function worksheetIndexHtmlFor(page: SeoPage): string {
-  if (page.locale.id === "en") return worksheetIndexHtml();
+function worksheetIndexHtmlFor(page: SeoPage, options?: AcademySeoOptions): string {
+  if (page.locale.id === "en") return worksheetIndexHtml(options);
   const cards = WORKSHEETS.map((sheet) => {
     const localized = sheetPages().find((row) => row.locale.id === page.locale.id && row.sheet?.slug === sheet.slug);
     const title = localized?.h1 ?? sheet.h1;
@@ -500,5 +533,6 @@ function worksheetIndexHtmlFor(page: SeoPage): string {
       <div class="cards">${cards}</div>
       <p class="fine">${practice}</p>
       ${crawlableExtras(page)}`,
+    options,
   );
 }

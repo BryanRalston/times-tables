@@ -289,7 +289,7 @@ describe("arabic layout guards", () => {
 describe("chinese subset", () => {
   it("covers every CJK character in the Chinese UI and the landing copy", () => {
     const codes = cmapCodes("academy/public/fonts/NotoSansSC-subset.woff2");
-    const files = ["src/academy/i18n-zh.ts", "src/academy/seo/copy.ts"];
+    const files = ["src/academy/i18n-zh.ts", "src/academy/seo/copy.ts", "src/academy/seo/privacy-copy.ts"];
     const missing: string[] = [];
     for (const file of files) {
       for (const ch of cjkIn(file)) {
@@ -298,6 +298,23 @@ describe("chinese subset", () => {
     }
     expect(missing).toEqual([]);
     expect(codes.has("择".codePointAt(0) ?? 0)).toBe(true);
+  });
+
+  it("covers Devanagari and Arabic on the privacy page", () => {
+    const text = readFileSync("src/academy/seo/privacy-copy.ts", "utf8");
+    const hindi = cmapCodes("academy/public/fonts/NotoSansDevanagari-subset.woff2");
+    const arabic = cmapCodes("academy/public/fonts/NotoSansArabic-subset.woff2");
+    const missingHindi = [...text].filter((ch) => {
+      const code = ch.codePointAt(0) ?? 0;
+      return code >= 0x0900 && code <= 0x097f && !hindi.has(code);
+    });
+    const missingArabic = [...text].filter((ch) => {
+      const code = ch.codePointAt(0) ?? 0;
+      const inArabic = (code >= 0x0600 && code <= 0x06ff) || (code >= 0xfb50 && code <= 0xfdff) || (code >= 0xfe70 && code <= 0xfeff);
+      return inArabic && !arabic.has(code);
+    });
+    expect([...new Set(missingHindi)]).toEqual([]);
+    expect([...new Set(missingArabic)]).toEqual([]);
   });
 });
 
