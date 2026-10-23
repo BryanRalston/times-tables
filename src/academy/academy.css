@@ -995,6 +995,9 @@ button.ac-card { font: inherit; text-align: left; cursor: pointer; color: inheri
   gap: 8px;
   margin-inline-start: auto;
 }
+@media (max-width: 430px) {
+  .ac-top-tools { margin-inline-start: 0; }
+}
 .ac-lang-slot { display: inline-flex; }
 .ac-lang-button {
   display: inline-flex;
