@@ -54,12 +54,12 @@ export function WorksheetPage({ game: gameId }: { game: string }) {
     setSeed(Date.now() % 1_000_000_000);
   }
 
-  const title = t(`${spec.title} worksheet`, `Hoja de ${show(spec.title)}`, `Folha de ${show(spec.title)}`, `Fiche de ${show(spec.title)}`, `${show(spec.title)}练习纸`, `${spec.title} अभ्यास पत्र`, `ورقة عمل ${show(spec.title)}`);
+  const title = t(`${spec.title} worksheet`, `Hoja de ${show(spec.title)}`, `Folha de ${show(spec.title)}`, `Fiche de ${show(spec.title)}`, `${show(spec.title)}练习纸`, `${show(spec.title)} अभ्यास पत्र`, `ورقة عمل ${show(spec.title)}`);
 
   return (
     <div className="ac-sheet-page">
       <header className="ac-sheet-bar ac-no-print">
-        <a href={`${import.meta.env.BASE_URL || "/times-tables/academy/"}#/`}>← {show("Games")}</a>
+        <a href={`${import.meta.env.BASE_URL || "/times-tables/academy/"}#/`}><span className="ac-back-arrow" aria-hidden="true">←</span> {show("Games")}</a>
         <div className="ac-sheet-controls">
           <label>
             {show("Level")}
@@ -73,9 +73,9 @@ export function WorksheetPage({ game: gameId }: { game: string }) {
           </label>
           {spec.focus ? (
             <label>
-              {spec.focus.label}
+              {show(spec.focus.label)}
               <select value={focus ?? ""} onChange={(e) => pushFocus(e.target.value ? Number(e.target.value) : undefined)}>
-                <option value="">{spec.focus.blank}</option>
+                <option value="">{show(spec.focus.blank)}</option>
                 {spec.focus.options.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}

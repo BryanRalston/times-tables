@@ -173,6 +173,11 @@ function AcademyApp() {
   }, []);
 
   useEffect(() => {
+    const footer = document.querySelector(".for-grownups");
+    if (footer instanceof HTMLElement) footer.hidden = save.lang !== "en";
+  }, [save.lang]);
+
+  useEffect(() => {
     const titles: Record<Route["name"], string> = {
       home: "Free learning games for kids Pre-K to grade 4 | Squishee Academy",
       play: `${show("Play")} · Squishee Academy`,

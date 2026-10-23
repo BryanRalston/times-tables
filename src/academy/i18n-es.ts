@@ -488,6 +488,7 @@ export const TRAIT_ES: Record<string, string> = {
 
 export const ES: Record<string, string> = {
   "Times Tables": "Las tablas",
+  "Mix": "Todas",
   "Add & Subtract": "Sumar y restar",
   "Telling Time": "La hora",
   Money: "Dinero",

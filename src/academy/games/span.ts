@@ -372,7 +372,14 @@ function decimalText(whole: number, tenths: number, hundredths: number): string 
   return `${whole}.${tenths}${hundredths}`;
 }
 
-function decimalSay(text: string): string {
+/** One tenth keeps the digit so the voice still splits into a number plus a recorded word. */
+function tenthsSpeech(tenths: number): string {
+  if (tenths === 1) return t("1 tenth", "1 décimo", "1 décimo", "1 dixième", "1个十分之一", "1 दशांश", "عُشر واحد");
+  return t(`${tenths} tenths`, `${tenths} décimos`, `${tenths} décimos`, `${tenths} dixièmes`, `${tenths}个十分之一`, `${tenths} दशांश`, tenths === 2 ? "عُشران" : `${tenths} أعشار`);
+}
+
+/** How a decimal choice is spoken. Hundredths stay plural: those singular clips are not recorded. */
+export function decimalSpeech(text: string): string {
   const match = /^(\d+)\.(\d)(\d)$/.exec(text);
   if (!match) return text;
   const whole = Number(match[1]);
@@ -380,9 +387,10 @@ function decimalSay(text: string): string {
   const hundredths = Number(match[3]);
   const places = tenths * 10 + hundredths;
   if (places === 0) return t(whole === 1 ? "one whole" : `${whole} wholes`, whole === 1 ? "un entero" : `${whole} enteros`, whole === 1 ? "um inteiro" : `${whole} inteiros`, whole === 1 ? "un entier" : `${whole} entiers`, whole === 1 ? "一整个" : `${whole}个整份`, whole === 1 ? "एक पूरा" : `${whole} पूरे`, whole === 1 ? "واحد صحيح" : whole === 2 ? "عددان صحيحان" : whole >= 3 && whole <= 10 ? `${whole} أعداد صحيحة` : `${whole} عددًا صحيحًا`);
-  if (whole === 0 && hundredths === 0) return t(`${tenths} tenths`, `${tenths} décimos`, `${tenths} décimos`, `${tenths} dixièmes`, `${tenths}个十分之一`, `${tenths} दशांश`, tenths === 1 ? "عُشر واحد" : tenths === 2 ? "عُشران" : `${tenths} أعشار`);
+  if (whole === 0 && hundredths === 0) return tenthsSpeech(tenths);
   if (whole === 0) return t(`${places} hundredths`, `${places} centésimos`, `${places} centésimos`, `${places} centièmes`, `${places}个百分之一`, `${places} शतांश`, `${places} من المئة`);
-  if (hundredths === 0) return t(`${whole} and ${tenths} tenths`, `${whole} y ${tenths} décimos`, `${whole} e ${tenths} décimos`, `${whole} et ${tenths} dixièmes`, `${whole}又${tenths}个十分之一`, `${whole} और ${tenths} दशांश`, `${whole} و${tenths === 1 ? "عُشر واحد" : tenths === 2 ? "عُشران" : `${tenths} أعشار`}`);
+  if (hundredths === 0 && tenths === 1) return t(`${whole} and 1 tenth`, `${whole} y 1 décimo`, `${whole} e 1 décimo`, `${whole} et 1 dixième`, `${whole}又1个十分之一`, `${whole} और 1 दशांश`, `${whole} وعُشر واحد`);
+  if (hundredths === 0) return t(`${whole} and ${tenths} tenths`, `${whole} y ${tenths} décimos`, `${whole} e ${tenths} décimos`, `${whole} et ${tenths} dixièmes`, `${whole}又${tenths}个十分之一`, `${whole} और ${tenths} दशांश`, `${whole} و${tenths === 2 ? "عُشران" : `${tenths} أعشار`}`);
   return t(`${whole} and ${places} hundredths`, `${whole} y ${places} centésimos`, `${whole} e ${places} centésimos`, `${whole} et ${places} centièmes`, `${whole}又${places}个百分之一`, `${whole} और ${places} शतांश`, `${whole} و${places} من المئة`);
 }
 
@@ -396,7 +404,7 @@ function decimalChoices(rng: Rng, answer: string, seeds: readonly string[]): str
 
 function decimalLabels(choices: readonly string[]): Record<string, string> {
   const labels: Record<string, string> = {};
-  for (const choice of choices) labels[choice] = decimalSay(choice);
+  for (const choice of choices) labels[choice] = decimalSpeech(choice);
   return labels;
 }
 
@@ -408,7 +416,7 @@ export function makeDecimalQuestion(rng: Rng): ChoiceQ {
     const board: FractionBoard = { game: "fractions", mode: "decimals", whole: 0, tenths, hundredths, ask: "write" };
     const said =
       hundredths === 0
-        ? t(`${tenths} tenths`, `${tenths} décimos`, `${tenths} décimos`, `${tenths} dixièmes`, `${tenths}个十分之一`, `${tenths} दशांश`, tenths === 1 ? "عُشر واحد" : tenths === 2 ? "عُشران" : `${tenths} أعشار`)
+        ? tenthsSpeech(tenths)
         : t(`${tenths * 10 + hundredths} hundredths`, `${tenths * 10 + hundredths} centésimos`, `${tenths * 10 + hundredths} centésimos`, `${tenths * 10 + hundredths} centièmes`, `${tenths * 10 + hundredths}个百分之一`, `${tenths * 10 + hundredths} शतांश`, `${tenths * 10 + hundredths} من المئة`);
     const wrongs = [
       decimalText(0, tenths, hundredths === 0 ? 1 : 0),

@@ -1,5 +1,5 @@
 import type { Rng } from "@/lib/rng";
-import { t } from "../i18n";
+import { groupedNumber, t } from "../i18n";
 import { buddyName, pickTalk } from "./flavor";
 import { placeCard } from "./cards";
 import { blockPhrase, expandedForm, roundHalfUp, type PlaceBoard } from "./boards";
@@ -282,12 +282,12 @@ function PlaceArt({ board }: { board: PlaceBoard }) {
     case "big":
       return (
         <p className="ac-big-num">
-          {board.n.toLocaleString("en-US")}
+          {groupedNumber(board.n)}
           <small>{board.digit}</small>
         </p>
       );
     case "roundBig":
-      return <p className="ac-big-num">{board.n.toLocaleString("en-US")}</p>;
+      return <p className="ac-big-num">{groupedNumber(board.n)}</p>;
     default: {
       const neverBoard: never = board;
       return neverBoard;

@@ -88,13 +88,8 @@ function academyOpenGraphPlugin() {
 
 /** Dev serves the repo-root index unless this answers first. That index is Squishee Math. */
 function academyDevIndex() {
-  const indexPaths = new Set([
-    "/",
-    "/index.html",
-    "/times-tables/academy",
-    "/times-tables/academy/",
-    "/times-tables/academy/index.html",
-  ]);
+  const root = resolve("academy");
+  const prefix = "/times-tables/academy";
   return {
     name: "academy-dev-index",
     apply: "serve" as const,
@@ -103,14 +98,28 @@ function academyDevIndex() {
       middlewares: { use: (fn: (req: IncomingMessage, res: ServerResponse, next: (err?: unknown) => void) => void) => void };
     }) {
       server.middlewares.use(async (req, res, next) => {
-        const pathOnly = (req.url ?? "").split("?")[0] ?? "";
-        if (!indexPaths.has(pathOnly)) {
+        const pathOnly = decodeURIComponent((req.url ?? "").split("?")[0] ?? "");
+        const home = pathOnly === "/" || pathOnly === "/index.html";
+        const under = pathOnly === prefix || pathOnly.startsWith(`${prefix}/`);
+        if (!home && !under) {
+          next();
+          return;
+        }
+        let rel = home ? "/index.html" : pathOnly.slice(prefix.length);
+        if (rel === "" || rel === "/") rel = "/index.html";
+        else if (rel.endsWith("/")) rel = `${rel}index.html`;
+        if (!rel.endsWith(".html") || rel.includes("..")) {
+          next();
+          return;
+        }
+        const file = normalize(join(root, rel));
+        if (!file.startsWith(root + sep) || !existsSync(file) || !statSync(file).isFile()) {
           next();
           return;
         }
         try {
-          const raw = readFileSync(resolve("academy/index.html"), "utf8").replaceAll("%BASE_URL%", "/");
-          const html = await server.transformIndexHtml("/index.html", raw);
+          const raw = readFileSync(file, "utf8").replaceAll("%BASE_URL%", "/");
+          const html = await server.transformIndexHtml(pathOnly, raw);
           res.statusCode = 200;
           res.setHeader("Content-Type", "text/html");
           res.end(html);
