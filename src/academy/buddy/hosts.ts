@@ -12,6 +12,9 @@ const NAMED_HOSTS: Record<string, string> = {
   money: "fox",
   sight: "cat",
   spelling: "owl",
+  share: "shark",
+  grid: "red-panda",
+  patterns: "bun",
 };
 
 const HOST_POOL = [

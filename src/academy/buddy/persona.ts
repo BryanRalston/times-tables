@@ -54,6 +54,9 @@ export const STUDY_PALS: Record<string, string> = {
   phonics: "axolotl",
   problems: "taco",
   variables: "toast",
+  share: "pearl-whale",
+  grid: "frost-bun",
+  patterns: "sugar-comet",
 };
 
 const PEOPLE: Record<string, Persona> = {

@@ -764,7 +764,12 @@ export function PlayScreen({
   });
   const palBond = bondTier(bondScore(child.bonds, child.avatarId));
   const choice = slot?.kind === "choice" ? slot.question : null;
-  const graphPals = choice?.visual.kind === "scene" && choice.visual.board.game === "graphs";
+  const graphPals =
+    choice?.visual.kind === "scene" &&
+    (choice.visual.board.game === "graphs" ||
+      choice.visual.board.game === "share" ||
+      choice.visual.board.game === "grid" ||
+      choice.visual.board.game === "patterns");
   const filled = dots.filter((dot) => dot != null).length;
   const playBuddy = boss ? null : (
     <div className="ac-play-buddy" data-pals={graphPals ? "pair" : "one"}>

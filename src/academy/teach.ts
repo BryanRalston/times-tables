@@ -657,6 +657,10 @@ function sceneFrames(question: ChoiceQ, board: Board): SceneFrame[] {
       return captions(variableCaptions(board));
     case "graphs":
       return captions([graphsTeachCaption(board), solved]);
+    case "share":
+    case "grid":
+    case "patterns":
+      return captions([question.title, solved]);
     default: {
       const neverBoard: never = board;
       return neverBoard;

@@ -1,6 +1,6 @@
 import { formatClockTime } from "../../lib/clock";
 
-export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables" | "graphs";
+export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables" | "graphs" | "share" | "grid" | "patterns";
 
 export interface CoinCounts {
   penny?: number;
@@ -773,6 +773,66 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       { prompt: "The line plot has 3 marks at 1/2. How many are 1/2?", answer: "3" },
       { prompt: "The longest ribbon is 3/4 and the shortest is 1/4. How much longer is the longest?", answer: "2/4" },
       { prompt: "The longest is 6/8 and the shortest is 2/8. What do they make together?", answer: "8/8" },
+    ],
+  },
+  {
+    slug: "sharing",
+    title: "Free Fair Shares Worksheet (Pre-K–4) | Squishee Academy",
+    description:
+      "Print a free sharing and division worksheet for Pre-K through grade 4. Deal cookies onto plates, make equal groups, and find what is left over. No signup.",
+    h1: "Fair shares",
+    game: "share",
+    items: [
+      { prompt: "Share 6 cookies onto 2 plates. How many on each plate?", answer: "3" },
+      { prompt: "Share 8 cookies onto 4 plates. How many on each plate?", answer: "2" },
+      { prompt: "Share 9 cookies onto 3 plates. How many on each plate?", answer: "3" },
+      { prompt: "Share 4 cookies onto 2 plates. How many on each plate?", answer: "2" },
+      { prompt: "Share 12 cookies into groups of 3. How many groups?", answer: "4" },
+      { prompt: "Share 10 cookies into groups of 5. How many groups?", answer: "2" },
+      { prompt: "Share 15 cookies into groups of 5. How many groups?", answer: "3" },
+      { prompt: "Share 7 cookies onto 3 plates. How many are left over?", answer: "1" },
+      { prompt: "Share 10 cookies onto 4 plates. How many are left over?", answer: "2" },
+      { prompt: "Share 5 cookies onto 2 plates. How many are left over?", answer: "1" },
+    ],
+  },
+  {
+    slug: "grid-garden",
+    title: "Free Grid Garden Worksheet (Grades 2–4) | Squishee Academy",
+    description:
+      "Print a free area and perimeter worksheet for grades 2–4. Count unit squares, find the distance around a figure, and solve for a missing side. No signup.",
+    h1: "Grid garden",
+    game: "grid",
+    items: [
+      { prompt: "An L is 3 squares tall plus 1 more. How many squares?", answer: "4" },
+      { prompt: "An L is 3 squares tall plus 2 more. How many squares?", answer: "5" },
+      { prompt: "An L is 4 squares tall plus 1 more. How many squares?", answer: "5" },
+      { prompt: "A figure of 4 squares has 3 shared sides. How many units around?", answer: "10" },
+      { prompt: "A figure of 5 squares has 4 shared sides. How many units around?", answer: "12" },
+      { prompt: "A figure of 3 squares has 2 shared sides. How many units around?", answer: "8" },
+      { prompt: "A rectangle has area 12 and one side 3. What is the other side?", answer: "4" },
+      { prompt: "A rectangle has area 20 and one side 4. What is the other side?", answer: "5" },
+      { prompt: "A rectangle has perimeter 14 and one side 3. What is the other side?", answer: "4" },
+      { prompt: "A rectangle has perimeter 18 and one side 4. What is the other side?", answer: "5" },
+    ],
+  },
+  {
+    slug: "number-patterns",
+    title: "Free Number Patterns Worksheet (K–4) | Squishee Academy",
+    description:
+      "Print a free skip-counting worksheet for kindergarten through grade 4. Count by tens, fives, twos, and hundreds, then name the rule. No signup.",
+    h1: "Number patterns",
+    game: "patterns",
+    items: [
+      { prompt: "10, 20, 30, __. What comes next?", answer: "40" },
+      { prompt: "5, 10, 15, __. What comes next?", answer: "20" },
+      { prompt: "2, 4, 6, __. What comes next?", answer: "8" },
+      { prompt: "100, 200, 300, __. What comes next?", answer: "400" },
+      { prompt: "6, 8, 10, __. What comes next?", answer: "12" },
+      { prompt: "1, 4, 7, __. What comes next?", answer: "10" },
+      { prompt: "4, 8, 12, 16. What is the rule?", answer: "add 4" },
+      { prompt: "3, 6, 9, 12. What is the rule?", answer: "add 3" },
+      { prompt: "10, 20, 30, 40. What is the rule?", answer: "add 10" },
+      { prompt: "5, 10, 15, 20. What is the rule?", answer: "add 5" },
     ],
   },
 ];

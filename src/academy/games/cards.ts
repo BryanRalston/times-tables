@@ -956,6 +956,156 @@ export const graphsCard = sceneCard("Data", GRAPH_ROWS, {
   isLevel: (value) => isId(["sort", "tally", "picture", "bar", "scale", "line"], value),
 });
 
+const SHARE_IDS = ["pairs", "fair", "groups", "facts", "left"] as const;
+const SHARE_ROWS: SkillRow[] = [
+  { key: "share:pairs", label: "Two plates" },
+  { key: "share:fair", label: "Equal shares" },
+  { key: "share:groups", label: "Groups of" },
+  { key: "share:facts", label: "Division facts" },
+  { key: "share:left", label: "Leftovers" },
+];
+
+export const shareCard = sceneCard("Shares", SHARE_ROWS, {
+  id: "share",
+  title: "Fair Shares",
+  audience: "Pre-K–4",
+  tint: "aqua",
+  mascot: "shark",
+  sheetSlug: "sharing",
+  sheetScreen: "sheet-share",
+  blurb:
+    "Free sharing and division practice for Pre-K through grade 4. Deal cookies onto plates, make equal groups, and see what is left over. No signup.",
+  levels: [
+    { id: "pairs", label: "Two plates", num: 1 },
+    { id: "fair", label: "Equal shares", num: 2 },
+    { id: "groups", label: "Groups of", num: 3 },
+    { id: "facts", label: "Division facts", num: 4 },
+    { id: "left", label: "Leftovers", num: 5 },
+  ],
+  defaultLevel(grade) {
+    const fallback = ((): string => {
+      switch (grade) {
+        case "PK":
+        case "K":
+        case "1":
+          return "pairs";
+        case "2":
+          return "fair";
+        case "3":
+          return "facts";
+        case "4":
+          return "left";
+        default: {
+          const neverGrade: never = grade;
+          return neverGrade;
+        }
+      }
+    })();
+    return bandStart("share", grade, SHARE_IDS, fallback);
+  },
+  sheetDefaultLevel: "pairs",
+  isLevel: (value) => isId(SHARE_IDS, value),
+});
+
+const GRID_IDS = ["tiles", "fence", "side"] as const;
+const GRID_ROWS: SkillRow[] = [
+  { key: "grid:tiles", label: "Count squares" },
+  { key: "grid:fence", label: "Around the shape" },
+  { key: "grid:side", label: "Missing side" },
+];
+
+export const gridCard = sceneCard("Garden", GRID_ROWS, {
+  id: "grid",
+  title: "Grid Garden",
+  audience: "Grades 2–4",
+  tint: "leaf",
+  mascot: "red-panda",
+  sheetSlug: "grid-garden",
+  sheetScreen: "sheet-grid",
+  blurb:
+    "Free area and perimeter practice for grades 2–4. Count unit squares in a shape, walk the fence around it, and find a missing side. No signup.",
+  levels: [
+    { id: "tiles", label: "Count squares", num: 1 },
+    { id: "fence", label: "Around the shape", num: 2 },
+    { id: "side", label: "Missing side", num: 3 },
+  ],
+  defaultLevel(grade) {
+    const fallback = ((): string => {
+      switch (grade) {
+        case "PK":
+        case "K":
+        case "1":
+        case "2":
+          return "tiles";
+        case "3":
+          return "fence";
+        case "4":
+          return "side";
+        default: {
+          const neverGrade: never = grade;
+          return neverGrade;
+        }
+      }
+    })();
+    return bandStart("grid", grade, GRID_IDS, fallback);
+  },
+  sheetDefaultLevel: "tiles",
+  isLevel: (value) => isId(GRID_IDS, value),
+});
+
+const PATTERN_IDS = ["tens", "fives", "twos", "hundreds", "rule", "grow"] as const;
+const PATTERN_ROWS: SkillRow[] = [
+  { key: "patterns:tens", label: "Count by tens" },
+  { key: "patterns:fives", label: "Count by fives" },
+  { key: "patterns:twos", label: "Count by twos" },
+  { key: "patterns:hundreds", label: "Count by hundreds" },
+  { key: "patterns:rule", label: "Next number" },
+  { key: "patterns:grow", label: "The rule" },
+];
+
+export const patternsCard = sceneCard("Patterns", PATTERN_ROWS, {
+  id: "patterns",
+  title: "Number Patterns",
+  audience: "K–4",
+  tint: "sand",
+  mascot: "bun",
+  sheetSlug: "number-patterns",
+  sheetScreen: "sheet-patterns",
+  blurb:
+    "Free skip-counting and number patterns for kindergarten through grade 4. Count by tens, fives, twos, and hundreds, then find the rule. No signup.",
+  levels: [
+    { id: "tens", label: "Count by tens", num: 1 },
+    { id: "fives", label: "Count by fives", num: 2 },
+    { id: "twos", label: "Count by twos", num: 3 },
+    { id: "hundreds", label: "Count by hundreds", num: 4 },
+    { id: "rule", label: "Next number", num: 5 },
+    { id: "grow", label: "The rule", num: 6 },
+  ],
+  defaultLevel(grade) {
+    const fallback = ((): string => {
+      switch (grade) {
+        case "PK":
+        case "K":
+        case "1":
+          return "tens";
+        case "2":
+          return "fives";
+        case "3":
+          return "rule";
+        case "4":
+          return "grow";
+        default: {
+          const neverGrade: never = grade;
+          return neverGrade;
+        }
+      }
+    })();
+    return bandStart("patterns", grade, PATTERN_IDS, fallback);
+  },
+  sheetDefaultLevel: "tens",
+  isLevel: (value) => isId(PATTERN_IDS, value),
+});
+
 /** Home-card order is also the island order. Append a game; do not insert one in front. */
 export const GAME_CARDS = [
   timesCard,
@@ -973,6 +1123,9 @@ export const GAME_CARDS = [
   problemsCard,
   variablesCard,
   graphsCard,
+  shareCard,
+  gridCard,
+  patternsCard,
 ] as const;
 
 export type GameId = (typeof GAME_CARDS)[number]["id"];

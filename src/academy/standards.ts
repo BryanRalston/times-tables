@@ -147,6 +147,26 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     scale: "3.MD.B.3",
     line: "4.MD.B.4",
   },
+  share: {
+    pairs: "2.OA.C.3",
+    fair: "2.OA.C.4",
+    groups: "3.OA.A.2",
+    facts: "3.OA.C.7",
+    left: "4.OA.A.3",
+  },
+  grid: {
+    tiles: "3.MD.C.6",
+    fence: "3.MD.D.8",
+    side: "4.MD.A.3",
+  },
+  patterns: {
+    tens: "K.CC.A.1",
+    fives: "2.NBT.A.2",
+    twos: "2.NBT.A.2",
+    hundreds: "2.NBT.A.2",
+    rule: "3.OA.D.9",
+    grow: "4.OA.C.5",
+  },
 };
 
 const CHIP_SKILL: Record<string, string> = {
@@ -213,6 +233,12 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "3.MD.A.1": { en: "Tell time to the minute", es: "Decir la hora al minuto" },
   "3.MD.B.3": { en: "Read a bar graph", es: "Leer una gráfica de barras" },
   "3.MD.C.5": { en: "Understand area", es: "Entender el área" },
+  "3.MD.C.6": { en: "Count unit squares", es: "Contar cuadrados unidad" },
+  "3.MD.D.8": { en: "Find the perimeter", es: "Hallar el perímetro" },
+  "3.OA.A.2": { en: "Share into equal groups", es: "Repartir en grupos iguales" },
+  "3.OA.D.9": { en: "Number patterns", es: "Patrones numéricos" },
+  "2.OA.C.3": { en: "Pair objects into equal groups", es: "Emparejar objetos en grupos iguales" },
+  "4.OA.C.5": { en: "Follow a number rule", es: "Seguir una regla numérica" },
   "3.MD.C.7": { en: "Find the area of a rectangle", es: "Hallar el área de un rectángulo" },
   "3.G.A.1": { en: "Sort shapes", es: "Clasificar figuras" },
   "3.G.A.2": { en: "Equal parts of a shape", es: "Partes iguales de una figura" },

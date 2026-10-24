@@ -455,7 +455,29 @@ export const BOSS_ZH: Record<string, BossEs> = {
     "personality": "Duck戴着纸皇冠，最喜欢整整齐齐的统计图。",
     "cosmeticName": "纸皇冠",
     "trophyName": "统计图奖杯"
-  }
+  },
+
+  "share": {
+    "taunt": "你能把饼干分得一样多吗？",
+    "friendly": "每个盘子都一样。来跟我一起分！",
+    "personality": "披着斗篷的鲨鱼，要让每个盘子都一样多。",
+    "cosmeticName": "饼干斗篷",
+    "trophyName": "分饼干奖杯"
+  },
+  "grid": {
+    "taunt": "我的园子里有多少格？",
+    "friendly": "每一条边你都走过了。来跟我一起搭！",
+    "personality": "穿着砖甲的小熊猫，专门量园子。",
+    "cosmeticName": "砖头盔",
+    "trophyName": "方格奖杯"
+  },
+  "patterns": {
+    "taunt": "下一个数是多少？",
+    "friendly": "你找到每次跳多少了。跟我一起跳！",
+    "personality": "戴着皇冠的小面包，沿着数字规律往前跳。",
+    "cosmeticName": "跳跃皇冠",
+    "trophyName": "规律奖杯"
+  },
 };
 
 export const TRAIT_ZH: Record<string, string> = {
@@ -1459,5 +1481,49 @@ export const ZH: Record<string, string> = {
   "Check each group.": "每一组都看一看。",
   "Sort and count": "分类再数数",
   "Picture and bar graphs": "象形统计图和条形统计图",
-  "Line plots with fractions": "带分数的点数图"
+  "Line plots with fractions": "带分数的点数图",
+  "Fair Shares": "平均分",
+  "Two plates": "两个盘子",
+  "Equal shares": "分得一样多",
+  "Groups of": "同样多的一组",
+  "Division facts": "除法口诀",
+  "Leftovers": "剩下的",
+  "Grid Garden": "方格园",
+  "Count squares": "数方格",
+  "Around the shape": "绕着图形",
+  "Missing side": "缺的边",
+  "Number Patterns": "数字规律",
+  "Count by tens": "十个十个",
+  "Count by fives": "五个五个",
+  "Count by twos": "两个两个",
+  "Count by hundreds": "一百一百",
+  "Next number": "下一个数",
+  "The rule": "规律",
+  "Grades 2–4": "二至四年级",
+  "Shares": "平均分",
+  "Garden": "方格园",
+  "Give one to each plate.": "每个盘子放一块。",
+  "Fill a group, then start the next one.": "先放满一组，再开始下一组。",
+  "Tap each square.": "点一下每一格。",
+  "Tap each edge.": "点一下每一条边。",
+  "Use the area or the distance around.": "用面积或者周长。",
+  "Look at the jump.": "看一看每次跳多少。",
+  "Deal the cookies, then pick an answer.": "先把饼干分好，再选答案。",
+  "Count the squares, then pick an answer.": "先数方格，再选答案。",
+  "Walk the fence, then pick an answer.": "先沿着边走一圈，再选答案。",
+  "Put a number on the blank.": "把一个数放到空格里。",
+  "Cookies to share": "要分的饼干",
+  "Plate": "盘子",
+  "Group": "一组",
+  "Square": "方格",
+  "Edge": "边",
+  "Pair objects into equal groups": "把物品配成相等的组",
+  "Share into equal groups": "分成相等的组",
+  "Count unit squares": "数单位正方形",
+  "Find the perimeter": "求周长",
+  "Number patterns": "数字规律",
+  "Follow a number rule": "按数字规律往后数",
+  "Free sharing and division practice for Pre-K through grade 4. Deal cookies onto plates, make equal groups, and see what is left over. No signup.": "学前班到四年级的免费平均分和除法练习。把饼干分到盘子里，做成相等的组，再看还剩多少。不用注册。",
+  "Free area and perimeter practice for grades 2–4. Count unit squares in a shape, walk the fence around it, and find a missing side. No signup.": "二至四年级的免费面积和周长练习。数图形里的方格，沿着四周走一圈，再求缺的边。不用注册。",
+  "Free skip-counting and number patterns for kindergarten through grade 4. Count by tens, fives, twos, and hundreds, then find the rule. No signup.": "幼儿园到四年级的免费跳着数和数字规律。按十、五、二和一百往后数，再找出规律。不用注册。",
 };

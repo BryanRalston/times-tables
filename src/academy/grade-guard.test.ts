@@ -13,6 +13,7 @@ import { GAMES } from "./games/registry";
 import { pileCents } from "./games/money-model";
 import { sightWords, type SightList } from "./games/sight-data";
 import { spellWords, type SpellLevel } from "./games/spell-data";
+import { shareAnswer } from "./games/share-data";
 import { TIME_MINUTES, type TimeLevel } from "./games/time";
 import { TIMES_SPEC, type TimesLevel } from "./games/times";
 import { FRACTION_DENOMINATORS, GRADE_BANDS, playWindow } from "./grade-map";
@@ -262,6 +263,71 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if (grade === "4") expect(["scale", "line"]).toContain(board.mode);
       break;
     }
+    case "share": {
+      expect(Number(question.answer)).toBe(shareAnswer(board));
+      expect(board.total).toBe(board.plates * board.each + board.leftover);
+      expect(board.each).toBeGreaterThanOrEqual(1);
+      expect(board.plates).toBeGreaterThanOrEqual(2);
+      if (board.mode === "pairs") {
+        expect(board.plates).toBe(2);
+        expect([2, 4, 6]).toContain(board.total);
+        expect(board.leftover).toBe(0);
+      }
+      if (board.mode === "fair" || board.mode === "facts") expect(board.leftover).toBe(0);
+      if (board.mode === "left") {
+        expect(board.leftover).toBeGreaterThanOrEqual(1);
+        expect(board.leftover).toBeLessThan(board.plates);
+      }
+      if (board.mode === "groups") expect([2, 5, 10]).toContain(board.each);
+      if (grade === "PK" || grade === "K" || grade === "1") expect(board.mode).toBe("pairs");
+      if (grade === "2") expect(["pairs", "fair"]).toContain(board.mode);
+      if (grade === "3") expect(["fair", "groups", "facts"]).toContain(board.mode);
+      if (grade === "4") expect(["groups", "facts", "left"]).toContain(board.mode);
+      expect(board.total).toBeLessThanOrEqual(board.mode === "groups" ? 20 : 18);
+      break;
+    }
+    case "grid": {
+      if (board.mode === "tiles" || board.mode === "fence") {
+        expect(board.cells.length).toBeGreaterThanOrEqual(3);
+        expect(board.cells.length).toBeLessThanOrEqual(6);
+        expect(board.cells.length).not.toBe(board.rows * board.cols);
+        if (board.mode === "tiles") expect(Number(question.answer)).toBe(board.cells.length);
+        if (board.mode === "fence") expect(Number(question.answer)).toBe(board.edges);
+      }
+      if (board.mode === "side") {
+        expect(board.missing).toBeGreaterThanOrEqual(2);
+        expect(board.known).toBeGreaterThanOrEqual(2);
+        expect(Number(question.answer)).toBe(board.missing);
+        const total = board.useArea ? board.known * board.missing : 2 * (board.known + board.missing);
+        expect(question.title).toContain(String(total));
+      }
+      if (grade === "2") expect(board.mode).toBe("tiles");
+      if (grade === "3") expect(["tiles", "fence"]).toContain(board.mode);
+      if (grade === "4") expect(["tiles", "fence", "side"]).toContain(board.mode);
+      break;
+    }
+    case "patterns": {
+      expect(board.step).toBeGreaterThan(0);
+      if (board.mode === "grow") {
+        expect(board.terms).toHaveLength(4);
+        expect(Number(question.answer) || question.answer).toBeTruthy();
+        expect(board.answer).toBe(board.step);
+      } else {
+        expect(board.terms).toHaveLength(3);
+        expect(question.answer).toBe(String(board.answer));
+        expect(board.answer).toBe((board.terms[2] ?? 0) + board.step);
+      }
+      if (board.mode === "tens") expect(board.step).toBe(10);
+      if (board.mode === "fives") expect(board.step).toBe(5);
+      if (board.mode === "twos") expect(board.step).toBe(2);
+      if (board.mode === "hundreds") expect(board.step).toBe(100);
+      if (grade === "K" || grade === "1") expect(board.mode).toBe("tens");
+      if (grade === "2") expect(["tens", "fives", "twos", "hundreds"]).toContain(board.mode);
+      if (grade === "3") expect(["hundreds", "rule"]).toContain(board.mode);
+      if (grade === "4") expect(["rule", "grow"]).toContain(board.mode);
+      expect(board.answer).toBeLessThanOrEqual(1000);
+      break;
+    }
     default: {
       const neverBoard: never = board;
       throw new Error(String(neverBoard));
@@ -406,6 +472,27 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
       expect(icons).toBeLessThanOrEqual(grade === "PK" || grade === "K" ? 6 : 8);
       break;
     }
+    case "share":
+      expect(task.total).toBe(task.plates * task.each + task.leftover);
+      expect(task.total).toBeLessThanOrEqual(task.mode === "groups" ? 20 : 18);
+      if (grade === "PK" || grade === "K" || grade === "1") expect(task.mode).toBe("pairs");
+      if (grade === "2") expect(["pairs", "fair"]).toContain(task.mode);
+      if (grade === "4") expect(["groups", "facts", "left"]).toContain(task.mode);
+      break;
+    case "grid":
+      if (task.mode !== "side") {
+        expect(task.cells.length).toBeGreaterThanOrEqual(3);
+        expect(task.cells.length).toBeLessThanOrEqual(6);
+      }
+      if (grade === "2") expect(task.mode).toBe("tiles");
+      if (grade === "4") expect(["tiles", "fence", "side"]).toContain(task.mode);
+      break;
+    case "pattern":
+      expect(task.answer).toBeLessThanOrEqual(1000);
+      if (grade === "K" || grade === "1") expect(task.mode).toBe("tens");
+      if (grade === "2") expect(["tens", "fives", "twos", "hundreds"]).toContain(task.mode);
+      if (grade === "4") expect(["rule", "grow"]).toContain(task.mode);
+      break;
     default: {
       const neverTask: never = task;
       throw new Error(String(neverTask));

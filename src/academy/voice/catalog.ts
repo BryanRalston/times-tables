@@ -149,14 +149,15 @@ export function collectSpokenLines(): SpokenLine[] {
       }
     }
   }
-  const graphs = GAMES.find((game) => game.id === "graphs");
-  if (graphs) {
-    for (const level of graphs.levels) {
+  for (const id of ["graphs", "share", "grid", "patterns"] as const) {
+    const game = GAMES.find((row) => row.id === id);
+    if (!game) continue;
+    for (const level of game.levels) {
       for (let i = 0; i < HAND_SAMPLES; i += 1) {
-        const task = makeHandsTask("graphs", level.id, rngFromSeed(`hands:graphs:${level.id}:${i}`));
-        push(lines, task.speech, "graphs");
-        push(lines, yourTurnLine(task.speech), "graphs");
-        push(lines, exampleFor(task).speech, "graphs");
+        const task = makeHandsTask(id, level.id, rngFromSeed(`hands:${id}:${level.id}:${i}`));
+        push(lines, task.speech, id);
+        push(lines, yourTurnLine(task.speech), id);
+        push(lines, exampleFor(task).speech, id);
       }
     }
   }

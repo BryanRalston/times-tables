@@ -27,6 +27,9 @@ const GAME_TITLE_ES: Record<string, string> = {
   problems: "Problemas",
   variables: "Qué falta",
   graphs: "Datos",
+  share: "Repartos",
+  grid: "Cuadrícula",
+  patterns: "Patrones",
 };
 
 interface NamedSheet {
