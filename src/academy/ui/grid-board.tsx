@@ -30,7 +30,7 @@ function Shape({
             <button
               key={key}
               type="button"
-              className={on ? "ac-cell is-on" : "ac-cell"}
+              className={on ? "ac-plot is-on" : "ac-plot"}
               style={{ gridColumn: x + 1, gridRow: y + 1 }}
               disabled={locked}
               aria-label={show("Square")}
@@ -38,7 +38,7 @@ function Shape({
             />
           );
         }
-        return <div key={key} className="ac-cell" style={{ gridColumn: x + 1, gridRow: y + 1 }} />;
+        return <div key={key} className="ac-plot" style={{ gridColumn: x + 1, gridRow: y + 1 }} />;
       })}
       {edges.map((edge) => (
         <EdgeButton key={`${edge.x},${edge.y},${edge.side}`} edge={edge} on={picked.includes(`${edge.x},${edge.y},${edge.side}`)} locked={locked} onToggle={onToggle} />
@@ -94,7 +94,7 @@ export function GridBench({
       <div className="ac-grid-play">
         <div className="ac-side-row" aria-hidden="true">
           {Array.from({ length: task.known }, (_, index) => (
-            <i key={index} className="ac-cell" />
+            <i key={index} className="ac-plot" />
           ))}
           <b>?</b>
         </div>
@@ -118,7 +118,7 @@ export function GridHands({ task, onAnswer }: { task: GridTask; onAnswer: (ok: b
         <div className="ac-grid-play">
           <div className="ac-side-row" aria-hidden="true">
             {Array.from({ length: task.known }, (_, index) => (
-              <i key={index} className="ac-cell" />
+              <i key={index} className="ac-plot" />
             ))}
             <b>?</b>
           </div>

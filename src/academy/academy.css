@@ -3264,7 +3264,7 @@ button.ac-go:disabled:active, button.ac-go:disabled { transform: none; }
   gap: 12px;
   width: 100%;
 }
-.ac-cookie-bank, .ac-plate, .ac-cell, .ac-stone, .ac-edge-hit {
+.ac-cookie-bank, .ac-plate, .ac-plot, .ac-stone, .ac-edge-hit {
   border: 3px solid #3d2a55;
   background: #fff;
   color: #3d2a55;
@@ -3281,7 +3281,7 @@ button.ac-go:disabled:active, button.ac-go:disabled { transform: none; }
   background: #fff8ef;
   box-shadow: 0 4px 0 #e2d3c0;
 }
-.ac-cookie-bank:active, .ac-plate:active, .ac-cell:active, .ac-stone:active { transform: translateY(2px); }
+.ac-cookie-bank:active, .ac-plate:active, .ac-plot:active, .ac-stone:active { transform: translateY(2px); }
 .ac-cookie {
   display: inline-block;
   width: 28px;
@@ -3317,15 +3317,16 @@ button.ac-go:disabled:active, button.ac-go:disabled { transform: none; }
   gap: 6px;
   justify-content: center;
 }
-.ac-cell {
+.ac-plot {
   width: 52px;
   height: 52px;
   border-radius: 10px;
   background: #f4e7c4;
   box-shadow: 0 3px 0 #e0c98a;
 }
-.ac-cell.is-on { background: #b7d98a; }
+.ac-plot.is-on { background: #b7d98a; }
 .ac-edge-hit {
+  z-index: 1;
   width: 44px;
   height: 22px;
   align-self: start;

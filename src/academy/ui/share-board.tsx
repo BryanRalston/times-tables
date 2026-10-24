@@ -24,16 +24,29 @@ export function ShareBench({
 
   function deal() {
     if (locked || bank <= 0) return;
-    const open = counts.findIndex((count) => count < task.each);
-    if (open >= 0) {
-      const next = [...counts];
-      next[open] = (next[open] ?? 0) + 1;
-      publish(next, bank - 1);
+    if (task.mode === "groups") {
+      const open = counts.findIndex((count) => count < task.each);
+      if (open >= 0) {
+        const next = [...counts];
+        next[open] = (next[open] ?? 0) + 1;
+        publish(next, bank - 1);
+        return;
+      }
+      if (counts.length < task.plates) publish([...counts, 1], bank - 1);
       return;
     }
-    if (task.mode === "groups" && counts.length < task.plates) {
-      publish([...counts, 1], bank - 1);
-    }
+    let open = -1;
+    let least = task.each;
+    counts.forEach((count, index) => {
+      if (count < least) {
+        least = count;
+        open = index;
+      }
+    });
+    if (open < 0) return;
+    const next = [...counts];
+    next[open] = (next[open] ?? 0) + 1;
+    publish(next, bank - 1);
   }
 
   function undo(index: number) {

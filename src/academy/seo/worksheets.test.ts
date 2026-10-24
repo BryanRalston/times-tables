@@ -402,6 +402,13 @@ function expectFresh(item: StaticItem) {
     expect(item.answer).toBe(`$${(sum / 100).toFixed(2)}`);
     return;
   }
+  const patternNext = item.prompt.match(/^(\d+), (\d+), (\d+), __\. What comes next\?$/);
+  if (patternNext) {
+    const step = Number(patternNext[2]) - Number(patternNext[1]);
+    expect(Number(patternNext[3]) - Number(patternNext[2])).toBe(step);
+    expect(item.answer).toBe(String(Number(patternNext[3]) + step));
+    return;
+  }
   if (item.prompt.includes("__")) {
     expect(item.prompt.match(/__/g)).toHaveLength(1);
     const filled = item.prompt.replace("__", item.answer);
@@ -460,13 +467,6 @@ function expectFresh(item: StaticItem) {
   const periSide = item.prompt.match(/^A rectangle has perimeter (\d+) and one side (\d+)\. What is the other side\?$/);
   if (periSide) {
     expect(item.answer).toBe(String(Number(periSide[1]) / 2 - Number(periSide[2])));
-    return;
-  }
-  const patternNext = item.prompt.match(/^(\d+), (\d+), (\d+), __\. What comes next\?$/);
-  if (patternNext) {
-    const step = Number(patternNext[2]) - Number(patternNext[1]);
-    expect(Number(patternNext[3]) - Number(patternNext[2])).toBe(step);
-    expect(item.answer).toBe(String(Number(patternNext[3]) + step));
     return;
   }
   const patternRule = item.prompt.match(/^(\d+), (\d+), (\d+), (\d+)\. What is the rule\?$/);

@@ -18,7 +18,7 @@ export const WARDROBE = [
   { id: "sun-hat", slot: "hat", price: 34, stars: 96, bond: 0, study: 0 },
   { id: "night-cap", slot: "hat", price: 38, stars: 0, bond: 15, study: 0 },
   { id: "party-crown", slot: "hat", price: 48, stars: 240, bond: 0, study: 0 },
-  { id: "star-glasses", slot: "face", price: 56, stars: 0, bond: 0, study: 15 },
+  { id: "star-glasses", slot: "face", price: 56, stars: 0, bond: 0, study: 18 },
 ] as const;
 
 export type WardrobeId = (typeof WARDROBE)[number]["id"];

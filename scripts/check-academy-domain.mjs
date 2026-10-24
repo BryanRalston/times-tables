@@ -458,7 +458,7 @@ if (manifestList.includes("/google2c987beeafe3d9b2.html")) fail("precache includ
 if (manifestList.some((url) => typeof url === "string" && (url.startsWith("/shots/") || url.includes("-game")))) {
   fail("precache includes a landing page or screenshot");
 }
-for (const id of ["times", "add", "time", "money", "sight", "spelling", "count", "place", "shapes", "fractions", "measure", "phonics", "problems", "variables", "graphs"]) {
+for (const id of ["times", "add", "time", "money", "sight", "spelling", "count", "place", "shapes", "fractions", "measure", "phonics", "problems", "variables", "graphs", "share", "grid", "patterns"]) {
   const shot = readFileSync(resolve(root, "shots", `${id}.png`));
   if (shot.subarray(0, 8).toString("hex") !== "89504e470d0a1a0a") fail(`${id} screenshot is not a png`);
   if (shot.readUInt32BE(16) !== 480 || shot.readUInt32BE(20) !== 720) {

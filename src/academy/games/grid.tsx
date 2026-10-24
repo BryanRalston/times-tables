@@ -33,7 +33,7 @@ export function GridChoices({ question, reveal, onChoose }: ChoiceProps) {
       {board.mode === "side" ? (
         <div className="ac-side-row" aria-hidden="true">
           {Array.from({ length: board.known }, (_, index) => (
-            <i key={index} className="ac-cell" />
+            <i key={index} className="ac-plot" />
           ))}
           <b>?</b>
         </div>
