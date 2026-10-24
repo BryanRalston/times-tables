@@ -96,6 +96,26 @@ describe("academy question generators", () => {
     }
   });
 
+  it("keeps both parts of a small sum visible and eases inside the level", () => {
+    for (const level of ["within5", "within10", "within20", "within100"] as const) {
+      for (let seed = 1; seed <= 30; seed++) {
+        const q = makeAddQuestion(rngFromSeed(`parts-${level}-${seed}`), level);
+        if (q.visual.kind !== "add") continue;
+        const total = q.visual.pink + q.visual.teal;
+        if (total >= 2) {
+          expect(q.visual.pink).toBeGreaterThanOrEqual(1);
+          expect(q.visual.teal).toBeGreaterThanOrEqual(1);
+        }
+      }
+    }
+    for (let seed = 1; seed <= 24; seed++) {
+      const gentle = makeAddQuestion(rngFromSeed(`gentle-${seed}`), "within20", ["ease:gentle"]);
+      const firm = makeAddQuestion(rngFromSeed(`firm-${seed}`), "within20", ["ease:firm"]);
+      if (gentle.visual.kind === "add") expect(gentle.visual.pink + gentle.visual.teal).toBeLessThanOrEqual(10);
+      if (firm.visual.kind === "add") expect(firm.visual.pink + firm.visual.teal).toBeGreaterThanOrEqual(11);
+    }
+  });
+
   it("reuses times facts inside the level and tags the fact key", () => {
     for (const level of TIMES_LEVELS) {
       const spec = TIMES_SPEC[level];

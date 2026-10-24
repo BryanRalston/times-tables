@@ -10,7 +10,7 @@ import { EGG_IDS, hatchPick } from "./egg";
 import { hostIdFor } from "./hosts";
 import { STUDY_PALS } from "./persona";
 import { bubbleText, buddyMotion, buddyReaction } from "./react";
-import { storyLine } from "./story";
+import { slotStory, storyLine } from "./story";
 import { openEgg, palOwned, withBuddy } from "./unlock";
 
 function child(partial: Partial<Child> = {}): Child {
@@ -99,6 +99,69 @@ describe("squishee unlocks", () => {
     expect(hidden).toContain("1 squishee");
     expect(hidden).toContain("3 squishees");
     expect(hidden).not.toContain("2");
+    const elapsed = storyLine({ kind: "time", hours: 2, minutes: 15, level: "elapsed" }, "peach", "panda");
+    expect(elapsed).toContain("How much time passed?");
+    expect(elapsed).not.toContain("What time is it?");
+    const color = storyLine(
+      {
+        kind: "scene",
+        picture: "",
+        hands: false,
+        quietChoices: false,
+        labels: {},
+        board: { game: "shapes", mode: "color", color: "red" },
+      },
+      "peach",
+      "panda",
+    );
+    expect(color).toContain("color");
+    expect(color).not.toContain("What shape is it?");
+    const size = storyLine(
+      {
+        kind: "scene",
+        picture: "",
+        hands: false,
+        quietChoices: false,
+        labels: {},
+        board: { game: "measure", mode: "size", ask: "bigger" },
+      },
+      "peach",
+      "panda",
+    );
+    expect(size).toContain("Which size?");
+    expect(size).not.toContain("How long");
+    const shared = storyLine(
+      {
+        kind: "add",
+        op: "-",
+        left: 31,
+        right: 0,
+        result: null,
+        pink: 31,
+        teal: 0,
+        max: 100,
+        hidden: 31,
+        solved: "31 − 0 = 31",
+      },
+      "peach",
+      "bear",
+    );
+    expect(shared).toContain("31 squishees");
+    expect(shared).not.toContain("has 31 squishees and");
+    const clock = slotStory(
+      { kind: "clock", hours: 3, minutes: 0, snap: 60, speech: "Show 3 o'clock.", skill: "time:hour", factKey: "3:00" },
+      "peach",
+      "panda",
+    );
+    expect(clock).toContain("sets the clock");
+    expect(clock).not.toContain("What time is it?");
+    const pay = slotStory(
+      { kind: "pay", cents: 25, bank: ["penny", "nickel", "dime", "quarter"], speech: "Pay 25¢.", skill: "money:make", factKey: "25" },
+      "peach",
+      "panda",
+    );
+    expect(pay).toContain("pay with coins");
+    expect(pay).not.toContain("How much do they have?");
     const one = storyLine(
       {
         kind: "add",

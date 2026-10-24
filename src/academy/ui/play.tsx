@@ -5,7 +5,9 @@ import {
   CLEAN_UP_AT,
   clockMastery,
   cloneSkills,
+  easeFromRound,
   freshMastery,
+  gameHasMarks,
   moveLadder,
   noteMark,
   openingForRound,
@@ -44,8 +46,10 @@ import { makeBossRound, makeQuestion } from "../games/round";
 import type { ChoiceQ } from "../games/types";
 import { coinsForRound, dueIdeas, newestUnlock, starsForRound, weakTimesFacts } from "../rewards";
 import {
+  choiceFact,
   exampleFor,
   handsOnSlots,
+  pickFreshQuestion,
   planReturn,
   similarSlot,
   slotFact,
@@ -189,17 +193,19 @@ export function PlayScreen({
   const calm = autoSpeakGrade(child.grade);
   const crownFight = crown && child.journey.bosses.includes(game);
   const openingBoss = crownFight || bossReady(child.journey, game, child.grade);
+  const practiced = gameHasMarks(child.skills, game);
+  const roundsHere = practiced ? Math.max(1, child.rounds) : 0;
   const openAt = blocked
     ? 0
     : openingForRound({
         savedIndex: baseIndex,
         startIndex: Math.max(0, spec?.levels.findIndex((row) => row.id === gradeWindow.start) ?? baseIndex),
-        roundsPlayed: child.rounds,
+        roundsPlayed: roundsHere,
         boss: openingBoss,
         bounds,
       });
   const roundLevel = spec?.levels[openAt]?.id ?? level;
-  const [planned, setPlanned] = useState(() => cardsThisRound(child.grade, child.rounds, openingBoss));
+  const [planned, setPlanned] = useState(() => cardsThisRound(child.grade, roundsHere, openingBoss));
   const cards = planned;
   const bossDef = bossForGame(game);
   const [roundId, setRoundId] = useState(0);
@@ -248,6 +254,9 @@ export function PlayScreen({
   const boundsRef = useRef(bounds);
   boundsRef.current = bounds;
   const ladderRef = useRef<Ladder>(startLadder(openAt));
+  const recentRef = useRef<string[]>([]);
+  const comboRef = useRef(0);
+  const missedRef = useRef(false);
   const handsRef = useRef<Set<number>>(new Set());
   const returnsRef = useRef<Map<number, RoundSlot>>(new Map());
   menuRef.current = menu;
@@ -277,14 +286,23 @@ export function PlayScreen({
       maxIndex: box.max,
     });
     const levelId = levels[pick.index]?.id ?? levels[box.min]?.id ?? level;
-    return makeQuestion(game, levelId, rngRandom(), preferIds());
+    const question = pickFreshQuestion(() => makeQuestion(game, levelId, rngRandom(), preferIds()), recentRef.current);
+    remember(choiceFact(question));
+    return question;
   }
 
   function preferIds(): string[] {
     const ideas = dueIdeas(skillsRef.current);
     const words = spec?.reviewKeys?.(child.words) ?? [];
     const facts = game === "times" ? weakTimesFacts(skillsRef.current) : [];
-    return [...ideas, ...words, ...facts];
+    const ease = easeFromRound({ combo: comboRef.current, missed: missedRef.current });
+    const tags = [...ideas, ...words, ...facts];
+    if (ease !== "steady") tags.push(`ease:${ease}`);
+    return tags;
+  }
+
+  function remember(fact: string) {
+    recentRef.current = [...recentRef.current, fact].slice(-8);
   }
 
   function stepUpAt(): number {
@@ -309,7 +327,11 @@ export function PlayScreen({
     if (queued) return { slot: queued, returning: true };
     const handsOn = handsRef.current.has(i);
     const lvl = levelNow();
-    if (handsOn) return { slot: makeHandsTask(game, lvl, rngRandom(), undefined, preferIds()), returning: false };
+    if (handsOn) {
+      const slot = makeHandsTask(game, lvl, rngRandom(), recentRef.current.at(-1), preferIds());
+      remember(slot.factKey);
+      return { slot, returning: false };
+    }
     return { slot: { kind: "choice", question: nextQuestion() }, returning: false };
   }
 
@@ -343,20 +365,25 @@ export function PlayScreen({
     const nextSpec = gameById(game);
     const nextBase = Math.max(boundsRef.current.min, nextSpec?.levels.findIndex((row) => row.id === nextLevel) ?? boundsRef.current.min);
     const nextBoss = crownFight || bossReady(child.journey, game, child.grade);
-    const nextPlanned = cardsThisRound(child.grade, child.rounds, nextBoss);
+    const nextPracticed = gameHasMarks(child.skills, game);
+    const nextRounds = nextPracticed ? Math.max(1, child.rounds) : 0;
+    const nextPlanned = cardsThisRound(child.grade, nextRounds, nextBoss);
     skillsRef.current = cloneSkills(child.skills);
     masteryRef.current = freshMastery();
     ladderRef.current = startLadder(
       openingForRound({
         savedIndex: nextBase,
         startIndex: Math.max(0, nextSpec?.levels.findIndex((row) => row.id === gradeWindow.start) ?? nextBase),
-        roundsPlayed: child.rounds,
+        roundsPlayed: nextRounds,
         boss: nextBoss,
         bounds: boundsRef.current,
       }),
     );
     handsRef.current = new Set(nextBoss ? [] : handsOnSlots(nextPlanned));
     returnsRef.current = new Map();
+    recentRef.current = [];
+    comboRef.current = 0;
+    missedRef.current = false;
     replayHereRef.current = false;
     practiceTaughtRef.current = false;
     answersRef.current = [];
@@ -414,6 +441,12 @@ export function PlayScreen({
       boss,
       crown: boss && crownFight,
     });
+    if (!boss && spec) {
+      const box = boundsRef.current;
+      const at = Math.max(box.min, Math.min(box.max, ladderRef.current.index));
+      const nextLevel = spec.levels[at]?.id;
+      if (nextLevel) onLevel(nextLevel);
+    }
   }
 
   function beginBattle() {
@@ -459,6 +492,7 @@ export function PlayScreen({
       applyShift(step.shift);
     }
     const nextCombo = served.returning ? 0 : fromCombo + 1;
+    comboRef.current = nextCombo;
     if (!served.returning) bestRef.current = Math.max(bestRef.current, nextCombo);
     setCombo(nextCombo);
     if (boss) {
@@ -473,7 +507,9 @@ export function PlayScreen({
     phaseRef.current = "feedback";
     setPhase("feedback");
     if (!boss) setCheer((n) => n + 1);
-    waitRef.current = window.setTimeout(() => advance(fromIndex), 880);
+    if (soundRef.current) speak(show("Yes!"), true);
+    const beat = nextCombo >= 3 ? 1200 : 900;
+    waitRef.current = window.setTimeout(() => advance(fromIndex), beat);
   }
 
   function beginTeach(slot: RoundSlot, source: "scored" | "practice") {
@@ -500,6 +536,8 @@ export function PlayScreen({
         applyShift(step.shift);
       }
     }
+    comboRef.current = 0;
+    missedRef.current = true;
     setCombo(0);
     if (boss) {
       setMood("raspberry");
@@ -847,6 +885,11 @@ export function PlayScreen({
             {correct} {show("of")} {total} · {liveStars} {liveStars === 1 ? show("star") : show("stars")} · +
             {coinsForRound(correct, total, bestCombo, boss)} {show("coins")}
           </p>
+          {bestCombo >= 3 ? (
+            <p className="ac-combo-note" data-combo={bestCombo}>
+              {t(`Combo ×${bestCombo}`, `Combo ×${bestCombo}`, `Combo ×${bestCombo}`, `Combo ×${bestCombo}`, `连击×${bestCombo}`, `कॉम्बो ×${bestCombo}`, `سلسلة ×${bestCombo}`)}
+            </p>
+          ) : null}
           {bossWonRound ? (
             <div className="ac-boss-win" data-boss-win={game}>
               <p>{bossDef.friendly}</p>
@@ -994,14 +1037,13 @@ export function PlayScreen({
                 {slot.kind !== "choice" ? (
                   <div className="ac-hands-layout">
                     {playBuddy}
+                    <p className="ac-story">{slotStory(slot, child.avatarId, hostId)}</p>
                     {phase === "feedback" ? (
                       <p className="ac-banner is-yes">{served ? praiseLine(served.slot) : show("Yes!")}</p>
-                    ) : (
-                      <>
-                        <p className="ac-story">{slotStory(slot, child.avatarId, hostId)}</p>
-                        <HandsBoard task={slot} onAnswer={(good) => answer(good)} />
-                      </>
-                    )}
+                    ) : null}
+                    <div className={phase === "feedback" ? "ac-hands-lock" : undefined}>
+                      <HandsBoard task={slot} onAnswer={(good) => answer(good)} />
+                    </div>
                   </div>
                 ) : choice ? (
                   <>

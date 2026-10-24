@@ -1,4 +1,5 @@
 import type { Rng } from "@/lib/rng";
+import { easeOf, easeSpan } from "../adapt";
 import { STORY_STARS, type StoryStar } from "../buddy/persona";
 import { countedNoun, howManyPhrase, nounMeasure, starLead, t, thingName } from "../i18n";
 import { problemsCard } from "./cards";
@@ -127,27 +128,33 @@ function storyTitle(rng: Rng, level: Exclude<ProblemLevel, "picture">, star: Sto
   `${star.pal} et ${star.name} partagent ${a} ${esItems} en ${b} tas égaux. ${esMany} y a-t-il dans chaque tas ?`, `${star.pal}和${star.name}把${countedNoun(thing, a)}分成${b}堆，每堆一样多。每堆有几${nounMeasure(thing)}${esItems}？`, `${star.pal} और ${star.name} ${a} ${esItems} को ${b} बराबर ढेरों में बाँटते हैं। हर ढेर में ${esMany}?`, `${star.pal} و${star.name} يقسمان ${a} ${esItems} إلى ${b} أكوام متساوية. ${esMany} في كل كومة؟`);
 }
 
-function makeStory(rng: Rng, level: Exclude<ProblemLevel, "picture">): ChoiceQ {
+function makeStory(rng: Rng, level: Exclude<ProblemLevel, "picture">, prefer: readonly string[] = []): ChoiceQ {
+  const ease = easeOf(prefer);
   const star = starOf(rng);
   const thing = rng.pick([...THINGS]);
   let a = 1;
   let b = 1;
   let op: ProblemBoard["op"] = "+";
   if (level === "add") {
-    a = rng.int(1, 9);
+    const span = easeSpan(1, 9, ease);
+    a = rng.int(span.lo, span.hi);
     b = rng.int(1, 10 - a);
     op = "+";
   } else if (level === "sub") {
-    a = rng.int(1, 12);
+    const span = easeSpan(1, 12, ease);
+    a = rng.int(span.lo, span.hi);
     b = rng.int(1, a);
     op = "-";
   } else if (level === "mult") {
-    a = rng.int(1, 5);
+    const span = easeSpan(1, 5, ease);
+    a = rng.int(span.lo, span.hi);
     b = rng.int(1, 5);
     op = "×";
   } else {
-    b = rng.int(2, 5);
-    const quotient = rng.int(1, 5);
+    const bags = easeSpan(2, 5, ease);
+    b = rng.int(bags.lo, bags.hi);
+    const quot = easeSpan(1, 5, ease);
+    const quotient = rng.int(quot.lo, quot.hi);
     a = b * quotient;
     op = "÷";
   }
@@ -202,11 +209,14 @@ function pictureOptions(groups: number, size: number): Array<{ groups: number; s
   return options;
 }
 
-function makePicture(rng: Rng): ChoiceQ {
+function makePicture(rng: Rng, prefer: readonly string[] = []): ChoiceQ {
+  const ease = easeOf(prefer);
   const star = starOf(rng);
   const thing = rng.pick([...THINGS]);
-  const groups = rng.int(2, 4);
-  const size = rng.int(1, 4);
+  const groupSpan = easeSpan(2, 4, ease);
+  const sizeSpan = easeSpan(1, 4, ease);
+  const groups = rng.int(groupSpan.lo, groupSpan.hi);
+  const size = rng.int(sizeSpan.lo, sizeSpan.hi);
   const options = pictureOptions(groups, size);
   const ids = options.map((_, i) => `p${i}`);
   const pictures: Record<string, string> = {};
@@ -252,18 +262,18 @@ function makePicture(rng: Rng): ChoiceQ {
   });
 }
 
-export function makeProblemQuestion(rng: Rng, level: ProblemLevel): ChoiceQ {
+export function makeProblemQuestion(rng: Rng, level: ProblemLevel, prefer: readonly string[] = []): ChoiceQ {
   switch (level) {
     case "add":
-      return makeStory(rng, "add");
+      return makeStory(rng, "add", prefer);
     case "sub":
-      return makeStory(rng, "sub");
+      return makeStory(rng, "sub", prefer);
     case "mult":
-      return makeStory(rng, "mult");
+      return makeStory(rng, "mult", prefer);
     case "div":
-      return makeStory(rng, "div");
+      return makeStory(rng, "div", prefer);
     case "picture":
-      return makePicture(rng);
+      return makePicture(rng, prefer);
     case "steps":
       return makeStepsQuestion(rng);
     default: {
@@ -382,7 +392,7 @@ function ProblemArt({ board }: { board: ProblemBoard }) {
 export const problemsGame = sceneModule({
   ...problemsCard,
   short: "Word Problems",
-  makeQuestion: (rng, level) => makeProblemQuestion(rng, isProblemLevel(level) ? level : "add"),
+  makeQuestion: (rng, level, prefer) => makeProblemQuestion(rng, isProblemLevel(level) ? level : "add", prefer),
   makeSheetItem: sheetItem,
   Prompt: ProblemsPrompt,
 });

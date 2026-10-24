@@ -1,5 +1,6 @@
 import { formatClockTime } from "@/lib/clock";
 import type { Rng } from "@/lib/rng";
+import { easeOf, easeSpan } from "../adapt";
 import { countedNoun, howManyPhrase, nounMeasure, t, thingName } from "../i18n";
 import { formatCents } from "./money-model";
 import { buddyName, pickTalk } from "./flavor";
@@ -708,9 +709,10 @@ export function makeDivideQuestion(rng: Rng): ChoiceQ {
   };
 }
 
-export function makeBigAddQuestion(rng: Rng, level: "within1000" | "thousands"): ChoiceQ {
+export function makeBigAddQuestion(rng: Rng, level: "within1000" | "thousands", prefer: readonly string[] = []): ChoiceQ {
   const max = level === "within1000" ? 1000 : 9999;
   const floor = level === "within1000" ? 40 : 200;
+  const span = easeSpan(floor, max, easeOf(prefer));
   const sub = rng.next() < 0.4;
   let pink = 0;
   let teal = 0;
@@ -718,14 +720,14 @@ export function makeBigAddQuestion(rng: Rng, level: "within1000" | "thousands"):
   let solved = "";
   let op: "+" | "-" = "+";
   if (!sub) {
-    const sum = rng.int(floor, max);
+    const sum = rng.int(span.lo, span.hi);
     pink = rng.int(Math.floor(floor / 2), sum - 10);
     teal = sum - pink;
     hidden = sum;
     solved = `${pink} + ${teal} = ${sum}`;
   } else {
     op = "-";
-    const total = rng.int(floor, max);
+    const total = rng.int(span.lo, span.hi);
     teal = rng.int(10, total - 10);
     pink = total - teal;
     hidden = pink;

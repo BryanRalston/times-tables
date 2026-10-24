@@ -130,10 +130,22 @@ export function similarChoice(game: string, question: ChoiceQ, rng: Rng): Choice
     ? question.skill.slice(question.game.length + 1)
     : question.skill;
   const fact = choiceFact(question);
-  let next = makeQuestion(game, level, rng);
+  const prefer = [...question.tags.filter((tag) => tag !== "ease:gentle" && tag !== "ease:firm"), "ease:gentle"];
+  let next = makeQuestion(game, level, rng, prefer);
   for (let i = 0; i < 8; i++) {
     if (choiceFact(next) !== fact) return next;
-    next = makeQuestion(game, level, rng);
+    next = makeQuestion(game, level, rng, prefer);
+  }
+  return next;
+}
+
+/** Skip a fact that was just on screen. The last try is returned if every draw repeats. */
+export function pickFreshQuestion(make: () => ChoiceQ, recent: readonly string[], tries = 8): ChoiceQ {
+  let next = make();
+  const seen = new Set(recent);
+  for (let i = 0; i < tries; i += 1) {
+    if (!seen.has(choiceFact(next))) return next;
+    next = make();
   }
   return next;
 }

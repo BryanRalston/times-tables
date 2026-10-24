@@ -167,6 +167,45 @@ export const CLEAN_UP_AT = 8;
 /** Misses of one idea before the ladder steps down. */
 export const IDEA_DOWN_AT = 2;
 
+export type Ease = "gentle" | "steady" | "firm";
+
+/** This game already has a scored try, so the next round can start where it left off. */
+export function gameHasMarks(skills: Record<string, { ok: number; miss: number }>, gameId: string): boolean {
+  const prefix = `${gameId}:`;
+  for (const [key, stat] of Object.entries(skills)) {
+    if (!key.startsWith(prefix)) continue;
+    if (stat.ok + stat.miss > 0) return true;
+  }
+  return false;
+}
+
+/**
+ * After a miss, the next questions use the easier half of the same level.
+ * A clean run of four uses the harder half. The level itself still waits
+ * for the mastery clock.
+ */
+export function easeFromRound(opts: { combo: number; missed: boolean }): Ease {
+  if (opts.missed && opts.combo < 2) return "gentle";
+  if (opts.combo >= 4) return "firm";
+  return "steady";
+}
+
+export function easeOf(prefer: readonly string[]): Ease {
+  if (prefer.includes("ease:gentle")) return "gentle";
+  if (prefer.includes("ease:firm")) return "firm";
+  return "steady";
+}
+
+/** Inclusive range. Steady returns the inputs. Gentle keeps the lower half. Firm keeps the upper half. */
+export function easeSpan(lo: number, hi: number, ease: Ease): { lo: number; hi: number } {
+  const low = Math.min(lo, hi);
+  const high = Math.max(lo, hi);
+  if (ease === "steady" || high <= low) return { lo: low, hi: high };
+  const span = high - low;
+  if (ease === "gentle") return { lo: low, hi: low + Math.floor(span / 2) };
+  return { lo: Math.min(high, low + Math.ceil(span / 2)), hi: high };
+}
+
 export interface MasteryClock {
   clean: number;
   answered: number;
