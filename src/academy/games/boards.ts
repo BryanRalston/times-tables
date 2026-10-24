@@ -171,7 +171,54 @@ export interface GraphsBoard {
   marks: number[];
 }
 
-export type Board = CountBoard | PlaceBoard | ShapeBoard | FractionBoard | MeasureBoard | PhonicsBoard | ProblemBoard | VariableBoard | GraphsBoard;
+export type ShareLevel = "pairs" | "fair" | "groups" | "facts" | "left";
+
+export interface ShareBoard {
+  game: "share";
+  mode: ShareLevel;
+  total: number;
+  plates: number;
+  each: number;
+  leftover: number;
+}
+
+export type GridLevel = "tiles" | "fence" | "side";
+
+export interface GridBoard {
+  game: "grid";
+  mode: GridLevel;
+  cells: [number, number][];
+  rows: number;
+  cols: number;
+  edges: number;
+  known: number;
+  missing: number;
+  useArea: boolean;
+}
+
+export type PatternLevel = "tens" | "fives" | "twos" | "hundreds" | "rule" | "grow";
+
+export interface PatternBoard {
+  game: "patterns";
+  mode: PatternLevel;
+  terms: number[];
+  step: number;
+  answer: number;
+}
+
+export type Board =
+  | CountBoard
+  | PlaceBoard
+  | ShapeBoard
+  | FractionBoard
+  | MeasureBoard
+  | PhonicsBoard
+  | ProblemBoard
+  | VariableBoard
+  | GraphsBoard
+  | ShareBoard
+  | GridBoard
+  | PatternBoard;
 
 export function countName(name: string, n: number): string {
   if (n === 1 && name.endsWith("s")) return name.slice(0, -1);

@@ -644,6 +644,51 @@ export const GAME_COPY: readonly GameCopy[] = [
       "يصنّف الأطفال ويعدّون ويضعون علامات حتى ثلاث مجموعات ويقرؤون رسوم الصور والأعمدة ويستخدمون مقياسًا ويقرؤون مخطط نقاط بالكسور.",
     ),
   },
+  {
+    id: "share",
+    slug: "sharing-game",
+    grades: ["PK", "K", "1", "2", "3", "4"],
+    name: phrase("fair shares", "repartos iguales", "partes iguais", "parts égales", "平均分", "बराबर बाँटना", "حصص متساوية"),
+    blurb: phrase(
+      "Kids deal cookies onto plates, make equal groups, practice division facts, and see what is left over.",
+      "Los niños reparten galletas en platos, hacen grupos iguales, practican la división y ven lo que sobra.",
+      "As crianças repartem biscoitos nos pratos, fazem grupos iguais, praticam a divisão e veem o que sobra.",
+      "Les enfants partagent des biscuits dans des assiettes, font des groupes égaux, s'exercent à la division et voient ce qui reste.",
+      "孩子把饼干分到盘子里，做成相等的组，练习除法，再看还剩多少。",
+      "बच्चे बिस्कुट प्लेटों पर बाँटते हैं, बराबर समूह बनाते हैं, भाग का अभ्यास करते हैं और देखते हैं कितने बचते हैं।",
+      "يوزّع الأطفال البسكويت على الأطباق ويكوّنون مجموعات متساوية ويتدرّبون على القسمة ويرون ما يبقى.",
+    ),
+  },
+  {
+    id: "grid",
+    slug: "grid-garden-game",
+    grades: ["2", "3", "4"],
+    name: phrase("grid garden", "jardín de cuadrícula", "jardim quadriculado", "jardin quadrillé", "方格园", "ग्रिड बगीचा", "حديقة المربعات"),
+    blurb: phrase(
+      "Kids count unit squares in a shape, walk the fence around it, and find a missing side.",
+      "Los niños cuentan cuadrados unidad, recorren el borde y hallan un lado que falta.",
+      "As crianças contam quadrados unitários, percorrem a cerca e acham um lado que falta.",
+      "Les enfants comptent les carrés unités, font le tour de la figure et trouvent un côté manquant.",
+      "孩子数图形里的方格，沿着四周走一圈，再求缺的边。",
+      "बच्चे आकृति के इकाई वर्ग गिनते हैं, बाड़ के चारों ओर चलते हैं और छूटी भुजा निकालते हैं।",
+      "يعدّ الأطفال مربعات الوحدة ويدورون حول الشكل ويجدون الضلع الناقص.",
+    ),
+  },
+  {
+    id: "patterns",
+    slug: "number-patterns-game",
+    grades: ["K", "1", "2", "3", "4"],
+    name: phrase("number patterns", "patrones numéricos", "padrões numéricos", "suites de nombres", "数字规律", "संख्या के पैटर्न", "أنماط الأعداد"),
+    blurb: phrase(
+      "Kids count by tens, fives, twos, and hundreds, then find the rule that grows the pattern.",
+      "Los niños cuentan de 10 en 10, de 5 en 5, de 2 en 2 y de 100 en 100, y luego hallan la regla.",
+      "As crianças contam de 10 em 10, de 5 em 5, de 2 em 2 e de 100 em 100, e depois acham a regra.",
+      "Les enfants comptent de 10 en 10, de 5 en 5, de 2 en 2 et de 100 en 100, puis trouvent la règle.",
+      "孩子按10、5、2和100往后数，再找出规律。",
+      "बच्चे दस, पाँच, दो और सौ के अंतर से गिनते हैं, फिर नियम ढूँढते हैं।",
+      "يعدّ الأطفال بالعشرات والخمسات والاثنين والمئات، ثم يجدون القاعدة.",
+    ),
+  },
 ];
 
 const SKILL_TEXT = `
@@ -757,6 +802,20 @@ graphs:picture|picture graphs for data|gráficas de dibujos de datos|gráficos d
 graphs:bar|bar graphs for data|gráficas de barras de datos|gráficos de barras de dados|graphiques à barres de données|数据条形图|आँकड़ों के बार ग्राफ|رسوم أعمدة للبيانات
 graphs:scale|scaled graphs|gráficas con escala|gráficos com escala|graphiques à échelle|带刻度的图表|पैमाने वाले ग्राफ|رسوم بمقياس
 graphs:line|line plots|diagramas de puntos|diagramas de pontos|diagrammes à points|折线点图|लाइन प्लॉट|مخططات النقاط
+share:pairs|two equal plates|dos platos iguales|dois pratos iguais|deux assiettes égales|两个一样的盘子|दो बराबर प्लेट|طبقان متساويان
+share:fair|equal shares|repartos iguales|partes iguais|parts égales|平均分|बराबर बाँट|حصص متساوية
+share:groups|groups of the same size|grupos del mismo tamaño|grupos do mesmo tamanho|groupes de même taille|同样多的一组|एक जैसे समूह|مجموعات متساوية
+share:facts|division facts|division exacta|divisão exata|division exacte|除法口诀|भाग के तथ्य|حقائق القسمة
+share:left|leftovers|lo que sobra|o que sobra|ce qui reste|剩下的|बचे हुए|الباقي
+grid:tiles|counting unit squares|contar cuadrados unidad|contar quadrados unitários|compter les carrés unités|数单位方格|इकाई वर्ग गिनना|عدّ مربعات الوحدة
+grid:fence|distance around a shape|distancia alrededor|distância ao redor|tour d'une figure|图形的周长|आकृति के चारों ओर|المسافة حول الشكل
+grid:side|a missing side|un lado que falta|um lado que falta|un côté manquant|缺的边|छूटी भुजा|ضلع ناقص
+patterns:tens|counting by tens|contar de 10 en 10|contar de 10 em 10|compter de 10 en 10|十个十个数|दस-दस गिनना|العدّ بالعشرات
+patterns:fives|counting by fives|contar de 5 en 5|contar de 5 em 5|compter de 5 en 5|五个五个数|पाँच-पाँच गिनना|العدّ بالخمسات
+patterns:twos|counting by twos|contar de 2 en 2|contar de 2 em 2|compter de 2 en 2|两个两个数|दो-दो गिनना|العدّ بالاثنين
+patterns:hundreds|counting by hundreds|contar de 100 en 100|contar de 100 em 100|compter de 100 en 100|一百一百地数|सौ-सौ गिनना|العدّ بالمئات
+patterns:rule|the next number|el número que sigue|o próximo número|le nombre suivant|下一个数|अगली संख्या|العدد التالي
+patterns:grow|the rule of a pattern|la regla del patrón|a regra do padrão|la règle de la suite|规律是什么|पैटर्न का नियम|قاعدة النمط
 `;
 
 function loadSkills(): Record<string, Phrase> {
@@ -844,6 +903,9 @@ const SHEET_H1: Record<string, Phrase> = {
   "Like fractions and decimals": rest("fracciones iguales y decimales", "frações de mesmo denominador e decimais", "fractions de même dénominateur et décimales", "同分母分数和小数", "समान भिन्न और दशमलव", "كسور متشابهة وأعداد عشرية"),
   "Area, time, and money": rest("área, tiempo y dinero", "área, tempo e dinheiro", "aire, temps et argent", "面积、时间和钱", "क्षेत्रफल, समय और पैसे", "المساحة والوقت والنقود"),
   "Data and graphs": rest("datos y gráficas", "dados e gráficos", "données et graphiques", "数据和图表", "आँकड़े और ग्राफ", "بيانات ورسوم"),
+  "Fair shares": rest("repartos iguales", "partes iguais", "parts égales", "平均分", "बराबर बाँटना", "حصص متساوية"),
+  "Grid garden": rest("jardín de cuadrícula", "jardim quadriculado", "jardin quadrillé", "方格园", "ग्रिड बगीचा", "حديقة المربعات"),
+  "Number patterns": rest("patrones numéricos", "padrões numéricos", "suites de nombres", "数字规律", "संख्या के पैटर्न", "أنماط الأعداد"),
 };
 
 export function sheetH1(englishH1: string, lang: SeoLang): string {

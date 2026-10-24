@@ -5,6 +5,9 @@ import { addGame } from "./add";
 import { countGame } from "./count";
 import { fractionsGame } from "./fractions";
 import { graphsGame } from "./graphs";
+import { gridGame } from "./grid";
+import { patternsGame } from "./patterns";
+import { shareGame } from "./share";
 import { measureGame } from "./measure";
 import { moneyGame } from "./money";
 import { phonicsGame } from "./phonics";
@@ -38,6 +41,9 @@ export const GAMES = [
   problemsGame,
   variablesGame,
   graphsGame,
+  shareGame,
+  gridGame,
+  patternsGame,
 ] as const;
 
 export type GameId = (typeof GAMES)[number]["id"];

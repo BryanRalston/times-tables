@@ -307,3 +307,54 @@ Pre-K missing numbers are coming later. Kindergarten and grade 1 stay on a missi
 | 4 | Play | Two-step blank | Two-step blank | One level down (times blank) | 4.OA.A.2, 4.OA.A.3 |
 
 Kindergarten and grade 1 do not see subtraction blanks, missing factors, or two-step equations.
+
+## Fair Shares
+
+Levels, easy to hard: two plates, equal shares, groups of, division facts, leftovers.
+
+The child deals cookies onto plates. Two plates uses 2, 4, or 6 cookies and asks how many land on each plate. Equal shares uses two to four plates with nothing left over. Groups of asks how many groups of 2, 5, or 10 the cookies make. Division facts asks the same equal-share question with a larger total. Leftovers leaves fewer extras than there are plates.
+
+| Grade | Offer | Start | Core levels | Cap without challenge | Standards |
+|---|---|---|---|---|---|
+| Pre-K | Gentle intro | Two plates | Two plates | Two plates | K.CC.B.5 |
+| K | Gentle intro | Two plates | Two plates | Two plates | K.CC.B.5 |
+| 1 | Play | Two plates | Two plates | Two plates | 1.OA.C.5 |
+| 2 | Play | Equal shares | Two plates, equal shares | Equal shares | 2.OA.C.3, 2.OA.C.4 |
+| 3 | Play | Division facts | Groups of, division facts | Division facts | 3.OA.A.2, 3.OA.C.7 |
+| 4 | Play | Leftovers | Division facts, leftovers | One level down (groups of) | 4.OA.A.3, 3.OA.C.7 |
+
+Pre-K and kindergarten only deal two plates. Grade 1 stays there too. Grade 2 can drift down to two plates and cannot climb into groups of. Grade 3 can drift down to equal shares and cannot climb into leftovers. Grade 4 can drift down to groups of.
+
+## Grid Garden
+
+Levels, easy to hard: count squares, around the shape, missing side.
+
+The shape is an irregular group of unit squares, never a filled rectangle. Count squares asks how many squares are in the shape. Around the shape asks for the distance around, counted as the outside edges. Missing side gives the area or the distance around plus one side, and asks for the other side.
+
+| Grade | Offer | Start | Core levels | Cap without challenge | Standards |
+|---|---|---|---|---|---|
+| Pre-K | Coming later | — | — | — | Grid garden waits |
+| K | Coming later | — | — | — | Grid garden waits |
+| 1 | Coming later | — | — | — | Grid garden waits |
+| 2 | Gentle intro | Count squares | Count squares | Count squares | 2.G.A.2 |
+| 3 | Play | Around the shape | Count squares, around the shape | Around the shape | 3.MD.C.6, 3.MD.D.8 |
+| 4 | Play | Missing side | Around the shape, missing side | One level down (count squares) | 4.MD.A.3, 3.MD.D.8 |
+
+Pre-K through grade 1 stay locked. Grade 2 only counts squares. Grade 3 can drift down to count squares and cannot climb into a missing side. Grade 4 can drift down to count squares.
+
+## Number Patterns
+
+Levels, easy to hard: count by tens, count by fives, count by twos, count by hundreds, next number, the rule.
+
+Count by tens, fives, twos, and hundreds shows three numbers and asks for the next one. Next number uses a step of 2, 3, 4, 5, or 10. The rule shows the whole row and asks which step built it.
+
+| Grade | Offer | Start | Core levels | Cap without challenge | Standards |
+|---|---|---|---|---|---|
+| Pre-K | Coming later | — | — | — | Number patterns wait |
+| K | Gentle intro | Count by tens | Count by tens | Count by tens | K.CC.A.1 |
+| 1 | Play | Count by tens | Count by tens | Count by tens | 1.NBT.A.1 |
+| 2 | Play | Count by fives | Count by fives, count by twos, count by hundreds | Count by hundreds | 2.NBT.A.2 |
+| 3 | Play | Next number | Next number | Next number | 3.OA.D.9 |
+| 4 | Play | The rule | The rule | One level down (next number) | 4.OA.C.5 |
+
+Pre-K stays locked. Kindergarten and grade 1 only count by tens. Grade 2 can drift down to tens and cannot climb into next number. Grade 3 can drift down to hundreds and cannot climb into the rule. Grade 4 can drift down to next number.

@@ -23,6 +23,9 @@ const GAMES = [
   "problems",
   "variables",
   "graphs",
+  "share",
+  "grid",
+  "patterns",
 ];
 
 function portOpen(port) {

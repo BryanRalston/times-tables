@@ -455,7 +455,29 @@ export const BOSS_FR: Record<string, BossEs> = {
     "personality": "Une Duck avec une couronne en papier qui adore un graphique bien rangé.",
     "cosmeticName": "Couronne en papier",
     "trophyName": "Trophée du graphique"
-  }
+  },
+
+  "share": {
+    "taunt": "Tu arrives à partager les biscuits également ?",
+    "friendly": "Chaque assiette est pareille. Viens partager avec moi !",
+    "personality": "Un requin en cape qui vérifie que chaque assiette est pareille.",
+    "cosmeticName": "Cape de miettes",
+    "trophyName": "Trophée du partage"
+  },
+  "grid": {
+    "taunt": "Combien de carrés y a-t-il dans mon jardin ?",
+    "friendly": "Tu as suivi chaque bord. Viens construire avec moi !",
+    "personality": "Un panda roux en armure de briques qui mesure le jardin.",
+    "cosmeticName": "Casque de brique",
+    "trophyName": "Trophée du quadrillage"
+  },
+  "patterns": {
+    "taunt": "Quel nombre vient ensuite ?",
+    "friendly": "Tu as trouvé le saut. Saute avec moi !",
+    "personality": "Un petit pain couronné qui saute le long d'une suite.",
+    "cosmeticName": "Couronne du saut",
+    "trophyName": "Trophée de la suite"
+  },
 };
 
 export const TRAIT_FR: Record<string, string> = {
@@ -1458,5 +1480,49 @@ export const FR: Record<string, string> = {
   "Check each group.": "Vérifie chaque groupe.",
   "Sort and count": "Trier et compter",
   "Picture and bar graphs": "Graphiques à images et en barres",
-  "Line plots with fractions": "Diagrammes à points avec des fractions"
+  "Line plots with fractions": "Diagrammes à points avec des fractions",
+  "Fair Shares": "Parts égales",
+  "Two plates": "Deux assiettes",
+  "Equal shares": "Parts égales",
+  "Groups of": "Groupes de",
+  "Division facts": "Division exacte",
+  "Leftovers": "Ce qui reste",
+  "Grid Garden": "Jardin quadrillé",
+  "Count squares": "Compter les carrés",
+  "Around the shape": "Autour de la figure",
+  "Missing side": "Côté manquant",
+  "Number Patterns": "Suites de nombres",
+  "Count by tens": "De 10 en 10",
+  "Count by fives": "De 5 en 5",
+  "Count by twos": "De 2 en 2",
+  "Count by hundreds": "De 100 en 100",
+  "Next number": "Nombre suivant",
+  "The rule": "La règle",
+  "Grades 2–4": "CE1 au CM1",
+  "Shares": "Partages",
+  "Garden": "Jardin",
+  "Give one to each plate.": "Donne-en un à chaque assiette.",
+  "Fill a group, then start the next one.": "Remplis un groupe, puis commence le suivant.",
+  "Tap each square.": "Touche chaque carré.",
+  "Tap each edge.": "Touche chaque bord.",
+  "Use the area or the distance around.": "Utilise l'aire ou le tour.",
+  "Look at the jump.": "Regarde le saut.",
+  "Deal the cookies, then pick an answer.": "Partage les biscuits, puis choisis une réponse.",
+  "Count the squares, then pick an answer.": "Compte les carrés, puis choisis une réponse.",
+  "Walk the fence, then pick an answer.": "Fais le tour, puis choisis une réponse.",
+  "Put a number on the blank.": "Mets un nombre dans la case.",
+  "Cookies to share": "Biscuits à partager",
+  "Plate": "Assiette",
+  "Group": "Groupe",
+  "Square": "Carré",
+  "Edge": "Bord",
+  "Pair objects into equal groups": "Apparier des objets en groupes égaux",
+  "Share into equal groups": "Partager en groupes égaux",
+  "Count unit squares": "Compter les carrés unités",
+  "Find the perimeter": "Trouver le périmètre",
+  "Number patterns": "Suites de nombres",
+  "Follow a number rule": "Suivre une règle de nombres",
+  "Free sharing and division practice for Pre-K through grade 4. Deal cookies onto plates, make equal groups, and see what is left over. No signup.": "Partage et division gratuits, de la maternelle au CM1. Partage des biscuits dans des assiettes, fais des groupes égaux et vois ce qui reste. Sans compte.",
+  "Free area and perimeter practice for grades 2–4. Count unit squares in a shape, walk the fence around it, and find a missing side. No signup.": "Aire et périmètre gratuits pour le CE1 au CM1. Compte les carrés unités, fais le tour de la figure et trouve un côté manquant. Sans compte.",
+  "Free skip-counting and number patterns for kindergarten through grade 4. Count by tens, fives, twos, and hundreds, then find the rule. No signup.": "Comptage par sauts et suites de nombres gratuits, de la grande section au CM1. Compte de 10 en 10, de 5 en 5, de 2 en 2 et de 100 en 100, puis trouve la règle. Sans compte.",
 };

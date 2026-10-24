@@ -4,6 +4,9 @@ import { ArrayBoard, BlocksBoard, CountBoard, FrameBoard, ShadeBoard } from "./n
 import { LetterBoard, PhonicsBoard, SightBoard } from "./word-boards";
 import { TraceBoard } from "./trace-board";
 import { GraphsHands } from "./graph-board";
+import { GridHands } from "./grid-board";
+import { PatternHands } from "./pattern-board";
+import { ShareHands } from "./share-board";
 import { BlankBoard, MeasureBoard, ShapeBoard, StoryBoard } from "./world-boards";
 
 export function HandsBoard({
@@ -46,6 +49,12 @@ export function HandsBoard({
       return <TraceBoard task={task} onAnswer={onAnswer} />;
     case "graphs":
       return <GraphsHands task={task} onAnswer={onAnswer} />;
+    case "share":
+      return <ShareHands task={task} onAnswer={onAnswer} />;
+    case "grid":
+      return <GridHands task={task} onAnswer={onAnswer} />;
+    case "pattern":
+      return <PatternHands task={task} onAnswer={onAnswer} />;
     default: {
       const neverTask: never = task;
       return neverTask;

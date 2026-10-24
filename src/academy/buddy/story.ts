@@ -622,6 +622,36 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string): s
       `${buddy}，${trait}，和${host}一起找缺少的数。`, `${buddy} ${trait} और ${host} छिपी संख्या ढूँढते हैं।`, `${buddy} ${trait} و${host} يجدان العدد الناقص.`);
     case "graphs":
       return graphStory(board, buddy, host);
+    case "share":
+      return say(
+        `${buddy} and ${host} share the cookies.`,
+        `${buddy} y ${host} reparten las galletas.`,
+        `${buddy} e ${host} repartem os biscoitos.`,
+        `${buddy} et ${host} partagent les biscuits.`,
+        `${buddy}和${host}一起分饼干。`,
+        `${buddy} और ${host} बिस्कुट बाँटते हैं।`,
+        `${buddy} و${host} يتقاسمان البسكويت.`,
+      );
+    case "grid":
+      return say(
+        `${buddy} and ${host} count the squares.`,
+        `${buddy} y ${host} cuentan los cuadrados.`,
+        `${buddy} e ${host} contam os quadrados.`,
+        `${buddy} et ${host} comptent les carrés.`,
+        `${buddy}和${host}一起数方格。`,
+        `${buddy} और ${host} वर्ग गिनते हैं।`,
+        `${buddy} و${host} يعدّان المربعات.`,
+      );
+    case "patterns":
+      return say(
+        `${buddy} and ${host} find what comes next.`,
+        `${buddy} y ${host} buscan qué sigue.`,
+        `${buddy} e ${host} procuram o que vem depois.`,
+        `${buddy} et ${host} cherchent ce qui vient ensuite.`,
+        `${buddy}和${host}找下一个数。`,
+        `${buddy} और ${host} आगे की संख्या ढूँढते हैं।`,
+        `${buddy} و${host} يجدان العدد التالي.`,
+      );
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -689,6 +719,12 @@ function handsStory(kind: Exclude<RoundSlot, { kind: "choice" }>["kind"], buddy:
       return say(`${buddy} and ${host} trace together.`, `${buddy} y ${host} trazan juntos.`, `${buddy} e ${host} traçam juntos.`, `${buddy} et ${host} tracent ensemble.`, `${buddy}和${host}一起描。`, `${buddy} और ${host} साथ ट्रेस करते हैं।`, `${buddy} و${host} يتتبعان معًا.`);
     case "graphs":
       return say(`${buddy} and ${host} build the graph.`, `${buddy} y ${host} arman la gráfica.`, `${buddy} e ${host} montam o gráfico.`, `${buddy} et ${host} construisent le graphique.`, `${buddy}和${host}把统计图做出来。`, `${buddy} और ${host} आलेख बनाते हैं।`, `${buddy} و${host} يصنعان المخطط.`);
+    case "share":
+      return say(`${buddy} and ${host} deal the cookies.`, `${buddy} y ${host} reparten las galletas.`, `${buddy} e ${host} repartem os biscoitos.`, `${buddy} et ${host} distribuent les biscuits.`, `${buddy}和${host}把饼干分好。`, `${buddy} और ${host} बिस्कुट बाँटते हैं।`, `${buddy} و${host} يوزّعان البسكويت.`);
+    case "grid":
+      return say(`${buddy} and ${host} walk the shape.`, `${buddy} y ${host} recorren la figura.`, `${buddy} e ${host} percorrem a figura.`, `${buddy} et ${host} font le tour de la figure.`, `${buddy}和${host}沿着图形走一圈。`, `${buddy} और ${host} आकृति के चारों ओर चलते हैं।`, `${buddy} و${host} يدوران حول الشكل.`);
+    case "pattern":
+      return say(`${buddy} and ${host} finish the pattern.`, `${buddy} y ${host} completan el patrón.`, `${buddy} e ${host} completam o padrão.`, `${buddy} et ${host} finissent la suite.`, `${buddy}和${host}把规律补完。`, `${buddy} और ${host} पैटर्न पूरा करते हैं।`, `${buddy} و${host} يكملان النمط.`);
     default: {
       const neverKind: never = kind;
       return neverKind;

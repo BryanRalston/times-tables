@@ -69,7 +69,7 @@ describe("Arabic copy", () => {
     expect(blob).not.toMatch(/[¡¿]/);
     expect(PERSONA_FALLBACK_AR.line.length).toBeGreaterThan(2);
     expect(Object.keys(PERSONA_AR)).toHaveLength(42);
-    expect(Object.keys(BOSS_AR)).toHaveLength(15);
+    expect(Object.keys(BOSS_AR)).toHaveLength(18);
     expect(Object.keys(TRAIT_AR).length).toBeGreaterThanOrEqual(10);
   });
 

@@ -402,6 +402,13 @@ function expectFresh(item: StaticItem) {
     expect(item.answer).toBe(`$${(sum / 100).toFixed(2)}`);
     return;
   }
+  const patternNext = item.prompt.match(/^(\d+), (\d+), (\d+), __\. What comes next\?$/);
+  if (patternNext) {
+    const step = Number(patternNext[2]) - Number(patternNext[1]);
+    expect(Number(patternNext[3]) - Number(patternNext[2])).toBe(step);
+    expect(item.answer).toBe(String(Number(patternNext[3]) + step));
+    return;
+  }
   if (item.prompt.includes("__")) {
     expect(item.prompt.match(/__/g)).toHaveLength(1);
     const filled = item.prompt.replace("__", item.answer);
@@ -422,6 +429,52 @@ function expectFresh(item: StaticItem) {
     if (op === "−") expect(left - right).toBe(result);
     if (op === "×") expect(left * right).toBe(result);
     if (op === "÷") expect(left / right).toBe(result);
+    return;
+  }
+  const shareEach = item.prompt.match(/^Share (\d+) cookies onto (\d+) plates\. How many on each plate\?$/);
+  if (shareEach) {
+    expect(Number(shareEach[1]) % Number(shareEach[2])).toBe(0);
+    expect(item.answer).toBe(String(Number(shareEach[1]) / Number(shareEach[2])));
+    return;
+  }
+  const shareGroups = item.prompt.match(/^Share (\d+) cookies into groups of (\d+)\. How many groups\?$/);
+  if (shareGroups) {
+    expect(Number(shareGroups[1]) % Number(shareGroups[2])).toBe(0);
+    expect(item.answer).toBe(String(Number(shareGroups[1]) / Number(shareGroups[2])));
+    return;
+  }
+  const shareLeft = item.prompt.match(/^Share (\d+) cookies onto (\d+) plates\. How many are left over\?$/);
+  if (shareLeft) {
+    expect(item.answer).toBe(String(Number(shareLeft[1]) % Number(shareLeft[2])));
+    return;
+  }
+  const ell = item.prompt.match(/^An L is (\d+) squares tall plus (\d+) more\. How many squares\?$/);
+  if (ell) {
+    expect(item.answer).toBe(String(Number(ell[1]) + Number(ell[2])));
+    return;
+  }
+  const figure = item.prompt.match(/^A figure of (\d+) squares has (\d+) shared sides\. How many units around\?$/);
+  if (figure) {
+    expect(item.answer).toBe(String(4 * Number(figure[1]) - 2 * Number(figure[2])));
+    return;
+  }
+  const areaSide = item.prompt.match(/^A rectangle has area (\d+) and one side (\d+)\. What is the other side\?$/);
+  if (areaSide) {
+    expect(Number(areaSide[1]) % Number(areaSide[2])).toBe(0);
+    expect(item.answer).toBe(String(Number(areaSide[1]) / Number(areaSide[2])));
+    return;
+  }
+  const periSide = item.prompt.match(/^A rectangle has perimeter (\d+) and one side (\d+)\. What is the other side\?$/);
+  if (periSide) {
+    expect(item.answer).toBe(String(Number(periSide[1]) / 2 - Number(periSide[2])));
+    return;
+  }
+  const patternRule = item.prompt.match(/^(\d+), (\d+), (\d+), (\d+)\. What is the rule\?$/);
+  if (patternRule) {
+    const step = Number(patternRule[2]) - Number(patternRule[1]);
+    expect(Number(patternRule[3]) - Number(patternRule[2])).toBe(step);
+    expect(Number(patternRule[4]) - Number(patternRule[3])).toBe(step);
+    expect(item.answer).toBe(`add ${step}`);
     return;
   }
   throw new Error(`unchecked worksheet prompt: ${item.prompt}`);

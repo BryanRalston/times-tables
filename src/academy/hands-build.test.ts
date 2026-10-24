@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
+import { gridCellKeys, gridEdgeKeys, gridMatches } from "./games/grid-data";
+import { patternMatches } from "./games/patterns-data";
 import { GAMES } from "./games/registry";
+import { shareMatches } from "./games/share-data";
 import { guideInk, traceMatches } from "./trace/score";
 import { TIMES_SPEC, type TimesLevel } from "./games/times";
 import { FRACTION_DENOMINATORS } from "./grade-map";
@@ -51,6 +54,12 @@ function canSpell(word: string, labels: readonly string[]): boolean {
   return true;
 }
 
+function gridRight(task: Extract<BuildTask, { kind: "grid" }>): string[] {
+  if (task.mode === "tiles") return gridCellKeys(task.cells);
+  if (task.mode === "fence") return gridEdgeKeys(task.cells);
+  return [String(task.missing)];
+}
+
 function builtOf(task: BuildTask): boolean {
   switch (task.kind) {
     case "array":
@@ -84,6 +93,12 @@ function builtOf(task: BuildTask): boolean {
       return traceMatches(task.glyph, guideInk(task.glyph));
     case "graphs":
       return graphsMatches(task, task.mode === "line" ? task.stacks : task.cats.map((cat) => cat.icons));
+    case "share":
+      return shareMatches(task, Array.from({ length: task.plates }, () => task.each), task.leftover);
+    case "grid":
+      return gridMatches(task, gridRight(task));
+    case "pattern":
+      return patternMatches(task, task.answer);
     default: {
       const neverTask: never = task;
       return neverTask;
@@ -126,6 +141,12 @@ function wrongOf(task: BuildTask): boolean {
       const target = task.mode === "line" ? task.stacks : task.cats.map((cat) => cat.icons);
       return graphsMatches(task, target.map((count, index) => (index === 0 ? count + 1 : count)));
     }
+    case "share":
+      return shareMatches(task, Array.from({ length: task.plates }, () => task.each), task.leftover + 1);
+    case "grid":
+      return gridMatches(task, []);
+    case "pattern":
+      return patternMatches(task, task.answer + 1);
     default: {
       const neverTask: never = task;
       return neverTask;
@@ -203,6 +224,18 @@ function assertBounds(task: HandsTask, level: string): void {
       break;
     case "graphs":
       assertGraphs(task);
+      break;
+    case "share":
+      expect(task.total).toBe(task.plates * task.each + task.leftover);
+      expect(task.plates).toBeGreaterThanOrEqual(2);
+      break;
+    case "grid":
+      if (task.mode === "side") expect(task.missing).toBeGreaterThanOrEqual(2);
+      else expect(task.cells.length).toBeGreaterThanOrEqual(3);
+      break;
+    case "pattern":
+      expect(task.terms.length).toBeGreaterThanOrEqual(3);
+      expect(task.step).toBeGreaterThan(0);
       break;
     default: {
       const neverTask: never = task;

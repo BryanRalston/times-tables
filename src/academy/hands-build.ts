@@ -27,6 +27,9 @@ import { isTimesLevel, nextTimesFact } from "./games/times";
 import { makeClockTask, makePayTask, type ClockTask, type PayTask } from "./hands";
 import { tracePraise, traceSpeech } from "./trace/lines";
 import { makeGraphsTask, type GraphsTask } from "./games/graph-data";
+import { makeGridTask, type GridTask } from "./games/grid-data";
+import { makePatternTask, type PatternTask } from "./games/patterns-data";
+import { makeShareTask, type ShareTask } from "./games/share-data";
 import { workedExample, type ModelArt, type WorkedExample } from "./teach";
 import { blankOut, buildTiles, countWord, extraLetters } from "./games/words";
 
@@ -221,7 +224,10 @@ export type BuildTask =
   | StoryTask
   | BlankTask
   | TraceTask
-  | GraphsTask;
+  | GraphsTask
+  | ShareTask
+  | GridTask
+  | PatternTask;
 
 export type HandsTask = ClockTask | PayTask | BuildTask;
 
@@ -1408,6 +1414,12 @@ export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: str
       return makeBlankTask(level, rng, avoid);
     case "graphs":
       return makeGraphsTask(level, rng, avoid);
+    case "share":
+      return makeShareTask(level, rng, avoid);
+    case "grid":
+      return makeGridTask(level, rng, avoid);
+    case "patterns":
+      return makePatternTask(level, rng, avoid);
     default:
       throw new Error(`No hands-on card for ${game}`);
   }
@@ -1573,6 +1585,27 @@ export function handsExample(task: BuildTask): WorkedExample {
         },
       ]);
     }
+    case "share":
+      return modeled([
+        {
+          art: { type: "groups", sizes: Array.from({ length: task.plates }, () => task.each) },
+          caption: task.speech.replace(/\.$/, ""),
+        },
+      ]);
+    case "grid":
+      return modeled([
+        {
+          art: { type: "grid", rows: Math.max(1, task.rows), cols: Math.max(1, task.cols) },
+          caption: task.speech.replace(/\.$/, ""),
+        },
+      ]);
+    case "pattern":
+      return modeled([
+        {
+          art: { type: "counters", n: Math.max(1, Math.min(task.terms.length, 8)), frame: false },
+          caption: task.speech.replace(/\.$/, ""),
+        },
+      ]);
     case "blank": {
       const groups =
         task.op === "×"
