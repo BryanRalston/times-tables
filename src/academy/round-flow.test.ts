@@ -2,7 +2,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
 import { clockMatches, dragClock, makeClockTask, makePayTask, payMatches, stepClock } from "./hands";
 import { emptyPile } from "./games/money-model";
-import { daysPlayedCaption, daysPlayedThisWeek, handsOnSlots, planReturn, scheduleMiss, similarSlot, weekStickers, type RoundSlot } from "./round-flow";
+import { choiceFact, daysPlayedCaption, daysPlayedThisWeek, handsOnSlots, pickFreshQuestion, planReturn, scheduleMiss, similarChoice, similarSlot, weekStickers, type RoundSlot } from "./round-flow";
+import { makeAddQuestion, type ChoiceQ } from "./questions";
 import { setLocale } from "./i18n";
 
 describe("hands-on cards", () => {
@@ -68,6 +69,45 @@ describe("a miss comes back before card 10", () => {
     expect(indexes.every((index) => index > 1 && index < 10)).toBe(true);
     expect(new Set(indexes).size).toBe(indexes.length);
     expect(plan.returns[indexes[0]!]).toBeTruthy();
+  });
+
+  it("skips a fact that was just on screen", () => {
+    const facts = ["2+2", "2+2", "3+1"];
+    let drawn = 0;
+    const question = pickFreshQuestion(() => {
+      const fact = facts[drawn] ?? "9+9";
+      drawn += 1;
+      return {
+        id: fact,
+        game: "add",
+        title: "Tap",
+        hint: "Count",
+        praise: "Yes!",
+        almost: "Almost!",
+        answer: "4",
+        choices: ["4", "3", "5", "6"],
+        skill: "add:within5",
+        tags: [],
+        factKey: fact,
+        visual: { kind: "add", op: "+", left: 2, right: 2, result: null, pink: 2, teal: 2, max: 5, hidden: 4, solved: fact },
+      } satisfies ChoiceQ;
+    }, ["2+2"]);
+    expect(question.factKey).toBe("3+1");
+  });
+
+  it("practices a gentler sibling of the missed question", () => {
+    let found = false;
+    for (let seed = 1; seed <= 40 && !found; seed++) {
+      const rng = rngFromSeed(`gentle-practice-${seed}`);
+      const missed = makeAddQuestion(rng, "within20");
+      if (missed.visual.kind !== "add" || missed.visual.pink + missed.visual.teal <= 10) continue;
+      const next = similarChoice("add", missed, rng);
+      expect(choiceFact(next)).not.toBe(choiceFact(missed));
+      expect(next.skill).toBe("add:within20");
+      if (next.visual.kind === "add") expect(next.visual.pink + next.visual.teal).toBeLessThanOrEqual(10);
+      found = true;
+    }
+    expect(found).toBe(true);
   });
 
   it("retries a similar card, not the same fact", () => {

@@ -120,6 +120,7 @@ html[lang="ar"] .ac-ruler-wrap,
 html[lang="ar"] .ac-clock,
 html[lang="ar"] .ac-clock-wrap,
 html[lang="ar"] .ac-clock-drag,
+html[lang="ar"] .ac-hand-steps,
 html[lang="ar"] .ac-clock-read,
 html[lang="ar"] .ac-clock-grid,
 html[lang="ar"] .ac-money-price,
@@ -1799,6 +1800,23 @@ button.ac-go.ac-play-main {
 .ac-clock-drag { width: min(280px, 78vw); touch-action: none; cursor: grab; }
 .ac-clock-drag:focus-visible { border-radius: 50%; }
 .ac-clock-drag .ac-clock { width: 100%; margin: 0; }
+.ac-hand-steps { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; }
+.ac-hand-step {
+  min-width: 72px;
+  min-height: 52px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: var(--ac-radius-md);
+  background: #fff;
+  color: var(--ac-ink);
+  font-family: Fredoka, Nunito, sans-serif;
+  font-size: 18px;
+  box-shadow: 0 4px 0 #f3c3d8;
+}
+.ac-hand-step.is-on { background: #fff6df; box-shadow: inset 0 0 0 2px #e7c27a, 0 4px 0 #f3c3d8; }
+.ac-hand-step:active { transform: translateY(2px); box-shadow: 0 2px 0 #f3c3d8; }
+.ac-hands-lock { pointer-events: none; }
+.ac-combo-note { font-family: Fredoka, Nunito, sans-serif; color: var(--ac-ink); }
 .ac-bank, .ac-tray {
   display: flex;
   flex-wrap: wrap;

@@ -1,4 +1,5 @@
 import type { Rng } from "@/lib/rng";
+import { easeOf, easeSpan } from "../adapt";
 import { t, thingName } from "../i18n";
 import { buddyName, pickTalk } from "./flavor";
 import { countCard } from "./cards";
@@ -27,9 +28,10 @@ function ask(rng: Rng, spec: Parameters<typeof sceneQuestion>[1]): ChoiceQ {
   return sceneQuestion(rng, spec);
 }
 
-function makeObjects(rng: Rng, max: number, level: "objects" | "to20"): ChoiceQ {
+function makeObjects(rng: Rng, max: number, level: "objects" | "to20", prefer: readonly string[] = []): ChoiceQ {
   const lo = level === "to20" ? 8 : 1;
-  const n = rng.int(lo, max);
+  const span = easeSpan(lo, max, easeOf(prefer));
+  const n = rng.int(span.lo, span.hi);
   const board: CountBoard = { game: "count", mode: level, emoji: "", name: "squishees", n };
   const buddy = buddyName(rng);
   return ask(rng, {
@@ -93,8 +95,9 @@ function makeCompare(rng: Rng): ChoiceQ {
   });
 }
 
-function makeNeighbor(rng: Rng): ChoiceQ {
-  const n = rng.int(1, 20);
+function makeNeighbor(rng: Rng, prefer: readonly string[] = []): ChoiceQ {
+  const span = easeSpan(1, 20, easeOf(prefer));
+  const n = rng.int(span.lo, span.hi);
   const canBefore = n > 1;
   const canAfter = n < 20;
   const askBefore = canBefore && (!canAfter || rng.next() < 0.5);
@@ -122,8 +125,9 @@ function makeNeighbor(rng: Rng): ChoiceQ {
   });
 }
 
-function makeSubitize(rng: Rng): ChoiceQ {
-  const n = rng.int(1, 6);
+function makeSubitize(rng: Rng, prefer: readonly string[] = []): ChoiceQ {
+  const span = easeSpan(1, 6, easeOf(prefer));
+  const n = rng.int(span.lo, span.hi);
   const clusters = rng.pick(DOTS[n - 1] ?? [[n]]);
   const board: CountBoard = { game: "count", mode: "subitize", clusters };
   const buddy = buddyName(rng);
@@ -148,8 +152,9 @@ function makeSubitize(rng: Rng): ChoiceQ {
   });
 }
 
-function makeTen(rng: Rng): ChoiceQ {
-  const n = rng.int(0, 20);
+function makeTen(rng: Rng, prefer: readonly string[] = []): ChoiceQ {
+  const span = easeSpan(0, 20, easeOf(prefer));
+  const n = rng.int(span.lo, span.hi);
   const frames = n <= 10 ? [n] : [10, n - 10];
   const board: CountBoard = { game: "count", mode: "tenframe", frames };
   return ask(rng, {
@@ -173,8 +178,9 @@ function makeTen(rng: Rng): ChoiceQ {
   });
 }
 
-function makeBuild(rng: Rng): ChoiceQ {
-  const n = rng.int(1, 10);
+function makeBuild(rng: Rng, prefer: readonly string[] = []): ChoiceQ {
+  const span = easeSpan(1, 10, easeOf(prefer));
+  const n = rng.int(span.lo, span.hi);
   const board: CountBoard = { game: "count", mode: "build", n };
   return ask(rng, {
     game: "count",
@@ -194,22 +200,22 @@ function makeBuild(rng: Rng): ChoiceQ {
   });
 }
 
-export function makeCountQuestion(rng: Rng, level: CountLevel): ChoiceQ {
+export function makeCountQuestion(rng: Rng, level: CountLevel, prefer: readonly string[] = []): ChoiceQ {
   switch (level) {
     case "objects":
-      return makeObjects(rng, 10, "objects");
+      return makeObjects(rng, 10, "objects", prefer);
     case "to20":
-      return makeObjects(rng, 20, "to20");
+      return makeObjects(rng, 20, "to20", prefer);
     case "compare":
       return makeCompare(rng);
     case "neighbor":
-      return makeNeighbor(rng);
+      return makeNeighbor(rng, prefer);
     case "subitize":
-      return makeSubitize(rng);
+      return makeSubitize(rng, prefer);
     case "tenframe":
-      return makeTen(rng);
+      return makeTen(rng, prefer);
     case "build":
-      return makeBuild(rng);
+      return makeBuild(rng, prefer);
     default: {
       const neverLevel: never = level;
       return neverLevel;
@@ -308,7 +314,7 @@ function CountArt({ board }: { board: CountBoard }) {
 export const countGame = sceneModule({
   ...countCard,
   short: "Counting",
-  makeQuestion: (rng, level) => makeCountQuestion(rng, isCountLevel(level) ? level : "objects"),
+  makeQuestion: (rng, level, prefer) => makeCountQuestion(rng, isCountLevel(level) ? level : "objects", prefer),
   makeSheetItem: sheetItem,
   Prompt: CountPrompt,
 });

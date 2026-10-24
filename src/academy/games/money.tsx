@@ -1,4 +1,5 @@
 import type { Rng } from "@/lib/rng";
+import { easeOf, easeSpan } from "../adapt";
 import { coinAsA, coinButton, coinWord, t } from "../i18n";
 import { buddyName, pickTalk } from "./flavor";
 import { moneyCard } from "./cards";
@@ -61,10 +62,11 @@ function hintFor(kind: CoinKind): string {
   }
 }
 
-function countPile(rng: Rng): CoinPile {
+function countPile(rng: Rng, prefer: readonly string[] = []): CoinPile {
   const kinds: CoinKind[] = ["penny", "nickel", "dime", "quarter"];
   const pile = emptyPile();
-  const n = rng.int(1, 3);
+  const span = easeSpan(1, 3, easeOf(prefer));
+  const n = rng.int(span.lo, span.hi);
   for (let i = 0; i < n; i++) {
     const kind = rng.pick(kinds);
     if (kind === "quarter" && pile.quarter >= 1) continue;
@@ -103,8 +105,8 @@ function makeName(rng: Rng): ChoiceQ {
   };
 }
 
-function makeCount(rng: Rng): ChoiceQ {
-  const coins = countPile(rng);
+function makeCount(rng: Rng, prefer: readonly string[] = []): ChoiceQ {
+  const coins = countPile(rng, prefer);
   const total = pileCents(coins);
   const pile = describePile(coins);
   return {
@@ -228,12 +230,12 @@ function makeDollars(rng: Rng): ChoiceQ {
   };
 }
 
-export function makeMoneyQuestion(rng: Rng, level: MoneyLevel): ChoiceQ {
+export function makeMoneyQuestion(rng: Rng, level: MoneyLevel, prefer: readonly string[] = []): ChoiceQ {
   switch (level) {
     case "name":
       return makeName(rng);
     case "count":
-      return makeCount(rng);
+      return makeCount(rng, prefer);
     case "make":
       return makeMake(rng);
     case "change":
@@ -350,7 +352,7 @@ export function MoneySheet({ items }: { items: SheetItem[] }) {
 
 export const moneyGame = {
   ...moneyCard,
-  makeQuestion: (rng, level) => makeMoneyQuestion(rng, isMoneyLevel(level) ? level : "name"),
+  makeQuestion: (rng, level, prefer) => makeMoneyQuestion(rng, isMoneyLevel(level) ? level : "name", prefer),
   makeSheetItem: sheetItem,
   Prompt: MoneyPrompt,
   SheetBody: MoneySheet,

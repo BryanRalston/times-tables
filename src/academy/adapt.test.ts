@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   clockMastery,
+  easeFromRound,
+  easeOf,
+  easeSpan,
   freshMastery,
+  gameHasMarks,
   moveLadder,
   noteMark,
   openingForRound,
@@ -130,6 +134,22 @@ describe("mastery mix", () => {
     expect(clockMastery(short, { ok: true, idea: "count", assisted: false }, 5).shift).toBe("up");
     expect(moveLadder(startLadder(1), 4, -1, { min: 0, max: 2 })).toEqual({ index: 0, streak: 0 });
     expect(moveLadder(startLadder(2), 4, 1, { min: 0, max: 2 })).toEqual({ index: 2, streak: 0 });
+  });
+
+  it("eases the numbers inside a level without leaving it", () => {
+    expect(easeSpan(1, 20, "steady")).toEqual({ lo: 1, hi: 20 });
+    expect(easeSpan(1, 20, "gentle")).toEqual({ lo: 1, hi: 10 });
+    expect(easeSpan(1, 20, "firm")).toEqual({ lo: 11, hi: 20 });
+    expect(easeSpan(5, 5, "firm")).toEqual({ lo: 5, hi: 5 });
+    expect(easeOf(["doubles", "ease:gentle"])).toBe("gentle");
+    expect(easeOf(["ease:firm"])).toBe("firm");
+    expect(easeOf([])).toBe("steady");
+    expect(easeFromRound({ combo: 0, missed: true })).toBe("gentle");
+    expect(easeFromRound({ combo: 2, missed: true })).toBe("steady");
+    expect(easeFromRound({ combo: 4, missed: false })).toBe("firm");
+    expect(gameHasMarks({ "add:within5": { ok: 1, miss: 0 } }, "add")).toBe(true);
+    expect(gameHasMarks({ "add:within5": { ok: 0, miss: 0 } }, "add")).toBe(false);
+    expect(gameHasMarks({ "count:objects": { ok: 2, miss: 0 } }, "add")).toBe(false);
   });
 
   it("treats five strong tries as mastered and records one outcome per mark", () => {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent } from "react";
-import { t, nounIsFeminine, thingName } from "../i18n";
+import { show, t, nounIsFeminine, thingName } from "../i18n";
 import type { GraphShape } from "../games/boards";
 import { graphsMatches, type GraphBenchSpec, type GraphsTask } from "../games/graph-data";
 import { DragGhost, HandsShell, inside, useTrayDrag } from "./hands-kit";
@@ -268,6 +268,7 @@ export function GraphBench({
       ) : (
         <div ref={bankRef} hidden />
       )}
+      {!locked && selected ? <p className="ac-tile-note">{show("Tap a column")}</p> : null}
       {!locked && placed === view.length && view.length > 0 && !matched ? (
         <p className="ac-tile-note">{t("Check each group.", "Revisa cada grupo.")}</p>
       ) : null}

@@ -1,4 +1,5 @@
 import type { Rng } from "@/lib/rng";
+import { easeOf, easeSpan } from "../adapt";
 import { t } from "../i18n";
 import { pickTalk } from "./flavor";
 import { addCard } from "./cards";
@@ -40,10 +41,19 @@ function tensOperands(rng: Rng): { op: "+" | "-"; pink: number; teal: number; to
   return { op: "-", pink: total - teal, teal, total };
 }
 
-export function makeAddQuestion(rng: Rng, level: AddLevel): ChoiceQ {
-  if (level === "within1000" || level === "thousands") return makeBigAddQuestion(rng, level);
+/** Keep both parts of a small sum visible. Zero still fits a sum of 1, and tens stay on their own rules. */
+function bothParts(level: AddLevel, total: number, part: number): number {
+  if (level === "tens" || total < 2) return part;
+  if (part <= 0) return 1;
+  if (part >= total) return total - 1;
+  return part;
+}
+
+export function makeAddQuestion(rng: Rng, level: AddLevel, prefer: readonly string[] = []): ChoiceQ {
+  if (level === "within1000" || level === "thousands") return makeBigAddQuestion(rng, level, prefer);
   if (level === "tens") return makeTensQuestion(rng);
   const max = ADD_MAX[level];
+  const span = easeSpan(1, max, easeOf(prefer));
   const sub = rng.next() < (max <= 10 ? 0.28 : 0.45);
   const roll = rng.next();
   let op: "+" | "-" = "+";
@@ -56,8 +66,12 @@ export function makeAddQuestion(rng: Rng, level: AddLevel): ChoiceQ {
   let solved = "";
 
   if (!sub) {
-    const sum = rng.int(1, max);
+    let sum = rng.int(span.lo, span.hi);
+    if (prefer.includes("make10") && max >= 10) sum = 10;
+    if (prefer.includes("doubles") && sum >= 2 && sum % 2 === 1) sum -= 1;
     pink = rng.int(0, sum);
+    if (prefer.includes("doubles") && sum >= 2) pink = sum / 2;
+    else pink = bothParts(level, sum, pink);
     teal = sum - pink;
     solved = `${pink} + ${teal} = ${sum}`;
     if (roll < 0.5) {
@@ -78,8 +92,8 @@ export function makeAddQuestion(rng: Rng, level: AddLevel): ChoiceQ {
     }
   } else {
     op = "-";
-    const total = rng.int(1, max);
-    teal = rng.int(0, total);
+    const total = rng.int(span.lo, span.hi);
+    teal = bothParts(level, total, rng.int(0, total));
     pink = total - teal;
     solved = `${total} ${MINUS} ${teal} = ${pink}`;
     if (roll < 0.55) {
@@ -241,7 +255,7 @@ export function AddSheet({ items }: { items: SheetItem[] }) {
 
 export const addGame = {
   ...addCard,
-  makeQuestion: (rng, level) => makeAddQuestion(rng, isAddLevel(level) ? level : "within5"),
+  makeQuestion: (rng, level, prefer) => makeAddQuestion(rng, isAddLevel(level) ? level : "within5", prefer),
   makeSheetItem: sheetItem,
   Prompt: AddPrompt,
   SheetBody: AddSheet,
