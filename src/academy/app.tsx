@@ -7,7 +7,6 @@ import { acknowledgeUnlocks, applyRound, applyStory, claimDailyGift } from "./re
 import { getLocale, loadLocalePack, localePackReady, setLocale, show, type Locale } from "./i18n";
 import { activeChild, loadSave, mapActive, withLevel, writeSave } from "./storage";
 import { warmVoices } from "./voice";
-import { ensureVoice } from "./voice/clips";
 import { HelloScreen, SettingsScreen, SheetsScreen, ShelfScreen } from "./ui/extra";
 import { LanguageWelcome, withLang } from "./ui/lang";
 import { HomeScreen } from "./ui/home";
@@ -169,7 +168,6 @@ function AcademyApp() {
 
   useEffect(() => {
     warmVoices();
-    void ensureVoice();
   }, []);
 
   useEffect(() => {

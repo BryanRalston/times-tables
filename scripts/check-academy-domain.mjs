@@ -221,8 +221,28 @@ for (const [rel, lang, dir] of privacyLocales) {
   if (needsJs(page)) fail(`${rel} needs JavaScript`);
 }
 
-const manifestList = JSON.parse(readFileSync(resolve(root, "precache-manifest.json"), "utf8"));
-if (!Array.isArray(manifestList) || manifestList.length < 20) fail("precache manifest");
+const shellList = JSON.parse(readFileSync(resolve(root, "precache-manifest.json"), "utf8"));
+const laterList = JSON.parse(readFileSync(resolve(root, "precache-later.json"), "utf8"));
+const voiceLangs = ["en", "es", "pt", "fr", "zh", "hi", "ar"];
+const voiceLists = {};
+for (const lang of voiceLangs) {
+  const voiceList = JSON.parse(readFileSync(resolve(root, `precache-voice-${lang}.json`), "utf8"));
+  if (!Array.isArray(voiceList) || voiceList.length < 100) fail(`precache-voice-${lang}.json is empty`);
+  voiceLists[lang] = voiceList;
+}
+if (!Array.isArray(shellList) || shellList.length < 8) fail("precache manifest");
+if (!Array.isArray(laterList) || laterList.length < 20) fail("precache later list");
+if (shellList.some((url) => typeof url === "string" && (url.includes("/voice/") || url.startsWith("/cosmetics/") || url.startsWith("/squishees/") || url.startsWith("/wardrobe/") || url.startsWith("/money/")))) {
+  fail("install precache includes voice or pictures");
+}
+if (!shellList.some((url) => typeof url === "string" && url.includes("/assets/main-") && url.endsWith(".js"))) {
+  fail("install precache missing main js");
+}
+if (!shellList.some((url) => typeof url === "string" && url.includes("/assets/main-") && url.endsWith(".css"))) {
+  fail("install precache missing main css");
+}
+const manifestList = [...shellList, ...laterList, ...voiceLangs.flatMap((lang) => voiceLists[lang])];
+if (manifestList.length < 20) fail("precache manifest");
 for (const needed of [
   "/",
   "/index.html",
@@ -301,6 +321,15 @@ for (const url of manifestList) {
   if (!existsSync(join(root, rel))) fail(`precache file missing for ${url}`);
 }
 if (!sw.includes("precache-manifest.json")) fail("service worker does not precache");
+if (!sw.includes("precache-later.json") || !sw.includes("precache-voice-") || !sw.includes('data.type === "precache-pause"')) {
+  fail("service worker does not defer voice until after the first prompt");
+}
+const coreDir = readdirSync(resolve(root, "voice/core")).filter((name) => name.endsWith(".mp3"));
+if (voiceLists.en.length !== coreDir.length) fail(`English voice precache has ${voiceLists.en.length} urls, disk has ${coreDir.length}`);
+for (const name of coreDir) {
+  if (!voiceLists.en.includes(`/voice/core/${name}`)) fail(`precache missing English clip ${name}`);
+}
+if (voiceLists.en.some((url) => !url.startsWith("/voice/core/"))) fail("English voice precache includes another language");
 if (!sw.includes('caches.match("/index.html")')) fail("service worker missing root index fallback");
 if (!existsSync(resolve(root, ".nojekyll"))) fail(".nojekyll missing");
 if (!existsSync(resolve(root, "404.html"))) fail("404.html missing");

@@ -1,4 +1,5 @@
 import { getLocale } from "./i18n";
+import { holdPrecache } from "./offline/later";
 import { ensureVoice } from "./voice/clips";
 import { startClipSpeech, stopClipSpeech } from "./voice/player";
 
@@ -105,10 +106,16 @@ export function speak(text: string, enabled: boolean): void {
   const line = text.trim();
   if (!enabled || !line) return;
   cancelDevice();
-  void ensureVoice().then(() => {
-    if (startClipSpeech(line, 1, () => sayWithDevice(line))) return;
-    sayWithDevice(line);
-  });
+  const release = holdPrecache();
+  void ensureVoice()
+    .then(() => {
+      if (startClipSpeech(line, 1, () => sayWithDevice(line), release)) return;
+      sayWithDevice(line);
+      release();
+    })
+    .catch(() => {
+      release();
+    });
 }
 
 function sayWithDevice(line: string): void {
