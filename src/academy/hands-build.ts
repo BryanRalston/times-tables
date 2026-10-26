@@ -1589,21 +1589,25 @@ export function handsExample(task: BuildTask): WorkedExample {
       return modeled([
         {
           art: { type: "groups", sizes: Array.from({ length: task.plates }, () => task.each) },
-          caption: task.speech.replace(/\.$/, ""),
+          caption: task.praise,
         },
       ]);
     case "grid":
       return modeled([
         {
-          art: { type: "grid", rows: Math.max(1, task.rows), cols: Math.max(1, task.cols) },
-          caption: task.speech.replace(/\.$/, ""),
+          art: {
+            type: "counters",
+            n: Math.max(1, Math.min(task.mode === "tiles" ? task.cells.length : task.mode === "fence" ? task.edges : task.missing, 12)),
+            frame: false,
+          },
+          caption: task.praise,
         },
       ]);
     case "pattern":
       return modeled([
         {
-          art: { type: "counters", n: Math.max(1, Math.min(task.terms.length, 8)), frame: false },
-          caption: task.speech.replace(/\.$/, ""),
+          art: { type: "counters", n: Math.max(1, Math.min(task.step, 10)), frame: false },
+          caption: task.praise,
         },
       ]);
     case "blank": {

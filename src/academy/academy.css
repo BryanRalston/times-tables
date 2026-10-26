@@ -3264,6 +3264,12 @@ button.ac-go:disabled:active, button.ac-go:disabled { transform: none; }
   gap: 12px;
   width: 100%;
 }
+.ac-share-play .ac-choices,
+.ac-grid-play .ac-choices,
+.ac-pattern-play .ac-choices {
+  align-self: stretch;
+  width: 100%;
+}
 .ac-cookie-bank, .ac-plate, .ac-plot, .ac-stone, .ac-edge-hit {
   border: 3px solid #3d2a55;
   background: #fff;
@@ -3316,6 +3322,7 @@ button.ac-go:disabled:active, button.ac-go:disabled { transform: none; }
   display: grid;
   gap: 6px;
   justify-content: center;
+  padding: 22px;
 }
 .ac-plot {
   width: 52px;
@@ -3327,19 +3334,50 @@ button.ac-go:disabled:active, button.ac-go:disabled { transform: none; }
 .ac-plot.is-on { background: #b7d98a; }
 .ac-edge-hit {
   z-index: 1;
+  position: relative;
   width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+.ac-edge-hit.is-n,
+.ac-edge-hit.is-s { justify-self: center; }
+.ac-edge-hit.is-n { align-self: start; margin-top: -22px; }
+.ac-edge-hit.is-s { align-self: end; margin-bottom: -22px; }
+.ac-edge-hit.is-e,
+.ac-edge-hit.is-w { align-self: center; }
+.ac-edge-hit.is-e { justify-self: end; margin-right: -22px; }
+.ac-edge-hit.is-w { justify-self: start; margin-left: -22px; }
+.ac-edge-hit::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
   height: 22px;
-  align-self: start;
-  justify-self: center;
+  border: 3px solid #3d2a55;
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 2px 0 #e0c98a;
+  pointer-events: none;
 }
-.ac-edge-hit.is-s { align-self: end; }
-.ac-edge-hit.is-e, .ac-edge-hit.is-w { width: 22px; height: 44px; align-self: center; }
-.ac-edge-hit.is-e { justify-self: end; }
-.ac-edge-hit.is-w { justify-self: start; }
-.ac-edge-hit.is-on { background: #8fbf6a; }
+.ac-edge-hit.is-n::after { bottom: 0; }
+.ac-edge-hit.is-s::after { top: 0; }
+.ac-edge-hit.is-e::after,
+.ac-edge-hit.is-w::after { top: 0; bottom: 0; height: auto; width: 22px; }
+.ac-edge-hit.is-e::after { left: 0; right: auto; }
+.ac-edge-hit.is-w::after { left: auto; right: 0; }
+.ac-edge-hit.is-on::after { background: #8fbf6a; }
+.ac-side-row { width: 100%; max-width: 100%; }
+.ac-side-row .ac-plot {
+  width: auto;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 52px;
+  height: 44px;
+}
+.ac-side-row b { flex: 0 0 44px; width: 44px; }
 .ac-side-row, .ac-pattern-row, .ac-num-tiles {
   display: flex;
   flex-wrap: wrap;

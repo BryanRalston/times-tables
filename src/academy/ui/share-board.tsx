@@ -35,15 +35,14 @@ export function ShareBench({
       if (counts.length < task.plates) publish([...counts, 1], bank - 1);
       return;
     }
-    let open = -1;
-    let least = task.each;
+    let open = 0;
+    let least = counts[0] ?? 0;
     counts.forEach((count, index) => {
       if (count < least) {
         least = count;
         open = index;
       }
     });
-    if (open < 0) return;
     const next = [...counts];
     next[open] = (next[open] ?? 0) + 1;
     publish(next, bank - 1);
@@ -57,6 +56,34 @@ export function ShareBench({
     publish(next, bank + 1);
   }
 
+  function placeOn(index: number) {
+    if (locked) return;
+    if (bank <= 0) {
+      undo(index);
+      return;
+    }
+    if (task.mode === "groups") {
+      if ((counts[index] ?? 0) < task.each) {
+        const next = [...counts];
+        next[index] = (next[index] ?? 0) + 1;
+        publish(next, bank - 1);
+        return;
+      }
+      if (counts.length < task.plates) publish([...counts, 1], bank - 1);
+      return;
+    }
+    const next = [...counts];
+    next[index] = (next[index] ?? 0) + 1;
+    publish(next, bank - 1);
+  }
+
+  function reset() {
+    if (locked) return;
+    publish(task.mode === "groups" ? [0] : Array.from({ length: task.plates }, () => 0), task.total);
+  }
+
+  const placed = counts.reduce((sum, count) => sum + count, 0);
+
   return (
     <div className="ac-share-play">
       <button type="button" className="ac-cookie-bank" onClick={deal} disabled={locked || bank <= 0}>
@@ -67,13 +94,18 @@ export function ShareBench({
       </button>
       <div className="ac-plates">
         {counts.map((count, index) => (
-          <button key={index} type="button" className="ac-plate" onClick={() => undo(index)} disabled={locked || count <= 0} aria-label={show("Plate")}>
+          <button key={index} type="button" className="ac-plate" onClick={() => placeOn(index)} disabled={locked || (count <= 0 && bank <= 0)} aria-label={show("Plate")}>
             {Array.from({ length: count }, (_, cookie) => (
               <i key={cookie} className="ac-cookie" />
             ))}
           </button>
         ))}
       </div>
+      {placed > 0 ? (
+        <button type="button" className="ac-quiet" onClick={reset} disabled={locked}>
+          {show("Start over")}
+        </button>
+      ) : null}
     </div>
   );
 }

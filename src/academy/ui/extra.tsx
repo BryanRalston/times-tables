@@ -11,7 +11,7 @@ import { playWindow } from "../grade-map";
 import { show, t } from "../i18n";
 import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type Grade, type Save } from "../model";
 import { buyOutfit, wearOutfit } from "../rewards";
-import { outfitHint, outfitLabel, outfitPrice, shopSections } from "../wardrobe";
+import { lookShowsOn, outfitHint, outfitLabel, outfitPrice, shopSections } from "../wardrobe";
 import { activeChild, mapActive, withGrade, withLevel } from "../storage";
 import { silence, speak } from "../voice";
 import { AcademyPal, BackLink, Foot, FreeNote, Logo, PlayMark, SquisheeImg, cx } from "./bits";
@@ -206,6 +206,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
   const found = book.filter((entry) => palOwned(child, entry.id)).length;
   const shop = shopSections();
   const lookCount = shop.reduce((sum, section) => sum + section.items.length, 0);
+  const [shopNote, setShopNote] = useState<string | null>(null);
 
   return (
     <div className="ac-shell ac-mid">
@@ -230,6 +231,11 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
       </p>
       <p className="ac-hint">{show("Spend coins you earn. Never real money.")}</p>
       <p className="ac-hint">{t("Stars and practice unlock looks too.", "Las estrellas y la práctica también dan disfraces.")}</p>
+      {shopNote ? (
+        <p className="ac-hint" role="status">
+          {shopNote}
+        </p>
+      ) : null}
       {shop.map((section) => (
         <section key={section.slot} className="ac-shop-slot" data-slot={section.slot}>
           <h3>{show(section.title)}</h3>
@@ -247,16 +253,26 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
             {section.items.map((item) => {
               const have = child.cosmetics.includes(item.id);
               const price = outfitPrice(item.id);
+              const fits = lookShowsOn(child.avatarId, item.id);
               return (
                 <button
                   key={item.id}
                   type="button"
                   data-outfit={item.id}
-                  className={cx("ac-shelf-card", !have && child.coins < price && "is-locked", child.equipped === item.id && "is-you")}
-                  disabled={!have && child.coins < price}
-                  onClick={() =>
-                    onSave(mapActive(save, (row) => (row.cosmetics.includes(item.id) ? wearOutfit(row, item.id) : buyOutfit(row, item.id))))
-                  }
+                  data-fit={fits ? "yes" : "no"}
+                  className={cx("ac-shelf-card", (!fits || (!have && child.coins < price)) && "is-locked", fits && child.equipped === item.id && "is-you")}
+                  onClick={() => {
+                    if (!fits) {
+                      setShopNote(show("This look does not fit."));
+                      return;
+                    }
+                    if (!have && child.coins < price) {
+                      setShopNote(show("You need more coins."));
+                      return;
+                    }
+                    setShopNote(null);
+                    onSave(mapActive(save, (row) => (row.cosmetics.includes(item.id) ? wearOutfit(row, item.id) : buyOutfit(row, item.id))));
+                  }}
                 >
                   <AcademyPal id={child.avatarId} cosmetic={item.id} />
                   <small>

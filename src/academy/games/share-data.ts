@@ -232,6 +232,14 @@ export function shareMatches(task: ShareTask, counts: readonly number[], bank: n
   return counts.every((count) => count === task.each);
 }
 
+/** Cookies are dealt, including a try that is not fair yet, so the child can answer and be taught. */
+export function shareSettled(task: ShareTask, counts: readonly number[], bank: number): boolean {
+  const placed = counts.reduce((sum, count) => sum + count, 0);
+  if (placed + bank !== task.total || bank < 0) return false;
+  if (task.mode === "left") return bank === task.leftover || bank === 0;
+  return bank === 0;
+}
+
 export function makeShareQuestion(rng: Rng, level: string): ChoiceQ {
   const task = makeShareTask(level, rng);
   const answer = shareAnswer(task);

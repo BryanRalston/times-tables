@@ -169,8 +169,11 @@ export function TraceBoard({ task, onAnswer }: { task: TraceTask; onAnswer: (ok:
           review(scoreTrace(glyph, inkRef.current));
         }}
         onPointerCancel={() => {
+          if (doneRef.current || liveRef.current.length === 0) return;
+          inkRef.current = [...inkRef.current, liveRef.current];
           liveRef.current = [];
           schedule();
+          review(scoreTrace(glyph, inkRef.current));
         }}
       >
         <svg ref={svgRef} className="ac-trace-guide" viewBox="0 0 100 100" aria-hidden="true">

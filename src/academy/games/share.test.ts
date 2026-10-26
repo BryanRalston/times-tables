@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
-import { makeShareQuestion, makeShareTask, shareAnswer, shareMatches } from "./share-data";
+import { makeShareQuestion, makeShareTask, shareAnswer, shareMatches, shareSettled } from "./share-data";
 
 describe("fair shares", () => {
   it("deals equal plates, groups, facts, and leftovers", () => {
@@ -10,6 +10,9 @@ describe("fair shares", () => {
       expect([2, 4, 6]).toContain(pairs.total);
       expect(shareAnswer(pairs)).toBe(pairs.each);
       expect(shareMatches(pairs, [pairs.each, pairs.each], 0)).toBe(true);
+      expect(shareSettled(pairs, [pairs.total, 0], 0)).toBe(true);
+      expect(shareMatches(pairs, [pairs.total, 0], 0)).toBe(false);
+      expect(shareSettled(pairs, [0, 0], pairs.total)).toBe(false);
 
       const fair = makeShareTask("fair", rngFromSeed(`share-fair-${i}`));
       expect(fair.total % fair.plates).toBe(0);
@@ -30,6 +33,11 @@ describe("fair shares", () => {
       expect(left.leftover).toBeLessThan(left.plates);
       expect(shareAnswer(left)).toBe(left.leftover);
       expect(shareMatches(left, Array.from({ length: left.plates }, () => left.each), left.leftover)).toBe(true);
+      expect(shareSettled(left, Array.from({ length: left.plates }, () => left.each), left.leftover)).toBe(true);
+      const dumped = Array.from({ length: left.plates }, () => left.each);
+      dumped[0] = (dumped[0] ?? 0) + left.leftover;
+      expect(shareSettled(left, dumped, 0)).toBe(true);
+      expect(shareMatches(left, dumped, 0)).toBe(false);
 
       const question = makeShareQuestion(rngFromSeed(`share-q-${i}`), "facts");
       expect(question.choices).toHaveLength(4);

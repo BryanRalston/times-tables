@@ -87,27 +87,20 @@ export function gridAnswer(task: Pick<GridTask, "mode" | "cells" | "edges" | "mi
   }
 }
 
-function sizeTitle(rows: number, cols: number, around: boolean): string {
+/** The shape is not a filled rectangle, so height times width is the wrong count. */
+function sizeTitle(around: boolean): string {
   if (around) {
     return t(
-      `This shape is ${rows} tall and ${cols} wide. How many units around?`,
-      `Esta figura mide ${rows} de alto y ${cols} de ancho. ¿Cuántas unidades hay alrededor?`,
-      `Esta figura tem ${rows} de altura e ${cols} de largura. Quantas unidades ao redor?`,
-      `Cette figure fait ${rows} de haut et ${cols} de large. Combien d'unités autour ?`,
-      `这个图形高${rows}格、宽${cols}格。四周一共多少格边？`,
-      `यह आकृति ${rows} ऊँची और ${cols} चौड़ी है। चारों ओर कितनी इकाइयाँ हैं?`,
-      `هذا الشكل ارتفاعه ${rows} وعرضه ${cols}. كم وحدة حول الشكل؟`,
+      "How many units around?",
+      "¿Cuántas unidades hay alrededor?",
+      "Quantas unidades ao redor?",
+      "Combien d'unités autour ?",
+      "四周一共多少格边？",
+      "चारों ओर की दूरी",
+      "كم وحدة حول الشكل؟",
     );
   }
-  return t(
-    `This shape is ${rows} tall and ${cols} wide. How many squares?`,
-    `Esta figura mide ${rows} de alto y ${cols} de ancho. ¿Cuántos cuadrados?`,
-    `Esta figura tem ${rows} de altura e ${cols} de largura. Quantos quadrados?`,
-    `Cette figure fait ${rows} de haut et ${cols} de large. Combien de carrés ?`,
-    `这个图形高${rows}格、宽${cols}格。一共有多少格？`,
-    `यह आकृति ${rows} ऊँची और ${cols} चौड़ी है। कितने वर्ग हैं?`,
-    `هذا الشكل ارتفاعه ${rows} وعرضه ${cols}. كم مربعاً؟`,
-  );
+  return t("Count the squares.", "Cuenta los cuadritos.");
 }
 
 function sideTitle(total: number, known: number, area: boolean): string {
@@ -188,7 +181,7 @@ function figureTask(mode: "tiles" | "fence", rng: Rng): GridTask {
   const cells = [...rng.pick(FIGURES)].map(([x, y]) => [x, y] as [number, number]);
   const { rows, cols } = gridBounds(cells);
   const edges = gridPerimeter(cells);
-  const speech = sizeTitle(rows, cols, mode === "fence");
+  const speech = sizeTitle(mode === "fence");
   const praise = mode === "fence" ? aroundWord(edges) : squaresWord(cells.length);
   const signature = cells.map(([x, y]) => `${x}${y}`).join("");
   return {
