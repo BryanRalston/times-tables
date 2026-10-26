@@ -39,8 +39,16 @@ for (const sheet of ["times-tables", "add-subtract", "telling-time", "money", "s
 }
 if (!existsSync(resolve("dist/academy-sw.js"))) fail("dist/academy-sw.js missing");
 const academyManifestPath = resolve("dist/academy/precache-manifest.json");
+const academyLaterPath = resolve("dist/academy/precache-later.json");
 if (!existsSync(academyManifestPath)) fail("dist/academy/precache-manifest.json missing");
+if (!existsSync(academyLaterPath)) fail("dist/academy/precache-later.json missing");
 const academyManifest = JSON.parse(readFileSync(academyManifestPath, "utf8"));
+const academyLater = JSON.parse(readFileSync(academyLaterPath, "utf8"));
+if (!Array.isArray(academyManifest) || academyManifest.length < 8) fail("academy install precache");
+if (!Array.isArray(academyLater) || academyLater.length < 20) fail("academy later precache");
+if (academyManifest.some((url) => typeof url === "string" && url.includes("/squishees/"))) {
+  fail("academy install precache includes poke media");
+}
 for (const rel of [
   "squishees/frog-poke.mp4",
   "squishees/cat-poke.mp4",
@@ -51,7 +59,7 @@ for (const rel of [
 ]) {
   if (!existsSync(resolve("dist/academy", rel))) fail(`dist/academy/${rel} missing`);
   const url = `/times-tables/academy/${rel}`;
-  if (!academyManifest.includes(url)) fail(`academy precache missing ${url}`);
+  if (!academyLater.includes(url)) fail(`academy later precache missing ${url}`);
 }
 if (!existsSync(resolve("dist/squishees/frog-poke.mp4"))) fail("dist/squishees/frog-poke.mp4 missing");
 
