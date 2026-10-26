@@ -47,3 +47,48 @@ Layout: no horizontal overflow at either size. Choice buttons, Go, and coins sta
 - A right answer stays long enough to see, says “Yes!” if the sound is on, and leaves the clock or the coins on the card. A combo of three or more is named at the end.
 
 Stories, tracing, and the wardrobe were not part of this play. They were left as they are.
+
+## The books, the tracing, the wardrobe, and three newer games
+
+Played the parts the pass above left, plus Fair Shares, Grid Garden, and Number Patterns. Fresh profile, sound on, at phone size (390×844) and tablet size (820×1180). Pre-K, kindergarten where the game is open, grade 2, and grade 4. English, Spanish, and Arabic, with Arabic pages right to left. Khan Academy Kids and Duolingo ABC are the comparison for a short spoken job and a tap that lands. Epic and Vooks are the comparison for a book that reads itself.
+
+Academy stays a paper card, a squishee, a spoken prompt, and a short round. Squishee Math (`/times-tables/`) was not touched. No account, no ads, and no new request off this device. New on-screen sentences are in all 7 languages. Spoken lines reuse clips that already exist in every language.
+
+## Ranked, from this play
+
+1. **Grid Garden described a rectangle the picture was not.** The shape is an irregular group of squares. The big line talked about how tall and wide that box was, so the count and the sentence disagreed. A kid trusts the big line. **Changed.** Count squares says “Count the squares.” Around the shape says “How many units around?” Both lines already had a clip in every language, including the Hindi your-turn line. The hands card counts separate squares. The missing-side line already named the area or the distance and the known side.
+
+2. **A wrong try could not be handed in until the board was already right.** Fair Shares, Grid Garden, and Number Patterns kept the answer buttons back until the manipulative matched the secret answer. A child who shared unevenly, or who wanted to guess the count, never reached the worked example. Khan Academy Kids and Duolingo ABC let the try land, then show the same idea again. **Changed.** Once every cookie is on a plate, the number buttons show, including an unfair split and a leftover that was piled onto one plate. Grid Garden and Number Patterns show the buttons immediately. A wrong tap still opens the worked example. That example walks an existing hint (one cookie to each plate, count the squares, look at the jump) and then the answer.
+
+3. **Fair Shares ignored some taps.** An empty plate did nothing. The cookie pile stopped once each plate held the hidden fair number, so a leftover cookie felt stuck. **Changed.** A tap on a plate puts a cookie there. A tap on the pile puts the next cookie on the plate that has the fewest. Start over puts them all back. On the groups level, a full group starts the next group.
+
+4. **Number Patterns asked twice.** Number tiles sat on the card, and the official choices sat under them. The two sets could name different numbers. A note said “Put a number on the blank” on a card the child answers with the buttons. **Changed.** The choice card keeps the number row and one set of answer buttons. The hands card still uses the tiles. Grade 2’s first visit counts by tens, such as 0, 10, 20. Grade 4 asks “What is the rule?” and the buttons say “add 4” and the other steps.
+
+5. **Around-the-shape edges were small, and a long side row spilled off a phone.** The fence marks were under 44px and could sit on top of each other, so one side stole the tap. A missing side of eight squares overflowed a 390px screen. **Changed.** Each edge has a 44×44 hit box, pushed outward so the centers stay separate. The painted bar stays the same size. The known-side squares shrink so the row fits. The cards played at phone and tablet size had no horizontal overflow. Answer buttons on these three games stretch to the card and stay at least 44px.
+
+6. **Grade 2 books stayed quiet unless the child pressed Read to me.** A read-along that waits is a picture with words. Epic, Vooks, and Khan Academy Kids speak the page. **Changed.** With sound on, every grade hears the page and the picture check. English, Spanish, and Arabic each played that language’s clips. A wrong picture returns to the page and shows the existing line “Let’s look together.” The recorded sentences stay as they are. A clearer “where is it?” line would need a new clip in all 7 languages, and the buttons are already the place or the thing the sentence names.
+
+7. **A cancelled finger stroke threw the tracing away.** If the browser cancelled the pointer mid-stroke, the ink vanished. **Changed.** That stroke stays on the page and is scored. Tracing is still a drag along the path, which is the skill. No new spoken line was added.
+
+8. **The wardrobe swallowed taps.** A look the child could not buy was a disabled button, so the tap did nothing. Glasses on a capybara and a bow tie on a penguin could be bought and then disappear, because that pal cannot wear them. **Changed.** The tap says “You need more coins.” or “This look does not fit.” Those two sentences are on screen in all 7 languages. Buying, wearing, a daily gift, and a study reward leave the current outfit on when the new look does not fit. The wardrobe art is unchanged.
+
+9. **The grade locks match `docs/GRADE_MAP.md`.** Pre-K Grid Garden and Number Patterns say coming later. Fair Shares through grade 1 stays on two plates. Grade 2 Grid Garden counts squares. Grade 4 can ask for the distance around or a missing side, and Number Patterns asks for the rule. Grade 4 Fair Shares can leave leftovers. One map sentence was stale: it said Spanish hides the books. The shelf already offers them in every language, which is what `docs/LANGUAGE.md` says. The map sentence now says that. The games were already behaving that way.
+
+## Left as they are
+
+Celebration stays the paper confetti. Nothing new is drawn on a squishee. The worked-example beat stays the short one from the first pass. Grade 2 and up still tap the speaker for game prompts. Books are the exception, because a silent read-along was the bug.
+
+Story word chips such as “a” can be narrower than 44px. Growing them would restyle the reading line. Next, Back, Read to me, and the picture choices are large. See the phone story screenshot.
+
+A missing side shows the known side as a row of squares and a question mark. A drawn rectangle would be new art. The row fits a phone. See the phone Grid Garden side screenshot.
+
+The shared footer links under the card are shorter than 44px. They are the same site footer as before this pass. Growing them would restyle every page, so they were left for a visual review.
+
+## What a child will notice
+
+- Grid Garden asks “Count the squares.” or “How many units around?” and those words match the picture.
+- Cookies go where you tap, and you can pick a number even when the plates are uneven. A wrong number shows how a fair share works.
+- Number Patterns has one set of answer buttons. The first grade 2 visit counts by tens.
+- Storybooks read themselves when the sound is on, including grade 2. A miss brings that page back.
+- A finger stroke that gets interrupted stays on the page.
+- A look that does not fit, or that costs more coins than you have, tells you so.

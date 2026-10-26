@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { autoSpeakGrade, type Grade, type SkillStat } from "../model";
+import { type Grade, type SkillStat } from "../model";
 import { starsForRound } from "../rewards";
 import { storyGradeLabel } from "../stories/band";
 import type { Story } from "../stories/catalog";
@@ -153,10 +153,9 @@ export function StoryReader({
     }
     if (state.phase === "done") return;
     const text = state.phase === "page" ? (shown.pages[state.page]?.text ?? "") : (shown.checks[state.check]?.prompt ?? "");
-    const auto = state.phase === "check" || state.returnTo != null || autoSpeakGrade(grade);
-    if (!auto || !text) return;
+    if (!text) return;
     playText(text);
-  }, [state.phase, state.page, state.check, state.returnTo, grade, shown, sound]);
+  }, [state.phase, state.page, state.check, state.returnTo, shown, sound]);
 
   useEffect(() => {
     if (state.phase !== "done" || sent.current) return;
@@ -191,7 +190,7 @@ export function StoryReader({
     const score = storyScore(state);
     const stars = starsForRound(score.correct, Math.max(1, score.total));
     return (
-      <div className="ac-shell ac-mid" data-story-phase="done" data-story-id={story.id} dir={storyDir()} lang={lang}>
+      <div className="ac-shell ac-mid" data-story-phase="done" data-story-id={story.id} data-grade={grade} dir={storyDir()} lang={lang}>
         <StoryScene mood={page.mood} pals={page.pals} prop={page.prop} />
         <h1>{show("Yes!")}</h1>
         <Stars value={stars} />
@@ -206,7 +205,7 @@ export function StoryReader({
     const check = shown.checks[state.check];
     if (!check) return null;
     return (
-      <div className="ac-shell ac-mid" data-story-phase="check" data-story-id={story.id} data-story-check={state.check} dir={storyDir()} lang={lang}>
+      <div className="ac-shell ac-mid" data-story-phase="check" data-story-id={story.id} data-story-check={state.check} data-grade={grade} dir={storyDir()} lang={lang}>
         <header className="ac-top">
           <a className="ac-back" href="#/stories">
             {show("Stories")}
@@ -264,7 +263,7 @@ export function StoryReader({
 
   const tokens = lineTokens(page.text);
   return (
-    <div className="ac-shell ac-mid" data-story-phase="page" data-story-id={story.id} data-story-page={state.page} dir={storyDir()} lang={lang}>
+    <div className="ac-shell ac-mid" data-story-phase="page" data-story-id={story.id} data-story-page={state.page} data-grade={grade} dir={storyDir()} lang={lang}>
       <header className="ac-top">
         <a className="ac-back" href="#/stories">
           {show("Stories")}
@@ -279,6 +278,7 @@ export function StoryReader({
         </span>
       </header>
       <StoryScene mood={page.mood} pals={page.pals} prop={page.prop} />
+      {state.returnTo != null ? <p className="ac-hint">{show("Let's look together.")}</p> : null}
       <StoryWords
         text={page.text}
         active={active}

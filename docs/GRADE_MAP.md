@@ -149,7 +149,7 @@ A word in a book has to be one of these:
 
 Grade 3 sight words, grade 4 vocabulary, and grade 4 spelling stay out. `src/academy/stories/stories.test.ts` checks every page, question, and clip.
 
-Spanish hides the books instead of showing the English words. See `docs/LANGUAGE.md`.
+Read-along books play in every language on the shelf. The pictures stay the same, character names stay, and each word uses that language's recorded clip. Arabic pages run right to left. See `docs/LANGUAGE.md`.
 
 ## Counting
 
