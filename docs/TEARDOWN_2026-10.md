@@ -20,6 +20,8 @@ These still fit a free, on-device product. They are not small fixes. A new graph
 
 4. **The first visit is still heavy after the script split.** The live first script is 418 kB. Shared voice clips are about 5.3 MB and load with the first visit, and the fonts sit beside them. Later games and Spanish stay lazy. Cutting that shared set without leaving a silent first round is the remaining download gap.
 
+   Update, 26 October 2026: measured and reduced. The install cache was 12,828 files (about 151 MB), costumes and every language included, not only the 5.3 MB of English clips. A fresh visit now transfers about 8.4 MB before the first question speaks, down from about 71.7 MB in English and 71.3 MB in Spanish. The rest caches after that prompt. Numbers and the offline check are in [docs/PERF_FIRST_VISIT.md](PERF_FIRST_VISIT.md).
+
 5. **Grade 4 is real skills, not a second product.** SplashLearn’s public path runs preschool through grade 5. Prodigy wraps a longer curriculum in a quest, and a membership is what adds the parent dashboard and the extra rewards. Academy’s grade 4 questions (elapsed time, thousands, area, angles) are free and on the device. Do not add an account, a paywall, or a second currency to copy the quest wrapper.
 
 6. **Books and tracing stop early.** The books end at grade 2. Tracing is one hands card inside a round, not a handwriting path through every letter the way Duolingo ABC sequences it. Extending either one is its own project, with new clips for every new line.

@@ -13,7 +13,7 @@ import { BOSS_HI, HI, PERSONA_FALLBACK_HI, PERSONA_HI, TRAIT_HI } from "../i18n-
 import { BOSS_ZH, PERSONA_FALLBACK_ZH, PERSONA_ZH, TRAIT_ZH, ZH } from "../i18n-zh";
 import { SQUAD_IDS } from "../model";
 import { exampleFor } from "../round-flow";
-import { artPaths, buildPrecacheList, domainServiceWorker, isPrecacheFile, pokeMediaFiles, referencedPokeNames, referencedUrls, SHARE_IMAGE_PATH, subpathServiceWorker, WARDROBE_FILES } from "../../../scripts/academy-precache.mjs";
+import { artPaths, buildPrecacheList, domainServiceWorker, isPrecacheFile, isShellUrl, partitionPrecache, pokeMediaFiles, referencedPokeNames, referencedUrls, SHARE_IMAGE_PATH, subpathServiceWorker, WARDROBE_FILES } from "../../../scripts/academy-precache.mjs";
 import { hintCue, promptSpeech, speakable, workedExample } from "../teach";
 import { WARDROBE } from "../wardrobe";
 import { SHARE_IMAGE_PATH as htmlShareImage } from "../seo/html";
@@ -144,6 +144,70 @@ describe("offline precache", () => {
     expect(domainSw).toContain("if (url.pathname === SHARE_IMAGE) return;");
     expect(domainSw).toContain('caches.match("/index.html")');
     expect(domainSw).toContain('const CACHE = "squishee-academy-root-v15"');
+    expect(domainSw).toContain("precache-later.json");
+    expect(domainSw).toContain("precache-voice-");
+    expect(domainSw).toContain('data.type === "precache-pause"');
+    expect(domainSw).toContain("if (!navigator.onLine) return cached();");
+    expect(subpathServiceWorker()).toContain("precache-later.json");
+  });
+
+  it("defers voice and costumes until after the first prompt", () => {
+    const sample = [
+      "/",
+      "/index.html",
+      "/assets/main-abc.js",
+      "/assets/main-abc.css",
+      "/assets/fredoka-latin-600-normal-x.woff2",
+      "/assets/nunito-latin-700-normal-x.woff2",
+      "/assets/noto-arab-picker-x.woff2",
+      "/assets/play-abc.js",
+      "/assets/manifest-es-abc.js",
+      "/voice/core/seven.mp3",
+      "/voice/es/siete.mp3",
+      "/voice/pt/sete.mp3",
+      "/voice/fr/sept.mp3",
+      "/voice/zh/qi.mp3",
+      "/voice/hi/saat.mp3",
+      "/voice/ar/sabaa.mp3",
+      "/voice/lazy/elephant.mp3",
+      "/cosmetics/peach-bow.png",
+      "/squishees/peach.png",
+      "/wardrobe/fitted/peach-bow-tie.webp",
+      "/money/penny.png",
+      "/worksheets/multiplication-7s/",
+      "/favicon.ico",
+      "/times-tables/academy/assets/main-abc.js",
+      "/times-tables/academy/voice/core/seven.mp3",
+      "/times-tables/squishees/frog.png",
+    ];
+    const parts = partitionPrecache(sample);
+    expect(isShellUrl("/assets/main-abc.js")).toBe(true);
+    expect(isShellUrl("/voice/core/seven.mp3")).toBe(false);
+    expect(isShellUrl("/cosmetics/peach-bow.png")).toBe(false);
+    expect(parts.shell).toContain("/");
+    expect(parts.shell).toContain("/assets/main-abc.js");
+    expect(parts.shell).toContain("/assets/main-abc.css");
+    expect(parts.shell).toContain("/favicon.ico");
+    expect(parts.shell).toContain("/times-tables/academy/assets/main-abc.js");
+    expect(parts.shell.some((url) => url.includes("/voice/"))).toBe(false);
+    expect(parts.shell.some((url) => url.includes("/cosmetics/") || url.includes("/squishees/") || url.includes("/money/"))).toBe(false);
+    expect(parts.voice.en).toEqual(["/voice/core/seven.mp3", "/times-tables/academy/voice/core/seven.mp3"]);
+    expect(parts.voice.es).toEqual(["/voice/es/siete.mp3"]);
+    expect(parts.voice.pt).toEqual(["/voice/pt/sete.mp3"]);
+    expect(parts.voice.fr).toEqual(["/voice/fr/sept.mp3"]);
+    expect(parts.voice.zh).toEqual(["/voice/zh/qi.mp3"]);
+    expect(parts.voice.hi).toEqual(["/voice/hi/saat.mp3"]);
+    expect(parts.voice.ar).toEqual(["/voice/ar/sabaa.mp3"]);
+    expect(parts.later).toContain("/cosmetics/peach-bow.png");
+    expect(parts.later).toContain("/squishees/peach.png");
+    expect(parts.later).toContain("/assets/play-abc.js");
+    expect(parts.later).toContain("/assets/manifest-es-abc.js");
+    expect(parts.later).toContain("/worksheets/multiplication-7s/");
+    expect(parts.later).toContain("/times-tables/squishees/frog.png");
+    expect(parts.later.some((url) => url.includes("/voice/"))).toBe(false);
+    const kept = [...parts.shell, ...parts.later, ...Object.values(parts.voice).flat()];
+    expect(kept).toHaveLength(sample.length - 1);
+    expect(kept).not.toContain("/voice/lazy/elephant.mp3");
   });
 
   it("precaches Spanish clips for an Add, Times, and Telling Time round", () => {

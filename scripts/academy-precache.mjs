@@ -126,9 +126,17 @@ export function artPaths() {
 
 export function isPrecacheFile(rel) {
   if (!rel || SKIP_COPY.test(rel)) return false;
-  if (rel === "precache-manifest.json" || rel === "CNAME" || rel === ".nojekyll") return false;
+  if (
+    rel === "precache-manifest.json" ||
+    rel === "precache-later.json" ||
+    /^precache-voice-[a-z]{2}\.json$/.test(rel) ||
+    rel === "CNAME" ||
+    rel === ".nojekyll"
+  ) {
+    return false;
+  }
   if (rel === SHARE_IMAGE_PATH.slice(1)) return false;
-  // Game clips load on first play and stay in the runtime cache. Core clips precache on install.
+  // Game clips load on first play and stay in the runtime cache. Core clips are deferred until the first prompt.
   if (rel.startsWith("voice/lazy/")) return false;
   if (rel.startsWith("voice/es/")) return ES_PRECACHE_FILES.has(rel.slice("voice/".length));
   if (rel.startsWith("voice/pt/")) return PT_PRECACHE_FILES.has(rel.slice("voice/".length));
@@ -214,6 +222,64 @@ export function fileForPrecacheUrl(url, { outDir, publicDir, appPrefix, artPrefi
   return candidates.find((file) => existsSync(file) && statSync(file).isFile()) ?? null;
 }
 
+const VOICE_PARTS = [
+  ["/voice/core/", "en"],
+  ["/voice/es/", "es"],
+  ["/voice/pt/", "pt"],
+  ["/voice/fr/", "fr"],
+  ["/voice/zh/", "zh"],
+  ["/voice/hi/", "hi"],
+  ["/voice/ar/", "ar"],
+];
+
+/** Which deferred voice list a precache URL belongs to. Lazy game clips are omitted. */
+export function voicePrecacheLang(url) {
+  const path = String(url).split("?")[0] ?? "";
+  if (!path.includes("/voice/")) return null;
+  for (const [part, lang] of VOICE_PARTS) {
+    if (path.includes(part)) return lang;
+  }
+  return "lazy";
+}
+
+/**
+ * The install cache is the app shell. Voice, costumes, and the rest of the
+ * pictures wait until the first prompt has started, so a phone is not still
+ * downloading them when the first question is ready.
+ */
+export function isShellUrl(url) {
+  const path = String(url).split("?")[0] ?? "";
+  if (path === "/" || path === "/times-tables/academy" || path === "/times-tables/academy/") return true;
+  const asset = path.indexOf("/assets/");
+  const rel = (asset >= 0 ? path.slice(asset + 1) : path.replace(/^\/times-tables\/academy/, "").replace(/^\/times-tables/, ""))
+    .replace(/^\//, "");
+  if (rel === "" || rel === "index.html" || rel === "404.html" || rel === "academy-sw.js") return true;
+  if (rel === "favicon.svg" || rel === "favicon.ico" || rel === "favicon-16.png" || rel === "favicon-32.png") return true;
+  if (rel === "apple-touch-icon.png" || rel === "manifest.webmanifest" || rel.startsWith("icons/")) return true;
+  if (rel.endsWith(".woff")) return false;
+  if (rel.startsWith("assets/main-")) return true;
+  if (rel.startsWith("assets/fredoka-") || rel.startsWith("assets/nunito-") || rel.startsWith("assets/noto-")) return true;
+  return false;
+}
+
+/** Split the offline set into the install shell, the later download, and one voice list per language. */
+export function partitionPrecache(urls) {
+  const shell = [];
+  const later = [];
+  const voice = { en: [], es: [], pt: [], fr: [], zh: [], hi: [], ar: [] };
+  for (const url of urls) {
+    const lang = voicePrecacheLang(url);
+    if (lang === "lazy") continue;
+    if (lang) {
+      voice[lang].push(url);
+      continue;
+    }
+    if (isShellUrl(url)) shell.push(url);
+    else later.push(url);
+  }
+  return { shell, later, voice };
+}
+
 export function writePrecacheManifest(outDir, { appPrefix, artPrefix, mediaPrefix, publicDir = resolve("public") }) {
   const root = resolve(outDir);
   const files = listBuildFiles(root);
@@ -224,29 +290,165 @@ export function writePrecacheManifest(outDir, { appPrefix, artPrefix, mediaPrefi
   const list = buildPrecacheList({ appPrefix, artPrefix, mediaPrefix, files, texts }).filter((url) =>
     fileForPrecacheUrl(url, { outDir: root, publicDir, appPrefix, artPrefix }),
   );
-  writeFileSync(join(root, "precache-manifest.json"), `${JSON.stringify(list)}\n`);
+  const { shell, later, voice } = partitionPrecache(list);
+  writeFileSync(join(root, "precache-manifest.json"), `${JSON.stringify(shell)}\n`);
+  writeFileSync(join(root, "precache-later.json"), `${JSON.stringify(later)}\n`);
+  for (const [lang, urls] of Object.entries(voice)) {
+    writeFileSync(join(root, `precache-voice-${lang}.json`), `${JSON.stringify(urls)}\n`);
+  }
   return list;
 }
 
 const PRECACHE_RUNTIME = `
-async function precacheAll() {
-  const cache = await caches.open(CACHE);
-  const manifestUrl = new URL("precache-manifest.json", self.registration.scope);
+const VOICE_LANGS = ["en", "es", "pt", "fr", "zh", "hi", "ar"];
+let precachePaused = false;
+const precacheJobs = {};
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function readList(name) {
+  const manifestUrl = new URL(name, self.registration.scope);
   const res = await fetch(manifestUrl, { cache: "no-store" });
-  if (!res.ok) throw new Error("precache manifest");
+  if (!res.ok) throw new Error(name);
   const list = await res.json();
-  if (!Array.isArray(list)) throw new Error("precache manifest");
-  for (let i = 0; i < list.length; i += 8) {
-    const slice = list.slice(i, i + 8);
+  if (!Array.isArray(list)) throw new Error(name);
+  return list;
+}
+
+function matchCached(req) {
+  return caches.match(req, { ignoreVary: true });
+}
+
+async function precacheUrls(list, batchSize, deferrable) {
+  const cache = await caches.open(CACHE);
+  for (let i = 0; i < list.length; i += batchSize) {
+    if (deferrable) {
+      while (precachePaused) await sleep(40);
+    }
+    const slice = list.slice(i, i + batchSize);
     await Promise.all(
       slice.map(async (url) => {
         if (typeof url !== "string" || !url.startsWith("/")) throw new Error("precache url");
-        const hit = await fetch(url);
+        if (deferrable && (await cache.match(url, { ignoreVary: true }))) return;
+        if (deferrable) {
+          while (precachePaused) await sleep(40);
+          if (!navigator.onLine) throw new Error("offline");
+        }
+        const hit = await fetch(url, deferrable ? { priority: "low" } : undefined);
         if (!hit.ok) throw new Error(url);
         await cache.put(url, hit);
       }),
     );
   }
+}
+
+async function precacheAll() {
+  await precacheUrls(await readList("precache-manifest.json"), 8, false);
+}
+
+async function tellClients(message) {
+  const clients = await self.clients.matchAll({ includeUncontrolled: true });
+  for (const client of clients) client.postMessage(message);
+}
+
+function cleanSeen(seen) {
+  if (!Array.isArray(seen)) return [];
+  const out = [];
+  const used = new Set();
+  for (const url of seen) {
+    if (typeof url !== "string" || !url.startsWith("/") || url.includes("..") || url.length >= 240) continue;
+    if (used.has(url)) continue;
+    used.add(url);
+    out.push(url);
+  }
+  return out;
+}
+
+async function rememberSeen(urls) {
+  const cache = await caches.open(CACHE);
+  const list = cleanSeen(urls);
+  for (let i = 0; i < list.length; i += 4) {
+    while (precachePaused) await sleep(40);
+    if (!navigator.onLine) throw new Error("offline");
+    const slice = list.slice(i, i + 4);
+    await Promise.all(
+      slice.map(async (url) => {
+        try {
+          if (await cache.match(url, { ignoreVary: true })) return;
+          while (precachePaused) await sleep(40);
+          const hit = await fetch(url, { priority: "low" });
+          if (!hit.ok) return;
+          await cache.put(url, hit);
+        } catch {
+          /* one missed file should not skip this language's clips */
+        }
+      }),
+    );
+  }
+}
+
+async function networkFirst(req, cached) {
+  const hit = await matchCached(req);
+  const pull = fetch(req).then((res) => {
+    if (res && res.ok) {
+      const copy = res.clone();
+      caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => {});
+      return res;
+    }
+    return hit || res;
+  });
+  if (!hit) {
+    try {
+      return await pull;
+    } catch {
+      return cached();
+    }
+  }
+  let timer = 0;
+  const giveUp = new Promise((resolve) => {
+    timer = setTimeout(() => resolve(hit), 2500);
+  });
+  try {
+    const res = await Promise.race([pull, giveUp]);
+    clearTimeout(timer);
+    return res;
+  } catch {
+    clearTimeout(timer);
+    return hit;
+  }
+}
+
+async function precacheLater(lang, seen) {
+  if (!VOICE_LANGS.includes(lang)) return;
+  if (!precacheJobs.seen) {
+    precacheJobs.seen = rememberSeen(seen).catch((err) => {
+      delete precacheJobs.seen;
+      throw err;
+    });
+  }
+  await precacheJobs.seen;
+  if (!precacheJobs[lang]) {
+    precacheJobs[lang] = readList("precache-voice-" + lang + ".json")
+      .then((list) => precacheUrls(list, 4, true))
+      .catch((err) => {
+        delete precacheJobs[lang];
+        throw err;
+      });
+  }
+  await precacheJobs[lang];
+  await tellClients({ type: "precache-voice-done", lang });
+  if (!precacheJobs.rest) {
+    precacheJobs.rest = readList("precache-later.json")
+      .then((list) => precacheUrls(list, 4, true))
+      .catch((err) => {
+        delete precacheJobs.rest;
+        throw err;
+      });
+  }
+  await precacheJobs.rest;
+  await tellClients({ type: "precache-later-done", lang });
 }
 
 self.addEventListener("install", (event) => {
@@ -262,6 +464,22 @@ self.addEventListener("activate", (event) => {
       )
       .then(() => self.clients.claim()),
   );
+});
+
+self.addEventListener("message", (event) => {
+  const data = event.data;
+  if (!data || typeof data !== "object") return;
+  if (data.type === "precache-pause") {
+    precachePaused = true;
+    return;
+  }
+  if (data.type === "precache-resume") {
+    precachePaused = false;
+    return;
+  }
+  if (data.type === "precache-later" && typeof data.lang === "string") {
+    event.waitUntil(precacheLater(data.lang, data.seen));
+  }
 });
 `;
 
@@ -281,25 +499,21 @@ self.addEventListener("fetch", (event) => {
   if (isMathShell(url.pathname)) return;
   if (req.mode === "navigate" && !url.pathname.startsWith("/times-tables/academy")) return;
 
+  const cached = async () => {
+    const hit = await matchCached(req);
+    if (hit) return hit;
+    if (req.mode === "navigate") {
+      const page =
+        (await matchCached("/times-tables/academy/index.html")) || (await matchCached("/times-tables/academy/"));
+      if (page) return page;
+    }
+    return new Response("Offline", { status: 503, headers: { "Content-Type": "text/plain" } });
+  };
   event.respondWith(
-    fetch(req)
-      .then((res) => {
-        if (res.ok) {
-          const copy = res.clone();
-          caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => {});
-        }
-        return res;
-      })
-      .catch(async () => {
-        const hit = await caches.match(req);
-        if (hit) return hit;
-        if (req.mode === "navigate") {
-          const page =
-            (await caches.match("/times-tables/academy/index.html")) || (await caches.match("/times-tables/academy/"));
-          if (page) return page;
-        }
-        return new Response("Offline", { status: 503, headers: { "Content-Type": "text/plain" } });
-      }),
+    (async () => {
+      if (!navigator.onLine) return cached();
+      return networkFirst(req, cached);
+    })(),
   );
 });
 `;
@@ -318,29 +532,26 @@ self.addEventListener("fetch", (event) => {
   // Link-preview crawlers need the PNG itself. Do not intercept, cache, or replace it with the app shell.
   if (url.pathname === SHARE_IMAGE) return;
 
+  const cached = async () => {
+    const hit = await matchCached(req);
+    if (hit) return hit;
+    if (req.mode === "navigate") {
+      const indexUrl = (url.pathname.endsWith("/") ? url.pathname : url.pathname + "/") + "index.html";
+      const page =
+        (await matchCached(url.pathname)) ||
+        (await matchCached(indexUrl)) ||
+        (await caches.match("/index.html")) ||
+        (await matchCached("/index.html")) ||
+        (await matchCached("/"));
+      if (page) return page;
+    }
+    return new Response("Offline", { status: 503, headers: { "Content-Type": "text/plain" } });
+  };
   event.respondWith(
-    fetch(req)
-      .then((res) => {
-        if (res.ok) {
-          const copy = res.clone();
-          caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => {});
-        }
-        return res;
-      })
-      .catch(async () => {
-        const hit = await caches.match(req);
-        if (hit) return hit;
-        if (req.mode === "navigate") {
-          const indexUrl = (url.pathname.endsWith("/") ? url.pathname : url.pathname + "/") + "index.html";
-          const page =
-            (await caches.match(url.pathname)) ||
-            (await caches.match(indexUrl)) ||
-            (await caches.match("/index.html")) ||
-            (await caches.match("/"));
-          if (page) return page;
-        }
-        return new Response("Offline", { status: 503, headers: { "Content-Type": "text/plain" } });
-      }),
+    (async () => {
+      if (!navigator.onLine) return cached();
+      return networkFirst(req, cached);
+    })(),
   );
 });
 `;

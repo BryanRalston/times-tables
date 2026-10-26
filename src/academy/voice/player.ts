@@ -283,16 +283,20 @@ export function startWordClips(
  * Play `text` from clips. Returns false when any piece is missing so the
  * caller can use the device voice. `onFail` runs if a clip file will not load.
  */
-export function startClipSpeech(text: string, rate: number, onFail: () => void): boolean {
+export function startClipSpeech(text: string, rate: number, onFail: () => void, onReady?: () => void): boolean {
   stopClipSpeech();
   const plan = planSpeech(text, hasVoiceClip);
   if (!plan || plan.length === 0) return false;
   const audio = context();
   if (!audio) return false;
   const mine = generation;
-  void run(plan, rate, mine, audio).catch(() => {
-    if (mine !== generation) return;
-    onFail();
-  });
+  void run(plan, rate, mine, audio)
+    .then(() => {
+      onReady?.();
+    })
+    .catch(() => {
+      if (mine === generation) onFail();
+      onReady?.();
+    });
   return true;
 }

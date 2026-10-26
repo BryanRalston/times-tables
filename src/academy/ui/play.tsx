@@ -27,7 +27,7 @@ import { bossForGame } from "../bosses";
 import { playWindow } from "../grade-map";
 import { gameById, pillLabel } from "../games/registry";
 import { makeHandsTask } from "../hands-build";
-import { cardStepLabel, cardsRoundLabel, remainderShown, show, t, yourTurnLine } from "../i18n";
+import { cardStepLabel, cardsRoundLabel, getLocale, remainderShown, show, t, yourTurnLine } from "../i18n";
 import { bossReady, bossWon } from "../journey";
 import {
   autoSpeakGrade,
@@ -58,6 +58,7 @@ import {
 } from "../round-flow";
 import { blip, bossFanfare, bossRaspberry, bossStrike, chime, startBossMusic, stopBossMusic, teachTone } from "../sound";
 import { hintCue } from "../teach";
+import { precacheAfterFirstPrompt } from "../offline/later";
 import { silence, speak } from "../voice";
 import { CoinShare, RoundBuddy } from "./buddy-view";
 import { BossFigure, type BossMood } from "./boss-figure";
@@ -695,8 +696,8 @@ export function PlayScreen({
 
   useEffect(() => {
     if ((phase !== "ask" && phase !== "practice") || !speech) return;
-    if (!autoSpeakGrade(child.grade)) return;
-    speak(speech, sound);
+    if (autoSpeakGrade(child.grade)) speak(speech, sound);
+    if (phase === "ask") precacheAfterFirstPrompt(getLocale());
   }, [phase, speech, sound, child.grade]);
 
   useEffect(() => {
