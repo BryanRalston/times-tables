@@ -1,6 +1,6 @@
 import { show } from "../i18n";
 import type { Child } from "../model";
-import { BOND_REWARDS, STUDY_REWARDS } from "../wardrobe";
+import { BOND_REWARDS, STUDY_REWARDS, lookShowsOn } from "../wardrobe";
 import { GAME_CARDS as GAMES } from "../games/catalog";
 
 /** A few practice rounds, not a long grind. */
@@ -85,7 +85,7 @@ export function withLearningLooks(child: Child, looks: readonly string[]): Child
     if (cosmetics.includes(id)) continue;
     cosmetics.push(id);
     changed = true;
-    if (!equipped) equipped = id;
+    if (!equipped && lookShowsOn(child.avatarId, id)) equipped = id;
   }
   if (!changed) return child;
   return { ...child, cosmetics, equipped };

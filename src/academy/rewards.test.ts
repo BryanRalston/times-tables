@@ -5,6 +5,7 @@ import {
   acknowledgeUnlocks,
   applyRound,
   buyOutfit,
+  wearOutfit,
   claimDailyGift,
   coinsForRound,
   formatMinutes,
@@ -222,6 +223,13 @@ describe("stars, streak, and unlocks", () => {
     expect(cap.equipped).toBe("star-cap");
     expect(cap.coins).toBe(0);
     expect(buyOutfit(child({ coins: 13 }), "star-cap")).toEqual(child({ coins: 13 }));
+    const capy = child({ avatarId: "capybara", coins: 80 });
+    const glasses = buyOutfit(capy, "star-glasses");
+    expect(glasses.cosmetics).toContain("star-glasses");
+    expect(glasses.equipped).toBe("");
+    expect(wearOutfit(glasses, "star-glasses")).toBe(glasses);
+    const penguin = child({ avatarId: "penguin", coins: 40, cosmetics: ["bow-tie"] });
+    expect(wearOutfit(penguin, "bow-tie")).toBe(penguin);
   });
 
   it("gives the same gift for the same day and mixes in academy looks", () => {

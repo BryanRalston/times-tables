@@ -5,6 +5,9 @@ export { speakable } from "./voice/speakable";
 import type { Board, CountBoard, FractionBoard, MeasureBoard, PhonicsBoard, PlaceBoard, ProblemBoard, ShapeBoard } from "./games/boards";
 import { geometryArt } from "./games/geometry";
 import { graphsTeachCaption } from "./games/graph-data";
+import { gridHint } from "./games/grid-data";
+import { patternHint } from "./games/patterns-data";
+import { shareHint } from "./games/share-data";
 import { variableCaptions } from "./games/variables";
 import { COIN_CENTS, COIN_NAME, emptyPile, formatCents, pileCents } from "./games/money-model";
 import { timeTalk } from "./games/time";
@@ -658,9 +661,17 @@ function sceneFrames(question: ChoiceQ, board: Board): SceneFrame[] {
     case "graphs":
       return captions([graphsTeachCaption(board), solved]);
     case "share":
+      return captions([shareHint(board.mode === "groups" ? "groups" : "pairs"), solved]);
     case "grid":
+      if (board.mode === "side") {
+        return captions([
+          board.useArea ? t("Length times width", "Largo por ancho") : t("Add all four sides", "Suma los cuatro lados"),
+          solved,
+        ]);
+      }
+      return captions([gridHint(board.mode === "fence" ? "fence" : "tiles"), solved]);
     case "patterns":
-      return captions([question.title, solved]);
+      return captions([patternHint(), solved]);
     default: {
       const neverBoard: never = board;
       return neverBoard;

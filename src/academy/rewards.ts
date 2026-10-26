@@ -11,7 +11,7 @@ import { advanceJourney, bossWon, withDailyRound } from "./journey";
 import { noteRoundWords } from "./games/words";
 import { show, t } from "./i18n";
 import { SQUAD_IDS, addDays, weekDates, type Child, type RoundResult, type SkillStat } from "./model";
-import { applyBuyWardrobe, isWardrobeId, looksCrossingStars, nextGiftOutfit } from "./wardrobe";
+import { applyBuyWardrobe, isWardrobeId, lookShowsOn, looksCrossingStars, nextGiftOutfit } from "./wardrobe";
 
 /** Finishing a round always earns a star. 90% earns 3. 60% earns 2. A 10-question round is 9 and 6. */
 export function starsForRound(correct: number, total = 10): 1 | 2 | 3 {
@@ -107,7 +107,8 @@ export function claimDailyGift(child: Child, today: string): Child {
   }
   if (gift.kind === "cosmetic") {
     const cosmetics = opened.cosmetics.includes(gift.id) ? opened.cosmetics : [...opened.cosmetics, gift.id];
-    return { ...opened, cosmetics, equipped: opened.equipped || gift.id };
+    const equipped = lookShowsOn(opened.avatarId, gift.id) ? opened.equipped || gift.id : opened.equipped;
+    return { ...opened, cosmetics, equipped };
   }
   const gifted = opened.gifted.includes(gift.id) ? opened.gifted : [...opened.gifted, gift.id];
   return { ...opened, gifted };
@@ -117,17 +118,19 @@ export function buyOutfit(child: Child, id: string): Child {
   const wardrobe = applyBuyWardrobe(child.coins, child.cosmetics, id);
   const result = wardrobe.reason === "missing" ? applyBuyCosmetic(child.coins, child.cosmetics, id) : wardrobe;
   if (!result.ok) return child;
+  const fits = lookShowsOn(child.avatarId, id);
   return {
     ...child,
     coins: result.coins,
     cosmetics: result.cosmetics,
-    equipped: child.equipped || id,
+    equipped: fits ? child.equipped || id : child.equipped,
   };
 }
 
 export function wearOutfit(child: Child, id: string): Child {
   if (id === "") return child.equipped ? { ...child, equipped: "" } : child;
   if ((!isCosmeticId(id) && !isWardrobeId(id)) || !child.cosmetics.includes(id)) return child;
+  if (!lookShowsOn(child.avatarId, id)) return child;
   if (child.equipped === id) return child;
   return { ...child, equipped: id };
 }

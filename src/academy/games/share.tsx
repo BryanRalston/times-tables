@@ -3,7 +3,7 @@ import { show } from "../i18n";
 import { cx } from "../ui/bits";
 import { ShareBench } from "../ui/share-board";
 import { shareCard } from "./cards";
-import { isShareLevel, makeShareQuestion, makeShareSheet, shareAnswer, shareMatches } from "./share-data";
+import { isShareLevel, makeShareQuestion, makeShareSheet, shareSettled } from "./share-data";
 import type { ShareTask } from "./share-data";
 import { SceneCard, sceneModule } from "./scene-ui";
 import type { ChoiceProps, GameModule, PromptProps } from "./types";
@@ -48,7 +48,7 @@ export function ShareChoices({ question, reveal, onChoose }: ChoiceProps) {
         key={question.id}
         task={task}
         locked={reveal}
-        onChange={(counts, bank) => setReady(shareMatches(task, counts, bank) && shareAnswer(board) === Number(question.answer))}
+        onChange={(counts, bank) => setReady(shareSettled(task, counts, bank))}
       />
       {showChoices ? (
         <div ref={choiceRef} className={cx("ac-choices", reveal && "is-locked")}>

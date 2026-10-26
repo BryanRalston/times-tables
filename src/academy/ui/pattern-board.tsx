@@ -17,13 +17,16 @@ export function PatternBench({
   locked,
   picked,
   onPick,
+  tiles = true,
 }: {
   task: PatternTask;
   locked: boolean;
   picked: number | null;
   onPick: (n: number | null) => void;
+  /** Choice cards answer with the buttons under the row. Hands cards keep the tiles. */
+  tiles?: boolean;
 }) {
-  const shown = task.mode === "grow" ? task.terms : task.terms;
+  const shown = task.terms;
   return (
     <div className="ac-pattern-play">
       <div className="ac-pattern-row">
@@ -38,15 +41,17 @@ export function PatternBench({
           </button>
         )}
       </div>
-      <div className="ac-num-tiles">
-        {optionsFor(task).map((n) => (
-          <button key={n} type="button" className={picked === n ? "ac-stone is-on" : "ac-stone"} disabled={locked} onClick={() => onPick(n)}>
-            {task.mode === "grow" ? ruleLabel(n) : n}
-          </button>
-        ))}
-      </div>
-      {task.mode === "grow" && picked != null ? <p className="ac-tile-note">{ruleLabel(picked)}</p> : null}
-      <span className="ac-sr">{show("Put a number on the blank.")}</span>
+      {tiles ? (
+        <div className="ac-num-tiles">
+          {optionsFor(task).map((n) => (
+            <button key={n} type="button" className={picked === n ? "ac-stone is-on" : "ac-stone"} disabled={locked} onClick={() => onPick(n)}>
+              {task.mode === "grow" ? ruleLabel(n) : n}
+            </button>
+          ))}
+        </div>
+      ) : null}
+      {tiles && task.mode === "grow" && picked != null ? <p className="ac-tile-note">{ruleLabel(picked)}</p> : null}
+      {tiles ? <span className="ac-sr">{show("Put a number on the blank.")}</span> : null}
     </div>
   );
 }
