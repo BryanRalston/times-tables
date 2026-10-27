@@ -14,6 +14,7 @@ import { pileCents } from "./games/money-model";
 import { sightWords, type SightList } from "./games/sight-data";
 import { spellWords, type SpellLevel } from "./games/spell-data";
 import { shareAnswer } from "./games/share-data";
+import { signTruth, trueSignCount } from "./games/signs-data";
 import { TIME_MINUTES, type TimeLevel } from "./games/time";
 import { TIMES_SPEC, type TimesLevel } from "./games/times";
 import { FRACTION_DENOMINATORS, GRADE_BANDS, playWindow } from "./grade-map";
@@ -328,6 +329,62 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       expect(board.answer).toBeLessThanOrEqual(1000);
       break;
     }
+    case "signs": {
+      expect(board.left).toBeGreaterThanOrEqual(board.mode === "big" ? 1000 : 1);
+      expect(signTruth(board.left, board.right)).toBe(board.mark);
+      expect(question.answer).toBe(`${board.left} ${board.mark} ${board.right}`);
+      expect(trueSignCount(board.left, board.right, question.choices)).toBe(1);
+      if (board.mode === "to10") {
+        expect(board.left).toBeLessThanOrEqual(10);
+        expect(board.right).toBeLessThanOrEqual(10);
+      }
+      if (board.mode === "tens") {
+        expect(board.left).toBeGreaterThanOrEqual(10);
+        expect(board.right).toBeGreaterThanOrEqual(10);
+        expect(board.left).toBeLessThan(100);
+        expect(board.right).toBeLessThan(100);
+      }
+      if (board.mode === "hundreds") {
+        expect(board.left).toBeGreaterThanOrEqual(100);
+        expect(board.right).toBeGreaterThanOrEqual(100);
+        expect(board.left).toBeLessThan(1000);
+        expect(board.right).toBeLessThan(1000);
+      }
+      if (board.mode === "big") {
+        expect(board.left).toBeLessThanOrEqual(9999);
+        expect(board.right).toBeLessThanOrEqual(9999);
+      }
+      if (grade === "K") expect(board.mode).toBe("to10");
+      if (grade === "1") expect(["to10", "tens"]).toContain(board.mode);
+      if (grade === "2" || grade === "3") expect(["tens", "hundreds"]).toContain(board.mode);
+      if (grade === "4") expect(["hundreds", "big"]).toContain(board.mode);
+      break;
+    }
+    case "jumps": {
+      expect(board.answer).toBe(board.dir === "more" ? board.start + board.step : board.start - board.step);
+      expect(board.answer % 10).toBe(board.start % 10);
+      expect(board.answer).toBeGreaterThanOrEqual(0);
+      expect(board.answer).toBeLessThanOrEqual(9999);
+      if (board.mode === "ten") {
+        expect(board.step).toBe(10);
+        expect(board.start).toBeGreaterThanOrEqual(10);
+        expect(board.start).toBeLessThan(100);
+        expect(board.answer).toBeLessThanOrEqual(100);
+      }
+      if (board.mode === "hundred") {
+        expect(board.step).toBe(100);
+        expect(board.answer).toBeLessThanOrEqual(1000);
+      }
+      if (board.mode === "thousand") {
+        expect(board.step).toBe(1000);
+        expect(board.start).toBeGreaterThanOrEqual(1000);
+      }
+      if (grade === "1") expect(board.mode).toBe("ten");
+      if (grade === "2") expect(["ten", "hundred"]).toContain(board.mode);
+      if (grade === "3") expect(["ten", "hundred"]).toContain(board.mode);
+      if (grade === "4") expect(["hundred", "thousand"]).toContain(board.mode);
+      break;
+    }
     default: {
       const neverBoard: never = board;
       throw new Error(String(neverBoard));
@@ -492,6 +549,19 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
       if (grade === "K" || grade === "1") expect(task.mode).toBe("tens");
       if (grade === "2") expect(["tens", "fives", "twos", "hundreds"]).toContain(task.mode);
       if (grade === "4") expect(["rule", "grow"]).toContain(task.mode);
+      break;
+    case "signs":
+      expect(signTruth(task.left, task.right)).toBe(task.mark);
+      if (grade === "K") expect(task.mode).toBe("to10");
+      if (grade === "1") expect(["to10", "tens"]).toContain(task.mode);
+      if (grade === "4") expect(["hundreds", "big"]).toContain(task.mode);
+      break;
+    case "jumps":
+      expect(task.answer).toBe(task.dir === "more" ? task.start + task.step : task.start - task.step);
+      expect(task.answer % 10).toBe(task.start % 10);
+      if (grade === "1") expect(task.mode).toBe("ten");
+      if (grade === "2" || grade === "3") expect(["ten", "hundred"]).toContain(task.mode);
+      if (grade === "4") expect(["hundred", "thousand"]).toContain(task.mode);
       break;
     default: {
       const neverTask: never = task;

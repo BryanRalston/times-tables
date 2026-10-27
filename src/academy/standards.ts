@@ -167,6 +167,17 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     rule: "3.OA.D.9",
     grow: "4.OA.C.5",
   },
+  signs: {
+    to10: "K.CC.C.7",
+    tens: "1.NBT.B.3",
+    hundreds: "2.NBT.A.4",
+    big: "4.NBT.A.2",
+  },
+  jumps: {
+    ten: "1.NBT.C.5",
+    hundred: "2.NBT.B.8",
+    thousand: "4.NBT.A.1",
+  },
 };
 
 const CHIP_SKILL: Record<string, string> = {
@@ -184,6 +195,7 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "K.CC.B.4": { en: "The last number is how many", es: "El último número es cuántos hay" },
   "K.CC.B.5": { en: "Count how many", es: "Contar cuántos hay" },
   "K.CC.C.6": { en: "Compare two groups", es: "Comparar dos grupos" },
+  "K.CC.C.7": { en: "Compare numbers to 10", es: "Comparar números hasta el 10" },
   "K.OA.A.2": { en: "Add and subtract within 10", es: "Sumar y restar hasta el 10" },
   "K.OA.A.4": { en: "Find the number that makes 10", es: "Hallar el número que completa 10" },
   "K.OA.A.5": { en: "Add and subtract within 5", es: "Sumar y restar hasta el 5" },
@@ -201,6 +213,7 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "1.NBT.B.2": { en: "Tens and ones", es: "Decenas y unidades" },
   "1.NBT.B.3": { en: "Compare two-digit numbers", es: "Comparar números de dos cifras" },
   "1.NBT.C.4": { en: "Add a two-digit number", es: "Sumar un número de dos cifras" },
+  "1.NBT.C.5": { en: "Ten more and ten less", es: "10 más y 10 menos" },
   "1.MD.B.3": { en: "Tell time to the hour and half hour", es: "Decir la hora en punto y la media" },
   "1.MD.C.4": { en: "Read a graph", es: "Leer una gráfica" },
   "1.G.A.1": { en: "Name the parts of a shape", es: "Nombrar las partes de una figura" },
@@ -213,6 +226,7 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "2.NBT.A.2": { en: "Skip-count by 5s, 10s, and 100s", es: "Contar de 5 en 5, de 10 en 10 y de 100 en 100" },
   "2.NBT.A.3": { en: "Read and write numbers to 1000", es: "Leer y escribir números hasta el 1000" },
   "2.NBT.A.4": { en: "Compare three-digit numbers", es: "Comparar números de tres cifras" },
+  "2.NBT.B.8": { en: "100 more and 100 less", es: "100 más y 100 menos" },
   "2.NBT.B.5": { en: "Add and subtract within 100", es: "Sumar y restar hasta el 100" },
   "2.MD.A.1": { en: "Measure length", es: "Medir el largo" },
   "2.MD.D.10": { en: "Picture and bar graphs", es: "Gráficas de dibujos y de barras" },

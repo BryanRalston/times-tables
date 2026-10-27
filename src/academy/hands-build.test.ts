@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
 import { gridCellKeys, gridEdgeKeys, gridMatches } from "./games/grid-data";
+import { jumpsMatch } from "./games/jumps-data";
 import { patternMatches } from "./games/patterns-data";
+import { signsMatch, signTruth } from "./games/signs-data";
 import { GAMES } from "./games/registry";
 import { shareMatches } from "./games/share-data";
 import { guideInk, traceMatches } from "./trace/score";
@@ -99,6 +101,10 @@ function builtOf(task: BuildTask): boolean {
       return gridMatches(task, gridRight(task));
     case "pattern":
       return patternMatches(task, task.answer);
+    case "signs":
+      return signsMatch(task, task.mark);
+    case "jumps":
+      return jumpsMatch(task, task.answer);
     default: {
       const neverTask: never = task;
       return neverTask;
@@ -147,6 +153,10 @@ function wrongOf(task: BuildTask): boolean {
       return gridMatches(task, []);
     case "pattern":
       return patternMatches(task, task.answer + 1);
+    case "signs":
+      return signsMatch(task, task.mark === "<" ? ">" : "<");
+    case "jumps":
+      return jumpsMatch(task, task.answer + 1);
     default: {
       const neverTask: never = task;
       return neverTask;
@@ -235,6 +245,13 @@ function assertBounds(task: HandsTask, level: string): void {
       break;
     case "pattern":
       expect(task.terms.length).toBeGreaterThanOrEqual(3);
+      expect(task.step).toBeGreaterThan(0);
+      break;
+    case "signs":
+      expect(signTruth(task.left, task.right)).toBe(task.mark);
+      break;
+    case "jumps":
+      expect(task.answer).toBe(task.dir === "more" ? task.start + task.step : task.start - task.step);
       expect(task.step).toBeGreaterThan(0);
       break;
     default: {

@@ -358,3 +358,41 @@ Count by tens, fives, twos, and hundreds shows three numbers and asks for the ne
 | 4 | Play | The rule | The rule | One level down (next number) | 4.OA.C.5 |
 
 Pre-K stays locked. Kindergarten and grade 1 only count by tens. Grade 2 can drift down to tens and cannot climb into next number. Grade 3 can drift down to hundreds and cannot climb into the rule. Grade 4 can drift down to next number.
+
+## Compare
+
+Levels, easy to hard: numbers to 10, two digits, three digits, big numbers.
+
+The child picks the one true sentence using `<`, `=`, or `>`. Numbers to 10 show counters under the digits. Two-digit and three-digit questions show tens and hundreds. Big numbers stay on the card and are not spoken, because some languages have no clip past 1,000. A hands card puts the sign in the middle. Counting already asks which group has more. Place value already asks which number is greater, without an equals sign and without recording `<` or `>`.
+
+| Grade | Offer | Start | Core levels | Cap without challenge | Standards |
+|---|---|---|---|---|---|
+| Pre-K | Coming later | — | — | — | Compare waits |
+| K | Play | To 10 | To 10 | To 10 | K.CC.C.7 |
+| 1 | Play | Two digits | Two digits | Two digits | 1.NBT.B.3 |
+| 2 | Play | Three digits | Three digits | Three digits | 2.NBT.A.4 |
+| 3 | Play | Three digits | Three digits | Three digits | 2.NBT.A.4 |
+| 4 | Play | Big numbers | Big numbers | One level down (three digits) | 4.NBT.A.2 |
+
+Pre-K stays locked. Kindergarten only compares 1 through 10. Grade 1 can drift down to 10 and cannot climb into three digits. Grades 2 and 3 can drift down to two digits and cannot climb into four digits. Grade 4 can drift down to three digits.
+
+## 10 More
+
+Levels, easy to hard: ten more, 100 more, 1000 more.
+
+The child finds 10 more or 10 less, then 100 more or 100 less, then 1000 more or 1000 less. The other digits stay put. A hands card adds or takes away that one place, and Done counts even when the built number is still wrong. Skip counting already asks for the next term in a row. This game asks for one mental jump.
+
+| Grade | Offer | Start | Core levels | Cap without challenge | Standards |
+|---|---|---|---|---|---|
+| Pre-K | Coming later | — | — | — | Ten more waits |
+| K | Coming later | — | — | — | Ten more waits |
+| 1 | Play | Ten more | Ten more | Ten more | 1.NBT.C.5 |
+| 2 | Play | 100 more | Ten more, 100 more | 100 more | 2.NBT.B.8 |
+| 3 | Play | 100 more | 100 more | 100 more | 2.NBT.B.8 |
+| 4 | Play | 1000 more | 1000 more | One level down (100 more) | 4.NBT.A.1 |
+
+Pre-K and kindergarten stay locked. Grade 1 only jumps by 10. Grade 2 can drift down to 10 and cannot climb into 1000. Grade 3 can drift down to 10 and cannot climb into 1000. Grade 4 can drift down to 100. The 1000 prompt says “What is 1000 more?” or “What is 1000 less?” and leaves the starting number on the card, so a language that cannot speak past 1,000 still has a clip.
+
+## Still open
+
+These Common Core skills still have no game: teen numbers as ten and ones (K.NBT.A.1), decomposing numbers within 10 (K.OA.A.3), the meaning of the equal sign (1.OA.D.7), three-addend word problems (1.OA.A.2), adding up to four two-digit numbers (2.NBT.B.6), the full subtraction algorithm within 1000 (2.NBT.B.7), measuring the same length in two units (2.MD.A.2), estimating length (2.MD.A.3), comparing lengths (2.MD.A.4), length word problems (2.MD.B.5), a number line of lengths (2.MD.B.6), line plots of measurements (2.MD.D.9), multiplying a one-digit number by a multiple of 10 (3.NBT.A.3), mass and liquid volume (3.MD.A.2), properties of multiplication (3.OA.B.5), time to the minute (3.MD.A.1), and the early reading work of syllables (RF.K.2.B), onset and rime (RF.K.2.C), and phoneme substitution (RF.K.2.E). Rounding to 10 and 100 is already Place Value. Rhyming words are already Phonics, and only in the languages that teach English reading. Even and odd is still open as a question, though Fair Shares already deals equal pairs.

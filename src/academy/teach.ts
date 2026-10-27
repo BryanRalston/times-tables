@@ -639,7 +639,7 @@ function problemTeach(board: ProblemBoard): SceneFrame[] {
   }
 }
 
-function sceneFrames(question: ChoiceQ, board: Board): SceneFrame[] {
+function sceneFrames(question: ChoiceQ, board: Board): TeachFrame[] {
   const solved = solvedLine(question);
   switch (board.game) {
     case "count":
@@ -672,6 +672,22 @@ function sceneFrames(question: ChoiceQ, board: Board): SceneFrame[] {
       return captions([gridHint(board.mode === "fence" ? "fence" : "tiles"), solved]);
     case "patterns":
       return captions([patternHint(), solved]);
+    case "signs":
+      return [
+        {
+          kind: "model",
+          art: { type: "word", text: `${board.left} ${board.mark} ${board.right}` },
+          caption: solved,
+        },
+      ];
+    case "jumps":
+      return [
+        {
+          kind: "model",
+          art: { type: "word", text: `${board.start} ${board.dir === "more" ? "+" : "−"} ${board.step} = ${board.answer}` },
+          caption: solved,
+        },
+      ];
     default: {
       const neverBoard: never = board;
       return neverBoard;

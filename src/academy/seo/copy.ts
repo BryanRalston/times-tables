@@ -675,6 +675,36 @@ export const GAME_COPY: readonly GameCopy[] = [
     ),
   },
   {
+    id: "signs",
+    slug: "compare-numbers-game",
+    grades: ["K", "1", "2", "3", "4"],
+    name: phrase("compare", "compara", "compare", "compare", "比较", "तुलना", "قارن"),
+    blurb: phrase(
+      "Kids compare numbers with less than, equal to, and greater than, from 10 up through four digits.",
+      "Los niños comparan números con menor, igual y mayor, desde el 10 hasta cuatro cifras.",
+      "As crianças comparam números com menor, igual e maior, do 10 até quatro algarismos.",
+      "Les enfants comparent des nombres avec plus petit, égal et plus grand, de 10 jusqu'à quatre chiffres.",
+      "孩子用小于、等于和大于比较数字，从10一直到四位数。",
+      "बच्चे छोटी, बराबर और बड़ी से संख्याएँ तुलना करते हैं, 10 से चार अंकों तक।",
+      "يقارن الأطفال الأعداد بأصغر ويساوي وأكبر، من 10 حتى أربعة أرقام.",
+    ),
+  },
+  {
+    id: "jumps",
+    slug: "ten-more-game",
+    grades: ["1", "2", "3", "4"],
+    name: phrase("10 more", "10 más", "10 mais", "10 plus", "加10", "10 जमा", "10 زائد"),
+    blurb: phrase(
+      "Kids add or take away 10, 100, or 1000 and watch the other digits stay put.",
+      "Los niños suman o quitan 10, 100 o 1000 y ven que las otras cifras se quedan.",
+      "As crianças somam ou tiram 10, 100 ou 1000 e veem que os outros algarismos ficam.",
+      "Les enfants ajoutent ou enlèvent 10, 100 ou 1000 et voient que les autres chiffres restent.",
+      "孩子加上或减去10、100或1000，其他数位不动。",
+      "बच्चे 10, 100 या 1000 जोड़ते या घटाते हैं और बाकी अंक वैसे ही रहते हैं।",
+      "يضيف الأطفال أو ينقصون 10 أو 100 أو 1000 وتبقى الأرقام الأخرى.",
+    ),
+  },
+  {
     id: "patterns",
     slug: "number-patterns-game",
     grades: ["K", "1", "2", "3", "4"],
@@ -816,6 +846,13 @@ patterns:twos|counting by twos|contar de 2 en 2|contar de 2 em 2|compter de 2 en
 patterns:hundreds|counting by hundreds|contar de 100 en 100|contar de 100 em 100|compter de 100 en 100|一百一百地数|सौ-सौ गिनना|العدّ بالمئات
 patterns:rule|the next number|el número que sigue|o próximo número|le nombre suivant|下一个数|अगली संख्या|العدد التالي
 patterns:grow|the rule of a pattern|la regla del patrón|a regra do padrão|la règle de la suite|规律是什么|पैटर्न का नियम|قاعدة النمط
+signs:to10|comparing numbers to 10|comparar números hasta el 10|comparar números até 10|comparer les nombres jusqu'à 10|比较10以内的数|10 तक तुलना|مقارنة الأعداد حتى 10
+signs:tens|comparing two-digit numbers|comparar números de dos cifras|comparar números de dois algarismos|comparer les nombres à deux chiffres|比较两位数|दो अंकों की तुलना|مقارنة عددين من رقمين
+signs:hundreds|comparing three-digit numbers|comparar números de tres cifras|comparar números de três algarismos|comparer les nombres à trois chiffres|比较三位数|तीन अंकों की तुलना|مقارنة عددين من ثلاثة أرقام
+signs:big|comparing big numbers|comparar números grandes|comparar números grandes|comparer de grands nombres|比较大数|बड़ी संख्याओं की तुलना|مقارنة الأعداد الكبيرة
+jumps:ten|ten more and ten less|10 más y 10 menos|10 a mais e 10 a menos|10 de plus et 10 de moins|多10和少10|10 अधिक और 10 कम|10 أكثر و10 أقل
+jumps:hundred|100 more and 100 less|100 más y 100 menos|100 a mais e 100 a menos|100 de plus et 100 de moins|多100和少100|100 अधिक और 100 कम|100 أكثر و100 أقل
+jumps:thousand|1000 more and 1000 less|1000 más y 1000 menos|1000 a mais e 1000 a menos|1000 de plus et 1000 de moins|多1000和少1000|1000 अधिक और 1000 कम|1000 أكثر و1000 أقل
 `;
 
 function loadSkills(): Record<string, Phrase> {
@@ -906,6 +943,8 @@ const SHEET_H1: Record<string, Phrase> = {
   "Fair shares": rest("repartos iguales", "partes iguais", "parts égales", "平均分", "बराबर बाँटना", "حصص متساوية"),
   "Grid garden": rest("jardín de cuadrícula", "jardim quadriculado", "jardin quadrillé", "方格园", "ग्रिड बगीचा", "حديقة المربعات"),
   "Number patterns": rest("patrones numéricos", "padrões numéricos", "suites de nombres", "数字规律", "संख्या के पैटर्न", "أنماط الأعداد"),
+  "Compare numbers": rest("comparar números", "comparar números", "comparer des nombres", "比较数字", "संख्याओं की तुलना", "مقارنة الأعداد"),
+  "Ten more": rest("10 más", "10 mais", "10 de plus", "多10", "10 अधिक", "10 أكثر"),
 };
 
 export function sheetH1(englishH1: string, lang: SeoLang): string {

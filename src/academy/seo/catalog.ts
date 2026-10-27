@@ -1,6 +1,6 @@
 import { formatClockTime } from "../../lib/clock";
 
-export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables" | "graphs" | "share" | "grid" | "patterns";
+export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables" | "graphs" | "share" | "grid" | "patterns" | "signs" | "jumps";
 
 export interface CoinCounts {
   penny?: number;
@@ -833,6 +833,46 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       { prompt: "3, 6, 9, 12. What is the rule?", answer: "add 3" },
       { prompt: "10, 20, 30, 40. What is the rule?", answer: "add 10" },
       { prompt: "5, 10, 15, 20. What is the rule?", answer: "add 5" },
+    ],
+  },
+  {
+    slug: "compare-numbers",
+    title: "Free Compare Numbers Worksheet (K–4) | Squishee Academy",
+    description:
+      "Print a free comparison worksheet for kindergarten through grade 4. Mark less than, equal to, or greater than. No signup.",
+    h1: "Compare numbers",
+    game: "signs",
+    items: [
+      { prompt: "Which is true: 3 is less than 8, 3 is greater than 8, or 3 is equal to 8?", answer: "3 is less than 8" },
+      { prompt: "Which is true: 6 is equal to 6, 6 is less than 6, or 6 is greater than 6?", answer: "6 is equal to 6" },
+      { prompt: "Which is true: 9 is greater than 4, 9 is less than 4, or 9 is equal to 4?", answer: "9 is greater than 4" },
+      { prompt: "Which is true: 14 is less than 41, 14 is greater than 41, or 14 is equal to 41?", answer: "14 is less than 41" },
+      { prompt: "Which is true: 70 is equal to 70, 70 is less than 70, or 70 is greater than 70?", answer: "70 is equal to 70" },
+      { prompt: "Which is true: 58 is greater than 49, 58 is less than 49, or 58 is equal to 49?", answer: "58 is greater than 49" },
+      { prompt: "Which is true: 305 is less than 350, 305 is greater than 350, or 305 is equal to 350?", answer: "305 is less than 350" },
+      { prompt: "Which is true: 428 is equal to 428, 428 is less than 428, or 428 is greater than 428?", answer: "428 is equal to 428" },
+      { prompt: "Which is true: 900 is greater than 890, 900 is less than 890, or 900 is equal to 890?", answer: "900 is greater than 890" },
+      { prompt: "Which is true: 2406 is less than 2604, 2406 is greater than 2604, or 2406 is equal to 2604?", answer: "2406 is less than 2604" },
+    ],
+  },
+  {
+    slug: "ten-more",
+    title: "Free Ten More Worksheet (Grades 1–4) | Squishee Academy",
+    description:
+      "Print a free worksheet for grades 1–4. Find 10 more, 10 less, 100 more, 100 less, and 1000 more. No signup.",
+    h1: "Ten more",
+    game: "jumps",
+    items: [
+      { prompt: "What is 10 more than 24?", answer: "34" },
+      { prompt: "What is 10 less than 51?", answer: "41" },
+      { prompt: "What is 10 more than 70?", answer: "80" },
+      { prompt: "What is 10 less than 16?", answer: "6" },
+      { prompt: "What is 100 more than 240?", answer: "340" },
+      { prompt: "What is 100 less than 800?", answer: "700" },
+      { prompt: "What is 100 more than 90?", answer: "190" },
+      { prompt: "What is 100 less than 105?", answer: "5" },
+      { prompt: "What is 1000 more than 2300?", answer: "3300" },
+      { prompt: "What is 1000 less than 4500?", answer: "3500" },
     ],
   },
 ];

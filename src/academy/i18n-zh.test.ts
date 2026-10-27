@@ -70,7 +70,7 @@ describe("Chinese copy", () => {
     expect(blob).not.toMatch(/[¡¿]/);
     expect(PERSONA_FALLBACK_ZH.line.length).toBeGreaterThan(2);
     expect(Object.keys(PERSONA_ZH)).toHaveLength(42);
-    expect(Object.keys(BOSS_ZH)).toHaveLength(18);
+    expect(Object.keys(BOSS_ZH)).toHaveLength(20);
     expect(Object.keys(TRAIT_ZH).length).toBeGreaterThanOrEqual(10);
   });
 

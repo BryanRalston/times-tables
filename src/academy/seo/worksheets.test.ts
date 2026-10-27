@@ -469,6 +469,28 @@ function expectFresh(item: StaticItem) {
     expect(item.answer).toBe(String(Number(periSide[1]) / 2 - Number(periSide[2])));
     return;
   }
+  const compareTrue = item.prompt.match(
+    /^Which is true: (\d+) is (less than|greater than|equal to) (\d+), (\d+) is (less than|greater than|equal to) (\d+), or (\d+) is (less than|greater than|equal to) (\d+)\?$/,
+  );
+  if (compareTrue) {
+    const rows = [
+      { left: Number(compareTrue[1]), word: compareTrue[2] ?? "", right: Number(compareTrue[3]) },
+      { left: Number(compareTrue[4]), word: compareTrue[5] ?? "", right: Number(compareTrue[6]) },
+      { left: Number(compareTrue[7]), word: compareTrue[8] ?? "", right: Number(compareTrue[9]) },
+    ];
+    const holds = (left: number, word: string, right: number) =>
+      word === "less than" ? left < right : word === "greater than" ? left > right : left === right;
+    const trueOnes = rows.filter((row) => holds(row.left, row.word, row.right)).map((row) => `${row.left} is ${row.word} ${row.right}`);
+    expect(trueOnes).toEqual([item.answer]);
+    return;
+  }
+  const jump = item.prompt.match(/^What is (\d+) (more|less) than (\d+)\?$/);
+  if (jump) {
+    const step = Number(jump[1]);
+    const start = Number(jump[3]);
+    expect(item.answer).toBe(String(jump[2] === "more" ? start + step : start - step));
+    return;
+  }
   const patternRule = item.prompt.match(/^(\d+), (\d+), (\d+), (\d+)\. What is the rule\?$/);
   if (patternRule) {
     const step = Number(patternRule[2]) - Number(patternRule[1]);
@@ -481,9 +503,9 @@ function expectFresh(item: StaticItem) {
 }
 
 describe("printable worksheets", () => {
-  it("publishes 15 to 45 static sheets search engines can read", () => {
+  it("publishes 15 to 47 static sheets search engines can read", () => {
     expect(WORKSHEETS.length).toBeGreaterThanOrEqual(15);
-    expect(WORKSHEETS.length).toBeLessThanOrEqual(45);
+    expect(WORKSHEETS.length).toBeLessThanOrEqual(47);
     const slugs = WORKSHEETS.map((sheet) => sheet.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
     expect(slugs).toEqual(expect.arrayContaining(["telling-time-quarter-hour", "counting-coins", "multiplication-7s"]));

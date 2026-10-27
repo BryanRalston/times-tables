@@ -69,7 +69,7 @@ describe("Hindi copy", () => {
     expect(blob).not.toMatch(/[¡¿]/);
     expect(PERSONA_FALLBACK_HI.line.length).toBeGreaterThan(2);
     expect(Object.keys(PERSONA_HI)).toHaveLength(42);
-    expect(Object.keys(BOSS_HI)).toHaveLength(18);
+    expect(Object.keys(BOSS_HI)).toHaveLength(20);
     expect(Object.keys(TRAIT_HI).length).toBeGreaterThanOrEqual(10);
   });
 

@@ -478,6 +478,20 @@ export const BOSS_ZH: Record<string, BossEs> = {
     "cosmeticName": "跳跃皇冠",
     "trophyName": "规律奖杯"
   },
+  "signs": {
+    "taunt": "哪个数更大？",
+    "friendly": "对！",
+    "personality": "fox戴着纸皇冠，把数字排成一排再比较。",
+    "cosmeticName": "比较皇冠",
+    "trophyName": "比较奖杯"
+  },
+  "jumps": {
+    "taunt": "20加10是多少？",
+    "friendly": "对！",
+    "personality": "otter披着斗篷，一次跳十个，个位不动。",
+    "cosmeticName": "十的斗篷",
+    "trophyName": "多十奖杯"
+  },
 };
 
 export const TRAIT_ZH: Record<string, string> = {
@@ -1502,6 +1516,32 @@ export const ZH: Record<string, string> = {
   "Count by hundreds": "一百一百",
   "Next number": "下一个数",
   "The rule": "规律",
+  "Compare": "比",
+  "10 more": "加10",
+  "To 10": "到10",
+  "Two digits": "两位数",
+  "Three digits": "三位数",
+  "Big numbers": "大数",
+  "Ten more": "多10",
+  "100 more": "多100",
+  "1000 more": "多1000",
+  "Look at the tens": "看十位",
+  "Compare.": "比。",
+  "equals": "等于",
+  "is greater": "更大",
+  "is less": "更小",
+  "more": "加",
+  "less": "减",
+  "What is 1000 more?": "1000加，是多少？",
+  "What is 1000 less?": "1000减，是多少？",
+  "Grades 1–4": "一至四年级",
+  "Compare numbers to 10": "比较10以内的数",
+  "Ten more and ten less": "多10和少10",
+  "100 more and 100 less": "多100和少100",
+  "Free comparison practice for kindergarten through grade 4. Choose the true less-than, equal, or greater-than sentence. No signup.":
+    "幼儿园到四年级的免费比较练习。选出小于、等于或大于的对的句子。不用注册。",
+  "Free practice adding or taking away 10, 100, or 1000 for grades 1–4. The other digits stay put. No signup.":
+    "一至四年级的免费练习：加上或减去10、100或1000。其他数位不动。不用注册。",
   "Grades 2–4": "二至四年级",
   "Shares": "平均分",
   "Garden": "方格园",

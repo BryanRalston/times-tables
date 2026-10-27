@@ -652,6 +652,26 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string): s
         `${buddy} और ${host} आगे की संख्या ढूँढते हैं।`,
         `${buddy} و${host} يجدان العدد التالي.`,
       );
+    case "signs":
+      return say(
+        `${buddy} and ${host} compare the numbers.`,
+        `${buddy} y ${host} comparan los números.`,
+        `${buddy} e ${host} comparam os números.`,
+        `${buddy} et ${host} comparent les nombres.`,
+        `${buddy}和${host}比较这两个数。`,
+        `${buddy} और ${host} संख्याओं की तुलना करते हैं।`,
+        `${buddy} و${host} يقارنان العددين.`,
+      );
+    case "jumps":
+      return say(
+        `${buddy} and ${host} jump ten more.`,
+        `${buddy} y ${host} saltan 10 más.`,
+        `${buddy} e ${host} pulam mais 10.`,
+        `${buddy} et ${host} sautent 10 de plus.`,
+        `${buddy}和${host}跳到多10。`,
+        `${buddy} और ${host} 10 और आगे कूदते हैं।`,
+        `${buddy} و${host} يقفزان 10 أكثر.`,
+      );
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -725,6 +745,10 @@ function handsStory(kind: Exclude<RoundSlot, { kind: "choice" }>["kind"], buddy:
       return say(`${buddy} and ${host} walk the shape.`, `${buddy} y ${host} recorren la figura.`, `${buddy} e ${host} percorrem a figura.`, `${buddy} et ${host} font le tour de la figure.`, `${buddy}和${host}沿着图形走一圈。`, `${buddy} और ${host} आकृति के चारों ओर चलते हैं।`, `${buddy} و${host} يدوران حول الشكل.`);
     case "pattern":
       return say(`${buddy} and ${host} finish the pattern.`, `${buddy} y ${host} completan el patrón.`, `${buddy} e ${host} completam o padrão.`, `${buddy} et ${host} finissent la suite.`, `${buddy}和${host}把规律补完。`, `${buddy} और ${host} पैटर्न पूरा करते हैं।`, `${buddy} و${host} يكملان النمط.`);
+    case "signs":
+      return say(`${buddy} and ${host} place the sign.`, `${buddy} y ${host} ponen el signo.`, `${buddy} e ${host} colocam o sinal.`, `${buddy} et ${host} posent le signe.`, `${buddy}和${host}放上符号。`, `${buddy} और ${host} चिह्न रखते हैं।`, `${buddy} و${host} يضعان الإشارة.`);
+    case "jumps":
+      return say(`${buddy} and ${host} add one ten.`, `${buddy} y ${host} agregan una decena.`, `${buddy} e ${host} somam uma dezena.`, `${buddy} et ${host} ajoutent une dizaine.`, `${buddy}和${host}加上一个十。`, `${buddy} और ${host} एक दहाई जोड़ते हैं।`, `${buddy} و${host} يضيفان عشرة.`);
     default: {
       const neverKind: never = kind;
       return neverKind;

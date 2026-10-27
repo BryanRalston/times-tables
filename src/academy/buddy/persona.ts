@@ -57,6 +57,8 @@ export const STUDY_PALS: Record<string, string> = {
   share: "pearl-whale",
   grid: "frost-bun",
   patterns: "sugar-comet",
+  signs: "fox",
+  jumps: "otter",
 };
 
 const PEOPLE: Record<string, Persona> = {

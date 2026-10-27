@@ -149,7 +149,7 @@ export function collectSpokenLines(): SpokenLine[] {
       }
     }
   }
-  for (const id of ["graphs", "share", "grid", "patterns"] as const) {
+  for (const id of ["graphs", "share", "grid", "patterns", "signs", "jumps"] as const) {
     const game = GAMES.find((row) => row.id === id);
     if (!game) continue;
     for (const level of game.levels) {
