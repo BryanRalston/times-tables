@@ -1,4 +1,5 @@
 import type { Locale } from "../i18n";
+import { SHELF_COPY } from "./shelf-copy";
 
 /** One book's words in a language. Choice labels follow the English choice order. */
 export interface StoryCopy {
@@ -9,12 +10,23 @@ export interface StoryCopy {
 
 export type StoryLang = Exclude<Locale, "en">;
 
+function withShelf(books: Record<StoryLang, Record<string, StoryCopy>>): Record<StoryLang, Record<string, StoryCopy>> {
+  return {
+    es: { ...books.es, ...SHELF_COPY.es },
+    pt: { ...books.pt, ...SHELF_COPY.pt },
+    fr: { ...books.fr, ...SHELF_COPY.fr },
+    zh: { ...books.zh, ...SHELF_COPY.zh },
+    hi: { ...books.hi, ...SHELF_COPY.hi },
+    ar: { ...books.ar, ...SHELF_COPY.ar },
+  };
+}
+
 /**
  * Kid-friendly read-along text. Character names stay Peach, Frog, Bunny, and
  * the rest, the same way the games say them. Chinese words are spaced so each
  * one can light up with its own clip.
  */
-export const STORY_COPY: Record<StoryLang, Record<string, StoryCopy>> = {
+export const STORY_COPY: Record<StoryLang, Record<string, StoryCopy>> = withShelf({
   es: {
     "pk-peach-cat": {
       title: "La gatita",
@@ -670,4 +682,4 @@ export const STORY_COPY: Record<StoryLang, Record<string, StoryCopy>> = {
       ],
     },
   },
-};
+});

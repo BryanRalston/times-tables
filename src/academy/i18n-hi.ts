@@ -829,6 +829,8 @@ export const HI: Record<string, string> = {
   "Grade 2–3": "कक्षा 2 से 3",
   "Grade 2–4": "कक्षा 2 से 4",
   "Grade 2–3 patterns": "कक्षा 2 से 3 के पैटर्न",
+  "Grade 3": "कक्षा 3",
+  "Grade 4": "कक्षा 4",
   "Grade 4 vocabulary": "कक्षा 4 के शब्द",
   "Grade 4 words": "कक्षा 4 के शब्द",
   "Grown-ups": "बड़े",

@@ -135,19 +135,19 @@ CVC, digraphs, blends, and long-vowel words are spoken. The sentence is not prin
 
 ## Read-along stories
 
-Stories are short books, not an island game. Pre-K, kindergarten, grade 1, and grade 2 each have books. Grade 3 and grade 4 can still open every book. A child sees books at their grade and every easier book.
+Stories are short books, not an island game. Pre-K, kindergarten, grade 1, grade 2, grade 3, and grade 4 each have books. A child sees books at their grade and every easier book.
 
 Each page is read from recorded word clips, with the current word lit. A miss on the picture check shows that page again. There is no timer and no fail screen. Finishing adds stars, coins, and friendship the same way a round does, and the grown-ups report lists the books.
 
 A word in a book has to be one of these:
 
-- a sight word at or below the book’s grade (Pre-K is pre-primer, kindergarten goes through primer, grade 1 through 1st grade, grade 2 through 2nd grade)
+- a sight word at or below the book’s grade (Pre-K is pre-primer, kindergarten goes through primer, grade 1 through 1st grade, grade 2 through 2nd grade, grade 3 through 3rd grade, grade 4 through the grade 4 list)
 - a phonics picture noun from the sound bank
 - a CVC word from the rhyme families
-- a spelling word at or below the book’s grade (Pre-K has none, kindergarten is CVC, grade 1 goes through long vowels, grade 2 goes through patterns)
+- a spelling word at or below the book’s grade (Pre-K has none, kindergarten is CVC, grade 1 goes through long vowels, grade 2 and grade 3 go through patterns, grade 4 adds grade 4 spelling)
 - the single-word name of a squishee in that book
 
-Grade 3 sight words, grade 4 vocabulary, and grade 4 spelling stay out. `src/academy/stories/stories.test.ts` checks every page, question, and clip.
+Grade 4 vocabulary and grade 4 spelling stay out of the grade 3 books. `src/academy/stories/stories.test.tsx` checks every page, question, and clip.
 
 Read-along books play in every language on the shelf. The pictures stay the same, character names stay, and each word uses that language's recorded clip. Arabic pages run right to left. See `docs/LANGUAGE.md`.
 

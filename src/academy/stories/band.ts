@@ -5,8 +5,8 @@ import { RHYME_FAMILIES, SOUND_BANK } from "../games/phonics";
 import { ALL_SIGHT, type SightList } from "../games/sight-data";
 import { ALL_SPELL, type SpellLevel } from "../games/spell-data";
 
-/** Read-along books stop at grade 2. Older grades can still open them. */
-export type StoryGrade = "PK" | "K" | "1" | "2";
+/** Read-along books run through grade 4. A child sees that grade and every easier book. */
+export type StoryGrade = "PK" | "K" | "1" | "2" | "3" | "4";
 
 const GRADE_RANK: Record<Grade, number> = {
   PK: 0,
@@ -22,6 +22,8 @@ const SIGHT_BAND: Record<StoryGrade, readonly SightList[]> = {
   K: ["preprimer", "primer"],
   "1": ["preprimer", "primer", "first"],
   "2": ["preprimer", "primer", "first", "second"],
+  "3": ["preprimer", "primer", "first", "second", "third"],
+  "4": ["preprimer", "primer", "first", "second", "third", "fourth"],
 };
 
 const SPELL_BAND: Record<StoryGrade, readonly SpellLevel[]> = {
@@ -29,6 +31,8 @@ const SPELL_BAND: Record<StoryGrade, readonly SpellLevel[]> = {
   K: ["cvc"],
   "1": ["cvc", "digraphs", "blends", "long"],
   "2": ["cvc", "digraphs", "blends", "long", "patterns"],
+  "3": ["cvc", "digraphs", "blends", "long", "patterns"],
+  "4": ["cvc", "digraphs", "blends", "long", "patterns", "grade4"],
 };
 
 function listWords(grade: StoryGrade): Set<string> {
@@ -53,6 +57,8 @@ const BANDS: Record<StoryGrade, Set<string>> = {
   K: listWords("K"),
   "1": listWords("1"),
   "2": listWords("2"),
+  "3": listWords("3"),
+  "4": listWords("4"),
 };
 
 /** Single-word squishee name, lowercased. Multi-word names are not story tokens. */
@@ -75,9 +81,9 @@ export function storyRank(grade: StoryGrade): number {
   return GRADE_RANK[grade];
 }
 
-/** Books at this grade and every easier book. Grade 3 and 4 keep the grade 2 shelf. */
+/** Books at this grade and every easier book. */
 export function gradeCap(grade: Grade): number {
-  return Math.min(GRADE_RANK[grade], GRADE_RANK["2"]);
+  return GRADE_RANK[grade];
 }
 
 export function storyGradeLabel(grade: StoryGrade): string {
@@ -90,6 +96,10 @@ export function storyGradeLabel(grade: StoryGrade): string {
       return t("Grade 1", "Grado 1", "1.º ano", "CP", "一年级", "कक्षा 1", "الصف 1");
     case "2":
       return t("Grade 2", "Grado 2", "2.º ano", "CE1", "二年级", "कक्षा 2", "الصف 2");
+    case "3":
+      return t("Grade 3", "Grado 3", "3.º ano", "CE2", "三年级", "कक्षा 3", "الصف 3");
+    case "4":
+      return t("Grade 4", "Grado 4", "4.º ano", "CM1", "四年级", "कक्षा 4", "الصف 4");
     default: {
       const neverGrade: never = grade;
       return neverGrade;

@@ -830,6 +830,8 @@ export const ZH: Record<string, string> = {
   "Grade 2–3": "二年级到三年级",
   "Grade 2–4": "二年级到四年级",
   "Grade 2–3 patterns": "二年级和三年级的规律",
+  "Grade 3": "三年级",
+  "Grade 4": "四年级",
   "Grade 4 vocabulary": "四年级词汇",
   "Grade 4 words": "四年级的词",
   "Grown-ups": "家长",

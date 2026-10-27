@@ -849,6 +849,8 @@ export const PT: Record<string, string> = {
   "Grade 2": "2.º ano",
   "Grade 2–3": "2.º ao 3.º ano",
   "Grade 2–3 patterns": "Padrões do 2.º e 3.º ano",
+  "Grade 3": "3.º ano",
+  "Grade 4": "4.º ano",
   "Grade 4 vocabulary": "Vocabulário do 4.º ano",
   "Grade 4 words": "Palavras do 4.º ano",
   "Grown-ups": "Adultos",

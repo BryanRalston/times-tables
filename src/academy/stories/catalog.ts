@@ -1,4 +1,5 @@
 import type { StoryGrade } from "./band";
+import { SHELF_STORIES } from "./shelf";
 
 export const STORY_PROPS = ["hat", "mat", "sun", "bug", "cup", "kite", "fish", "log", "snack", "moon", "house", "boat"] as const;
 export type StoryProp = (typeof STORY_PROPS)[number];
@@ -314,6 +315,7 @@ export const STORIES: readonly Story[] = [
       },
     ],
   },
+  ...SHELF_STORIES,
 ];
 
 export function storyById(id: string | undefined): Story | undefined {
