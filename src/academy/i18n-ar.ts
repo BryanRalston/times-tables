@@ -843,6 +843,8 @@ export const AR: Record<string, string> = {
   "Grade 2–3": "الصف 2–3",
   "Grade 2–4": "الصف 2–4",
   "Grade 2–3 patterns": "أنماط الصف 2–3",
+  "Grade 3": "الصف 3",
+  "Grade 4": "الصف 4",
   "Grade 4 vocabulary": "مفردات الصف 4",
   "Grade 4 words": "كلمات الصف 4",
   "Grown-ups": "الكبار",

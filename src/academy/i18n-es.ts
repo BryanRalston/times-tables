@@ -1028,6 +1028,8 @@ export const ES: Record<string, string> = {
   "K": "Kínder",
   "Grade 1": "Grado 1",
   "Grade 2": "Grado 2",
+  "Grade 3": "Grado 3",
+  "Grade 4": "Grado 4",
   "1 story finished.": "1 cuento terminado.",
   "No stories finished yet.": "Todavía no hay cuentos terminados.",
   Colors: "Colores",

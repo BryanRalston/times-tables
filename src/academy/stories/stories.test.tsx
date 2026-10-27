@@ -56,10 +56,12 @@ afterEach(() => {
 
 describe("story grade bands", () => {
   it("keeps every book inside its sight-word and phonics band", () => {
-    expect(STORIES.length).toBeGreaterThanOrEqual(8);
+    expect(STORIES.length).toBeGreaterThanOrEqual(22);
     for (const grade of ["PK", "K", "1", "2"] as const) {
-      expect(STORIES.filter((story) => story.grade === grade).length).toBeGreaterThanOrEqual(2);
+      expect(STORIES.filter((story) => story.grade === grade).length).toBeGreaterThanOrEqual(4);
     }
+    expect(STORIES.filter((story) => story.grade === "3").length).toBeGreaterThanOrEqual(3);
+    expect(STORIES.filter((story) => story.grade === "4").length).toBeGreaterThanOrEqual(3);
     const problems = STORIES.flatMap((story) => storyViolations(story).map((row) => `${story.id}: ${row}`));
     expect(problems).toEqual([]);
   });
@@ -77,17 +79,29 @@ describe("story grade bands", () => {
     expect(wordAllowed("2", "night", [])).toBe(true);
     expect(wordAllowed("2", "habitat", [])).toBe(false);
     expect(wordAllowed("2", "predict", [])).toBe(false);
+    expect(wordAllowed("3", "together", [])).toBe(true);
+    expect(wordAllowed("3", "habitat", [])).toBe(false);
+    expect(wordAllowed("3", "predict", [])).toBe(false);
+    expect(wordAllowed("4", "habitat", [])).toBe(true);
+    expect(wordAllowed("4", "predict", [])).toBe(true);
+    expect(wordAllowed("4", "measure", [])).toBe(true);
   });
 
   it("opens books at the child's grade and every easier book", () => {
-    expect(storiesForGrade("PK").map((story) => story.grade)).toEqual(["PK", "PK"]);
+    expect(storiesForGrade("PK").every((story) => story.grade === "PK")).toBe(true);
+    expect(storiesForGrade("PK").length).toBeGreaterThanOrEqual(4);
     expect(storiesForGrade("K").some((story) => story.grade === "1")).toBe(false);
+    expect(storiesForGrade("K").some((story) => story.grade === "PK")).toBe(true);
     expect(storiesForGrade("1").some((story) => story.grade === "2")).toBe(false);
     expect(storiesForGrade("1").some((story) => story.grade === "PK")).toBe(true);
-    for (const grade of ["2", "3", "4"] as const) {
-      expect(storiesForGrade(grade)).toHaveLength(STORIES.length);
-      expect(storiesForGrade(grade)[0]?.grade).toBe("2");
-    }
+    expect(storiesForGrade("2").some((story) => story.grade === "3")).toBe(false);
+    expect(storiesForGrade("2").some((story) => story.grade === "2")).toBe(true);
+    expect(storiesForGrade("2")[0]?.grade).toBe("2");
+    expect(storiesForGrade("3").some((story) => story.grade === "4")).toBe(false);
+    expect(storiesForGrade("3").some((story) => story.grade === "3")).toBe(true);
+    expect(storiesForGrade("3")[0]?.grade).toBe("3");
+    expect(storiesForGrade("4")).toHaveLength(STORIES.length);
+    expect(storiesForGrade("4")[0]?.grade).toBe("4");
   });
 });
 

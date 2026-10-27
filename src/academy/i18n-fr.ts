@@ -843,6 +843,8 @@ export const FR: Record<string, string> = {
   "Grade 2": "CE1",
   "Grade 2–3": "CE1 à CE2",
   "Grade 2–3 patterns": "Motifs du CE1 et du CE2",
+  "Grade 3": "CE2",
+  "Grade 4": "CM1",
   "Grade 4 vocabulary": "Vocabulaire du CM1",
   "Grade 4 words": "Mots du CM1",
   "Grown-ups": "Adultes",
