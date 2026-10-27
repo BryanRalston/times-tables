@@ -37,9 +37,19 @@ export function signsMatch(task: SignsTask, picked: SignMark | null): boolean {
   return picked === task.mark;
 }
 
-function compareSpeech(left: number, right: number): string {
+function compareSpeech(left: number, right: number, places: boolean): string {
   if (left > 1000 || right > 1000) {
-    return t("Compare.", "Compara.", "Compare.", "Compare.", "比。", "तुलना", "قارن");
+    if (places) {
+      return t(
+        "Look at the hundreds, then the tens",
+        "Mira las centenas y luego las decenas",
+        undefined,
+        undefined,
+        undefined,
+        "। पहले सैकड़ा देखो, फिर दहाई",
+      );
+    }
+    return t("Compare.", "Compara.", "Compare.", "Compare.", "比。", "। तुलना", "قارن");
   }
   return t(
     `Compare ${left} and ${right}.`,
@@ -47,7 +57,7 @@ function compareSpeech(left: number, right: number): string {
     `Compare ${left} e ${right}.`,
     `Compare ${left} et ${right}.`,
     `比${left}和${right}。`,
-    `तुलना ${left} और ${right}`,
+    `${left} और ${right} तुलना`,
     `قارن ${left} و ${right}`,
   );
 }
@@ -158,7 +168,7 @@ function roll(mode: SignLevel, rng: Rng, ease: ReturnType<typeof easeOf>): Signs
     left,
     right,
     mark,
-    speech: compareSpeech(left, right),
+    speech: compareSpeech(left, right, left > 1000 && left % 2 === 0),
     skill: `signs:${mode}`,
     factKey: `${mode}:${left}:${mark}:${right}`,
     praise: signPraise(left, right, mark),
@@ -222,7 +232,12 @@ export function makeSignsQuestion(rng: Rng, level: string, prefer: readonly stri
   });
 }
 
+/** Hindi four-digit speech starts with a danda so it does not stick to "your turn". */
+export function shownSignSpeech(speech: string): string {
+  return speech.replace(/^।\s*/, "");
+}
+
 export function makeSignsSheet(rng: Rng, level: string): SheetItem {
   const task = makeSignsTask(level, rng);
-  return { prompt: task.speech, answer: signLabel(task.left, task.mark, task.right) };
+  return { prompt: shownSignSpeech(task.speech), answer: signLabel(task.left, task.mark, task.right) };
 }

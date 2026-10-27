@@ -1,7 +1,7 @@
 import { cx } from "../ui/bits";
 import { SignPair } from "../ui/sign-board";
 import { signsCard } from "./cards";
-import { isSignLevel, makeSignsQuestion, makeSignsSheet } from "./signs-data";
+import { isSignLevel, makeSignsQuestion, makeSignsSheet, shownSignSpeech } from "./signs-data";
 import type { SignsTask } from "./signs-data";
 import { SceneCard, sceneModule } from "./scene-ui";
 import type { ChoiceProps, GameModule, PromptProps } from "./types";
@@ -23,7 +23,7 @@ function taskOf(board: { mode: SignsTask["mode"]; left: number; right: number; m
 export function SignPrompt({ question, mascot, happy }: PromptProps) {
   if (question.visual.kind !== "scene" || question.visual.board.game !== "signs") return null;
   return (
-    <SceneCard title={question.title} mascot={mascot} happy={happy} hint={question.hint} hands={question.visual.hands} answer={question.answer}>
+    <SceneCard title={shownSignSpeech(question.title)} mascot={mascot} happy={happy} hint={question.hint} hands={question.visual.hands} answer={question.answer}>
       {null}
     </SceneCard>
   );

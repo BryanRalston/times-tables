@@ -36,8 +36,8 @@ function jumpSpeech(start: number, step: number, dir: JumpTask["dir"]): string {
         "¿Cuánto es 1000 más?",
         "Quanto é 1000 mais?",
         "Combien font 1000 plus ?",
-        "1000加是多少？",
-        "कितना है 1000 जमा",
+        "1000加，是多少？",
+        "1000 जमा । कितना है",
         "كم 1000 زائد",
       );
     }
@@ -46,8 +46,8 @@ function jumpSpeech(start: number, step: number, dir: JumpTask["dir"]): string {
       "¿Cuánto es 1000 menos?",
       "Quanto é 1000 menos?",
       "Combien font 1000 moins ?",
-      "1000减是多少？",
-      "कितना है 1000 घटा",
+      "1000减，是多少？",
+      "1000 घटा । कितना है",
       "كم 1000 ناقص",
     );
   }
@@ -58,7 +58,7 @@ function jumpSpeech(start: number, step: number, dir: JumpTask["dir"]): string {
       `Quanto é ${start} mais ${step}?`,
       `Combien font ${start} plus ${step} ?`,
       `${start}加${step}是多少？`,
-      `कितना है ${start} जमा ${step}`,
+      `${start} जमा ${step} कितना है`,
       `كم ${start} زائد ${step}`,
     );
   }
@@ -68,7 +68,7 @@ function jumpSpeech(start: number, step: number, dir: JumpTask["dir"]): string {
     `Quanto é ${start} menos ${step}?`,
     `Combien font ${start} moins ${step} ?`,
     `${start}减${step}是多少？`,
-    `कितना है ${start} घटा ${step}`,
+    `${start} घटा ${step} कितना है`,
     `كم ${start} ناقص ${step}`,
   );
 }
