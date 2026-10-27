@@ -30,6 +30,8 @@ const GAME_TITLE_ES: Record<string, string> = {
   share: "Repartos",
   grid: "Cuadrícula",
   patterns: "Patrones",
+  signs: "Compara",
+  jumps: "10 más",
 };
 
 interface NamedSheet {

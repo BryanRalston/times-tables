@@ -255,6 +255,32 @@ const AUTHORED: readonly IslandBoss[] = [
     trophyId: "trophy-pattern",
     trophyName: "Pattern trophy",
   },
+  {
+    gameId: "signs",
+    name: "Fern Fox",
+    taunt: "Which number is greater?",
+    friendly: "Yes!",
+    personality: "A fox in a paper crown who lines numbers up to compare them.",
+    face: "fox",
+    look: "crown",
+    cosmeticId: "sign-crown",
+    cosmeticName: "Sign crown",
+    trophyId: "trophy-signs",
+    trophyName: "Compare trophy",
+  },
+  {
+    gameId: "jumps",
+    name: "Otto Otter",
+    taunt: "What is 10 more than 20?",
+    friendly: "Yes!",
+    personality: "An otter in a cape who hops ten at a time and leaves the ones alone.",
+    face: "otter",
+    look: "cape",
+    cosmeticId: "ten-cape",
+    cosmeticName: "Ten cape",
+    trophyId: "trophy-jumps",
+    trophyName: "Ten more trophy",
+  },
 ];
 
 const LOOKS: readonly BossLook[] = ["crown", "cape", "armor", "clock", "coins", "spell"];

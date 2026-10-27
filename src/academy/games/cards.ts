@@ -1106,6 +1106,101 @@ export const patternsCard = sceneCard("Patterns", PATTERN_ROWS, {
   isLevel: (value) => isId(PATTERN_IDS, value),
 });
 
+const SIGN_IDS = ["to10", "tens", "hundreds", "big"] as const;
+const SIGN_ROWS: SkillRow[] = [
+  { key: "signs:to10", label: "To 10" },
+  { key: "signs:tens", label: "Two digits" },
+  { key: "signs:hundreds", label: "Three digits" },
+  { key: "signs:big", label: "Big numbers" },
+];
+
+export const signsCard = sceneCard("Compare", SIGN_ROWS, {
+  id: "signs",
+  title: "Compare",
+  audience: "K–4",
+  tint: "rose",
+  mascot: "fox",
+  sheetSlug: "compare-numbers",
+  sheetScreen: "sheet-signs",
+  blurb:
+    "Free comparison practice for kindergarten through grade 4. Choose the true less-than, equal, or greater-than sentence. No signup.",
+  levels: [
+    { id: "to10", label: "To 10", num: 1 },
+    { id: "tens", label: "Two digits", num: 2 },
+    { id: "hundreds", label: "Three digits", num: 3 },
+    { id: "big", label: "Big numbers", num: 4 },
+  ],
+  defaultLevel(grade) {
+    const fallback = ((): string => {
+      switch (grade) {
+        case "PK":
+        case "K":
+          return "to10";
+        case "1":
+          return "tens";
+        case "2":
+        case "3":
+          return "hundreds";
+        case "4":
+          return "big";
+        default: {
+          const neverGrade: never = grade;
+          return neverGrade;
+        }
+      }
+    })();
+    return bandStart("signs", grade, SIGN_IDS, fallback);
+  },
+  sheetDefaultLevel: "to10",
+  isLevel: (value) => isId(SIGN_IDS, value),
+});
+
+const JUMP_IDS = ["ten", "hundred", "thousand"] as const;
+const JUMP_ROWS: SkillRow[] = [
+  { key: "jumps:ten", label: "Ten more" },
+  { key: "jumps:hundred", label: "100 more" },
+  { key: "jumps:thousand", label: "1000 more" },
+];
+
+export const jumpsCard = sceneCard("10 more", JUMP_ROWS, {
+  id: "jumps",
+  title: "10 more",
+  audience: "Grades 1–4",
+  tint: "iris",
+  mascot: "otter",
+  sheetSlug: "ten-more",
+  sheetScreen: "sheet-jumps",
+  blurb:
+    "Free practice adding or taking away 10, 100, or 1000 for grades 1–4. The other digits stay put. No signup.",
+  levels: [
+    { id: "ten", label: "Ten more", num: 1 },
+    { id: "hundred", label: "100 more", num: 2 },
+    { id: "thousand", label: "1000 more", num: 3 },
+  ],
+  defaultLevel(grade) {
+    const fallback = ((): string => {
+      switch (grade) {
+        case "PK":
+        case "K":
+        case "1":
+          return "ten";
+        case "2":
+        case "3":
+          return "hundred";
+        case "4":
+          return "thousand";
+        default: {
+          const neverGrade: never = grade;
+          return neverGrade;
+        }
+      }
+    })();
+    return bandStart("jumps", grade, JUMP_IDS, fallback);
+  },
+  sheetDefaultLevel: "ten",
+  isLevel: (value) => isId(JUMP_IDS, value),
+});
+
 /** Home-card order is also the island order. Append a game; do not insert one in front. */
 export const GAME_CARDS = [
   timesCard,
@@ -1126,6 +1221,8 @@ export const GAME_CARDS = [
   shareCard,
   gridCard,
   patternsCard,
+  signsCard,
+  jumpsCard,
 ] as const;
 
 export type GameId = (typeof GAME_CARDS)[number]["id"];

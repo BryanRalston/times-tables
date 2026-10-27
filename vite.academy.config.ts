@@ -211,6 +211,8 @@ export default defineConfig({
         sheetShare: resolve("academy/worksheets/sharing/index.html"),
         sheetGrid: resolve("academy/worksheets/grid-garden/index.html"),
         sheetPatterns: resolve("academy/worksheets/number-patterns/index.html"),
+        sheetSigns: resolve("academy/worksheets/compare-numbers/index.html"),
+        sheetJumps: resolve("academy/worksheets/ten-more/index.html"),
       },
     },
   },

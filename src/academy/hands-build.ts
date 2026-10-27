@@ -28,7 +28,9 @@ import { makeClockTask, makePayTask, type ClockTask, type PayTask } from "./hand
 import { tracePraise, traceSpeech } from "./trace/lines";
 import { makeGraphsTask, type GraphsTask } from "./games/graph-data";
 import { makeGridTask, type GridTask } from "./games/grid-data";
+import { makeJumpTask, type JumpTask } from "./games/jumps-data";
 import { makePatternTask, type PatternTask } from "./games/patterns-data";
+import { makeSignsTask, type SignsTask } from "./games/signs-data";
 import { makeShareTask, type ShareTask } from "./games/share-data";
 import { workedExample, type ModelArt, type WorkedExample } from "./teach";
 import { blankOut, buildTiles, countWord, extraLetters } from "./games/words";
@@ -227,7 +229,9 @@ export type BuildTask =
   | GraphsTask
   | ShareTask
   | GridTask
-  | PatternTask;
+  | PatternTask
+  | SignsTask
+  | JumpTask;
 
 export type HandsTask = ClockTask | PayTask | BuildTask;
 
@@ -1380,7 +1384,7 @@ function makeLetterTrace(level: string, rng: Rng, avoid?: string): TraceTask {
   );
 }
 
-export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: string, kind?: BuildTask["kind"]): BuildTask {
+export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: string, kind?: BuildTask["kind"], prefer: readonly string[] = []): BuildTask {
   switch (game) {
     case "times":
       return makeArrayTask(level, rng, avoid);
@@ -1420,6 +1424,10 @@ export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: str
       return makeGridTask(level, rng, avoid);
     case "patterns":
       return makePatternTask(level, rng, avoid);
+    case "signs":
+      return makeSignsTask(level, rng, avoid, prefer);
+    case "jumps":
+      return makeJumpTask(level, rng, avoid, prefer);
     default:
       throw new Error(`No hands-on card for ${game}`);
   }
@@ -1428,7 +1436,7 @@ export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: str
 export function makeHandsTask(game: string, level: string, rng: Rng, avoid?: string, prefer: readonly string[] = []): HandsTask {
   if (game === "time") return makeClockTask(level, rng, avoid, prefer);
   if (game === "money") return makePayTask(level, rng, avoid);
-  return makeBuildTask(game, level, rng, avoid);
+  return makeBuildTask(game, level, rng, avoid, undefined, prefer);
 }
 
 function frameQuestion(task: FrameTask): ChoiceQ {
@@ -1607,6 +1615,20 @@ export function handsExample(task: BuildTask): WorkedExample {
       return modeled([
         {
           art: { type: "counters", n: Math.max(1, Math.min(task.step, 10)), frame: false },
+          caption: task.praise,
+        },
+      ]);
+    case "signs":
+      return modeled([
+        {
+          art: { type: "word", text: `${task.left} ${task.mark} ${task.right}` },
+          caption: task.praise,
+        },
+      ]);
+    case "jumps":
+      return modeled([
+        {
+          art: { type: "word", text: `${task.start} ${task.dir === "more" ? "+" : "−"} ${task.step} = ${task.answer}` },
           caption: task.praise,
         },
       ]);

@@ -94,3 +94,9 @@ VOICE_JOBS=/tmp/voice-jobs-ar.json python3 scripts/render-voice-ar.py
 npx vite-node scripts/export-voice-fr.ts
 VOICE_JOBS=/tmp/voice-jobs-fr.json VOICE_NAME=ff_siwis VOICE_LANG=fr-fr python3 scripts/render-voice.py
 ```
+
+## Compare and 10 More
+
+Compare and 10 More reuse clips that are already in the seven manifests. Kokoro and eSpeak are not available in every build environment, so those games do not add new recordings.
+
+Spoken compare lines are `Compare 4 and 7` (and the same shape in each language) while both numbers are at most 1,000. A four-digit card says only `Compare`, and the numerals stay on screen. The signs `<` and `>` are never spoken. 10 more says `What is 10 more than 24?` in English. The other languages say the same jump as plus or minus, because a full “10 less than” line, and Spanish “más que”, were not recorded. A 1000 jump says `What is 1000 more?` or `What is 1000 less?` and leaves the starting number on the card, so Mandarin, Hindi, and Arabic never have to speak a number past 1,000. Even and odd were not added: those words are not in the clip set.

@@ -770,7 +770,9 @@ export function PlayScreen({
     (choice.visual.board.game === "graphs" ||
       choice.visual.board.game === "share" ||
       choice.visual.board.game === "grid" ||
-      choice.visual.board.game === "patterns");
+      choice.visual.board.game === "patterns" ||
+      choice.visual.board.game === "signs" ||
+      choice.visual.board.game === "jumps");
   const filled = dots.filter((dot) => dot != null).length;
   const playBuddy = boss ? null : (
     <div className="ac-play-buddy" data-pals={graphPals ? "pair" : "one"}>

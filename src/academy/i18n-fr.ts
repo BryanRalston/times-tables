@@ -478,6 +478,20 @@ export const BOSS_FR: Record<string, BossEs> = {
     "cosmeticName": "Couronne du saut",
     "trophyName": "Trophée de la suite"
   },
+  "signs": {
+    "taunt": "Quel nombre est le plus grand ?",
+    "friendly": "Oui !",
+    "personality": "Un renard à couronne de papier qui aligne les nombres pour les comparer.",
+    "cosmeticName": "Couronne du signe",
+    "trophyName": "Trophée comparer"
+  },
+  "jumps": {
+    "taunt": "Combien font 20 plus 10 ?",
+    "friendly": "Oui !",
+    "personality": "Une loutre en cape qui saute de dix en dix et laisse les unités tranquilles.",
+    "cosmeticName": "Cape du dix",
+    "trophyName": "Trophée dix de plus"
+  },
 };
 
 export const TRAIT_FR: Record<string, string> = {
@@ -1501,6 +1515,32 @@ export const FR: Record<string, string> = {
   "Count by hundreds": "De 100 en 100",
   "Next number": "Nombre suivant",
   "The rule": "La règle",
+  "Compare": "Compare",
+  "10 more": "10 plus",
+  "To 10": "Jusqu'à 10",
+  "Two digits": "Deux chiffres",
+  "Three digits": "Trois chiffres",
+  "Big numbers": "Grands nombres",
+  "Ten more": "10 de plus",
+  "100 more": "100 de plus",
+  "1000 more": "1000 de plus",
+  "Look at the tens": "Regarde les dizaines",
+  "Compare.": "Compare.",
+  "equals": "égal",
+  "is greater": "est plus grand",
+  "is less": "est plus petit",
+  "more": "plus",
+  "less": "moins",
+  "What is 1000 more?": "Combien font 1000 plus ?",
+  "What is 1000 less?": "Combien font 1000 moins ?",
+  "Grades 1–4": "CP au CM1",
+  "Compare numbers to 10": "Comparer les nombres jusqu'à 10",
+  "Ten more and ten less": "10 de plus et 10 de moins",
+  "100 more and 100 less": "100 de plus et 100 de moins",
+  "Free comparison practice for kindergarten through grade 4. Choose the true less-than, equal, or greater-than sentence. No signup.":
+    "Exercice gratuit pour comparer, de la grande section au CM1. Choisis la phrase vraie avec plus petit, égal ou plus grand. Sans compte.",
+  "Free practice adding or taking away 10, 100, or 1000 for grades 1–4. The other digits stay put. No signup.":
+    "Exercice gratuit pour ajouter ou enlever 10, 100 ou 1000, du CP au CM1. Les autres chiffres restent. Sans compte.",
   "Grades 2–4": "CE1 au CM1",
   "Shares": "Partages",
   "Garden": "Jardin",

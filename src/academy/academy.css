@@ -136,6 +136,11 @@ html[lang="ar"] .ac-share-play,
 html[lang="ar"] .ac-grid-play,
 html[lang="ar"] .ac-pattern-play,
 html[lang="ar"] .ac-pattern-row,
+html[lang="ar"] .ac-sign-play,
+html[lang="ar"] .ac-sign-eq,
+html[lang="ar"] .ac-jump-play,
+html[lang="ar"] .ac-jump-read,
+html[lang="ar"] .ac-sight-word,
 html[lang="ar"] .ac-grid-shape,
 html[lang="ar"] .ac-side-row,
 html[lang="ar"] .ac-big-num {
@@ -3407,6 +3412,31 @@ button.ac-go:disabled:active, button.ac-go:disabled { transform: none; }
 }
 .ac-stone.is-blank { background: #fff; border-style: dashed; }
 .ac-stone.is-on { background: #b7d98a; }
+.ac-sign-play, .ac-jump-play { max-width: 100%; min-width: 0; }
+.ac-sign-play .ac-choices { grid-template-columns: 1fr; }
+.ac-sign-play .ac-choice { font-size: clamp(22px, 6vw, 32px); min-height: 56px; }
+.ac-sign-eq, .ac-jump-read {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.ac-sign-eq b, .ac-jump-read b {
+  font-size: clamp(28px, 8vw, 48px);
+  line-height: 1;
+}
+.ac-sign-gap {
+  font-size: 32px;
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+}
+.ac-sign-eq .ac-dots, .ac-jump-read .ac-base { max-width: 100%; }
 .ac-sr {
   position: absolute;
   width: 1px;

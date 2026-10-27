@@ -1,6 +1,6 @@
 import { formatClockTime } from "../../lib/clock";
 
-export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables" | "graphs" | "share" | "grid" | "patterns";
+export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables" | "graphs" | "share" | "grid" | "patterns" | "signs" | "jumps";
 
 export interface CoinCounts {
   penny?: number;
@@ -833,6 +833,46 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       { prompt: "3, 6, 9, 12. What is the rule?", answer: "add 3" },
       { prompt: "10, 20, 30, 40. What is the rule?", answer: "add 10" },
       { prompt: "5, 10, 15, 20. What is the rule?", answer: "add 5" },
+    ],
+  },
+  {
+    slug: "compare-numbers",
+    title: "Free Compare Numbers Worksheet (K–4) | Squishee Academy",
+    description:
+      "Print a free comparison worksheet for kindergarten through grade 4. Mark less than, equal to, or greater than. No signup.",
+    h1: "Compare numbers",
+    game: "signs",
+    items: [
+      { prompt: "Which is true? 3 < 8, 3 > 8, 3 = 8", answer: "3 < 8" },
+      { prompt: "Which is true? 6 = 6, 6 < 6, 6 > 6", answer: "6 = 6" },
+      { prompt: "Which is true? 9 > 4, 9 < 4, 9 = 4", answer: "9 > 4" },
+      { prompt: "Which is true? 14 < 41, 14 > 41, 14 = 41", answer: "14 < 41" },
+      { prompt: "Which is true? 70 = 70, 70 < 70, 70 > 70", answer: "70 = 70" },
+      { prompt: "Which is true? 58 > 49, 58 < 49, 58 = 49", answer: "58 > 49" },
+      { prompt: "Which is true? 305 < 350, 305 > 350, 305 = 350", answer: "305 < 350" },
+      { prompt: "Which is true? 428 = 428, 428 < 428, 428 > 428", answer: "428 = 428" },
+      { prompt: "Which is true? 900 > 890, 900 < 890, 900 = 890", answer: "900 > 890" },
+      { prompt: "Which is true? 2406 < 2604, 2406 > 2604, 2406 = 2604", answer: "2406 < 2604" },
+    ],
+  },
+  {
+    slug: "ten-more",
+    title: "Free Ten More Worksheet (Grades 1–4) | Squishee Academy",
+    description:
+      "Print a free worksheet for grades 1–4. Find 10 more, 10 less, 100 more, 100 less, and 1000 more. No signup.",
+    h1: "Ten more",
+    game: "jumps",
+    items: [
+      { prompt: "What is 10 more than 24?", answer: "34" },
+      { prompt: "What is 10 less than 51?", answer: "41" },
+      { prompt: "What is 10 more than 70?", answer: "80" },
+      { prompt: "What is 10 less than 16?", answer: "6" },
+      { prompt: "What is 100 more than 240?", answer: "340" },
+      { prompt: "What is 100 less than 800?", answer: "700" },
+      { prompt: "What is 100 more than 90?", answer: "190" },
+      { prompt: "What is 100 less than 105?", answer: "5" },
+      { prompt: "What is 1000 more than 2300?", answer: "3300" },
+      { prompt: "What is 1000 less than 4500?", answer: "3500" },
     ],
   },
 ];

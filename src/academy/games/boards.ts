@@ -206,6 +206,29 @@ export interface PatternBoard {
   answer: number;
 }
 
+export type SignLevel = "to10" | "tens" | "hundreds" | "big";
+
+export type SignMark = "<" | "=" | ">";
+
+export interface SignsBoard {
+  game: "signs";
+  mode: SignLevel;
+  left: number;
+  right: number;
+  mark: SignMark;
+}
+
+export type JumpLevel = "ten" | "hundred" | "thousand";
+
+export interface JumpsBoard {
+  game: "jumps";
+  mode: JumpLevel;
+  start: number;
+  step: 10 | 100 | 1000;
+  dir: "more" | "less";
+  answer: number;
+}
+
 export type Board =
   | CountBoard
   | PlaceBoard
@@ -218,7 +241,9 @@ export type Board =
   | GraphsBoard
   | ShareBoard
   | GridBoard
-  | PatternBoard;
+  | PatternBoard
+  | SignsBoard
+  | JumpsBoard;
 
 export function countName(name: string, n: number): string {
   if (n === 1 && name.endsWith("s")) return name.slice(0, -1);
