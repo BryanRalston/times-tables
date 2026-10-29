@@ -189,7 +189,21 @@ function expectFresh(item: StaticItem) {
     expect(item.answer).toBe(String(compared[1] === "greater" ? Math.max(a, b) : Math.min(a, b)));
     return;
   }
-  const rounded = item.prompt.match(/^Round (\d+) to the nearest (10|100)\.$/);
+  const lineDot = item.prompt.match(
+    /^A number line from 0 to (\d+) is split into (\d+) equal parts\. The dot is on mark (\d+)\. What fraction\?$/,
+  );
+  if (lineDot) {
+    const whole = Number(lineDot[1]);
+    const parts = Number(lineDot[2]);
+    const mark = Number(lineDot[3]);
+    expect(whole).toBeGreaterThan(0);
+    expect(parts % whole).toBe(0);
+    expect(mark).toBeGreaterThan(0);
+    expect(mark).toBeLessThanOrEqual(parts);
+    expect(item.answer).toBe(`${mark}/${parts / whole}`);
+    return;
+  }
+  const rounded = item.prompt.match(/(?:^|\. )Round (\d+) to the nearest (10|100)\.$/);
   if (rounded) {
     const place = rounded[2] === "100" ? 100 : 10;
     expect(item.answer).toBe(String(roundHalfUp(Number(rounded[1]), place)));
@@ -503,9 +517,9 @@ function expectFresh(item: StaticItem) {
 }
 
 describe("printable worksheets", () => {
-  it("publishes 15 to 47 static sheets search engines can read", () => {
+  it("publishes 15 to 49 static sheets search engines can read", () => {
     expect(WORKSHEETS.length).toBeGreaterThanOrEqual(15);
-    expect(WORKSHEETS.length).toBeLessThanOrEqual(47);
+    expect(WORKSHEETS.length).toBeLessThanOrEqual(49);
     const slugs = WORKSHEETS.map((sheet) => sheet.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
     expect(slugs).toEqual(expect.arrayContaining(["telling-time-quarter-hour", "counting-coins", "multiplication-7s"]));

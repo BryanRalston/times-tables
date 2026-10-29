@@ -855,6 +855,84 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["4.OA.A.2", "4.OA.A.3"],
     }),
   },
+  ticks: {
+    PK: band({
+      levels: ["fourths"],
+      start: "fourths",
+      offer: "later",
+      standards: ["1.G.A.3"],
+    }),
+    K: band({
+      levels: ["fourths"],
+      start: "fourths",
+      offer: "later",
+      standards: ["1.G.A.3"],
+    }),
+    "1": band({
+      levels: ["fourths"],
+      start: "fourths",
+      offer: "later",
+      standards: ["1.G.A.3"],
+    }),
+    "2": band({
+      levels: ["fourths"],
+      start: "fourths",
+      offer: "intro",
+      standards: ["2.G.A.3"],
+    }),
+    "3": band({
+      levels: ["sixths", "eighths"],
+      start: "sixths",
+      offer: "play",
+      cap: "eighths",
+      standards: ["3.NF.A.2"],
+    }),
+    "4": band({
+      levels: ["past"],
+      start: "past",
+      offer: "play",
+      standards: ["3.NF.A.2", "4.NF.B.3"],
+    }),
+  },
+  about: {
+    PK: band({
+      levels: ["ten"],
+      start: "ten",
+      offer: "later",
+      standards: ["3.NBT.A.1"],
+    }),
+    K: band({
+      levels: ["ten"],
+      start: "ten",
+      offer: "later",
+      standards: ["3.NBT.A.1"],
+    }),
+    "1": band({
+      levels: ["ten"],
+      start: "ten",
+      offer: "later",
+      standards: ["3.NBT.A.1"],
+    }),
+    "2": band({
+      levels: ["ten"],
+      start: "ten",
+      offer: "later",
+      standards: ["3.NBT.A.1"],
+    }),
+    "3": band({
+      levels: ["ten", "hundred"],
+      start: "ten",
+      offer: "play",
+      cap: "hundred",
+      standards: ["3.NBT.A.1"],
+    }),
+    "4": band({
+      levels: ["mix"],
+      start: "mix",
+      offer: "play",
+      standards: ["4.NBT.A.3", "4.OA.A.3"],
+    }),
+  },
 };
 
 export function bandFor(gameId: string, grade: Grade): GradeBand | undefined {

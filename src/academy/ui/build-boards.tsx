@@ -5,7 +5,9 @@ import { LetterBoard, PhonicsBoard, SightBoard } from "./word-boards";
 import { TraceBoard } from "./trace-board";
 import { GraphsHands } from "./graph-board";
 import { GridHands } from "./grid-board";
+import { AboutHands } from "./about-board";
 import { JumpHands } from "./jump-board";
+import { TickHands } from "./tick-board";
 import { PatternHands } from "./pattern-board";
 import { SignHands } from "./sign-board";
 import { ShareHands } from "./share-board";
@@ -61,6 +63,10 @@ export function HandsBoard({
       return <SignHands task={task} onAnswer={onAnswer} />;
     case "jumps":
       return <JumpHands task={task} onAnswer={onAnswer} />;
+    case "ticks":
+      return <TickHands task={task} onAnswer={onAnswer} />;
+    case "about":
+      return <AboutHands task={task} onAnswer={onAnswer} />;
     default: {
       const neverTask: never = task;
       return neverTask;

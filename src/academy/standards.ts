@@ -178,6 +178,17 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     hundred: "2.NBT.B.8",
     thousand: "4.NBT.A.1",
   },
+  ticks: {
+    fourths: "2.G.A.3",
+    sixths: "3.NF.A.2",
+    eighths: "3.NF.A.2",
+    past: "4.NF.B.3",
+  },
+  about: {
+    ten: "3.NBT.A.1",
+    hundred: "3.NBT.A.1",
+    mix: "4.NBT.A.3",
+  },
 };
 
 const CHIP_SKILL: Record<string, string> = {

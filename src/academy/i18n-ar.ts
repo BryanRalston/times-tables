@@ -491,6 +491,20 @@ export const BOSS_AR: Record<string, BossEs> = {
     cosmeticName: "عباءة العشرة",
     trophyName: "كأس العشرة زيادة",
   },
+  ticks: {
+    taunt: "عدّ النقاط",
+    friendly: "نعم!",
+    personality: "بسكويت بتاج ورقي يعدّ العلامات الفارغة على الخط.",
+    cosmeticName: "تاج العلامات",
+    trophyName: "كأس الخط",
+  },
+  about: {
+    taunt: "قرّب",
+    friendly: "نعم!",
+    personality: "كيوي بعباءة يقرّب برطمان الملصقات إلى أقرب عشرة أو مئة.",
+    cosmeticName: "عباءة التقريب",
+    trophyName: "كأس التقريب",
+  },
 };
 
 export const TRAIT_AR: Record<string, string> = {
@@ -1544,6 +1558,20 @@ export const AR: Record<string, string> = {
   "Free practice adding or taking away 10, 100, or 1000 for grades 1–4. The other digits stay put. No signup.":
     "تدريب مجاني على إضافة أو إنقاص 10 أو 100 أو 1000 للصف الأول حتى الرابع. تبقى الأرقام الأخرى. بلا حساب.",
   "Grades 2–4": "الصف الثاني حتى الرابع",
+  "Line": "النقطة",
+  "Round": "قرّب",
+  "Fourths": "أرباع",
+  "Sixths": "أسداس",
+  "Eighths": "أثمان",
+  "Past 1": "بعد 1",
+  "Nearest 10": "أقرب 10",
+  "Nearest 100": "أقرب 100",
+  "Nearest 10 or 100": "10 أو 100",
+  "Grades 3–4": "الصفان الثالث والرابع",
+  "Free fractions on a number line for grades 2–4. The ticks between 0 and 1 stay blank, so you count the parts. No signup.":
+    "كسور مجانية على خط الأعداد للصف الثاني حتى الرابع. علامات ما بين 0 و1 فارغة، فعدّ الأجزاء. بلا حساب.",
+  "Free rounding word problems for grades 3–4. Round a story's number to the nearest 10 or 100. No signup.":
+    "مسائل تقريب مجانية للصفين الثالث والرابع. قرّب عدد القصة إلى أقرب 10 أو 100. بلا حساب.",
   "Shares": "التوزيع",
   "Garden": "الحديقة",
   "Give one to each plate.": "ضع واحدة في كل طبق.",

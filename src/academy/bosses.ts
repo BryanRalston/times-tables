@@ -281,6 +281,32 @@ const AUTHORED: readonly IslandBoss[] = [
     trophyId: "trophy-jumps",
     trophyName: "Ten more trophy",
   },
+  {
+    gameId: "ticks",
+    name: "Dot Cookie",
+    taunt: "Count the dots",
+    friendly: "Yes!",
+    personality: "A cookie in a paper crown who counts the blank marks on a line.",
+    face: "cookie",
+    look: "crown",
+    cosmeticId: "tick-crown",
+    cosmeticName: "Tick crown",
+    trophyId: "trophy-ticks",
+    trophyName: "Line trophy",
+  },
+  {
+    gameId: "about",
+    name: "Kip Kiwi",
+    taunt: "Round",
+    friendly: "Yes!",
+    personality: "A kiwi in a cape who rounds a jar of stickers to a nearby ten or hundred.",
+    face: "kiwi",
+    look: "cape",
+    cosmeticId: "about-cape",
+    cosmeticName: "Round cape",
+    trophyId: "trophy-about",
+    trophyName: "Round trophy",
+  },
 ];
 
 const LOOKS: readonly BossLook[] = ["crown", "cape", "armor", "clock", "coins", "spell"];

@@ -1,6 +1,6 @@
 import { formatClockTime } from "../../lib/clock";
 
-export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables" | "graphs" | "share" | "grid" | "patterns" | "signs" | "jumps";
+export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables" | "graphs" | "share" | "grid" | "patterns" | "signs" | "jumps" | "ticks" | "about";
 
 export interface CoinCounts {
   penny?: number;
@@ -873,6 +873,46 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       { prompt: "What is 100 less than 105?", answer: "5" },
       { prompt: "What is 1000 more than 2300?", answer: "3300" },
       { prompt: "What is 1000 less than 4500?", answer: "3500" },
+    ],
+  },
+  {
+    slug: "number-line-fractions",
+    title: "Free Number Line Fractions Worksheet (Grades 2–4) | Squishee Academy",
+    description:
+      "Print a free number-line fractions worksheet for grades 2–4. The middle ticks stay blank. Count the parts. No signup.",
+    h1: "Number line fractions",
+    game: "ticks",
+    items: [
+      { prompt: "A number line from 0 to 1 is split into 2 equal parts. The dot is on mark 1. What fraction?", answer: "1/2" },
+      { prompt: "A number line from 0 to 1 is split into 4 equal parts. The dot is on mark 1. What fraction?", answer: "1/4" },
+      { prompt: "A number line from 0 to 1 is split into 4 equal parts. The dot is on mark 2. What fraction?", answer: "2/4" },
+      { prompt: "A number line from 0 to 1 is split into 4 equal parts. The dot is on mark 3. What fraction?", answer: "3/4" },
+      { prompt: "A number line from 0 to 1 is split into 3 equal parts. The dot is on mark 1. What fraction?", answer: "1/3" },
+      { prompt: "A number line from 0 to 1 is split into 3 equal parts. The dot is on mark 2. What fraction?", answer: "2/3" },
+      { prompt: "A number line from 0 to 1 is split into 6 equal parts. The dot is on mark 5. What fraction?", answer: "5/6" },
+      { prompt: "A number line from 0 to 1 is split into 8 equal parts. The dot is on mark 3. What fraction?", answer: "3/8" },
+      { prompt: "A number line from 0 to 1 is split into 8 equal parts. The dot is on mark 7. What fraction?", answer: "7/8" },
+      { prompt: "A number line from 0 to 2 is split into 4 equal parts. The dot is on mark 3. What fraction?", answer: "3/2" },
+    ],
+  },
+  {
+    slug: "rounding-stories",
+    title: "Free Rounding Stories Worksheet (Grades 3–4) | Squishee Academy",
+    description:
+      "Print a free rounding worksheet for grades 3–4. Round the number in each story to the nearest 10 or 100. No signup.",
+    h1: "Rounding stories",
+    game: "about",
+    items: [
+      { prompt: "Round 48 to the nearest 10.", answer: "50" },
+      { prompt: "Round 42 to the nearest 10.", answer: "40" },
+      { prompt: "Round 35 to the nearest 10.", answer: "40" },
+      { prompt: "The jar has 67 stickers. Round 67 to the nearest 10.", answer: "70" },
+      { prompt: "The box has 124 crayons. Round 124 to the nearest 10.", answer: "120" },
+      { prompt: "Round 250 to the nearest 100.", answer: "300" },
+      { prompt: "Round 460 to the nearest 100.", answer: "500" },
+      { prompt: "The shelf holds 875 books. Round 875 to the nearest 100.", answer: "900" },
+      { prompt: "The bag has 505 marbles. Round 505 to the nearest 100.", answer: "500" },
+      { prompt: "The jar has 955 stickers. Round 955 to the nearest 100.", answer: "1000" },
     ],
   },
 ];

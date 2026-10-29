@@ -32,6 +32,8 @@ const GAME_TITLE_ES: Record<string, string> = {
   patterns: "Patrones",
   signs: "Compara",
   jumps: "10 más",
+  ticks: "Punto",
+  about: "Decena",
 };
 
 interface NamedSheet {

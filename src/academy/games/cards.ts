@@ -1201,6 +1201,99 @@ export const jumpsCard = sceneCard("10 more", JUMP_ROWS, {
   isLevel: (value) => isId(JUMP_IDS, value),
 });
 
+const TICK_IDS = ["fourths", "sixths", "eighths", "past"] as const;
+const TICK_ROWS: SkillRow[] = [
+  { key: "ticks:fourths", label: "Fourths" },
+  { key: "ticks:sixths", label: "Sixths" },
+  { key: "ticks:eighths", label: "Eighths" },
+  { key: "ticks:past", label: "Past 1" },
+];
+
+export const ticksCard = sceneCard("Line", TICK_ROWS, {
+  id: "ticks",
+  title: "Line",
+  audience: "Grades 2–4",
+  tint: "aqua",
+  mascot: "cookie",
+  sheetSlug: "number-line-fractions",
+  sheetScreen: "sheet-ticks",
+  blurb:
+    "Free fractions on a number line for grades 2–4. The ticks between 0 and 1 stay blank, so you count the parts. No signup.",
+  levels: [
+    { id: "fourths", label: "Fourths", num: 1 },
+    { id: "sixths", label: "Sixths", num: 2 },
+    { id: "eighths", label: "Eighths", num: 3 },
+    { id: "past", label: "Past 1", num: 4 },
+  ],
+  defaultLevel(grade) {
+    const fallback = ((): string => {
+      switch (grade) {
+        case "PK":
+        case "K":
+        case "1":
+        case "2":
+          return "fourths";
+        case "3":
+          return "sixths";
+        case "4":
+          return "past";
+        default: {
+          const neverGrade: never = grade;
+          return neverGrade;
+        }
+      }
+    })();
+    return bandStart("ticks", grade, TICK_IDS, fallback);
+  },
+  sheetDefaultLevel: "fourths",
+  isLevel: (value) => isId(TICK_IDS, value),
+});
+
+const ABOUT_IDS = ["ten", "hundred", "mix"] as const;
+const ABOUT_ROWS: SkillRow[] = [
+  { key: "about:ten", label: "Nearest 10" },
+  { key: "about:hundred", label: "Nearest 100" },
+  { key: "about:mix", label: "Nearest 10 or 100" },
+];
+
+export const aboutCard = sceneCard("Round", ABOUT_ROWS, {
+  id: "about",
+  title: "Round",
+  audience: "Grades 3–4",
+  tint: "sand",
+  mascot: "kiwi",
+  sheetSlug: "rounding-stories",
+  sheetScreen: "sheet-about",
+  blurb:
+    "Free rounding word problems for grades 3–4. Round a story's number to the nearest 10 or 100. No signup.",
+  levels: [
+    { id: "ten", label: "Nearest 10", num: 1 },
+    { id: "hundred", label: "Nearest 100", num: 2 },
+    { id: "mix", label: "Nearest 10 or 100", num: 3 },
+  ],
+  defaultLevel(grade) {
+    const fallback = ((): string => {
+      switch (grade) {
+        case "PK":
+        case "K":
+        case "1":
+        case "2":
+        case "3":
+          return "ten";
+        case "4":
+          return "mix";
+        default: {
+          const neverGrade: never = grade;
+          return neverGrade;
+        }
+      }
+    })();
+    return bandStart("about", grade, ABOUT_IDS, fallback);
+  },
+  sheetDefaultLevel: "ten",
+  isLevel: (value) => isId(ABOUT_IDS, value),
+});
+
 /** Home-card order is also the island order. Append a game; do not insert one in front. */
 export const GAME_CARDS = [
   timesCard,
@@ -1223,6 +1316,8 @@ export const GAME_CARDS = [
   patternsCard,
   signsCard,
   jumpsCard,
+  ticksCard,
+  aboutCard,
 ] as const;
 
 export type GameId = (typeof GAME_CARDS)[number]["id"];

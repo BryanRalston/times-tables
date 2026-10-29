@@ -492,6 +492,20 @@ export const BOSS_ZH: Record<string, BossEs> = {
     "cosmeticName": "十的斗篷",
     "trophyName": "多十奖杯"
   },
+  "ticks": {
+    "taunt": "数这些点",
+    "friendly": "对！",
+    "personality": "cookie戴着纸皇冠，数数轴上的空刻度。",
+    "cosmeticName": "刻度皇冠",
+    "trophyName": "数轴奖杯"
+  },
+  "about": {
+    "taunt": "四舍五入到最近的",
+    "friendly": "对！",
+    "personality": "kiwi披着斗篷，把一罐贴纸四舍五入到十或百。",
+    "cosmeticName": "四舍五入斗篷",
+    "trophyName": "四舍五入奖杯"
+  },
 };
 
 export const TRAIT_ZH: Record<string, string> = {
@@ -1545,6 +1559,20 @@ export const ZH: Record<string, string> = {
   "Free practice adding or taking away 10, 100, or 1000 for grades 1–4. The other digits stay put. No signup.":
     "一至四年级的免费练习：加上或减去10、100或1000。其他数位不动。不用注册。",
   "Grades 2–4": "二至四年级",
+  "Line": "点",
+  "Round": "四舍五入到最近的",
+  "Fourths": "四分",
+  "Sixths": "六分",
+  "Eighths": "八分",
+  "Past 1": "大于1",
+  "Nearest 10": "最近的十",
+  "Nearest 100": "最近的百",
+  "Nearest 10 or 100": "十或百",
+  "Grades 3–4": "三至四年级",
+  "Free fractions on a number line for grades 2–4. The ticks between 0 and 1 stay blank, so you count the parts. No signup.":
+    "二至四年级的免费数轴分数。0和1之间的刻度是空的，要数有几份。不用注册。",
+  "Free rounding word problems for grades 3–4. Round a story's number to the nearest 10 or 100. No signup.":
+    "三至四年级的免费四舍五入应用题。把故事里的数四舍五入到十或百。不用注册。",
   "Shares": "平均分",
   "Garden": "方格园",
   "Give one to each plate.": "每个盘子放一块。",

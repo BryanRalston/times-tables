@@ -221,7 +221,7 @@ Kindergarten through grade 3 denominators are 2, 3, 4, 6, and 8. Grade 4 like-fr
 | 3 | Play | Equivalent fractions | Equivalent fractions, shade a fraction | 3.NF.A.1, 3.NF.A.2, 3.NF.A.3 |
 | 4 | Play | Add like fractions | Add like fractions, decimals | 4.NF.A.1, 4.NF.B.3, 4.NF.C.6, 4.NF.C.7 |
 
-Grade 1 does not climb. Grade 2 uses halves, thirds, and fourths, and the cap stops them before equivalent fractions. Sixths and eighths start at grade 3.
+Grade 1 does not climb. Grade 2 uses halves, thirds, and fourths, and the cap stops them before equivalent fractions. Sixths and eighths start at grade 3. That number-line level labels every tick. The blank line, where the child counts the parts, is the Line game.
 
 ## Measurement and Data
 
@@ -393,6 +393,40 @@ The child finds 10 more or 10 less, then 100 more or 100 less, then 1000 more or
 
 Pre-K and kindergarten stay locked. Grade 1 only jumps by 10. Grade 2 can drift down to 10 and cannot climb into 1000. Grade 3 can drift down to 10 and cannot climb into 1000. Grade 4 can drift down to 100. The 1000 prompt says “What is 1000 more?” or “What is 1000 less?” and leaves the starting number on the card, so a language that cannot speak past 1,000 still has a clip.
 
+## Line
+
+Levels, easy to hard: fourths, sixths, eighths, past 1.
+
+The child sees a number line labeled only at the wholes. The ticks between them stay blank, so the fraction is not printed under the dot. Grade 2 meets halves and fourths. Grade 3 counts sixths and eighths between 0 and 1 (3.NF.A.2). Grade 4 places a fraction on a line from 0 to 2 (4.NF.B.3). A hands card moves the dot to a spoken fraction.
+
+| Grade | Offer | Start | Core levels | Cap without challenge | Standards |
+|---|---|---|---|---|---|
+| Pre-K | Coming later | — | — | — | The blank line waits |
+| K | Coming later | — | — | — | The blank line waits |
+| 1 | Coming later | — | — | — | The blank line waits |
+| 2 | Gentle intro | Fourths | Fourths | Fourths | 2.G.A.3 |
+| 3 | Play | Sixths | Sixths, eighths | Eighths | 3.NF.A.2 |
+| 4 | Play | Past 1 | Past 1 | One level down (eighths) | 3.NF.A.2, 4.NF.B.3 |
+
+Pre-K through grade 1 stay locked. Grade 2 does not climb into sixths. Grade 3 can drift down to fourths and cannot climb past 1. Grade 4 can drift down to eighths.
+
+## Round
+
+Levels, easy to hard: nearest 10, nearest 100, nearest 10 or 100.
+
+A short story sits on the card. The spoken question is still “Round 48 to the nearest 10,” the same sentence Place Value already speaks. Grade 3 rounds a two-digit story to the nearest 10 and a three-digit story to the nearest 100 (3.NBT.A.1). Grade 4 mixes the two places on three-digit numbers (4.NBT.A.3, 4.OA.A.3). The hands card steps by 10 or by 100. Numbers stay at or under 999 so every language can speak them.
+
+| Grade | Offer | Start | Core levels | Cap without challenge | Standards |
+|---|---|---|---|---|---|
+| Pre-K | Coming later | — | — | — | Rounding waits |
+| K | Coming later | — | — | — | Rounding waits |
+| 1 | Coming later | — | — | — | Rounding waits |
+| 2 | Coming later | — | — | — | Rounding waits |
+| 3 | Play | Nearest 10 | Nearest 10, nearest 100 | Nearest 100 | 3.NBT.A.1 |
+| 4 | Play | Nearest 10 or 100 | Nearest 10 or 100 | One level down (nearest 100) | 4.NBT.A.3, 4.OA.A.3 |
+
+Pre-K through grade 2 stay locked. Grade 3 can drift only inside nearest 10 and nearest 100. Grade 4 can drift down to nearest 100. Elapsed time is already a grade 4 level in Telling Time, so it is not a separate game. Time to the minute is still open.
+
 ## Still open
 
-These Common Core skills still have no game: teen numbers as ten and ones (K.NBT.A.1), decomposing numbers within 10 (K.OA.A.3), the meaning of the equal sign (1.OA.D.7), three-addend word problems (1.OA.A.2), adding up to four two-digit numbers (2.NBT.B.6), the full subtraction algorithm within 1000 (2.NBT.B.7), measuring the same length in two units (2.MD.A.2), estimating length (2.MD.A.3), comparing lengths (2.MD.A.4), length word problems (2.MD.B.5), a number line of lengths (2.MD.B.6), line plots of measurements (2.MD.D.9), multiplying a one-digit number by a multiple of 10 (3.NBT.A.3), mass and liquid volume (3.MD.A.2), properties of multiplication (3.OA.B.5), time to the minute (3.MD.A.1), and the early reading work of syllables (RF.K.2.B), onset and rime (RF.K.2.C), and phoneme substitution (RF.K.2.E). Rounding to 10 and 100 is already Place Value. Rhyming words are already Phonics, and only in the languages that teach English reading. Even and odd is still open as a question, though Fair Shares already deals equal pairs.
+These Common Core skills still have no game: teen numbers as ten and ones (K.NBT.A.1), decomposing numbers within 10 (K.OA.A.3), the meaning of the equal sign (1.OA.D.7), three-addend word problems (1.OA.A.2), adding up to four two-digit numbers (2.NBT.B.6), the full subtraction algorithm within 1000 (2.NBT.B.7), measuring the same length in two units (2.MD.A.2), estimating length (2.MD.A.3), comparing lengths (2.MD.A.4), length word problems (2.MD.B.5), a number line of lengths (2.MD.B.6), line plots of measurements (2.MD.D.9), multiplying a one-digit number by a multiple of 10 (3.NBT.A.3), mass and liquid volume (3.MD.A.2), properties of multiplication (3.OA.B.5), time to the minute (3.MD.A.1), and the early reading work of syllables (RF.K.2.B), onset and rime (RF.K.2.C), and phoneme substitution (RF.K.2.E). Rounding to 10 and 100 is already Place Value. Rounding stories are the Round game. Blank fraction lines are the Line game. Rhyming words are already Phonics, and only in the languages that teach English reading. Even and odd is still open as a question, though Fair Shares already deals equal pairs.

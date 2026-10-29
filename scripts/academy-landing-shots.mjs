@@ -26,6 +26,8 @@ const GAMES = [
   "share",
   "grid",
   "patterns",
+  "ticks",
+  "about",
 ];
 
 function portOpen(port) {

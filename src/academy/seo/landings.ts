@@ -85,6 +85,7 @@ const SHEET_GRADE_IDS: Record<string, Grade[]> = {
   "Pre-K–4": ["PK", "K", "1", "2", "3", "4"],
   "Pre-K": ["PK"],
   "Grade 4": ["4"],
+  "Grades 3–4": ["3", "4"],
 };
 
 export function withLocale(prefix: string, slug: string): string {

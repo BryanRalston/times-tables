@@ -185,7 +185,7 @@ for (const name of readdirSync(sheetDir)) {
   if (needsJs(sheetHtml)) fail(`${name} needs JavaScript to render`);
   if (hasTracking(sheetHtml)) fail(`${name} has a tracking script`);
 }
-if (staticSheets < 15 || staticSheets > 47) fail(`expected 15–47 static worksheets, found ${staticSheets}`);
+if (staticSheets < 15 || staticSheets > 49) fail(`expected 15–49 static worksheets, found ${staticSheets}`);
 
 const privacy = readFileSync(resolve(root, "privacy/index.html"), "utf8");
 if (!privacy.includes("does not collect") && !privacy.includes("do not collect")) fail("privacy page");
