@@ -499,12 +499,12 @@ export const BOSS_PT: Record<string, BossEs> = {
     cosmeticName: "Coroa das marcas",
     trophyName: "Troféu da reta",
   },
-  about: {
-    taunt: "Dezena",
+  minute: {
+    taunt: "Minutos",
     friendly: "Sim!",
-    personality: "Um kiwi de capa que arredonda um pote de adesivos para a dezena ou a centena.",
-    cosmeticName: "Capa de arredondar",
-    trophyName: "Troféu de arredondar",
+    personality: "Um kiwi com um relógio de papel que conta os minutos depois da hora.",
+    cosmeticName: "Relógio de papel",
+    trophyName: "Troféu do minuto",
   },
 };
 
@@ -1586,19 +1586,19 @@ export const PT: Record<string, string> = {
     "Prática grátis de somar ou tirar 10, 100 ou 1000, do 1.º ao 4.º ano. Os outros algarismos ficam. Sem conta.",
   "Grades 2–4": "2.º ao 4.º ano",
   "Line": "Ponto",
-  "Round": "Dezena",
+  "Minutes": "Minutos",
   "Fourths": "Quartos",
   "Sixths": "Sextos",
   "Eighths": "Oitavos",
   "Past 1": "Depois do 1",
-  "Nearest 10": "Dezena",
-  "Nearest 100": "Centena",
-  "Nearest 10 or 100": "Dezena ou centena",
+  "After the hour": "Depois da hora",
+  "To the half hour": "Até e meia",
+  "Any minute": "Qualquer minuto",
   "Grades 3–4": "3.º e 4.º ano",
   "Free fractions on a number line for grades 2–4. The ticks between 0 and 1 stay blank, so you count the parts. No signup.":
     "Frações grátis na reta numérica, do 2.º ao 4.º ano. Os traços entre 0 e 1 ficam em branco, então você conta as partes. Sem cadastro.",
-  "Free rounding word problems for grades 3–4. Round a story's number to the nearest 10 or 100. No signup.":
-    "Problemas grátis de arredondamento, do 3.º ao 4.º ano. Arredonde o número da história para a dezena ou a centena. Sem cadastro.",
+  "Free time to the minute for grades 3–4. Count the minutes past the hour. No signup.":
+    "Horas até o minuto, grátis, do 3.º ao 4.º ano. Conte os minutos depois da hora. Sem cadastro.",
   "Shares": "Partes",
   "Garden": "Jardim",
   "Give one to each plate.": "Dê um para cada prato.",

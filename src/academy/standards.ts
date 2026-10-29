@@ -184,10 +184,10 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     eighths: "3.NF.A.2",
     past: "4.NF.B.3",
   },
-  about: {
-    ten: "3.NBT.A.1",
-    hundred: "3.NBT.A.1",
-    mix: "4.NBT.A.3",
+  minute: {
+    early: "3.MD.A.1",
+    half: "3.MD.A.1",
+    all: "3.MD.A.1",
   },
 };
 

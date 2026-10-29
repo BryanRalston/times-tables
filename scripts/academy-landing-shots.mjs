@@ -27,7 +27,7 @@ const GAMES = [
   "grid",
   "patterns",
   "ticks",
-  "about",
+  "minute",
 ];
 
 function portOpen(port) {

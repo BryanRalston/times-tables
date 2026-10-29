@@ -499,12 +499,12 @@ export const BOSS_FR: Record<string, BossEs> = {
     "cosmeticName": "Couronne des traits",
     "trophyName": "Trophée de la droite"
   },
-  "about": {
-    "taunt": "Dizaine",
+  "minute": {
+    "taunt": "Minutes",
     "friendly": "Oui !",
-    "personality": "Un kiwi en cape qui arrondit un pot d'autocollants à la dizaine ou à la centaine.",
-    "cosmeticName": "Cape d'arrondi",
-    "trophyName": "Trophée de l'arrondi"
+    "personality": "Un kiwi avec une horloge en papier qui compte les minutes après l'heure.",
+    "cosmeticName": "Horloge en papier",
+    "trophyName": "Trophée de la minute"
   },
 };
 
@@ -1559,19 +1559,19 @@ export const FR: Record<string, string> = {
     "Exercice gratuit pour ajouter ou enlever 10, 100 ou 1000, du CP au CM1. Les autres chiffres restent. Sans compte.",
   "Grades 2–4": "CE1 au CM1",
   "Line": "Points",
-  "Round": "Dizaine",
+  "Minutes": "Minutes",
   "Fourths": "Quarts",
   "Sixths": "Sixièmes",
   "Eighths": "Huitièmes",
   "Past 1": "Après 1",
-  "Nearest 10": "Dizaine",
-  "Nearest 100": "Centaine",
-  "Nearest 10 or 100": "Dizaine ou centaine",
+  "After the hour": "Après l'heure",
+  "To the half hour": "Jusqu'à et demie",
+  "Any minute": "N'importe quelle minute",
   "Grades 3–4": "CE2 et CM1",
   "Free fractions on a number line for grades 2–4. The ticks between 0 and 1 stay blank, so you count the parts. No signup.":
     "Fractions gratuites sur une droite, du CE1 au CM1. Les traits entre 0 et 1 restent vides, alors tu comptes les parts. Sans compte.",
-  "Free rounding word problems for grades 3–4. Round a story's number to the nearest 10 or 100. No signup.":
-    "Problèmes gratuits d'arrondi pour le CE2 et le CM1. Arrondis le nombre de l'histoire à la dizaine ou à la centaine. Sans compte.",
+  "Free time to the minute for grades 3–4. Count the minutes past the hour. No signup.":
+    "L'heure à la minute, gratuite, pour le CE2 et le CM1. Compte les minutes après l'heure. Sans compte.",
   "Shares": "Partages",
   "Garden": "Jardin",
   "Give one to each plate.": "Donne-en un à chaque assiette.",

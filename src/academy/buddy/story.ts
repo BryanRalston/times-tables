@@ -682,15 +682,15 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string): s
         `${buddy} और ${host} बिंदु ढूँढते हैं।`,
         `${buddy} و${host} يجدان النقطة.`,
       );
-    case "about":
+    case "minute":
       return say(
-        `${buddy} and ${host} round the number.`,
-        `${buddy} y ${host} redondean el número.`,
-        `${buddy} e ${host} arredondam o número.`,
-        `${buddy} et ${host} arrondissent le nombre.`,
-        `${buddy}和${host}把这个数四舍五入。`,
-        `${buddy} और ${host} संख्या को पूर्णांक बनाते हैं।`,
-        `${buddy} و${host} يقرّبان العدد.`,
+        `${buddy} and ${host} read the clock.`,
+        `${buddy} y ${host} leen el reloj.`,
+        `${buddy} e ${host} leem o relógio.`,
+        `${buddy} et ${host} lisent l'horloge.`,
+        `${buddy}和${host}看钟。`,
+        `${buddy} और ${host} घड़ी पढ़ते हैं।`,
+        `${buddy} و${host} يقرآن الساعة.`,
       );
     default: {
       const neverBoard: never = board;
@@ -778,16 +778,6 @@ function handsStory(kind: Exclude<RoundSlot, { kind: "choice" }>["kind"], buddy:
         `${buddy}和${host}移动这个点。`,
         `${buddy} और ${host} बिंदु हिलाते हैं।`,
         `${buddy} و${host} يحرّكان النقطة.`,
-      );
-    case "about":
-      return say(
-        `${buddy} and ${host} step to a round number.`,
-        `${buddy} y ${host} saltan hasta un número redondo.`,
-        `${buddy} e ${host} pulam até um número redondo.`,
-        `${buddy} et ${host} sautent jusqu'à un nombre rond.`,
-        `${buddy}和${host}跳到一个整数。`,
-        `${buddy} और ${host} एक पूर्ण संख्या तक कूदते हैं।`,
-        `${buddy} و${host} يقفزان إلى عدد مقرّب.`,
       );
     default: {
       const neverKind: never = kind;

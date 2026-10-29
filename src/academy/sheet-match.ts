@@ -33,7 +33,7 @@ const GAME_TITLE_ES: Record<string, string> = {
   signs: "Compara",
   jumps: "10 más",
   ticks: "Punto",
-  about: "Decena",
+  minute: "Minutos",
 };
 
 interface NamedSheet {

@@ -1249,27 +1249,26 @@ export const ticksCard = sceneCard("Line", TICK_ROWS, {
   isLevel: (value) => isId(TICK_IDS, value),
 });
 
-const ABOUT_IDS = ["ten", "hundred", "mix"] as const;
-const ABOUT_ROWS: SkillRow[] = [
-  { key: "about:ten", label: "Nearest 10" },
-  { key: "about:hundred", label: "Nearest 100" },
-  { key: "about:mix", label: "Nearest 10 or 100" },
+const MINUTE_IDS = ["early", "half", "all"] as const;
+const MINUTE_ROWS: SkillRow[] = [
+  { key: "minute:early", label: "After the hour" },
+  { key: "minute:half", label: "To the half hour" },
+  { key: "minute:all", label: "Any minute" },
 ];
 
-export const aboutCard = sceneCard("Round", ABOUT_ROWS, {
-  id: "about",
-  title: "Round",
+export const minuteCard = sceneCard("Minutes", MINUTE_ROWS, {
+  id: "minute",
+  title: "Minutes",
   audience: "Grades 3–4",
   tint: "sand",
   mascot: "kiwi",
-  sheetSlug: "rounding-stories",
-  sheetScreen: "sheet-about",
-  blurb:
-    "Free rounding word problems for grades 3–4. Round a story's number to the nearest 10 or 100. No signup.",
+  sheetSlug: "time-to-the-minute",
+  sheetScreen: "sheet-minute",
+  blurb: "Free time to the minute for grades 3–4. Count the minutes past the hour. No signup.",
   levels: [
-    { id: "ten", label: "Nearest 10", num: 1 },
-    { id: "hundred", label: "Nearest 100", num: 2 },
-    { id: "mix", label: "Nearest 10 or 100", num: 3 },
+    { id: "early", label: "After the hour", num: 1 },
+    { id: "half", label: "To the half hour", num: 2 },
+    { id: "all", label: "Any minute", num: 3 },
   ],
   defaultLevel(grade) {
     const fallback = ((): string => {
@@ -1279,19 +1278,19 @@ export const aboutCard = sceneCard("Round", ABOUT_ROWS, {
         case "1":
         case "2":
         case "3":
-          return "ten";
+          return "early";
         case "4":
-          return "mix";
+          return "all";
         default: {
           const neverGrade: never = grade;
           return neverGrade;
         }
       }
     })();
-    return bandStart("about", grade, ABOUT_IDS, fallback);
+    return bandStart("minute", grade, MINUTE_IDS, fallback);
   },
-  sheetDefaultLevel: "ten",
-  isLevel: (value) => isId(ABOUT_IDS, value),
+  sheetDefaultLevel: "early",
+  isLevel: (value) => isId(MINUTE_IDS, value),
 });
 
 /** Home-card order is also the island order. Append a game; do not insert one in front. */
@@ -1317,7 +1316,7 @@ export const GAME_CARDS = [
   signsCard,
   jumpsCard,
   ticksCard,
-  aboutCard,
+  minuteCard,
 ] as const;
 
 export type GameId = (typeof GAME_CARDS)[number]["id"];

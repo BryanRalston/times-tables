@@ -1,6 +1,6 @@
 import { formatClockTime } from "../../lib/clock";
 
-export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables" | "graphs" | "share" | "grid" | "patterns" | "signs" | "jumps" | "ticks" | "about";
+export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables" | "graphs" | "share" | "grid" | "patterns" | "signs" | "jumps" | "ticks" | "minute";
 
 export interface CoinCounts {
   penny?: number;
@@ -896,23 +896,23 @@ export const WORKSHEETS: readonly StaticSheet[] = [
     ],
   },
   {
-    slug: "rounding-stories",
-    title: "Free Rounding Stories Worksheet (Grades 3–4) | Squishee Academy",
+    slug: "time-to-the-minute",
+    title: "Free Time to the Minute Worksheet (Grades 3–4) | Squishee Academy",
     description:
-      "Print a free rounding worksheet for grades 3–4. Round the number in each story to the nearest 10 or 100. No signup.",
-    h1: "Rounding stories",
-    game: "about",
+      "Print a free time-to-the-minute worksheet for grades 3–4. Count the minutes past the hour. No signup.",
+    h1: "Time to the minute",
+    game: "minute",
     items: [
-      { prompt: "Round 48 to the nearest 10.", answer: "50" },
-      { prompt: "Round 42 to the nearest 10.", answer: "40" },
-      { prompt: "Round 35 to the nearest 10.", answer: "40" },
-      { prompt: "The jar has 67 stickers. Round 67 to the nearest 10.", answer: "70" },
-      { prompt: "The box has 124 crayons. Round 124 to the nearest 10.", answer: "120" },
-      { prompt: "Round 250 to the nearest 100.", answer: "300" },
-      { prompt: "Round 460 to the nearest 100.", answer: "500" },
-      { prompt: "The shelf holds 875 books. Round 875 to the nearest 100.", answer: "900" },
-      { prompt: "The bag has 505 marbles. Round 505 to the nearest 100.", answer: "500" },
-      { prompt: "The jar has 955 stickers. Round 955 to the nearest 100.", answer: "1000" },
+      { prompt: "What time is it?", answer: "2:07", clock: { hours: 2, minutes: 7 } },
+      { prompt: "What time is it?", answer: "4:13", clock: { hours: 4, minutes: 13 } },
+      { prompt: "What time is it?", answer: "6:22", clock: { hours: 6, minutes: 22 } },
+      { prompt: "What time is it?", answer: "8:41", clock: { hours: 8, minutes: 41 } },
+      { prompt: "What time is it?", answer: "1:09", clock: { hours: 1, minutes: 9 } },
+      { prompt: "What time is it?", answer: "3:28", clock: { hours: 3, minutes: 28 } },
+      { prompt: "What time is it?", answer: "5:46", clock: { hours: 5, minutes: 46 } },
+      { prompt: "What time is it?", answer: "7:53", clock: { hours: 7, minutes: 53 } },
+      { prompt: "What time is it?", answer: "9:18", clock: { hours: 9, minutes: 18 } },
+      { prompt: "What time is it?", answer: "11:37", clock: { hours: 11, minutes: 37 } },
     ],
   },
 ];

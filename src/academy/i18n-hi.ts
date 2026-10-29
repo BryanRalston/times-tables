@@ -498,12 +498,12 @@ export const BOSS_HI: Record<string, BossEs> = {
     cosmeticName: "निशान का ताज",
     trophyName: "रेखा ट्रॉफी",
   },
-  about: {
-    taunt: "पूर्णांक",
+  minute: {
+    taunt: "मिनट",
     friendly: "हाँ!",
-    personality: "केप वाला कीवी स्टिकर के जार को निकटतम दस या सौ तक बनाता है।",
-    cosmeticName: "पूर्णांक का केप",
-    trophyName: "पूर्णांक ट्रॉफी",
+    personality: "कागज़ की घड़ी वाला कीवी घंटे के बाद के मिनट गिनता है।",
+    cosmeticName: "कागज़ की घड़ी",
+    trophyName: "मिनट ट्रॉफी",
   },
 };
 
@@ -1559,19 +1559,19 @@ export const HI: Record<string, string> = {
     "कक्षा 1–4 के लिए 10, 100 या 1000 जोड़ने या घटाने का मुफ़्त अभ्यास। बाकी अंक वही रहते हैं। साइन अप नहीं।",
   "Grades 2–4": "कक्षा 2–4",
   "Line": "बिंदु",
-  "Round": "पूर्णांक",
+  "Minutes": "मिनट",
   "Fourths": "चौथाई",
   "Sixths": "छठाई",
   "Eighths": "आठवाँ",
   "Past 1": "1 के बाद",
-  "Nearest 10": "निकटतम 10",
-  "Nearest 100": "निकटतम 100",
-  "Nearest 10 or 100": "10 या 100",
+  "After the hour": "घंटे के बाद",
+  "To the half hour": "साढ़े से पहले",
+  "Any minute": "कोई भी मिनट",
   "Grades 3–4": "कक्षा 3–4",
   "Free fractions on a number line for grades 2–4. The ticks between 0 and 1 stay blank, so you count the parts. No signup.":
     "कक्षा 2–4 के लिए संख्या रेखा पर मुफ़्त भिन्न। 0 और 1 के बीच के निशान खाली रहते हैं, इसलिए हिस्से गिनो। साइन अप नहीं।",
-  "Free rounding word problems for grades 3–4. Round a story's number to the nearest 10 or 100. No signup.":
-    "कक्षा 3–4 के लिए मुफ़्त पूर्णांक वाले सवाल। कहानी की संख्या को निकटतम 10 या 100 तक बनाओ। साइन अप नहीं।",
+  "Free time to the minute for grades 3–4. Count the minutes past the hour. No signup.":
+    "कक्षा 3–4 के लिए मुफ़्त मिनट वाली घड़ी। घंटे के बाद के मिनट गिनो। साइन अप नहीं।",
   "Shares": "बाँटना",
   "Garden": "बगीचा",
   "Give one to each plate.": "हर प्लेट पर एक रखो।",

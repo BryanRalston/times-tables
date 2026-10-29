@@ -239,15 +239,13 @@ export interface TickBoard {
   whole: 1 | 2;
 }
 
-export type AboutLevel = "ten" | "hundred" | "mix";
+export type MinuteLevel = "early" | "half" | "all";
 
-export interface AboutBoard {
-  game: "about";
-  mode: AboutLevel;
-  n: number;
-  place: 10 | 100;
-  answer: number;
-  story: string;
+export interface MinuteBoard {
+  game: "minute";
+  mode: MinuteLevel;
+  hours: number;
+  minutes: number;
 }
 
 export type Board =
@@ -266,7 +264,7 @@ export type Board =
   | SignsBoard
   | JumpsBoard
   | TickBoard
-  | AboutBoard;
+  | MinuteBoard;
 
 export function countName(name: string, n: number): string {
   if (n === 1 && name.endsWith("s")) return name.slice(0, -1);

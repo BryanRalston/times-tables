@@ -2218,6 +2218,7 @@ body:has(.ac-boss-intro) { background: #3c2448; }
   .ac-choice.is-picture { min-height: 72px; font-size: 36px; }
   .ac-banner:empty { display: none; }
   .ac-stage.is-time .ac-clock { width: min(220px, 100%); }
+  .ac-stage:not(.is-time) .ac-qcard .ac-clock { width: min(220px, 70vw); }
   .ac-stage:not(.is-teach) .ac-mascot { display: none; }
   .ac-speaker { width: 72px; height: 72px; }
   .ac-fallback strong.is-word { font-size: 32px; }

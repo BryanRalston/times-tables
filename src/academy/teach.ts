@@ -690,13 +690,8 @@ function sceneFrames(question: ChoiceQ, board: Board): TeachFrame[] {
       ];
     case "ticks":
       return captions([t("Read the tick under the dot", "Lee la marca debajo del punto"), `${board.num}/${board.den}`]);
-    case "about":
-      return captions([
-        board.place === 10
-          ? t("5 or more in the ones rounds up", "5 o más en las unidades sube")
-          : t("50 or more in the tens rounds up", "50 o más en las decenas sube"),
-        solved,
-      ]);
+    case "minute":
+      return timeFrames({ kind: "time", hours: board.hours, minutes: board.minutes, level: board.mode });
     default: {
       const neverBoard: never = board;
       return neverBoard;

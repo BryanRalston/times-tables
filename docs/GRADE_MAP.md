@@ -410,23 +410,23 @@ The child sees a number line labeled only at the wholes. The ticks between them 
 
 Pre-K through grade 1 stay locked. Grade 2 does not climb into sixths. Grade 3 can drift down to fourths and cannot climb past 1. Grade 4 can drift down to eighths.
 
-## Round
+## Minutes
 
-Levels, easy to hard: nearest 10, nearest 100, nearest 10 or 100.
+Levels, easy to hard: just after the hour, up to the half hour, any minute.
 
-A short story sits on the card. The spoken question is still “Round 48 to the nearest 10,” the same sentence Place Value already speaks. Grade 3 rounds a two-digit story to the nearest 10 and a three-digit story to the nearest 100 (3.NBT.A.1). Grade 4 mixes the two places on three-digit numbers (4.NBT.A.3, 4.OA.A.3). The hands card steps by 10 or by 100. Numbers stay at or under 999 so every language can speak them.
+The card shows an analog clock. The spoken question is “What time is it?” The minutes are never a multiple of 5, so this does not repeat Telling Time. Grade 3 reads minutes just after the hour, then up to the half hour, then any minute (3.MD.A.1). Grade 4 stays on any minute and can drift down to the half hour. The hands card moves one minute at a time. Elapsed time stays a grade 4 level of Telling Time.
 
 | Grade | Offer | Start | Core levels | Cap without challenge | Standards |
 |---|---|---|---|---|---|
-| Pre-K | Coming later | — | — | — | Rounding waits |
-| K | Coming later | — | — | — | Rounding waits |
-| 1 | Coming later | — | — | — | Rounding waits |
-| 2 | Coming later | — | — | — | Rounding waits |
-| 3 | Play | Nearest 10 | Nearest 10, nearest 100 | Nearest 100 | 3.NBT.A.1 |
-| 4 | Play | Nearest 10 or 100 | Nearest 10 or 100 | One level down (nearest 100) | 4.NBT.A.3, 4.OA.A.3 |
+| Pre-K | Coming later | — | — | — | The minute clock waits |
+| K | Coming later | — | — | — | The minute clock waits |
+| 1 | Coming later | — | — | — | The minute clock waits |
+| 2 | Coming later | — | — | — | The minute clock waits |
+| 3 | Play | After the hour | After the hour, to the half hour, any minute | Any minute | 3.MD.A.1 |
+| 4 | Play | Any minute | Any minute | One level down (to the half hour) | 3.MD.A.1 |
 
-Pre-K through grade 2 stay locked. Grade 3 can drift only inside nearest 10 and nearest 100. Grade 4 can drift down to nearest 100. Elapsed time is already a grade 4 level in Telling Time, so it is not a separate game. Time to the minute is still open.
+Pre-K through grade 2 stay locked. Grade 3 can use every level of this game. Grade 4 can drift down to the half hour. Estimation of a sum or difference (3.OA.D.8) is still open: a spoken “about how many” would either repeat Place Value’s rounding line or Add’s “what is A plus B.”
 
 ## Still open
 
-These Common Core skills still have no game: teen numbers as ten and ones (K.NBT.A.1), decomposing numbers within 10 (K.OA.A.3), the meaning of the equal sign (1.OA.D.7), three-addend word problems (1.OA.A.2), adding up to four two-digit numbers (2.NBT.B.6), the full subtraction algorithm within 1000 (2.NBT.B.7), measuring the same length in two units (2.MD.A.2), estimating length (2.MD.A.3), comparing lengths (2.MD.A.4), length word problems (2.MD.B.5), a number line of lengths (2.MD.B.6), line plots of measurements (2.MD.D.9), multiplying a one-digit number by a multiple of 10 (3.NBT.A.3), mass and liquid volume (3.MD.A.2), properties of multiplication (3.OA.B.5), time to the minute (3.MD.A.1), and the early reading work of syllables (RF.K.2.B), onset and rime (RF.K.2.C), and phoneme substitution (RF.K.2.E). Rounding to 10 and 100 is already Place Value. Rounding stories are the Round game. Blank fraction lines are the Line game. Rhyming words are already Phonics, and only in the languages that teach English reading. Even and odd is still open as a question, though Fair Shares already deals equal pairs.
+These Common Core skills still have no game: teen numbers as ten and ones (K.NBT.A.1), decomposing numbers within 10 (K.OA.A.3), the meaning of the equal sign (1.OA.D.7), three-addend word problems (1.OA.A.2), adding up to four two-digit numbers (2.NBT.B.6), the full subtraction algorithm within 1000 (2.NBT.B.7), measuring the same length in two units (2.MD.A.2), estimating length (2.MD.A.3), comparing lengths (2.MD.A.4), length word problems (2.MD.B.5), a number line of lengths (2.MD.B.6), line plots of measurements (2.MD.D.9), multiplying a one-digit number by a multiple of 10 (3.NBT.A.3), mass and liquid volume (3.MD.A.2), properties of multiplication (3.OA.B.5), estimating a sum or difference and judging whether the answer is reasonable (3.OA.D.8), and the early reading work of syllables (RF.K.2.B), onset and rime (RF.K.2.C), and phoneme substitution (RF.K.2.E). Rounding to 10 and 100 is already Place Value. Time to the minute is the Minutes game. Blank fraction lines are the Line game. Elapsed time stays a grade 4 level of Telling Time. Rhyming words are already Phonics, and only in the languages that teach English reading. Even and odd is still open as a question, though Fair Shares already deals equal pairs.

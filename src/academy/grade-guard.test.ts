@@ -23,7 +23,8 @@ import { makeClockTask, makePayTask } from "./hands";
 import type { Grade } from "./model";
 import { nextPlacement } from "./placement";
 import { blankChild } from "./storage";
-import { roundHalfUp, type Board } from "./games/boards";
+import { formatClockTime } from "@/lib/clock";
+import type { Board } from "./games/boards";
 import type { ChoiceQ } from "./games/types";
 import { graphAnswer } from "./games/graph-data";
 import { variableAnswer } from "./games/variables";
@@ -414,20 +415,20 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if (grade === "4") expect(["eighths", "past"]).toContain(board.mode);
       break;
     }
-    case "about": {
-      expect(board.n).toBeGreaterThanOrEqual(board.mode === "ten" ? 10 : 100);
-      expect(board.n).toBeLessThanOrEqual(999);
-      expect(board.answer).toBe(roundHalfUp(board.n, board.place));
-      expect(question.answer).toBe(String(board.answer));
-      expect(board.answer).toBeLessThanOrEqual(1000);
-      expect(board.story.length).toBeGreaterThan(0);
-      if (board.mode === "ten") {
-        expect(board.place).toBe(10);
-        expect(board.n).toBeLessThan(100);
+    case "minute": {
+      expect(board.hours).toBeGreaterThanOrEqual(1);
+      expect(board.hours).toBeLessThanOrEqual(12);
+      expect(board.minutes).toBeGreaterThanOrEqual(1);
+      expect(board.minutes).toBeLessThanOrEqual(59);
+      expect(board.minutes % 5).not.toBe(0);
+      expect(question.answer).toBe(formatClockTime(board.hours, board.minutes));
+      if (board.mode === "early") expect(board.minutes).toBeLessThanOrEqual(12);
+      if (board.mode === "half") {
+        expect(board.minutes).toBeGreaterThanOrEqual(13);
+        expect(board.minutes).toBeLessThanOrEqual(29);
       }
-      if (board.mode === "hundred") expect(board.place).toBe(100);
-      if (grade === "3") expect(["ten", "hundred"]).toContain(board.mode);
-      if (grade === "4") expect(["hundred", "mix"]).toContain(board.mode);
+      if (grade === "3") expect(["early", "half", "all"]).toContain(board.mode);
+      if (grade === "4") expect(["half", "all"]).toContain(board.mode);
       break;
     }
     default: {
@@ -442,6 +443,23 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
   expect(task.speech).not.toMatch(/[×÷¢]/);
   switch (task.kind) {
     case "clock":
+      if (task.skill.startsWith("minute:")) {
+        expect(task.snap).toBe(1);
+        expect(task.hours).toBeGreaterThanOrEqual(1);
+        expect(task.hours).toBeLessThanOrEqual(12);
+        expect(task.minutes).toBeGreaterThanOrEqual(1);
+        expect(task.minutes).toBeLessThanOrEqual(59);
+        expect(task.minutes % 5).not.toBe(0);
+        const mode = task.skill.slice("minute:".length);
+        if (mode === "early") expect(task.minutes).toBeLessThanOrEqual(12);
+        if (mode === "half") {
+          expect(task.minutes).toBeGreaterThanOrEqual(13);
+          expect(task.minutes).toBeLessThanOrEqual(29);
+        }
+        if (grade === "3") expect(["early", "half", "all"]).toContain(mode);
+        if (grade === "4") expect(["half", "all"]).toContain(mode);
+      }
+      break;
     case "pay":
       break;
     case "array":
@@ -615,15 +633,6 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
       if (grade === "2") expect(task.mode).toBe("fourths");
       if (grade === "3") expect(["fourths", "sixths", "eighths"]).toContain(task.mode);
       if (grade === "4") expect(["eighths", "past"]).toContain(task.mode);
-      break;
-    case "about":
-      expect(task.answer).toBe(roundHalfUp(task.n, task.place));
-      expect(task.n).toBeLessThanOrEqual(999);
-      expect(task.answer).toBeLessThanOrEqual(1000);
-      if (task.mode === "ten") expect(task.place).toBe(10);
-      if (task.mode === "hundred") expect(task.place).toBe(100);
-      if (grade === "3") expect(["ten", "hundred"]).toContain(task.mode);
-      if (grade === "4") expect(["hundred", "mix"]).toContain(task.mode);
       break;
     default: {
       const neverTask: never = task;

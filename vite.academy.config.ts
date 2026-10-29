@@ -214,7 +214,7 @@ export default defineConfig({
         sheetSigns: resolve("academy/worksheets/compare-numbers/index.html"),
         sheetJumps: resolve("academy/worksheets/ten-more/index.html"),
         sheetTicks: resolve("academy/worksheets/number-line-fractions/index.html"),
-        sheetAbout: resolve("academy/worksheets/rounding-stories/index.html"),
+        sheetMinute: resolve("academy/worksheets/time-to-the-minute/index.html"),
       },
     },
   },

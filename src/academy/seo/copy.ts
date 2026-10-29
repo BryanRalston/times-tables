@@ -728,26 +728,26 @@ export const GAME_COPY: readonly GameCopy[] = [
     ),
   },
   {
-    id: "about",
-    slug: "rounding-word-problems-game",
+    id: "minute",
+    slug: "time-to-the-nearest-minute-game",
     grades: ["3", "4"],
     name: phrase(
-      "rounding stories",
-      "historias de redondeo",
-      "histórias de arredondamento",
-      "histoires d'arrondi",
-      "四舍五入的故事",
-      "पूर्णांक की कहानियाँ",
-      "قصص التقريب",
+      "time to the minute",
+      "la hora al minuto",
+      "horas até o minuto",
+      "l'heure à la minute",
+      "每一分钟",
+      "मिनट वाली घड़ी",
+      "الوقت لأقرب دقيقة",
     ),
     blurb: phrase(
-      "Kids round the number in a short story to the nearest 10 or 100.",
-      "Los niños redondean el número de una historia corta a la decena o a la centena.",
-      "As crianças arredondam o número de uma história curta para a dezena ou a centena.",
-      "Les enfants arrondissent le nombre d'une courte histoire à la dizaine ou à la centaine.",
-      "孩子把短故事里的数四舍五入到十或百。",
-      "बच्चे छोटी कहानी की संख्या को निकटतम 10 या 100 तक बनाते हैं।",
-      "يقرّب الأطفال عدد قصة قصيرة إلى أقرب 10 أو 100.",
+      "Kids count the minutes past the hour on a clock.",
+      "Los niños cuentan los minutos después de la hora en un reloj.",
+      "As crianças contam os minutos depois da hora num relógio.",
+      "Les enfants comptent les minutes après l'heure sur une horloge.",
+      "孩子看钟，数过了整点多少分钟。",
+      "बच्चे घड़ी पर घंटे के बाद के मिनट गिनते हैं।",
+      "يعدّ الأطفال الدقائق بعد الساعة على الساعة.",
     ),
   },
   {
@@ -903,9 +903,9 @@ ticks:fourths|fourths on a blank line|cuartos en una recta en blanco|quartos num
 ticks:sixths|sixths on a blank line|sextos en una recta en blanco|sextos numa reta em branco|sixièmes sur une droite vide|空数轴上的六分|खाली रेखा पर छठाई|أسداس على خط فارغ
 ticks:eighths|eighths on a blank line|octavos en una recta en blanco|oitavos numa reta em branco|huitièmes sur une droite vide|空数轴上的八分|खाली रेखा पर आठवाँ|أثمان على خط فارغ
 ticks:past|fractions past one|fracciones después del uno|frações depois do um|fractions après un|大于1的分数|एक के बाद की भिन्न|كسور بعد الواحد
-about:ten|rounding a story to the nearest 10|redondear una historia a la decena|arredondar uma história para a dezena|arrondir une histoire à la dizaine|把故事四舍五入到十|कहानी को निकटतम 10|تقريب قصة لأقرب 10
-about:hundred|rounding a story to the nearest 100|redondear una historia a la centena|arredondar uma história para a centena|arrondir une histoire à la centaine|把故事四舍五入到百|कहानी को निकटतम 100|تقريب قصة لأقرب 100
-about:mix|rounding a story to either place|redondear una historia a la decena o la centena|arredondar uma história para a dezena ou a centena|arrondir une histoire à la dizaine ou à la centaine|把故事四舍五入到十或百|कहानी को 10 या 100|تقريب قصة إلى 10 أو 100
+minute:early|minutes just after the hour|minutos justo después de la hora|minutos logo depois da hora|minutes juste après l'heure|过了整点的分钟|घंटे के बाद के मिनट|دقائق بعد الساعة
+minute:half|minutes before half past|minutos antes de y media|minutos antes de e meia|minutes avant et demie|到半点的分钟|साढ़े से पहले के मिनट|دقائق قبل النصف
+minute:all|any minute on the clock|cualquier minuto del reloj|qualquer minuto do relógio|n'importe quelle minute de l'horloge|钟上的每一分钟|घड़ी का कोई भी मिनट|أي دقيقة على الساعة
 `;
 
 function loadSkills(): Record<string, Phrase> {
@@ -1000,7 +1000,7 @@ const SHEET_H1: Record<string, Phrase> = {
   "Compare numbers": rest("comparar números", "comparar números", "comparer des nombres", "比较数字", "संख्याओं की तुलना", "مقارنة الأعداد"),
   "Ten more": rest("10 más", "10 mais", "10 de plus", "多10", "10 अधिक", "10 أكثر"),
   "Number line fractions": rest("fracciones en la recta", "frações na reta", "fractions sur une droite", "数轴上的分数", "संख्या रेखा की भिन्न", "كسور خط الأعداد"),
-  "Rounding stories": rest("historias de redondeo", "histórias de arredondamento", "histoires d'arrondi", "四舍五入的故事", "पूर्णांक की कहानियाँ", "قصص التقريب"),
+  "Time to the minute": rest("la hora al minuto", "horas até o minuto", "l'heure à la minute", "每一分钟", "मिनट वाली घड़ी", "الوقت لأقرب دقيقة"),
 };
 
 export function sheetH1(englishH1: string, lang: SeoLang): string {

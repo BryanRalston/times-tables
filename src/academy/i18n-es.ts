@@ -514,12 +514,12 @@ export const BOSS_ES: Record<string, BossEs> = {
     cosmeticName: "Corona de marcas",
     trophyName: "Trofeo de la recta",
   },
-  about: {
-    taunt: "Decena",
+  minute: {
+    taunt: "Minutos",
     friendly: "¡Sí!",
-    personality: "Un kiwi con capa que redondea un frasco de calcomanías a la decena o a la centena.",
-    cosmeticName: "Capa de redondeo",
-    trophyName: "Trofeo de redondear",
+    personality: "Un kiwi con un reloj de papel que cuenta los minutos después de la hora.",
+    cosmeticName: "Reloj de papel",
+    trophyName: "Trofeo del minuto",
   },
 };
 
@@ -1126,19 +1126,19 @@ export const ES: Record<string, string> = {
     "Práctica gratis de sumar o quitar 10, 100 o 1000, de grado 1 a 4. Las otras cifras se quedan. Sin cuenta.",
   "Grades 2–4": "Grados 2 a 4",
   "Line": "Punto",
-  "Round": "Decena",
+  "Minutes": "Minutos",
   "Fourths": "Cuartos",
   "Sixths": "Sextos",
   "Eighths": "Octavos",
   "Past 1": "Después del 1",
-  "Nearest 10": "Decena",
-  "Nearest 100": "Centena",
-  "Nearest 10 or 100": "Decena o centena",
+  "After the hour": "Después de la hora",
+  "To the half hour": "Hasta y media",
+  "Any minute": "Cualquier minuto",
   "Grades 3–4": "Grados 3 a 4",
   "Free fractions on a number line for grades 2–4. The ticks between 0 and 1 stay blank, so you count the parts. No signup.":
     "Fracciones gratis en la recta numérica, de grado 2 a 4. Las marcas entre 0 y 1 van en blanco, así que cuentas las partes. Sin cuenta.",
-  "Free rounding word problems for grades 3–4. Round a story's number to the nearest 10 or 100. No signup.":
-    "Problemas gratis de redondeo, de grado 3 a 4. Redondea el número de la historia a la decena o a la centena. Sin cuenta.",
+  "Free time to the minute for grades 3–4. Count the minutes past the hour. No signup.":
+    "La hora al minuto, gratis, de grado 3 a 4. Cuenta los minutos después de la hora. Sin cuenta.",
   "Shares": "Repartos",
   "Garden": "Jardín",
   "Give one to each plate.": "Da una a cada plato.",
