@@ -8,6 +8,7 @@ import { presentStory } from "../stories/localize";
 import { lineTokens } from "../stories/read";
 import { blip, chime, teachTone } from "../sound";
 import { getLocale, show, t } from "../i18n";
+import { countStoryFinish } from "../seo/events";
 import { ensureVoice } from "../voice/clips";
 import { startClipSpeech, startReadAlong, stopClipSpeech } from "../voice/player";
 import { BackLink, SquisheeImg, Stars, cx } from "./bits";
@@ -167,6 +168,7 @@ export function StoryReader({
       total: score.total,
       seconds: Math.max(1, Math.round((Date.now() - started.current) / 1000)),
     });
+    countStoryFinish(story.id);
   }, [state, onFinish, story.id]);
 
   function speakThen(line: string, follow: string | null) {

@@ -5,6 +5,7 @@ import { todayIso, type RoundResult, type Save } from "./model";
 import { openEgg } from "./buddy/unlock";
 import { acknowledgeUnlocks, applyRound, applyStory, claimDailyGift } from "./rewards";
 import { getLocale, loadLocalePack, localePackReady, setLocale, show, type Locale } from "./i18n";
+import { noteLocale } from "./seo/events";
 import { activeChild, loadSave, mapActive, withLevel, writeSave } from "./storage";
 import { warmVoices } from "./voice";
 import { HelloScreen, SettingsScreen, SheetsScreen, ShelfScreen } from "./ui/extra";
@@ -169,6 +170,10 @@ function AcademyApp() {
   useEffect(() => {
     warmVoices();
   }, []);
+
+  useEffect(() => {
+    noteLocale(save.lang);
+  }, [save.lang]);
 
   useEffect(() => {
     const footer = document.querySelector(".for-grownups");

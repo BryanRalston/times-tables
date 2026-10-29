@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { rngFromSeed } from "@/lib/rng";
 import { gameById } from "../games/registry";
 import { getLocale, loadLocalePack, localePackReady, setLocale, show, t } from "../i18n";
+import { noteLocale } from "../seo/events";
 import { makeSheet } from "../games/round";
 import { loadSave } from "../storage";
 
@@ -9,6 +10,10 @@ export function WorksheetPage({ game: gameId }: { game: string }) {
   setLocale(loadSave().lang);
   const lang = getLocale();
   const [packReady, setPackReady] = useState(() => localePackReady(lang));
+  useEffect(() => {
+    noteLocale(lang);
+  }, [lang]);
+
   useEffect(() => {
     if (localePackReady(lang)) return;
     let live = true;

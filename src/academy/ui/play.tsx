@@ -25,6 +25,7 @@ import { slotStory } from "../buddy/story";
 import { bossEnergyAfterHit, bossIsTimed, bossMaxEnergy, phaseForIndex } from "../boss-battle";
 import { bossForGame } from "../bosses";
 import { playWindow } from "../grade-map";
+import { countGameStart, countRoundComplete } from "../seo/events";
 import { gameById, pillLabel } from "../games/registry";
 import { makeHandsTask } from "../hands-build";
 import { cardStepLabel, cardsRoundLabel, getLocale, remainderShown, show, t, yourTurnLine } from "../i18n";
@@ -419,9 +420,10 @@ export function PlayScreen({
     setNudge(null);
     setPractice(null);
     setTeachSlot(null);
+    countGameStart(game);
   }
 
-  function finish() {
+  function finish(complete = false) {
     if (finishedRef.current) return;
     finishedRef.current = true;
     if (waitRef.current) window.clearTimeout(waitRef.current);
@@ -431,6 +433,7 @@ export function PlayScreen({
     setUnlockId(newestUnlock(startStarsRef.current, startStarsRef.current + earned));
     setBestCombo(bestRef.current);
     setPhase("done");
+    if (complete) countRoundComplete(game);
     const seconds = Math.min(180, Math.max(1, Math.round((Date.now() - startedRef.current) / 1000)));
     onRoundRef.current({
       game,
@@ -464,7 +467,7 @@ export function PlayScreen({
     phaseRef.current = "ask";
     const total = roundTotal();
     if (fromIndex + 1 >= total) {
-      finishRef.current();
+      finishRef.current(true);
       return;
     }
     if (!questionsRef.current[fromIndex + 1]) {
@@ -648,6 +651,11 @@ export function PlayScreen({
   const stepLabel = calm
     ? cardStepLabel(index, total)
     : t(`Question ${Math.min(total, index + 1)} of ${total}`, `Pregunta ${Math.min(total, index + 1)} de ${total}`, `Pergunta ${Math.min(total, index + 1)} de ${total}`, `Question ${Math.min(total, index + 1)} sur ${total}`, `第${Math.min(total, index + 1)}题，共${total}题`, `सवाल ${total} में से ${Math.min(total, index + 1)}`, `السؤال ${Math.min(total, index + 1)} من ${total}`);
+
+  useEffect(() => {
+    if (blocked) return;
+    countGameStart(game);
+  }, [blocked, game]);
 
   useEffect(() => {
     if (!showSpeed) return;
