@@ -6,7 +6,9 @@ import { countGame } from "./count";
 import { fractionsGame } from "./fractions";
 import { graphsGame } from "./graphs";
 import { gridGame } from "./grid";
+import { minuteGame } from "./minute";
 import { jumpsGame } from "./jumps";
+import { ticksGame } from "./ticks";
 import { patternsGame } from "./patterns";
 import { signsGame } from "./signs";
 import { shareGame } from "./share";
@@ -48,6 +50,8 @@ export const GAMES = [
   patternsGame,
   signsGame,
   jumpsGame,
+  ticksGame,
+  minuteGame,
 ] as const;
 
 export type GameId = (typeof GAMES)[number]["id"];

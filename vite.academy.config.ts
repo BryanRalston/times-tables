@@ -213,6 +213,8 @@ export default defineConfig({
         sheetPatterns: resolve("academy/worksheets/number-patterns/index.html"),
         sheetSigns: resolve("academy/worksheets/compare-numbers/index.html"),
         sheetJumps: resolve("academy/worksheets/ten-more/index.html"),
+        sheetTicks: resolve("academy/worksheets/number-line-fractions/index.html"),
+        sheetMinute: resolve("academy/worksheets/time-to-the-minute/index.html"),
       },
     },
   },

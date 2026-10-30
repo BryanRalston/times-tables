@@ -229,6 +229,25 @@ export interface JumpsBoard {
   answer: number;
 }
 
+export type TickLevel = "fourths" | "sixths" | "eighths" | "past";
+
+export interface TickBoard {
+  game: "ticks";
+  mode: TickLevel;
+  num: number;
+  den: number;
+  whole: 1 | 2;
+}
+
+export type MinuteLevel = "early" | "half" | "all";
+
+export interface MinuteBoard {
+  game: "minute";
+  mode: MinuteLevel;
+  hours: number;
+  minutes: number;
+}
+
 export type Board =
   | CountBoard
   | PlaceBoard
@@ -243,7 +262,9 @@ export type Board =
   | GridBoard
   | PatternBoard
   | SignsBoard
-  | JumpsBoard;
+  | JumpsBoard
+  | TickBoard
+  | MinuteBoard;
 
 export function countName(name: string, n: number): string {
   if (n === 1 && name.endsWith("s")) return name.slice(0, -1);

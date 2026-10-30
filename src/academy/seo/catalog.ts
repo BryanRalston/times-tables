@@ -1,6 +1,6 @@
 import { formatClockTime } from "../../lib/clock";
 
-export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables" | "graphs" | "share" | "grid" | "patterns" | "signs" | "jumps";
+export type SheetGame = "times" | "add" | "time" | "money" | "count" | "place" | "shapes" | "fractions" | "measure" | "phonics" | "problems" | "variables" | "graphs" | "share" | "grid" | "patterns" | "signs" | "jumps" | "ticks" | "minute";
 
 export interface CoinCounts {
   penny?: number;
@@ -873,6 +873,46 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       { prompt: "What is 100 less than 105?", answer: "5" },
       { prompt: "What is 1000 more than 2300?", answer: "3300" },
       { prompt: "What is 1000 less than 4500?", answer: "3500" },
+    ],
+  },
+  {
+    slug: "number-line-fractions",
+    title: "Free Number Line Fractions Worksheet (Grades 2–4) | Squishee Academy",
+    description:
+      "Print a free number-line fractions worksheet for grades 2–4. The middle ticks stay blank. Count the parts. No signup.",
+    h1: "Number line fractions",
+    game: "ticks",
+    items: [
+      { prompt: "A number line from 0 to 1 is split into 2 equal parts. The dot is on mark 1. What fraction?", answer: "1/2" },
+      { prompt: "A number line from 0 to 1 is split into 4 equal parts. The dot is on mark 1. What fraction?", answer: "1/4" },
+      { prompt: "A number line from 0 to 1 is split into 4 equal parts. The dot is on mark 2. What fraction?", answer: "2/4" },
+      { prompt: "A number line from 0 to 1 is split into 4 equal parts. The dot is on mark 3. What fraction?", answer: "3/4" },
+      { prompt: "A number line from 0 to 1 is split into 3 equal parts. The dot is on mark 1. What fraction?", answer: "1/3" },
+      { prompt: "A number line from 0 to 1 is split into 3 equal parts. The dot is on mark 2. What fraction?", answer: "2/3" },
+      { prompt: "A number line from 0 to 1 is split into 6 equal parts. The dot is on mark 5. What fraction?", answer: "5/6" },
+      { prompt: "A number line from 0 to 1 is split into 8 equal parts. The dot is on mark 3. What fraction?", answer: "3/8" },
+      { prompt: "A number line from 0 to 1 is split into 8 equal parts. The dot is on mark 7. What fraction?", answer: "7/8" },
+      { prompt: "A number line from 0 to 2 is split into 4 equal parts. The dot is on mark 3. What fraction?", answer: "3/2" },
+    ],
+  },
+  {
+    slug: "time-to-the-minute",
+    title: "Free Time to the Minute Worksheet (Grades 3–4) | Squishee Academy",
+    description:
+      "Print a free time-to-the-minute worksheet for grades 3–4. Count the minutes past the hour. No signup.",
+    h1: "Time to the minute",
+    game: "minute",
+    items: [
+      { prompt: "What time is it?", answer: "2:07", clock: { hours: 2, minutes: 7 } },
+      { prompt: "What time is it?", answer: "4:13", clock: { hours: 4, minutes: 13 } },
+      { prompt: "What time is it?", answer: "6:22", clock: { hours: 6, minutes: 22 } },
+      { prompt: "What time is it?", answer: "8:41", clock: { hours: 8, minutes: 41 } },
+      { prompt: "What time is it?", answer: "1:09", clock: { hours: 1, minutes: 9 } },
+      { prompt: "What time is it?", answer: "3:28", clock: { hours: 3, minutes: 28 } },
+      { prompt: "What time is it?", answer: "5:46", clock: { hours: 5, minutes: 46 } },
+      { prompt: "What time is it?", answer: "7:53", clock: { hours: 7, minutes: 53 } },
+      { prompt: "What time is it?", answer: "9:18", clock: { hours: 9, minutes: 18 } },
+      { prompt: "What time is it?", answer: "11:37", clock: { hours: 11, minutes: 37 } },
     ],
   },
 ];

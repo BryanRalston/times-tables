@@ -1201,6 +1201,98 @@ export const jumpsCard = sceneCard("10 more", JUMP_ROWS, {
   isLevel: (value) => isId(JUMP_IDS, value),
 });
 
+const TICK_IDS = ["fourths", "sixths", "eighths", "past"] as const;
+const TICK_ROWS: SkillRow[] = [
+  { key: "ticks:fourths", label: "Fourths" },
+  { key: "ticks:sixths", label: "Sixths" },
+  { key: "ticks:eighths", label: "Eighths" },
+  { key: "ticks:past", label: "Past 1" },
+];
+
+export const ticksCard = sceneCard("Line", TICK_ROWS, {
+  id: "ticks",
+  title: "Line",
+  audience: "Grades 2–4",
+  tint: "aqua",
+  mascot: "cookie",
+  sheetSlug: "number-line-fractions",
+  sheetScreen: "sheet-ticks",
+  blurb:
+    "Free fractions on a number line for grades 2–4. The ticks between 0 and 1 stay blank, so you count the parts. No signup.",
+  levels: [
+    { id: "fourths", label: "Fourths", num: 1 },
+    { id: "sixths", label: "Sixths", num: 2 },
+    { id: "eighths", label: "Eighths", num: 3 },
+    { id: "past", label: "Past 1", num: 4 },
+  ],
+  defaultLevel(grade) {
+    const fallback = ((): string => {
+      switch (grade) {
+        case "PK":
+        case "K":
+        case "1":
+        case "2":
+          return "fourths";
+        case "3":
+          return "sixths";
+        case "4":
+          return "past";
+        default: {
+          const neverGrade: never = grade;
+          return neverGrade;
+        }
+      }
+    })();
+    return bandStart("ticks", grade, TICK_IDS, fallback);
+  },
+  sheetDefaultLevel: "fourths",
+  isLevel: (value) => isId(TICK_IDS, value),
+});
+
+const MINUTE_IDS = ["early", "half", "all"] as const;
+const MINUTE_ROWS: SkillRow[] = [
+  { key: "minute:early", label: "After the hour" },
+  { key: "minute:half", label: "To the half hour" },
+  { key: "minute:all", label: "Any minute" },
+];
+
+export const minuteCard = sceneCard("Minutes", MINUTE_ROWS, {
+  id: "minute",
+  title: "Minutes",
+  audience: "Grades 3–4",
+  tint: "sand",
+  mascot: "kiwi",
+  sheetSlug: "time-to-the-minute",
+  sheetScreen: "sheet-minute",
+  blurb: "Free time to the minute for grades 3–4. Count the minutes past the hour. No signup.",
+  levels: [
+    { id: "early", label: "After the hour", num: 1 },
+    { id: "half", label: "To the half hour", num: 2 },
+    { id: "all", label: "Any minute", num: 3 },
+  ],
+  defaultLevel(grade) {
+    const fallback = ((): string => {
+      switch (grade) {
+        case "PK":
+        case "K":
+        case "1":
+        case "2":
+        case "3":
+          return "early";
+        case "4":
+          return "all";
+        default: {
+          const neverGrade: never = grade;
+          return neverGrade;
+        }
+      }
+    })();
+    return bandStart("minute", grade, MINUTE_IDS, fallback);
+  },
+  sheetDefaultLevel: "early",
+  isLevel: (value) => isId(MINUTE_IDS, value),
+});
+
 /** Home-card order is also the island order. Append a game; do not insert one in front. */
 export const GAME_CARDS = [
   timesCard,
@@ -1223,6 +1315,8 @@ export const GAME_CARDS = [
   patternsCard,
   signsCard,
   jumpsCard,
+  ticksCard,
+  minuteCard,
 ] as const;
 
 export type GameId = (typeof GAME_CARDS)[number]["id"];

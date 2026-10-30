@@ -507,6 +507,20 @@ export const BOSS_ES: Record<string, BossEs> = {
     cosmeticName: "Capa del diez",
     trophyName: "Trofeo de 10 más",
   },
+  ticks: {
+    taunt: "Cuenta los puntos",
+    friendly: "¡Sí!",
+    personality: "Una galleta con corona de papel que cuenta las marcas vacías de la recta.",
+    cosmeticName: "Corona de marcas",
+    trophyName: "Trofeo de la recta",
+  },
+  minute: {
+    taunt: "Minutos",
+    friendly: "¡Sí!",
+    personality: "Un kiwi con un reloj de papel que cuenta los minutos después de la hora.",
+    cosmeticName: "Reloj de papel",
+    trophyName: "Trofeo del minuto",
+  },
 };
 
 export const TRAIT_ES: Record<string, string> = {
@@ -1111,6 +1125,20 @@ export const ES: Record<string, string> = {
   "Free practice adding or taking away 10, 100, or 1000 for grades 1–4. The other digits stay put. No signup.":
     "Práctica gratis de sumar o quitar 10, 100 o 1000, de grado 1 a 4. Las otras cifras se quedan. Sin cuenta.",
   "Grades 2–4": "Grados 2 a 4",
+  "Line": "Punto",
+  "Minutes": "Minutos",
+  "Fourths": "Cuartos",
+  "Sixths": "Sextos",
+  "Eighths": "Octavos",
+  "Past 1": "Después del 1",
+  "After the hour": "Después de la hora",
+  "To the half hour": "Hasta y media",
+  "Any minute": "Cualquier minuto",
+  "Grades 3–4": "Grados 3 a 4",
+  "Free fractions on a number line for grades 2–4. The ticks between 0 and 1 stay blank, so you count the parts. No signup.":
+    "Fracciones gratis en la recta numérica, de grado 2 a 4. Las marcas entre 0 y 1 van en blanco, así que cuentas las partes. Sin cuenta.",
+  "Free time to the minute for grades 3–4. Count the minutes past the hour. No signup.":
+    "La hora al minuto, gratis, de grado 3 a 4. Cuenta los minutos después de la hora. Sin cuenta.",
   "Shares": "Repartos",
   "Garden": "Jardín",
   "Give one to each plate.": "Da una a cada plato.",

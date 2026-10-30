@@ -492,6 +492,20 @@ export const BOSS_ZH: Record<string, BossEs> = {
     "cosmeticName": "十的斗篷",
     "trophyName": "多十奖杯"
   },
+  "ticks": {
+    "taunt": "数这些点",
+    "friendly": "对！",
+    "personality": "cookie戴着纸皇冠，数数轴上的空刻度。",
+    "cosmeticName": "刻度皇冠",
+    "trophyName": "数轴奖杯"
+  },
+  "minute": {
+    "taunt": "分钟",
+    "friendly": "对！",
+    "personality": "kiwi戴着纸钟，数过了整点多少分钟。",
+    "cosmeticName": "纸钟",
+    "trophyName": "分钟奖杯"
+  },
 };
 
 export const TRAIT_ZH: Record<string, string> = {
@@ -1545,6 +1559,20 @@ export const ZH: Record<string, string> = {
   "Free practice adding or taking away 10, 100, or 1000 for grades 1–4. The other digits stay put. No signup.":
     "一至四年级的免费练习：加上或减去10、100或1000。其他数位不动。不用注册。",
   "Grades 2–4": "二至四年级",
+  "Line": "点",
+  "Minutes": "分钟",
+  "Fourths": "四分",
+  "Sixths": "六分",
+  "Eighths": "八分",
+  "Past 1": "大于1",
+  "After the hour": "过了整点",
+  "To the half hour": "到半点",
+  "Any minute": "每一分钟",
+  "Grades 3–4": "三至四年级",
+  "Free fractions on a number line for grades 2–4. The ticks between 0 and 1 stay blank, so you count the parts. No signup.":
+    "二至四年级的免费数轴分数。0和1之间的刻度是空的，要数有几份。不用注册。",
+  "Free time to the minute for grades 3–4. Count the minutes past the hour. No signup.":
+    "三至四年级的免费看钟。数一数过了整点多少分钟。不用注册。",
   "Shares": "平均分",
   "Garden": "方格园",
   "Give one to each plate.": "每个盘子放一块。",

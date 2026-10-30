@@ -1398,6 +1398,25 @@ html[lang="ar"] .ac-hello-grades .ac-grade {
   pointer-events: none;
   object-fit: contain;
 }
+/* Minutes only. The pal sits beside the clock, outside the face and the numbers. */
+.ac-stage.is-minute .ac-clock-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.ac-stage.is-minute .ac-clock {
+  flex: none;
+  margin: 0;
+}
+.ac-stage.is-minute .ac-clock-pal {
+  position: static;
+  flex: none;
+  left: auto;
+  bottom: auto;
+  transform: none;
+}
 .ac-buddy-row { display: flex; justify-content: flex-end; min-height: 52px; }
 .ac-buddy {
   position: static;
@@ -2218,6 +2237,7 @@ body:has(.ac-boss-intro) { background: #3c2448; }
   .ac-choice.is-picture { min-height: 72px; font-size: 36px; }
   .ac-banner:empty { display: none; }
   .ac-stage.is-time .ac-clock { width: min(220px, 100%); }
+  .ac-stage:not(.is-time) .ac-qcard .ac-clock { width: min(220px, 70vw); }
   .ac-stage:not(.is-teach) .ac-mascot { display: none; }
   .ac-speaker { width: 72px; height: 72px; }
   .ac-fallback strong.is-word { font-size: 32px; }

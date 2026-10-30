@@ -492,6 +492,20 @@ export const BOSS_FR: Record<string, BossEs> = {
     "cosmeticName": "Cape du dix",
     "trophyName": "Trophée dix de plus"
   },
+  "ticks": {
+    "taunt": "Compte les points",
+    "friendly": "Oui !",
+    "personality": "Un biscuit à couronne de papier qui compte les traits vides de la droite.",
+    "cosmeticName": "Couronne des traits",
+    "trophyName": "Trophée de la droite"
+  },
+  "minute": {
+    "taunt": "Minutes",
+    "friendly": "Oui !",
+    "personality": "Un kiwi avec une horloge en papier qui compte les minutes après l'heure.",
+    "cosmeticName": "Horloge en papier",
+    "trophyName": "Trophée de la minute"
+  },
 };
 
 export const TRAIT_FR: Record<string, string> = {
@@ -1544,6 +1558,20 @@ export const FR: Record<string, string> = {
   "Free practice adding or taking away 10, 100, or 1000 for grades 1–4. The other digits stay put. No signup.":
     "Exercice gratuit pour ajouter ou enlever 10, 100 ou 1000, du CP au CM1. Les autres chiffres restent. Sans compte.",
   "Grades 2–4": "CE1 au CM1",
+  "Line": "Points",
+  "Minutes": "Minutes",
+  "Fourths": "Quarts",
+  "Sixths": "Sixièmes",
+  "Eighths": "Huitièmes",
+  "Past 1": "Après 1",
+  "After the hour": "Après l'heure",
+  "To the half hour": "Jusqu'à et demie",
+  "Any minute": "N'importe quelle minute",
+  "Grades 3–4": "CE2 et CM1",
+  "Free fractions on a number line for grades 2–4. The ticks between 0 and 1 stay blank, so you count the parts. No signup.":
+    "Fractions gratuites sur une droite, du CE1 au CM1. Les traits entre 0 et 1 restent vides, alors tu comptes les parts. Sans compte.",
+  "Free time to the minute for grades 3–4. Count the minutes past the hour. No signup.":
+    "L'heure à la minute, gratuite, pour le CE2 et le CM1. Compte les minutes après l'heure. Sans compte.",
   "Shares": "Partages",
   "Garden": "Jardin",
   "Give one to each plate.": "Donne-en un à chaque assiette.",

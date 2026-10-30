@@ -672,6 +672,26 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string): s
         `${buddy} और ${host} 10 और आगे कूदते हैं।`,
         `${buddy} و${host} يقفزان 10 أكثر.`,
       );
+    case "ticks":
+      return say(
+        `${buddy} and ${host} find the dot.`,
+        `${buddy} y ${host} buscan el punto.`,
+        `${buddy} e ${host} acham o ponto.`,
+        `${buddy} et ${host} trouvent le point.`,
+        `${buddy}和${host}找这个点。`,
+        `${buddy} और ${host} बिंदु ढूँढते हैं।`,
+        `${buddy} و${host} يجدان النقطة.`,
+      );
+    case "minute":
+      return say(
+        `${buddy} and ${host} read the clock.`,
+        `${buddy} y ${host} leen el reloj.`,
+        `${buddy} e ${host} leem o relógio.`,
+        `${buddy} et ${host} lisent l'horloge.`,
+        `${buddy}和${host}看钟。`,
+        `${buddy} और ${host} घड़ी पढ़ते हैं।`,
+        `${buddy} و${host} يقرآن الساعة.`,
+      );
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -749,6 +769,16 @@ function handsStory(kind: Exclude<RoundSlot, { kind: "choice" }>["kind"], buddy:
       return say(`${buddy} and ${host} place the sign.`, `${buddy} y ${host} ponen el signo.`, `${buddy} e ${host} colocam o sinal.`, `${buddy} et ${host} posent le signe.`, `${buddy}和${host}放上符号。`, `${buddy} और ${host} चिह्न रखते हैं।`, `${buddy} و${host} يضعان الإشارة.`);
     case "jumps":
       return say(`${buddy} and ${host} add one ten.`, `${buddy} y ${host} agregan una decena.`, `${buddy} e ${host} somam uma dezena.`, `${buddy} et ${host} ajoutent une dizaine.`, `${buddy}和${host}加上一个十。`, `${buddy} और ${host} एक दहाई जोड़ते हैं।`, `${buddy} و${host} يضيفان عشرة.`);
+    case "ticks":
+      return say(
+        `${buddy} and ${host} move the dot.`,
+        `${buddy} y ${host} mueven el punto.`,
+        `${buddy} e ${host} movem o ponto.`,
+        `${buddy} et ${host} déplacent le point.`,
+        `${buddy}和${host}移动这个点。`,
+        `${buddy} और ${host} बिंदु हिलाते हैं।`,
+        `${buddy} و${host} يحرّكان النقطة.`,
+      );
     default: {
       const neverKind: never = kind;
       return neverKind;

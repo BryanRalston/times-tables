@@ -491,6 +491,20 @@ export const BOSS_HI: Record<string, BossEs> = {
     cosmeticName: "दस का केप",
     trophyName: "दस अधिक ट्रॉफी",
   },
+  ticks: {
+    taunt: "बिंदु गिनो",
+    friendly: "हाँ!",
+    personality: "कागज़ का ताज पहना बिस्कुट रेखा के खाली निशान गिनता है।",
+    cosmeticName: "निशान का ताज",
+    trophyName: "रेखा ट्रॉफी",
+  },
+  minute: {
+    taunt: "मिनट",
+    friendly: "हाँ!",
+    personality: "कागज़ की घड़ी वाला कीवी घंटे के बाद के मिनट गिनता है।",
+    cosmeticName: "कागज़ की घड़ी",
+    trophyName: "मिनट ट्रॉफी",
+  },
 };
 
 export const TRAIT_HI: Record<string, string> = {
@@ -1544,6 +1558,20 @@ export const HI: Record<string, string> = {
   "Free practice adding or taking away 10, 100, or 1000 for grades 1–4. The other digits stay put. No signup.":
     "कक्षा 1–4 के लिए 10, 100 या 1000 जोड़ने या घटाने का मुफ़्त अभ्यास। बाकी अंक वही रहते हैं। साइन अप नहीं।",
   "Grades 2–4": "कक्षा 2–4",
+  "Line": "बिंदु",
+  "Minutes": "मिनट",
+  "Fourths": "चौथाई",
+  "Sixths": "छठाई",
+  "Eighths": "आठवाँ",
+  "Past 1": "1 के बाद",
+  "After the hour": "घंटे के बाद",
+  "To the half hour": "साढ़े से पहले",
+  "Any minute": "कोई भी मिनट",
+  "Grades 3–4": "कक्षा 3–4",
+  "Free fractions on a number line for grades 2–4. The ticks between 0 and 1 stay blank, so you count the parts. No signup.":
+    "कक्षा 2–4 के लिए संख्या रेखा पर मुफ़्त भिन्न। 0 और 1 के बीच के निशान खाली रहते हैं, इसलिए हिस्से गिनो। साइन अप नहीं।",
+  "Free time to the minute for grades 3–4. Count the minutes past the hour. No signup.":
+    "कक्षा 3–4 के लिए मुफ़्त मिनट वाली घड़ी। घंटे के बाद के मिनट गिनो। साइन अप नहीं।",
   "Shares": "बाँटना",
   "Garden": "बगीचा",
   "Give one to each plate.": "हर प्लेट पर एक रखो।",

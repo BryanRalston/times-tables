@@ -4,6 +4,7 @@ import type { ChoiceQ } from "./games/types";
 import { promptSpeech, workedExample, type WorkedExample } from "./teach";
 import { handsExample, makeBuildTask, type BuildTask } from "./hands-build";
 import { clockQuestion, makeClockTask, makePayTask, payQuestion, type ClockTask, type PayTask } from "./hands";
+import { makeMinuteTask } from "./games/minute-data";
 
 export type { ClockTask, PayTask };
 
@@ -153,6 +154,7 @@ export function pickFreshQuestion(make: () => ChoiceQ, recent: readonly string[]
 export function similarSlot(game: string, slot: RoundSlot, rng: Rng): RoundSlot {
   switch (slot.kind) {
     case "clock": {
+      if (slot.skill.startsWith("minute:")) return makeMinuteTask(slot.skill.slice("minute:".length), rng, slot.factKey);
       const level = slot.skill.startsWith("time:") ? slot.skill.slice(5) : "hour";
       return makeClockTask(level, rng, slot.factKey);
     }

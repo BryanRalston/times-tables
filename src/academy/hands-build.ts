@@ -28,7 +28,9 @@ import { makeClockTask, makePayTask, type ClockTask, type PayTask } from "./hand
 import { tracePraise, traceSpeech } from "./trace/lines";
 import { makeGraphsTask, type GraphsTask } from "./games/graph-data";
 import { makeGridTask, type GridTask } from "./games/grid-data";
+import { makeMinuteTask } from "./games/minute-data";
 import { makeJumpTask, type JumpTask } from "./games/jumps-data";
+import { makeTickTask, type TickTask } from "./games/ticks-data";
 import { makePatternTask, type PatternTask } from "./games/patterns-data";
 import { makeSignsTask, type SignsTask } from "./games/signs-data";
 import { makeShareTask, type ShareTask } from "./games/share-data";
@@ -231,7 +233,8 @@ export type BuildTask =
   | GridTask
   | PatternTask
   | SignsTask
-  | JumpTask;
+  | JumpTask
+  | TickTask;
 
 export type HandsTask = ClockTask | PayTask | BuildTask;
 
@@ -1428,6 +1431,8 @@ export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: str
       return makeSignsTask(level, rng, avoid, prefer);
     case "jumps":
       return makeJumpTask(level, rng, avoid, prefer);
+    case "ticks":
+      return makeTickTask(level, rng, avoid);
     default:
       throw new Error(`No hands-on card for ${game}`);
   }
@@ -1436,6 +1441,7 @@ export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: str
 export function makeHandsTask(game: string, level: string, rng: Rng, avoid?: string, prefer: readonly string[] = []): HandsTask {
   if (game === "time") return makeClockTask(level, rng, avoid, prefer);
   if (game === "money") return makePayTask(level, rng, avoid);
+  if (game === "minute") return makeMinuteTask(level, rng, avoid);
   return makeBuildTask(game, level, rng, avoid, undefined, prefer);
 }
 
@@ -1632,6 +1638,8 @@ export function handsExample(task: BuildTask): WorkedExample {
           caption: task.praise,
         },
       ]);
+    case "ticks":
+      return modeled([{ art: { type: "word", text: task.answer }, caption: task.answer }]);
     case "blank": {
       const groups =
         task.op === "×"

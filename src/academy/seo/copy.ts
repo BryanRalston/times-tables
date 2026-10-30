@@ -705,6 +705,52 @@ export const GAME_COPY: readonly GameCopy[] = [
     ),
   },
   {
+    id: "ticks",
+    slug: "fractions-on-a-number-line-game",
+    grades: ["2", "3", "4"],
+    name: phrase(
+      "number line fractions",
+      "fracciones en la recta",
+      "frações na reta",
+      "fractions sur une droite",
+      "数轴上的分数",
+      "संख्या रेखा की भिन्न",
+      "كسور خط الأعداد",
+    ),
+    blurb: phrase(
+      "Kids find a fraction on a number line whose middle ticks are blank.",
+      "Los niños hallan una fracción en una recta cuyas marcas del medio van en blanco.",
+      "As crianças acham uma fração numa reta cujas marcas do meio ficam em branco.",
+      "Les enfants trouvent une fraction sur une droite dont les traits du milieu sont vides.",
+      "孩子在中间刻度为空的数轴上找分数。",
+      "बच्चे उस संख्या रेखा पर भिन्न ढूँढते हैं जिसके बीच के निशान खाली हैं।",
+      "يجد الأطفال كسرًا على خط أعداد علاماته الوسطى فارغة.",
+    ),
+  },
+  {
+    id: "minute",
+    slug: "time-to-the-nearest-minute-game",
+    grades: ["3", "4"],
+    name: phrase(
+      "time to the minute",
+      "la hora al minuto",
+      "horas até o minuto",
+      "l'heure à la minute",
+      "每一分钟",
+      "मिनट वाली घड़ी",
+      "الوقت لأقرب دقيقة",
+    ),
+    blurb: phrase(
+      "Kids count the minutes past the hour on a clock.",
+      "Los niños cuentan los minutos después de la hora en un reloj.",
+      "As crianças contam os minutos depois da hora num relógio.",
+      "Les enfants comptent les minutes après l'heure sur une horloge.",
+      "孩子看钟，数过了整点多少分钟。",
+      "बच्चे घड़ी पर घंटे के बाद के मिनट गिनते हैं।",
+      "يعدّ الأطفال الدقائق بعد الساعة على الساعة.",
+    ),
+  },
+  {
     id: "patterns",
     slug: "number-patterns-game",
     grades: ["K", "1", "2", "3", "4"],
@@ -853,6 +899,13 @@ signs:big|comparing big numbers|comparar números grandes|comparar números gran
 jumps:ten|ten more and ten less|10 más y 10 menos|10 a mais e 10 a menos|10 de plus et 10 de moins|多10和少10|10 अधिक और 10 कम|10 أكثر و10 أقل
 jumps:hundred|100 more and 100 less|100 más y 100 menos|100 a mais e 100 a menos|100 de plus et 100 de moins|多100和少100|100 अधिक और 100 कम|100 أكثر و100 أقل
 jumps:thousand|1000 more and 1000 less|1000 más y 1000 menos|1000 a mais e 1000 a menos|1000 de plus et 1000 de moins|多1000和少1000|1000 अधिक और 1000 कम|1000 أكثر و1000 أقل
+ticks:fourths|fourths on a blank line|cuartos en una recta en blanco|quartos numa reta em branco|quarts sur une droite vide|空数轴上的四分|खाली रेखा पर चौथाई|أرباع على خط فارغ
+ticks:sixths|sixths on a blank line|sextos en una recta en blanco|sextos numa reta em branco|sixièmes sur une droite vide|空数轴上的六分|खाली रेखा पर छठाई|أسداس على خط فارغ
+ticks:eighths|eighths on a blank line|octavos en una recta en blanco|oitavos numa reta em branco|huitièmes sur une droite vide|空数轴上的八分|खाली रेखा पर आठवाँ|أثمان على خط فارغ
+ticks:past|fractions past one|fracciones después del uno|frações depois do um|fractions après un|大于1的分数|एक के बाद की भिन्न|كسور بعد الواحد
+minute:early|minutes just after the hour|minutos justo después de la hora|minutos logo depois da hora|minutes juste après l'heure|过了整点的分钟|घंटे के बाद के मिनट|دقائق بعد الساعة
+minute:half|minutes before half past|minutos antes de y media|minutos antes de e meia|minutes avant et demie|到半点的分钟|साढ़े से पहले के मिनट|دقائق قبل النصف
+minute:all|any minute on the clock|cualquier minuto del reloj|qualquer minuto do relógio|n'importe quelle minute de l'horloge|钟上的每一分钟|घड़ी का कोई भी मिनट|أي دقيقة على الساعة
 `;
 
 function loadSkills(): Record<string, Phrase> {
@@ -891,6 +944,7 @@ const SHEET_GRADES: Record<string, Phrase> = {
   "Pre-K–4": phrase("Pre-K–4", "de prekínder a grado 4", "da pré-escola ao 4.º ano", "de la maternelle au CM1", "学前班到四年级", "नर्सरी से कक्षा 4", "ما قبل الروضة حتى الصف الرابع"),
   "Pre-K": phrase("Pre-K", "prekínder", "pré-escola", "maternelle", "学前班", "नर्सरी", "ما قبل الروضة"),
   "Grade 4": phrase("Grade 4", "grado 4", "4.º ano", "CM1", "四年级", "कक्षा 4", "الصف الرابع"),
+  "Grades 3–4": phrase("Grades 3–4", "grados 3 a 4", "3.º e 4.º ano", "CE2 et CM1", "三至四年级", "कक्षा 3–4", "الصفان الثالث والرابع"),
 };
 
 export function sheetGradeLabel(englishTitle: string, lang: SeoLang): string {
@@ -945,6 +999,8 @@ const SHEET_H1: Record<string, Phrase> = {
   "Number patterns": rest("patrones numéricos", "padrões numéricos", "suites de nombres", "数字规律", "संख्या के पैटर्न", "أنماط الأعداد"),
   "Compare numbers": rest("comparar números", "comparar números", "comparer des nombres", "比较数字", "संख्याओं की तुलना", "مقارنة الأعداد"),
   "Ten more": rest("10 más", "10 mais", "10 de plus", "多10", "10 अधिक", "10 أكثر"),
+  "Number line fractions": rest("fracciones en la recta", "frações na reta", "fractions sur une droite", "数轴上的分数", "संख्या रेखा की भिन्न", "كسور خط الأعداد"),
+  "Time to the minute": rest("la hora al minuto", "horas até o minuto", "l'heure à la minute", "每一分钟", "मिनट वाली घड़ी", "الوقت لأقرب دقيقة"),
 };
 
 export function sheetH1(englishH1: string, lang: SeoLang): string {

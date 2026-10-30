@@ -136,6 +136,7 @@ function markOf(slot: RoundSlot, ok: boolean, unscored = false): AnswerMark {
 function ideaOf(slot: RoundSlot): string {
   if (slot.kind === "choice") return slot.question.tags[0] || slot.question.skill;
   if (slot.kind === "clock") {
+    if (slot.skill.startsWith("minute:")) return slot.skill;
     if (slot.minutes === 15) return "quarterpast";
     if (slot.minutes === 45) return "quarterto";
     if (slot.minutes === 30) return "halfpast";
@@ -780,7 +781,9 @@ export function PlayScreen({
       choice.visual.board.game === "grid" ||
       choice.visual.board.game === "patterns" ||
       choice.visual.board.game === "signs" ||
-      choice.visual.board.game === "jumps");
+      choice.visual.board.game === "jumps" ||
+      choice.visual.board.game === "ticks" ||
+      choice.visual.board.game === "minute");
   const filled = dots.filter((dot) => dot != null).length;
   const playBuddy = boss ? null : (
     <div className="ac-play-buddy" data-pals={graphPals ? "pair" : "one"}>
@@ -1028,6 +1031,7 @@ export function PlayScreen({
           <div
             className={cx(
               "ac-stage",
+              game === "minute" && "is-minute",
               spec?.layout === "wide" && phase !== "teach" && slot.kind === "choice" && "is-time",
               phase === "feedback" && "is-yes",
               phase === "feedback" && combo >= 3 && "is-glow",

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
 import { gridCellKeys, gridEdgeKeys, gridMatches } from "./games/grid-data";
 import { jumpsMatch } from "./games/jumps-data";
+import { ticksMatch } from "./games/ticks-data";
 import { patternMatches } from "./games/patterns-data";
 import { signsMatch, signTruth } from "./games/signs-data";
 import { GAMES } from "./games/registry";
@@ -105,6 +106,8 @@ function builtOf(task: BuildTask): boolean {
       return signsMatch(task, task.mark);
     case "jumps":
       return jumpsMatch(task, task.answer);
+    case "ticks":
+      return ticksMatch(task, task.num);
     default: {
       const neverTask: never = task;
       return neverTask;
@@ -157,6 +160,8 @@ function wrongOf(task: BuildTask): boolean {
       return signsMatch(task, task.mark === "<" ? ">" : "<");
     case "jumps":
       return jumpsMatch(task, task.answer + 1);
+    case "ticks":
+      return ticksMatch(task, task.num === 0 ? 1 : 0);
     default: {
       const neverTask: never = task;
       return neverTask;
@@ -253,6 +258,11 @@ function assertBounds(task: HandsTask, level: string): void {
     case "jumps":
       expect(task.answer).toBe(task.dir === "more" ? task.start + task.step : task.start - task.step);
       expect(task.step).toBeGreaterThan(0);
+      break;
+    case "ticks":
+      expect(task.num).toBeGreaterThan(0);
+      expect(task.den).toBeGreaterThan(1);
+      expect(task.speech).toBe(task.answer);
       break;
     default: {
       const neverTask: never = task;
@@ -558,7 +568,7 @@ describe("hands-on card generators", () => {
 
   it("retries a hands-on card at the same level with a new build", () => {
     for (const game of GAMES) {
-      if (game.id === "time" || game.id === "money") continue;
+      if (game.id === "time" || game.id === "money" || game.id === "minute") continue;
       const level = game.levels[0]!.id;
       const task = makeBuildTask(game.id, level, rngFromSeed(`${game.id}-retry`));
       const next = similarSlot(game.id, task, rngFromSeed(`${game.id}-retry-next`));

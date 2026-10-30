@@ -23,6 +23,7 @@ import { makeClockTask, makePayTask } from "./hands";
 import type { Grade } from "./model";
 import { nextPlacement } from "./placement";
 import { blankChild } from "./storage";
+import { formatClockTime } from "@/lib/clock";
 import type { Board } from "./games/boards";
 import type { ChoiceQ } from "./games/types";
 import { graphAnswer } from "./games/graph-data";
@@ -385,6 +386,51 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if (grade === "4") expect(["hundred", "thousand"]).toContain(board.mode);
       break;
     }
+    case "ticks": {
+      expect(board.den).toBeGreaterThan(0);
+      expect(board.num).toBeGreaterThan(0);
+      expect(question.answer).toBe(`${board.num}/${board.den}`);
+      expect(board.num).toBeLessThan(board.den * board.whole);
+      if (board.mode === "fourths") {
+        expect(board.whole).toBe(1);
+        expect([2, 4]).toContain(board.den);
+        expect(board.num).toBeLessThan(board.den);
+      }
+      if (board.mode === "sixths") {
+        expect(board.whole).toBe(1);
+        expect([3, 6]).toContain(board.den);
+        expect(board.num).toBeLessThan(board.den);
+      }
+      if (board.mode === "eighths") {
+        expect(board.whole).toBe(1);
+        expect(board.den).toBe(8);
+        expect(board.num).toBeLessThan(board.den);
+      }
+      if (board.mode === "past") {
+        expect(board.whole).toBe(2);
+        expect(board.num).toBeGreaterThanOrEqual(board.den);
+      }
+      if (grade === "2") expect(board.mode).toBe("fourths");
+      if (grade === "3") expect(["fourths", "sixths", "eighths"]).toContain(board.mode);
+      if (grade === "4") expect(["eighths", "past"]).toContain(board.mode);
+      break;
+    }
+    case "minute": {
+      expect(board.hours).toBeGreaterThanOrEqual(1);
+      expect(board.hours).toBeLessThanOrEqual(12);
+      expect(board.minutes).toBeGreaterThanOrEqual(1);
+      expect(board.minutes).toBeLessThanOrEqual(59);
+      expect(board.minutes % 5).not.toBe(0);
+      expect(question.answer).toBe(formatClockTime(board.hours, board.minutes));
+      if (board.mode === "early") expect(board.minutes).toBeLessThanOrEqual(12);
+      if (board.mode === "half") {
+        expect(board.minutes).toBeGreaterThanOrEqual(13);
+        expect(board.minutes).toBeLessThanOrEqual(29);
+      }
+      if (grade === "3") expect(["early", "half", "all"]).toContain(board.mode);
+      if (grade === "4") expect(["half", "all"]).toContain(board.mode);
+      break;
+    }
     default: {
       const neverBoard: never = board;
       throw new Error(String(neverBoard));
@@ -397,6 +443,23 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
   expect(task.speech).not.toMatch(/[×÷¢]/);
   switch (task.kind) {
     case "clock":
+      if (task.skill.startsWith("minute:")) {
+        expect(task.snap).toBe(1);
+        expect(task.hours).toBeGreaterThanOrEqual(1);
+        expect(task.hours).toBeLessThanOrEqual(12);
+        expect(task.minutes).toBeGreaterThanOrEqual(1);
+        expect(task.minutes).toBeLessThanOrEqual(59);
+        expect(task.minutes % 5).not.toBe(0);
+        const mode = task.skill.slice("minute:".length);
+        if (mode === "early") expect(task.minutes).toBeLessThanOrEqual(12);
+        if (mode === "half") {
+          expect(task.minutes).toBeGreaterThanOrEqual(13);
+          expect(task.minutes).toBeLessThanOrEqual(29);
+        }
+        if (grade === "3") expect(["early", "half", "all"]).toContain(mode);
+        if (grade === "4") expect(["half", "all"]).toContain(mode);
+      }
+      break;
     case "pay":
       break;
     case "array":
@@ -562,6 +625,14 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
       if (grade === "1") expect(task.mode).toBe("ten");
       if (grade === "2" || grade === "3") expect(["ten", "hundred"]).toContain(task.mode);
       if (grade === "4") expect(["hundred", "thousand"]).toContain(task.mode);
+      break;
+    case "ticks":
+      expect(task.speech).toBe(`${task.num}/${task.den}`);
+      expect(task.num).toBeGreaterThan(0);
+      expect(task.num).toBeLessThan(task.den * task.whole);
+      if (grade === "2") expect(task.mode).toBe("fourths");
+      if (grade === "3") expect(["fourths", "sixths", "eighths"]).toContain(task.mode);
+      if (grade === "4") expect(["eighths", "past"]).toContain(task.mode);
       break;
     default: {
       const neverTask: never = task;

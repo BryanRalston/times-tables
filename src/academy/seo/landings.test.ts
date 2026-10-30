@@ -63,7 +63,7 @@ describe("search landing pages", () => {
   it("gives every game a skill page and keeps titles unique in each language", () => {
     const pages = landingPages();
     const games = new Set(pages.filter((page) => page.kind === "game").map((page) => page.gameId));
-    expect(games.size).toBe(20);
+    expect(games.size).toBe(22);
     for (const gameId of games) {
       expect(pages.some((page) => page.kind === "skill" && page.gameId === gameId && page.locale.id === "en")).toBe(true);
     }
