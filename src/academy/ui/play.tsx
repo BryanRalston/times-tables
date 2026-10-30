@@ -1023,6 +1023,7 @@ export function PlayScreen({
           <div
             className={cx(
               "ac-stage",
+              game === "minute" && "is-minute",
               spec?.layout === "wide" && phase !== "teach" && slot.kind === "choice" && "is-time",
               phase === "feedback" && "is-yes",
               phase === "feedback" && combo >= 3 && "is-glow",
