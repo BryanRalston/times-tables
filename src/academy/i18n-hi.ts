@@ -900,6 +900,7 @@ export const HI: Record<string, string> = {
   "How many sides?": "कितनी भुजाएँ?",
   "How many squishees in the ten-frame?": "दस के खाने में कितने squishees?",
   "How many squishees?": "कितने squishees?",
+  "Price": "कीमत",
   "How much change?": "कितने पैसे वापस?",
   "How much money?": "कितने पैसे?",
   "Hundreds, tens, and ones": "सैकड़ा, दहाई, और इकाई",

@@ -900,6 +900,7 @@ export const AR: Record<string, string> = {
   "How many sides?": "كم ضلعاً؟",
   "How many squishees in the ten-frame?": "كم squishees في إطار العشرة؟",
   "How many squishees?": "كم squishees؟",
+  "Price": "السعر",
   "How much change?": "كم الباقي؟",
   "How much money?": "كم من النقود؟",
   "Hundreds, tens, and ones": "مئات، وعشرات، وآحاد",

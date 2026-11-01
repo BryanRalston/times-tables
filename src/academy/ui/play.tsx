@@ -758,7 +758,8 @@ export function PlayScreen({
     slot?.kind === "choice" &&
     (slot.question.visual.kind === "add" ||
       slot.question.visual.kind === "times" ||
-      slot.question.visual.kind === "money" ||
+      // "Count the ..." only fits money cards where the kid adds up the coins.
+      (slot.question.visual.kind === "money" && slot.question.visual.mode === "count") ||
       (slot.question.visual.kind === "scene" &&
         (slot.question.visual.board.game === "count" ||
           slot.question.visual.board.game === "problems" ||

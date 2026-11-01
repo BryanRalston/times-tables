@@ -45,7 +45,8 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
           const cleaned = cleanName(name) || "Pal";
           const pick = (STARTERS as readonly string[]).includes(buddy) ? buddy : "peach";
           onSave(withLang(mapActive(save, (child) => withGrade({ ...child, name: cleaned, avatarId: pick }, grade)), save.lang));
-          window.location.hash = "#/";
+          // A first visit from a game page keeps its #/play/<game> route, so the kid lands in that game.
+          if (!window.location.hash.startsWith("#/play/")) window.location.hash = "#/";
         }}
       >
         <h1 className="ac-sr">{show("Pick a buddy")}</h1>

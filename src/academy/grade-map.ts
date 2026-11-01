@@ -12,6 +12,8 @@ export interface GradeBand {
   start: string;
   offer: GradeOffer;
   cap?: string;
+  /** Lowest level the one-level drift down may reach. */
+  floor?: string;
   standards: readonly string[];
 }
 
@@ -376,10 +378,11 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["1.G.A.1", "1.G.A.2"],
     }),
     "2": band({
-      levels: ["faces", "rows", "symmetry"],
+      // Counting lines of symmetry is 4.G.A.3, so grade 2 stops at rows of squares.
+      levels: ["faces", "rows"],
       start: "faces",
       offer: "play",
-      cap: "symmetry",
+      cap: "rows",
       standards: ["2.G.A.1", "2.G.A.2"],
     }),
     "3": band({
@@ -387,6 +390,8 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       start: "quads",
       offer: "play",
       cap: "cover",
+      // Do not drift down into counting lines of symmetry (4.G.A.3).
+      floor: "quads",
       standards: ["3.G.A.1", "3.G.A.2", "3.MD.C.5", "3.MD.C.7"],
     }),
     "4": band({
@@ -967,6 +972,7 @@ export function playWindow(
     min = Math.max(0, lo - 1);
     max = Math.min(levelIds.length - 1, hi + 1);
     if (bandRow.cap) max = Math.min(max, indexOf(levelIds, bandRow.cap, max));
+    if (bandRow.floor) min = Math.max(min, indexOf(levelIds, bandRow.floor, min));
   }
   if (bandRow.offer === "later" && challengeAhead) {
     min = indexOf(levelIds, start, 0);
