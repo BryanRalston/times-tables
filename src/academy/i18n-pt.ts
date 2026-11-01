@@ -920,6 +920,7 @@ export const PT: Record<string, string> = {
   "How many sides?": "Quantos lados?",
   "How many squishees in the ten-frame?": "Quantos squishees há no quadro de dez?",
   "How many squishees?": "Quantos squishees?",
+  "Price": "Preço",
   "How much change?": "Quanto de troco?",
   "How much money?": "Quanto dinheiro?",
   "Hundreds, tens, and ones": "Centenas, dezenas e unidades",

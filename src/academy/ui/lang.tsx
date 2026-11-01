@@ -74,6 +74,20 @@ export function withLang(save: Save, lang: AppLang): Save {
   return { ...save, lang, langChosen: true };
 }
 
+const LANDING_LANG: Record<string, AppLang> = { es: "es", "pt-br": "pt", fr: "fr", "zh-hans": "zh", hi: "hi", ar: "ar" };
+
+/**
+ * The language of the game landing page a first-time visitor came from, or null.
+ * Only same-site game pages count, such as /money-game/ (English) or /es/money-game/.
+ */
+export function langFromLanding(referrer: string, origin: string): AppLang | null {
+  if (!referrer || !origin || !referrer.startsWith(`${origin}/`)) return null;
+  const parts = referrer.slice(origin.length).split(/[?#]/)[0].split("/").filter(Boolean);
+  if (parts.length === 1 && parts[0].endsWith("-game")) return "en";
+  if (parts.length === 2 && parts[1].endsWith("-game")) return LANDING_LANG[parts[0]] ?? null;
+  return null;
+}
+
 /** Load a lazy language pack, then apply it. English and Spanish are already in the first download. */
 export function chooseLanguage(lang: AppLang, apply: (lang: AppLang) => void): void {
   switch (lang) {

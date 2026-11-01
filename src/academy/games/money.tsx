@@ -184,13 +184,16 @@ function makeChange(rng: Rng): ChoiceQ {
   return {
     id: qid(rng),
     game: "money",
-    title: (() => {
-      const buddy = buddyName(rng);
-      return pickTalk(rng, [
-        ["How much change?", "¿Cuánto es el cambio?"],
-        [`${buddy} pays. How much change is left?`, `${buddy} paga. ¿Cuánto cambio sobra?`, `${buddy} paga. Quanto sobra de troco?`, `${buddy} paie. Combien de monnaie reste-t-il ?`, `${buddy}付了钱。要找回多少钱？`, `${buddy} पैसे देता है। कितने पैसे वापस मिलेंगे?`, `${buddy} يدفع. كم الباقي؟`],
-      ]);
-    })(),
+    // Kid-simple: say what was paid and what it costs, then ask.
+    title: t(
+      `You pay ${paidLabel}. The price is ${priceLabel}. How much change?`,
+      `Pagas ${paidLabel}. El precio es ${priceLabel}. ¿Cuánto es el cambio?`,
+      `Você paga ${paidLabel}. O preço é ${priceLabel}. Quanto sobra de troco?`,
+      `Tu paies ${paidLabel}. Le prix est ${priceLabel}. Combien de monnaie reste-t-il ?`,
+      `你付${paidLabel}。价格是${priceLabel}。要找回多少钱？`,
+      `कितने पैसे वापस? तुम ${paidLabel} देते हो। कीमत ${priceLabel} है।`,
+      `تدفع ${paidLabel}. السعر ${priceLabel}. كم الباقي؟`,
+    ),
     hint: t(`You pay ${paidLabel}. The price is ${priceLabel}.`, `Pagas ${paidLabel}. El precio es ${priceLabel}.`, `Você paga ${paidLabel}. O preço é ${priceLabel}.`, `Tu paies ${paidLabel}. Le prix est ${priceLabel}.`, `你付${paidLabel}。价格是${priceLabel}。`, `तुम ${paidLabel} देते हो। कीमत ${priceLabel} है।`, `تدفع ${paidLabel}. السعر ${priceLabel}.`),
     praise: t(`Yes! The change is ${changeLabel}.`, `¡Sí! El cambio es ${changeLabel}.`, `Sim! O troco é ${changeLabel}.`, `Oui ! La monnaie est ${changeLabel}.`, `对！找回的是${changeLabel}。`, `हाँ! बचे पैसे ${changeLabel} हैं।`, `نعم! الباقي ${changeLabel}.`),
     almost: t(`Almost! The change is ${changeLabel}.`, `¡Casi! El cambio es ${changeLabel}.`, `Quase! O troco é ${changeLabel}.`, `Presque ! La monnaie est ${changeLabel}.`, `差一点！找回的是${changeLabel}。`, `लगभग! बचे पैसे ${changeLabel} हैं।`, `تقريبًا! الباقي ${changeLabel}.`),
@@ -333,7 +336,10 @@ export function MoneyPrompt({
       <SquisheeImg id={mascot} className={cx("ac-mascot", happy && "is-happy")} />
       <MoneyArt visual={visual} />
       {(visual.mode === "change" || visual.mode === "spend") && visual.priceCents != null ? (
-        <p className="ac-eq ac-money-price">{formatCents(visual.priceCents)}</p>
+        <p className="ac-eq ac-money-price">
+          <span className="ac-money-cost">{t("Price", "Precio", "Preço", "Prix", "价格", "कीमत", "السعر")}</span>{" "}
+          {formatCents(visual.priceCents)}
+        </p>
       ) : null}
       <p className="ac-hint">{question.hint}</p>
     </section>

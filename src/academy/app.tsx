@@ -9,7 +9,7 @@ import { noteLocale } from "./seo/events";
 import { activeChild, loadSave, mapActive, withLevel, writeSave } from "./storage";
 import { warmVoices } from "./voice";
 import { HelloScreen, SettingsScreen, SheetsScreen, ShelfScreen } from "./ui/extra";
-import { LanguageWelcome, withLang } from "./ui/lang";
+import { chooseLanguage, LanguageWelcome, langFromLanding, withLang } from "./ui/lang";
 import { HomeScreen } from "./ui/home";
 import { MapScreen } from "./ui/map";
 import { SoundContext } from "./ui/sound-context";
@@ -147,6 +147,13 @@ function AcademyApp() {
   const route = useRoute();
   const [packReady, setPackReady] = useState(() => localePackReady(save.lang));
   setLocale(save.lang);
+  // First visit from a game landing page: that page already set the language, so skip the language step.
+  const [landingLang] = useState(() =>
+    save.langChosen || !window.location.hash.startsWith("#/play/") ? null : langFromLanding(document.referrer, window.location.origin),
+  );
+  useEffect(() => {
+    if (landingLang) chooseLanguage(landingLang, (lang) => setSave((current) => (current.langChosen ? current : withLang(current, lang))));
+  }, [landingLang]);
 
   useEffect(() => {
     if (localePackReady(save.lang)) {
@@ -203,7 +210,9 @@ function AcademyApp() {
   }
 
   let body: ReactNode;
-  if (!child.name && !save.langChosen) {
+  if (!child.name && !save.langChosen && landingLang) {
+    body = <div className="ac-shell" data-lang-step="landing" />;
+  } else if (!child.name && !save.langChosen) {
     body = <LanguageWelcome save={save} onSave={setSave} />;
   } else if (!child.name) {
     body = <HelloScreen save={save} onSave={setSave} sound={save.sound} />;

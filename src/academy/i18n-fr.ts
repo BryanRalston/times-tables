@@ -900,6 +900,7 @@ export const FR: Record<string, string> = {
   "How many sides?": "Combien de côtés ?",
   "How many squishees in the ten-frame?": "Combien de squishees dans la grille de dix ?",
   "How many squishees?": "Combien de squishees ?",
+  "Price": "Prix",
   "How much change?": "Combien de monnaie ?",
   "How much money?": "Combien d'argent ?",
   "Hundreds, tens, and ones": "Centaines, dizaines et unités",

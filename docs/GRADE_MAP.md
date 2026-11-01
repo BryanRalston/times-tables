@@ -200,11 +200,11 @@ Halves and fourths of a shape for grade 1 live in Fractions. This game's equal-p
 | Pre-K | Play | Colors | Colors, matching, patterns, flat shapes | K.G.A.1, K.G.A.2 |
 | K | Play | Flat shapes | Flat shapes, solid shapes, position, flat or solid | K.G.A.1, K.G.A.2, K.G.B.4 |
 | 1 | Play | What matters | What matters, join shapes, sides and corners | 1.G.A.1, 1.G.A.2 |
-| 2 | Play | Faces | Faces, rows of squares, symmetry | 2.G.A.1, 2.G.A.2 |
+| 2 | Play | Faces | Faces, rows of squares | 2.G.A.1, 2.G.A.2 |
 | 3 | Play | Quadrilaterals | Quadrilaterals, unit fractions, equal parts, cover the rectangle | 3.G.A.1, 3.G.A.2, 3.MD.C.5, 3.MD.C.7 |
 | 4 | Play | Angles | Line of symmetry, angles | 4.G.A.1, 4.G.A.3, 4.MD.C.5 |
 
-Kindergarten does not count sides unless challenge ahead is on. Grade 1 can drift down to flat or solid and does not count cube faces. Grade 2 can drift down to sides and corners. Grade 4 can drift down to covering a rectangle.
+Kindergarten does not count sides unless challenge ahead is on. Grade 1 can drift down to flat or solid and does not count cube faces. Grade 2 can drift down to sides and corners. Grade 4 can drift down to covering a rectangle. Counting lines of symmetry is 4.G.A.3, so grades 2 and 3 never get the symmetry level: grade 2 is capped at rows of squares and grade 3 does not drift below quadrilaterals.
 
 ## Fractions
 

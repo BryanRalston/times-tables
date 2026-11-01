@@ -119,7 +119,7 @@ body {
   font: 700 18px/1.45 Nunito, "Trebuchet MS", sans-serif;
 }
 main { width: min(760px, calc(100% - 32px)); margin: 0 auto; padding: 22px 0 48px; }
-a { color: #12988a; }
+a { color: #0b7a6f; }
 h1, h2 { font-family: Fredoka, Nunito, "Trebuchet MS", sans-serif; letter-spacing: -0.02em; line-height: 1.15; }
 h1 { font-size: 34px; margin: 8px 0; }
 .brand { font-family: Fredoka, Nunito, "Trebuchet MS", sans-serif; font-size: 22px; text-decoration: none; }
@@ -147,7 +147,7 @@ ol.problems li { margin: 14px 0; break-inside: avoid; }
   padding: 12px 18px;
   box-shadow: 0 4px 0 #b01058;
 }
-.play a.quiet, .links a.quiet { background: white; color: #12988a; box-shadow: 0 4px 0 #f3d4e4; }
+.play a.quiet, .links a.quiet { background: white; color: #0b7a6f; box-shadow: 0 4px 0 #f3d4e4; }
 .cards { display: grid; gap: 12px; }
 .cards a.card {
   display: block;
@@ -169,7 +169,8 @@ ol.problems li { margin: 14px 0; break-inside: avoid; }
 .prose h1 { font-size: 44px; }
 .shot { width: min(100%, 480px); height: auto; border-radius: 22px; display: block; margin: 12px 0; background: #fff; }
 .note, .standards { color: #5c4566; }
-.langs { display: flex; flex-wrap: wrap; gap: 8px 12px; margin-top: 16px; }
+.langs { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-top: 16px; }
+.langs a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0 8px; border-radius: 12px; }
 html[dir="rtl"] body { text-align: right; }
 html[dir="rtl"] .play a, html[dir="rtl"] .links a { margin: 6px 0 0 10px; }
 .promise { display: grid; gap: 10px; margin: 8px 0 18px; }

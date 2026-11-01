@@ -860,3 +860,16 @@ describe("grade bands", () => {
     }
   }, 120_000);
 });
+
+describe("shapes symmetry stays at grade 4", () => {
+  it("never serves counting lines of symmetry (4.G.A.3) below grade 4", () => {
+    const shapes = GAMES.find((game) => game.id === "shapes")!;
+    const ids = shapes.levels.map((row) => row.id);
+    for (const grade of ["PK", "K", "1", "2", "3"] as const) {
+      expect(playWindow(ids, "shapes", grade, false).ids).not.toContain("symmetry");
+      expect(playWindow(ids, "shapes", grade, false).ids).not.toContain("fold");
+    }
+    expect(playWindow(ids, "shapes", "3", false).ids).toContain("quads");
+    expect(playWindow(ids, "shapes", "2", false).ids).toContain("rows");
+  });
+});

@@ -901,6 +901,7 @@ export const ZH: Record<string, string> = {
   "How many sides?": "有几条边？",
   "How many squishees in the ten-frame?": "十格框里有几个squishees？",
   "How many squishees?": "有几个squishees？",
+  "Price": "价格",
   "How much change?": "找回多少？",
   "How much money?": "有多少钱？",
   "Hundreds, tens, and ones": "百位、十位和个位",
