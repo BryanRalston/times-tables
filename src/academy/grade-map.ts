@@ -805,11 +805,11 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["2.OA.A.1"],
     }),
     "3": band({
-      levels: ["div", "picture"],
+      levels: ["div", "picture", "estimate"],
       start: "picture",
       offer: "play",
-      cap: "picture",
-      standards: ["3.OA.A.3"],
+      cap: "estimate",
+      standards: ["3.OA.A.3", "3.NBT.A.1", "3.OA.D.8"],
     }),
     "4": band({
       levels: ["steps"],

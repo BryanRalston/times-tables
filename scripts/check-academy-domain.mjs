@@ -407,21 +407,23 @@ const ico = readFileSync(resolve(root, "favicon.ico"));
 if (ico.readUInt16LE(0) !== 0 || ico.readUInt16LE(2) !== 1 || ico.readUInt16LE(4) < 3) fail("favicon.ico set");
 
 const GAME_LANDINGS = [
-  ["times-tables-game", "Free times tables game for kids (grades 2–4)", "times"],
-  ["telling-time-game", "Free telling time game for kids (grades 1–4)", "time"],
-  ["money-game", "Free counting money game for kids (Pre-K to grade 4)", "money"],
-  ["addition-subtraction-game", "Free addition and subtraction game for kids (kindergarten through grade 4)", "add"],
-  ["fractions-game", "Free fractions game for kids (grades 1–4)", "fractions"],
-  ["graphs-game", "Free graphs game for kids (Pre-K to grade 4)", "graphs"],
-  ["sight-words-game", "Free sight words game for kids (kindergarten through grade 4)", "sight"],
-  ["phonics-game", "Free phonics game for kids (Pre-K to grade 4)", "phonics"],
-  ["shapes-geometry-game", "Free shapes and geometry game for kids (Pre-K to grade 4)", "shapes"],
+  ["times-tables-game", "Free times tables game for kids | Squishee Academy", "times"],
+  ["telling-time-game", "Free telling time game for kids | Squishee Academy", "time"],
+  ["money-game", "Free counting money game for kids | Squishee Academy", "money"],
+  ["addition-subtraction-game", "Free addition and subtraction game | Squishee Academy", "add"],
+  ["fractions-game", "Free fractions game for kids | Squishee Academy", "fractions"],
+  ["graphs-game", "Free graphs game for kids | Squishee Academy", "graphs"],
+  ["sight-words-game", "Free sight words game for kids | Squishee Academy", "sight"],
+  ["phonics-game", "Free phonics game for kids | Squishee Academy", "phonics"],
+  ["shapes-geometry-game", "Free shapes and geometry game for kids | Squishee Academy", "shapes"],
 ];
-for (const [slug, titleStart, gameId] of GAME_LANDINGS) {
+// Titles stay within 60 characters (seo/landings.ts TITLE_MAX).
+for (const [slug, title, gameId] of GAME_LANDINGS) {
   const pagePath = resolve(root, slug, "index.html");
   if (!existsSync(pagePath)) fail(`missing landing ${slug}`);
   const page = readFileSync(pagePath, "utf8");
-  if (!page.includes(`<title>${titleStart} | Squishee Academy</title>`)) fail(`${slug} title`);
+  if (!page.includes(`<title>${title}</title>`)) fail(`${slug} title`);
+  if (title.length > 60) fail(`${slug} title over 60 characters`);
   if (!page.includes("<h1>")) fail(`${slug} missing h1`);
   if (!page.includes(`href="../#/play/${gameId}">Play free</a>`)) fail(`${slug} play link`);
   if (!page.includes(`src="/shots/${gameId}.png"`)) fail(`${slug} screenshot`);

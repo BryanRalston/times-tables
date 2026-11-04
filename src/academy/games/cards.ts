@@ -808,6 +808,7 @@ const PROBLEM_ROWS: SkillRow[] = [
   { key: "problems:mult", label: "Multiply stories" },
   { key: "problems:div", label: "Share stories" },
   { key: "problems:picture", label: "Picture stories" },
+  { key: "problems:estimate", label: "Estimate stories" },
   { key: "problems:steps", label: "Two-step stories" },
 ];
 
@@ -820,14 +821,15 @@ export const problemsCard = sceneCard("Word Problems", PROBLEM_ROWS, {
   sheetSlug: "word-problems",
   sheetScreen: "sheet-problems",
   blurb:
-    "Free word problems for kindergarten through grade 4. Short add, subtract, multiply, share, and two-step stories with a picture, read aloud for children who are still learning to read.",
+    "Free word problems for kindergarten through grade 4. Short add, subtract, multiply, share, estimate, and two-step stories with a picture, read aloud for children who are still learning to read.",
   levels: [
     { id: "add", label: "Add stories", num: 1 },
     { id: "sub", label: "Subtract stories", num: 2 },
     { id: "mult", label: "Multiply stories", num: 3 },
     { id: "div", label: "Share stories", num: 4 },
     { id: "picture", label: "Picture stories", num: 5 },
-    { id: "steps", label: "Two-step stories", num: 6 },
+    { id: "estimate", label: "Estimate stories", num: 6 },
+    { id: "steps", label: "Two-step stories", num: 7 },
   ],
   defaultLevel(grade) {
     switch (grade) {
@@ -848,7 +850,7 @@ export const problemsCard = sceneCard("Word Problems", PROBLEM_ROWS, {
     }
   },
   sheetDefaultLevel: "add",
-  isLevel: (value) => isId(["add", "sub", "mult", "div", "picture", "steps"], value),
+  isLevel: (value) => isId(["add", "sub", "mult", "div", "picture", "estimate", "steps"], value),
 });
 
 const VARIABLE_ROWS: SkillRow[] = [

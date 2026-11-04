@@ -6,10 +6,11 @@ import { problemsCard } from "./cards";
 import { countName, type ProblemBoard } from "./boards";
 import { nearChoices, sceneQuestion, uniqueChoices } from "./pick";
 import { makeStepsQuestion, spanSheet } from "./span";
+import { estimateSheet, makeEstimateQuestion } from "./estimate";
 import { SceneCard, StoryGroups, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
-export const PROBLEM_LEVELS = ["add", "sub", "mult", "div", "picture", "steps"] as const;
+export const PROBLEM_LEVELS = ["add", "sub", "mult", "div", "picture", "estimate", "steps"] as const;
 export type ProblemLevel = (typeof PROBLEM_LEVELS)[number];
 
 const THINGS = [
@@ -274,6 +275,8 @@ export function makeProblemQuestion(rng: Rng, level: ProblemLevel, prefer: reado
       return makeStory(rng, "div", prefer);
     case "picture":
       return makePicture(rng, prefer);
+    case "estimate":
+      return makeEstimateQuestion(rng, prefer);
     case "steps":
       return makeStepsQuestion(rng);
     default: {
@@ -341,6 +344,8 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         answer: String(groups * size),
       };
     }
+    case "estimate":
+      return estimateSheet(rng);
     case "steps": {
       const printed = spanSheet(rng, "problems", "steps");
       if (printed) return printed;
@@ -380,6 +385,8 @@ function ProblemArt({ board }: { board: ProblemBoard }) {
       return <StoryGroups op={board.op} a={board.a} b={board.b} emoji={board.emoji} />;
     case "picture":
       return <p className="ac-big-num">{t("?", "?")}</p>;
+    case "estimate":
+      return <EstimateArt board={board} />;
     case "steps":
       return <StoryGroups op="×" a={board.a} b={board.b} emoji={board.emoji} />;
     default: {
@@ -387,6 +394,18 @@ function ProblemArt({ board }: { board: ProblemBoard }) {
       return neverMode;
     }
   }
+}
+
+/** Just the numbers from the story, with "about" so the child knows to estimate. */
+function EstimateArt({ board }: { board: ProblemBoard }) {
+  const kind = board.estimate ?? "ten";
+  const sign = board.op === "-" ? "−" : "+";
+  const text = kind === "ten" || kind === "hundred" ? `${board.a} ≈ ?` : kind === "check" ? `${board.a} ${sign} ${board.b} = ?` : `${board.a} ${sign} ${board.b} ≈ ?`;
+  return (
+    <p className="ac-big-num" dir="ltr">
+      {text}
+    </p>
+  );
 }
 
 export const problemsGame = sceneModule({

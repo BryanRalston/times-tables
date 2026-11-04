@@ -866,6 +866,7 @@ problems:sub|subtraction stories|historias de restar|histórias de subtração|h
 problems:mult|multiplication stories|historias de multiplicar|histórias de multiplicação|histoires de multiplication|乘法故事|गुणा की कहानियाँ|قصص الضرب
 problems:div|sharing stories|historias de repartir|histórias de repartir|histoires de partage|平均分的故事|बाँटने की कहानियाँ|قصص التوزيع
 problems:picture|picture word problems|problemas con dibujos|problemas com desenhos|problèmes illustrés|看图应用题|चित्र वाली समस्याएँ|مسائل بالصور
+problems:estimate|estimation and rounding stories|historias de estimar y redondear|histórias de estimar e arredondar|histoires d'estimation et d'arrondi|四舍五入和凑整十的故事|अनुमान और गोल करने की कहानियाँ|قصص التقدير والتقريب
 problems:steps|two-step word problems|problemas de dos pasos|problemas de dois passos|problèmes à deux étapes|两步应用题|दो चरणों की समस्याएँ|مسائل من خطوتين
 variables:addend|missing addends within 10|sumandos que faltan hasta el 10|parcelas que faltam até 10|termes manquants jusqu'à 10|10以内缺的加数|10 के अंदर गायब जोड़|حدود جمع ناقصة ضمن 10
 variables:either|missing numbers within 20|números que faltan hasta el 20|números que faltam até 20|nombres manquants jusqu'à 20|20以内的缺数|20 के अंदर गायब संख्या|أعداد ناقصة ضمن 20

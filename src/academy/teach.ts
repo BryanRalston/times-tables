@@ -601,6 +601,25 @@ function phonicsTeach(board: PhonicsBoard, solved: string): SceneFrame[] {
   }
 }
 
+function estimateCaptions(board: ProblemBoard): string[] {
+  const kind = board.estimate ?? "ten";
+  const near = (n: number) => Math.floor((n + 5) / 10) * 10;
+  const about = (n: number, r: number) => t(`${n} is about ${r}`, `${n} es aproximadamente ${r}`, `${n} é aproximadamente ${r}`, `${n}, c'est environ ${r}`, `${n}差不多是${r}`, `${n} लगभग ${r} है`, `${n} تقريبًا ${r}`);
+  if (kind === "ten" || kind === "hundred") {
+    const lo = Math.floor(board.a / board.b) * board.b;
+    const hi = lo + board.b;
+    const r = Math.floor((board.a + board.b / 2) / board.b) * board.b;
+    return [
+      t(`${board.a} is between ${lo} and ${hi}`, `${board.a} está entre ${lo} y ${hi}`, `${board.a} está entre ${lo} e ${hi}`, `${board.a} est entre ${lo} et ${hi}`, `${board.a}在${lo}和${hi}之间`, `${board.a}, ${lo} और ${hi} के बीच है`, `${board.a} بين ${lo} و${hi}`),
+      t(`It is closer to ${r}`, `Está más cerca de ${r}`, `Está mais perto de ${r}`, `Il est plus près de ${r}`, `它更接近${r}`, `यह ${r} के ज़्यादा पास है`, `إنه أقرب إلى ${r}`),
+    ];
+  }
+  const ra = near(board.a);
+  const rb = near(board.b);
+  const total = board.op === "-" ? ra - rb : ra + rb;
+  return [about(board.a, ra), about(board.b, rb), `${ra} ${board.op === "-" ? "-" : "+"} ${rb} = ${total}`];
+}
+
 function problemTeach(board: ProblemBoard): SceneFrame[] {
   switch (board.mode) {
     case "add":
@@ -624,6 +643,8 @@ function problemTeach(board: ProblemBoard): SceneFrame[] {
         t(`${board.b} in each group`, `${board.b} en cada grupo`, `${board.b} em cada grupo`, `${board.b} dans chaque groupe`, `每组${board.b}个`, `हर समूह में ${board.b}`, `${board.b} في كل مجموعة`),
         t(`${board.a} groups of ${board.b}`, `${board.a} grupos de ${board.b}`, `${board.a} grupos de ${board.b}`, `${board.a} groupes de ${board.b}`, `${board.a}组，每组${board.b}个`, `${board.b} के ${board.a} समूह`, `${board.a} مجموعات من ${board.b}`),
       ]);
+    case "estimate":
+      return captions(estimateCaptions(board));
     case "steps": {
       const away = board.extra ?? 0;
       return captions([

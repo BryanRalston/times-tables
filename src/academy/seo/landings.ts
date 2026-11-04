@@ -310,6 +310,70 @@ function disambiguate(pages: SeoPage[]): SeoPage[] {
   });
 }
 
+/** Search results cut titles near 60 characters and descriptions near 160. */
+export const TITLE_MAX = 60;
+export const DESCRIPTION_MAX = 160;
+const BRAND = " | Squishee Academy";
+
+function charLength(text: string): number {
+  return [...text].length;
+}
+
+/** Cut at a word (or, for Chinese, any character) so the text ends cleanly with an ellipsis. */
+function clip(text: string, max: number): string {
+  if (charLength(text) <= max) return text;
+  const chars = [...text].slice(0, max - 1).join("");
+  const space = chars.lastIndexOf(" ");
+  const cut = space > max * 0.6 ? chars.slice(0, space) : chars;
+  return `${cut.replace(/[\s,.;:，。、—–-]+$/u, "")}…`;
+}
+
+/** Titles drop grade ranges (descriptions carry grades) and keep the brand whenever it fits. */
+function titleOptions(title: string): string[] {
+  const base = title.endsWith(BRAND) ? title.slice(0, -BRAND.length) : title;
+  const plain = base.replace(/\s*[（(][^)）]*[)）]/gu, "").trim();
+  const dash = plain.indexOf(" — ");
+  const short = dash > 0 ? plain.slice(0, dash) : plain;
+  // Before giving up the brand: drop "for kids" so the skill name stays whole.
+  const bare = short.replace(/ (for kids|para niños|para crianças|pour les enfants|للأطفال)(?=\s|$)/u, "").replace(/^बच्चों के लिए /u, "");
+  return [`${plain}${BRAND}`, `${short}${BRAND}`, `${bare}${BRAND}`, plain, short, bare, clip(bare, TITLE_MAX)];
+}
+
+function descriptionOptions(page: SeoPage): string[] {
+  if (page.kind !== "game" && page.kind !== "skill") return [page.description, clip(page.description, DESCRIPTION_MAX)];
+  // Lead with the search phrase (the page's H1), then the blurb, then grades and standards as room allows.
+  const sep = page.locale.id === "zh-Hans" ? "。" : page.locale.id === "hi" ? "। " : ". ";
+  const lede = page.lede;
+  const standards = page.ui.standards;
+  const cut = standards ? lede.indexOf(standards) : -1;
+  const noCodes = (cut > 0 ? lede.slice(0, cut) : lede).trim();
+  const madeFor = page.ui.madeFor;
+  const at = madeFor ? noCodes.indexOf(madeFor) : -1;
+  const blurb = (at > 0 ? noCodes.slice(0, at) : noCodes).trim();
+  const lead = `${page.h1}${sep}`;
+  return [
+    `${lead}${lede}`,
+    `${lead}${noCodes}`,
+    `${lead}${blurb}`,
+    clip(`${lead}${blurb}`, DESCRIPTION_MAX),
+  ].map((row) => row.replace(/\s+/g, " ").trim());
+}
+
+/** Keep every title and description inside search-result limits, and titles unique per language. */
+function fitMeta(pages: SeoPage[]): SeoPage[] {
+  const used = new Set<string>();
+  return pages.map((page) => {
+    const options = titleOptions(page.title);
+    const title =
+      options.find((row) => charLength(row) <= TITLE_MAX && !used.has(row)) ??
+      clip(`${options[3]} ${page.path.split("/").pop() ?? ""}`, TITLE_MAX);
+    used.add(title);
+    const description =
+      descriptionOptions(page).find((row) => charLength(row) <= DESCRIPTION_MAX) ?? clip(page.description, DESCRIPTION_MAX);
+    return { ...page, title, description };
+  });
+}
+
 let cachedLandings: SeoPage[] | null = null;
 let cachedSheets: SeoPage[] | null = null;
 
@@ -322,7 +386,7 @@ export function landingPages(): SeoPage[] {
     list.push(page);
     byLang.set(page.locale.id, list);
   }
-  cachedLandings = SEO_LOCALES.flatMap((locale) => disambiguate(byLang.get(locale.id) ?? []));
+  cachedLandings = SEO_LOCALES.flatMap((locale) => fitMeta(disambiguate(byLang.get(locale.id) ?? [])));
   return cachedLandings;
 }
 

@@ -274,9 +274,9 @@ Pre-K taps a spoken letter name. Kindergarten can drift one level down into lett
 
 ## Word Problems
 
-Levels: add stories, subtract stories, multiply stories, share stories, picture stories, two-step stories.
+Levels: add stories, subtract stories, multiply stories, share stories, picture stories, estimate stories, two-step stories.
 
-Pre-K word problems are coming later. Two-step stories multiply, then subtract (4.OA.A.3). Grade 3 is capped at picture stories.
+Pre-K word problems are coming later. Estimate stories round a number to the nearest 10 or 100 (3.NBT.A.1), estimate a sum or difference by rounding each number to the nearest ten, and pick the total that makes sense (3.OA.D.8). They start in grade 3; grade 2 is capped at multiply stories, so it never drifts into them. Two-step stories multiply, then subtract (4.OA.A.3). Grade 3 is capped at estimate stories.
 
 Every story has a picture. Kindergarten and grade 1 hear the story as well as see it. Add stories stay within 10. Subtract stories take away no more than the start amount. Multiply stories use factors 1–5. Share stories divide evenly.
 
@@ -286,10 +286,10 @@ Every story has a picture. Kindergarten and grade 1 hear the story as well as se
 | K | Play | Add stories | Add stories | Add stories | K.OA.A.2 |
 | 1 | Play | Add stories | Add stories, subtract stories | Subtract stories | 1.OA.A.1 |
 | 2 | Play | Subtract stories | Subtract stories, multiply stories | Multiply stories | 2.OA.A.1 |
-| 3 | Play | Picture stories | Share stories, picture stories | Picture stories | 3.OA.A.3 |
-| 4 | Play | Two-step stories | Two-step stories | One level down (picture stories) | 4.OA.A.3 |
+| 3 | Play | Picture stories | Share stories, picture stories, estimate stories | Estimate stories | 3.OA.A.3, 3.NBT.A.1, 3.OA.D.8 |
+| 4 | Play | Two-step stories | Two-step stories | One level down (estimate stories) | 4.OA.A.3 |
 
-Kindergarten and grade 1 do not see multiply or share stories.
+Kindergarten and grade 1 do not see multiply or share stories. Pre-K through grade 2 never see estimate stories. Estimate numbers never end in 5, so rounding is never a coin flip. Estimate stories are read by the device voice until clips are recorded.
 
 ## What is missing
 
@@ -429,4 +429,4 @@ Pre-K through grade 2 stay locked. Grade 3 can use every level of this game. Gra
 
 ## Still open
 
-These Common Core skills still have no game: teen numbers as ten and ones (K.NBT.A.1), decomposing numbers within 10 (K.OA.A.3), the meaning of the equal sign (1.OA.D.7), three-addend word problems (1.OA.A.2), adding up to four two-digit numbers (2.NBT.B.6), the full subtraction algorithm within 1000 (2.NBT.B.7), measuring the same length in two units (2.MD.A.2), estimating length (2.MD.A.3), comparing lengths (2.MD.A.4), length word problems (2.MD.B.5), a number line of lengths (2.MD.B.6), line plots of measurements (2.MD.D.9), multiplying a one-digit number by a multiple of 10 (3.NBT.A.3), mass and liquid volume (3.MD.A.2), properties of multiplication (3.OA.B.5), estimating a sum or difference and judging whether the answer is reasonable (3.OA.D.8), and the early reading work of syllables (RF.K.2.B), onset and rime (RF.K.2.C), and phoneme substitution (RF.K.2.E). Rounding to 10 and 100 is already Place Value. Time to the minute is the Minutes game. Blank fraction lines are the Line game. Elapsed time stays a grade 4 level of Telling Time. Rhyming words are already Phonics, and only in the languages that teach English reading. Even and odd is still open as a question, though Fair Shares already deals equal pairs.
+These Common Core skills still have no game: teen numbers as ten and ones (K.NBT.A.1), decomposing numbers within 10 (K.OA.A.3), the meaning of the equal sign (1.OA.D.7), three-addend word problems (1.OA.A.2), adding up to four two-digit numbers (2.NBT.B.6), the full subtraction algorithm within 1000 (2.NBT.B.7), measuring the same length in two units (2.MD.A.2), estimating length (2.MD.A.3), comparing lengths (2.MD.A.4), length word problems (2.MD.B.5), a number line of lengths (2.MD.B.6), line plots of measurements (2.MD.D.9), multiplying a one-digit number by a multiple of 10 (3.NBT.A.3), mass and liquid volume (3.MD.A.2), properties of multiplication (3.OA.B.5), and the early reading work of syllables (RF.K.2.B), onset and rime (RF.K.2.C), and phoneme substitution (RF.K.2.E). Rounding to 10 and 100 is already Place Value, and estimate stories put it in a story. Estimating sums and differences is the estimate stories level of Word Problems. Time to the minute is the Minutes game. Blank fraction lines are the Line game. Elapsed time stays a grade 4 level of Telling Time. Rhyming words are already Phonics, and only in the languages that teach English reading. Even and odd is still open as a question, though Fair Shares already deals equal pairs.

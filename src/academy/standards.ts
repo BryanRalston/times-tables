@@ -130,6 +130,7 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     mult: "2.OA.A.1",
     div: "3.OA.A.3",
     picture: "3.OA.A.3",
+    estimate: "3.OA.D.8",
     steps: "4.OA.A.3",
   },
   variables: {
@@ -261,6 +262,7 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "3.MD.C.6": { en: "Count unit squares", es: "Contar cuadrados unidad" },
   "3.MD.D.8": { en: "Find the perimeter", es: "Hallar el perímetro" },
   "3.OA.A.2": { en: "Share into equal groups", es: "Repartir en grupos iguales" },
+  "3.OA.D.8": { en: "Estimate and check answers", es: "Estimar y comprobar respuestas" },
   "3.OA.D.9": { en: "Number patterns", es: "Patrones numéricos" },
   "2.OA.C.3": { en: "Pair objects into equal groups", es: "Emparejar objetos en grupos iguales" },
   "4.OA.C.5": { en: "Follow a number rule", es: "Seguir una regla numérica" },

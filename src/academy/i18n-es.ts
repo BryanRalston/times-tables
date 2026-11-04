@@ -1069,6 +1069,7 @@ export const ES: Record<string, string> = {
   "Multi-digit multiply": "Multiplicación de varios dígitos",
   "Division with remainders": "División con residuo",
   "Two-step stories": "Historias de dos pasos",
+  "Estimate stories": "Historias de estimar",
   "Addend within 10": "Sumando hasta el 10",
   "Blank within 20": "Hueco hasta el 20",
   "Missing factor": "Factor que falta",
