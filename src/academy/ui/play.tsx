@@ -762,7 +762,8 @@ export function PlayScreen({
       (slot.question.visual.kind === "money" && slot.question.visual.mode === "count") ||
       (slot.question.visual.kind === "scene" &&
         (slot.question.visual.board.game === "count" ||
-          slot.question.visual.board.game === "problems" ||
+          // Estimate stories are about rounding, not counting, so the buddy stays quiet.
+          (slot.question.visual.board.game === "problems" && slot.question.visual.board.mode !== "estimate") ||
           slot.question.visual.board.game === "place" ||
           slot.question.visual.board.game === "variables")));
   const buddyCue = buddyReaction({

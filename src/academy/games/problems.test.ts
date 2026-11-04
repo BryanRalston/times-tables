@@ -79,6 +79,34 @@ describe("word problem questions", () => {
             for (const choice of q.choices) expect(q.visual.labels[choice]).toBe("");
             break;
           }
+          case "estimate": {
+            const kind = board.estimate;
+            const near = (n: number, place: number) => Math.floor((n + place / 2) / place) * place;
+            if (kind === "ten" || kind === "hundred") {
+              expect(board.b).toBe(kind === "ten" ? 10 : 100);
+              expect(board.a % board.b).not.toBe(0);
+              expect(board.a).toBeLessThan(1000);
+              expect(q.answer).toBe(String(near(board.a, board.b)));
+            } else {
+              expect(board.a).toBeGreaterThanOrEqual(11);
+              expect(board.a).toBeLessThanOrEqual(98);
+              expect(board.b).toBeGreaterThanOrEqual(11);
+              expect(board.a % 10 === 5 || board.b % 10 === 5).toBe(false);
+              const ra = near(board.a, 10);
+              const rb = near(board.b, 10);
+              if (kind === "sum") expect(q.answer).toBe(String(ra + rb));
+              if (kind === "diff") expect(q.answer).toBe(String(ra - rb));
+              if (kind === "check") {
+                expect(q.answer).toBe(String(board.a + board.b));
+                for (const choice of q.choices) {
+                  if (choice === q.answer) continue;
+                  expect(Math.abs(Number(choice) - (ra + rb))).toBeGreaterThan(Math.abs(board.a + board.b - (ra + rb)));
+                }
+              }
+            }
+            for (const choice of q.choices) expect(Number(choice)).toBeGreaterThan(0);
+            break;
+          }
           case "steps": {
             const away = board.extra ?? 0;
             expect(q.answer).toBe(String(board.a * board.b - away));
@@ -127,6 +155,10 @@ describe("word problem questions", () => {
         const picture = row.prompt.match(/^Bunny draws (\d+) groups of (\d+) frogs\. How many frogs\?$/);
         if (picture) {
           expect(row.answer).toBe(String(Number(picture[1]) * Number(picture[2])));
+          continue;
+        }
+        if (/rounded to the nearest (ten|hundred)\?$|About how many|Which total makes sense\?$/.test(row.prompt)) {
+          expect(Number(row.answer)).toBeGreaterThan(0);
           continue;
         }
         const steps = row.prompt.match(/^(\d+) bags of (\d+) apples\. Give away (\d+)\. How many are left\?$/);

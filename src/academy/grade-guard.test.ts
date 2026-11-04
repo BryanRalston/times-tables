@@ -172,6 +172,9 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
         expect(board.mode === "add" || board.mode === "sub").toBe(true);
         expect(board.emoji.length).toBeGreaterThan(0);
       }
+      // Rounding and estimation stories (3.NBT.A.1, 3.OA.D.8) start in grade 3.
+      if (grade === "PK" || grade === "K" || grade === "1" || grade === "2") expect(board.mode).not.toBe("estimate");
+      if (grade === "3") expect(["div", "picture", "mult", "estimate"]).toContain(board.mode);
       break;
     case "variables": {
       expect(question.answer).toBe(String(variableAnswer(board)));
@@ -862,6 +865,18 @@ describe("grade bands", () => {
 });
 
 describe("shapes symmetry stays at grade 4", () => {
+  it("never serves estimate stories (3.NBT.A.1, 3.OA.D.8) below grade 3", () => {
+    const game = GAMES.find((item) => item.id === "problems");
+    if (!game) throw new Error("problems");
+    const ids = game.levels.map((level) => level.id);
+    for (const grade of ["PK", "K", "1", "2"] as const) {
+      expect(playWindow(ids, "problems", grade, false).ids).not.toContain("estimate");
+    }
+    expect(playWindow(ids, "problems", "3", false).ids).toContain("estimate");
+    expect(playWindow(ids, "problems", "3", false).ids).not.toContain("steps");
+    expect(playWindow(ids, "problems", "4", false).ids).toContain("estimate");
+  });
+
   it("never serves counting lines of symmetry (4.G.A.3) below grade 4", () => {
     const shapes = GAMES.find((game) => game.id === "shapes")!;
     const ids = shapes.levels.map((row) => row.id);

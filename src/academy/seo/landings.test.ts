@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { isPrecacheFile } from "../../../scripts/academy-precache.mjs";
-import { landingPages, sheetPages } from "./landings";
+import { DESCRIPTION_MAX, landingPages, sheetPages, TITLE_MAX } from "./landings";
 import { GOATCOUNTER_ENDPOINT, GOATCOUNTER_SRC } from "./counter";
 import { academySeoFiles, HOME_DESCRIPTION, HOME_TITLE, sitemapXml, worksheetHtml } from "./html";
 import { WORKSHEETS } from "./catalog";
@@ -23,15 +23,15 @@ describe("search landing pages", () => {
     const pages = landingPages().filter((page) => page.locale.id === "en" && page.kind === "game");
     const bySlug = new Map(pages.map((page) => [page.path, page]));
     const expected: Record<string, string> = {
-      "times-tables-game": "Free times tables game for kids (grades 2–4) | Squishee Academy",
-      "telling-time-game": "Free telling time game for kids (grades 1–4) | Squishee Academy",
-      "money-game": "Free counting money game for kids (Pre-K to grade 4) | Squishee Academy",
-      "addition-subtraction-game": "Free addition and subtraction game for kids (kindergarten through grade 4) | Squishee Academy",
-      "fractions-game": "Free fractions game for kids (grades 1–4) | Squishee Academy",
-      "graphs-game": "Free graphs game for kids (Pre-K to grade 4) | Squishee Academy",
-      "sight-words-game": "Free sight words game for kids (kindergarten through grade 4) | Squishee Academy",
-      "phonics-game": "Free phonics game for kids (Pre-K to grade 4) | Squishee Academy",
-      "shapes-geometry-game": "Free shapes and geometry game for kids (Pre-K to grade 4) | Squishee Academy",
+      "times-tables-game": "Free times tables game for kids | Squishee Academy",
+      "telling-time-game": "Free telling time game for kids | Squishee Academy",
+      "money-game": "Free counting money game for kids | Squishee Academy",
+      "addition-subtraction-game": "Free addition and subtraction game | Squishee Academy",
+      "fractions-game": "Free fractions game for kids | Squishee Academy",
+      "graphs-game": "Free graphs game for kids | Squishee Academy",
+      "sight-words-game": "Free sight words game for kids | Squishee Academy",
+      "phonics-game": "Free phonics game for kids | Squishee Academy",
+      "shapes-geometry-game": "Free shapes and geometry game for kids | Squishee Academy",
     };
     for (const [slug, title] of Object.entries(expected)) {
       const page = bySlug.get(slug);
@@ -58,6 +58,30 @@ describe("search landing pages", () => {
     const times = bySlug.get("times-tables-game");
     expect(times?.ageRange).toBe("7-10");
     expect(times?.gradesLabel).toBe("grades 2–4");
+  });
+
+  it("keeps game and skill landing titles within 60 and descriptions within 160 characters, search phrase first", () => {
+    const pages = landingPages();
+    const long = pages.filter((page) => [...page.title].length > TITLE_MAX || [...page.description].length > DESCRIPTION_MAX);
+    expect(long.map((page) => `${page.path}: ${page.title} / ${page.description.length}`).slice(0, 6)).toEqual([]);
+    for (const page of pages.filter((row) => row.kind === "game")) {
+      expect(page.description.startsWith(page.h1), page.path).toBe(true);
+      const html = pageHtml(`${page.path}/index.html`);
+      expect(html).toContain(`<title>${page.title.replace(/&/g, "&amp;")}</title>`);
+    }
+    const money = pages.find((page) => page.path === "money-game");
+    expect(money?.description.startsWith("Free counting money game for kids.")).toBe(true);
+  });
+
+  it("drops grade ranges from every landing title and keeps the brand whenever it fits", () => {
+    const brand = " | Squishee Academy";
+    const pages = landingPages();
+    expect(pages.filter((page) => /[（(][^)）]*[)）]/u.test(page.title)).map((page) => page.title)).toEqual([]);
+    const unbranded = pages.filter((page) => !page.title.endsWith(brand));
+    // Only titles whose shortest whole name would not fit with the brand may drop it.
+    expect(unbranded.length).toBeLessThan(pages.length / 10);
+    const english = pages.filter((page) => page.locale.id === "en" && page.kind === "game");
+    expect(english.filter((page) => !page.title.endsWith(brand)).map((page) => page.title)).toEqual([]);
   });
 
   it("gives every game a skill page and keeps titles unique in each language", () => {

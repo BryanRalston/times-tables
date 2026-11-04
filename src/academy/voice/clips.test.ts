@@ -10,7 +10,7 @@ import { yourTurnLine } from "../i18n";
 import { hintCue, promptSpeech, speakable, workedExample } from "../teach";
 import { voiceClipUrl } from "./clips";
 import { VOICE_FILES, VOICE_MODEL } from "./manifest";
-import { collectClipSpecs, collectSpokenLines, lineChunkErrors } from "./catalog";
+import { collectClipSpecs, collectSpokenLines, DEVICE_VOICE_SKILLS, lineChunkErrors } from "./catalog";
 import { idealPieces, planSpeech, speechChunkError } from "./plan";
 import { numberWords, spokenText } from "./pronounce";
 
@@ -104,7 +104,9 @@ describe("recorded voice", () => {
     for (const game of GAMES) {
       for (const level of game.levels) {
         for (let i = 0; i < 48; i += 1) {
-          addChoice(game.makeQuestion(rngFromSeed(`voice-gap:${game.id}:${level.id}:${i}`), level.id, []));
+          const question = game.makeQuestion(rngFromSeed(`voice-gap:${game.id}:${level.id}:${i}`), level.id, []);
+          if (DEVICE_VOICE_SKILLS.has(question.skill)) continue;
+          addChoice(question);
         }
       }
     }
@@ -124,6 +126,10 @@ describe("recorded voice", () => {
     }
 
     expect(gaps.slice(0, 8)).toEqual([]);
+    // Device-voice skills still make lines the device can read.
+    const estimate = GAMES.find((game) => game.id === "problems")?.makeQuestion(rngFromSeed("voice-gap:estimate"), "estimate", []);
+    expect(estimate && DEVICE_VOICE_SKILLS.has(estimate.skill)).toBe(true);
+    expect(promptSpeech(estimate!).length).toBeGreaterThan(10);
     expect(gaps).toHaveLength(0);
   });
 });

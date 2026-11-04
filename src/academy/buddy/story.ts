@@ -181,7 +181,8 @@ export function storyLine(visual: Visual, buddyId: string, hostId: string): stri
         return say(`${host} holds up a coin. What coin is it?`, `${host} muestra una moneda. ¿Qué moneda es?`, `${host} mostra uma moeda. Que moeda é?`, `${host} montre une pièce. Quelle pièce est-ce ?`, `${host}举起一枚硬币。这是哪种硬币？`, `${host} एक सिक्का दिखाता है। यह कौन सा सिक्का है?`, `${host} يرفع قطعة نقد. ما هذه القطعة؟`);
       }
       if (visual.mode === "change") {
-        return say(`${buddy} pays ${host}. How much change is left?`, `${buddy} le paga a ${host}. ¿Cuánto cambio queda?`, `${buddy} paga ${host}. Quanto de troco sobra?`, `${buddy} paie ${host}. Combien de monnaie reste-t-il ?`, `${buddy}付给${host}。要找回多少钱？`, `${buddy} ${host} देता है। कितने पैसे बचे?`, `${buddy} يدفع إلى ${host}. كم الباقي؟`);
+        // The card asks the question; the story only sets the scene.
+        return say(`${buddy} pays ${host}.`, `${buddy} le paga a ${host}.`, `${buddy} paga ${host}.`, `${buddy} paie ${host}.`, `${buddy}付给${host}。`, `${buddy} ${host} देता है।`, `${buddy} يدفع إلى ${host}.`);
       }
       if (visual.mode === "make") {
         return say(

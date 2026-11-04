@@ -36,6 +36,13 @@ const HAND_SAMPLES = 16;
 const NUMBER_MAX = 1000;
 
 /** Games whose clips ship in the first offline cache. Sight words and the rest load with the game. */
+/**
+ * Skills read by the device voice (speechSynthesis) instead of recorded clips.
+ * New stories start here so no new paid audio is needed; speak() falls back to
+ * the device whenever planSpeech cannot cover a line.
+ */
+export const DEVICE_VOICE_SKILLS: ReadonlySet<string> = new Set(["problems:estimate"]);
+
 export const CORE_VOICE_GAMES = new Set(["add", "time", "ui", "buddy", "boss"]);
 
 const BUBBLES = ["The hint can help.", "Let's look together.", "Three stars!", "Your turn!"] as const;
@@ -123,6 +130,7 @@ export function collectSpokenLines(): SpokenLine[] {
     for (const level of game.levels) {
       for (let i = 0; i < SAMPLES; i += 1) {
         const question = game.makeQuestion(rngFromSeed(`${game.id}:${level.id}:${i}`), level.id, []);
+        if (DEVICE_VOICE_SKILLS.has(question.skill)) continue;
         addChoice(lines, question, game.id);
       }
     }

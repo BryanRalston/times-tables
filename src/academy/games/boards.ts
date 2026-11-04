@@ -105,7 +105,7 @@ export type PhonicsBoard =
 
 export interface ProblemBoard {
   game: "problems";
-  mode: "add" | "sub" | "mult" | "div" | "picture" | "steps";
+  mode: "add" | "sub" | "mult" | "div" | "picture" | "estimate" | "steps";
   op: "+" | "-" | "×" | "÷";
   a: number;
   b: number;
@@ -113,7 +113,11 @@ export interface ProblemBoard {
   thing: string;
   /** Taken away or added after the first step. */
   extra?: number;
+  /** Estimate stories: round `a` to `b` (10 or 100), or estimate `a op b` with tens. */
+  estimate?: EstimateKind;
 }
+
+export type EstimateKind = "ten" | "hundred" | "sum" | "diff" | "check";
 
 export type VariableMode = "addend" | "either" | "factor" | "times" | "steps";
 export type VariableBox = "left" | "right" | "result" | "extra";
