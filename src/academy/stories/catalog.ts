@@ -4,6 +4,52 @@ import { SHELF_STORIES } from "./shelf";
 export const STORY_PROPS = ["hat", "mat", "sun", "bug", "cup", "kite", "fish", "log", "snack", "moon", "house", "boat"] as const;
 export type StoryProp = (typeof STORY_PROPS)[number];
 
+/** Where each prop belongs in the scene. Default for unknown props is ground. */
+export const STORY_PROP_PLACEMENTS = {
+  hat: "ground",
+  mat: "ground",
+  sun: "sky",
+  bug: "ground",
+  cup: "ground",
+  kite: "sky",
+  fish: "water",
+  log: "ground",
+  snack: "ground",
+  moon: "sky",
+  house: "ground",
+  boat: "water",
+} as const satisfies Record<StoryProp, "ground" | "sky" | "water">;
+export type StoryPropPlacement = (typeof STORY_PROP_PLACEMENTS)[StoryProp];
+
+/** A page may override the prop's default zone when its text says otherwise. */
+export function storyPropPlacement(id: StoryProp, override?: StoryPropPlacement): StoryPropPlacement {
+  return override ?? STORY_PROP_PLACEMENTS[id];
+}
+
+export const STORY_BACKGROUNDS = [
+  "meadow",
+  "garden",
+  "night",
+  "shore-split",
+  "dock-split",
+  "room",
+  "kitchen",
+  "bedroom",
+] as const;
+export type StoryBackground = (typeof STORY_BACKGROUNDS)[number];
+
+/** Zones each background supports for prop placement checks. */
+export const STORY_BACKGROUND_ZONES = {
+  meadow: ["ground", "sky"],
+  garden: ["ground", "sky"],
+  night: ["ground", "sky"],
+  "shore-split": ["ground", "sky", "water"],
+  "dock-split": ["ground", "sky", "water"],
+  room: ["ground"],
+  kitchen: ["ground"],
+  bedroom: ["ground", "sky"],
+} as const satisfies Record<StoryBackground, readonly StoryPropPlacement[]>;
+
 export type StoryMood = "day" | "night" | "water";
 
 export type StoryPicture =
@@ -28,7 +74,11 @@ export interface StoryPage {
   text: string;
   pals: readonly string[];
   prop?: StoryProp;
+  /** Overrides the prop's default placement for this page only. */
+  placement?: "ground" | "sky" | "water";
   mood: StoryMood;
+  /** Stable across locales; each page explicitly chooses its setting. */
+  background: StoryBackground;
 }
 
 export interface Story {
@@ -48,11 +98,11 @@ export const STORIES: readonly Story[] = [
     grade: "PK",
     cast: ["peach", "cat"],
     pages: [
-      { text: "Peach can see a cat.", pals: ["peach", "cat"], mood: "day" },
-      { text: "The cat is little.", pals: ["cat"], mood: "day" },
-      { text: "Look! The cat can jump.", pals: ["cat"], mood: "day" },
-      { text: "Peach and the cat play.", pals: ["peach", "cat"], mood: "day" },
-      { text: "I see a big hug.", pals: ["peach", "cat"], mood: "day" },
+      { text: "Peach can see a cat.", pals: ["peach", "cat"], mood: "day", background: "meadow" },
+      { text: "The cat is little.", pals: ["cat"], mood: "day", background: "meadow" },
+      { text: "Look! The cat can jump.", pals: ["cat"], mood: "day", background: "meadow" },
+      { text: "Peach and the cat play.", pals: ["peach", "cat"], mood: "day", background: "meadow" },
+      { text: "I see a big hug.", pals: ["peach", "cat"], mood: "day", background: "meadow" },
     ],
     checks: [
       {
@@ -81,11 +131,11 @@ export const STORIES: readonly Story[] = [
     grade: "PK",
     cast: ["frog"],
     pages: [
-      { text: "Frog can hop.", pals: ["frog"], mood: "day" },
-      { text: "Hop, hop, hop!", pals: ["frog"], mood: "day" },
-      { text: "The frog is red.", pals: ["frog"], mood: "day" },
-      { text: "Look! The sun.", pals: ["frog"], prop: "sun", mood: "day" },
-      { text: "We play. We jump.", pals: ["frog"], mood: "day" },
+      { text: "Frog can hop.", pals: ["frog"], mood: "day", background: "meadow" },
+      { text: "Hop, hop, hop!", pals: ["frog"], mood: "day", background: "meadow" },
+      { text: "The frog is red.", pals: ["frog"], mood: "day", background: "meadow" },
+      { text: "Look! The sun.", pals: ["frog"], prop: "sun", mood: "day", background: "meadow" },
+      { text: "We play. We jump.", pals: ["frog"], mood: "day", background: "meadow" },
     ],
     checks: [
       {
@@ -114,12 +164,12 @@ export const STORIES: readonly Story[] = [
     grade: "K",
     cast: ["bunny"],
     pages: [
-      { text: "Bunny can see a red hat.", pals: ["bunny"], prop: "hat", mood: "day" },
-      { text: "The hat is little.", pals: ["bunny"], prop: "hat", mood: "day" },
-      { text: "Where is the hat?", pals: ["bunny"], mood: "day" },
-      { text: "It is on the mat.", pals: ["bunny"], prop: "mat", mood: "day" },
-      { text: "Bunny ran to the hat.", pals: ["bunny"], prop: "hat", mood: "day" },
-      { text: "We like the red hat.", pals: ["bunny"], prop: "hat", mood: "day" },
+      { text: "Bunny can see a red hat.", pals: ["bunny"], prop: "hat", mood: "day", background: "room" },
+      { text: "The hat is little.", pals: ["bunny"], prop: "hat", mood: "day", background: "room" },
+      { text: "Where is the hat?", pals: ["bunny"], mood: "day", background: "room" },
+      { text: "It is on the mat.", pals: ["bunny"], prop: "mat", mood: "day", background: "room" },
+      { text: "Bunny ran to the hat.", pals: ["bunny"], prop: "hat", mood: "day", background: "room" },
+      { text: "We like the red hat.", pals: ["bunny"], prop: "hat", mood: "day", background: "room" },
     ],
     checks: [
       {
@@ -148,12 +198,12 @@ export const STORIES: readonly Story[] = [
     grade: "K",
     cast: ["pig"],
     pages: [
-      { text: "Pig can see a bug.", pals: ["pig"], prop: "bug", mood: "day" },
-      { text: "The bug is little.", pals: ["pig"], prop: "bug", mood: "day" },
-      { text: "The bug is on a cup.", pals: ["pig"], prop: "cup", mood: "day" },
-      { text: "Pig said, Come here.", pals: ["pig"], mood: "day" },
-      { text: "The bug can hop.", pals: ["pig"], prop: "bug", mood: "day" },
-      { text: "Pig and the bug play.", pals: ["pig"], prop: "bug", mood: "day" },
+      { text: "Pig can see a bug.", pals: ["pig"], prop: "bug", mood: "day", background: "garden" },
+      { text: "The bug is little.", pals: ["pig"], prop: "bug", mood: "day", background: "garden" },
+      { text: "The bug is on a cup.", pals: ["pig"], prop: "cup", mood: "day", background: "garden" },
+      { text: "Pig said, Come here.", pals: ["pig"], mood: "day", background: "garden" },
+      { text: "The bug can hop.", pals: ["pig"], prop: "bug", mood: "day", background: "garden" },
+      { text: "Pig and the bug play.", pals: ["pig"], prop: "bug", mood: "day", background: "garden" },
     ],
     checks: [
       {
@@ -182,13 +232,13 @@ export const STORIES: readonly Story[] = [
     grade: "1",
     cast: ["fox"],
     pages: [
-      { text: "Fox has a red kite.", pals: ["fox"], prop: "kite", mood: "day" },
-      { text: "The kite can fly.", pals: ["fox"], prop: "kite", mood: "day" },
-      { text: "Look! It went up.", pals: ["fox"], prop: "kite", mood: "day" },
-      { text: "Then the kite came down.", pals: ["fox"], prop: "kite", mood: "day" },
-      { text: "Fox ran to get the kite.", pals: ["fox"], prop: "kite", mood: "day" },
-      { text: "He will fly it again.", pals: ["fox"], prop: "kite", mood: "day" },
-      { text: "Fox is glad.", pals: ["fox"], mood: "day" },
+      { text: "Fox has a red kite.", pals: ["fox"], prop: "kite", placement: "ground", mood: "day", background: "meadow" },
+      { text: "The kite can fly.", pals: ["fox"], prop: "kite", mood: "day", background: "meadow" },
+      { text: "Look! It went up.", pals: ["fox"], prop: "kite", mood: "day", background: "meadow" },
+      { text: "Then the kite came down.", pals: ["fox"], prop: "kite", placement: "ground", mood: "day", background: "meadow" },
+      { text: "Fox ran to get the kite.", pals: ["fox"], prop: "kite", placement: "ground", mood: "day", background: "meadow" },
+      { text: "He will fly it again.", pals: ["fox"], prop: "kite", mood: "day", background: "meadow" },
+      { text: "Fox is glad.", pals: ["fox"], mood: "day", background: "meadow" },
     ],
     checks: [
       {
@@ -217,12 +267,12 @@ export const STORIES: readonly Story[] = [
     grade: "1",
     cast: ["duck"],
     pages: [
-      { text: "Duck can see the fish.", pals: ["duck"], prop: "fish", mood: "water" },
-      { text: "The fish can swim.", pals: ["duck"], prop: "fish", mood: "water" },
-      { text: "Duck will swim with the fish.", pals: ["duck"], prop: "fish", mood: "water" },
-      { text: "They play in the sun.", pals: ["duck"], prop: "sun", mood: "day" },
-      { text: "Then Duck sat on a log.", pals: ["duck"], prop: "log", mood: "day" },
-      { text: "She had a good snack.", pals: ["duck"], prop: "snack", mood: "day" },
+      { text: "Duck can see the fish.", pals: ["duck"], prop: "fish", mood: "water", background: "shore-split" },
+      { text: "The fish can swim.", pals: ["duck"], prop: "fish", mood: "water", background: "shore-split" },
+      { text: "Duck will swim with the fish.", pals: ["duck"], prop: "fish", mood: "water", background: "shore-split" },
+      { text: "They play in the sun.", pals: ["duck"], prop: "sun", mood: "day", background: "meadow" },
+      { text: "Then Duck sat on a log.", pals: ["duck"], prop: "log", mood: "day", background: "meadow" },
+      { text: "She had a good snack.", pals: ["duck"], prop: "snack", mood: "day", background: "meadow" },
     ],
     checks: [
       {
@@ -251,13 +301,13 @@ export const STORIES: readonly Story[] = [
     grade: "2",
     cast: ["owl", "bunny"],
     pages: [
-      { text: "Owl can see the moon at night.", pals: ["owl"], prop: "moon", mood: "night" },
-      { text: "The moon is big and white.", pals: ["owl"], prop: "moon", mood: "night" },
-      { text: "Bunny came to the house.", pals: ["owl", "bunny"], prop: "house", mood: "night" },
-      { text: "They sit and look at the moon.", pals: ["owl", "bunny"], prop: "moon", mood: "night" },
-      { text: "Owl said, The night is very pretty.", pals: ["owl", "bunny"], prop: "moon", mood: "night" },
-      { text: "Bunny was glad.", pals: ["bunny"], mood: "night" },
-      { text: "Then they went to sleep.", pals: ["owl", "bunny"], prop: "moon", mood: "night" },
+      { text: "Owl can see the moon at night.", pals: ["owl"], prop: "moon", mood: "night", background: "night" },
+      { text: "The moon is big and white.", pals: ["owl"], prop: "moon", mood: "night", background: "night" },
+      { text: "Bunny came to the house.", pals: ["owl", "bunny"], prop: "house", mood: "night", background: "night" },
+      { text: "They sit and look at the moon.", pals: ["owl", "bunny"], prop: "moon", mood: "night", background: "night" },
+      { text: "Owl said, The night is very pretty.", pals: ["owl", "bunny"], prop: "moon", mood: "night", background: "night" },
+      { text: "Bunny was glad.", pals: ["bunny"], mood: "night", background: "night" },
+      { text: "Then they went to sleep.", pals: ["owl", "bunny"], prop: "moon", mood: "night", background: "bedroom" },
     ],
     checks: [
       {
@@ -286,13 +336,13 @@ export const STORIES: readonly Story[] = [
     grade: "2",
     cast: ["bear"],
     pages: [
-      { text: "Bear can see a boat.", pals: ["bear"], prop: "boat", mood: "water" },
-      { text: "The boat is on the water.", pals: ["bear"], prop: "boat", mood: "water" },
-      { text: "Bear went to the boat.", pals: ["bear"], prop: "boat", mood: "water" },
-      { text: "The boat can go.", pals: ["bear"], prop: "boat", mood: "water" },
-      { text: "Bear had a good ride.", pals: ["bear"], prop: "boat", mood: "water" },
-      { text: "Then Bear came back.", pals: ["bear"], prop: "boat", mood: "water" },
-      { text: "Bear was glad.", pals: ["bear"], mood: "day" },
+      { text: "Bear can see a boat.", pals: ["bear"], prop: "boat", mood: "water", background: "dock-split" },
+      { text: "The boat is on the water.", pals: ["bear"], prop: "boat", mood: "water", background: "dock-split" },
+      { text: "Bear went to the boat.", pals: ["bear"], prop: "boat", mood: "water", background: "dock-split" },
+      { text: "The boat can go.", pals: ["bear"], prop: "boat", mood: "water", background: "dock-split" },
+      { text: "Bear had a good ride.", pals: ["bear"], prop: "boat", mood: "water", background: "dock-split" },
+      { text: "Then Bear came back.", pals: ["bear"], prop: "boat", mood: "water", background: "dock-split" },
+      { text: "Bear was glad.", pals: ["bear"], mood: "day", background: "meadow" },
     ],
     checks: [
       {

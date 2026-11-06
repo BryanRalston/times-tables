@@ -1,0 +1,961 @@
+[
+  {
+    "id": "pk-peach-cat",
+    "title": "The cat",
+    "grade": "PK",
+    "pages": [
+      {
+        "text": "Peach can see a cat.",
+        "mood": "day",
+        "background": "meadow"
+      },
+      {
+        "text": "The cat is little.",
+        "mood": "day",
+        "background": "meadow"
+      },
+      {
+        "text": "Look! The cat can jump.",
+        "mood": "day",
+        "background": "meadow"
+      },
+      {
+        "text": "Peach and the cat play.",
+        "mood": "day",
+        "background": "meadow"
+      },
+      {
+        "text": "I see a big hug.",
+        "mood": "day",
+        "background": "meadow"
+      }
+    ]
+  },
+  {
+    "id": "pk-frog-hop",
+    "title": "Frog can hop",
+    "grade": "PK",
+    "pages": [
+      {
+        "text": "Frog can hop.",
+        "mood": "day",
+        "background": "meadow"
+      },
+      {
+        "text": "Hop, hop, hop!",
+        "mood": "day",
+        "background": "meadow"
+      },
+      {
+        "text": "The frog is red.",
+        "mood": "day",
+        "background": "meadow"
+      },
+      {
+        "text": "Look! The sun.",
+        "mood": "day",
+        "background": "meadow",
+        "prop": "sun"
+      },
+      {
+        "text": "We play. We jump.",
+        "mood": "day",
+        "background": "meadow"
+      }
+    ]
+  },
+  {
+    "id": "k-bunny-hat",
+    "title": "The red hat",
+    "grade": "K",
+    "pages": [
+      {
+        "text": "Bunny can see a red hat.",
+        "mood": "day",
+        "background": "room",
+        "prop": "hat"
+      },
+      {
+        "text": "The hat is little.",
+        "mood": "day",
+        "background": "room",
+        "prop": "hat"
+      },
+      {
+        "text": "Where is the hat?",
+        "mood": "day",
+        "background": "room"
+      },
+      {
+        "text": "It is on the mat.",
+        "mood": "day",
+        "background": "room",
+        "prop": "mat"
+      },
+      {
+        "text": "Bunny ran to the hat.",
+        "mood": "day",
+        "background": "room",
+        "prop": "hat"
+      },
+      {
+        "text": "We like the red hat.",
+        "mood": "day",
+        "background": "room",
+        "prop": "hat"
+      }
+    ]
+  },
+  {
+    "id": "k-pig-bug",
+    "title": "A little bug",
+    "grade": "K",
+    "pages": [
+      {
+        "text": "Pig can see a bug.",
+        "mood": "day",
+        "background": "garden",
+        "prop": "bug"
+      },
+      {
+        "text": "The bug is little.",
+        "mood": "day",
+        "background": "garden",
+        "prop": "bug"
+      },
+      {
+        "text": "The bug is on a cup.",
+        "mood": "day",
+        "background": "garden",
+        "prop": "cup"
+      },
+      {
+        "text": "Pig said, Come here.",
+        "mood": "day",
+        "background": "garden"
+      },
+      {
+        "text": "The bug can hop.",
+        "mood": "day",
+        "background": "garden",
+        "prop": "bug"
+      },
+      {
+        "text": "Pig and the bug play.",
+        "mood": "day",
+        "background": "garden",
+        "prop": "bug"
+      }
+    ]
+  },
+  {
+    "id": "g1-fox-kite",
+    "title": "The red kite",
+    "grade": "1",
+    "pages": [
+      {
+        "text": "Fox has a red kite.",
+        "mood": "day",
+        "background": "meadow",
+        "prop": "kite"
+      },
+      {
+        "text": "The kite can fly.",
+        "mood": "day",
+        "background": "meadow",
+        "prop": "kite"
+      },
+      {
+        "text": "Look! It went up.",
+        "mood": "day",
+        "background": "meadow",
+        "prop": "kite"
+      },
+      {
+        "text": "Then the kite came down.",
+        "mood": "day",
+        "background": "meadow",
+        "prop": "kite"
+      },
+      {
+        "text": "Fox ran to get the kite.",
+        "mood": "day",
+        "background": "meadow",
+        "prop": "kite"
+      },
+      {
+        "text": "He will fly it again.",
+        "mood": "day",
+        "background": "meadow",
+        "prop": "kite"
+      },
+      {
+        "text": "Fox is glad.",
+        "mood": "day",
+        "background": "meadow"
+      }
+    ]
+  },
+  {
+    "id": "g1-duck-fish",
+    "title": "Duck can swim",
+    "grade": "1",
+    "pages": [
+      {
+        "text": "Duck can see the fish.",
+        "mood": "water",
+        "background": "shore-split",
+        "prop": "fish"
+      },
+      {
+        "text": "The fish can swim.",
+        "mood": "water",
+        "background": "shore-split",
+        "prop": "fish"
+      },
+      {
+        "text": "Duck will swim with the fish.",
+        "mood": "water",
+        "background": "shore-split",
+        "prop": "fish"
+      },
+      {
+        "text": "They play in the sun.",
+        "mood": "day",
+        "background": "meadow",
+        "prop": "sun"
+      },
+      {
+        "text": "Then Duck sat on a log.",
+        "mood": "day",
+        "background": "meadow",
+        "prop": "log"
+      },
+      {
+        "text": "She had a good snack.",
+        "mood": "day",
+        "background": "meadow",
+        "prop": "snack"
+      }
+    ]
+  },
+  {
+    "id": "g2-owl-night",
+    "title": "The night moon",
+    "grade": "2",
+    "pages": [
+      {
+        "text": "Owl can see the moon at night.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "The moon is big and white.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "Bunny came to the house.",
+        "mood": "night",
+        "background": "night",
+        "prop": "house"
+      },
+      {
+        "text": "They sit and look at the moon.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "Owl said, The night is very pretty.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "Bunny was glad.",
+        "mood": "night",
+        "background": "night"
+      },
+      {
+        "text": "Then they went to sleep.",
+        "mood": "night",
+        "background": "bedroom",
+        "prop": "moon"
+      }
+    ]
+  },
+  {
+    "id": "g2-bear-boat",
+    "title": "The boat",
+    "grade": "2",
+    "pages": [
+      {
+        "text": "Bear can see a boat.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "The boat is on the water.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "Bear went to the boat.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "The boat can go.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "Bear had a good ride.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "Then Bear came back.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "Bear was glad.",
+        "mood": "day",
+        "background": "meadow"
+      }
+    ]
+  },
+  {
+    "id": "pk-panda-sun",
+    "title": "The big sun",
+    "grade": "PK",
+    "pages": [
+      {
+        "text": "Panda can see the sun.",
+        "mood": "day",
+        "background": "meadow",
+        "prop": "sun"
+      },
+      {
+        "text": "The sun is big.",
+        "mood": "day",
+        "background": "meadow",
+        "prop": "sun"
+      },
+      {
+        "text": "The sun is yellow.",
+        "mood": "day",
+        "background": "meadow",
+        "prop": "sun"
+      },
+      {
+        "text": "Look! Panda can run.",
+        "mood": "day",
+        "background": "meadow"
+      },
+      {
+        "text": "Panda and I play.",
+        "mood": "day",
+        "background": "meadow"
+      }
+    ]
+  },
+  {
+    "id": "pk-chick-hug",
+    "title": "A big hug",
+    "grade": "PK",
+    "pages": [
+      {
+        "text": "I see a chick.",
+        "mood": "day",
+        "background": "meadow"
+      },
+      {
+        "text": "The chick is little.",
+        "mood": "day",
+        "background": "meadow"
+      },
+      {
+        "text": "The chick is yellow.",
+        "mood": "day",
+        "background": "meadow"
+      },
+      {
+        "text": "Look! A big hug.",
+        "mood": "day",
+        "background": "meadow"
+      },
+      {
+        "text": "We play.",
+        "mood": "day",
+        "background": "meadow"
+      }
+    ]
+  },
+  {
+    "id": "k-penguin-cup",
+    "title": "The yellow cup",
+    "grade": "K",
+    "pages": [
+      {
+        "text": "Penguin can see a cup.",
+        "mood": "day",
+        "background": "room",
+        "prop": "cup"
+      },
+      {
+        "text": "The cup is yellow.",
+        "mood": "day",
+        "background": "room",
+        "prop": "cup"
+      },
+      {
+        "text": "Where is the cup?",
+        "mood": "day",
+        "background": "room"
+      },
+      {
+        "text": "It is on the mat.",
+        "mood": "day",
+        "background": "room",
+        "prop": "mat"
+      },
+      {
+        "text": "Penguin ran to the cup.",
+        "mood": "day",
+        "background": "room",
+        "prop": "cup"
+      },
+      {
+        "text": "We like the yellow cup.",
+        "mood": "day",
+        "background": "room",
+        "prop": "cup"
+      }
+    ]
+  },
+  {
+    "id": "k-otter-fish",
+    "title": "Otter and the fish",
+    "grade": "K",
+    "pages": [
+      {
+        "text": "Otter can see a fish.",
+        "mood": "water",
+        "background": "shore-split",
+        "prop": "fish"
+      },
+      {
+        "text": "The fish is little.",
+        "mood": "water",
+        "background": "shore-split",
+        "prop": "fish"
+      },
+      {
+        "text": "Look at the fish.",
+        "mood": "water",
+        "background": "shore-split",
+        "prop": "fish"
+      },
+      {
+        "text": "The fish is red.",
+        "mood": "water",
+        "background": "shore-split",
+        "prop": "fish"
+      },
+      {
+        "text": "Otter and the fish play.",
+        "mood": "water",
+        "background": "shore-split",
+        "prop": "fish"
+      },
+      {
+        "text": "I like the fish.",
+        "mood": "day",
+        "background": "shore-split",
+        "prop": "fish"
+      }
+    ]
+  },
+  {
+    "id": "g1-koala-snack",
+    "title": "A good snack",
+    "grade": "1",
+    "pages": [
+      {
+        "text": "Koala has a snack.",
+        "mood": "day",
+        "background": "kitchen",
+        "prop": "snack"
+      },
+      {
+        "text": "The snack is yellow.",
+        "mood": "day",
+        "background": "kitchen",
+        "prop": "snack"
+      },
+      {
+        "text": "Koala will eat it.",
+        "mood": "day",
+        "background": "kitchen",
+        "prop": "snack"
+      },
+      {
+        "text": "Then Koala had a cup.",
+        "mood": "day",
+        "background": "kitchen",
+        "prop": "cup"
+      },
+      {
+        "text": "She sat in the sun.",
+        "mood": "day",
+        "background": "garden",
+        "prop": "sun"
+      },
+      {
+        "text": "Koala is glad.",
+        "mood": "day",
+        "background": "garden"
+      }
+    ]
+  },
+  {
+    "id": "g1-hedgehog-hat",
+    "title": "Hedgehog has a hat",
+    "grade": "1",
+    "pages": [
+      {
+        "text": "Hedgehog has a red hat.",
+        "mood": "day",
+        "background": "room",
+        "prop": "hat"
+      },
+      {
+        "text": "The hat is little.",
+        "mood": "day",
+        "background": "room",
+        "prop": "hat"
+      },
+      {
+        "text": "Where is the hat?",
+        "mood": "day",
+        "background": "room"
+      },
+      {
+        "text": "It is on the mat.",
+        "mood": "day",
+        "background": "room",
+        "prop": "mat"
+      },
+      {
+        "text": "Hedgehog ran to get it.",
+        "mood": "day",
+        "background": "room",
+        "prop": "hat"
+      },
+      {
+        "text": "He will put it on.",
+        "mood": "day",
+        "background": "room",
+        "prop": "hat"
+      },
+      {
+        "text": "Hedgehog is glad.",
+        "mood": "day",
+        "background": "room",
+        "prop": "hat"
+      }
+    ]
+  },
+  {
+    "id": "g2-panda-moon",
+    "title": "Panda and the moon",
+    "grade": "2",
+    "pages": [
+      {
+        "text": "Panda can see the moon at night.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "The moon is big and white.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "Owl came to the house.",
+        "mood": "night",
+        "background": "night",
+        "prop": "house"
+      },
+      {
+        "text": "They sit and look at the moon.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "Panda said, The night is very pretty.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "Owl was glad.",
+        "mood": "night",
+        "background": "night"
+      },
+      {
+        "text": "Then they went to sleep.",
+        "mood": "night",
+        "background": "bedroom",
+        "prop": "moon"
+      }
+    ]
+  },
+  {
+    "id": "g2-fox-boat",
+    "title": "A green boat",
+    "grade": "2",
+    "pages": [
+      {
+        "text": "Fox can see a green boat.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "The boat is on the water.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "Fox went to the boat.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "The boat can go fast.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "Fox had a good ride.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "Then Fox came back.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "Fox was very glad.",
+        "mood": "day",
+        "background": "meadow"
+      }
+    ]
+  },
+  {
+    "id": "g3-bear-warm",
+    "title": "The warm ride",
+    "grade": "3",
+    "pages": [
+      {
+        "text": "Bear and Duck start on the boat.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "The water is warm today.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "They can see a small fish.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "fish"
+      },
+      {
+        "text": "The fish can jump.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "fish"
+      },
+      {
+        "text": "Bear said, Keep together.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "Then they come back to the house.",
+        "mood": "day",
+        "background": "meadow",
+        "prop": "house"
+      },
+      {
+        "text": "The ride was very good.",
+        "mood": "day",
+        "background": "meadow"
+      }
+    ]
+  },
+  {
+    "id": "g3-owl-story",
+    "title": "A long story",
+    "grade": "3",
+    "pages": [
+      {
+        "text": "Owl will tell a story about the moon.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "The story is long.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "Bunny came to the house.",
+        "mood": "night",
+        "background": "night",
+        "prop": "house"
+      },
+      {
+        "text": "They read the story together.",
+        "mood": "night",
+        "background": "bedroom",
+        "prop": "moon"
+      },
+      {
+        "text": "Owl said, The moon is pretty.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "Today the night is warm.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "Then they sleep.",
+        "mood": "night",
+        "background": "bedroom",
+        "prop": "moon"
+      }
+    ]
+  },
+  {
+    "id": "g3-fox-kind",
+    "title": "A kind day",
+    "grade": "3",
+    "pages": [
+      {
+        "text": "Fox and Peach play at the house.",
+        "mood": "day",
+        "background": "room",
+        "prop": "house"
+      },
+      {
+        "text": "They read a story together.",
+        "mood": "day",
+        "background": "room"
+      },
+      {
+        "text": "The story is about a little bug.",
+        "mood": "day",
+        "background": "room",
+        "prop": "bug"
+      },
+      {
+        "text": "Fox said, Be kind.",
+        "mood": "day",
+        "background": "room"
+      },
+      {
+        "text": "They draw the bug.",
+        "mood": "day",
+        "background": "room",
+        "prop": "bug"
+      },
+      {
+        "text": "Today they laugh.",
+        "mood": "day",
+        "background": "room"
+      },
+      {
+        "text": "The day is done.",
+        "mood": "day",
+        "background": "room"
+      }
+    ]
+  },
+  {
+    "id": "g4-owl-habitat",
+    "title": "The night habitat",
+    "grade": "4",
+    "pages": [
+      {
+        "text": "Owl can observe the night habitat.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "The moon is a light there.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "Bunny came to the house.",
+        "mood": "night",
+        "background": "night",
+        "prop": "house"
+      },
+      {
+        "text": "Owl will explain the habitat.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "Bunny can compare the moon and the sun.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "I predict the sun will come.",
+        "mood": "night",
+        "background": "night",
+        "prop": "moon"
+      },
+      {
+        "text": "Then they sleep.",
+        "mood": "night",
+        "background": "bedroom",
+        "prop": "moon"
+      }
+    ]
+  },
+  {
+    "id": "g4-duck-water",
+    "title": "The water habitat",
+    "grade": "4",
+    "pages": [
+      {
+        "text": "Duck can observe the water.",
+        "mood": "water",
+        "background": "shore-split"
+      },
+      {
+        "text": "The water is a habitat.",
+        "mood": "water",
+        "background": "shore-split"
+      },
+      {
+        "text": "Duck can see a small fish.",
+        "mood": "water",
+        "background": "shore-split",
+        "prop": "fish"
+      },
+      {
+        "text": "The fish can jump.",
+        "mood": "water",
+        "background": "shore-split",
+        "prop": "fish"
+      },
+      {
+        "text": "Duck will explain the habitat.",
+        "mood": "water",
+        "background": "shore-split",
+        "prop": "fish"
+      },
+      {
+        "text": "I predict the fish will swim.",
+        "mood": "water",
+        "background": "shore-split",
+        "prop": "fish"
+      },
+      {
+        "text": "Duck was glad.",
+        "mood": "day",
+        "background": "meadow"
+      }
+    ]
+  },
+  {
+    "id": "g4-bear-measure",
+    "title": "Measure the boat",
+    "grade": "4",
+    "pages": [
+      {
+        "text": "Bear can see a boat.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "Bear will measure the boat.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "Duck can compare the boat and the fish.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "fish"
+      },
+      {
+        "text": "The boat is long.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "Bear will explain the water habitat.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "I predict the boat will go.",
+        "mood": "water",
+        "background": "dock-split",
+        "prop": "boat"
+      },
+      {
+        "text": "Bear was glad.",
+        "mood": "day",
+        "background": "meadow"
+      }
+    ]
+  }
+]
