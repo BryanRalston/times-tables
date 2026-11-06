@@ -4,11 +4,12 @@ import { buddyName, pickTalk } from "./flavor";
 import { placeCard } from "./cards";
 import { blockPhrase, expandedForm, roundHalfUp, type PlaceBoard } from "./boards";
 import { extremeChoices, nearChoices, sceneQuestion, uniqueChoices } from "./pick";
+import { makeThousandthsQuestion, thousandthsText } from "./grade5";
 import { makeBigPlaceQuestion, makeRoundBigQuestion, spanSheet } from "./span";
-import { BaseTen, SceneCard, sceneModule } from "./scene-ui";
+import { BaseTen, PlaceValueChart, SceneCard, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
-export const PLACE_LEVELS = ["blocks", "expanded", "compare", "round10", "round100", "build", "big", "roundBig"] as const;
+export const PLACE_LEVELS = ["blocks", "expanded", "compare", "round10", "round100", "build", "big", "roundBig", "thousandths"] as const;
 export type PlaceLevel = (typeof PLACE_LEVELS)[number];
 
 export function isPlaceLevel(value: unknown): value is PlaceLevel {
@@ -183,6 +184,8 @@ export function makePlaceQuestion(rng: Rng, level: PlaceLevel): ChoiceQ {
       return makeBigPlaceQuestion(rng);
     case "roundBig":
       return makeRoundBigQuestion(rng);
+    case "thousandths":
+      return makeThousandthsQuestion(rng);
     default: {
       const neverLevel: never = level;
       return neverLevel;
@@ -226,6 +229,24 @@ function sheetItem(rng: Rng, level: string): SheetItem {
     case "round100": {
       const n = rng.int(100, 999);
       return { prompt: t(`Round ${n} to the nearest 100.`, `Redondea ${n} a la centena más cercana.`, `Arredonde ${n} para a centena mais próxima.`, `Arrondis ${n} à la centaine la plus proche.`, `把${n}四舍五入到百位。`, `${n} को निकटतम 100 तक पूर्णांक बनाओ।`, `قرّب ${n} إلى أقرب 100.`), answer: String(roundHalfUp(n, 100)) };
+    }
+    case "thousandths": {
+      const [w = 1, d1 = 2, d2 = 3, d3 = 4] = rng.shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      const v = w * 1000 + d1 * 100 + d2 * 10 + d3;
+      const text = thousandthsText(v, 3);
+      if (rng.next() < 0.5) {
+        const place = rng.int(1, 3);
+        const digit = Number(text.replace(".", "")[place] ?? 1);
+        return {
+          prompt: t(`What is the value of the ${digit} in ${text}?`, `¿Cuál es el valor del ${digit} en ${text}?`, `Qual é o valor do ${digit} em ${text}?`, `Quelle est la valeur du ${digit} dans ${text} ?`, `${text}里面的${digit}表示多少？`, `${text} में ${digit} का मान क्या है?`, `ما قيمة الرقم ${digit} في العدد ${text}؟`),
+          answer: `0.${"0".repeat(place - 1)}${digit}`,
+        };
+      }
+      const nearest = Math.floor((v + 50) / 100) * 100;
+      return {
+        prompt: t(`Round ${text} to the nearest tenth.`, `Redondea ${text} al décimo más cercano.`, `Arredonde ${text} para o décimo mais próximo.`, `Arrondis ${text} au dixième le plus proche.`, `把${text}四舍五入到十分位。`, `${text} को निकटतम दशांश तक पूर्णांक बनाओ।`, `قرّب ${text} إلى أقرب عُشر.`),
+        answer: thousandthsText(nearest, 1),
+      };
     }
     case "big":
     case "roundBig": {
@@ -288,6 +309,9 @@ function PlaceArt({ board }: { board: PlaceBoard }) {
       );
     case "roundBig":
       return <p className="ac-big-num">{groupedNumber(board.n)}</p>;
+    case "thousandths":
+      if (board.ask === "greatest") return null;
+      return <PlaceValueChart text={board.text} mark={board.ask === "value" ? board.place : 0} />;
     default: {
       const neverBoard: never = board;
       return neverBoard;

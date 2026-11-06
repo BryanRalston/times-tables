@@ -244,6 +244,47 @@ export function DecimalGrid({ tenths, hundredths }: { tenths: number; hundredths
   );
 }
 
+/** Place value chart for a decimal like 4.837. `mark` is 1 to 3 to highlight a digit after the point, 0 for none. */
+export function PlaceValueChart({ text, mark }: { text: string; mark: number }) {
+  const [whole = "0", frac = ""] = text.split(".");
+  const heads = [
+    t("ones", "unidades", "unidades", "unités", "个位", "इकाई", "آحاد"),
+    t("tenths", "décimos", "décimos", "dixièmes", "十分位", "दशांश", "أعشار"),
+    t("hundredths", "centésimos", "centésimos", "centièmes", "百分位", "शतांश", "من المئة"),
+    t("thousandths", "milésimos", "milésimos", "millièmes", "千分位", "सहस्रांश", "من الألف"),
+  ];
+  const digits = [whole, ...frac.padEnd(3, " ").slice(0, 3).split("")];
+  return (
+    <div className="ac-pv" dir="ltr" aria-hidden="true">
+      {heads.map((head, i) => (
+        <div key={i} className={cx("ac-pv-col", mark > 0 && mark === i && "is-mark", i === 1 && "has-point")}>
+          <span className="ac-pv-head">{head}</span>
+          <b className="ac-pv-digit">{digits[i]?.trim() || "\u00a0"}</b>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Area model for one fraction times another. Columns show the first fraction, rows the second, and the overlap is the answer. */
+export function AreaModel({ num, den, num2, den2 }: { num: number; den: number; num2: number; den2: number }) {
+  const cells: string[] = [];
+  for (let row = 0; row < den2; row += 1) {
+    for (let col = 0; col < den; col += 1) {
+      const a = col < num;
+      const b = row < num2;
+      cells.push(a && b ? "is-both" : a ? "is-a" : b ? "is-b" : "");
+    }
+  }
+  return (
+    <div className="ac-area" dir="ltr" aria-hidden="true" style={{ gridTemplateColumns: `repeat(${den}, 1fr)`, aspectRatio: `${den} / ${den2}` }}>
+      {cells.map((kind, i) => (
+        <i key={i} className={kind} />
+      ))}
+    </div>
+  );
+}
+
 function isShapeColor(value: string): value is ShapeColor {
   return value === "red" || value === "blue" || value === "yellow" || value === "green";
 }

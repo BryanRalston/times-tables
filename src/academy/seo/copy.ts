@@ -181,6 +181,7 @@ const AGE: Record<Grade, [number, number]> = {
   "2": [7, 8],
   "3": [8, 9],
   "4": [9, 10],
+  "5": [10, 11],
 };
 
 export function ageRange(grades: readonly Grade[]): string {
@@ -820,6 +821,7 @@ place:round100|rounding to the nearest 100|redondear a la centena|arredondar par
 place:build|building a number|formar un número|montar um número|construire un nombre|搭一个数|संख्या बनाना|بناء عدد
 place:big|place value to one million|valor posicional hasta un millón|valor posicional até um milhão|valeur de position jusqu'au million|百万以内的数位|दस लाख तक स्थानीय मान|القيمة المنزلية حتى المليون
 place:roundBig|rounding large numbers|redondear números grandes|arredondar números grandes|arrondir de grands nombres|大数四舍五入|बड़ी संख्याओं का पूर्णांक|تقريب الأعداد الكبيرة
+place:thousandths|decimals to thousandths|decimales hasta milésimos|decimais até milésimos|décimaux jusqu'aux millièmes|小数到千分位|सहस्रांश तक के दशमलव|الأعداد العشرية حتى الأجزاء من الألف
 shapes:color|colors|colores|cores|couleurs|颜色|रंग|الألوان
 shapes:match|matching shapes|emparejar figuras|combinar formas|associer des formes|配对图形|आकार मिलाना|مطابقة الأشكال
 shapes:pattern|shape patterns|patrones de figuras|padrões de formas|suites de formes|图形规律|आकार के पैटर्न|أنماط الأشكال
@@ -847,6 +849,7 @@ fractions:equivalent|equivalent fractions|fracciones equivalentes|frações equi
 fractions:shade|shading a fraction|colorear una fracción|pintar uma fração|colorier une fraction|涂分数|भिन्न रंगना|تظليل كسر
 fractions:addLike|adding like fractions|sumar fracciones iguales|somar frações de mesmo denominador|additionner des fractions de même dénominateur|加同分母分数|समान हर वाली भिन्न जोड़ना|جمع كسور متشابهة
 fractions:decimals|decimals|decimales|decimais|décimales|小数|दशमलव|الأعداد العشرية
+fractions:fracTimes|multiplying fractions|multiplicar fracciones|multiplicar frações|multiplier des fractions|分数乘法|भिन्नों का गुणा|ضرب الكسور
 measure:size|bigger and smaller|más grande y más pequeño|maior e menor|plus grand et plus petit|大小|बड़ा और छोटा|أكبر وأصغر
 measure:compare|longer and shorter|más largo y más corto|mais longo e mais curto|plus long et plus court|长短|लंबा और छोटा|أطول وأقصر
 measure:picture|picture graphs|gráficas de dibujos|gráficos de figuras|graphiques illustrés|象形图|चित्र ग्राफ|رسوم الصور
@@ -873,6 +876,7 @@ variables:either|missing numbers within 20|números que faltan hasta el 20|núme
 variables:factor|missing factors|factores que faltan|fatores que faltam|facteurs manquants|缺的因数|गायब गुणनखंड|عوامل ناقصة
 variables:times|missing numbers in multiplication|números que faltan en la multiplicación|números que faltam na multiplicação|nombres manquants dans une multiplication|乘法里的缺数|गुणा में गायब संख्या|أعداد ناقصة في الضرب
 variables:steps|two-step missing numbers|números que faltan en dos pasos|números que faltam em dois passos|nombres manquants en deux étapes|两步算式的缺数|दो चरणों में गायब संख्या|أعداد ناقصة في خطوتين
+variables:orderOps|order of operations|orden de las operaciones|ordem das operações|ordre des opérations|运算顺序|संक्रियाओं का क्रम|ترتيب العمليات
 graphs:sort|sorting and counting|clasificar y contar|classificar e contar|trier et compter|分类计数|छाँटना और गिनना|التصنيف والعدّ
 graphs:tally|tally charts|recuentos|listas de contagem|décomptes|正字统计|टैली चार्ट|جداول العدّ
 graphs:picture|picture graphs for data|gráficas de dibujos de datos|gráficos de figuras de dados|graphiques illustrés de données|数据象形图|आँकड़ों के चित्र ग्राफ|رسوم صور للبيانات

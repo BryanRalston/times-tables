@@ -12,7 +12,9 @@ export type PlaceBoard =
   | { game: "place"; mode: "blocks" | "expanded" | "round10" | "round100" | "build"; n: number }
   | { game: "place"; mode: "compare"; left: number; right: number; ask: "greater" | "less" }
   | { game: "place"; mode: "big"; n: number; digit: number; place: number }
-  | { game: "place"; mode: "roundBig"; n: number; place: number };
+  | { game: "place"; mode: "roundBig"; n: number; place: number }
+  /** Grade 5 decimals. `text` is the printed decimal, like "4.837". `place` is 1, 2, or 3 digits after the point. */
+  | { game: "place"; mode: "thousandths"; ask: "value" | "round" | "greatest"; text: string; place: number };
 
 export type ShapeName =
   | "circle"
@@ -71,6 +73,8 @@ export type FractionBoard =
     }
   | { game: "fractions"; mode: "equivalent"; num: number; den: number; num2: number; den2: number }
   | { game: "fractions"; mode: "addLike"; num: number; den: number; num2: number; op: "+" | "-" }
+  /** Grade 5: a fraction times a whole number (`whole` set) or times another fraction. */
+  | { game: "fractions"; mode: "fracTimes"; num: number; den: number; num2: number; den2: number; whole: number }
   | {
       game: "fractions";
       mode: "decimals";
@@ -119,7 +123,7 @@ export interface ProblemBoard {
 
 export type EstimateKind = "ten" | "hundred" | "sum" | "diff" | "check";
 
-export type VariableMode = "addend" | "either" | "factor" | "times" | "steps";
+export type VariableMode = "addend" | "either" | "factor" | "times" | "steps" | "orderOps";
 export type VariableBox = "left" | "right" | "result" | "extra";
 
 /** One unknown in an equation. `a`, `b`, and `c` are the true numbers. A null slot is the box. */
@@ -136,6 +140,11 @@ export interface VariableBoard {
   right: number | null;
   result: number | null;
   extra: number | null;
+  /** Grade 5 order of operations: the printed expression, and whether the card asks for its value or its match. */
+  expr?: string;
+  ask?: "value" | "match";
+  /** Worked steps a miss can show. */
+  steps?: string[];
 }
 
 export interface GraphCat {

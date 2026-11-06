@@ -15,6 +15,7 @@ const GRADE_RANK: Record<Grade, number> = {
   "2": 3,
   "3": 4,
   "4": 5,
+  "5": 5,
 };
 
 const SIGHT_BAND: Record<StoryGrade, readonly SightList[]> = {

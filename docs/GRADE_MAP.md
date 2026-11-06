@@ -1,12 +1,14 @@
 # Grade map
 
-Squishee Academy is for Pre-K through grade 4. The grade picker chooses the **starting level** and the **levels a game may serve**. Adaptive play can move **one level** outside that core band. It does not keep climbing. A grown-up can turn on **Challenge ahead** in Settings to open the higher levels.
+Squishee Academy is for Pre-K through grade 5. The grade picker chooses the **starting level** and the **levels a game may serve**. Adaptive play can move **one level** outside that core band. It does not keep climbing. A grown-up can turn on **Challenge ahead** in Settings to open the higher levels.
 
 Pre-K (ages 3–5) is spoken, with pictures, huge tap targets, and short rounds. Games that need reading or later math stay **coming later**: times, addition, clocks, fractions, place value, sight words, spelling, and word problems. Coin names are a gentle intro. Counting stops at 10.
 
 Grade 4 follows Common Core 4.OA, 4.NBT, 4.NF, 4.MD, 4.G, and RF/L. Where the next level is a grade 4 standard, grade 3 has a cap so one-level drift does not land there. Addition is the exception: grade 3 can drift into within 1000 (3.NBT.A.2). Four-digit work stays grade 4.
 
-Saved games from version 9 keep their grade. Version 10 only adds Pre-K and grade 4.
+Saved games from version 9 keep their grade. Version 10 only adds Pre-K and grade 4. Version 12 only adds grade 5 (a no-op migration from 11).
+
+**Grade 5 (pre-algebra path, slice 1).** Grade 5 follows Common Core 5.OA, 5.NBT, and 5.NF. This first slice adds three new levels, one in Place Value, one in Fractions, and one in What is missing. Every other game keeps its grade 4 band for grade 5 as review, until a grade 5 level exists for it. The three new levels are capped so grade 4 and lower never drift into them. Challenge ahead opens them. They are text-first, tap-and-think cards: grade 5 does not auto-speak, the device voice reads the instructions, and there is no drag-and-build card for these levels. There is no grade 5 boss yet. See `PREALGEBRA_ROADMAP.md` for what comes next.
 
 Standards below are Common Core. Sight words use the Dolch lists. Grade 2 adds Fry words that are not already on a Dolch list. Grade 3 does the same with the next Fry band.
 
@@ -170,9 +172,11 @@ Kindergarten can drift to before and after. Ten-frames wait until grade 2 unless
 
 ## Place Value
 
-Levels: tens and ones with base-ten blocks, expanded form, compare, round to 10, round to 100, build a number, place value to 1,000,000, round large numbers.
+Levels: tens and ones with base-ten blocks, expanded form, compare, round to 10, round to 100, build a number, place value to 1,000,000, round large numbers, decimals to thousandths.
 
 Grade 4 reads a digit's value through the hundred thousands and rounds to the nearest thousand, ten thousand, or hundred thousand (4.NBT.A.1–3). Numbers above 1000 are spoken as existing number clips plus "thousand" or "million". Pre-K place value is coming later.
+
+Grade 5 decimals to thousandths (5.NBT.A.3, 5.NBT.A.4) mixes three card types on a place value chart: the value of one digit after the point (answers 0.7, 0.07, or 0.007), rounding a three-place decimal to the nearest tenth or hundredth, and picking the greatest or least of four decimals. Whole parts are 0 to 9, and the digits in a value question are all different. No two choices are the same amount.
 
 Tens-and-ones blocks stay under 100. Expanded form and compare also use numbers through 999, which is the grade 2 standard. The tens-and-ones hands-on card stays under 100. Rounding to the nearest hundred drags hundred tiles for that rounded number.
 
@@ -184,8 +188,9 @@ Tens-and-ones blocks stay under 100. Expanded form and compare also use numbers 
 | 2 | Play | Expanded form | Expanded form, compare | 2.NBT.A.1, 2.NBT.A.3, 2.NBT.A.4 |
 | 3 | Play | Round to 10 | Round to 10, round to 100 | 3.NBT.A.1 |
 | 4 | Play | Place value to 1,000,000 | That level, then round large numbers | 4.NBT.A.1, 4.NBT.A.2, 4.NBT.A.3 |
+| 5 | Play | Decimals to thousandths | Decimals to thousandths (round large numbers is the one-level drift down) | 5.NBT.A.3, 5.NBT.A.4 |
 
-Grade 1 does not climb into expanded form. Grade 2 can drift back to the blocks and does not round. Rounding to 10 or 100 starts at grade 3. Build-a-number is the one-level drift above rounding.
+Grade 1 does not climb into expanded form. Grade 2 can drift back to the blocks and does not round. Rounding to 10 or 100 starts at grade 3. Build-a-number is the one-level drift above rounding. Grade 4 is capped at round large numbers, so decimals to thousandths stay grade 5 unless challenge ahead is on.
 
 ## Shapes
 
@@ -208,9 +213,9 @@ Kindergarten does not count sides unless challenge ahead is on. Grade 1 can drif
 
 ## Fractions
 
-Levels: parts of a whole, unit fractions, number line, compare, equivalent fractions, shade a fraction, add like fractions, decimals to hundredths.
+Levels: parts of a whole, unit fractions, number line, compare, equivalent fractions, shade a fraction, add like fractions, decimals to hundredths, multiply fractions.
 
-Kindergarten through grade 3 denominators are 2, 3, 4, 6, and 8. Grade 4 like-fractions also use 5, 10, and 12, and the sum stays at most 1. Decimals are spoken as tenths and hundredths. Pre-K fractions are coming later.
+Kindergarten through grade 3 denominators are 2, 3, 4, 6, and 8. Grade 4 like-fractions also use 5, 10, and 12, and the sum stays at most 1. Decimals are spoken as tenths and hundredths. Pre-K fractions are coming later. Grade 5 multiply fractions (5.NF.B.4) uses denominators 2 through 6. A fraction times a whole number always divides evenly (like 2/3 × 6 = 4, whole number at most 24). A fraction times a fraction has a product denominator of at most 24, an area model picture, and an answer in simplest form. Wrong choices are never the same amount as the answer.
 
 | Grade | Offer | Start | Core levels | Standards |
 |---|---|---|---|---|
@@ -220,8 +225,9 @@ Kindergarten through grade 3 denominators are 2, 3, 4, 6, and 8. Grade 4 like-fr
 | 2 | Play | Number line | Unit fractions, number line, compare | 2.G.A.3 |
 | 3 | Play | Equivalent fractions | Equivalent fractions, shade a fraction | 3.NF.A.1, 3.NF.A.2, 3.NF.A.3 |
 | 4 | Play | Add like fractions | Add like fractions, decimals | 4.NF.A.1, 4.NF.B.3, 4.NF.C.6, 4.NF.C.7 |
+| 5 | Play | Multiply fractions | Multiply fractions (decimals is the one-level drift down) | 5.NF.B.4 |
 
-Grade 1 does not climb. Grade 2 uses halves, thirds, and fourths, and the cap stops them before equivalent fractions. Sixths and eighths start at grade 3. That number-line level labels every tick. The blank line, where the child counts the parts, is the Line game.
+Grade 4 is capped at decimals, so multiplying fractions stays grade 5 unless challenge ahead is on. Grade 1 does not climb. Grade 2 uses halves, thirds, and fourths, and the cap stops them before equivalent fractions. Sixths and eighths start at grade 3. That number-line level labels every tick. The blank line, where the child counts the parts, is the Line game.
 
 ## Measurement and Data
 
@@ -293,9 +299,9 @@ Kindergarten and grade 1 do not see multiply or share stories. Pre-K through gra
 
 ## What is missing
 
-Levels: addend within 10, blank within 20, missing factor, times blank, two-step blank.
+Levels: addend within 10, blank within 20, missing factor, times blank, two-step blank, order of operations.
 
-Pre-K missing numbers are coming later. Kindergarten and grade 1 stay on a missing addend within 10, with a picture of the known part and empty holes for the box. Grade 2 opens any position in addition or subtraction within 20, and a missing factor from 1 to 5. Grade 3 finds an unknown in multiplication or division through 10×10, and is capped before two-step equations. Grade 4 fills one blank in a two-step equation.
+Pre-K missing numbers are coming later. Kindergarten and grade 1 stay on a missing addend within 10, with a picture of the known part and empty holes for the box. Grade 2 opens any position in addition or subtraction within 20, and a missing factor from 1 to 5. Grade 3 finds an unknown in multiplication or division through 10×10, and is capped before two-step equations. Grade 4 fills one blank in a two-step equation. Grade 5 order of operations (5.OA.A.1, 5.OA.A.2) uses whole numbers up to 100, parentheses only (no nested brackets, no exponents, no letters), and at most three operations. Half the cards evaluate an expression such as (8 + 2) × 3, and the answer you get by ignoring the parentheses is always one of the wrong choices. The others match words like "add 8 and 7, then multiply by 2" to the expression. Results are whole numbers, never negative. Expressions stay left to right in Arabic.
 
 | Grade | Offer | Start | Core levels | Cap without challenge | Standards |
 |---|---|---|---|---|---|
@@ -305,8 +311,9 @@ Pre-K missing numbers are coming later. Kindergarten and grade 1 stay on a missi
 | 2 | Play | Blank within 20 | Blank within 20, missing factor | Missing factor | 1.OA.D.8, 2.OA.C.4 |
 | 3 | Play | Times blank | Missing factor, times blank | Times blank | 3.OA.A.4 |
 | 4 | Play | Two-step blank | Two-step blank | One level down (times blank) | 4.OA.A.2, 4.OA.A.3 |
+| 5 | Play | Order of operations | Order of operations (two-step blank is the one-level drift down) | Last level | 5.OA.A.1, 5.OA.A.2 |
 
-Kindergarten and grade 1 do not see subtraction blanks, missing factors, or two-step equations.
+Kindergarten and grade 1 do not see subtraction blanks, missing factors, or two-step equations. Grade 4 is capped at the two-step blank, so order of operations stays grade 5 unless challenge ahead is on.
 
 ## Fair Shares
 
@@ -428,5 +435,7 @@ The card shows an analog clock. The spoken question is “What time is it?” Th
 Pre-K through grade 2 stay locked. Grade 3 can use every level of this game. Grade 4 can drift down to the half hour. Estimation of a sum or difference (3.OA.D.8) is still open: a spoken “about how many” would either repeat Place Value’s rounding line or Add’s “what is A plus B.”
 
 ## Still open
+
+Grade 5 also has more to add. Next up are unlike denominators (5.NF.A), decimal operations and two-digit division (5.NBT.B), the coordinate plane and two-rule patterns (5.OA.B, 5.G), unit conversion and volume (5.MD), and a grade 5 boss. Grade 5 search-engine landing copy waits for those.
 
 These Common Core skills still have no game: teen numbers as ten and ones (K.NBT.A.1), decomposing numbers within 10 (K.OA.A.3), the meaning of the equal sign (1.OA.D.7), three-addend word problems (1.OA.A.2), adding up to four two-digit numbers (2.NBT.B.6), the full subtraction algorithm within 1000 (2.NBT.B.7), measuring the same length in two units (2.MD.A.2), estimating length (2.MD.A.3), comparing lengths (2.MD.A.4), length word problems (2.MD.B.5), a number line of lengths (2.MD.B.6), line plots of measurements (2.MD.D.9), multiplying a one-digit number by a multiple of 10 (3.NBT.A.3), mass and liquid volume (3.MD.A.2), properties of multiplication (3.OA.B.5), and the early reading work of syllables (RF.K.2.B), onset and rime (RF.K.2.C), and phoneme substitution (RF.K.2.E). Rounding to 10 and 100 is already Place Value, and estimate stories put it in a story. Estimating sums and differences is the estimate stories level of Word Problems. Time to the minute is the Minutes game. Blank fraction lines are the Line game. Elapsed time stays a grade 4 level of Telling Time. Rhyming words are already Phonics, and only in the languages that teach English reading. Even and odd is still open as a question, though Fair Shares already deals equal pairs.

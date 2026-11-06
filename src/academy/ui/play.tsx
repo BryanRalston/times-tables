@@ -27,7 +27,7 @@ import { bossForGame } from "../bosses";
 import { playWindow } from "../grade-map";
 import { countGameStart, countRoundComplete } from "../seo/events";
 import { gameById, pillLabel } from "../games/registry";
-import { makeHandsTask } from "../hands-build";
+import { hasHandsCard, makeHandsTask } from "../hands-build";
 import { cardStepLabel, cardsRoundLabel, getLocale, remainderShown, show, t, yourTurnLine } from "../i18n";
 import { bossReady, bossWon } from "../journey";
 import {
@@ -95,7 +95,7 @@ function bossOpening(
   return questions.map((question, i) => {
     const twist = phaseForIndex(i, questions.length);
     const skillLevel = question.skill.split(":")[1] ?? level;
-    if (twist === "cards") return { slot: makeHandsTask(game, skillLevel, rngRandom(), undefined, prefer), returning: false };
+    if (twist === "cards" && hasHandsCard(game, skillLevel)) return { slot: makeHandsTask(game, skillLevel, rngRandom(), undefined, prefer), returning: false };
     return { slot: { kind: "choice", question }, returning: false };
   });
 }
@@ -328,8 +328,8 @@ export function PlayScreen({
   function buildSlot(i: number): Served {
     const queued = returnsRef.current.get(i);
     if (queued) return { slot: queued, returning: true };
-    const handsOn = handsRef.current.has(i);
     const lvl = levelNow();
+    const handsOn = handsRef.current.has(i) && hasHandsCard(game, lvl);
     if (handsOn) {
       const slot = makeHandsTask(game, lvl, rngRandom(), recentRef.current.at(-1), preferIds());
       remember(slot.factKey);

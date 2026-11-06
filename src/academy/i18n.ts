@@ -340,6 +340,8 @@ export function gradeText(grade: Grade): string {
         return "الصف 3";
       case "4":
         return "الصف 4";
+      case "5":
+        return "الصف 5";
       default: {
         const neverGrade: never = grade;
         return neverGrade;
@@ -360,6 +362,8 @@ export function gradeText(grade: Grade): string {
         return "कक्षा 3";
       case "4":
         return "कक्षा 4";
+      case "5":
+        return "कक्षा 5";
       default: {
         const neverGrade: never = grade;
         return neverGrade;
@@ -380,6 +384,8 @@ export function gradeText(grade: Grade): string {
         return "三年级";
       case "4":
         return "四年级";
+      case "5":
+        return "五年级";
       default: {
         const neverGrade: never = grade;
         return neverGrade;
@@ -400,6 +406,8 @@ export function gradeText(grade: Grade): string {
         return "CE2";
       case "4":
         return "CM1";
+      case "5":
+        return "CM2";
       default: {
         const neverGrade: never = grade;
         return neverGrade;

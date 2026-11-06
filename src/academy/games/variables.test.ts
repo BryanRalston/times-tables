@@ -32,10 +32,43 @@ function filledHolds(prompt: string, answer: string): void {
   if (op === "÷") expect(a / b).toBe(result);
 }
 
+/** Tiny evaluator for the printed grade 5 expressions: numbers, + − ×, and parentheses. */
+export function evalOrder(text: string): number {
+  const tokens = text.replace(/\u2066|\u2069/g, "").match(/\d+|[+−×()]/g) ?? [];
+  let at = 0;
+  const expr = (): number => {
+    let value = term();
+    while (tokens[at] === "+" || tokens[at] === "−") {
+      const op = tokens[at++];
+      const right = term();
+      value = op === "+" ? value + right : value - right;
+    }
+    return value;
+  };
+  const term = (): number => {
+    let value = atom();
+    while (tokens[at] === "×") {
+      at += 1;
+      value *= atom();
+    }
+    return value;
+  };
+  const atom = (): number => {
+    if (tokens[at] === "(") {
+      at += 1;
+      const value = expr();
+      at += 1;
+      return value;
+    }
+    return Number(tokens[at++]);
+  };
+  return expr();
+}
+
 describe("missing-number questions", () => {
   it("hides one number that makes the equation true", () => {
     for (let seed = 0; seed < 24; seed += 1) {
-      for (const level of VARIABLE_LEVELS) {
+      for (const level of VARIABLE_LEVELS.filter((id) => id !== "orderOps")) {
         const q = makeVariableQuestion(rngFromSeed(`variables-${seed}-${level}`), level);
         expectChoices(q);
         if (q.visual.kind !== "scene" || q.visual.board.game !== "variables") throw new Error(level);
@@ -67,6 +100,12 @@ describe("missing-number questions", () => {
     for (let seed = 0; seed < 8; seed += 1) {
       for (const level of variablesGame.levels) {
         const row = variablesGame.makeSheetItem(rngFromSeed(`variables-sheet-${seed}-${level.id}`), level.id);
+        if (level.id === "orderOps") {
+          const parsed = row.prompt.match(/^(.+) =$/);
+          expect(parsed).toBeTruthy();
+          expect(evalOrder(parsed?.[1] ?? "")).toBe(Number(row.answer));
+          continue;
+        }
         filledHolds(row.prompt, row.answer);
       }
     }

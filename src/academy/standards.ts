@@ -74,6 +74,7 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     build: "2.NBT.A.1",
     big: "4.NBT.A.1",
     roundBig: "4.NBT.A.3",
+    thousandths: "5.NBT.A.3",
   },
   shapes: {
     color: "K.G.A.2",
@@ -105,6 +106,7 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     shade: "3.NF.A.1",
     addLike: "4.NF.B.3",
     decimals: "4.NF.C.6",
+    fracTimes: "5.NF.B.4",
   },
   measure: {
     size: "K.MD.A.2",
@@ -139,6 +141,7 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     factor: "2.OA.C.4",
     times: "3.OA.A.4",
     steps: "4.OA.A.3",
+    orderOps: "5.OA.A.1",
   },
   graphs: {
     sort: "K.MD.B.3",
@@ -288,6 +291,11 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "4.MD.C.5": { en: "Understand angles", es: "Entender los ángulos" },
   "4.G.A.1": { en: "Lines and angles", es: "Líneas y ángulos" },
   "4.G.A.3": { en: "A line of symmetry", es: "Un eje de simetría" },
+  "5.NBT.A.3": { en: "Read, compare, and round decimals", es: "Leer, comparar y redondear decimales" },
+  "5.NBT.A.4": { en: "Round decimals to any place", es: "Redondear decimales a cualquier lugar" },
+  "5.NF.B.4": { en: "Multiply fractions", es: "Multiplicar fracciones" },
+  "5.OA.A.1": { en: "Parentheses in expressions", es: "Paréntesis en expresiones" },
+  "5.OA.A.2": { en: "Write and read expressions", es: "Escribir y leer expresiones" },
   "RF.K.1.D": { en: "Name the letters", es: "Nombrar las letras" },
   "RF.K.2.A": { en: "Hear rhymes", es: "Escuchar rimas" },
   "RF.K.2.D": { en: "Hear sounds in a word", es: "Escuchar los sonidos de una palabra" },

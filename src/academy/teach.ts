@@ -479,6 +479,14 @@ function placeTeach(board: PlaceBoard, solved: string): SceneFrame[] {
       return captions([t("Find the place, then multiply", "Encuentra el lugar y luego multiplica"), solved]);
     case "roundBig":
       return captions([t("Look at the digit to the right", "Mira el dígito de la derecha"), solved]);
+    case "thousandths":
+      if (board.ask === "greatest") {
+        return captions([t("Compare tenths first, then hundredths, then thousandths", "Compara primero los décimos, luego los centésimos y luego los milésimos", "Compare primeiro os décimos, depois os centésimos e depois os milésimos", "Compare d'abord les dixièmes, puis les centièmes, puis les millièmes", "先比十分位，再比百分位，最后比千分位", "पहले दशांश, फिर शतांश, फिर सहस्रांश की तुलना करो", "قارن الأعشار أولًا ثم الأجزاء من المئة ثم من الألف"), solved]);
+      }
+      if (board.ask === "round") {
+        return captions([t("Look at the digit to the right. 5 or more rounds up", "Mira el dígito de la derecha. 5 o más, sube", "Olhe o algarismo à direita. 5 ou mais arredonda para cima", "Regarde le chiffre à droite. 5 ou plus, on arrondit au-dessus", "看右边的数字。是5或更大就进一", "दाईं ओर का अंक देखो। 5 या अधिक हो तो ऊपर पूर्णांक करो", "انظر إلى الرقم على اليمين. إذا كان 5 أو أكثر فقرّب إلى الأعلى"), solved]);
+      }
+      return captions([t("Each place is 10 times smaller than the one on its left", "Cada lugar es 10 veces menor que el de su izquierda", "Cada posição é 10 vezes menor que a da esquerda", "Chaque rang est 10 fois plus petit que celui de gauche", "每一位都比左边一位小10倍", "हर स्थान अपने बाईं ओर वाले से 10 गुना छोटा है", "كل منزلة أصغر 10 مرات من التي على يسارها"), solved]);
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -550,6 +558,13 @@ function fractionTeach(board: FractionBoard, solved: string): SceneFrame[] {
       return captions([t("The denominator stays the same", "El denominador se queda igual"), solved]);
     case "decimals":
       return captions([t("Tenths, then hundredths", "Décimos, luego centésimos"), solved]);
+    case "fracTimes":
+      return captions([
+        board.whole > 0
+          ? t("Divide by the bottom number, then multiply by the top", "Divide entre el número de abajo y multiplica por el de arriba", "Divida pelo número de baixo e multiplique pelo de cima", "Divise par le dénominateur, puis multiplie par le numérateur", "先除以分母，再乘分子", "नीचे वाली संख्या से भाग दो, फिर ऊपर वाली से गुणा करो", "اقسم على المقام ثم اضرب في البسط")
+          : t("Multiply the tops, multiply the bottoms, then simplify", "Multiplica los de arriba, multiplica los de abajo y simplifica", "Multiplique os de cima, multiplique os de baixo e simplifique", "Multiplie les numérateurs, multiplie les dénominateurs, puis simplifie", "分子乘分子，分母乘分母，再约分", "ऊपर वाली संख्याएँ गुणा करो, नीचे वाली गुणा करो, फिर सरल करो", "اضرب البسطين واضرب المقامين ثم بسّط"),
+        solved,
+      ]);
     default: {
       const neverBoard: never = board;
       return neverBoard;

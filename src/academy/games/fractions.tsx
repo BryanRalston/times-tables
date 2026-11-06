@@ -5,10 +5,11 @@ import { fractionsCard } from "./cards";
 import { fractionText, type FractionBoard } from "./boards";
 import { sceneQuestion, uniqueChoices } from "./pick";
 import { makeAddLikeQuestion, makeDecimalQuestion, spanSheet } from "./span";
-import { DecimalGrid, FractionBar, FractionLine, SceneCard, sceneModule } from "./scene-ui";
+import { makeFracTimesQuestion, simplestFraction } from "./grade5";
+import { AreaModel, DecimalGrid, FractionBar, FractionLine, SceneCard, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
-export const FRACTION_LEVELS = ["parts", "unit", "line", "compare", "equivalent", "shade", "addLike", "decimals"] as const;
+export const FRACTION_LEVELS = ["parts", "unit", "line", "compare", "equivalent", "shade", "addLike", "decimals", "fracTimes"] as const;
 export type FractionLevel = (typeof FRACTION_LEVELS)[number];
 
 const PAIRS: Array<[number, number, number, number]> = [
@@ -315,6 +316,8 @@ export function makeFractionQuestion(rng: Rng, level: FractionLevel): ChoiceQ {
       return makeAddLikeQuestion(rng);
     case "decimals":
       return makeDecimalQuestion(rng);
+    case "fracTimes":
+      return makeFracTimesQuestion(rng);
     default: {
       const neverLevel: never = level;
       return neverLevel;
@@ -369,6 +372,17 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         prompt: t(`Which fraction matches ${pair[0]}/${pair[1]}?`, `¿Qué fracción es igual a ${pair[0]}/${pair[1]}?`, `Que fração é igual a ${pair[0]}/${pair[1]}?`, `Quelle fraction est égale à ${pair[0]}/${pair[1]} ?`, `哪个分数和${pair[0]}/${pair[1]}一样？`, `कौन सा भिन्न ${pair[0]}/${pair[1]} से मेल खाता है?`, `أي كسر يساوي ${pair[0]}/${pair[1]}؟`),
         answer: `${pair[2]}/${pair[3]}`,
       };
+    }
+    case "fracTimes": {
+      const den = rng.pick([2, 3, 4, 5, 6]);
+      const num = rng.int(1, den - 1);
+      if (rng.next() < 0.5) {
+        const k = rng.int(1, 4);
+        return { prompt: `${num}/${den} × ${den * k} =`, answer: String(num * k) };
+      }
+      const den2 = rng.pick([2, 3, 4].filter((d) => d * den <= 24));
+      const num2 = rng.int(1, den2 - 1);
+      return { prompt: `${num}/${den} × ${num2}/${den2} =`, answer: simplestFraction(num * num2, den * den2) };
     }
     case "addLike":
     case "decimals": {
@@ -435,6 +449,9 @@ function FractionArt({ board }: { board: FractionBoard }) {
       );
     case "decimals":
       return <DecimalGrid tenths={board.tenths} hundredths={board.hundredths} />;
+    case "fracTimes":
+      if (board.whole > 0) return <FractionBar num={board.num} den={board.den} />;
+      return <AreaModel num={board.num} den={board.den} num2={board.num2} den2={board.den2} />;
     default: {
       const neverBoard: never = board;
       return neverBoard;

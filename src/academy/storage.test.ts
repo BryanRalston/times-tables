@@ -179,7 +179,7 @@ describe("academy save", () => {
 
     const mem = new Map<string, string>();
     const disk = {
-      version: 12,
+      version: 13,
       activeId: "maya",
       sound: true,
       children: [{ id: "maya", name: "Maya", grade: "2", stars: 4 }],
@@ -201,11 +201,42 @@ describe("academy save", () => {
       children: loaded.children.map((child) => ({ ...child, stars: 99 })),
     });
     const kept = JSON.parse(mem.get(STORAGE_KEY) ?? "{}") as { version: number; children: { stars: number }[] };
-    expect(kept.version).toBe(12);
+    expect(kept.version).toBe(13);
     expect(kept.children[0]?.stars).toBe(4);
     mem.delete(STORAGE_KEY);
     loadSave();
     vi.unstubAllGlobals();
+  });
+
+  it("migrates a version 11 save to 12 and keeps the grade", () => {
+    expect(SAVE_VERSION).toBe(12);
+    const old = {
+      version: 11,
+      activeId: "kai",
+      sound: true,
+      lang: "es",
+      langChosen: true,
+      children: [{ id: "kai", name: "Kai", grade: "4", stars: 7 }],
+    };
+    const migrated = parseSave(old);
+    expect(migrated.version).toBe(12);
+    expect(migrated.lang).toBe("es");
+    expect(migrated.children[0]?.grade).toBe("4");
+    expect(migrated.children[0]?.stars).toBe(7);
+  });
+
+  it("round-trips a grade 5 child and starts grade 5 on the new levels", () => {
+    const child = blankChild({ name: "Noor", grade: "5" });
+    expect(child.grade).toBe("5");
+    expect(child.levels.place).toBe("thousandths");
+    expect(child.levels.fractions).toBe("fracTimes");
+    expect(child.levels.variables).toBe("orderOps");
+    const save = { ...freshSave(), activeId: child.id, children: [child] };
+    const again = parseSave(JSON.parse(JSON.stringify(save)));
+    expect(again.version).toBe(12);
+    expect(again.children[0]?.grade).toBe("5");
+    expect(again.children[0]?.levels.place).toBe("thousandths");
+    expect(withGrade(child, "4").grade).toBe("4");
   });
 
   it("keeps the offline worker on the academy path", () => {
