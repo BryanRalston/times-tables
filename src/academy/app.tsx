@@ -6,7 +6,7 @@ import { openEgg } from "./buddy/unlock";
 import { acknowledgeUnlocks, applyRound, applyStory, claimDailyGift } from "./rewards";
 import { getLocale, loadLocalePack, localePackReady, setLocale, show, type Locale } from "./i18n";
 import { noteLocale } from "./seo/events";
-import { activeChild, loadSave, mapActive, withLevel, writeSave } from "./storage";
+import { activeChild, loadSave, mapActive, tierFor, withLevel, withTier, writeSave } from "./storage";
 import { warmVoices } from "./voice";
 import { HelloScreen, SettingsScreen, SheetsScreen, ShelfScreen } from "./ui/extra";
 import { chooseLanguage, LanguageWelcome, langFromLanding, withLang } from "./ui/lang";
@@ -189,7 +189,7 @@ function AcademyApp() {
 
   useEffect(() => {
     const titles: Record<Route["name"], string> = {
-      home: "Free learning games for kids Pre-K to grade 4 | Squishee Academy",
+      home: "Free learning games for kids Pre-K to grade 5 | Squishee Academy",
       play: `${show("Play")} · Squishee Academy`,
       grownups: `${show("Grown-ups")} · Squishee Academy`,
       settings: `${show("Settings")} · Squishee Academy`,
@@ -232,7 +232,7 @@ function AcademyApp() {
     body = (
       <Screen>
         <PlayScreen
-          key={`${route.game}-${route.crown ? "crown" : "round"}`}
+          key={`${route.game}-${route.crown ? "crown" : "round"}-${tierFor(child, route.game)}`}
           child={child}
           game={route.game}
           crown={route.crown}
@@ -240,6 +240,7 @@ function AcademyApp() {
           onExit={goHome}
           onRound={onRound}
           onLevel={(level) => setSave((current) => mapActive(current, (row) => withLevel(row, route.game, level)))}
+          onTier={(tier) => setSave((current) => mapActive(current, (row) => withTier(row, route.game, tier)))}
           onAck={() => setSave((current) => mapActive(current, acknowledgeUnlocks))}
           onToggleSound={() => setSave((current) => ({ ...current, sound: !current.sound }))}
         />

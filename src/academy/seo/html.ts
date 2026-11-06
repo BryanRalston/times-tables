@@ -6,9 +6,9 @@ import { privacyCopy } from "./privacy-copy";
 
 export const CANONICAL_ORIGIN = "https://squisheeacademy.com";
 
-export const HOME_TITLE = "Free learning games for kids Pre-K to grade 4 | Squishee Academy";
+export const HOME_TITLE = "Free learning games for kids Pre-K to grade 5 | Squishee Academy";
 export const HOME_DESCRIPTION =
-  "Free learning games for kids Pre-K to grade 4. Play in 7 languages: English, Español, Português, Français, 中文, हिन्दी, العربية. No ads, no accounts.";
+  "Free learning games for kids Pre-K to grade 5. Play in 7 languages: English, Español, Português, Français, 中文, हिन्दी, العربية. No ads, no accounts.";
 
 /** One URL serves every language. These tell crawlers which languages that page is for. */
 export const HOME_HREFLANGS = ["x-default", "en", "es", "pt-BR", "fr", "zh-Hans", "hi", "ar"] as const;
