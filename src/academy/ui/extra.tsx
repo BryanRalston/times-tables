@@ -7,12 +7,13 @@ import { bookEntries, catchphrase } from "../buddy/cast";
 import { palOwned, withBuddy } from "../buddy/unlock";
 import { GAME_CARDS as GAMES, sheetHref } from "../games/catalog";
 import { gameOffered } from "../games/offer";
-import { playWindow } from "../grade-map";
+import { tierWindow } from "../grade-map";
+import { TierPicker } from "./tier-picker";
 import { show, t } from "../i18n";
 import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type Grade, type Save } from "../model";
 import { buyOutfit, wearOutfit } from "../rewards";
 import { lookShowsOn, outfitHint, outfitLabel, outfitPrice, shopSections } from "../wardrobe";
-import { activeChild, mapActive, withGrade, withLevel } from "../storage";
+import { activeChild, mapActive, tierFor, withGrade, withLevel, withTier } from "../storage";
 import { silence, speak } from "../voice";
 import { AcademyPal, BackLink, Foot, FreeNote, Logo, PlayMark, SquisheeImg, cx } from "./bits";
 import { SquishTally } from "./squishy";
@@ -142,11 +143,12 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
                 const next = { ...row, challengeAhead };
                 const levels = { ...next.levels };
                 for (const game of GAMES) {
-                  const allowed = playWindow(
+                  const allowed = tierWindow(
                     game.levels.map((level) => level.id),
                     game.id,
                     next.grade,
                     challengeAhead,
+                    tierFor(next, game.id),
                   );
                   if (!allowed.ids.includes(levels[game.id] ?? "")) levels[game.id] = allowed.start || game.defaultLevel(next.grade);
                 }
@@ -165,11 +167,13 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
         </button>
       </section>
       {GAMES.filter((game) => gameOffered(game.id)).map((game) => {
-        const allowed = playWindow(
+        const tier = tierFor(child, game.id);
+        const allowed = tierWindow(
           game.levels.map((row) => row.id),
           game.id,
           child.grade,
           child.challengeAhead,
+          tier,
         );
         return (
           <section key={game.id} className="ac-panel">
@@ -177,6 +181,8 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
             {allowed.ids.length === 0 ? (
               <p className="ac-hint">{show("Coming later for this grade.")}</p>
             ) : (
+              <>
+              <TierPicker tier={tier} onTier={(next) => onSave(mapActive(save, (kid) => withTier(kid, game.id, next)))} />
               <div className="ac-levels">
                 {game.levels
                   .filter((row) => allowed.ids.includes(row.id))
@@ -191,6 +197,7 @@ export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
                     </button>
                   ))}
               </div>
+              </>
             )}
           </section>
         );

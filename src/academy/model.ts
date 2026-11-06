@@ -1,3 +1,4 @@
+import type { Tier } from "./grade-map";
 export type Grade = "PK" | "K" | "1" | "2" | "3" | "4" | "5";
 
 /**
@@ -93,6 +94,8 @@ export interface Child {
   words: Record<string, WordCard>;
   /** A grown-up opened levels past this grade. Adaptive play stays in band until this is on. */
   challengeAhead: boolean;
+  /** Easy, Medium or Hard per game and grade, keyed `grade:game`. Missing means Medium. */
+  tiers: Record<string, Tier>;
 }
 
 export interface AnswerMark {

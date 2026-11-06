@@ -184,8 +184,12 @@ export function gameHasMarks(skills: Record<string, { ok: number; miss: number }
  * A clean run of four uses the harder half. The level itself still waits
  * for the mastery clock.
  */
-export function easeFromRound(opts: { combo: number; missed: boolean }): Ease {
-  if (opts.missed && opts.combo < 2) return "gentle";
+export function easeFromRound(opts: { combo: number; missed: boolean; tier?: "easy" | "medium" | "hard" }): Ease {
+  const struggling = opts.missed && opts.combo < 2;
+  // Hard leans on the harder half of each level; Easy on the easier half.
+  if (opts.tier === "hard") return struggling ? "steady" : "firm";
+  if (opts.tier === "easy") return opts.combo >= 4 ? "steady" : "gentle";
+  if (struggling) return "gentle";
   if (opts.combo >= 4) return "firm";
   return "steady";
 }

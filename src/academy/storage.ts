@@ -3,7 +3,7 @@ import { bossForGame } from "./bosses";
 import { hostIdFor } from "./buddy/hosts";
 import { ownedIds, palOwned } from "./buddy/unlock";
 import { defaultLevels, gameCard as gameById, GAME_CARDS as GAMES, isGameId } from "./games/catalog";
-import { levelAllowed } from "./grade-map";
+import { isTier, levelAllowed, tierKey, tierWindow, type Tier } from "./grade-map";
 import { foldSkillHistory } from "./history";
 import { blankJourney, normalizeJourney, parseJourney } from "./journey";
 import { parseEquippedLook, parseOwnedLooks } from "./wardrobe";
@@ -23,7 +23,7 @@ import {
 
 /** Stable key. The schema version lives on the save, not in the key name. */
 export const STORAGE_KEY = "squishee-academy-v1";
-export const SAVE_VERSION = 12;
+export const SAVE_VERSION = 13;
 
 /**
  * Migrations run from the save's version up to SAVE_VERSION.
@@ -41,6 +41,7 @@ const MIGRATIONS: Record<number, (raw: Record<string, unknown>) => Record<string
   9: migrateV9toV10,
   10: migrateV10toV11,
   11: migrateV11toV12,
+  12: migrateV12toV13,
 };
 
 /** A newer app wrote this disk. Don't replace it with an older schema. */
@@ -85,6 +86,7 @@ export function blankChild(opts: { id?: string; name?: string; grade?: Grade; av
     bonds: {},
     words: {},
     challengeAhead: false,
+    tiers: {},
     trophies: [],
     bossLooks: [],
     equippedLook: "",
@@ -235,6 +237,14 @@ function migrateV11toV12(raw: Record<string, unknown>): Record<string, unknown> 
   return { ...raw, version: 12 };
 }
 
+/** Difficulty per game and grade arrives. Older saves play Medium and keep their levels. */
+function migrateV12toV13(raw: Record<string, unknown>): Record<string, unknown> {
+  const children = Array.isArray(raw.children)
+    ? raw.children.map((row) => (row && typeof row === "object" ? { ...(row as Record<string, unknown>), tiers: {} } : row))
+    : raw.children;
+  return { ...raw, version: 13, children };
+}
+
 function migrateV10toV11(raw: Record<string, unknown>): Record<string, unknown> {
   const children = Array.isArray(raw.children)
     ? raw.children.map((row) => {
@@ -288,7 +298,7 @@ function clampInt(v: unknown, min: number, max: number, fallback = min): number 
   return Math.max(min, Math.min(max, Math.floor(n)));
 }
 
-function parseLevels(raw: unknown, grade: Grade, challengeAhead: boolean): Record<string, string> {
+function parseLevels(raw: unknown, grade: Grade, challengeAhead: boolean, tiers: Record<string, Tier> = {}): Record<string, string> {
   const out: Record<string, string> = { ...defaultLevels(grade) };
   if (!raw || typeof raw !== "object") return out;
   const o = raw as Record<string, unknown>;
@@ -296,7 +306,18 @@ function parseLevels(raw: unknown, grade: Grade, challengeAhead: boolean): Recor
     if (!game.isLevel(o[game.id])) continue;
     const level = String(o[game.id]);
     const ids = game.levels.map((row) => row.id);
-    if (levelAllowed(ids, game.id, grade, level, challengeAhead)) out[game.id] = level;
+    if (levelAllowed(ids, game.id, grade, level, challengeAhead, tiers[tierKey(grade, game.id)] ?? "medium")) out[game.id] = level;
+  }
+  return out;
+}
+
+const TIER_KEY = /^(PK|K|[1-5]):[a-z0-9-]+$/i;
+
+function parseTiers(raw: unknown): Record<string, Tier> {
+  const out: Record<string, Tier> = {};
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return out;
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (TIER_KEY.test(key) && isTier(value) && value !== "medium") out[key] = value;
   }
   return out;
 }
@@ -491,7 +512,7 @@ export function parseChild(raw: unknown): Child | null {
     secondsByDay: parseSeconds(o.secondsByDay),
     bestStars,
     rounds: clampInt(o.rounds, 0, 100000),
-    levels: parseLevels(o.levels, grade, challengeAhead),
+    levels: parseLevels(o.levels, grade, challengeAhead, parseTiers(o.tiers)),
     coins: clampInt(o.coins, 0, 1_000_000),
     cosmetics,
     equipped: parseEquippedLook(o.equipped, cosmetics),
@@ -506,6 +527,7 @@ export function parseChild(raw: unknown): Child | null {
     bonds: parseBonds(o.bonds),
     words: parseWords(o.words),
     challengeAhead,
+    tiers: parseTiers(o.tiers),
     trophies,
     bossLooks,
     equippedLook,
@@ -547,8 +569,26 @@ export function withLevel(child: Child, gameId: string, level: string): Child {
   const game = gameById(gameId);
   if (!game || !isGameId(game.id) || !game.isLevel(level)) return child;
   const ids = game.levels.map((row) => row.id);
-  if (!levelAllowed(ids, game.id, child.grade, level, child.challengeAhead)) return child;
+  if (!levelAllowed(ids, game.id, child.grade, level, child.challengeAhead, tierFor(child, game.id))) return child;
   return { ...child, levels: { ...child.levels, [game.id]: level } };
+}
+
+export function tierFor(child: Child, gameId: string): Tier {
+  return child.tiers?.[tierKey(child.grade, gameId)] ?? "medium";
+}
+
+/** Set Easy, Medium or Hard for this game at the child's grade. The level moves to that tier's start. */
+export function withTier(child: Child, gameId: string, tier: Tier): Child {
+  const game = gameById(gameId);
+  if (!game || !isGameId(game.id) || !isTier(tier)) return child;
+  const tiers = { ...(child.tiers ?? {}) };
+  const key = tierKey(child.grade, game.id);
+  if (tier === "medium") delete tiers[key];
+  else tiers[key] = tier;
+  const window = tierWindow(game.levels.map((row) => row.id), game.id, child.grade, child.challengeAhead, tier);
+  const levels = { ...child.levels };
+  if (window.start) levels[game.id] = window.start;
+  return { ...child, tiers, levels };
 }
 
 export function addChild(save: Save, name: string, grade: Grade): Save {

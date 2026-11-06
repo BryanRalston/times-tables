@@ -1130,6 +1130,58 @@ export function levelAllowed(
   grade: Grade,
   level: string,
   challengeAhead: boolean,
+  tier: Tier = "medium",
 ): boolean {
-  return playWindow(levelIds, gameId, grade, challengeAhead).ids.includes(level);
+  return tierWindow(levelIds, gameId, grade, challengeAhead, tier).ids.includes(level);
+}
+
+/** Grown-up or child choice per game and grade. Medium is the grade band as before. */
+export type Tier = "easy" | "medium" | "hard";
+export const TIERS: readonly Tier[] = ["easy", "medium", "hard"];
+
+export function isTier(value: unknown): value is Tier {
+  return value === "easy" || value === "medium" || value === "hard";
+}
+
+/**
+ * The grade window narrowed to one difficulty. Always a slice of playWindow,
+ * so grade guardrails still hold.
+ * Easy: bottom of the window up to the middle of the core band, starting low.
+ * Medium: the window unchanged.
+ * Hard: grade start and up, including the one-level stretch plus exactly one
+ * more level past the window (every higher level when Challenge ahead is on),
+ * starting at the top of the core band. Easy and Medium stay inside playWindow.
+ */
+export function tierWindow(
+  levelIds: readonly string[],
+  gameId: string,
+  grade: Grade,
+  challengeAhead: boolean,
+  tier: Tier,
+): LevelWindow {
+  const base = playWindow(levelIds, gameId, grade, challengeAhead);
+  if (tier === "medium" || base.ids.length === 0) return base;
+  const bandRow = bandFor(gameId, grade);
+  const clamp = (n: number) => Math.max(base.min, Math.min(base.max, n));
+  const startAt = clamp(indexOf(levelIds, base.start, base.min));
+  const core = (bandRow?.levels ?? []).map((id) => levelIds.indexOf(id)).filter((index) => index >= 0);
+  const lo = clamp(core.length > 0 ? Math.min(...core) : startAt);
+  const hi = clamp(core.length > 0 ? Math.max(...core) : startAt);
+  let min = base.min;
+  let max = base.max;
+  let start = startAt;
+  if (tier === "easy") {
+    max = Math.max(min, Math.min(startAt, Math.floor((lo + hi) / 2)));
+    start = Math.max(min, Math.min(max, startAt - 1));
+  } else {
+    min = startAt;
+    start = Math.max(startAt, hi);
+    // Hard opens exactly one level past the grade window.
+    max = Math.min(levelIds.length - 1, base.max + 1);
+  }
+  return { offer: base.offer, min, max, start: levelIds[start] ?? base.start, ids: levelIds.slice(min, max + 1) };
+}
+
+export function tierKey(grade: Grade, gameId: string): string {
+  return `${grade}:${gameId}`;
 }

@@ -24,7 +24,9 @@ import { buddyReaction } from "../buddy/react";
 import { slotStory } from "../buddy/story";
 import { bossEnergyAfterHit, bossIsTimed, bossMaxEnergy, phaseForIndex } from "../boss-battle";
 import { bossForGame } from "../bosses";
-import { playWindow } from "../grade-map";
+import { tierWindow, type Tier } from "../grade-map";
+import { tierFor } from "../storage";
+import { TierPicker } from "./tier-picker";
 import { countGameStart, countRoundComplete } from "../seo/events";
 import { gameById, pillLabel } from "../games/registry";
 import { hasHandsCard, makeHandsTask } from "../hands-build";
@@ -167,6 +169,7 @@ export function PlayScreen({
   onExit,
   onRound,
   onLevel,
+  onTier,
   onAck,
   onToggleSound,
 }: {
@@ -177,15 +180,18 @@ export function PlayScreen({
   onExit: () => void;
   onRound: (result: RoundResult) => void;
   onLevel: (level: string) => void;
+  onTier?: (tier: Tier) => void;
   onAck: () => void;
   onToggleSound: () => void;
 }) {
   const spec = gameById(game);
-  const gradeWindow = playWindow(
+  const tier = tierFor(child, game);
+  const gradeWindow = tierWindow(
     spec?.levels.map((row) => row.id) ?? [],
     game,
     child.grade,
     child.challengeAhead,
+    tier,
   );
   const blocked = gradeWindow.offer === "later" || gradeWindow.ids.length === 0;
   const level = gradeWindow.ids.includes(child.levels[game] ?? "") ? (child.levels[game] ?? gradeWindow.start) : gradeWindow.start;
@@ -203,7 +209,7 @@ export function PlayScreen({
     : openingForRound({
         savedIndex: baseIndex,
         startIndex: Math.max(0, spec?.levels.findIndex((row) => row.id === gradeWindow.start) ?? baseIndex),
-        roundsPlayed: roundsHere,
+        roundsPlayed: tier === "hard" ? Math.max(1, roundsHere) : roundsHere,
         boss: openingBoss,
         bounds,
       });
@@ -298,7 +304,7 @@ export function PlayScreen({
     const ideas = dueIdeas(skillsRef.current);
     const words = spec?.reviewKeys?.(child.words) ?? [];
     const facts = game === "times" ? weakTimesFacts(skillsRef.current) : [];
-    const ease = easeFromRound({ combo: comboRef.current, missed: missedRef.current });
+    const ease = easeFromRound({ combo: comboRef.current, missed: missedRef.current, tier });
     const tags = [...ideas, ...words, ...facts];
     if (ease !== "steady") tags.push(`ease:${ease}`);
     return tags;
@@ -377,7 +383,7 @@ export function PlayScreen({
       openingForRound({
         savedIndex: nextBase,
         startIndex: Math.max(0, nextSpec?.levels.findIndex((row) => row.id === gradeWindow.start) ?? nextBase),
-        roundsPlayed: nextRounds,
+        roundsPlayed: tier === "hard" ? Math.max(1, nextRounds) : nextRounds,
         boss: nextBoss,
         bounds: boundsRef.current,
       }),
@@ -989,6 +995,7 @@ export function PlayScreen({
               crown={crownFight}
             />
           ) : null}
+          {filled === 0 && !boss && onTier ? <TierPicker tier={tier} compact onTier={(next) => { if (next !== tier) onTier(next); }} /> : null}
           <div className="ac-play-meta">
             {filled === 0 && !boss ? (
               <button type="button" className="ac-pill" onClick={() => setMenu(true)}>
@@ -1169,6 +1176,7 @@ export function PlayScreen({
           <div className="ac-modal-card">
             <h2>{show("Pick a level")}</h2>
             <p className="ac-hint">{show("Starts a new round.")}</p>
+            {onTier ? <TierPicker tier={tier} onTier={(next) => { setMenu(false); if (next !== tier) onTier(next); }} /> : null}
             {(spec?.levels ?? []).filter((row) => gradeWindow.ids.includes(row.id)).map((row) => (
               <button
                 key={row.id}

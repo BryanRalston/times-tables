@@ -3532,3 +3532,15 @@ button.ac-go:disabled:active, button.ac-go:disabled { transform: none; }
   overflow: hidden;
   clip: rect(0 0 0 0);
 }
+
+/* Difficulty: Easy / Medium / Hard. In the page flow, never over game content. */
+.ac-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 8px 0 4px; padding: 4px; border-radius: 16px; background: #fff; box-shadow: 0 3px 0 var(--ac-line); }
+.ac-tiers.is-compact { margin: 4px 0 0; }
+.ac-tier { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 6px 8px; border: 0; border-radius: 12px; background: transparent; color: var(--ac-ink); font: inherit; font-weight: 800; font-size: var(--ac-text-sm); cursor: pointer; }
+.ac-tier.is-on { background: #a01050; color: #fff; }
+.ac-tier:focus-visible { outline: 3px solid var(--ac-teal); outline-offset: 2px; }
+.ac-tier-icon rect { fill: var(--ac-line); }
+.ac-tier-icon rect.is-lit { fill: var(--ac-action); }
+.ac-tier.is-on .ac-tier-icon rect { fill: rgba(255, 255, 255, 0.4); }
+.ac-tier.is-on .ac-tier-icon rect.is-lit { fill: #fff; }
+.ac-panel .ac-tiers { margin-bottom: 10px; }

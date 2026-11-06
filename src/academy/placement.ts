@@ -1,6 +1,6 @@
 import { skillHeat, skillKeyForLevel, openingIndex, type SkillHeat } from "./adapt";
 import { GAME_CARDS as GAMES } from "./games/catalog";
-import { playWindow } from "./grade-map";
+import { tierKey, tierWindow, type Tier } from "./grade-map";
 import { gradeText, t } from "./i18n";
 import type { Grade, SkillStat } from "./model";
 
@@ -47,8 +47,10 @@ function dueStats(stat: SkillStat | undefined): { acc: number; miss: number; n: 
  * One tap, no quiz. A new child starts a step easier than the grade default.
  * A skill they are still missing comes back. A mastered skill steps up.
  */
+let activeTiers: Record<string, Tier> = {};
+
 function windowFor(gameId: string, levelIds: readonly string[], grade: Grade, challengeAhead: boolean) {
-  return playWindow(levelIds, gameId, grade, challengeAhead);
+  return tierWindow(levelIds, gameId, grade, challengeAhead, activeTiers[tierKey(grade, gameId)] ?? "medium");
 }
 
 export function nextPlacement(child: {
@@ -57,8 +59,11 @@ export function nextPlacement(child: {
   skills: Record<string, SkillStat>;
   levels: Record<string, string>;
   challengeAhead?: boolean;
+  /** Easy, Medium or Hard per `grade:game`. Missing is Medium. */
+  tiers?: Record<string, Tier>;
 }): Placement {
   const challenge = child.challengeAhead === true;
+  activeTiers = child.tiers ?? {};
   const rows: SkillRow[] = [];
   for (const game of GAMES) {
     const allowed = windowFor(game.id, game.levels.map((level) => level.id), child.grade, challenge);
@@ -129,7 +134,8 @@ export function nextPlacement(child: {
     if (!startGame) return { game: "add", level: "within5", reason: "start" };
     const allowed = windowFor(startGame.id, startGame.levels.map((level) => level.id), child.grade, challenge);
     const base = Math.max(0, startGame.levels.findIndex((level) => level.id === (allowed.start || startGame.defaultLevel(child.grade))));
-    const index = openingIndex(base < 0 ? 0 : base, child.rounds, false, { min: Math.max(0, allowed.min), max: Math.max(0, allowed.max) });
+    const hard = (activeTiers[tierKey(child.grade, startGame.id)] ?? "medium") === "hard";
+    const index = openingIndex(base < 0 ? 0 : base, hard ? Math.max(1, child.rounds) : child.rounds, false, { min: Math.max(0, allowed.min), max: Math.max(0, allowed.max) });
     const level = startGame.levels[index] ?? startGame.levels[0];
     return { game: startGame.id, level: level?.id ?? allowed.start, reason: "start" };
   }

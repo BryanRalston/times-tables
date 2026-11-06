@@ -146,7 +146,7 @@ describe("profile migration", () => {
       ],
     });
 
-    expect(save.version).toBe(12);
+    expect(save.version).toBe(13);
     expect(save.lang).toBe("es");
     expect(save.sound).toBe(false);
     expect(save.children.map((child) => child.name)).toEqual(["Maya", "Leo"]);

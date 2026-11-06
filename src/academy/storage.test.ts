@@ -179,7 +179,7 @@ describe("academy save", () => {
 
     const mem = new Map<string, string>();
     const disk = {
-      version: 13,
+      version: 14,
       activeId: "maya",
       sound: true,
       children: [{ id: "maya", name: "Maya", grade: "2", stars: 4 }],
@@ -201,15 +201,15 @@ describe("academy save", () => {
       children: loaded.children.map((child) => ({ ...child, stars: 99 })),
     });
     const kept = JSON.parse(mem.get(STORAGE_KEY) ?? "{}") as { version: number; children: { stars: number }[] };
-    expect(kept.version).toBe(13);
+    expect(kept.version).toBe(14);
     expect(kept.children[0]?.stars).toBe(4);
     mem.delete(STORAGE_KEY);
     loadSave();
     vi.unstubAllGlobals();
   });
 
-  it("migrates a version 11 save to 12 and keeps the grade", () => {
-    expect(SAVE_VERSION).toBe(12);
+  it("migrates a version 11 save to the current version and keeps the grade", () => {
+    expect(SAVE_VERSION).toBe(13);
     const old = {
       version: 11,
       activeId: "kai",
@@ -219,7 +219,7 @@ describe("academy save", () => {
       children: [{ id: "kai", name: "Kai", grade: "4", stars: 7 }],
     };
     const migrated = parseSave(old);
-    expect(migrated.version).toBe(12);
+    expect(migrated.version).toBe(13);
     expect(migrated.lang).toBe("es");
     expect(migrated.children[0]?.grade).toBe("4");
     expect(migrated.children[0]?.stars).toBe(7);
@@ -233,7 +233,7 @@ describe("academy save", () => {
     expect(child.levels.variables).toBe("orderOps");
     const save = { ...freshSave(), activeId: child.id, children: [child] };
     const again = parseSave(JSON.parse(JSON.stringify(save)));
-    expect(again.version).toBe(12);
+    expect(again.version).toBe(13);
     expect(again.children[0]?.grade).toBe("5");
     expect(again.children[0]?.levels.place).toBe("thousandths");
     expect(withGrade(child, "4").grade).toBe("4");
