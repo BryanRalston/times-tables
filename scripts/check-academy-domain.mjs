@@ -1,3 +1,4 @@
+import { PROP_ART_FILES } from "./academy-prop-assets.mjs";
 import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -548,5 +549,12 @@ const sitemapBody = readFileSync(resolve(root, "sitemap.xml"), "utf8");
 if (robotsBody.includes(COUNTER_SRC) || sitemapBody.includes(COUNTER_SRC)) fail("robots or sitemap includes the counter");
 if (!sitemapBody.includes("<loc>https://squisheeacademy.com/privacy/</loc>")) fail("sitemap missing privacy");
 if (!sitemapBody.includes("<loc>https://squisheeacademy.com/ar/privacy/</loc>")) fail("sitemap missing arabic privacy");
+
+// Dynamic prop URLs must ship all 18 files, not just statically scanned references.
+for (const rel of PROP_ART_FILES) {
+  if (!existsSync(resolve(root, rel))) fail(`missing Imagine object ${rel}`);
+  const source = readFileSync(resolve("public", rel));
+  if (!source.equals(readFileSync(resolve(root, rel)))) fail(`Imagine object differs from source: ${rel}`);
+}
 
 console.log("check-academy-domain OK dist-domain");

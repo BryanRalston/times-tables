@@ -191,6 +191,23 @@ def two_faces(blobs: list[tuple[int, int, int]], w: int, h: int) -> bool:
 
 def main() -> int:
     fails: list[str] = []
+    # Keep the art manifest, actual files, alpha and payload budget in lockstep.
+    for folder, ids in (
+        ("story-props", "hat mat sun bug cup kite fish log snack moon house boat".split()),
+        ("problem-objects", "apple fish star cookie ball frog".split()),
+    ):
+        for object_id in ids:
+            path = PUBLIC / "art" / folder / f"{object_id}.png"
+            if not path.exists():
+                fails.append(f"missing Imagine object {path}")
+                continue
+            image = Image.open(path).convert("RGBA")
+            if image.size != (512, 512) or image.getpixel((0, 0))[3] != 0:
+                fails.append(f"{path.name}: expected 512px transparent PNG")
+            if path.stat().st_size > 120_000:
+                fails.append(f"{path.name}: exceeds 120KB budget")
+            if any(a > 16 and r > 120 and b > 55 and g < 100 and r-g > 65 and b-g > 35 and b > r*.32 for r, g, b, a in list(image.getdata())):
+                fails.append(f"{path.name}: magenta fringe remains")
     files = squishee_files()
     if len(files) < 10:
         fails.append(f"parsed only {len(files)} squishee files from {SRC}")

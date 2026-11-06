@@ -26,3 +26,11 @@ One continuous quiet map. Keep hop, numbers, locks, glow, and mist as overlays â
 Older `meadow.png` / `cove.png` / `forest.png` plates are leftovers, not the Lessons world model.
 
 Do not put letters on new art. Chroma the magentas; do not leave hot pink boxes in the layout.
+
+## Academy story / Word Problems objects (Imagine, November 2026)
+- `story-props/{hat,mat,sun,bug,cup,kite,fish,log,snack,moon,house,boat}.png`
+- `problem-objects/{apple,fish,star,cookie,ball,frog}.png`
+
+512px transparent, matte, faceless objects; no overlays on squishees. All 18 are explicitly copied by `scripts/academy-prop-assets.mjs` in both Academy builds.
+Story colors follow **both** catalog and shelf: red hat/kite/fish, yellow sun/cup/snack (golden apple), white full moon, green sailboat. Counting fish stays teal. The frog is rear-facing to avoid a character face.
+Imagine masters live outside the website; provenance in `docs/story-props-generation.json`. Key with `scripts/key-story-props.py` (Pillow, NumPy, imagequant); existing edge-flood chroma key, one-pixel choke, 512px Lanczos, high-quality dithered palette. No WebP copies: these small PNGs are the established art format.

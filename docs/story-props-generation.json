@@ -1,0 +1,35 @@
+{
+  "calls": 25,
+  "retries": [
+    "story/snack",
+    "problem/star",
+    "problem/cookie",
+    "story/cup",
+    "story/fish",
+    "story/moon",
+    "story/boat"
+  ],
+  "masters": {
+    "story/hat": "8cd2bbdef851df7328f6b8bfcb173eec6591723c8a008f96d4207c7a8ac3701c",
+    "story/mat": "d1d00aa84551f4e8001a6a59d2fd7341c20800fe5ee12b3618b96707bff4268d",
+    "story/sun": "028413a259e00a0c6a87cc2399d6c43c5aab712cb7f0aa17aa1196d88c44ae90",
+    "story/bug": "784585a7c638a80bed0a7dca00342b97dc3545f8942fcce65e31eaf629809670",
+    "story/cup": "b1b984e0dd464568cd7f4ff6b13d71e1d8348809ccff22de8a4e7af624f73ab6",
+    "story/kite": "0ced6b60fc15c46f2c37b7e8518d36ceb1f73fcda8bccfde4f58b1e9d34d4824",
+    "story/fish": "2de435e673a02ddda6871e9d4251ab4a3309df4b42bf77992f24465f1441a19c",
+    "story/log": "154e3e7316b01e69df0dde3ee0c97bd4a5293ad85205551eb7c11a999351e4cb",
+    "story/snack": "2bbdb224907c778df95f039d5761a1621667130d6d7737ff0dc99099281d2d4d",
+    "story/moon": "c820f2ef21203f066ef61b6800d5470068ea69232338ac535fb4423cc5a10413",
+    "story/house": "c2aca8cfbfc1e44684e34450080c45b4cf91f6df74d862d3dc790ff46ea0dc9b",
+    "story/boat": "08e17c6800b0dbb3a64cf7b54939a4a9ddf50c7b75b502ab7eb6987516b26225",
+    "problem/apple": "543469114ffda36fbf0d7a73a305d967f7a8926c2ed25509e86c184a39c4e55e",
+    "problem/fish": "097f6a1cf46d3cda480c2348b65e61dfd94ab7c2ba86fb5cffda15b80c491672",
+    "problem/star": "b54d573e6f2bd7a803757be7387ece6c0b12d5534e72b3b8c01ad489ea5a6754",
+    "problem/cookie": "16713edc21fa983ef65b98cebf045864a19769875dd4e23eea79c69353780b24",
+    "problem/ball": "5e64e12fa31843504b18ee2c5ec54c166ead6a779377833b8eb1de496ab25578",
+    "problem/frog": "5a77196ec2d687740cd66895ae832546bd8d80987a6d17a2cac1482eab6ad7be"
+  },
+  "postprocessing": {
+    "story/snack": "Golden-yellow apple hue, matching Koala story text. Leaf/stem preserved."
+  }
+}

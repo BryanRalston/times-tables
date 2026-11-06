@@ -2747,7 +2747,7 @@ body:has(.ac-boss-intro) { background: #3c2448; }
   margin-bottom: 10px;
   flex: none;
 }
-.ac-story-prop svg { width: 96px; height: 96px; display: block; }
+.ac-story-prop img { width: 96px; height: 96px; display: block; }
 .ac-story-pals {
   display: flex;
   align-items: flex-end;
@@ -2858,7 +2858,7 @@ body:has(.ac-boss-intro) { background: #3c2448; }
   object-fit: contain;
 }
 .ac-story-choice-prop { display: flex; align-items: center; justify-content: center; }
-.ac-story-choice-prop svg { width: 96px; height: 96px; }
+.ac-story-choice-prop img { width: 96px; height: 96px; }
 [data-story-phase="done"] { text-align: center; }
 [data-story-phase="done"] h1 { margin: 14px 0 8px; }
 [data-story-phase="done"] .ac-stars { justify-content: center; }
@@ -2870,7 +2870,7 @@ body:has(.ac-boss-intro) { background: #3c2448; }
   .ac-story-pals:has(.ac-story-pal + .ac-story-pal) .ac-story-pal { width: 210px; height: 210px; }
   .ac-story-stage:has(.ac-story-prop) .ac-story-pal { width: 220px; height: 220px; }
   .ac-story-stage:has(.ac-story-prop):has(.ac-story-pal + .ac-story-pal) .ac-story-pal { width: 180px; height: 180px; }
-  .ac-story-prop, .ac-story-prop svg { width: 128px; height: 128px; }
+  .ac-story-prop, .ac-story-prop img { width: 128px; height: 128px; }
   .ac-story-word { font-size: 34px; }
   .ac-story-choice { min-height: 210px; }
   .ac-story-choice-art { width: 140px; height: 140px; }
@@ -3544,3 +3544,11 @@ button.ac-go:disabled:active, button.ac-go:disabled { transform: none; }
 .ac-tier.is-on .ac-tier-icon rect { fill: rgba(255, 255, 255, 0.4); }
 .ac-tier.is-on .ac-tier-icon rect.is-lit { fill: #fff; }
 .ac-panel .ac-tiers { margin-bottom: 10px; }
+
+/* Imagine counting objects keep each token separate and groups readable on phones. */
+.ac-story-prop img, .ac-story-choice-prop img { object-fit: contain; }
+.ac-problem-object { width: 36px; height: 36px; object-fit: contain; flex: 0 0 36px; vertical-align: middle; }
+.ac-object-set { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0; max-width: 100%; }
+.ac-problem-picture { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 100%; }
+.ac-problem-picture .ac-object-set { padding: 3px; border: 1px solid #e7b4cb; border-radius: 10px; }
+.ac-group:has(.ac-problem-object) { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; max-width: 100%; }

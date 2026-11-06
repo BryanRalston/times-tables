@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { gamePill, starPlace, t, thingName } from "../i18n";
 import type { Grade } from "../model";
 import { SquisheeImg, cx } from "../ui/bits";
+import { ProblemObjects, ProblemPicture } from "../ui/problem-object";
 import { CountToken } from "../ui/count-token";
 import type { AngleKind, FlatKind, FoldFig, MeasureItem, PositionWord, QuadName, ShapeColor, ShapeName } from "./boards";
 import { labelFor } from "./pick";
@@ -393,17 +394,17 @@ export function StoryGroups({
   if (op === "+") {
     return (
       <div className="ac-emoji-row">
-        <span>{emoji.repeat(a)}</span>
+        <span className="ac-object-set"><ProblemObjects token={emoji} count={a} /></span>
         <span className="ac-op-mini">+</span>
-        <span>{emoji.repeat(b)}</span>
+        <span className="ac-object-set"><ProblemObjects token={emoji} count={b} /></span>
       </div>
     );
   }
   if (op === "-") {
     return (
       <div className="ac-emoji-row">
-        <span>{emoji.repeat(Math.max(0, a - b))}</span>
-        <span className="ac-gone">{emoji.repeat(b)}</span>
+        <span className="ac-object-set"><ProblemObjects token={emoji} count={Math.max(0, a - b)} /></span>
+        <span className="ac-object-set ac-gone"><ProblemObjects token={emoji} count={b} /></span>
       </div>
     );
   }
@@ -412,7 +413,7 @@ export function StoryGroups({
       <div className="ac-groups" aria-hidden="true">
         {Array.from({ length: a }, (_, i) => (
           <span key={i} className="ac-group">
-            {emoji.repeat(b)}
+            <ProblemObjects token={emoji} count={b} />
           </span>
         ))}
       </div>
@@ -423,7 +424,7 @@ export function StoryGroups({
     <div className="ac-groups" aria-label={`${b} equal groups`}>
       {Array.from({ length: b }, (_, i) => (
         <span key={i} className="ac-group">
-          {emoji.repeat(each)}
+          <ProblemObjects token={emoji} count={each} />
         </span>
       ))}
     </div>
@@ -926,7 +927,7 @@ function PictureChoices({ question, onChoose }: { question: ChoiceQ; onChoose: C
             aria-label={pictureAlt(labels[choice], choice, pictures[choice] ?? "")}
             onClick={() => onChoose(choice)}
           >
-            <PictureFace picture={pictures[choice] ?? ""} />
+            {visual?.board.game === "problems" ? <ProblemPicture picture={pictures[choice] ?? ""} /> : <PictureFace picture={pictures[choice] ?? ""} />}
             {caption ? <small>{caption}</small> : null}
           </button>
         );
