@@ -4,8 +4,50 @@ import { SHELF_STORIES } from "./shelf";
 export const STORY_PROPS = ["hat", "mat", "sun", "bug", "cup", "kite", "fish", "log", "snack", "moon", "house", "boat"] as const;
 export type StoryProp = (typeof STORY_PROPS)[number];
 
-export const STORY_BACKGROUNDS = ["meadow", "garden", "night", "shore", "dock", "room", "kitchen", "bedroom"] as const;
+/** Where each prop belongs in the scene. Default for unknown props is ground. */
+export const STORY_PROP_PLACEMENTS = {
+  hat: "ground",
+  mat: "ground",
+  sun: "sky",
+  bug: "ground",
+  cup: "ground",
+  kite: "sky",
+  fish: "water",
+  log: "ground",
+  snack: "ground",
+  moon: "sky",
+  house: "ground",
+  boat: "water",
+} as const satisfies Record<StoryProp, "ground" | "sky" | "water">;
+export type StoryPropPlacement = (typeof STORY_PROP_PLACEMENTS)[StoryProp];
+
+export function storyPropPlacement(id: StoryProp): StoryPropPlacement {
+  return STORY_PROP_PLACEMENTS[id];
+}
+
+export const STORY_BACKGROUNDS = [
+  "meadow",
+  "garden",
+  "night",
+  "shore-split",
+  "dock-split",
+  "room",
+  "kitchen",
+  "bedroom",
+] as const;
 export type StoryBackground = (typeof STORY_BACKGROUNDS)[number];
+
+/** Zones each background supports for prop placement checks. */
+export const STORY_BACKGROUND_ZONES = {
+  meadow: ["ground", "sky"],
+  garden: ["ground", "sky"],
+  night: ["ground", "sky"],
+  "shore-split": ["ground", "sky", "water"],
+  "dock-split": ["ground", "sky", "water"],
+  room: ["ground"],
+  kitchen: ["ground"],
+  bedroom: ["ground", "sky"],
+} as const satisfies Record<StoryBackground, readonly StoryPropPlacement[]>;
 
 export type StoryMood = "day" | "night" | "water";
 
@@ -222,9 +264,9 @@ export const STORIES: readonly Story[] = [
     grade: "1",
     cast: ["duck"],
     pages: [
-      { text: "Duck can see the fish.", pals: ["duck"], prop: "fish", mood: "water", background: "shore" },
-      { text: "The fish can swim.", pals: ["duck"], prop: "fish", mood: "water", background: "shore" },
-      { text: "Duck will swim with the fish.", pals: ["duck"], prop: "fish", mood: "water", background: "shore" },
+      { text: "Duck can see the fish.", pals: ["duck"], prop: "fish", mood: "water", background: "shore-split" },
+      { text: "The fish can swim.", pals: ["duck"], prop: "fish", mood: "water", background: "shore-split" },
+      { text: "Duck will swim with the fish.", pals: ["duck"], prop: "fish", mood: "water", background: "shore-split" },
       { text: "They play in the sun.", pals: ["duck"], prop: "sun", mood: "day", background: "meadow" },
       { text: "Then Duck sat on a log.", pals: ["duck"], prop: "log", mood: "day", background: "meadow" },
       { text: "She had a good snack.", pals: ["duck"], prop: "snack", mood: "day", background: "meadow" },
@@ -291,12 +333,12 @@ export const STORIES: readonly Story[] = [
     grade: "2",
     cast: ["bear"],
     pages: [
-      { text: "Bear can see a boat.", pals: ["bear"], prop: "boat", mood: "water", background: "dock" },
-      { text: "The boat is on the water.", pals: ["bear"], prop: "boat", mood: "water", background: "dock" },
-      { text: "Bear went to the boat.", pals: ["bear"], prop: "boat", mood: "water", background: "dock" },
-      { text: "The boat can go.", pals: ["bear"], prop: "boat", mood: "water", background: "dock" },
-      { text: "Bear had a good ride.", pals: ["bear"], prop: "boat", mood: "water", background: "dock" },
-      { text: "Then Bear came back.", pals: ["bear"], prop: "boat", mood: "water", background: "dock" },
+      { text: "Bear can see a boat.", pals: ["bear"], prop: "boat", mood: "water", background: "dock-split" },
+      { text: "The boat is on the water.", pals: ["bear"], prop: "boat", mood: "water", background: "dock-split" },
+      { text: "Bear went to the boat.", pals: ["bear"], prop: "boat", mood: "water", background: "dock-split" },
+      { text: "The boat can go.", pals: ["bear"], prop: "boat", mood: "water", background: "dock-split" },
+      { text: "Bear had a good ride.", pals: ["bear"], prop: "boat", mood: "water", background: "dock-split" },
+      { text: "Then Bear came back.", pals: ["bear"], prop: "boat", mood: "water", background: "dock-split" },
       { text: "Bear was glad.", pals: ["bear"], mood: "day", background: "meadow" },
     ],
     checks: [

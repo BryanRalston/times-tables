@@ -1,7 +1,7 @@
 {
   "generator": "Grok Imagine via GenerateImage",
-  "round": 2,
-  "note": "Rework after Bryan feedback t468u: lower half must be ground characters can stand on; water only behind/side.",
+  "round": 3,
+  "note": "Round 3: prop placements (ground|sky|water) + shore-split/dock-split so fish/boat sit in water and moon/sun/kite in sky.",
   "keptFromRound1": [
     "meadow",
     "garden",
@@ -18,7 +18,7 @@
     "pond",
     "lake"
   ],
-  "calls": 6,
+  "calls": 8,
   "attemptsNotes": "room regenerated once to remove outdoor bushes",
   "assets": [
     {
@@ -45,6 +45,16 @@
       "id": "bedroom",
       "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/b4d76b6f87c765c5b12fcbcd25288d46dcd5cd7bc35ded57c6968df28708f325.jpg",
       "bytes": 7422
+    },
+    {
+      "id": "shore-split",
+      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/4d4c4ed020f5168fac00e3c6d8cbf863149e41232fb1127d038e1f2ef2d606ec.jpg",
+      "bytes": 9004
+    },
+    {
+      "id": "dock-split",
+      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/a2555f93fd57f1a1571d17457729a1e534a358dfaf6dacae6eef7d8b07346148.jpg",
+      "bytes": 7842
     }
   ]
 }

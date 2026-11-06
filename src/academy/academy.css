@@ -2716,7 +2716,45 @@ body:has(.ac-boss-intro) { background: #3c2448; }
   margin-bottom: 10px;
   flex: none;
 }
+
 .ac-story-prop img { width: 96px; height: 96px; display: block; }
+/* Sky props float high, smaller, no ground shadow. */
+.ac-story-prop.is-sky {
+  position: absolute;
+  z-index: 3;
+  top: 6%;
+  right: 10%;
+  width: 64px;
+  height: 64px;
+  margin: 0;
+  filter: none;
+}
+.ac-story-prop.is-sky img { width: 64px; height: 64px; }
+/* Water props sit on the right water zone of split backgrounds. */
+.ac-story-prop.is-water {
+  position: absolute;
+  z-index: 3;
+  right: 4%;
+  bottom: 8%;
+  width: 92px;
+  height: 92px;
+  margin: 0;
+  filter: drop-shadow(0 4px 3px rgb(40 80 100 / 0.22));
+}
+/* Fish sit in the pond on the right, overlapping the water surface. */
+.ac-story-scene.is-bg-shore-split .ac-story-prop.is-water {
+  bottom: 14%;
+  right: 5%;
+}
+.ac-story-prop.is-water img { width: 92px; height: 92px; }
+.ac-story-stage.has-sky-prop,
+.ac-story-stage.has-water-prop {
+  justify-content: flex-start;
+  padding-left: 10px;
+  padding-right: 36%;
+}
+.ac-story-stage.has-sky-prop { padding-right: 8px; justify-content: center; }
+
 .ac-story-pals {
   display: flex;
   align-items: flex-end;
@@ -2840,6 +2878,8 @@ body:has(.ac-boss-intro) { background: #3c2448; }
   .ac-story-stage:has(.ac-story-prop) .ac-story-pal { width: 220px; height: 220px; }
   .ac-story-stage:has(.ac-story-prop):has(.ac-story-pal + .ac-story-pal) .ac-story-pal { width: 180px; height: 180px; }
   .ac-story-prop, .ac-story-prop img { width: 128px; height: 128px; }
+  .ac-story-prop.is-sky, .ac-story-prop.is-sky img { width: 80px; height: 80px; }
+  .ac-story-prop.is-water, .ac-story-prop.is-water img { width: 112px; height: 112px; }
   .ac-story-word { font-size: 34px; }
   .ac-story-choice { min-height: 210px; }
   .ac-story-choice-art { width: 140px; height: 140px; }

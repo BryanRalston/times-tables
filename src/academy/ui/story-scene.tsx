@@ -1,5 +1,6 @@
 import { asset } from "@/lib/art";
 import type { StoryBackground, StoryMood, StoryPicture, StoryProp } from "../stories/catalog";
+import { storyPropPlacement } from "../stories/catalog";
 import { SquisheeImg } from "./bits";
 
 export function PropArt({ id, label = id }: { id: StoryProp; label?: string }) {
@@ -34,21 +35,27 @@ export function StoryScene({
   pals: readonly string[];
   prop?: StoryProp;
 }) {
+  const placement = prop ? storyPropPlacement(prop) : null;
   return (
     <div className={`ac-story-scene is-${mood} is-bg-${background}`} aria-hidden="true">
       <img className="ac-story-background" src={asset(`art/story-backgrounds/${background}.webp`)} alt="" width={1200} height={900} />
-      <div className="ac-story-stage">
+      <div className={`ac-story-stage${placement && placement !== "ground" ? ` has-${placement}-prop` : ""}`}>
         <div className="ac-story-pals">
           {pals.map((id) => (
             <SquisheeImg key={id} id={id} className="ac-story-pal" squish="off" />
           ))}
         </div>
-        {prop ? (
-          <span className="ac-story-prop">
+        {prop && placement === "ground" ? (
+          <span className="ac-story-prop is-ground">
             <PropArt id={prop} />
           </span>
         ) : null}
       </div>
+      {prop && placement && placement !== "ground" ? (
+        <span className={`ac-story-prop is-${placement}`}>
+          <PropArt id={prop} />
+        </span>
+      ) : null}
     </div>
   );
 }
