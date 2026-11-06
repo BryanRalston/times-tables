@@ -1130,8 +1130,9 @@ export function levelAllowed(
   grade: Grade,
   level: string,
   challengeAhead: boolean,
+  tier: Tier = "medium",
 ): boolean {
-  return playWindow(levelIds, gameId, grade, challengeAhead).ids.includes(level);
+  return tierWindow(levelIds, gameId, grade, challengeAhead, tier).ids.includes(level);
 }
 
 /** Grown-up or child choice per game and grade. Medium is the grade band as before. */
@@ -1147,8 +1148,9 @@ export function isTier(value: unknown): value is Tier {
  * so grade guardrails still hold.
  * Easy: bottom of the window up to the middle of the core band, starting low.
  * Medium: the window unchanged.
- * Hard: grade start and up, including the one-level stretch (and every
- * higher level when Challenge ahead is on), starting at the top of the core band.
+ * Hard: grade start and up, including the one-level stretch plus exactly one
+ * more level past the window (every higher level when Challenge ahead is on),
+ * starting at the top of the core band. Easy and Medium stay inside playWindow.
  */
 export function tierWindow(
   levelIds: readonly string[],
@@ -1174,6 +1176,8 @@ export function tierWindow(
   } else {
     min = startAt;
     start = Math.max(startAt, hi);
+    // Hard opens exactly one level past the grade window.
+    max = Math.min(levelIds.length - 1, base.max + 1);
   }
   return { offer: base.offer, min, max, start: levelIds[start] ?? base.start, ids: levelIds.slice(min, max + 1) };
 }

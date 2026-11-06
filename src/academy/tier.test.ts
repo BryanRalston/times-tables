@@ -3,12 +3,12 @@ import { GAMES } from "./games/registry";
 import { playWindow, tierKey, tierWindow, TIERS } from "./grade-map";
 import type { Grade } from "./model";
 import { nextPlacement } from "./placement";
-import { freshSave, parseSave, SAVE_VERSION, tierFor, withGrade, withTier } from "./storage";
+import { freshSave, parseSave, SAVE_VERSION, tierFor, withGrade, withLevel, withTier } from "./storage";
 
 const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
 
 describe("difficulty tiers", () => {
-  it("every tier stays inside the grade window for every game and grade", () => {
+  it("Easy/Medium stay inside the grade window; Hard adds exactly one level past it", () => {
     for (const game of GAMES) {
       const ids = game.levels.map((row) => row.id);
       for (const grade of GRADES) {
@@ -18,11 +18,19 @@ describe("difficulty tiers", () => {
             const w = tierWindow(ids, game.id, grade, challenge, tier);
             const label = `${game.id} ${grade} ${tier} ${challenge}`;
             expect(w.offer, label).toBe(base.offer);
-            for (const id of w.ids) expect(base.ids, label).toContain(id);
-            if (base.ids.length === 0) continue;
+            if (base.ids.length === 0) {
+              expect(w.ids, label).toEqual([]);
+              continue;
+            }
             expect(w.ids.length, label).toBeGreaterThan(0);
             expect(w.min, label).toBeGreaterThanOrEqual(base.min);
-            expect(w.max, label).toBeLessThanOrEqual(base.max);
+            if (tier === "hard") {
+              expect(w.max, label).toBe(Math.min(ids.length - 1, base.max + 1));
+              for (const id of w.ids.slice(0, -1)) expect(base.ids, label).toContain(id);
+            } else {
+              for (const id of w.ids) expect(base.ids, label).toContain(id);
+              expect(w.max, label).toBeLessThanOrEqual(base.max);
+            }
             expect(w.ids, label).toContain(w.start);
           }
         }
@@ -48,7 +56,8 @@ describe("difficulty tiers", () => {
     const game = GAMES.find((row) => row.id === "add")!;
     const ids = game.levels.map((row) => row.id);
     const hard = tierWindow(ids, "add", "3", false, "hard");
-    expect(hard.max).toBe(playWindow(ids, "add", "3", false).max);
+    const base = playWindow(ids, "add", "3", false);
+    expect(hard.max).toBe(Math.min(ids.length - 1, base.max + 1));
     const ahead = tierWindow(ids, "add", "3", true, "hard");
     expect(ahead.max).toBeGreaterThanOrEqual(hard.max);
   });
@@ -79,6 +88,24 @@ describe("difficulty tiers", () => {
     expect(tierFor(four, "add")).toBe("medium");
     expect(tierFor(withGrade(four, "3"), "add")).toBe("hard");
     expect(parseSave({ ...save, children: [{ ...kid, tiers: { "3:add": "wild", "x": "hard" } }] }).children[0]!.tiers).toEqual({});
+  });
+
+  it("a saved Hard extra level survives reload and clamps when the tier goes back", () => {
+    const save = freshSave();
+    let kid = withTier(withGrade(save.children[0]!, "3"), "add", "hard");
+    const ids = GAMES.find((g) => g.id === "add")!.levels.map((r) => r.id);
+    const base = playWindow(ids, "add", "3", false);
+    const extra = ids[base.max + 1];
+    if (!extra) return;
+    kid = withLevel(kid, "add", extra);
+    expect(kid.levels.add).toBe(extra);
+    const reloaded = parseSave(JSON.parse(JSON.stringify({ ...save, children: [kid] }))).children[0]!;
+    expect(reloaded.levels.add).toBe(extra);
+    const medium = withTier(reloaded, "add", "medium");
+    expect(base.ids).toContain(medium.levels.add);
+    expect(withLevel(medium, "add", extra).levels.add).toBe(medium.levels.add);
+    const stale = parseSave(JSON.parse(JSON.stringify({ ...save, children: [{ ...kid, tiers: {} }] }))).children[0]!;
+    expect(base.ids).toContain(stale.levels.add);
   });
 
   it("one-tap Play stays in the chosen tier", () => {

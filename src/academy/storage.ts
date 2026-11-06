@@ -298,7 +298,7 @@ function clampInt(v: unknown, min: number, max: number, fallback = min): number 
   return Math.max(min, Math.min(max, Math.floor(n)));
 }
 
-function parseLevels(raw: unknown, grade: Grade, challengeAhead: boolean): Record<string, string> {
+function parseLevels(raw: unknown, grade: Grade, challengeAhead: boolean, tiers: Record<string, Tier> = {}): Record<string, string> {
   const out: Record<string, string> = { ...defaultLevels(grade) };
   if (!raw || typeof raw !== "object") return out;
   const o = raw as Record<string, unknown>;
@@ -306,7 +306,7 @@ function parseLevels(raw: unknown, grade: Grade, challengeAhead: boolean): Recor
     if (!game.isLevel(o[game.id])) continue;
     const level = String(o[game.id]);
     const ids = game.levels.map((row) => row.id);
-    if (levelAllowed(ids, game.id, grade, level, challengeAhead)) out[game.id] = level;
+    if (levelAllowed(ids, game.id, grade, level, challengeAhead, tiers[tierKey(grade, game.id)] ?? "medium")) out[game.id] = level;
   }
   return out;
 }
@@ -512,7 +512,7 @@ export function parseChild(raw: unknown): Child | null {
     secondsByDay: parseSeconds(o.secondsByDay),
     bestStars,
     rounds: clampInt(o.rounds, 0, 100000),
-    levels: parseLevels(o.levels, grade, challengeAhead),
+    levels: parseLevels(o.levels, grade, challengeAhead, parseTiers(o.tiers)),
     coins: clampInt(o.coins, 0, 1_000_000),
     cosmetics,
     equipped: parseEquippedLook(o.equipped, cosmetics),
@@ -569,7 +569,7 @@ export function withLevel(child: Child, gameId: string, level: string): Child {
   const game = gameById(gameId);
   if (!game || !isGameId(game.id) || !game.isLevel(level)) return child;
   const ids = game.levels.map((row) => row.id);
-  if (!levelAllowed(ids, game.id, child.grade, level, child.challengeAhead)) return child;
+  if (!levelAllowed(ids, game.id, child.grade, level, child.challengeAhead, tierFor(child, game.id))) return child;
   return { ...child, levels: { ...child.levels, [game.id]: level } };
 }
 
