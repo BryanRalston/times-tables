@@ -290,6 +290,11 @@ function AcademyApp() {
         child={child}
         subject={route.subject}
         onOpenEgg={() => setSave((current) => mapActive(current, (row) => openEgg(row, todayIso())))}
+        onPlayLevel={(gameId, level) => {
+          if (!isGameId(gameId)) return;
+          setSave((current) => mapActive(current, (row) => withLevel(row, gameId, level)));
+          window.location.hash = playHref(gameId, "map");
+        }}
       />
     );
   } else {

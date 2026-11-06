@@ -9,14 +9,17 @@ import {
   type DailyGiftState,
   type Grade,
   type Journey,
+  type JourneySpot,
 } from "./model";
+import { SUBJECT_KEYS, subjectIndexes, subjectKeyOf, type SubjectKey } from "./subject-games";
 
 export function blankJourney(): Journey {
   return { areaId: GAMES[0]?.id ?? "times", stop: 0, bosses: [] };
 }
 
-export function areaIndex(journey: Journey): number {
-  const index = GAMES.findIndex((game) => game.id === journey.areaId);
+export function areaIndex(journey: Journey, key?: SubjectKey): number {
+  const id = key ? subjectSpot(journey, key).areaId : journey.areaId;
+  const index = GAMES.findIndex((game) => game.id === id);
   return index < 0 ? 0 : index;
 }
 
@@ -32,21 +35,80 @@ function skipsGate(gameId: string, grade: Grade | undefined): boolean {
   return grade === "PK" && offer === "intro";
 }
 
-/** The first island is open. Each later island opens when the previous boss is beaten. */
+/**
+ * The first island of each subject is open. A later island opens when every
+ * earlier island in the SAME subject has its boss beaten (or skips the gate).
+ * Spelling never waits on Math bosses.
+ */
 export function areaOpen(journey: Journey, index: number, grade?: Grade): boolean {
-  if (index <= 0) return true;
+  const game = GAMES[index];
+  if (!game) return index <= 0;
+  const chain = subjectIndexes(subjectKeyOf(game.id));
+  const pos = chain.indexOf(index);
+  if (pos <= 0) return true;
   if (!grade) {
-    const prev = GAMES[index - 1];
-    if (!prev) return false;
-    return journey.bosses.includes(prev.id);
+    const prev = GAMES[chain[pos - 1]!];
+    return !!prev && journey.bosses.includes(prev.id);
   }
-  for (let i = 0; i < index; i++) {
-    const game = GAMES[i];
-    if (!game) return false;
-    if (skipsGate(game.id, grade)) continue;
-    if (!journey.bosses.includes(game.id)) return false;
+  for (let i = 0; i < pos; i++) {
+    const id = GAMES[chain[i]!]!.id;
+    if (skipsGate(id, grade)) continue;
+    if (!journey.bosses.includes(id)) return false;
   }
   return true;
+}
+
+/** The game whose boss must be beaten before this island opens (same subject), or "". */
+export function gateBefore(journey: Journey, index: number, grade?: Grade): string {
+  const game = GAMES[index];
+  if (!game) return "";
+  const chain = subjectIndexes(subjectKeyOf(game.id));
+  const pos = chain.indexOf(index);
+  for (let i = 0; i < pos; i++) {
+    const id = GAMES[chain[i]!]!.id;
+    if (grade && skipsGate(id, grade)) continue;
+    if (!journey.bosses.includes(id)) return id;
+  }
+  return "";
+}
+
+/** Fit a saved spot onto one subject's chain. */
+function fitSpot(bossesOnly: Journey, key: SubjectKey, saved: JourneySpot | undefined, grade?: Grade): JourneySpot {
+  let raw: JourneySpot = saved ?? { areaId: "", stop: 0 };
+  const chain = subjectIndexes(key);
+  if (chain.length === 0) return { areaId: GAMES[0]?.id ?? "times", stop: 0 };
+  let index = GAMES.findIndex((game) => game.id === raw.areaId);
+  if (index < 0 || !chain.includes(index)) {
+    // No saved spot here: stand on the furthest open island not yet beaten.
+    index = chain[0]!;
+    for (const i of chain) {
+      if (!areaOpen(bossesOnly, i, grade)) break;
+      index = i;
+      if (!bossesOnly.bosses.includes(GAMES[i]!.id)) break;
+    }
+    raw = { areaId: GAMES[index]!.id, stop: 0 };
+  }
+  if (!areaOpen(bossesOnly, index, grade)) {
+    index = chain[0]!;
+    for (const i of chain) {
+      if (areaOpen(bossesOnly, i, grade)) index = i;
+      else break;
+    }
+  }
+  let hopped = false;
+  if (grade) {
+    let pos = chain.indexOf(index);
+    while (pos < chain.length - 1 && skipsGate(GAMES[chain[pos]!]!.id, grade)) {
+      const next = chain[pos + 1]!;
+      if (!areaOpen(bossesOnly, next, grade)) break;
+      pos += 1;
+      index = next;
+      hopped = true;
+    }
+  }
+  const rawStop = hopped || GAMES[index]!.id !== raw.areaId ? 0 : raw.stop;
+  const stop = Math.max(0, Math.min(STOPS_PER_AREA - 1, Math.floor(rawStop) || 0));
+  return { areaId: GAMES[index]!.id, stop };
 }
 
 export function normalizeJourney(journey: Journey, grade?: Grade): Journey {
@@ -54,28 +116,22 @@ export function normalizeJourney(journey: Journey, grade?: Grade): Journey {
   for (const id of journey.bosses) {
     if (gameById(id) && !bosses.includes(id)) bosses.push(id);
   }
-  const draft: Journey = { areaId: journey.areaId, stop: journey.stop, bosses };
-  let index = GAMES.findIndex((game) => game.id === draft.areaId);
-  if (index < 0) index = 0;
-  if (!areaOpen(draft, index, grade)) {
-    index = 0;
-    for (let i = 0; i < GAMES.length; i++) {
-      if (areaOpen(draft, i, grade)) index = i;
-      else break;
-    }
+  const base: Journey = { areaId: journey.areaId, stop: journey.stop, bosses };
+  const legacyKey = gameById(journey.areaId) ? subjectKeyOf(journey.areaId) : null;
+  const trails: Record<SubjectKey, JourneySpot> = {} as Record<SubjectKey, JourneySpot>;
+  for (const key of SUBJECT_KEYS) {
+    // Older saves had one spot for every subject: it seeds its own subject only.
+    const saved = journey.trails?.[key] ?? (legacyKey === key ? { areaId: journey.areaId, stop: journey.stop } : undefined);
+    trails[key] = fitSpot(base, key, saved, grade);
   }
-  let hopped = false;
-  if (grade) {
-    while (index < GAMES.length - 1 && skipsGate(GAMES[index]!.id, grade)) {
-      const next = index + 1;
-      if (!areaOpen(draft, next, grade)) break;
-      index = next;
-      hopped = true;
-    }
-  }
-  const rawStop = hopped ? 0 : journey.stop;
-  const stop = Math.max(0, Math.min(STOPS_PER_AREA - 1, Math.floor(rawStop) || 0));
-  return { areaId: GAMES[index]!.id, stop, bosses };
+  const top = trails[legacyKey ?? subjectKeyOf(GAMES[0]?.id ?? "times")];
+  return { areaId: top.areaId, stop: top.stop, bosses, trails };
+}
+
+/** One subject's spot on its own island path. */
+export function subjectSpot(journey: Journey, key: SubjectKey, grade?: Grade): JourneySpot {
+  const here = journey.trails?.[key] ? journey : normalizeJourney(journey, grade);
+  return here.trails![key]!;
 }
 
 export function parseJourney(raw: unknown, grade?: Grade): Journey {
@@ -84,14 +140,23 @@ export function parseJourney(raw: unknown, grade?: Grade): Journey {
   const bosses = Array.isArray(o.bosses) ? o.bosses.filter((id): id is string => typeof id === "string") : [];
   const areaId = typeof o.areaId === "string" ? o.areaId : "";
   const stop = typeof o.stop === "number" ? o.stop : 0;
-  return normalizeJourney({ areaId, stop, bosses }, grade);
+  let trails: Journey["trails"];
+  if (o.trails && typeof o.trails === "object") {
+    trails = {};
+    for (const key of SUBJECT_KEYS) {
+      const row = (o.trails as Record<string, unknown>)[key] as Record<string, unknown> | undefined;
+      if (row && typeof row.areaId === "string" && typeof row.stop === "number") trails[key] = { areaId: row.areaId, stop: row.stop };
+    }
+  }
+  return normalizeJourney({ areaId, stop, bosses, trails }, grade);
 }
 
 export function bossReady(journey: Journey, gameId: string, grade?: Grade): boolean {
   const here = normalizeJourney(journey, grade);
-  if (here.areaId !== gameId) return false;
+  const spot = here.trails![subjectKeyOf(gameId)]!;
+  if (spot.areaId !== gameId) return false;
   if (here.bosses.includes(gameId)) return false;
-  return here.stop >= STOPS_PER_AREA - 1;
+  return spot.stop >= STOPS_PER_AREA - 1;
 }
 
 export function bossWon(correct: number, total: number): boolean {
@@ -113,21 +178,29 @@ export interface RoundStep {
  */
 export function advanceJourney(journey: Journey, step: RoundStep, grade?: Grade): Journey {
   const here = normalizeJourney(journey, grade);
-  if (step.game !== here.areaId) return here;
-  const atBoss = bossReady(here, step.game, grade);
-  if (atBoss) {
+  const key = subjectKeyOf(step.game);
+  const spot = here.trails![key]!;
+  if (step.game !== spot.areaId) return here;
+  const put = (next: JourneySpot, bosses = here.bosses): Journey => ({
+    areaId: next.areaId,
+    stop: next.stop,
+    bosses,
+    trails: { ...here.trails, [key]: next },
+  });
+  if (bossReady(here, step.game, grade)) {
     if (!step.boss || !bossWon(step.correct, step.total)) return here;
     const bosses = here.bosses.includes(step.game) ? here.bosses : [...here.bosses, step.game];
-    let nextIndex = areaIndex(here) + 1;
+    const chain = subjectIndexes(key);
+    let pos = chain.indexOf(GAMES.findIndex((game) => game.id === step.game)) + 1;
     if (grade) {
-      while (nextIndex < GAMES.length && skipsGate(GAMES[nextIndex]!.id, grade)) nextIndex += 1;
+      while (pos < chain.length && skipsGate(GAMES[chain[pos]!]!.id, grade)) pos += 1;
     }
-    const next = GAMES[nextIndex];
-    if (!next) return { areaId: here.areaId, stop: STOPS_PER_AREA - 1, bosses };
-    return { areaId: next.id, stop: 0, bosses };
+    const next = pos < chain.length ? GAMES[chain[pos]!] : undefined;
+    if (!next) return put({ areaId: spot.areaId, stop: STOPS_PER_AREA - 1 }, bosses);
+    return put({ areaId: next.id, stop: 0 }, bosses);
   }
-  if (here.stop >= STOPS_PER_AREA - 1) return here;
-  return { ...here, stop: here.stop + 1 };
+  if (spot.stop >= STOPS_PER_AREA - 1) return here;
+  return put({ areaId: spot.areaId, stop: spot.stop + 1 });
 }
 
 export function dailySnapshot(child: Pick<Child, "dailyDate" | "dailyRounds" | "dailyGift">, today: string) {

@@ -12,7 +12,7 @@ function fail(msg) {
 }
 
 const SHARE_IMAGE = "https://squisheeacademy.com/og/squishee-academy.png";
-const SHARE_ALT = "Squishee Academy. Free learning games for Pre-K to grade 4.";
+const SHARE_ALT = "Squishee Academy. Free learning games for Pre-K to grade 5.";
 
 function assertShareCard(label, html) {
   const title = html.match(/<title>([^<]*)<\/title>/)?.[1];

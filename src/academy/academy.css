@@ -3676,3 +3676,66 @@ button.ac-go.ac-next {
 .ac-next .ac-play-copy strong { font-size: 30px; }
 .ac-done-small { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .ac-done-small .ac-quiet { width: auto; flex: 1 1 0; min-width: 120px; min-height: 44px; font-size: 15px; }
+
+/* Stepping stones: a game's levels as one simple path. Matte, in flow, never over art. */
+.ac-lvstones {
+  list-style: none;
+  margin: 10px 0 4px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+.ac-lvstone { position: relative; display: flex; align-items: center; }
+.ac-lvstone + .ac-lvstone::before {
+  content: "";
+  width: 10px;
+  height: 4px;
+  margin-inline-end: 0;
+  margin-inline-start: -10px;
+  border-radius: 2px;
+  background: var(--ac-line);
+}
+.ac-path { margin: 10px 0 4px; }
+.ac-lvstone.is-boss button { background: #fff4c9; border-color: #f1c75b; color: #9a6a00; }
+.ac-lvstone.is-boss.is-done button { background: #baf3e8; border-color: var(--ac-teal); color: var(--ac-teal-deep); }
+.ac-lvstone.is-boss.is-locked button { color: #b89a5a; }
+.ac-lvstone-you { width: 44px; height: 44px; object-fit: contain; }
+.ac-lvstone.has-you button { background: #fff; }
+.ac-lvstone-cap { margin: 6px 0 0; font-size: 13px; color: var(--ac-muted); }
+.ac-lvstone button {
+  box-sizing: border-box;
+  padding: 0;
+  box-shadow: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid #f3c3d8;
+  background: #fff;
+  color: var(--ac-ink);
+  font: inherit;
+  font-weight: 800;
+  font-size: 17px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.ac-lvstone.is-done button { background: #baf3e8; border-color: var(--ac-teal); color: var(--ac-teal-deep); }
+.ac-lvstone.is-now button {
+  width: 56px;
+  height: 56px;
+  border-color: var(--ac-pink);
+  box-shadow: 0 0 0 5px rgba(240, 120, 170, 0.22);
+  animation: ac-lvstone-glow 2.4s ease-in-out infinite;
+}
+.ac-lvstone.is-locked button { background: #f4eef6; border-color: #e2d6e8; color: var(--ac-muted); cursor: default; }
+.ac-lvstone.is-locked svg { width: 16px; height: 16px; }
+.ac-lvstone button:focus-visible { outline: 3px solid var(--ac-teal); outline-offset: 2px; }
+@keyframes ac-lvstone-glow {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(240, 120, 170, 0.18); }
+  50% { box-shadow: 0 0 0 8px rgba(240, 120, 170, 0.28); }
+}
+@media (prefers-reduced-motion: reduce) { .ac-lvstone.is-now button { animation: none; } }
+.ac-modal .ac-lvstones { justify-content: center; margin: 14px 0; }

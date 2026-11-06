@@ -32,6 +32,7 @@ import { gameById, pillLabel } from "../games/registry";
 import { hasHandsCard, makeHandsTask } from "../hands-build";
 import { cardStepLabel, cardsRoundLabel, getLocale, remainderShown, show, t, yourTurnLine } from "../i18n";
 import { bossReady, bossWon } from "../journey";
+import { LevelStones } from "./level-stones";
 import { nextFor, subjectOf } from "../subjects";
 import { nextAction } from "./next-copy";
 import {
@@ -1209,26 +1210,18 @@ export function PlayScreen({
             <h2>{show("Pick a level")}</h2>
             <p className="ac-hint">{show("Starts a new round.")}</p>
             {onTier ? <TierPicker tier={tier} onTier={(next) => { setMenu(false); if (next !== tier) onTier(next); }} /> : null}
-            {(spec?.levels ?? []).filter((row) => gradeWindow.ids.includes(row.id)).map((row) => (
-              <button
-                key={row.id}
-                type="button"
-                className={cx("ac-level", row.id === level && "is-on")}
-                onClick={() => {
-                  setMenu(false);
-                  if (row.id === level) return;
-                  onLevel(row.id);
-                  restart(row.id);
-                }}
-              >
-                <strong>
-                  {show("Level")} {row.num}
-                </strong>
-                <small>{show(row.label)}</small>
-              </button>
-            ))}
+            <LevelStones
+              child={child}
+              gameId={game}
+              onPick={(next) => {
+                setMenu(false);
+                if (next === level) return;
+                onLevel(next);
+                restart(next);
+              }}
+            />
             <button type="button" className="ac-quiet" onClick={() => setMenu(false)}>
-              Keep playing
+              {show("Keep playing")}
             </button>
           </div>
         </div>

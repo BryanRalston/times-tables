@@ -5,7 +5,7 @@ import { bookEntries, catchphrase } from "../buddy/cast";
 import { ownedIds } from "../buddy/unlock";
 import { GAME_CARDS as GAMES } from "../games/catalog";
 import { bandFor } from "../grade-map";
-import { dailySnapshot, normalizeJourney } from "../journey";
+import { dailySnapshot, normalizeJourney, subjectSpot } from "../journey";
 import { show, t } from "../i18n";
 import { todayIso, type AppLang, type Child } from "../model";
 import { todayPlayLine } from "../placement";
@@ -335,7 +335,7 @@ export function SubjectGamesScreen({ child, subject }: { child: Child; subject: 
             key={id}
             gameId={id}
             child={child}
-            here={journey.areaId === id}
+            here={subjectSpot(journey, subject).areaId === id}
             onLater={(text) => {
               setToast(text);
               window.setTimeout(() => setToast(null), 1800);

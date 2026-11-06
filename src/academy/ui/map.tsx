@@ -8,21 +8,31 @@ import { bossForGame } from "../bosses";
 import { GAME_CARDS as GAMES, gameCard as gameById } from "../games/catalog";
 import { gameOffered } from "../games/offer";
 import { bandFor } from "../grade-map";
-import { areaIndex, areaOpen, bossReady, normalizeJourney } from "../journey";
+import { areaOpen, bossReady, gateBefore, normalizeJourney, subjectSpot } from "../journey";
+import { subjectKeyOf } from "../subject-games";
+import { LevelStones } from "./level-stones";
 import { show, t } from "../i18n";
-import { DAILY_GOAL, STOPS_PER_AREA, todayIso, type Child } from "../model";
+import { DAILY_GOAL, todayIso, type Child } from "../model";
 import { AcademyPal, BackLink, Foot, LockIcon, Logo, cx } from "./bits";
 import { PalWithLook } from "./boss-figure";
 import { EggIcon } from "./buddy-view";
 import { islandLabel } from "./home";
 import { playHref, subjectById, type SubjectId } from "../subjects";
 
-const STOP_NAME = ["Start", "Hop", "Skip", "Boss"];
-
-export function MapScreen({ child, subject = null, onOpenEgg }: { child: Child; subject?: SubjectId | null; onOpenEgg: () => void }) {
+export function MapScreen({
+  child,
+  subject = null,
+  onOpenEgg,
+  onPlayLevel,
+}: {
+  child: Child;
+  subject?: SubjectId | null;
+  onOpenEgg: () => void;
+  /** Tap a level stone: save that level, then play. */
+  onPlayLevel?: (gameId: string, level: string) => void;
+}) {
   const only = subject ? subjectById(subject).games : null;
   const journey = normalizeJourney(child.journey, child.grade);
-  const here = areaIndex(journey);
   const today = todayIso();
   const eggReady = child.dailyDate === today && child.egg === "closed";
   const eggOpen = child.dailyDate === today && child.egg === "open";
@@ -62,13 +72,15 @@ export function MapScreen({ child, subject = null, onOpenEgg }: { child: Child; 
           </p>
         )}
       </div>
-      <ol className="ac-islands" data-area={journey.areaId} data-stop={journey.stop}>
+      <ol className="ac-islands" data-area={subject ? subjectSpot(journey, subject).areaId : journey.areaId} data-stop={subject ? subjectSpot(journey, subject).stop : journey.stop}>
         {GAMES.map((game, index) => {
           if (!gameOffered(game.id)) return null;
           if (only && !only.includes(game.id)) return null;
           const open = areaOpen(journey, index, child.grade);
           const offer = bandFor(game.id, child.grade)?.offer ?? "play";
           const later = offer === "later" && !child.challengeAhead;
+          const spot = subjectSpot(journey, subjectKeyOf(game.id));
+          const here = GAMES.findIndex((row) => row.id === spot.areaId);
           const current = index === here;
           const beaten = journey.bosses.includes(game.id);
           const host = hostIdFor(game.id);
@@ -97,22 +109,18 @@ export function MapScreen({ child, subject = null, onOpenEgg }: { child: Child; 
                   </p>
                 </div>
               </div>
-              <div className="ac-stops" aria-hidden="true">
-                {Array.from({ length: STOPS_PER_AREA }, (_, stop) => {
-                  const state = stopState(index, stop, here, journey.stop, beaten);
-                  const boss = stop === STOPS_PER_AREA - 1;
-                  return (
-                    <span key={stop} className={cx("ac-stop", `is-${state}`, boss && "is-boss")} data-stop={stop} data-state={state}>
-                      {state === "now" ? (
-                        <AcademyPal id={child.avatarId} cosmetic={child.equipped} className="ac-map-you" />
-                      ) : (
-                        <small>{boss ? "★" : stop + 1}</small>
-                      )}
-                      <em>{show(STOP_NAME[stop] ?? "")}</em>
-                    </span>
-                  );
-                })}
-              </div>
+              {!later ? (
+                <LevelStones
+                  child={child}
+                  gameId={game.id}
+                  open={open}
+                  here={current}
+                  onPick={onPlayLevel ? (level) => onPlayLevel(game.id, level) : undefined}
+                  onBoss={() => {
+                    window.location.hash = playHref(game.id, "map");
+                  }}
+                />
+              ) : null}
               {later ? (
                 <p className="ac-hint">{show("Coming later for this grade.")}</p>
               ) : open ? (
@@ -130,7 +138,8 @@ export function MapScreen({ child, subject = null, onOpenEgg }: { child: Child; 
                 <p className="ac-hint">
                   <LockIcon />{" "}
                   {(() => {
-                    const prev = gameById(GAMES[index - 1]?.id)?.title;
+                    // Only ever names a game in this island's own subject.
+                    const prev = gameById(gateBefore(journey, index, child.grade))?.title;
                     return prev
                       ? t(`Beat the ${prev} boss.`, `Vence al jefe de ${show(prev)}.`, `Vença o chefe de ${show(prev)}.`, `Bats le chef de ${show(prev)}.`, `打败${show(prev)}的大魔王。`, `${show(prev)} बॉस को हराओ।`, `اهزم زعيم ${show(prev)}.`)
                       : t("Beat the last boss.", "Vence al jefe anterior.");
@@ -165,12 +174,4 @@ export function MapScreen({ child, subject = null, onOpenEgg }: { child: Child; 
       ) : null}
     </div>
   );
-}
-
-function stopState(index: number, stop: number, here: number, hereStop: number, beaten: boolean): "done" | "now" | "ahead" {
-  if (index < here || beaten) return stop === hereStop && index === here ? "now" : "done";
-  if (index > here) return "ahead";
-  if (stop < hereStop) return "done";
-  if (stop === hereStop) return "now";
-  return "ahead";
 }

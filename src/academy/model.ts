@@ -31,10 +31,19 @@ export interface WordCard {
 }
 
 /** Where the child is standing on the island. `bosses` are beaten area ids. */
+/** Where the kid stands on one subject's island path. */
+export interface JourneySpot {
+  areaId: string;
+  stop: number;
+}
+
 export interface Journey {
+  /** The spot last moved (any subject). Kept for older saves and Home. */
   areaId: string;
   stop: number;
   bosses: string[];
+  /** One spot per subject: Math, Reading and Spelling each unlock on their own. */
+  trails?: Partial<Record<"math" | "reading" | "spelling", JourneySpot>>;
 }
 
 export type DailyGiftState = "none" | "closed" | "open";

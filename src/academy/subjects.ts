@@ -2,9 +2,10 @@ import { GAME_CARDS as GAMES, gameCard } from "./games/catalog";
 import { gameOffered } from "./games/offer";
 import { tierKey, tierWindow, type Tier } from "./grade-map";
 import { t } from "./i18n";
-import { bossReady, normalizeJourney } from "./journey";
+import { bossReady, normalizeJourney, subjectSpot } from "./journey";
 import type { Child } from "./model";
 import { nextPlacement, type PlacementReason } from "./placement";
+import { READING_GAMES, SPELLING_GAMES } from "./subject-games";
 
 /**
  * Subjects group the games into a few kid-clear paths. Each subject has its own
@@ -22,8 +23,8 @@ export interface Subject {
   stories: boolean;
 }
 
-const READING = ["phonics", "sight"];
-const SPELLING = ["spelling"];
+const READING = [...READING_GAMES];
+const SPELLING = [...SPELLING_GAMES];
 /** Everything else is Math (numbers, time, money, shapes, data), in island order. */
 const MATH = GAMES.map((row) => row.id as string).filter((id) => !READING.includes(id) && !SPELLING.includes(id));
 
@@ -119,12 +120,12 @@ export function nextFor(child: Learner, id: SubjectId): NextStep {
   const trail = subjectTrail(child, id);
   if (trail.length === 0) return { subject: id, game: "", level: "", reason: "stories", href: "#/stories" };
   const place = nextPlacement(child, trail);
-  const journey = normalizeJourney(child.journey, child.grade);
-  if (place.reason !== "weak" && trail.includes(journey.areaId) && bossReady(journey, journey.areaId, child.grade)) {
-    const ids = allowedIds(child, journey.areaId);
-    const saved = child.levels[journey.areaId] ?? "";
+  const spot = subjectSpot(normalizeJourney(child.journey, child.grade), id);
+  if (place.reason !== "weak" && trail.includes(spot.areaId) && bossReady(child.journey, spot.areaId, child.grade)) {
+    const ids = allowedIds(child, spot.areaId);
+    const saved = child.levels[spot.areaId] ?? "";
     const level = ids.includes(saved) ? saved : (ids[0] ?? place.level);
-    return { subject: id, game: journey.areaId, level, reason: "boss", href: `#/play/${journey.areaId}` };
+    return { subject: id, game: spot.areaId, level, reason: "boss", href: `#/play/${spot.areaId}` };
   }
   const game = trail.includes(place.game) ? place.game : trail[0]!;
   const level = game === place.game ? place.level : (allowedIds(child, game)[0] ?? "");
