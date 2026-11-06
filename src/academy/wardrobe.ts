@@ -1,5 +1,7 @@
 import { COSMETIC_IDS, cosmeticPrice, isCosmeticId, type CosmeticId, type CosmeticSlot } from "@/lib/cosmetics";
 import { show, t } from "./i18n";
+import { SQUAD_IDS } from "./model";
+import { artPrefix } from "./paths";
 
 /**
  * Academy-only looks. Squishee Math keeps the four fitted composites in
@@ -48,12 +50,15 @@ const HIDDEN_ON: Readonly<Record<string, readonly string[]>> = {
 };
 
 export function lookShowsOn(face: string, id: string): boolean {
-  return !(HIDDEN_ON[face] ?? []).includes(id);
+  if ((HIDDEN_ON[face] ?? []).includes(id)) return false;
+  // Fitted wardrobe webps only exist for the starter squad. Other buddies keep classic cosmetics.
+  if (isWardrobeId(id) && !(SQUAD_IDS as readonly string[]).includes(face)) return false;
+  return true;
 }
 
 /** Per-squishee costume. A shared sticker would sit in the wrong place on a different body. */
 export function wardrobeSrc(face: string, id: string): string {
-  return `/times-tables/wardrobe/fitted/${face}-${id}.webp`;
+  return `${artPrefix()}/wardrobe/fitted/${face}-${id}.webp`;
 }
 
 /** Classics first, then the academy set, so a gift day stays stable as kids own more. */

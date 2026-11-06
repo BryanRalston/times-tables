@@ -4,7 +4,8 @@ import { fileURLToPath } from "node:url";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { COSMETICS } from "@/lib/cosmetics";
+import { COSMETIC_IDS, COSMETICS, canDressFace } from "@/lib/cosmetics";
+import { SQUISHEE_IDS } from "@/lib/squishees";
 import { GAMES } from "./games/registry";
 import { SQUAD_IDS } from "./model";
 import { setLocale } from "./i18n";
@@ -15,11 +16,14 @@ import { AcademyPal } from "./ui/bits";
 import {
   WARDROBE,
   giftOutfitIds,
+  lookShowsOn,
   looksCrossingStars,
   outfitHint,
   outfitLabel,
   shopItems,
+  wardrobeSrc,
 } from "./wardrobe";
+import { artPrefix, cosmeticCompositeUrl, squisheeUrl } from "./paths";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -108,5 +112,54 @@ describe("academy wardrobe", () => {
     expect(learningLooks(8, 9, 0, 0)).toContain("bow-tie");
     expect(learningLooks(11, 12, 5, 6)).toEqual(expect.arrayContaining(["flower-crown", "round-glasses"]));
     expect(learningLooks(2, 3, 0, 1)).toEqual(["bow", "scarf"]);
+  });
+});
+
+describe("squishee image paths", () => {
+  it("keeps every dressable composite and squad wardrobe file on disk with exact case", () => {
+    const root = join(HERE, "../..");
+    for (const face of SQUISHEE_IDS) {
+      const portrait = join(root, "public/squishees", `${face}.png`);
+      expect(existsSync(portrait), portrait).toBe(true);
+      for (const cosmetic of COSMETIC_IDS) {
+        expect(canDressFace(face, cosmetic)).toBe(true);
+        const file = join(root, "public/cosmetics", `${face}-${cosmetic}.png`);
+        expect(existsSync(file), file).toBe(true);
+      }
+    }
+    for (const face of SQUAD_IDS) {
+      for (const item of WARDROBE) {
+        const file = join(HERE, "../../public/wardrobe/fitted", `${face}-${item.id}.webp`);
+        expect(existsSync(file), file).toBe(true);
+        if (face === "capybara" && (item.id === "round-glasses" || item.id === "star-glasses")) {
+          expect(lookShowsOn(face, item.id)).toBe(false);
+        } else if (face === "penguin" && item.id === "bow-tie") {
+          expect(lookShowsOn(face, item.id)).toBe(false);
+        } else {
+          expect(lookShowsOn(face, item.id)).toBe(true);
+        }
+      }
+    }
+  });
+
+  it("hides academy wardrobe looks on friends outside the starter squad", () => {
+    expect(lookShowsOn("axolotl", "flower-crown")).toBe(false);
+    expect(lookShowsOn("nebula-fox", "star-cap")).toBe(false);
+    expect(lookShowsOn("peach", "flower-crown")).toBe(true);
+    expect(lookShowsOn("axolotl", "bow")).toBe(true);
+    const rare = renderToStaticMarkup(createElement(AcademyPal, { id: "axolotl", cosmetic: "flower-crown" }));
+    expect(rare).toContain("squishees/axolotl.png");
+    expect(rare).not.toContain("wardrobe/fitted/axolotl-flower-crown");
+    const classic = renderToStaticMarkup(createElement(AcademyPal, { id: "axolotl", cosmetic: "bow" }));
+    expect(classic).toContain("cosmetics/axolotl-bow.png");
+  });
+
+  it("builds portrait and outfit URLs from the shared art prefix", () => {
+    const prefix = artPrefix();
+    expect(squisheeUrl("peach.png")).toBe(`${prefix}/squishees/peach.png`);
+    expect(cosmeticCompositeUrl("peach", "bow")).toBe(`${prefix}/cosmetics/peach-bow.png`);
+    expect(wardrobeSrc("peach", "flower-crown")).toBe(`${prefix}/wardrobe/fitted/peach-flower-crown.webp`);
+    expect(squisheeUrl("peach.png")).toContain("squishees/peach.png");
+    expect(squisheeUrl("peach.png")).not.toMatch(/\/times-tables\/times-tables\//);
   });
 });
