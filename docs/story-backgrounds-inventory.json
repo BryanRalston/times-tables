@@ -71,32 +71,32 @@
       {
         "text": "Bunny can see a red hat.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "The hat is little.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "Where is the hat?",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "It is on the mat.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "Bunny ran to the hat.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "We like the red hat.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       }
     ]
   },
@@ -187,17 +187,17 @@
       {
         "text": "Duck can see the fish.",
         "mood": "water",
-        "background": "pond"
+        "background": "shore"
       },
       {
         "text": "The fish can swim.",
         "mood": "water",
-        "background": "pond"
+        "background": "shore"
       },
       {
         "text": "Duck will swim with the fish.",
         "mood": "water",
-        "background": "pond"
+        "background": "shore"
       },
       {
         "text": "They play in the sun.",
@@ -254,7 +254,7 @@
       {
         "text": "Then they went to sleep.",
         "mood": "night",
-        "background": "night"
+        "background": "bedroom"
       }
     ]
   },
@@ -266,32 +266,32 @@
       {
         "text": "Bear can see a boat.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "The boat is on the water.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "Bear went to the boat.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "The boat can go.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "Bear had a good ride.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "Then Bear came back.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "Bear was glad.",
@@ -372,32 +372,32 @@
       {
         "text": "Penguin can see a cup.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "The cup is yellow.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "Where is the cup?",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "It is on the mat.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "Penguin ran to the cup.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "We like the yellow cup.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       }
     ]
   },
@@ -409,27 +409,27 @@
       {
         "text": "Otter can see a fish.",
         "mood": "water",
-        "background": "pond"
+        "background": "shore"
       },
       {
         "text": "The fish is little.",
         "mood": "water",
-        "background": "pond"
+        "background": "shore"
       },
       {
         "text": "Look at the fish.",
         "mood": "water",
-        "background": "pond"
+        "background": "shore"
       },
       {
         "text": "The fish is red.",
         "mood": "water",
-        "background": "pond"
+        "background": "shore"
       },
       {
         "text": "Otter and the fish play.",
         "mood": "water",
-        "background": "pond"
+        "background": "shore"
       },
       {
         "text": "I like the fish.",
@@ -446,22 +446,22 @@
       {
         "text": "Koala has a snack.",
         "mood": "day",
-        "background": "garden"
+        "background": "kitchen"
       },
       {
         "text": "The snack is yellow.",
         "mood": "day",
-        "background": "garden"
+        "background": "kitchen"
       },
       {
         "text": "Koala will eat it.",
         "mood": "day",
-        "background": "garden"
+        "background": "kitchen"
       },
       {
         "text": "Then Koala had a cup.",
         "mood": "day",
-        "background": "garden"
+        "background": "kitchen"
       },
       {
         "text": "She sat in the sun.",
@@ -483,37 +483,37 @@
       {
         "text": "Hedgehog has a red hat.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "The hat is little.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "Where is the hat?",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "It is on the mat.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "Hedgehog ran to get it.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "He will put it on.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "Hedgehog is glad.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       }
     ]
   },
@@ -555,7 +555,7 @@
       {
         "text": "Then they went to sleep.",
         "mood": "night",
-        "background": "night"
+        "background": "bedroom"
       }
     ]
   },
@@ -567,32 +567,32 @@
       {
         "text": "Fox can see a green boat.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "The boat is on the water.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "Fox went to the boat.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "The boat can go fast.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "Fox had a good ride.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "Then Fox came back.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "Fox was very glad.",
@@ -609,27 +609,27 @@
       {
         "text": "Bear and Duck start on the boat.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "The water is warm today.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "They can see a small fish.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "The fish can jump.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "Bear said, Keep together.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "Then they come back to the house.",
@@ -666,7 +666,7 @@
       {
         "text": "They read the story together.",
         "mood": "night",
-        "background": "night"
+        "background": "bedroom"
       },
       {
         "text": "Owl said, The moon is pretty.",
@@ -681,7 +681,7 @@
       {
         "text": "Then they sleep.",
         "mood": "night",
-        "background": "night"
+        "background": "bedroom"
       }
     ]
   },
@@ -693,37 +693,37 @@
       {
         "text": "Fox and Peach play at the house.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "They read a story together.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "The story is about a little bug.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "Fox said, Be kind.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "They draw the bug.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "Today they laugh.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       },
       {
         "text": "The day is done.",
         "mood": "day",
-        "background": "garden"
+        "background": "room"
       }
     ]
   },
@@ -765,7 +765,7 @@
       {
         "text": "Then they sleep.",
         "mood": "night",
-        "background": "night"
+        "background": "bedroom"
       }
     ]
   },
@@ -777,32 +777,32 @@
       {
         "text": "Duck can observe the water.",
         "mood": "water",
-        "background": "pond"
+        "background": "shore"
       },
       {
         "text": "The water is a habitat.",
         "mood": "water",
-        "background": "pond"
+        "background": "shore"
       },
       {
         "text": "Duck can see a small fish.",
         "mood": "water",
-        "background": "pond"
+        "background": "shore"
       },
       {
         "text": "The fish can jump.",
         "mood": "water",
-        "background": "pond"
+        "background": "shore"
       },
       {
         "text": "Duck will explain the habitat.",
         "mood": "water",
-        "background": "pond"
+        "background": "shore"
       },
       {
         "text": "I predict the fish will swim.",
         "mood": "water",
-        "background": "pond"
+        "background": "shore"
       },
       {
         "text": "Duck was glad.",
@@ -819,32 +819,32 @@
       {
         "text": "Bear can see a boat.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "Bear will measure the boat.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "Duck can compare the boat and the fish.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "The boat is long.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "Bear will explain the water habitat.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "I predict the boat will go.",
         "mood": "water",
-        "background": "lake"
+        "background": "dock"
       },
       {
         "text": "Bear was glad.",

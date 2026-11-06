@@ -23,8 +23,8 @@ describe("Imagine story backgrounds", () => {
         expect(artPaths()).toContain(rel);
         expect(existsSync(resolve("public", rel)), rel).toBe(true);
         used.add(page.background);
-        if (page.mood === "night") expect(page.background).toBe("night");
-        if (page.mood === "water") expect(["pond", "lake"]).toContain(page.background);
+        if (page.mood === "night") expect(["night", "bedroom"]).toContain(page.background);
+        if (page.mood === "water") expect(["shore", "dock"]).toContain(page.background);
       }
     }
     expect([...used].sort()).toEqual([...STORY_BACKGROUNDS].sort());

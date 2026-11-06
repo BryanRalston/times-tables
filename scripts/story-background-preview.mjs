@@ -21,7 +21,7 @@ try {
     localStorage.setItem("squishee-academy-v1", JSON.stringify({ version: 13, activeId: "c-shot", sound: false, lang: "en", langChosen: true, children: [{ id: "c-shot", name: "Ada", grade: "2", avatarId: "peach" }] }));
   });
   await page.goto(base, { waitUntil: "networkidle" });
-  for (const [id, suffix] of [["k-bunny-hat", "hat"], ["g1-duck-fish", "fish"], ["g2-bear-boat", "boat"], ["g2-owl-night", "night"]]) {
+  for (const [id, suffix] of [["k-bunny-hat", "hat"], ["g1-duck-fish", "fish"], ["g2-bear-boat", "boat"], ["g2-owl-night", "night"], ["k-penguin-cup", "cup"]]) {
     await page.goto(base + "#/stories/" + id, { waitUntil: "networkidle" });
     await page.locator("[data-story-phase='page']").waitFor();
     await page.locator(".ac-story-prop img").waitFor();

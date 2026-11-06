@@ -35,7 +35,7 @@ export function StoryScene({
   prop?: StoryProp;
 }) {
   return (
-    <div className={`ac-story-scene is-${mood}`} aria-hidden="true">
+    <div className={`ac-story-scene is-${mood} is-bg-${background}`} aria-hidden="true">
       <img className="ac-story-background" src={asset(`art/story-backgrounds/${background}.webp`)} alt="" width={1200} height={900} />
       <div className="ac-story-stage">
         <div className="ac-story-pals">

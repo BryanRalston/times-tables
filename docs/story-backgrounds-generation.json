@@ -1,32 +1,50 @@
 {
   "generator": "Grok Imagine via GenerateImage",
-  "calls": 5,
-  "attemptsPerBackground": 1,
+  "round": 2,
+  "note": "Rework after Bryan feedback t468u: lower half must be ground characters can stand on; water only behind/side.",
+  "keptFromRound1": [
+    "meadow",
+    "garden",
+    "night"
+  ],
+  "newOrReplaced": [
+    "shore",
+    "dock",
+    "room",
+    "kitchen",
+    "bedroom"
+  ],
+  "removed": [
+    "pond",
+    "lake"
+  ],
+  "calls": 6,
+  "attemptsNotes": "room regenerated once to remove outdoor bushes",
   "assets": [
     {
-      "id": "meadow",
-      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/cd5913f7de0a6246274f9113d9993399557382999971905ee859d3b649441a91.jpg",
-      "bytes": 10516
+      "id": "shore",
+      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/068a9573f6d7a442ba55c57d0ee056ed4091ff160e547e2564d3215cf68e59d5.jpg",
+      "bytes": 7994
     },
     {
-      "id": "garden",
-      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/32a7cf4a91caf6f400c0b1935bd755a182061a7cc9d60569c692a59a408a2045.jpg",
-      "bytes": 10390
+      "id": "dock",
+      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/213cf7c9139de18b02335f750fa18c5ae7b529f501fdaa0a4d057d782469b108.jpg",
+      "bytes": 9258
     },
     {
-      "id": "night",
-      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/4e3f3f2127122c8c57507376b95db7a0eaf7cf22522c87cd1c4c577e477f5d5a.jpg",
-      "bytes": 7668
+      "id": "room",
+      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/1d94f1882f6407d4137d114b801e9178e3c60e6655c1649a0787b72d518a1884.jpg",
+      "bytes": 7376
     },
     {
-      "id": "pond",
-      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/264deb3c58d0ade0e395b8a99e4794c37ca06ed290ba5ca155c8e017acd984f6.jpg",
-      "bytes": 11318
+      "id": "kitchen",
+      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/cbbc3d50443858b0ff3a9c7c144aaf21fcad0612373c38f4fca8bed1cf999f7a.jpg",
+      "bytes": 7138
     },
     {
-      "id": "lake",
-      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/ae1dd85182aedc4d43a635545cd4b11fdbc7694f8d3bc820474abb0e217102f3.jpg",
-      "bytes": 10224
+      "id": "bedroom",
+      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/b4d76b6f87c765c5b12fcbcd25288d46dcd5cd7bc35ded57c6968df28708f325.jpg",
+      "bytes": 7422
     }
   ]
 }
