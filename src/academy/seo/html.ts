@@ -17,7 +17,7 @@ export const HOME_HREFLANGS = ["x-default", "en", "es", "pt-BR", "fr", "zh-Hans"
 export const SHARE_IMAGE_PATH = "/og/squishee-academy.png";
 export const SHARE_IMAGE_WIDTH = 1200;
 export const SHARE_IMAGE_HEIGHT = 630;
-export const SHARE_IMAGE_ALT = "Squishee Academy. Free learning games for Pre-K to grade 4.";
+export const SHARE_IMAGE_ALT = "Squishee Academy. Free learning games for Pre-K to grade 5.";
 
 export function shareImageUrl(): string {
   return `${CANONICAL_ORIGIN}${SHARE_IMAGE_PATH}`;

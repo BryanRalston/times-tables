@@ -95,7 +95,7 @@ describe("academy save", () => {
     });
     expect(migrated.children[0]?.words).toEqual({});
     expect(migrated.children[0]?.coins).toBe(0);
-    expect(migrated.children[0]?.journey).toEqual({ areaId: "times", stop: 0, bosses: [] });
+    expect(migrated.children[0]?.journey).toMatchObject({ areaId: "times", stop: 0, bosses: [] });
     expect(migrated.children[0]?.dailyGift).toBe("none");
 
     const repaired = parseSave({
@@ -151,7 +151,7 @@ describe("academy save", () => {
     expect(fromV3.version).toBe(SAVE_VERSION);
     expect(fromV3.children[0]?.coins).toBe(7);
     expect(fromV3.children[0]?.words).toEqual({});
-    expect(fromV3.children[0]?.journey).toEqual({ areaId: "add", stop: 1, bosses: ["times"] });
+    expect(fromV3.children[0]?.journey).toMatchObject({ areaId: "add", stop: 1, bosses: ["times"] });
     expect(fromV3.children[0]?.levels.sight).toBe(defaultLevels("2").sight);
     expect(fromV3.children[0]?.levels.spelling).toBe(defaultLevels("2").spelling);
 

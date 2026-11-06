@@ -3,6 +3,7 @@ import { rngFromSeed } from "@/lib/rng";
 import { GAMES } from "./games/registry";
 import { makeBossRound } from "./games/round";
 import { advanceJourney, areaOpen, blankJourney, bossReady, normalizeJourney } from "./journey";
+import { subjectKeyOf } from "./subject-games";
 import { BOSS_LENGTH, STOPS_PER_AREA } from "./model";
 import { blankChild } from "./storage";
 import { applyRound } from "./rewards";
@@ -52,8 +53,11 @@ describe("island map", () => {
     expect(again.areaId).toBe(last);
 
     const clamped = normalizeJourney({ areaId: last, stop: 9, bosses: [] });
-    expect(clamped.areaId).toBe(GAMES[0]!.id);
-    expect(clamped.stop).toBe(STOPS_PER_AREA - 1);
+    // Locked spots fall back to the first island of the same subject.
+    const chain = GAMES.filter((game) => subjectKeyOf(game.id) === subjectKeyOf(last));
+    expect(clamped.areaId).toBe(chain[0]!.id);
+    // Moving off a locked spot starts the open island fresh.
+    expect(clamped.stop).toBe(chain[0]!.id === last ? STOPS_PER_AREA - 1 : 0);
   });
 
   it("moves the saved journey when a round in the current area ends", () => {
