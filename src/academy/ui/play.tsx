@@ -32,6 +32,8 @@ import { gameById, pillLabel } from "../games/registry";
 import { hasHandsCard, makeHandsTask } from "../hands-build";
 import { cardStepLabel, cardsRoundLabel, getLocale, remainderShown, show, t, yourTurnLine } from "../i18n";
 import { bossReady, bossWon } from "../journey";
+import { nextFor, subjectOf } from "../subjects";
+import { nextAction } from "./next-copy";
 import {
   autoSpeakGrade,
   BOSS_LENGTH,
@@ -167,6 +169,7 @@ export function PlayScreen({
   crown = false,
   sound,
   onExit,
+  onNext,
   onRound,
   onLevel,
   onTier,
@@ -178,6 +181,8 @@ export function PlayScreen({
   crown?: boolean;
   sound: boolean;
   onExit: () => void;
+  /** Open the subject's next game. Missing falls back to Home. */
+  onNext?: (game: string, level: string) => void;
   onRound: (result: RoundResult) => void;
   onLevel: (level: string) => void;
   onTier?: (tier: Tier) => void;
@@ -824,6 +829,9 @@ export function PlayScreen({
     );
   }
 
+  const nextStep = nextFor(child, subjectOf(game));
+  const sameNext = nextStep.game === game && nextStep.reason !== "boss";
+  const nextCopy = { ...nextAction(nextStep, "done"), ...(sameNext ? { action: show("Play again") } : {}) };
   const fightPhase = boss ? phaseForIndex(index, total) : "rally";
   const bossWonRound = boss && bossWon(correct, total);
   const maxEnergy = bossMaxEnergy(BOSS_LENGTH, crownFight);
@@ -963,21 +971,45 @@ export function PlayScreen({
               </button>
             </div>
           ) : null}
-          <div className="ac-done-actions">
-            <button type="button" className="ac-go" onClick={() => restart()}>
-              {boss && !bossWonRound ? show("Try the boss") : show("Play again")}
+          <div className="ac-done-actions" data-next-game={nextStep.game} data-next-reason={nextStep.reason}>
+            <button
+              type="button"
+              className="ac-go ac-next"
+              aria-label={`${nextCopy.action}. ${nextCopy.title}`}
+              onClick={() => {
+                if (nextStep.reason === "stories" || !nextStep.game) {
+                  window.location.hash = nextStep.href;
+                } else if (nextStep.game === game) {
+                  if (nextStep.level) onLevel(nextStep.level);
+                  restart(nextStep.level || level);
+                } else if (onNext) {
+                  onNext(nextStep.game, nextStep.level);
+                } else {
+                  window.location.hash = nextStep.href;
+                }
+              }}
+            >
+              <SquisheeImg id={nextCopy.picture} squish="off" className="ac-next-pic" />
+              <span className="ac-play-copy">
+                <strong>{nextCopy.action}</strong>
+                <small>{nextCopy.title}</small>
+              </span>
             </button>
-            {bossWonRound ? (
-              <a className="ac-quiet ac-quiet-link" href={`#/play/${game}/crown`}>
-                {show("Gold Crown rematch")}
+            <div className="ac-done-small">
+              {nextStep.game !== game ? (
+                <button type="button" className="ac-quiet" onClick={() => restart()}>
+                  {boss && !bossWonRound ? show("Try the boss") : show("Play again")}
+                </button>
+              ) : null}
+              {bossWonRound ? (
+                <a className="ac-quiet ac-quiet-link" href={`#/play/${game}/crown`}>
+                  {show("Gold Crown rematch")}
+                </a>
+              ) : null}
+              <a className="ac-quiet ac-quiet-link" href="#/">
+                {show("Home")}
               </a>
-            ) : null}
-            <a className="ac-quiet ac-quiet-link" href="#/map">
-              {show("Island map")}
-            </a>
-            <button type="button" className="ac-quiet" onClick={onExit}>
-              {show("Home")}
-            </button>
+            </div>
           </div>
         </section>
       ) : phase === "intro" && boss ? (

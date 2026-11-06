@@ -96,6 +96,8 @@ export interface Child {
   challengeAhead: boolean;
   /** Easy, Medium or Hard per game and grade, keyed `grade:game`. Missing means Medium. */
   tiers: Record<string, Tier>;
+  /** Subject tab the child used last (math, reading, spelling). Missing means Math. */
+  subject?: string;
 }
 
 export interface AnswerMark {
