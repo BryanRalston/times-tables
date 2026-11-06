@@ -46,6 +46,19 @@ function copyPortraits(root) {
   }
 }
 
+/** Every catalog face has fitted classic cosmetics in public/. Ship them all —
+ * the outfit shop dresses the active buddy, who may be a rare friend outside the starter squad. */
+function copyCosmetics(root) {
+  const srcDir = resolve("public/cosmetics");
+  if (!existsSync(srcDir)) return;
+  const destDir = join(root, "cosmetics");
+  mkdirSync(destDir, { recursive: true });
+  for (const name of readdirSync(srcDir)) {
+    if (!name.endsWith(".png")) continue;
+    copyIfExists(join(srcDir, name), join(destDir, name));
+  }
+}
+
 function copyReferencedPublic(root) {
   const publicRoot = resolve("public");
   const wanted = new Set();
@@ -76,6 +89,7 @@ function publishRoot(outDir) {
   hoistIfNeeded(root);
   rewriteTree(root);
   copyPortraits(root);
+  copyCosmetics(root);
   copyPokeMedia(root);
   const money = resolve("public/money");
   if (existsSync(money)) cpSync(money, join(root, "money"), { recursive: true });

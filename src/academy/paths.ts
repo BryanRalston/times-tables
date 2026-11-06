@@ -3,8 +3,18 @@ export function sheetHref(slug: string, query = ""): string {
   return `${base}worksheets/${slug}/${query}`;
 }
 
+/**
+ * Shared portraits, cosmetics, and wardrobe sit beside Squishee Math on GitHub
+ * Pages (`/times-tables/...`). The domain build serves the same files at `/`.
+ * Match `artPrefix` in vite.academy.config / academy-precache.
+ */
+export function artPrefix(): string {
+  const base = import.meta.env.BASE_URL || "/";
+  return base === "/" || base === "" ? "" : "/times-tables";
+}
+
 export function squisheeUrl(file: string): string {
-  return `/times-tables/squishees/${file}`;
+  return `${artPrefix()}/squishees/${file}`;
 }
 
 /** Poke clips and strips ship inside this build, under its base URL. */
@@ -15,7 +25,7 @@ export function squisheeMediaUrl(src: string): string {
   return `${prefix}squishees/${file}`;
 }
 
-/** Fitted outfit art lives with Squishee Math, not under the academy base URL. */
+/** Fitted classic cosmetics. Domain root or `/times-tables` on Pages. */
 export function cosmeticCompositeUrl(face: string, cosmeticId: string): string {
-  return `/times-tables/cosmetics/${face}-${cosmeticId}.png`;
+  return `${artPrefix()}/cosmetics/${face}-${cosmeticId}.png`;
 }

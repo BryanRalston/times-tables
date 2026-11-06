@@ -334,6 +334,10 @@ if (!sw.includes('caches.match("/index.html")')) fail("service worker missing ro
 if (!existsSync(resolve(root, ".nojekyll"))) fail(".nojekyll missing");
 if (!existsSync(resolve(root, "404.html"))) fail("404.html missing");
 if (!existsSync(resolve(root, "squishees/frog.png"))) fail("squishees/frog.png missing");
+if (!existsSync(resolve(root, "cosmetics/peach-bow.png"))) fail("cosmetics/peach-bow.png missing");
+if (!existsSync(resolve(root, "cosmetics/axolotl-bow.png"))) fail("cosmetics/axolotl-bow.png missing — rare buddies need classic outfits too");
+if (!existsSync(resolve(root, "wardrobe/fitted/peach-flower-crown.webp"))) fail("wardrobe fitted peach missing");
+
 if (!existsSync(resolve(root, "favicon.svg"))) fail("favicon.svg missing");
 if (!existsSync(resolve(root, "money/penny.png"))) fail("money/penny.png missing");
 
