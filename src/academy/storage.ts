@@ -23,7 +23,7 @@ import {
 
 /** Stable key. The schema version lives on the save, not in the key name. */
 export const STORAGE_KEY = "squishee-academy-v1";
-export const SAVE_VERSION = 11;
+export const SAVE_VERSION = 12;
 
 /**
  * Migrations run from the save's version up to SAVE_VERSION.
@@ -40,6 +40,7 @@ const MIGRATIONS: Record<number, (raw: Record<string, unknown>) => Record<string
   8: migrateV8toV9,
   9: migrateV9toV10,
   10: migrateV10toV11,
+  11: migrateV11toV12,
 };
 
 /** A newer app wrote this disk. Don't replace it with an older schema. */
@@ -229,6 +230,11 @@ function migrateV9toV10(raw: Record<string, unknown>): Record<string, unknown> {
 }
 
 /** Version 10 kept a running total per skill. Month history starts here, and those totals are copied in. */
+/** Grade 5 joins the picker. Nothing in an older save changes. */
+function migrateV11toV12(raw: Record<string, unknown>): Record<string, unknown> {
+  return { ...raw, version: 12 };
+}
+
 function migrateV10toV11(raw: Record<string, unknown>): Record<string, unknown> {
   const children = Array.isArray(raw.children)
     ? raw.children.map((row) => {

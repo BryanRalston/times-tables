@@ -21,7 +21,7 @@ function expandSum(text: string): number {
 describe("place value questions", () => {
   it("uses grade 1–3 ranges and a real expanded or rounded answer", () => {
     for (let seed = 0; seed < 24; seed += 1) {
-      for (const level of PLACE_LEVELS) {
+      for (const level of PLACE_LEVELS.filter((id) => id !== "thousandths")) {
         const q = makePlaceQuestion(rngFromSeed(`place-${seed}-${level}`), level);
         expectChoices(q);
         if (q.visual.kind !== "scene" || q.visual.board.game !== "place") throw new Error(level);
@@ -73,6 +73,8 @@ describe("place value questions", () => {
           case "roundBig":
             expect(q.answer).toBe(String(Math.floor(board.n / board.place + 0.5) * board.place));
             break;
+          case "thousandths":
+            break;
           default: {
             const neverBoard: never = board;
             throw new Error(String(neverBoard));
@@ -101,6 +103,19 @@ describe("place value questions", () => {
           const a = Number(compared[2]);
           const b = Number(compared[3]);
           expect(row.answer).toBe(String(compared[1] === "greater" ? Math.max(a, b) : Math.min(a, b)));
+          continue;
+        }
+        const decimalRound = row.prompt.match(/^Round (\d+\.\d{3}) to the nearest tenth\.$/);
+        if (decimalRound) {
+          expect(Number(row.answer)).toBeCloseTo(Math.round(Number(decimalRound[1]) * 10) / 10, 6);
+          continue;
+        }
+        const decimalValue = row.prompt.match(/value of the (\d) in (\d+\.\d{3})\?$/);
+        if (decimalValue) {
+          const places = (decimalValue[2] ?? "").split(".")[1] ?? "";
+          const at = places.indexOf(decimalValue[1] ?? "") + 1;
+          expect(at).toBeGreaterThan(0);
+          expect(Number(row.answer)).toBeCloseTo(Number(decimalValue[1]) / 10 ** at, 6);
           continue;
         }
         if (/value of the \d+ in \d+/.test(row.prompt)) {

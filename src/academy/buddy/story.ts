@@ -307,6 +307,10 @@ function placeStory(board: PlaceBoard, host: string): string {
         `${host} संख्या को पूर्णांक बनाता है।`,
         `${host} يقرّب العدد.`,
       );
+    case "thousandths":
+      if (board.ask === "round") return placeStory({ game: "place", mode: "roundBig", n: 0, place: 1 }, host);
+      if (board.ask === "greatest") return placeStory({ game: "place", mode: "compare", left: 0, right: 0, ask: "greater" }, host);
+      return placeStory({ game: "place", mode: "big", n: 0, digit: 0, place: 1 }, host);
     case "big":
       return say(
         `${host} points to one digit.`,

@@ -44,7 +44,7 @@ describe("fraction questions", () => {
 
   it("stays inside grade 1–3 denominators and compares with the same numerator or denominator", () => {
     for (let seed = 0; seed < 24; seed += 1) {
-      for (const level of FRACTION_LEVELS) {
+      for (const level of FRACTION_LEVELS.filter((id) => id !== "fracTimes")) {
         const q = makeFractionQuestion(rngFromSeed(`fractions-${seed}-${level}`), level);
         expectChoices(q);
         if (q.visual.kind !== "scene" || q.visual.board.game !== "fractions") throw new Error(level);
@@ -116,6 +116,8 @@ describe("fraction questions", () => {
           case "decimals":
             expect(q.answer).toMatch(/^\d+\.\d+$/);
             break;
+          case "fracTimes":
+            break;
           default: {
             const neverBoard: never = board;
             throw new Error(String(neverBoard));
@@ -141,7 +143,7 @@ describe("fraction questions", () => {
         }
         const dens = [...`${row.prompt} ${row.answer}`.matchAll(/\/(\d+)/g)].map((found) => Number(found[1]));
         for (const found of dens) expect([2, 3, 4, 6, 8]).toContain(found);
-        if (level.id !== "equivalent") {
+        if (level.id !== "equivalent" && level.id !== "fracTimes") {
           for (const found of dens) expect([2, 3, 4]).toContain(found);
         }
         const parts = row.prompt.match(/^(\d+) of (\d+) equal parts are shaded\. What fraction\?$/);
@@ -165,6 +167,17 @@ describe("fraction questions", () => {
           const right = Number(compared[3]) * Number(compared[2]);
           const greater = left >= right ? `${compared[1]}/${compared[2]}` : `${compared[3]}/${compared[4]}`;
           expect(row.answer).toBe(greater);
+          continue;
+        }
+        const whole = row.prompt.match(/^(\d+)\/(\d+) × (\d+) =$/);
+        if (whole) {
+          expect(Number(row.answer) * Number(whole[2])).toBe(Number(whole[1]) * Number(whole[3]));
+          continue;
+        }
+        const product = row.prompt.match(/^(\d+)\/(\d+) × (\d+)\/(\d+) =$/);
+        if (product) {
+          const [n, d] = row.answer.split("/").map(Number);
+          expect((n ?? 0) * Number(product[2]) * Number(product[4])).toBe((d ?? 1) * Number(product[1]) * Number(product[3]));
           continue;
         }
         const match = row.prompt.match(/^Which fraction matches (\d+)\/(\d+)\?$/);

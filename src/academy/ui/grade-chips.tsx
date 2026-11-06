@@ -18,7 +18,7 @@ export function GradeChips({
   onGrade: (grade: Grade) => void;
   className?: string;
 }) {
-  const grades: Grade[] = ["PK", "K", "1", "2", "3", "4"];
+  const grades: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
   return (
     <div className={cx("ac-grades", className)} role="group" aria-label={show("Grade")}>
       {grades.map((g) => (

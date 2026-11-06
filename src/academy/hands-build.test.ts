@@ -19,6 +19,7 @@ import {
   handsExample,
   lettersMatch,
   makeBuildTask,
+  hasHandsCard,
   makeHandsTask,
   measureMatches,
   phonicsMatches,
@@ -541,6 +542,7 @@ describe("hands-on card generators", () => {
   it("builds a checked model for every game level and shows it again on a miss", () => {
     for (const game of GAMES) {
       for (const level of game.levels) {
+        if (!hasHandsCard(game.id, level.id)) continue;
         for (let i = 0; i < SAMPLES; i++) {
           const rng = rngFromSeed(`${game.id}-${level.id}-${i}`);
           const task = makeHandsTask(game.id, level.id, rng);

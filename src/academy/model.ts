@@ -1,4 +1,4 @@
-export type Grade = "PK" | "K" | "1" | "2" | "3" | "4";
+export type Grade = "PK" | "K" | "1" | "2" | "3" | "4" | "5";
 
 /**
  * Grade the hello screen starts on. The middle of the band is still gentle,
@@ -129,6 +129,7 @@ export function speedRoundGrade(grade: Grade): boolean {
     case "K":
     case "1":
     case "4":
+    case "5":
       return false;
     case "2":
     case "3":
@@ -232,7 +233,7 @@ export const DAILY_GOAL = 3;
 /** Share of a boss round that opens the next island. */
 export const BOSS_PASS = 0.6;
 
-const GRADES: readonly Grade[] = ["PK", "K", "1", "2", "3", "4"];
+const GRADES: readonly Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
 
 export function isGrade(v: unknown): v is Grade {
   return typeof v === "string" && (GRADES as readonly string[]).includes(v);
@@ -256,6 +257,8 @@ export function gradeLabel(grade: Grade): string {
       return "Gr 3";
     case "4":
       return "Gr 4";
+    case "5":
+      return "Gr 5";
     default: {
       const neverGrade: never = grade;
       return neverGrade;

@@ -1075,6 +1075,9 @@ export const ES: Record<string, string> = {
   "Missing factor": "Factor que falta",
   "Times blank": "Hueco de multiplicar",
   "Two-step blank": "Dos pasos",
+  "Decimals to thousandths": "Decimales hasta milésimos",
+  "Multiply fractions": "Multiplicar fracciones",
+  "Order of operations": "Orden de las operaciones",
   Numbers: "Números",
   "Free missing-number equations for kindergarten through grade 4. Find the box in an addition, subtraction, multiplication, or two-step equation. A first look at variables. No signup.":
     "Ecuaciones con un número que falta, de kínder a grado 4. Busca la caja en una suma, resta, multiplicación o dos pasos. Un primer vistazo a las variables. Sin cuenta.",

@@ -1216,6 +1216,68 @@ html[lang="ar"] .ac-hello-grades .ac-grade {
 .ac-decimal i.is-on {
   background: #7ad7c8;
 }
+/* Grade 5: place value chart and area model */
+.ac-pv {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  width: min(340px, 94%);
+  margin: 8px auto;
+}
+.ac-pv-col {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 2px 8px;
+  border-radius: 14px;
+  background: #fff6ea;
+  box-shadow: inset 0 0 0 2px #efe0cf;
+}
+.ac-pv-col.has-point::before {
+  content: ".";
+  position: absolute;
+  left: -7px;
+  bottom: 8px;
+  font: 700 30px/1 Fredoka, Nunito, sans-serif;
+  color: var(--ac-ink);
+}
+.ac-pv-head {
+  min-height: 2.4em;
+  display: flex;
+  align-items: center;
+  font: 700 11px/1.15 Nunito, sans-serif;
+  color: var(--ac-muted);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.ac-pv-digit {
+  font: 600 clamp(30px, 9vw, 44px)/1.05 Fredoka, Nunito, sans-serif;
+  color: var(--ac-ink);
+}
+.ac-pv-col.is-mark {
+  background: #d9f5ef;
+  box-shadow: inset 0 0 0 3px var(--ac-teal);
+}
+.ac-pv-col.is-mark .ac-pv-digit { color: var(--ac-teal-deep); }
+.ac-area {
+  display: grid;
+  gap: 2px;
+  width: min(210px, 70%);
+  max-height: 200px;
+  margin: 8px auto;
+  padding: 3px;
+  border-radius: 10px;
+  background: #3c2448;
+}
+.ac-area i {
+  background: #fff6ea;
+  border-radius: 3px;
+}
+.ac-area i.is-a { background: #ffb3d1; }
+.ac-area i.is-b { background: #a9e6dc; }
+.ac-area i.is-both { background: #7c6cff; }
 .ac-pal-play {
   display: flex;
   align-items: center;

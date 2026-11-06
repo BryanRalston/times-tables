@@ -76,6 +76,7 @@ export const timesCard: GameCard = {
         case "3":
           return "toTen";
         case "4":
+        case "5":
           return "factors";
         default: {
           const neverGrade: never = grade;
@@ -161,6 +162,7 @@ export const addCard: GameCard = {
         case "3":
           return "within100";
         case "4":
+        case "5":
           return "within1000";
         default: {
           const neverGrade: never = grade;
@@ -230,6 +232,7 @@ export const timeCard: GameCard = {
         case "3":
           return "fives";
         case "4":
+        case "5":
           return "elapsed";
         default: {
           const neverGrade: never = grade;
@@ -299,6 +302,7 @@ export const moneyCard: GameCard = {
         case "3":
           return "dollars";
         case "4":
+        case "5":
           return "spend";
         default: {
           const neverGrade: never = grade;
@@ -360,6 +364,7 @@ export const sightCard: GameCard = {
         case "3":
           return "third";
         case "4":
+        case "5":
           return "fourth";
         default: {
           const neverGrade: never = grade;
@@ -421,6 +426,7 @@ export const spellingCard: GameCard = {
         case "3":
           return "patterns";
         case "4":
+        case "5":
           return "grade4";
         default: {
           const neverGrade: never = grade;
@@ -479,6 +485,7 @@ export const countCard = sceneCard("Counting", COUNT_ROWS, {
         return "tenframe";
       case "3":
       case "4":
+      case "5":
         return "neighbor";
       default: {
         const neverGrade: never = grade;
@@ -499,6 +506,7 @@ const PLACE_ROWS: SkillRow[] = [
   { key: "place:build", label: "Build a number" },
   { key: "place:big", label: "Place value to 1,000,000" },
   { key: "place:roundBig", label: "Round large numbers" },
+  { key: "place:thousandths", label: "Decimals to thousandths" },
 ];
 
 export const placeCard = sceneCard("Place Value", PLACE_ROWS, {
@@ -520,6 +528,7 @@ export const placeCard = sceneCard("Place Value", PLACE_ROWS, {
     { id: "build", label: "Build a number", num: 6 },
     { id: "big", label: "Place value to 1,000,000", num: 7 },
     { id: "roundBig", label: "Round large numbers", num: 8 },
+    { id: "thousandths", label: "Decimals to thousandths", num: 9 },
   ],
   defaultLevel(grade) {
     switch (grade) {
@@ -533,6 +542,8 @@ export const placeCard = sceneCard("Place Value", PLACE_ROWS, {
         return "round10";
       case "4":
         return "big";
+      case "5":
+        return "thousandths";
       default: {
         const neverGrade: never = grade;
         return neverGrade;
@@ -540,7 +551,7 @@ export const placeCard = sceneCard("Place Value", PLACE_ROWS, {
     }
   },
   sheetDefaultLevel: "blocks",
-  isLevel: (value) => isId(["blocks", "expanded", "compare", "round10", "round100", "build", "big", "roundBig"], value),
+  isLevel: (value) => isId(["blocks", "expanded", "compare", "round10", "round100", "build", "big", "roundBig", "thousandths"], value),
 });
 
 const SHAPE_ROWS: SkillRow[] = [
@@ -609,6 +620,7 @@ export const shapesCard = sceneCard("Shapes", SHAPE_ROWS, {
       case "3":
         return "quads";
       case "4":
+      case "5":
         return "angles";
       default: {
         const neverGrade: never = grade;
@@ -653,6 +665,7 @@ const FRACTION_ROWS: SkillRow[] = [
   { key: "fractions:shade", label: "Shade a fraction" },
   { key: "fractions:addLike", label: "Add like fractions" },
   { key: "fractions:decimals", label: "Decimals" },
+  { key: "fractions:fracTimes", label: "Multiply fractions" },
 ];
 
 export const fractionsCard = sceneCard("Fractions", FRACTION_ROWS, {
@@ -674,6 +687,7 @@ export const fractionsCard = sceneCard("Fractions", FRACTION_ROWS, {
     { id: "shade", label: "Shade a fraction", num: 6 },
     { id: "addLike", label: "Add like fractions", num: 7 },
     { id: "decimals", label: "Decimals", num: 8 },
+    { id: "fracTimes", label: "Multiply fractions", num: 9 },
   ],
   defaultLevel(grade) {
     switch (grade) {
@@ -687,6 +701,8 @@ export const fractionsCard = sceneCard("Fractions", FRACTION_ROWS, {
         return "equivalent";
       case "4":
         return "addLike";
+      case "5":
+        return "fracTimes";
       default: {
         const neverGrade: never = grade;
         return neverGrade;
@@ -694,7 +710,7 @@ export const fractionsCard = sceneCard("Fractions", FRACTION_ROWS, {
     }
   },
   sheetDefaultLevel: "parts",
-  isLevel: (value) => isId(["parts", "unit", "line", "compare", "equivalent", "shade", "addLike", "decimals"], value),
+  isLevel: (value) => isId(["parts", "unit", "line", "compare", "equivalent", "shade", "addLike", "decimals", "fracTimes"], value),
 });
 
 const MEASURE_ROWS: SkillRow[] = [
@@ -741,6 +757,7 @@ export const measureCard = sceneCard("Measurement", MEASURE_ROWS, {
       case "3":
         return "bar";
       case "4":
+      case "5":
         return "area";
       default: {
         const neverGrade: never = grade;
@@ -791,6 +808,7 @@ export const phonicsCard = sceneCard("Phonics", PHONICS_ROWS, {
       case "3":
         return "cvc";
       case "4":
+      case "5":
         return "end";
       default: {
         const neverGrade: never = grade;
@@ -842,6 +860,7 @@ export const problemsCard = sceneCard("Word Problems", PROBLEM_ROWS, {
       case "3":
         return "picture";
       case "4":
+      case "5":
         return "steps";
       default: {
         const neverGrade: never = grade;
@@ -859,6 +878,7 @@ const VARIABLE_ROWS: SkillRow[] = [
   { key: "variables:factor", label: "Missing factor" },
   { key: "variables:times", label: "Times blank" },
   { key: "variables:steps", label: "Two-step blank" },
+  { key: "variables:orderOps", label: "Order of operations" },
 ];
 
 export const variablesCard = sceneCard("What is missing", VARIABLE_ROWS, {
@@ -877,9 +897,10 @@ export const variablesCard = sceneCard("What is missing", VARIABLE_ROWS, {
     { id: "factor", label: "Missing factor", num: 3 },
     { id: "times", label: "Times blank", num: 4 },
     { id: "steps", label: "Two-step blank", num: 5 },
+    { id: "orderOps", label: "Order of operations", num: 6 },
   ],
   defaultLevel(grade) {
-    const ids = ["addend", "either", "factor", "times", "steps"] as const;
+    const ids = ["addend", "either", "factor", "times", "steps", "orderOps"] as const;
     const fallback = ((): string => {
       switch (grade) {
         case "PK":
@@ -892,6 +913,8 @@ export const variablesCard = sceneCard("What is missing", VARIABLE_ROWS, {
           return "times";
         case "4":
           return "steps";
+        case "5":
+          return "orderOps";
         default: {
           const neverGrade: never = grade;
           return neverGrade;
@@ -901,7 +924,7 @@ export const variablesCard = sceneCard("What is missing", VARIABLE_ROWS, {
     return bandStart("variables", grade, ids, fallback);
   },
   sheetDefaultLevel: "addend",
-  isLevel: (value) => isId(["addend", "either", "factor", "times", "steps"], value),
+  isLevel: (value) => isId(["addend", "either", "factor", "times", "steps", "orderOps"], value),
 });
 
 const GRAPH_ROWS: SkillRow[] = [
@@ -945,6 +968,7 @@ export const graphsCard = sceneCard("Data", GRAPH_ROWS, {
         case "3":
           return "scale";
         case "4":
+        case "5":
           return "line";
         default: {
           const neverGrade: never = grade;
@@ -996,6 +1020,7 @@ export const shareCard = sceneCard("Shares", SHARE_ROWS, {
         case "3":
           return "facts";
         case "4":
+        case "5":
           return "left";
         default: {
           const neverGrade: never = grade;
@@ -1042,6 +1067,7 @@ export const gridCard = sceneCard("Garden", GRID_ROWS, {
         case "3":
           return "fence";
         case "4":
+        case "5":
           return "side";
         default: {
           const neverGrade: never = grade;
@@ -1095,6 +1121,7 @@ export const patternsCard = sceneCard("Patterns", PATTERN_ROWS, {
         case "3":
           return "rule";
         case "4":
+        case "5":
           return "grow";
         default: {
           const neverGrade: never = grade;
@@ -1144,6 +1171,7 @@ export const signsCard = sceneCard("Compare", SIGN_ROWS, {
         case "3":
           return "hundreds";
         case "4":
+        case "5":
           return "big";
         default: {
           const neverGrade: never = grade;
@@ -1190,6 +1218,7 @@ export const jumpsCard = sceneCard("10 more", JUMP_ROWS, {
         case "3":
           return "hundred";
         case "4":
+        case "5":
           return "thousand";
         default: {
           const neverGrade: never = grade;
@@ -1238,6 +1267,7 @@ export const ticksCard = sceneCard("Line", TICK_ROWS, {
         case "3":
           return "sixths";
         case "4":
+        case "5":
           return "past";
         default: {
           const neverGrade: never = grade;
@@ -1282,6 +1312,7 @@ export const minuteCard = sceneCard("Minutes", MINUTE_ROWS, {
         case "3":
           return "early";
         case "4":
+        case "5":
           return "all";
         default: {
           const neverGrade: never = grade;

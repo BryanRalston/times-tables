@@ -1438,6 +1438,16 @@ export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: str
   }
 }
 
+/**
+ * Grade 5 levels are tap-and-think cards on a written expression, decimal, or
+ * fraction. They have no drag-and-build card, so a round serves a normal card there.
+ */
+const NO_HANDS_CARD: ReadonlySet<string> = new Set(["place:thousandths", "fractions:fracTimes", "variables:orderOps"]);
+
+export function hasHandsCard(game: string, level: string): boolean {
+  return !NO_HANDS_CARD.has(`${game}:${level}`);
+}
+
 export function makeHandsTask(game: string, level: string, rng: Rng, avoid?: string, prefer: readonly string[] = []): HandsTask {
   if (game === "time") return makeClockTask(level, rng, avoid, prefer);
   if (game === "money") return makePayTask(level, rng, avoid);
