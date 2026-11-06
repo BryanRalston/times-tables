@@ -10,7 +10,8 @@ import { activeChild, loadSave, mapActive, tierFor, withLevel, withTier, writeSa
 import { warmVoices } from "./voice";
 import { HelloScreen, SettingsScreen, SheetsScreen, ShelfScreen } from "./ui/extra";
 import { chooseLanguage, LanguageWelcome, langFromLanding, withLang } from "./ui/lang";
-import { HomeScreen } from "./ui/home";
+import { HomeScreen, SubjectGamesScreen } from "./ui/home";
+import { backHref, isSubjectId, parseFrom, playHref, type From, type SubjectId } from "./subjects";
 import { MapScreen } from "./ui/map";
 import { SoundContext } from "./ui/sound-context";
 
@@ -42,24 +43,28 @@ function alphabetGameNote(): string {
 
 type Route =
   | { name: "home" }
-  | { name: "play"; game: GameId; crown: boolean }
+  | { name: "play"; game: GameId; crown: boolean; from: From }
+  | { name: "games"; subject: SubjectId }
   | { name: "grownups" }
   | { name: "settings" }
   | { name: "shelf" }
   | { name: "sheets" }
-  | { name: "map" }
+  | { name: "map"; subject: SubjectId | null }
   | { name: "stories" }
   | { name: "story"; id: string };
 
 function parseRoute(hash: string): Route {
-  const path = hash.replace(/^#/, "").replace(/^\//, "");
-  const [head, tail, extra] = path.split("/");
-  if (head === "play" && isGameId(tail)) return { name: "play", game: tail, crown: extra === "crown" };
+  const [rawPath = "", query = ""] = hash.replace(/^#/, "").replace(/^\//, "").split("?");
+  const [head, tail, extra] = rawPath.split("/");
+  if (head === "play" && isGameId(tail)) {
+    return { name: "play", game: tail, crown: extra === "crown", from: parseFrom(new URLSearchParams(query).get("from")) };
+  }
+  if (head === "games" && isSubjectId(tail)) return { name: "games", subject: tail };
   if (head === "grownups") return { name: "grownups" };
   if (head === "settings") return { name: "settings" };
   if (head === "shelf") return { name: "shelf" };
   if (head === "sheets") return { name: "sheets" };
-  if (head === "map") return { name: "map" };
+  if (head === "map") return { name: "map", subject: isSubjectId(tail) ? tail : null };
   if (head === "stories" && tail) return { name: "story", id: tail };
   if (head === "stories") return { name: "stories" };
   return { name: "home" };
@@ -73,10 +78,6 @@ function useRoute(): Route {
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
   return parseRoute(hash);
-}
-
-function goHome() {
-  window.location.hash = "#/";
 }
 
 function ScreenFallback() {
@@ -196,6 +197,7 @@ function AcademyApp() {
       shelf: `${show("Squishees")} · Squishee Academy`,
       sheets: `${show("Free worksheets")} · Squishee Academy`,
       map: `${show("Island")} · Squishee Academy`,
+      games: `${show("Games")} · Squishee Academy`,
       stories: `${show("Stories")} · Squishee Academy`,
       story: `${show("Stories")} · Squishee Academy`,
     };
@@ -237,7 +239,14 @@ function AcademyApp() {
           game={route.game}
           crown={route.crown}
           sound={save.sound}
-          onExit={goHome}
+          onExit={() => {
+            window.location.hash = backHref(route.from, route.game);
+          }}
+          onNext={(gameId, nextLevel) => {
+            if (!isGameId(gameId)) return;
+            setSave((current) => mapActive(current, (row) => withLevel(row, gameId, nextLevel)));
+            window.location.hash = playHref(gameId, route.from);
+          }}
           onRound={onRound}
           onLevel={(level) => setSave((current) => mapActive(current, (row) => withLevel(row, route.game, level)))}
           onTier={(tier) => setSave((current) => mapActive(current, (row) => withTier(row, route.game, tier)))}
@@ -273,10 +282,13 @@ function AcademyApp() {
         />
       </Screen>
     );
+  } else if (route.name === "games") {
+    body = <SubjectGamesScreen child={child} subject={route.subject} />;
   } else if (route.name === "map") {
     body = (
       <MapScreen
         child={child}
+        subject={route.subject}
         onOpenEgg={() => setSave((current) => mapActive(current, (row) => openEgg(row, todayIso())))}
       />
     );
@@ -288,6 +300,7 @@ function AcademyApp() {
         sound={save.sound}
         onLang={(lang) => setSave((current) => withLang(current, lang))}
         onClaim={() => setSave((current) => mapActive(current, (row) => claimDailyGift(row, todayIso())))}
+        onSubject={(subject) => setSave((current) => mapActive(current, (row) => ({ ...row, subject })))}
         onPlay={(gameId, nextLevel) => {
           if (!isGameId(gameId)) return;
           setSave((current) => mapActive(current, (row) => withLevel(row, gameId, nextLevel)));

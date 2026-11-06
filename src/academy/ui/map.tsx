@@ -14,10 +14,13 @@ import { DAILY_GOAL, STOPS_PER_AREA, todayIso, type Child } from "../model";
 import { AcademyPal, BackLink, Foot, LockIcon, Logo, cx } from "./bits";
 import { PalWithLook } from "./boss-figure";
 import { EggIcon } from "./buddy-view";
+import { islandLabel } from "./home";
+import { playHref, subjectById, type SubjectId } from "../subjects";
 
 const STOP_NAME = ["Start", "Hop", "Skip", "Boss"];
 
-export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () => void }) {
+export function MapScreen({ child, subject = null, onOpenEgg }: { child: Child; subject?: SubjectId | null; onOpenEgg: () => void }) {
+  const only = subject ? subjectById(subject).games : null;
   const journey = normalizeJourney(child.journey, child.grade);
   const here = areaIndex(journey);
   const today = todayIso();
@@ -32,7 +35,7 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
         <Logo />
         <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="ac-meter-pal" label={child.name} />
       </header>
-      <h1>{show("Island map")}</h1>
+      <h1>{subject ? islandLabel(subject) : show("Island map")}</h1>
       <p className="ac-lede">{t("Finish a round to hop. Beat the boss to befriend the host.", "Termina una ronda para saltar. Vence al jefe para hacerte amigo del anfitrión.")}</p>
       <div className="ac-egg-card" data-egg={eggReady ? "ready" : eggOpen ? "open" : "wait"}>
         <EggIcon ready={eggReady} />
@@ -62,6 +65,7 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
       <ol className="ac-islands" data-area={journey.areaId} data-stop={journey.stop}>
         {GAMES.map((game, index) => {
           if (!gameOffered(game.id)) return null;
+          if (only && !only.includes(game.id)) return null;
           const open = areaOpen(journey, index, child.grade);
           const offer = bandFor(game.id, child.grade)?.offer ?? "play";
           const later = offer === "later" && !child.challengeAhead;
@@ -113,11 +117,11 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
                 <p className="ac-hint">{show("Coming later for this grade.")}</p>
               ) : open ? (
                 <div className="ac-island-actions">
-                  <a className="ac-quiet" href={`#/play/${game.id}`}>
+                  <a className="ac-quiet" href={playHref(game.id, "map")}>
                     {atBoss ? t(`Face ${boss.name}`, `Enfrenta a ${boss.name}`, `Enfrente ${boss.name}`, `Affronte ${boss.name}`, `去见${boss.name}`, `${boss.name} का सामना`, `واجه ${boss.name}`) : current ? show("Play") : offer === "intro" ? show("Gentle intro") : t("Practice", "Practica")}
                   </a>
                   {beaten ? (
-                    <a className="ac-quiet" href={`#/play/${game.id}/crown`}>
+                    <a className="ac-quiet" href={playHref(game.id, "map", true)}>
                       {show("Gold Crown")}
                     </a>
                   ) : null}
@@ -137,7 +141,7 @@ export function MapScreen({ child, onOpenEgg }: { child: Child; onOpenEgg: () =>
           );
         })}
       </ol>
-      <BackLink>{show("Back to games")}</BackLink>
+      <BackLink>{show("Home")}</BackLink>
       <Foot />
       {hatchedId ? (
         <div className="ac-modal" role="dialog" aria-label={show("Hatched squishee")}>

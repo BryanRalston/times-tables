@@ -3,20 +3,20 @@ import { squisheeById } from "@/lib/squishees";
 import { bondName, bondScore, bondTier } from "../buddy/bond";
 import { bookEntries, catchphrase } from "../buddy/cast";
 import { ownedIds } from "../buddy/unlock";
-import { bossForGame } from "../bosses";
 import { GAME_CARDS as GAMES } from "../games/catalog";
 import { bandFor } from "../grade-map";
-import { bossReady, dailySnapshot, normalizeJourney } from "../journey";
+import { dailySnapshot, normalizeJourney } from "../journey";
 import { show, t } from "../i18n";
 import { todayIso, type AppLang, type Child } from "../model";
-import { nextPlacement, todayPlayLine } from "../placement";
+import { todayPlayLine } from "../placement";
+import { activeSubject, forYouToday, nextFor, playHref, subjectById, subjectGames, subjectName, subjectTrail, visibleSubjects, type SubjectId } from "../subjects";
+import { nextAction, pickTag } from "./next-copy";
 import { rollGift, type GiftRoll } from "../rewards";
 import { outfitLabel } from "../wardrobe";
 import { chime } from "../sound";
 import { WeekStickers } from "./stickers";
-import { gameOffered } from "../games/offer";
 import { storiesOffered } from "../stories/offer";
-import { AcademyPal, Foot, GiftBox, LockIcon, Logo, Pips, PlayMark, ProgressRing, SquisheeImg, cx } from "./bits";
+import { AcademyPal, BackLink, Foot, GiftBox, LockIcon, Logo, Pips, PlayMark, ProgressRing, SquisheeImg, cx } from "./bits";
 import { LanguageButton, PlayLanguages } from "./lang";
 import { PalWithLook } from "./boss-figure";
 
@@ -26,6 +26,7 @@ export function HomeScreen({
   sound,
   onClaim,
   onLang,
+  onSubject,
   onPlay,
 }: {
   child: Child;
@@ -33,22 +34,20 @@ export function HomeScreen({
   sound: boolean;
   onClaim: () => void;
   onLang: (lang: AppLang) => void;
+  onSubject: (subject: SubjectId) => void;
   onPlay: (game: string, level: string) => void;
 }) {
   const [prize, setPrize] = useState<GiftRoll | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
   const todayId = todayIso();
   const daily = dailySnapshot(child, todayId);
-  const journey = normalizeJourney(child.journey, child.grade);
-  const place = nextPlacement(child);
-  const facing = bossReady(journey, journey.areaId, child.grade) && place.reason !== "weak";
-  const playId = facing ? journey.areaId : place.game;
-  const playLevel = facing ? (child.levels[journey.areaId] ?? place.level) : place.level;
-  const playTitle = GAMES.find((game) => game.id === playId)?.title ?? playId;
-  const todayLine = todayPlayLine(show(playTitle), child.grade);
-  const playAction = facing
-    ? t(`Face ${bossForGame(playId).name}`, `Enfrenta a ${bossForGame(playId).name}`, `Enfrente ${bossForGame(playId).name}`, `Affronte ${bossForGame(playId).name}`, `去见${bossForGame(playId).name}`, `${bossForGame(playId).name} का सामना`, `واجه ${bossForGame(playId).name}`)
-    : show("Play");
+  const subject = activeSubject(child);
+  const subjects = visibleSubjects(child);
+  const step = nextFor(child, subject);
+  const copy = nextAction(step, "home");
+  const todayLine = todayPlayLine(copy.title, child.grade);
+  const picks = forYouToday(child, subject);
+  const info = subjectById(subject);
+  const more = subjectGames(subject);
   const book = bookEntries();
   const palTier = bondTier(bondScore(child.bonds, child.avatarId));
 
@@ -58,9 +57,6 @@ export function HomeScreen({
         <Logo />
         <div className="ac-top-tools">
           <LanguageButton lang={lang} onLang={onLang} />
-          <a className="ac-island-link" href="#/map">
-            {show("Island")}
-          </a>
         </div>
       </header>
 
@@ -70,6 +66,24 @@ export function HomeScreen({
         </h1>
         <p className="ac-lede">{show("Short games · hop the island · collect squishees")}</p>
         <PlayLanguages />
+        {subjects.length > 1 ? (
+          <div className="ac-subjects" role="tablist" aria-label={t("Subjects", "Materias", "Matérias", "Matières", "科目", "विषय", "المواد")}>
+            {subjects.map((row) => (
+              <button
+                key={row.id}
+                type="button"
+                role="tab"
+                aria-selected={row.id === subject}
+                className={cx("ac-subject", `is-${row.id}`, row.id === subject && "is-on")}
+                data-subject={row.id}
+                onClick={() => onSubject(row.id)}
+              >
+                <SquisheeImg id={row.icon} squish="off" />
+                <span>{subjectName(row.id)}</span>
+              </button>
+            ))}
+          </div>
+        ) : null}
         <div className="ac-play-stage">
           <div className="ac-play-pal">
             <div className="ac-pals">
@@ -83,15 +97,19 @@ export function HomeScreen({
           <button
             type="button"
             className="ac-go ac-play-main"
-            data-placement={place.reason}
-            data-play-game={playId}
-            data-play-level={playLevel}
-            aria-label={`${playAction}. ${todayLine}`}
-            onClick={() => onPlay(playId, playLevel)}
+            data-subject={subject}
+            data-placement={step.reason}
+            data-play-game={step.game}
+            data-play-level={step.level}
+            aria-label={`${copy.action}. ${todayLine}`}
+            onClick={() => {
+              if (step.game) onPlay(step.game, step.level);
+              else window.location.hash = step.href;
+            }}
           >
             <PlayMark />
             <span className="ac-play-copy">
-              <strong>{playAction}</strong>
+              <strong>{copy.action}</strong>
               <small>{todayLine}</small>
             </span>
           </button>
@@ -120,53 +138,60 @@ export function HomeScreen({
           </button>
         </div>
         <WeekStickers secondsByDay={child.secondsByDay} today={todayId} />
-        <a className="ac-map-link" href="#/map">
-          {show("Island map")}
-        </a>
       </section>
 
-      <div className="ac-grid">
-        {GAMES.filter((game) => gameOffered(game.id)).map((game) => {
-          const offer = bandFor(game.id, child.grade)?.offer ?? "play";
-          const open = offer !== "later" || child.challengeAhead;
-          if (!open) {
+      <section className="ac-foryou" data-subject={subject} aria-labelledby="ac-foryou-h">
+        <h2 id="ac-foryou-h">{t("For you today", "Para ti hoy", "Para você hoje", "Pour toi aujourd'hui", "今天给你", "आज तुम्हारे लिए", "لك اليوم")}</h2>
+        <div className="ac-foryou-list">
+          {picks.map((pick) => {
+            const game = GAMES.find((row) => row.id === pick.game);
+            if (!game) return null;
             return (
-              <button
-                key={game.id}
-                type="button"
-                className={`ac-card is-${game.tint} is-soon`}
-                data-offer="later"
-                onClick={() => {
-                  setToast(t(`${game.title} is coming later for this grade.`, `${show(game.title)} llega más adelante para este grado.`, `${show(game.title)} chega mais tarde para este ano.`, `${show(game.title)} arrive plus tard pour cette classe.`, `这个年级稍后才会有${show(game.title)}。`, `${show(game.title)} इस कक्षा के लिए बाद में आएगा।`, `${show(game.title)} يأتي لاحقًا لهذا الصف.`));
-                  window.setTimeout(() => setToast(null), 1800);
+              <a
+                key={pick.game}
+                className={`ac-pick is-${game.tint}`}
+                data-pick={pick.game}
+                data-reason={pick.reason}
+                href={playHref(pick.game, "home")}
+                onClick={(event) => {
+                  event.preventDefault();
+                  onPlay(pick.game, pick.level);
                 }}
               >
-                <span className="ac-soon">
-                  <LockIcon /> {show("Later")}
+                <SquisheeImg id={game.mascot} squish="off" />
+                <span className="ac-pick-copy">
+                  <strong>{show(game.title)}</strong>
+                  <small>{pickTag(pick.reason)}</small>
                 </span>
-                <SquisheeImg id={game.mascot} />
-                <h2>{show(game.title)}</h2>
-                <p>{show("Coming later")}</p>
-              </button>
+                <Pips value={child.bestStars[game.id] ?? 0} />
+              </a>
             );
-          }
-          return (
-            <a key={game.id} className={`ac-card is-${game.tint}`} data-offer={offer} href={`#/play/${game.id}`}>
-              {journey.areaId === game.id ? (
-                <span className="ac-soon">{show("Here")}</span>
-              ) : offer === "intro" ? (
-                <span className="ac-soon">{show("Intro")}</span>
-              ) : null}
-              <SquisheeImg id={game.mascot} />
-              <h2>{show(game.title)}</h2>
-              <p>{offer === "intro" ? show("Gentle intro") : show(game.audience)}</p>
-              <Pips value={child.bestStars[game.id] ?? 0} />
+          })}
+          {info.stories && storiesOffered() ? (
+            <a className="ac-pick is-sky" href="#/stories" data-stories="open">
+              <SquisheeImg id="owl" squish="off" />
+              <span className="ac-pick-copy">
+                <strong>{show("Stories")}</strong>
+                <small>{show("Read along")}</small>
+              </span>
             </a>
-          );
-        })}
-      </div>
+          ) : null}
+        </div>
+        <div className="ac-subject-links">
+          {more.length > picks.length ? (
+            <a className="ac-quiet ac-quiet-link" href={`#/games/${subject}`} data-more={subject}>
+              {moreGamesLabel(subject, more.length)}
+            </a>
+          ) : null}
+          {subjectTrail(child, subject).length > 0 ? (
+            <a className="ac-quiet ac-quiet-link ac-map-link" href={`#/map/${subject}`} data-map={subject}>
+              {islandLabel(subject)}
+            </a>
+          ) : null}
+        </div>
+      </section>
 
-      {storiesOffered() ? (
+      {!info.stories && storiesOffered() ? (
         <a className="ac-stories-card" href="#/stories" data-stories="open">
           <SquisheeImg id="owl" squish="off" />
           <span>
@@ -207,11 +232,6 @@ export function HomeScreen({
       </div>
 
       <Foot />
-      {toast ? (
-        <div className="ac-toast" role="status">
-          {toast}
-        </div>
-      ) : null}
       {prize ? (
         <div className="ac-modal" role="dialog" aria-label={show("Daily gift")}>
           <div className="ac-modal-card ac-prize">
@@ -247,3 +267,97 @@ function PrizeBody({ prize }: { prize: GiftRoll }) {
   );
 }
 
+
+function moreGamesLabel(subject: SubjectId, count: number): string {
+  const name = subjectName(subject);
+  return t(`All ${name} games · ${count}`, `Todos los juegos de ${name} · ${count}`, `Todos os jogos de ${name} · ${count}`, `Tous les jeux de ${name} · ${count}`, `全部${name}游戏 · ${count}`, `${name} के सभी खेल · ${count}`, `كل ألعاب ${name} · ${count}`);
+}
+
+export function islandLabel(subject: SubjectId): string {
+  const name = subjectName(subject);
+  return t(`${name} island map`, `Mapa de la isla de ${name}`, `Mapa da ilha de ${name}`, `Carte de l'île ${name}`, `${name}岛地图`, `${name} द्वीप का नक्शा`, `خريطة جزيرة ${name}`);
+}
+
+/** One game tile. Coming-later games stay visible with a lock and a short note. */
+function GameTile({ gameId, child, here, onLater }: { gameId: string; child: Child; here: boolean; onLater: (text: string) => void }) {
+  const game = GAMES.find((row) => row.id === gameId);
+  if (!game) return null;
+  const offer = bandFor(game.id, child.grade)?.offer ?? "play";
+  const open = offer !== "later" || child.challengeAhead;
+  if (!open) {
+    return (
+      <button
+        type="button"
+        className={`ac-card is-${game.tint} is-soon`}
+        data-offer="later"
+        onClick={() =>
+          onLater(t(`${game.title} is coming later for this grade.`, `${show(game.title)} llega más adelante para este grado.`, `${show(game.title)} chega mais tarde para este ano.`, `${show(game.title)} arrive plus tard pour cette classe.`, `这个年级稍后才会有${show(game.title)}。`, `${show(game.title)} इस कक्षा के लिए बाद में आएगा।`, `${show(game.title)} يأتي لاحقًا لهذا الصف.`))
+        }
+      >
+        <span className="ac-soon">
+          <LockIcon /> {show("Later")}
+        </span>
+        <SquisheeImg id={game.mascot} />
+        <h2>{show(game.title)}</h2>
+        <p>{show("Coming later")}</p>
+      </button>
+    );
+  }
+  return (
+    <a className={`ac-card is-${game.tint}`} data-offer={offer} href={playHref(game.id, "games")}>
+      {here ? <span className="ac-soon">{show("Here")}</span> : offer === "intro" ? <span className="ac-soon">{show("Intro")}</span> : null}
+      <SquisheeImg id={game.mascot} />
+      <h2>{show(game.title)}</h2>
+      <p>{offer === "intro" ? show("Gentle intro") : show(game.audience)}</p>
+      <Pips value={child.bestStars[game.id] ?? 0} />
+    </a>
+  );
+}
+
+/** A subject's full game list, opened from "All … games" on Home. */
+export function SubjectGamesScreen({ child, subject }: { child: Child; subject: SubjectId }) {
+  const [toast, setToast] = useState<string | null>(null);
+  const journey = normalizeJourney(child.journey, child.grade);
+  const info = subjectById(subject);
+  return (
+    <div className={cx("ac-shell", child.grade === "PK" && "is-prek")} data-games={subject}>
+      <header className="ac-top">
+        <BackLink href="#/">{show("Back")}</BackLink>
+        <Logo />
+      </header>
+      <div className="ac-subject-head">
+        <SquisheeImg id={info.icon} squish="off" />
+        <h1>{subjectName(subject)}</h1>
+      </div>
+      <div className="ac-grid">
+        {subjectGames(subject).map((id) => (
+          <GameTile
+            key={id}
+            gameId={id}
+            child={child}
+            here={journey.areaId === id}
+            onLater={(text) => {
+              setToast(text);
+              window.setTimeout(() => setToast(null), 1800);
+            }}
+          />
+        ))}
+      </div>
+      {info.stories && storiesOffered() ? (
+        <a className="ac-stories-card" href="#/stories" data-stories="open">
+          <SquisheeImg id="owl" squish="off" />
+          <span>
+            <strong>{show("Stories")}</strong>
+            <small>{show("Read along")}</small>
+          </span>
+        </a>
+      ) : null}
+      <Foot />
+      {toast ? (
+        <div className="ac-toast" role="status">
+          {toast}
+        </div>
+      ) : null}
+    </div>
+  );
+}

@@ -61,11 +61,15 @@ export function nextPlacement(child: {
   challengeAhead?: boolean;
   /** Easy, Medium or Hard per `grade:game`. Missing is Medium. */
   tiers?: Record<string, Tier>;
-}): Placement {
+}, only?: readonly string[]): Placement {
+  /** Only these games (one subject's trail). Missing means every game. */
+  const POOL = only ? GAMES.filter((game) => only.includes(game.id)) : GAMES;
+  const fallback = POOL.find((row) => row.id === "add")?.id ?? POOL[0]?.id ?? "add";
+  const fallbackLevel = POOL.find((row) => row.id === fallback)?.defaultLevel(child.grade) ?? "within5";
   const challenge = child.challengeAhead === true;
   activeTiers = child.tiers ?? {};
   const rows: SkillRow[] = [];
-  for (const game of GAMES) {
+  for (const game of POOL) {
     const allowed = windowFor(game.id, game.levels.map((level) => level.id), child.grade, challenge);
     if (allowed.ids.length === 0) continue;
     for (const level of game.levels) {
@@ -88,7 +92,7 @@ export function nextPlacement(child: {
   for (const [tag, home] of Object.entries(IDEA_LEVEL)) {
     const due = dueStats(child.skills[tag]);
     if (!due) continue;
-    const game = GAMES.find((row) => row.id === home.game);
+    const game = POOL.find((row) => row.id === home.game);
     if (!game) continue;
     const allowed = windowFor(game.id, game.levels.map((level) => level.id), child.grade, challenge);
     if (!allowed.ids.includes(home.level)) continue;
@@ -111,7 +115,7 @@ export function nextPlacement(child: {
   const weakest = weak[0];
   if (weakest) return { game: weakest.game, level: weakest.level, reason: "weak" };
 
-  for (const game of GAMES) {
+  for (const game of POOL) {
     const ids = game.levels.map((level) => level.id);
     const allowed = windowFor(game.id, ids, child.grade, challenge);
     if (allowed.ids.length === 0) continue;
@@ -127,11 +131,11 @@ export function nextPlacement(child: {
     }
   }
 
-  const starters = GAMES.filter((game) => windowFor(game.id, game.levels.map((level) => level.id), child.grade, challenge).ids.length > 0);
+  const starters = POOL.filter((game) => windowFor(game.id, game.levels.map((level) => level.id), child.grade, challenge).ids.length > 0);
   const game = starters.find((row) => row.id === "add") ?? starters.find((row) => row.id === "count") ?? starters[0];
   if (!game || rows.length === 0) {
-    const startGame = game ?? GAMES[0];
-    if (!startGame) return { game: "add", level: "within5", reason: "start" };
+    const startGame = game ?? POOL[0];
+    if (!startGame) return { game: fallback, level: fallback === "add" ? "within5" : fallbackLevel, reason: "start" };
     const allowed = windowFor(startGame.id, startGame.levels.map((level) => level.id), child.grade, challenge);
     const base = Math.max(0, startGame.levels.findIndex((level) => level.id === (allowed.start || startGame.defaultLevel(child.grade))));
     const hard = (activeTiers[tierKey(child.grade, startGame.id)] ?? "medium") === "hard";
@@ -143,5 +147,5 @@ export function nextPlacement(child: {
   const review = [...rows].sort((a, b) => a.acc - b.acc || b.n - a.n)[0];
   return review
     ? { game: review.game, level: review.level, reason: "review" }
-    : { game: "add", level: "within5", reason: "start" };
+    : { game: fallback, level: fallback === "add" ? "within5" : fallbackLevel, reason: "start" };
 }

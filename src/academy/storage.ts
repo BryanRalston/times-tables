@@ -23,6 +23,7 @@ import {
 
 /** Stable key. The schema version lives on the save, not in the key name. */
 export const STORAGE_KEY = "squishee-academy-v1";
+const SUBJECT_IDS: readonly string[] = ["math", "reading", "spelling"];
 export const SAVE_VERSION = 13;
 
 /**
@@ -528,6 +529,7 @@ export function parseChild(raw: unknown): Child | null {
     words: parseWords(o.words),
     challengeAhead,
     tiers: parseTiers(o.tiers),
+    ...(typeof o.subject === "string" && SUBJECT_IDS.includes(o.subject) ? { subject: o.subject } : {}),
     trophies,
     bossLooks,
     equippedLook,
