@@ -1,3 +1,4 @@
+import { STORY_BACKGROUND_FILES, copyStoryBackgrounds } from "./academy-background-assets.mjs";
 import { PROP_ART_FILES, copyPropArt } from "./academy-prop-assets.mjs";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -115,7 +116,7 @@ export function copyPokeMedia(outDir) {
 }
 
 export function artPaths() {
-  const out = ["favicon.svg", ...PROP_ART_FILES];
+  const out = ["favicon.svg", ...PROP_ART_FILES, ...STORY_BACKGROUND_FILES];
   for (const id of SQUAD_IDS) out.push(`squishees/${id}.png`);
   for (const id of SQUAD_IDS) {
     for (const cosmetic of COSMETIC_IDS) out.push(`cosmetics/${id}-${cosmetic}.png`);
@@ -564,6 +565,7 @@ export function academyPrecachePlugin(outDir, options) {
     writeBundle() {
       copyPokeMedia(outDir);
       copyPropArt(outDir);
+      copyStoryBackgrounds(outDir);
     },
     closeBundle() {
       writePrecacheManifest(outDir, options);

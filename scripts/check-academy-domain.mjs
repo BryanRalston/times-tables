@@ -1,3 +1,4 @@
+import { STORY_BACKGROUND_FILES } from "./academy-background-assets.mjs";
 import { PROP_ART_FILES } from "./academy-prop-assets.mjs";
 import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
@@ -550,11 +551,11 @@ if (robotsBody.includes(COUNTER_SRC) || sitemapBody.includes(COUNTER_SRC)) fail(
 if (!sitemapBody.includes("<loc>https://squisheeacademy.com/privacy/</loc>")) fail("sitemap missing privacy");
 if (!sitemapBody.includes("<loc>https://squisheeacademy.com/ar/privacy/</loc>")) fail("sitemap missing arabic privacy");
 
-// Dynamic prop URLs must ship all 18 files, not just statically scanned references.
-for (const rel of PROP_ART_FILES) {
-  if (!existsSync(resolve(root, rel))) fail(`missing Imagine object ${rel}`);
+// Dynamic object and background URLs must ship from their explicit manifests.
+for (const rel of [...PROP_ART_FILES, ...STORY_BACKGROUND_FILES]) {
+  if (!existsSync(resolve(root, rel))) fail(`missing Imagine art ${rel}`);
   const source = readFileSync(resolve("public", rel));
-  if (!source.equals(readFileSync(resolve(root, rel)))) fail(`Imagine object differs from source: ${rel}`);
+  if (!source.equals(readFileSync(resolve(root, rel)))) fail(`Imagine art differs from source: ${rel}`);
 }
 
 console.log("check-academy-domain OK dist-domain");

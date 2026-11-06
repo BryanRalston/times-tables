@@ -1,6 +1,5 @@
 import { asset } from "@/lib/art";
-import type { ReactNode } from "react";
-import type { StoryMood, StoryPicture, StoryProp } from "../stories/catalog";
+import type { StoryBackground, StoryMood, StoryPicture, StoryProp } from "../stories/catalog";
 import { SquisheeImg } from "./bits";
 
 export function PropArt({ id, label = id }: { id: StoryProp; label?: string }) {
@@ -26,33 +25,18 @@ export function StoryPicture({ picture, label }: { picture: StoryPicture; label?
 
 export function StoryScene({
   mood,
+  background,
   pals,
   prop,
 }: {
   mood: StoryMood;
+  background: StoryBackground;
   pals: readonly string[];
   prop?: StoryProp;
 }) {
-  let sky: ReactNode = null;
-  switch (mood) {
-    case "day":
-      sky = <span className="ac-story-sky is-day" />;
-      break;
-    case "night":
-      sky = <span className="ac-story-sky is-night" />;
-      break;
-    case "water":
-      sky = <span className="ac-story-sky is-water" />;
-      break;
-    default: {
-      const neverMood: never = mood;
-      sky = neverMood;
-    }
-  }
   return (
     <div className={`ac-story-scene is-${mood}`} aria-hidden="true">
-      {sky}
-      <span className="ac-story-ground" />
+      <img className="ac-story-background" src={asset(`art/story-backgrounds/${background}.webp`)} alt="" width={1200} height={900} />
       <div className="ac-story-stage">
         <div className="ac-story-pals">
           {pals.map((id) => (

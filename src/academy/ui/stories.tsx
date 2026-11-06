@@ -193,7 +193,7 @@ export function StoryReader({
     const stars = starsForRound(score.correct, Math.max(1, score.total));
     return (
       <div className="ac-shell ac-mid" data-story-phase="done" data-story-id={story.id} data-grade={grade} dir={storyDir()} lang={lang}>
-        <StoryScene mood={page.mood} pals={page.pals} prop={page.prop} />
+        <StoryScene background={page.background} mood={page.mood} pals={page.pals} prop={page.prop} />
         <h1>{show("Yes!")}</h1>
         <Stars value={stars} />
         <a className="ac-go" href="#/stories">
@@ -279,7 +279,7 @@ export function StoryReader({
           ))}
         </span>
       </header>
-      <StoryScene mood={page.mood} pals={page.pals} prop={page.prop} />
+      <StoryScene background={page.background} mood={page.mood} pals={page.pals} prop={page.prop} />
       {state.returnTo != null ? <p className="ac-hint">{show("Let's look together.")}</p> : null}
       <StoryWords
         text={page.text}

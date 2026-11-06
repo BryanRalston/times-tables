@@ -1,0 +1,32 @@
+{
+  "generator": "Grok Imagine via GenerateImage",
+  "calls": 5,
+  "attemptsPerBackground": 1,
+  "assets": [
+    {
+      "id": "meadow",
+      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/cd5913f7de0a6246274f9113d9993399557382999971905ee859d3b649441a91.jpg",
+      "bytes": 10516
+    },
+    {
+      "id": "garden",
+      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/32a7cf4a91caf6f400c0b1935bd755a182061a7cc9d60569c692a59a408a2045.jpg",
+      "bytes": 10390
+    },
+    {
+      "id": "night",
+      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/4e3f3f2127122c8c57507376b95db7a0eaf7cf22522c87cd1c4c577e477f5d5a.jpg",
+      "bytes": 7668
+    },
+    {
+      "id": "pond",
+      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/264deb3c58d0ade0e395b8a99e4794c37ca06ed290ba5ca155c8e017acd984f6.jpg",
+      "bytes": 11318
+    },
+    {
+      "id": "lake",
+      "source": "/cursor/stores/user/grok-bot/agents/aab7ea0b-834d-4f3b-8790-29c3affd5fa1/assets/ae1dd85182aedc4d43a635545cd4b11fdbc7694f8d3bc820474abb0e217102f3.jpg",
+      "bytes": 10224
+    }
+  ]
+}
