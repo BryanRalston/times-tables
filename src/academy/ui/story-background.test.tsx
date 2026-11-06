@@ -47,9 +47,36 @@ describe("Imagine story backgrounds", () => {
     for (const story of STORIES) {
       for (const page of story.pages) {
         if (!page.prop) continue;
-        const placement = storyPropPlacement(page.prop);
+        const placement = storyPropPlacement(page.prop, page.placement);
         const zones = STORY_BACKGROUND_ZONES[page.background];
         expect(zones, `${story.id}: ${page.text} (${page.prop}→${placement} on ${page.background})`).toContain(placement);
+      }
+    }
+  });
+
+  it("lets page text override a prop's default zone", () => {
+    const overrides = STORIES.flatMap((story) =>
+      story.pages.filter((page) => page.placement).map((page) => `${story.id}|${page.text}|${page.placement}`),
+    );
+    expect(overrides.sort()).toEqual([
+      "g1-fox-kite|Fox has a red kite.|ground",
+      "g1-fox-kite|Fox ran to get the kite.|ground",
+      "g1-fox-kite|Then the kite came down.|ground",
+    ]);
+    for (const story of STORIES) {
+      for (const page of story.pages) {
+        if (!page.placement) continue;
+        expect(page.prop, `${story.id}: ${page.text}`).toBeDefined();
+        expect(page.placement).not.toBe(STORY_PROP_PLACEMENTS[page.prop!]);
+        expect(STORY_BACKGROUND_ZONES[page.background]).toContain(page.placement);
+        const html = renderToStaticMarkup(<StoryScene {...page} />);
+        expect(html).toContain(`ac-story-prop is-${page.placement}`);
+      }
+    }
+    for (const locale of ["es", "ar"] as const) {
+      setLocale(locale);
+      for (const story of STORIES) {
+        expect(presentStory(story).pages.map((p) => p.placement)).toEqual(story.pages.map((p) => p.placement));
       }
     }
   });
@@ -71,7 +98,7 @@ describe("Imagine story backgrounds", () => {
         expect(html).toContain('alt="" width="1200" height="900"');
         expect(html.indexOf('class="ac-story-background"')).toBeLessThan(html.indexOf('class="ac-story-stage'));
         if (page.prop) {
-          const placement = storyPropPlacement(page.prop);
+          const placement = storyPropPlacement(page.prop, page.placement);
           expect(html).toContain(`ac-story-prop is-${placement}`);
           if (placement === "ground") {
             expect(html.indexOf('class="ac-story-stage')).toBeLessThan(html.indexOf(`ac-story-prop is-${placement}`));

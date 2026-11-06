@@ -21,8 +21,9 @@ export const STORY_PROP_PLACEMENTS = {
 } as const satisfies Record<StoryProp, "ground" | "sky" | "water">;
 export type StoryPropPlacement = (typeof STORY_PROP_PLACEMENTS)[StoryProp];
 
-export function storyPropPlacement(id: StoryProp): StoryPropPlacement {
-  return STORY_PROP_PLACEMENTS[id];
+/** A page may override the prop's default zone when its text says otherwise. */
+export function storyPropPlacement(id: StoryProp, override?: StoryPropPlacement): StoryPropPlacement {
+  return override ?? STORY_PROP_PLACEMENTS[id];
 }
 
 export const STORY_BACKGROUNDS = [
@@ -73,6 +74,8 @@ export interface StoryPage {
   text: string;
   pals: readonly string[];
   prop?: StoryProp;
+  /** Overrides the prop's default placement for this page only. */
+  placement?: "ground" | "sky" | "water";
   mood: StoryMood;
   /** Stable across locales; each page explicitly chooses its setting. */
   background: StoryBackground;
@@ -229,11 +232,11 @@ export const STORIES: readonly Story[] = [
     grade: "1",
     cast: ["fox"],
     pages: [
-      { text: "Fox has a red kite.", pals: ["fox"], prop: "kite", mood: "day", background: "meadow" },
+      { text: "Fox has a red kite.", pals: ["fox"], prop: "kite", placement: "ground", mood: "day", background: "meadow" },
       { text: "The kite can fly.", pals: ["fox"], prop: "kite", mood: "day", background: "meadow" },
       { text: "Look! It went up.", pals: ["fox"], prop: "kite", mood: "day", background: "meadow" },
-      { text: "Then the kite came down.", pals: ["fox"], prop: "kite", mood: "day", background: "meadow" },
-      { text: "Fox ran to get the kite.", pals: ["fox"], prop: "kite", mood: "day", background: "meadow" },
+      { text: "Then the kite came down.", pals: ["fox"], prop: "kite", placement: "ground", mood: "day", background: "meadow" },
+      { text: "Fox ran to get the kite.", pals: ["fox"], prop: "kite", placement: "ground", mood: "day", background: "meadow" },
       { text: "He will fly it again.", pals: ["fox"], prop: "kite", mood: "day", background: "meadow" },
       { text: "Fox is glad.", pals: ["fox"], mood: "day", background: "meadow" },
     ],

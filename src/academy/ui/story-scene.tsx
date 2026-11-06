@@ -1,5 +1,5 @@
 import { asset } from "@/lib/art";
-import type { StoryBackground, StoryMood, StoryPicture, StoryProp } from "../stories/catalog";
+import type { StoryBackground, StoryMood, StoryPicture, StoryProp, StoryPropPlacement } from "../stories/catalog";
 import { storyPropPlacement } from "../stories/catalog";
 import { SquisheeImg } from "./bits";
 
@@ -29,13 +29,15 @@ export function StoryScene({
   background,
   pals,
   prop,
+  placement: placementOverride,
 }: {
   mood: StoryMood;
   background: StoryBackground;
   pals: readonly string[];
   prop?: StoryProp;
+  placement?: StoryPropPlacement;
 }) {
-  const placement = prop ? storyPropPlacement(prop) : null;
+  const placement = prop ? storyPropPlacement(prop, placementOverride) : null;
   return (
     <div className={`ac-story-scene is-${mood} is-bg-${background}`} aria-hidden="true">
       <img className="ac-story-background" src={asset(`art/story-backgrounds/${background}.webp`)} alt="" width={1200} height={900} />
