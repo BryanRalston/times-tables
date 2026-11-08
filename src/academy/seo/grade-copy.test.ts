@@ -38,7 +38,7 @@ describe("Pre-K to grade 4 public copy", () => {
     expect(times?.blurb).toContain("grades 2–4");
     expect(times?.blurb).not.toContain("Pre-K");
     expect(add?.blurb).toContain("kindergarten through grade 4");
-    expect(fractions?.blurb).toContain("grades 1–4");
+    expect(fractions?.blurb).toContain("grades 1–5");
     const bySlug = (slug: string) => WORKSHEETS.find((sheet) => sheet.slug === slug);
     expect(bySlug("multiplication-7s")?.title).toContain("(Grades 2–4)");
     expect(bySlug("addition-within-10")?.title).toContain("(K–1)");

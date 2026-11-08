@@ -82,20 +82,30 @@ function countFactOk(level: TimesLevel, fact: { a: number; b: number }): boolean
 }
 
 /** Multiplication fact from Squishee Math's fluency engine, kept inside the level. */
+/** Hard ("ease:firm") skips trivial facts: no ×1, and from Multiply to 10 up no ×2 either. */
+function firmFactOk(level: TimesLevel, fact: { a: number; b: number }, firm: boolean): boolean {
+  if (!firm) return true;
+  const low = Math.min(fact.a, fact.b);
+  if (low < 2) return false;
+  if (level === "toTen" && low < 3) return false;
+  return true;
+}
+
 export function nextTimesFact(rng: Rng, level: TimesLevel, prefer: string[] = []): { a: number; b: number } {
   const spec = TIMES_SPEC[level];
+  const firm = prefer.includes("ease:firm");
   const usable = preferInLevel(prefer, level, spec);
   for (let i = 0; i < 8; i++) {
     const q = makeFluencyItem(rng, spec.factors, i === 0 && usable.length ? usable : undefined);
     const fact = fluencyTimes(q);
     if (!fact) continue;
     const oriented = orientFactors(level, fact.a, fact.b, spec);
-    if (oriented && countFactOk(level, oriented)) return oriented;
+    if (oriented && countFactOk(level, oriented) && firmFactOk(level, oriented, firm)) return oriented;
   }
   const partners = partnersFor(level, spec);
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 40; i++) {
     const fact = { a: rng.pick(spec.factors), b: rng.pick(partners) };
-    if (countFactOk(level, fact)) return fact;
+    if (countFactOk(level, fact) && firmFactOk(level, fact, firm)) return fact;
   }
   return { a: 2, b: 2 };
 }

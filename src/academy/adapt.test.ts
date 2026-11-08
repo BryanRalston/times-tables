@@ -32,20 +32,20 @@ describe("adaptive ladder", () => {
     expect(stepLadder({ index: 3, streak: 2 }, 4, true)).toEqual({ index: 3, streak: 3 });
   });
 
-  it("starts a new kid one level easier, then holds the grade level", () => {
-    expect(openingIndex(2, 0, false)).toBe(1);
+  it("opens at the saved level with no warm-up drop", () => {
+    expect(openingIndex(2, 0, false)).toBe(2);
     expect(openingIndex(0, 0, false)).toBe(0);
     expect(openingIndex(2, 1, false)).toBe(2);
     expect(openingIndex(2, 0, true)).toBe(2);
   });
 
-  it("does not drop again when Play already saved the easier level", () => {
+  it("opens at the saved level, never one under it", () => {
     expect(
       openingForRound({ savedIndex: 3, startIndex: 4, roundsPlayed: 0, boss: false, bounds: { min: 2, max: 5 } }),
     ).toBe(3);
     expect(
       openingForRound({ savedIndex: 4, startIndex: 4, roundsPlayed: 0, boss: false, bounds: { min: 2, max: 5 } }),
-    ).toBe(3);
+    ).toBe(4);
     expect(
       openingForRound({ savedIndex: 3, startIndex: 4, roundsPlayed: 1, boss: false, bounds: { min: 2, max: 5 } }),
     ).toBe(3);

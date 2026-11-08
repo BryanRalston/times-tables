@@ -297,6 +297,7 @@ export function PlayScreen({
       levelCount: count,
       heats,
       roll: rngRandom().next(),
+      first: answersRef.current.length === 0,
       minIndex: box.min,
       maxIndex: box.max,
     });
@@ -1215,7 +1216,6 @@ export function PlayScreen({
               gameId={game}
               onPick={(next) => {
                 setMenu(false);
-                if (next === level) return;
                 onLevel(next);
                 restart(next);
               }}

@@ -846,7 +846,7 @@ export const ZH: Record<string, string> = {
   "Free Dolch and Fry sight word practice for kindergarten through grade 4. Hear a word, match a picture, and fill a sentence. Trace the list, then check the answer key.": "免费的Dolch和Fry常见词练习，从幼儿园到四年级。听一个词，配一张图，填进句子里。把词表描一描，再对答案。",
   "Free counting practice for Pre-K through grade 4. Count objects to 20, compare groups, find the number before and after, read dot patterns, and fill a ten-frame.": "免费的数数练习，从学前班到四年级。把东西数到20，比一比两组，找出前一个和后一个数，读点子图，再填十格框。",
   "Free for every family. No ads, no accounts.": "每个家庭都免费。没有广告，也不用账号。",
-  "Free fraction practice for grades 1–4. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.": "免费的分数练习，从一年级到四年级。一个整体的几份、单位分数、数轴上的分数、比一比分数、看图认相等的分数，还有小数。",
+  "Free fraction practice for grades 1–5. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.": "免费的分数练习，从一年级到五年级。一个整体的几份、单位分数、数轴上的分数、比一比分数、看图认相等的分数，还有小数。",
   "Free geometry for Pre-K to grade 5. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.": "免费的图形练习，从学前班到五年级。说出图形的名字，学位置的说法，把图形拼起来，数面和正方形，再给四边形分类。",
   "Free measurement and data practice for Pre-K through grade 4. Compare longer and shorter, measure inches on a ruler, read picture graphs and bar graphs, and find area.": "免费的测量和数据练习，从学前班到四年级。比一比更长和更短，用尺子量英寸，读象形统计图和条形统计图，再求面积。",
   "Free missing-number equations for kindergarten through grade 4. Find the box in an addition, subtraction, multiplication, or two-step equation. A first look at variables. No signup.": "免费的缺数算式，从幼儿园到四年级。在加法、减法、乘法或两步算式里，找出方框里的数。第一次认识未知数。不用注册。",

@@ -674,8 +674,8 @@ export const ES: Record<string, string> = {
     "Práctica de multiplicar para imprimir, de grado 2 a grado 4. Las tablas, problemas de varios dígitos y la hoja de respuestas. Sin cuenta.",
   "Free printable addition and subtraction for kindergarten through grade 4. Facts within 5, 10, 20, 100, or the thousands, plus an answer key.":
     "Sumas y restas para imprimir, de kínder a grado 4. Hasta el 5, el 10, el 20, el 100 o los millares, con la hoja de respuestas.",
-  "Free fraction practice for grades 1–4. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.":
-    "Fracciones para los grados 1 a 4. Partes de un entero, fracciones unitarias, la recta numérica, comparar, fracciones equivalentes con dibujos y decimales.",
+  "Free fraction practice for grades 1–5. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.":
+    "Fracciones para los grados 1 a 5. Partes de un entero, fracciones unitarias, la recta numérica, comparar, fracciones equivalentes con dibujos y decimales.",
   "Free spelling for kindergarten through grade 4. Hear a word in a sentence, then build it from letter tiles. Lists move from CVC words to digraphs, blends, long vowels, and grade 4 words.":
     "Deletreo de kínder a grado 4. Escuchas una palabra en inglés y la armas con letras. Empieza con palabras cortas y llega a palabras de grado 4.",
   "Free measurement and data practice for Pre-K through grade 4. Compare longer and shorter, measure inches on a ruler, read picture graphs and bar graphs, and find area.":
