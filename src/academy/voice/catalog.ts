@@ -41,7 +41,7 @@ const NUMBER_MAX = 1000;
  * New stories start here so no new paid audio is needed; speak() falls back to
  * the device whenever planSpeech cannot cover a line.
  */
-export const DEVICE_VOICE_SKILLS: ReadonlySet<string> = new Set(["problems:estimate", "place:thousandths", "fractions:fracTimes", "variables:orderOps"]);
+export const DEVICE_VOICE_SKILLS: ReadonlySet<string> = new Set(["problems:estimate", "place:thousandths", "fractions:addUnlike", "fractions:fracTimes", "variables:orderOps"]);
 
 export const CORE_VOICE_GAMES = new Set(["add", "time", "ui", "buddy", "boss"]);
 

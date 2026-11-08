@@ -44,7 +44,7 @@ describe("fraction questions", () => {
 
   it("stays inside grade 1–3 denominators and compares with the same numerator or denominator", () => {
     for (let seed = 0; seed < 24; seed += 1) {
-      for (const level of FRACTION_LEVELS.filter((id) => id !== "fracTimes")) {
+      for (const level of FRACTION_LEVELS.filter((id) => id !== "fracTimes" && id !== "addUnlike")) {
         const q = makeFractionQuestion(rngFromSeed(`fractions-${seed}-${level}`), level);
         expectChoices(q);
         if (q.visual.kind !== "scene" || q.visual.board.game !== "fractions") throw new Error(level);
@@ -116,6 +116,7 @@ describe("fraction questions", () => {
           case "decimals":
             expect(q.answer).toMatch(/^\d+\.\d+$/);
             break;
+          case "addUnlike":
           case "fracTimes":
             break;
           default: {
@@ -142,6 +143,10 @@ describe("fraction questions", () => {
           continue;
         }
         const dens = [...`${row.prompt} ${row.answer}`.matchAll(/\/(\d+)/g)].map((found) => Number(found[1]));
+        if (level.id === "addUnlike") {
+          for (const found of dens) expect(found).toBeLessThanOrEqual(12);
+          continue;
+        }
         for (const found of dens) expect([2, 3, 4, 6, 8]).toContain(found);
         if (level.id !== "equivalent" && level.id !== "fracTimes") {
           for (const found of dens) expect([2, 3, 4]).toContain(found);

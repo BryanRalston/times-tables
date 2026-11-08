@@ -229,7 +229,7 @@ describe("academy save", () => {
     const child = blankChild({ name: "Noor", grade: "5" });
     expect(child.grade).toBe("5");
     expect(child.levels.place).toBe("thousandths");
-    expect(child.levels.fractions).toBe("fracTimes");
+    expect(child.levels.fractions).toBe("addUnlike");
     expect(child.levels.variables).toBe("orderOps");
     const save = { ...freshSave(), activeId: child.id, children: [child] };
     const again = parseSave(JSON.parse(JSON.stringify(save)));

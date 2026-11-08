@@ -684,8 +684,8 @@ export const ES: Record<string, string> = {
     "Datos y gráficas, de prekínder a grado 4. Clasifica y cuenta, haz un conteo de hasta tres grupos, arma gráficas de dibujos y de barras, lee una escala y usa un diagrama de puntos con fracciones.",
   "Free Dolch and Fry sight word practice for kindergarten through grade 4. Hear a word, match a picture, and fill a sentence. Trace the list, then check the answer key.":
     "Palabras frecuentes en inglés, de kínder a grado 4. Escucha la palabra, une el dibujo y completa la oración. Las palabras se quedan en inglés.",
-  "Free printable coin practice for Pre-K to grade 4. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.":
-    "Monedas para imprimir, de prekínder a grado 4. Nombra, cuenta, forma una cantidad, da el cambio, lee dólares y centavos y resuelve problemas de dinero.",
+  "Free printable coin practice for Pre-K to grade 5. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.":
+    "Monedas para imprimir, de prekínder a grado 5. Nombra, cuenta, forma una cantidad, da el cambio, lee dólares y centavos y resuelve problemas de dinero.",
   "Free printable telling-time practice for grades 1–4. Analog clocks to the hour, half hour, quarter hour, and 5 minutes, plus elapsed time, with an answer key.":
     "La hora para imprimir, de grado 1 a grado 4. Relojes en punto, y media, y cuarto, de 5 en 5 y el tiempo transcurrido, con la hoja de respuestas.",
   "Free counting practice for Pre-K through grade 4. Count objects to 20, compare groups, find the number before and after, read dot patterns, and fill a ten-frame.":
@@ -694,8 +694,8 @@ export const ES: Record<string, string> = {
     "Problemas cortos, de kínder a grado 4. Sumar, restar, multiplicar, repartir y dos pasos, con un dibujo y la voz en alto.",
   "Free phonics practice for Pre-K through grade 4. Letter sounds, beginning sounds with pictures, rhyming words, and CVC blending. A speaker reads the sound, with the sound written out when a voice is not available.":
     "Sonidos del inglés, de prekínder a grado 4. La letra, el sonido del principio, palabras que riman y unir sonidos. La voz dice el sonido.",
-  "Free geometry for Pre-K to grade 4. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.":
-    "Figuras de prekínder a grado 4. Nombra las formas, palabras de lugar, une figuras, cuenta caras y cuadrados, y ordena cuadriláteros.",
+  "Free geometry for Pre-K to grade 5. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.":
+    "Figuras de prekínder a grado 5. Nombra las formas, palabras de lugar, une figuras, cuenta caras y cuadrados, y ordena cuadriláteros.",
   "Free place value practice for grades 1–4. Tens and ones with base-ten blocks, expanded form, comparing numbers, rounding, and thousands up to a million.":
     "Valor posicional para los grados 1 a 4. Decenas y unidades, forma desarrollada, comparar, redondear y millares hasta el millón.",
   Settings: "Ajustes",
@@ -1083,6 +1083,8 @@ export const ES: Record<string, string> = {
   "Times blank": "Hueco de multiplicar",
   "Two-step blank": "Dos pasos",
   "Decimals to thousandths": "Decimales hasta milésimos",
+  "Cut both into same-size parts first. Then add or take away the tops.": "Primero parte las dos en partes del mismo tamaño. Luego suma o resta los de arriba.",
+  "Add unlike fractions": "Sumar fracciones distintas",
   "Multiply fractions": "Multiplicar fracciones",
   "Order of operations": "Orden de las operaciones",
   Numbers: "Números",

@@ -106,6 +106,7 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     shade: "3.NF.A.1",
     addLike: "4.NF.B.3",
     decimals: "4.NF.C.6",
+    addUnlike: "5.NF.A.1",
     fracTimes: "5.NF.B.4",
   },
   measure: {
@@ -293,6 +294,7 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "4.G.A.3": { en: "A line of symmetry", es: "Un eje de simetría" },
   "5.NBT.A.3": { en: "Read, compare, and round decimals", es: "Leer, comparar y redondear decimales" },
   "5.NBT.A.4": { en: "Round decimals to any place", es: "Redondear decimales a cualquier lugar" },
+  "5.NF.A.1": { en: "Add and subtract unlike fractions", es: "Sumar y restar fracciones con distinto denominador" },
   "5.NF.B.4": { en: "Multiply fractions", es: "Multiplicar fracciones" },
   "5.OA.A.1": { en: "Parentheses in expressions", es: "Paréntesis en expresiones" },
   "5.OA.A.2": { en: "Write and read expressions", es: "Escribir y leer expresiones" },

@@ -857,8 +857,8 @@ export const PT: Record<string, string> = {
   "Free for every family. No ads, no accounts.": "Grátis para todas as famílias. Sem anúncios e sem conta.",
   "Free fraction practice for grades 1–4. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.":
     "Frações de graça, do 1.º ao 4.º ano. Partes de um inteiro, frações unitárias, frações na reta numérica, comparar frações, frações equivalentes com desenhos e decimais.",
-  "Free geometry for Pre-K to grade 4. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.":
-    "Geometria de graça, da pré-escola ao 4.º ano. Diga o nome das figuras, aprenda palavras de lugar, junte figuras, conte faces e quadrados e separe os quadriláteros.",
+  "Free geometry for Pre-K to grade 5. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.":
+    "Geometria de graça, da pré-escola ao 5.º ano. Diga o nome das figuras, aprenda palavras de lugar, junte figuras, conte faces e quadrados e separe os quadriláteros.",
   "Free measurement and data practice for Pre-K through grade 4. Compare longer and shorter, measure inches on a ruler, read picture graphs and bar graphs, and find area.":
     "Medidas e dados de graça, da pré-escola ao 4.º ano. Compare o que é mais comprido e o que é mais curto, meça polegadas na régua, leia gráficos de figuras e gráficos de barras e ache a área.",
   "Free missing-number equations for kindergarten through grade 4. Find the box in an addition, subtraction, multiplication, or two-step equation. A first look at variables. No signup.":
@@ -869,8 +869,8 @@ export const PT: Record<string, string> = {
     "Valor posicional de graça, do 1.º ao 4.º ano. Dezenas e unidades com material dourado, forma decomposta, comparar números, arredondar e milhares até um milhão.",
   "Free printable addition and subtraction for kindergarten through grade 4. Facts within 5, 10, 20, 100, or the thousands, plus an answer key.":
     "Somar e subtrair para imprimir, do jardim ao 4.º ano, de graça. Contas até 5, 10, 20, 100 ou os milhares, com gabarito.",
-  "Free printable coin practice for Pre-K to grade 4. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.":
-    "Moedas para imprimir, da pré-escola ao 4.º ano, de graça. Diga o nome de centavos, moedas de 5, moedas de 10 e moedas de 25, conte, monte um valor, calcule o troco, leia dólares e centavos e resolva problemas de dinheiro.",
+  "Free printable coin practice for Pre-K to grade 5. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.":
+    "Moedas para imprimir, da pré-escola ao 5.º ano, de graça. Diga o nome de centavos, moedas de 5, moedas de 10 e moedas de 25, conte, monte um valor, calcule o troco, leia dólares e centavos e resolva problemas de dinheiro.",
   "Free printable multiplication practice for grades 2–4. Facts, multi-digit problems, and an answer key. No signup.":
     "Tabuada para imprimir, do 2.º ao 4.º ano, de graça. Fatos, contas com vários dígitos e o gabarito. Sem cadastro.",
   "Free printable telling-time practice for grades 1–4. Analog clocks to the hour, half hour, quarter hour, and 5 minutes, plus elapsed time, with an answer key.":
@@ -1402,6 +1402,8 @@ export const PT: Record<string, string> = {
   "Two triangles joined": "Dois triângulos juntos",
   "Two-step blank": "Dois passos",
   "Decimals to thousandths": "Decimais até milésimos",
+  "Cut both into same-size parts first. Then add or take away the tops.": "Primeiro divida as duas em partes do mesmo tamanho. Depois some ou subtraia os de cima.",
+  "Add unlike fractions": "Somar frações diferentes",
   "Multiply fractions": "Multiplicar frações",
   "Order of operations": "Ordem das operações",
   "Two-step stories": "Histórias de dois passos",

@@ -849,6 +849,7 @@ fractions:equivalent|equivalent fractions|fracciones equivalentes|frações equi
 fractions:shade|shading a fraction|colorear una fracción|pintar uma fração|colorier une fraction|涂分数|भिन्न रंगना|تظليل كسر
 fractions:addLike|adding like fractions|sumar fracciones iguales|somar frações de mesmo denominador|additionner des fractions de même dénominateur|加同分母分数|समान हर वाली भिन्न जोड़ना|جمع كسور متشابهة
 fractions:decimals|decimals|decimales|decimais|décimales|小数|दशमलव|الأعداد العشرية
+fractions:addUnlike|adding unlike fractions|sumar fracciones con distinto denominador|somar frações com denominadores diferentes|additionner des fractions de dénominateurs différents|分母不同的分数加减|असमान हर वाले भिन्नों का जोड़|جمع الكسور مختلفة المقامات
 fractions:fracTimes|multiplying fractions|multiplicar fracciones|multiplicar frações|multiplier des fractions|分数乘法|भिन्नों का गुणा|ضرب الكسور
 measure:size|bigger and smaller|más grande y más pequeño|maior e menor|plus grand et plus petit|大小|बड़ा और छोटा|أكبر وأصغر
 measure:compare|longer and shorter|más largo y más corto|mais longo e mais curto|plus long et plus court|长短|लंबा और छोटा|أطول وأقصر
@@ -1109,7 +1110,7 @@ export function sheetIndexTitle(lang: SeoLang): string {
 export function sheetIndexDescription(lang: SeoLang): string {
   switch (lang) {
     case "en":
-      return "Free printable math worksheets for Pre-K to grade 4. Times tables, addition, subtraction, elapsed time, counting coins, money problems, thousands, and area. Answer keys included. No signup.";
+      return "Free printable math worksheets for Pre-K to grade 5. Times tables, addition, subtraction, elapsed time, counting coins, money problems, thousands, and area. Answer keys included. No signup.";
     case "es":
       return "Fichas de mates imprimibles y gratis, de prekínder a grado 4. Tablas, sumas, restas, tiempo transcurrido, monedas, problemas de dinero, millares y área. Con respuestas. Sin registro.";
     case "pt-BR":

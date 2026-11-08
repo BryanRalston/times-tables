@@ -135,6 +135,24 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
         expect(board.hundredths).toBeLessThanOrEqual(9);
         break;
       }
+      if (board.mode === "addUnlike") {
+        expect(grade).toBe("5");
+        expect(board.den).not.toBe(board.den2);
+        expect(board.common).toBeLessThanOrEqual(12);
+        expect(board.common % board.den).toBe(0);
+        expect(board.common % board.den2).toBe(0);
+        expect(board.num).toBeLessThan(board.den);
+        expect(board.num2).toBeLessThan(board.den2);
+        expect(gcdOf(board.num, board.den)).toBe(1);
+        expect(gcdOf(board.num2, board.den2)).toBe(1);
+        const top = board.op === "+" ? board.num * (board.common / board.den) + board.num2 * (board.common / board.den2) : board.num * (board.common / board.den) - board.num2 * (board.common / board.den2);
+        expect(top).toBeGreaterThan(0);
+        expect(top).toBeLessThanOrEqual(board.common);
+        const [n, d] = question.answer.split("/").map(Number);
+        expect((n ?? 0) * board.common).toBe(top * (d ?? 1));
+        expect(gcdOf(n ?? 0, d ?? 1)).toBe(1);
+        break;
+      }
       if (board.mode === "fracTimes") {
         expect(grade).toBe("5");
         expect(board.den).toBeLessThanOrEqual(6);
@@ -954,9 +972,11 @@ describe("grade 5 slice 1", () => {
     for (const [gameId, levelId] of NEW_LEVELS) {
       const game = GAMES.find((item) => item.id === gameId)!;
       const ids = game.levels.map((row) => row.id);
-      expect(game.defaultLevel("5")).toBe(levelId);
+      // Slice 2 puts unlike-denominator fractions first in grade 5 fractions.
+      const opener = gameId === "fractions" ? "addUnlike" : levelId;
+      expect(game.defaultLevel("5")).toBe(opener);
       expect(playWindow(ids, gameId, "5", false).ids).toContain(levelId);
-      expect(playWindow(ids, gameId, "5", false).start).toBe(levelId);
+      expect(playWindow(ids, gameId, "5", false).start).toBe(opener);
       for (const grade of BELOW_FIVE) {
         expect(playWindow(ids, gameId, grade, false).ids, `${gameId} grade ${grade}`).not.toContain(levelId);
       }
@@ -966,7 +986,7 @@ describe("grade 5 slice 1", () => {
 
   it("ties each new level to a grade 5 standard and grade 5 only", () => {
     expect(GRADE_BANDS.place?.["5"].standards).toEqual(["5.NBT.A.3", "5.NBT.A.4"]);
-    expect(GRADE_BANDS.fractions?.["5"].standards).toEqual(["5.NF.B.4"]);
+    expect(GRADE_BANDS.fractions?.["5"].standards).toEqual(["5.NF.A.1", "5.NF.B.4"]);
     expect(GRADE_BANDS.variables?.["5"].standards).toEqual(["5.OA.A.1", "5.OA.A.2"]);
     for (const grade of BELOW_FIVE) {
       for (const row of Object.values(GRADE_BANDS)) {
@@ -1012,5 +1032,47 @@ describe("grade 5 slice 1", () => {
     expect(playWindow(fractions.levels.map((row) => row.id), "fractions", "4", false).ids.at(-1)).toBe("decimals");
     const variables = GAMES.find((item) => item.id === "variables")!;
     expect(playWindow(variables.levels.map((row) => row.id), "variables", "4", false).ids.at(-1)).toBe("steps");
+  });
+});
+
+describe("grade 5 slice 2: add and subtract unlike fractions", () => {
+  const BELOW_FIVE: Grade[] = ["PK", "K", "1", "2", "3", "4"];
+  const fractions = GAMES.find((item) => item.id === "fractions")!;
+  const ids = fractions.levels.map((row) => row.id);
+
+  it("opens addUnlike only to grade 5, or to challenge ahead from grade 4", () => {
+    expect(fractions.defaultLevel("5")).toBe("addUnlike");
+    expect(playWindow(ids, "fractions", "5", false).start).toBe("addUnlike");
+    expect(playWindow(ids, "fractions", "5", false).ids).toEqual(expect.arrayContaining(["addUnlike", "fracTimes"]));
+    expect(ids.indexOf("addUnlike")).toBe(ids.indexOf("fracTimes") - 1);
+    for (const grade of BELOW_FIVE) {
+      expect(playWindow(ids, "fractions", grade, false).ids, `grade ${grade}`).not.toContain("addUnlike");
+    }
+    expect(playWindow(ids, "fractions", "4", true).ids).toContain("addUnlike");
+  });
+
+  it("ties addUnlike to 5.NF.A.1", () => {
+    expect(GRADE_BANDS.fractions?.["5"].standards).toContain("5.NF.A.1");
+  });
+
+  it("serves 600 in-range addUnlike questions with one right, simplified answer", () => {
+    for (let i = 0; i < 600; i += 1) {
+      const question = fractions.makeQuestion(rngFromSeed(`g5s2-${i}`), "addUnlike");
+      expect(question.skill).toBe("fractions:addUnlike");
+      expect(question.choices).toHaveLength(4);
+      expect(new Set(question.choices).size).toBe(4);
+      expect(question.choices).toContain(question.answer);
+      assertQuestion("5", "addUnlike", question);
+    }
+  });
+
+  it("never serves addUnlike to grades below 5 in 400 draws", () => {
+    for (const grade of BELOW_FIVE) {
+      const window = playWindow(ids, "fractions", grade, false);
+      for (let i = 0; i < 400 && window.ids.length > 0; i += 1) {
+        const level = window.ids[i % window.ids.length]!;
+        expect(fractions.makeQuestion(rngFromSeed(`g5s2-leak-${grade}-${i}`), level).skill).not.toBe("fractions:addUnlike");
+      }
+    }
   });
 });

@@ -316,6 +316,107 @@ export function makeFracTimesQuestion(rng: Rng): ChoiceQ {
   return rng.next() < 0.45 ? makeFracTimesWhole(rng) : makeFracTimesFrac(rng);
 }
 
+/* ---------- add and subtract unlike fractions (5.NF.A.1) ---------- */
+
+/** Denominator pairs whose common denominator stays at or under 12. */
+export const UNLIKE_PAIRS: ReadonlyArray<readonly [number, number]> = [
+  [2, 3], [2, 4], [2, 5], [2, 6], [2, 8], [3, 4], [3, 6], [3, 9], [3, 12], [4, 6], [4, 8], [4, 12], [6, 12],
+];
+
+function lcmOf(a: number, b: number): number {
+  return (a * b) / gcd(a, b);
+}
+
+export function makeAddUnlikeQuestion(rng: Rng): ChoiceQ {
+  let den = 2;
+  let den2 = 3;
+  let num = 1;
+  let num2 = 1;
+  let op: "+" | "-" = "+";
+  let common = 6;
+  let top = 5;
+  for (let guard = 0; guard < 80; guard += 1) {
+    const pair = rng.pick([...UNLIKE_PAIRS]);
+    const flip = rng.next() < 0.5;
+    den = flip ? pair[1] : pair[0];
+    den2 = flip ? pair[0] : pair[1];
+    num = rng.int(1, den - 1);
+    num2 = rng.int(1, den2 - 1);
+    // Addends come in simplest form, so 6/12 never shows up as a starting fraction.
+    if (gcd(num, den) !== 1 || gcd(num2, den2) !== 1) continue;
+    op = rng.next() < 0.6 ? "+" : "-";
+    common = lcmOf(den, den2);
+    const a = num * (common / den);
+    const b = num2 * (common / den2);
+    if (op === "-" && a <= b) continue;
+    top = op === "+" ? a + b : a - b;
+    if (top > common) continue;
+    break;
+  }
+  const a = num * (common / den);
+  const b = num2 * (common / den2);
+  top = op === "+" ? a + b : a - b;
+  if (top <= 0 || top > common) {
+    den = 2; den2 = 4; num = 1; num2 = 1; op = "+"; common = 4; top = 3;
+  }
+  const answer = simplestFraction(top, common);
+  const sign = op === "+" ? "+" : MINUS;
+  const expr = `${num}/${den} ${sign} ${num2}/${den2}`;
+  const naiveTop = op === "+" ? num + num2 : Math.abs(num - num2);
+  const candidates: [number, number][] = [
+    [naiveTop, den + den2],
+    [naiveTop, common],
+    [naiveTop, Math.max(den, den2)],
+    [top + 1, common],
+    [top - 1, common],
+    [op === "+" ? Math.abs(a - b) : a + b, common],
+    [top, common + 1],
+  ];
+  const pool: string[] = [];
+  for (const [n, d] of candidates) {
+    if (n <= 0 || d <= 0 || n > d) continue;
+    if (sameValue(n, d, top, common)) continue;
+    const text = simplestFraction(n, d);
+    if (!pool.includes(text) && text !== answer) pool.push(text);
+  }
+  for (const fallback of ["1/2", "1/3", "2/3", "1/4", "3/4", "1/6", "5/6", "5/12", "7/12", "3/8"]) {
+    const [n, d] = fallback.split("/").map(Number) as [number, number];
+    if (!sameValue(n, d, top, common) && !pool.includes(fallback)) pool.push(fallback);
+  }
+  const board: FractionBoard = { game: "fractions", mode: "addUnlike", num, den, num2, den2, op, common };
+  return sceneQuestion(rng, {
+    game: "fractions",
+    title: t(`What is ${mathText(expr)}?`, `¿Cuánto es ${mathText(expr)}?`, `Quanto é ${mathText(expr)}?`, `Combien font ${mathText(expr)} ?`, `${expr}是多少？`, `${mathText(expr)} कितना है?`, `كم يساوي ${mathText(expr)}؟`),
+    hint: t(
+      "Cut both into same-size parts first. Then add or take away the tops.",
+      "Primero parte las dos en partes del mismo tamaño. Luego suma o resta los de arriba.",
+      "Primeiro divida as duas em partes do mesmo tamanho. Depois some ou subtraia os de cima.",
+      "Coupe d'abord les deux en parts de même taille. Puis ajoute ou retire les numérateurs.",
+      "先把两个分数分成一样大的份，再把分子相加或相减。",
+      "पहले दोनों को एक जैसे आकार के भागों में बाँटो। फिर ऊपर वाली संख्याएँ जोड़ो या घटाओ।",
+      "قسّم الكسرين أولًا إلى أجزاء متساوية الحجم، ثم اجمع البسطين أو اطرحهما.",
+    ),
+    answer,
+    choices: uniqueChoices(rng, answer, pool, pool.slice(0, 2)),
+    skill: "fractions:addUnlike",
+    tags: ["addUnlike"],
+    solved: `${expr} = ${a}/${common} ${sign} ${b}/${common} = ${answer}`,
+    picture: expr,
+    hands: false,
+    quietChoices: false,
+    labels: {},
+    board,
+    factKey: `addUnlike:${expr}`,
+  });
+}
+
+export function addUnlikeSheet(rng: Rng): { prompt: string; answer: string } {
+  const q = makeAddUnlikeQuestion(rng);
+  const b = q.visual.kind === "scene" && q.visual.board.game === "fractions" && q.visual.board.mode === "addUnlike" ? q.visual.board : null;
+  if (!b) return { prompt: "1/2 + 1/4 =", answer: "3/4" };
+  return { prompt: `${b.num}/${b.den} ${b.op === "+" ? "+" : MINUS} ${b.num2}/${b.den2} =`, answer: q.answer };
+}
+
 /* ---------- order of operations (5.OA.A.1, 5.OA.A.2) ---------- */
 
 export interface OrderForm {

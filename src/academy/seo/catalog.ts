@@ -480,7 +480,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   {
     slug: "naming-shapes",
     title: "Free Shapes Worksheet (Pre-K–4) | Squishee Academy",
-    description: "Print a free shapes worksheet for Pre-K to grade 4. Name flat and solid shapes, count sides, tile a rectangle, and find lines of symmetry. Answer key included. No signup.",
+    description: "Print a free shapes worksheet for Pre-K to grade 5. Name flat and solid shapes, count sides, tile a rectangle, and find lines of symmetry. Answer key included. No signup.",
     h1: "Naming shapes",
     game: "shapes",
     items: [
