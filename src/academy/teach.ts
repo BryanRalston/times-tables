@@ -558,6 +558,11 @@ function fractionTeach(board: FractionBoard, solved: string): SceneFrame[] {
       return captions([t("The denominator stays the same", "El denominador se queda igual"), solved]);
     case "decimals":
       return captions([t("Tenths, then hundredths", "Décimos, luego centésimos"), solved]);
+    case "addUnlike":
+      return captions([
+        t(`Cut both into ${board.common} equal parts`, `Parte las dos en ${board.common} partes iguales`, `Divida as duas em ${board.common} partes iguais`, `Coupe les deux en ${board.common} parts égales`, `把两个都分成${board.common}等份`, `दोनों को ${board.common} बराबर भागों में बाँटो`, `قسّم الكسرين إلى ${board.common} أجزاء متساوية`),
+        solved,
+      ]);
     case "fracTimes":
       return captions([
         board.whole > 0

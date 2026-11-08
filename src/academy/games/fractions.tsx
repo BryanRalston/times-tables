@@ -5,11 +5,11 @@ import { fractionsCard } from "./cards";
 import { fractionText, type FractionBoard } from "./boards";
 import { sceneQuestion, uniqueChoices } from "./pick";
 import { makeAddLikeQuestion, makeDecimalQuestion, spanSheet } from "./span";
-import { makeFracTimesQuestion, simplestFraction } from "./grade5";
+import { addUnlikeSheet, makeAddUnlikeQuestion, makeFracTimesQuestion, simplestFraction } from "./grade5";
 import { AreaModel, DecimalGrid, FractionBar, FractionLine, SceneCard, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
-export const FRACTION_LEVELS = ["parts", "unit", "line", "compare", "equivalent", "shade", "addLike", "decimals", "fracTimes"] as const;
+export const FRACTION_LEVELS = ["parts", "unit", "line", "compare", "equivalent", "shade", "addLike", "decimals", "addUnlike", "fracTimes"] as const;
 export type FractionLevel = (typeof FRACTION_LEVELS)[number];
 
 const PAIRS: Array<[number, number, number, number]> = [
@@ -316,6 +316,8 @@ export function makeFractionQuestion(rng: Rng, level: FractionLevel): ChoiceQ {
       return makeAddLikeQuestion(rng);
     case "decimals":
       return makeDecimalQuestion(rng);
+    case "addUnlike":
+      return makeAddUnlikeQuestion(rng);
     case "fracTimes":
       return makeFracTimesQuestion(rng);
     default: {
@@ -373,6 +375,8 @@ function sheetItem(rng: Rng, level: string): SheetItem {
         answer: `${pair[2]}/${pair[3]}`,
       };
     }
+    case "addUnlike":
+      return addUnlikeSheet(rng);
     case "fracTimes": {
       const den = rng.pick([2, 3, 4, 5, 6]);
       const num = rng.int(1, den - 1);
@@ -449,6 +453,20 @@ function FractionArt({ board }: { board: FractionBoard }) {
       );
     case "decimals":
       return <DecimalGrid tenths={board.tenths} hundredths={board.hundredths} />;
+    case "addUnlike":
+      return (
+        <div className="ac-frac-pair">
+          <div>
+            <FractionBar num={board.num * (board.common / board.den)} den={board.common} />
+            <p className="ac-frac-name">{fractionText(board.num, board.den)}</p>
+          </div>
+          <p className="ac-frac-name">{board.op === "+" ? "+" : "−"}</p>
+          <div>
+            <FractionBar num={board.num2 * (board.common / board.den2)} den={board.common} />
+            <p className="ac-frac-name">{fractionText(board.num2, board.den2)}</p>
+          </div>
+        </div>
+      );
     case "fracTimes":
       if (board.whole > 0) return <FractionBar num={board.num} den={board.den} />;
       return <AreaModel num={board.num} den={board.den} num2={board.num2} den2={board.den2} />;

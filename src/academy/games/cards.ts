@@ -278,7 +278,7 @@ export const moneyCard: GameCard = {
   sheetSlug: "money",
   sheetScreen: "sheet-money",
   blurb:
-    "Free printable coin practice for Pre-K to grade 4. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.",
+    "Free printable coin practice for Pre-K to grade 5. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.",
   sheetCount: 12,
   layout: "card",
   levels: [
@@ -585,7 +585,7 @@ export const shapesCard = sceneCard("Shapes", SHAPE_ROWS, {
   sheetSlug: "shapes",
   sheetScreen: "sheet-shapes",
   blurb:
-    "Free geometry for Pre-K to grade 4. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.",
+    "Free geometry for Pre-K to grade 5. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.",
   levels: [
     { id: "color", label: "Colors", num: 1 },
     { id: "match", label: "Matching", num: 2 },
@@ -665,6 +665,7 @@ const FRACTION_ROWS: SkillRow[] = [
   { key: "fractions:shade", label: "Shade a fraction" },
   { key: "fractions:addLike", label: "Add like fractions" },
   { key: "fractions:decimals", label: "Decimals" },
+  { key: "fractions:addUnlike", label: "Add unlike fractions" },
   { key: "fractions:fracTimes", label: "Multiply fractions" },
 ];
 
@@ -687,7 +688,8 @@ export const fractionsCard = sceneCard("Fractions", FRACTION_ROWS, {
     { id: "shade", label: "Shade a fraction", num: 6 },
     { id: "addLike", label: "Add like fractions", num: 7 },
     { id: "decimals", label: "Decimals", num: 8 },
-    { id: "fracTimes", label: "Multiply fractions", num: 9 },
+    { id: "addUnlike", label: "Add unlike fractions", num: 9 },
+    { id: "fracTimes", label: "Multiply fractions", num: 10 },
   ],
   defaultLevel(grade) {
     switch (grade) {
@@ -702,7 +704,7 @@ export const fractionsCard = sceneCard("Fractions", FRACTION_ROWS, {
       case "4":
         return "addLike";
       case "5":
-        return "fracTimes";
+        return "addUnlike";
       default: {
         const neverGrade: never = grade;
         return neverGrade;
@@ -710,7 +712,7 @@ export const fractionsCard = sceneCard("Fractions", FRACTION_ROWS, {
     }
   },
   sheetDefaultLevel: "parts",
-  isLevel: (value) => isId(["parts", "unit", "line", "compare", "equivalent", "shade", "addLike", "decimals", "fracTimes"], value),
+  isLevel: (value) => isId(["parts", "unit", "line", "compare", "equivalent", "shade", "addLike", "decimals", "addUnlike", "fracTimes"], value),
 });
 
 const MEASURE_ROWS: SkillRow[] = [

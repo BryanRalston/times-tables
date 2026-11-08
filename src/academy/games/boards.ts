@@ -73,6 +73,8 @@ export type FractionBoard =
     }
   | { game: "fractions"; mode: "equivalent"; num: number; den: number; num2: number; den2: number }
   | { game: "fractions"; mode: "addLike"; num: number; den: number; num2: number; op: "+" | "-" }
+  /** Grade 5: add or subtract fractions with unlike denominators; `common` is the least common denominator. */
+  | { game: "fractions"; mode: "addUnlike"; num: number; den: number; num2: number; den2: number; op: "+" | "-"; common: number }
   /** Grade 5: a fraction times a whole number (`whole` set) or times another fraction. */
   | { game: "fractions"; mode: "fracTimes"; num: number; den: number; num2: number; den2: number; whole: number }
   | {

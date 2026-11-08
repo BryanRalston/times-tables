@@ -497,10 +497,10 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       cap: "decimals",
     }),
     "5": band({
-      levels: ["fracTimes"],
-      start: "fracTimes",
+      levels: ["addUnlike", "fracTimes"],
+      start: "addUnlike",
       offer: "play",
-      standards: ["5.NF.B.4"],
+      standards: ["5.NF.A.1", "5.NF.B.4"],
     }),
   },
   measure: {
