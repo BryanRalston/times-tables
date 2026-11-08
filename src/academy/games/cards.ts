@@ -672,13 +672,13 @@ const FRACTION_ROWS: SkillRow[] = [
 export const fractionsCard = sceneCard("Fractions", FRACTION_ROWS, {
   id: "fractions",
   title: "Fractions",
-  audience: "1–4",
+  audience: "1–5",
   tint: "sand",
   mascot: "panda",
   sheetSlug: "fractions",
   sheetScreen: "sheet-fractions",
   blurb:
-    "Free fraction practice for grades 1–4. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.",
+    "Free fraction practice for grades 1–5. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.",
   levels: [
     { id: "parts", label: "Parts of a whole", num: 1 },
     { id: "unit", label: "Unit fractions", num: 2 },

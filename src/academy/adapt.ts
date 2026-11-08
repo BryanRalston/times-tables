@@ -16,25 +16,24 @@ export function startLadder(index: number): Ladder {
 }
 
 /**
- * A brand-new kid starts one level under the grade default so the first
- * round feels easy. Later rounds, and boss rounds, start where they left off.
+ * Where a round opens: exactly the saved (current) level, clamped to the
+ * grade window. No lower warm-up round, on any tier. `roundsPlayed` and
+ * `boss` are kept for callers; they no longer move the start.
  */
 export function openingIndex(
   levelIndex: number,
-  roundsPlayed: number,
-  boss: boolean,
+  _roundsPlayed: number,
+  _boss: boolean,
   bounds?: { min: number; max: number },
 ): number {
   const min = Math.max(0, bounds?.min ?? 0);
   const max = bounds?.max ?? Number.POSITIVE_INFINITY;
-  const index = Math.max(min, Math.min(max, Math.max(0, levelIndex)));
-  if (boss || roundsPlayed > 0) return index;
-  return Math.max(min, index - 1);
+  return Math.max(min, Math.min(max, Math.max(0, levelIndex)));
 }
 
 /**
- * First round of a game drops one level under the grade start.
- * If Play already saved that easier level, do not drop again.
+ * A round opens at the saved level (or the stone the child tapped), never a
+ * level under it. `startIndex` is the grade start, used only when nothing is saved.
  */
 export function openingForRound(opts: {
   savedIndex: number;
@@ -43,12 +42,8 @@ export function openingForRound(opts: {
   boss: boolean;
   bounds?: { min: number; max: number };
 }): number {
-  const min = Math.max(0, opts.bounds?.min ?? 0);
-  const max = opts.bounds?.max ?? Number.POSITIVE_INFINITY;
-  const saved = Math.max(min, Math.min(max, Math.max(0, opts.savedIndex)));
-  const placed = opts.roundsPlayed <= 0 && !opts.boss && opts.startIndex > saved;
-  if (placed) return saved;
-  return openingIndex(saved, opts.roundsPlayed, opts.boss, opts.bounds);
+  const at = opts.savedIndex >= 0 ? opts.savedIndex : opts.startIndex;
+  return openingIndex(at, opts.roundsPlayed, opts.boss, opts.bounds);
 }
 
 /** Step up after a clean streak. Step down after a miss. Stay inside the ladder. */
@@ -85,6 +80,8 @@ export function pickServeIndex(opts: {
   levelCount: number;
   heats: readonly SkillHeat[];
   roll: number;
+  /** First question of a round: always the ladder level, never a review dip. */
+  first?: boolean;
   minIndex?: number;
   maxIndex?: number;
 }): { index: number; reason: ServeReason } {
@@ -98,7 +95,7 @@ export function pickServeIndex(opts: {
     const heat = opts.heats[i] ?? "new";
     if (heat !== "new") seenBelow.push(i);
   }
-  if (roll < 0.2 && seenBelow.length > 0) {
+  if (!opts.first && roll < 0.2 && seenBelow.length > 0) {
     let pick = seenBelow[0]!;
     let best = reviewRank(opts.heats[pick] ?? "new");
     for (const i of seenBelow) {

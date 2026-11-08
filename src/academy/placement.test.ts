@@ -13,9 +13,9 @@ import { withLevel, blankChild } from "./storage";
 import { nextPlacement, todayPlayLine, type Placement } from "./placement";
 
 describe("next play", () => {
-  it("starts a new grade 1 child one step easier, on add", () => {
+  it("starts a new grade 1 child at the grade start on add, no warm-up dip", () => {
     const child = blankChild({ name: "Pal", grade: "1" });
-    expect(nextPlacement(child)).toEqual({ game: "add", level: "within5", reason: "start" });
+    expect(nextPlacement(child)).toEqual({ game: "add", level: "within10", reason: "start" });
   });
 
   it("comes back to the weakest skill", () => {
@@ -49,7 +49,7 @@ describe("next play", () => {
     const kindergarten = nextPlacement(blankChild({ name: "Ada", grade: "K" }));
     const third = nextPlacement(blankChild({ name: "Bea", grade: "3" }));
     expect(kindergarten).toEqual({ game: "add", level: "within5", reason: "start" });
-    expect(third).toEqual({ game: "add", level: "tens", reason: "start" });
+    expect(third).toEqual({ game: "add", level: "within100", reason: "start" });
     expect(nextPlacement(blankChild({ name: "Cam", grade: "PK" }))).toEqual({
       game: "count",
       level: "objects",
@@ -68,10 +68,10 @@ describe("next play", () => {
       "add:within10",
     ]);
     expect(third.map(stepLabel)).toEqual([
-      "add:tens",
       "add:within100",
       "add:within1000",
-      "add:tens",
+      "add:within100",
+      "add:within1000",
       "add:within100",
     ]);
     for (const grade of ["K", "3"] as const) {

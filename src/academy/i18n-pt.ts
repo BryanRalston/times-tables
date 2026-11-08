@@ -855,8 +855,8 @@ export const PT: Record<string, string> = {
   "Free counting practice for Pre-K through grade 4. Count objects to 20, compare groups, find the number before and after, read dot patterns, and fill a ten-frame.":
     "Contar de graça, da pré-escola ao 4.º ano. Conte objetos até 20, compare grupos, ache o número de antes e o de depois, leia padrões de pontos e preencha um quadro de dez.",
   "Free for every family. No ads, no accounts.": "Grátis para todas as famílias. Sem anúncios e sem conta.",
-  "Free fraction practice for grades 1–4. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.":
-    "Frações de graça, do 1.º ao 4.º ano. Partes de um inteiro, frações unitárias, frações na reta numérica, comparar frações, frações equivalentes com desenhos e decimais.",
+  "Free fraction practice for grades 1–5. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.":
+    "Frações de graça, do 1.º ao 5.º ano. Partes de um inteiro, frações unitárias, frações na reta numérica, comparar frações, frações equivalentes com desenhos e decimais.",
   "Free geometry for Pre-K to grade 5. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.":
     "Geometria de graça, da pré-escola ao 5.º ano. Diga o nome das figuras, aprenda palavras de lugar, junte figuras, conte faces e quadrados e separe os quadriláteros.",
   "Free measurement and data practice for Pre-K through grade 4. Compare longer and shorter, measure inches on a ruler, read picture graphs and bar graphs, and find area.":
