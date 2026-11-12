@@ -4035,3 +4035,18 @@ button.ac-go.ac-next {
 .ac-cubes-key .is-mint i { background: #5cbfa8; }
 .ac-cubes-sheet .ac-cubes-key { font-size: 14px; gap: 2px 10px; }
 .ac-cubes-sheet .ac-cubes-key i { width: 11px; height: 11px; }
+
+/* Grade 5 Summit worksheet: one mixed list, cube pictures above their row. */
+.ac-summit-sheet { margin: 0; padding-inline-start: 1.6em; display: grid; gap: 14px; }
+.ac-summit-sheet li { break-inside: avoid; line-height: 1.5; }
+.ac-summit-sheet .ac-cubes-art { max-width: 220px; margin: 0 0 4px; }
+.ac-summit-sheet .ac-cubes-svg { height: 110px; }
+
+/* Grade 5 Summit boss on a phone: a smaller fight row so a grid or a box of cubes and all four tiles fit. */
+@media (max-height: 900px) {
+  .ac-shell.is-boss.is-summit .ac-boss-hud { gap: 4px; margin: 4px 0 2px; }
+  .ac-shell.is-boss.is-summit .ac-boss-row { min-height: 88px; }
+  .ac-shell.is-boss.is-summit .ac-boss-row .ac-buddy { width: 64px; height: 76px; max-width: 64px; }
+  .ac-shell.is-boss.is-summit .ac-boss.is-fight { width: 76px; height: 90px; }
+  .ac-shell.is-boss.is-summit .ac-phase-banner { padding: 3px 12px; }
+}

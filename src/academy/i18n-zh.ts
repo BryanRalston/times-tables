@@ -506,6 +506,13 @@ export const BOSS_ZH: Record<string, BossEs> = {
     "cosmeticName": "纸钟",
     "trophyName": "分钟奖杯"
   },
+  "summit": {
+    "taunt": "五道五年级的题，每道都不一样。慢慢来，每道都想清楚。",
+    "friendly": "你一路都想得很仔细。你登上了山顶。",
+    "personality": "一位安静的刺猬教授，走遍了五年级的每条小路，喜欢听清楚的讲解。",
+    "cosmeticName": "山顶斗篷",
+    "trophyName": "山顶奖杯"
+  },
 };
 
 export const TRAIT_ZH: Record<string, string> = {
@@ -1393,6 +1400,16 @@ export const ZH: Record<string, string> = {
   "Two rules": "两个规律",
   "Coordinate plane": "坐标平面",
   "Cube Builder": "搭方块",
+  "Grade 5 boss": "五年级大关",
+  "Grade 5 Summit": "五年级山顶",
+  "Mixed review": "综合复习",
+  "Summit": "山顶",
+  "Free grade 5 math review. Unlike fractions, decimals, dividing by 2 digits, the coordinate plane, two-rule patterns, and volume. No signup.": "免费的五年级数学复习。异分母分数、小数、除以两位数、坐标平面、两条规律的数列和体积。无需注册。",
+  "K–5": "幼儿园到五年级",
+  "1–5": "一年级到五年级",
+  "Pre-K–5": "学前班到五年级",
+  "Grade 2–5": "二年级到五年级",
+  "Grades 2–5": "二至五年级",
   "Cubes": "方块",
   "Grade 5": "五年级",
   "Free volume practice for grade 5. Count unit cubes, build boxes, and use length × width × height. No signup.": "五年级免费体积练习。数单位小正方体，搭长方体，用长 × 宽 × 高。不用注册。",

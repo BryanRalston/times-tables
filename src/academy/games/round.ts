@@ -31,6 +31,7 @@ export function makeBossRound(
 ): ChoiceQ[] {
   const game = gameById(gameId);
   if (!game) return [];
+  if (game.makeBossRound) return game.makeBossRound(rng, opts?.grade, prefer);
   if (opts?.grade) {
     const plan = bossQuestionLevels(gameId, level, opts.grade, opts.crown === true, BOSS_LENGTH, opts.challengeAhead === true);
     return plan.map((use) => game.makeQuestion(rng, use, prefer));
@@ -56,7 +57,8 @@ export function makeBossRound(
 export function makeQuestion(gameId: string, level: string, rng: Rng, prefer: string[] = []): ChoiceQ {
   const game = gameById(gameId);
   if (!game) throw new Error(`Unknown Academy game: ${gameId}`);
-  const safe = game.isLevel(level) ? level : game.defaultLevel("K");
+  // A mixed game also takes a source level, so "Try one like it" stays on that skill.
+  const safe = game.isLevel(level) || game.mixed ? level : game.defaultLevel("K");
   return game.makeQuestion(rng, safe, prefer);
 }
 

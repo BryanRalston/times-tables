@@ -216,6 +216,7 @@ export default defineConfig({
         sheetTicks: resolve("academy/worksheets/number-line-fractions/index.html"),
         sheetMinute: resolve("academy/worksheets/time-to-the-minute/index.html"),
         sheetCubes: resolve("academy/worksheets/volume-with-cubes/index.html"),
+        sheetSummit: resolve("academy/worksheets/grade-5-math-review/index.html"),
       },
     },
   },

@@ -307,6 +307,19 @@ const AUTHORED: readonly IslandBoss[] = [
     trophyId: "trophy-minute",
     trophyName: "Minute trophy",
   },
+  {
+    gameId: "summit",
+    name: "Professor Quill",
+    taunt: "Five grade 5 questions, all different. Take your time and think each one through.",
+    friendly: "Careful thinking all the way up. You reached the summit.",
+    personality: "A calm hedgehog professor who has walked every grade 5 trail and likes a good explanation.",
+    face: "hedgehog",
+    look: "spell",
+    cosmeticId: "summit-cape",
+    cosmeticName: "Summit cape",
+    trophyId: "trophy-summit",
+    trophyName: "Summit trophy",
+  },
 ];
 
 const LOOKS: readonly BossLook[] = ["crown", "cape", "armor", "clock", "coins", "spell"];

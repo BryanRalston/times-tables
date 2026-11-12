@@ -4,6 +4,7 @@ import type { Grade } from "../model";
 import { addGame } from "./add";
 import { countGame } from "./count";
 import { cubesGame } from "./cubes";
+import { summitGame } from "./summit";
 import { fractionsGame } from "./fractions";
 import { graphsGame } from "./graphs";
 import { gridGame } from "./grid";
@@ -54,6 +55,7 @@ export const GAMES = [
   ticksGame,
   minuteGame,
   cubesGame,
+  summitGame,
 ] as const;
 
 export type GameId = (typeof GAMES)[number]["id"];

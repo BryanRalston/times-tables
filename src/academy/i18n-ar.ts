@@ -505,6 +505,13 @@ export const BOSS_AR: Record<string, BossEs> = {
     cosmeticName: "ساعة ورقية",
     trophyName: "كأس الدقيقة",
   },
+  summit: {
+    taunt: "خمسة أسئلة من الصف الخامس، كلها مختلفة. خذ وقتك وفكّر في كل سؤال.",
+    friendly: "فكّرت بعناية طوال الطريق. وصلت إلى القمة.",
+    personality: "أستاذ قنفذ هادئ مشى في كل دروب الصف الخامس ويحب الشرح الواضح.",
+    cosmeticName: "عباءة القمة",
+    trophyName: "كأس القمة",
+  },
 };
 
 export const TRAIT_AR: Record<string, string> = {
@@ -1392,6 +1399,16 @@ export const AR: Record<string, string> = {
   "Two rules": "قاعدتان",
   "Coordinate plane": "المستوى الإحداثي",
   "Cube Builder": "باني المكعبات",
+  "Grade 5 boss": "زعيم الصف الخامس",
+  "Grade 5 Summit": "قمة الصف الخامس",
+  "Mixed review": "مراجعة متنوعة",
+  "Summit": "القمة",
+  "Free grade 5 math review. Unlike fractions, decimals, dividing by 2 digits, the coordinate plane, two-rule patterns, and volume. No signup.": "مراجعة مجانية لرياضيات الصف الخامس. كسور بمقامات مختلفة، وأعداد عشرية، وقسمة على عدد من رقمين، والمستوى الإحداثي، وأنماط بقاعدتين، والحجم. بلا تسجيل.",
+  "K–5": "تمهيدي–5",
+  "1–5": "الصف 1–5",
+  "Pre-K–5": "روضة–الصف 5",
+  "Grade 2–5": "الصف 2–5",
+  "Grades 2–5": "الصف الثاني حتى الخامس",
   "Cubes": "المكعبات",
   "Grade 5": "الصف الخامس",
   "Free volume practice for grade 5. Count unit cubes, build boxes, and use length × width × height. No signup.": "تدريب مجاني على الحجم للصف الخامس. عُدّ مكعبات الوحدة، وابنِ صناديق، واستخدم الطول × العرض × الارتفاع. بلا تسجيل.",

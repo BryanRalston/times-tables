@@ -1444,7 +1444,11 @@ export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: str
  */
 const NO_HANDS_CARD: ReadonlySet<string> = new Set(["place:thousandths", "fractions:addUnlike", "fractions:fracTimes", "variables:orderOps", "times:bigMulti", "share:longDiv", "add:decimalOps", "patterns:twoRules", "grid:coords", "cubes:count", "cubes:build", "cubes:formula", "cubes:two"]);
 
+/** Games with no hands-on card at any level. The Grade 5 Summit is all tap-a-tile cards. */
+const NO_HANDS_GAMES: ReadonlySet<string> = new Set(["summit"]);
+
 export function hasHandsCard(game: string, level: string): boolean {
+  if (NO_HANDS_GAMES.has(game)) return false;
   return !NO_HANDS_CARD.has(`${game}:${level}`);
 }
 

@@ -46,7 +46,7 @@ const TIMES_CHIPS = ["2", "3", "4", "5", "6", "7", "8", "9", "10"].map((n) => ({
 export const timesCard: GameCard = {
   id: "times",
   title: "Times Tables",
-  audience: "Grade 2–4",
+  audience: "Grade 2–5",
   tint: "pink",
   mascot: "peach",
   sheetSlug: "times-tables",
@@ -134,7 +134,7 @@ const ADD_CHIPS: SkillRow[] = [
 export const addCard: GameCard = {
   id: "add",
   title: "Add & Subtract",
-  audience: "K–4",
+  audience: "K–5",
   tint: "mint",
   mascot: "frog",
   sheetSlug: "add-subtract",
@@ -517,7 +517,7 @@ const PLACE_ROWS: SkillRow[] = [
 export const placeCard = sceneCard("Place Value", PLACE_ROWS, {
   id: "place",
   title: "Place Value",
-  audience: "1–4",
+  audience: "1–5",
   tint: "leaf",
   mascot: "bear",
   sheetSlug: "place-value",
@@ -891,7 +891,7 @@ const VARIABLE_ROWS: SkillRow[] = [
 export const variablesCard = sceneCard("What is missing", VARIABLE_ROWS, {
   id: "variables",
   title: "What is missing",
-  audience: "K–4",
+  audience: "K–5",
   tint: "iris",
   mascot: "otter",
   sheetSlug: "missing-numbers",
@@ -1002,7 +1002,7 @@ const SHARE_ROWS: SkillRow[] = [
 export const shareCard = sceneCard("Shares", SHARE_ROWS, {
   id: "share",
   title: "Fair Shares",
-  audience: "Pre-K–4",
+  audience: "Pre-K–5",
   tint: "aqua",
   mascot: "shark",
   sheetSlug: "sharing",
@@ -1055,7 +1055,7 @@ const GRID_ROWS: SkillRow[] = [
 export const gridCard = sceneCard("Garden", GRID_ROWS, {
   id: "grid",
   title: "Grid Garden",
-  audience: "Grades 2–4",
+  audience: "Grades 2–5",
   tint: "leaf",
   mascot: "red-panda",
   sheetSlug: "grid-garden",
@@ -1108,7 +1108,7 @@ const PATTERN_ROWS: SkillRow[] = [
 export const patternsCard = sceneCard("Patterns", PATTERN_ROWS, {
   id: "patterns",
   title: "Number Patterns",
-  audience: "K–4",
+  audience: "K–5",
   tint: "sand",
   mascot: "bun",
   sheetSlug: "number-patterns",
@@ -1373,6 +1373,29 @@ export const cubesCard = sceneCard("Cubes", CUBE_ROWS, {
   isLevel: (value) => isId(CUBE_IDS, value),
 });
 
+const SUMMIT_ROWS: SkillRow[] = [{ key: "summit:mix", label: "Mixed review" }];
+
+/**
+ * Grade 5 Summit: the grade 5 boss. Its cards come from the grade 5 levels of
+ * Fractions, Add & Subtract, Fair Shares, Grid Garden, Number Patterns, and
+ * Cube Builder. Grade 5 only; see docs/GRADE_MAP.md.
+ */
+export const summitCard = sceneCard("Summit", SUMMIT_ROWS, {
+  id: "summit",
+  title: "Grade 5 Summit",
+  audience: "Grade 5 boss",
+  tint: "lav",
+  mascot: "hedgehog",
+  sheetSlug: "grade-5-math-review",
+  sheetScreen: "sheet-summit",
+  blurb: "Free grade 5 math review. Unlike fractions, decimals, dividing by 2 digits, the coordinate plane, two-rule patterns, and volume. No signup.",
+  levels: [{ id: "mix", label: "Mixed review", num: 1 }],
+  defaultLevel: () => "mix",
+  sheetDefaultLevel: "mix",
+  isLevel: (value) => value === "mix",
+  mixed: true,
+});
+
 /** Home-card order is also the island order. Append a game; do not insert one in front. */
 export const GAME_CARDS = [
   timesCard,
@@ -1398,6 +1421,7 @@ export const GAME_CARDS = [
   ticksCard,
   minuteCard,
   cubesCard,
+  summitCard,
 ] as const;
 
 export type GameId = (typeof GAME_CARDS)[number]["id"];

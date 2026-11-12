@@ -506,6 +506,13 @@ export const BOSS_FR: Record<string, BossEs> = {
     "cosmeticName": "Horloge en papier",
     "trophyName": "Trophée de la minute"
   },
+  "summit": {
+    "taunt": "Cinq questions de CM2, toutes différentes. Prends ton temps et réfléchis à chacune.",
+    "friendly": "Tu as réfléchi avec soin jusqu'en haut. Tu as atteint le sommet.",
+    "personality": "Un hérisson professeur très calme qui a parcouru chaque sentier du CM2 et aime les bonnes explications.",
+    "cosmeticName": "Cape du sommet",
+    "trophyName": "Trophée du sommet"
+  },
 };
 
 export const TRAIT_FR: Record<string, string> = {
@@ -1392,6 +1399,16 @@ export const FR: Record<string, string> = {
   "Two rules": "Deux règles",
   "Coordinate plane": "Repère du plan",
   "Cube Builder": "Bâtisseur de cubes",
+  "Grade 5 boss": "Boss du CM2",
+  "Grade 5 Summit": "Sommet du CM2",
+  "Mixed review": "Révision mélangée",
+  "Summit": "Sommet",
+  "Free grade 5 math review. Unlike fractions, decimals, dividing by 2 digits, the coordinate plane, two-rule patterns, and volume. No signup.": "Révision gratuite de maths de CM2. Fractions de dénominateurs différents, décimaux, division par un nombre à 2 chiffres, le repère, suites à deux règles et volume. Sans inscription.",
+  "K–5": "GS à CM2",
+  "1–5": "CP à CM2",
+  "Pre-K–5": "Maternelle à CM2",
+  "Grade 2–5": "CE1 au CM2",
+  "Grades 2–5": "CE1 au CM2",
   "Cubes": "Cubes",
   "Grade 5": "CM2",
   "Free volume practice for grade 5. Count unit cubes, build boxes, and use length × width × height. No signup.": "Le volume gratuit pour le CM2. Compte des cubes unités, construis des boîtes et utilise longueur × largeur × hauteur. Sans compte.",
