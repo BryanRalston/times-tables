@@ -1,5 +1,6 @@
 import type { Rng } from "@/lib/rng";
 import { makeQuestion } from "./games/round";
+import { ADD_PLAIN_TAG, addShapeTag } from "./games/add";
 import type { ChoiceQ } from "./games/types";
 import { promptSpeech, workedExample, type WorkedExample } from "./teach";
 import { handsExample, makeBuildTask, type BuildTask } from "./hands-build";
@@ -132,6 +133,8 @@ export function similarChoice(game: string, question: ChoiceQ, rng: Rng): Choice
     : question.skill;
   const fact = choiceFact(question);
   const prefer = [...question.tags.filter((tag) => tag !== "ease:gentle" && tag !== "ease:firm"), "ease:gentle"];
+  // "Try one like it" keeps the kind of card: a plain 3 + 1 = ? stays plain, 8 + ? = 10 stays a missing part.
+  if (question.visual.kind === "add") prefer.push(addShapeTag(question.visual));
   let next = makeQuestion(game, level, rng, prefer);
   for (let i = 0; i < 8; i++) {
     if (choiceFact(next) !== fact) return next;
@@ -173,3 +176,28 @@ export function similarSlot(game: string, slot: RoundSlot, rng: Rng): RoundSlot 
 }
 
 export { daysPlayedCaption, daysPlayedThisWeek, weekStickers, type StickerDay } from "./week";
+
+/** Opening cards of a first Addition round that ask a plain sum or difference, like 3 + 1 = ?. */
+export const ADD_PLAIN_OPENING = 4;
+
+/**
+ * Extra serve tags for one card. A new visitor's first Addition round opens with plain
+ * sums and differences; missing-number cards come later in the round. Hard keeps its mix.
+ */
+export function openingPrefer(game: string, firstRound: boolean, tier: string | undefined, index: number): string[] {
+  if (game !== "add" || !firstRound || tier === "hard") return [];
+  return index < ADD_PLAIN_OPENING ? [ADD_PLAIN_TAG] : [];
+}
+
+/** Drag-the-counters cards in a round. A first Addition round keeps it to one. */
+export function handsMinimum(game: string, firstRound: boolean): number {
+  return game === "add" && firstRound ? 1 : 3;
+}
+
+/**
+ * A first Addition round does not step up right before its last card. The step still
+ * counts: it is saved for the next round instead of making card 6 suddenly harder.
+ */
+export function holdStepUp(game: string, firstRound: boolean, fromIndex: number, roundLength: number): boolean {
+  return game === "add" && firstRound && fromIndex === roundLength - 2;
+}

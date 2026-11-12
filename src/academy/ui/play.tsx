@@ -54,7 +54,10 @@ import { coinsForRound, dueIdeas, newestUnlock, starsForRound, weakTimesFacts } 
 import {
   choiceFact,
   exampleFor,
+  handsMinimum,
   handsOnSlots,
+  holdStepUp,
+  openingPrefer,
   pickFreshQuestion,
   planReturn,
   similarSlot,
@@ -64,6 +67,7 @@ import {
 } from "../round-flow";
 import { blip, bossFanfare, bossRaspberry, bossStrike, chime, startBossMusic, stopBossMusic, teachTone } from "../sound";
 import { hintCue } from "../teach";
+import { addCountLine } from "../games/add";
 import { precacheAfterFirstPrompt } from "../offline/later";
 import { silence, speak } from "../voice";
 import { CoinShare, RoundBuddy } from "./buddy-view";
@@ -273,6 +277,10 @@ export function PlayScreen({
   const comboRef = useRef(0);
   const missedRef = useRef(false);
   const handsRef = useRef<Set<number>>(new Set());
+  /** A first visit to this game: the short placement round. */
+  const firstRoundRef = useRef(!openingBoss && roundsHere <= 0);
+  /** A step up earned right before the last card of a first round waits for the next round. */
+  const heldUpRef = useRef(false);
   const returnsRef = useRef<Map<number, RoundSlot>>(new Map());
   menuRef.current = menu;
   phaseRef.current = phase;
@@ -287,7 +295,7 @@ export function PlayScreen({
     return levels[at]?.id ?? level;
   }
 
-  function nextQuestion(): ChoiceQ {
+  function nextQuestion(i: number): ChoiceQ {
     const levels = spec?.levels ?? [];
     const count = Math.max(1, levels.length);
     const box = boundsRef.current;
@@ -302,7 +310,8 @@ export function PlayScreen({
       maxIndex: box.max,
     });
     const levelId = levels[pick.index]?.id ?? levels[box.min]?.id ?? level;
-    const question = pickFreshQuestion(() => makeQuestion(game, levelId, rngRandom(), preferIds()), recentRef.current);
+    const opening = openingPrefer(game, firstRoundRef.current, tier, i);
+    const question = pickFreshQuestion(() => makeQuestion(game, levelId, rngRandom(), [...preferIds(), ...opening]), recentRef.current);
     remember(choiceFact(question));
     return question;
   }
@@ -348,12 +357,12 @@ export function PlayScreen({
       remember(slot.factKey);
       return { slot, returning: false };
     }
-    return { slot: { kind: "choice", question: nextQuestion() }, returning: false };
+    return { slot: { kind: "choice", question: nextQuestion(i) }, returning: false };
   }
 
   const [questions, setQuestions] = useState<Served[]>(() => {
     if (blocked) return [];
-    handsRef.current = new Set(boss ? [] : handsOnSlots(cards));
+    handsRef.current = new Set(boss ? [] : handsOnSlots(cards, handsMinimum(game, firstRoundRef.current)));
     if (boss) {
       return bossOpening(game, level, preferIds(), child.grade, crownFight, child.challengeAhead);
     }
@@ -395,7 +404,9 @@ export function PlayScreen({
         bounds: boundsRef.current,
       }),
     );
-    handsRef.current = new Set(nextBoss ? [] : handsOnSlots(nextPlanned));
+    firstRoundRef.current = !nextBoss && nextRounds <= 0;
+    heldUpRef.current = false;
+    handsRef.current = new Set(nextBoss ? [] : handsOnSlots(nextPlanned, handsMinimum(game, firstRoundRef.current)));
     returnsRef.current = new Map();
     recentRef.current = [];
     comboRef.current = 0;
@@ -460,6 +471,10 @@ export function PlayScreen({
       crown: boss && crownFight,
     });
     if (!boss && spec) {
+      if (heldUpRef.current) {
+        heldUpRef.current = false;
+        ladderRef.current = moveLadder(ladderRef.current, spec.levels.length, 1, boundsRef.current);
+      }
       const box = boundsRef.current;
       const at = Math.max(box.min, Math.min(box.max, ladderRef.current.index));
       const nextLevel = spec.levels[at]?.id;
@@ -507,7 +522,8 @@ export function PlayScreen({
     if (!boss && spec && !served.returning) {
       const step = clockMastery(masteryRef.current, { ok: true, idea: ideaOf(served.slot), assisted: hint }, stepUpAt());
       masteryRef.current = step.clock;
-      applyShift(step.shift);
+      if (step.shift === "up" && holdStepUp(game, firstRoundRef.current, fromIndex, roundTotal())) heldUpRef.current = true;
+      else applyShift(step.shift);
     }
     const nextCombo = served.returning ? 0 : fromCombo + 1;
     comboRef.current = nextCombo;
@@ -754,8 +770,16 @@ export function PlayScreen({
   }, [phase, sound, bossDef.taunt]);
 
   useEffect(() => {
-    if (phase === "ask" || phase === "practice") retryFocusRef.current?.focus();
-  }, [phase, index, practice]);
+    if (phase === "ask" || phase === "practice") retryFocusRef.current?.focus(game === "add" ? { preventScroll: true } : undefined);
+  }, [phase, index, practice, game]);
+
+  // Addition fits a card on one phone screen. Each new card starts at the top, so a
+  // scroll left over from the last card never hides the question or the tiles.
+  useEffect(() => {
+    if (game !== "add" || boss) return;
+    if (phase !== "ask" && phase !== "practice" && phase !== "teach") return;
+    if (typeof window !== "undefined" && window.scrollY > 0) window.scrollTo(0, 0);
+  }, [game, boss, phase, index, practice, roundId]);
 
   const correct = dots.filter((dot) => dot === "ok" || dot === "helped").length;
   const liveStars = starsForRound(correct, total);
@@ -802,7 +826,13 @@ export function PlayScreen({
   const filled = dots.filter((dot) => dot != null).length;
   const playBuddy = boss ? null : (
     <div className="ac-play-buddy" data-pals={graphPals ? "pair" : "one"}>
-      <RoundBuddy id={child.avatarId} cosmetic={child.equipped} reaction={buddyCue} pulse={phase === "feedback" ? cheer : 0} />
+      <RoundBuddy
+        id={child.avatarId}
+        cosmetic={child.equipped}
+        reaction={buddyCue}
+        pulse={phase === "feedback" ? cheer : 0}
+        countLine={choice?.visual.kind === "add" ? addCountLine(choice.visual) : undefined}
+      />
       {graphPals ? <AcademyPal id={hostId} className="ac-buddy-img" squish="buddy" label="" /> : null}
     </div>
   );
@@ -1111,7 +1141,7 @@ export function PlayScreen({
                 ) : choice ? (
                   <>
                     {spec?.Aside ? <spec.Aside question={choice} /> : null}
-                    <div className="ac-stage-copy">
+                    <div className={cx("ac-stage-copy", game === "add" && "is-add")}>
                       <p className="ac-story">{slotStory(slot, child.avatarId, hostId)}</p>
                       {choice.visual.kind === "money" ? <CoinShare buddyId={child.avatarId} hostId={hostId} /> : null}
                       {spec ? (

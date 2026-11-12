@@ -3941,3 +3941,19 @@ button.ac-go.ac-next {
 .ac-choice.is-math { direction: ltr; }
 .ac-choices.is-compact .ac-choice { min-height: 58px; font-size: 30px; }
 .ac-g5-pair { unicode-bidi: isolate; white-space: nowrap; }
+
+/* Addition on a phone: the question, picture, buddy line, and all four tiles fit one screen.
+   The buddy tucks in beside its line instead of standing tall between the card and the tiles. */
+@media (max-height: 900px) {
+  .ac-stage-copy.is-add { gap: 6px; }
+  .ac-stage-copy.is-add .ac-story { margin-bottom: 0; }
+  .ac-stage-copy.is-add .ac-play-buddy { flex: 0 0 auto; min-height: 0; }
+  .ac-stage-copy.is-add .ac-play-buddy .ac-buddy { flex-direction: row; align-items: center; gap: 8px; }
+  .ac-stage-copy.is-add .ac-play-buddy .ac-buddy-img,
+  .ac-stage-copy.is-add .ac-play-buddy .ac-wear,
+  .ac-stage-copy.is-add .ac-play-buddy .ac-squish { width: 56px; height: 56px; }
+  .ac-stage-copy.is-add .ac-play-buddy .ac-bubble { font-size: 15px; }
+  .ac-stage-copy.is-add .ac-qcard { padding: 10px 12px; }
+  .ac-stage-copy.is-add .ac-qcard h1 { font-size: 22px; }
+  .ac-stage-copy.is-add .ac-choice { min-height: 76px; }
+}

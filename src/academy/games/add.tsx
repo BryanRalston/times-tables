@@ -54,21 +54,70 @@ function bothParts(level: AddLevel, total: number, part: number): number {
   return part;
 }
 
+/** Which number a card hides. "result" is a plain sum or difference, like 3 + 1 = ?. */
+export type AddHide = "left" | "right" | "result";
+
+/** Opening cards of a first round ask a plain sum or difference. */
+export const ADD_PLAIN_TAG = "shape:plain";
+
+/** A tag that asks for the same kind of card again, like "shape:+right" for 8 + ? = 10. */
+export function addShapeTag(visual: { op: "+" | "-"; left: number | null; right: number | null; result: number | null }): string {
+  return `shape:${visual.op}${addHideOf(visual)}`;
+}
+
+export function addHideOf(visual: { left: number | null; right: number | null; result: number | null }): AddHide {
+  if (visual.left == null) return "left";
+  if (visual.right == null) return "right";
+  return "result";
+}
+
+/** A missing-number card, like 8 + ? = 10 or 5 − ? = 3. */
+export function isMissingNumber(visual: { left: number | null; right: number | null; result: number | null }): boolean {
+  return addHideOf(visual) !== "result";
+}
+
+function shapeWish(prefer: readonly string[]): { op?: "+" | "-"; hide?: AddHide } {
+  if (prefer.includes(ADD_PLAIN_TAG)) return { hide: "result" };
+  for (const tag of prefer) {
+    const m = /^shape:([+-])(left|right|result)$/.exec(tag);
+    if (m) return { op: m[1] as "+" | "-", hide: m[2] as AddHide };
+  }
+  return {};
+}
+
+/** Plus: 50% hide the second part, 32% the sum, 18% the first part. Minus: 55% the answer, 30% the part taken, 15% the start. */
+function rollHide(op: "+" | "-", roll: number, wish: AddHide | undefined): AddHide {
+  if (wish) return wish;
+  if (op === "+") return roll < 0.5 ? "right" : roll < 0.82 ? "result" : "left";
+  return roll < 0.55 ? "result" : roll < 0.85 ? "right" : "left";
+}
+
+function placeHidden(op: "+" | "-", pink: number, teal: number, hide: AddHide) {
+  const total = pink + teal;
+  const left = op === "+" ? pink : total;
+  const right = teal;
+  const result = op === "+" ? total : pink;
+  return {
+    left: hide === "left" ? null : left,
+    right: hide === "right" ? null : right,
+    result: hide === "result" ? null : result,
+    hidden: hide === "left" ? left : hide === "right" ? right : result,
+  };
+}
+
 export function makeAddQuestion(rng: Rng, level: AddLevel, prefer: readonly string[] = []): ChoiceQ {
   if (level === "within1000" || level === "thousands") return makeBigAddQuestion(rng, level, prefer);
   if (level === "decimalOps") return makeDecimalOpsQuestion(rng);
-  if (level === "tens") return makeTensQuestion(rng);
+  if (level === "tens") return makeTensQuestion(rng, prefer);
   const max = ADD_MAX[level];
   const span = easeSpan(1, max, easeOf(prefer));
-  const sub = rng.next() < (max <= 10 ? 0.28 : 0.45);
+  const wish = shapeWish(prefer);
+  const subRoll = rng.next() < (max <= 10 ? 0.28 : 0.45);
+  const sub = wish.op ? wish.op === "-" : subRoll;
   const roll = rng.next();
-  let op: "+" | "-" = "+";
+  const op: "+" | "-" = sub ? "-" : "+";
   let pink = 0;
   let teal = 0;
-  let left: number | null = 0;
-  let right: number | null = 0;
-  let result: number | null = 0;
-  let hidden = 0;
   let solved = "";
 
   if (!sub) {
@@ -80,45 +129,13 @@ export function makeAddQuestion(rng: Rng, level: AddLevel, prefer: readonly stri
     else pink = bothParts(level, sum, pink);
     teal = sum - pink;
     solved = `${pink} + ${teal} = ${sum}`;
-    if (roll < 0.5) {
-      left = pink;
-      right = null;
-      result = sum;
-      hidden = teal;
-    } else if (roll < 0.82) {
-      left = pink;
-      right = teal;
-      result = null;
-      hidden = sum;
-    } else {
-      left = null;
-      right = teal;
-      result = sum;
-      hidden = pink;
-    }
   } else {
-    op = "-";
     const total = rng.int(span.lo, span.hi);
     teal = bothParts(level, total, rng.int(0, total));
     pink = total - teal;
     solved = `${total} ${MINUS} ${teal} = ${pink}`;
-    if (roll < 0.55) {
-      left = total;
-      right = teal;
-      result = null;
-      hidden = pink;
-    } else if (roll < 0.85) {
-      left = total;
-      right = null;
-      result = pink;
-      hidden = teal;
-    } else {
-      left = null;
-      right = teal;
-      result = pink;
-      hidden = total;
-    }
   }
+  const { left, right, result, hidden } = placeHidden(op, pink, teal, rollHide(op, roll, wish.hide));
 
   const tags: string[] = [];
   if (op === "+" && pink === teal) tags.push("doubles");
@@ -140,6 +157,38 @@ export function makeAddQuestion(rng: Rng, level: AddLevel, prefer: readonly stri
   };
 }
 
+/**
+ * What the buddy says on an Addition card. It points at the group that is the answer:
+ * all of them for a sum, the ones left for a difference, and counting on for a missing part.
+ * Big numbers count tens and ones. Empty when no picture backs the line up.
+ */
+export function addCountLine(visual: { op: "+" | "-"; left: number | null; right: number | null; result: number | null; pink: number; teal: number; max: number }): string {
+  if (visual.max > 100) return "";
+  if (visual.max > 20) return t("Count the tens and the ones", "Cuenta las decenas y las unidades");
+  const hide = addHideOf(visual);
+  const total = visual.pink + visual.teal;
+  if (visual.op === "+") {
+    if (hide === "result") return t("Count all of them.", "Cuéntalos todos.", "Conte todos.", "Compte-les tous.", "全部数一数。", "सबको गिनो।", "عُدَّها كلها.");
+    const known = hide === "right" ? visual.pink : visual.teal;
+    return countUpLine(known, total);
+  }
+  if (hide === "result") return t("Count the ones left.", "Cuenta los que quedan.", "Conte os que sobraram.", "Compte ceux qui restent.", "数一数剩下的。", "बचे हुए गिनो।", "عُدَّ الباقي.");
+  if (hide === "right") return countUpLine(visual.pink, total);
+  return t("Count all of them.", "Cuéntalos todos.", "Conte todos.", "Compte-les tous.", "全部数一数。", "सबको गिनो।", "عُدَّها كلها.");
+}
+
+function countUpLine(from: number, to: number): string {
+  return t(
+    `Start at ${from}. Count up to ${to}.`,
+    `Empieza en ${from}. Cuenta hasta ${to}.`,
+    `Comece no ${from}. Conte até ${to}.`,
+    `Commence à ${from}. Compte jusqu'à ${to}.`,
+    `从${from}开始，数到${to}。`,
+    `${from} से शुरू करो। ${to} तक गिनो।`,
+    `ابدأ من ${from}. عُدَّ حتى ${to}.`,
+  );
+}
+
 function addTitle(rng: Rng, op: "+" | "-"): string {
   if (op === "+") {
     return pickTalk(rng, [
@@ -155,53 +204,15 @@ function addTitle(rng: Rng, op: "+" | "-"): string {
   ]);
 }
 
-function makeTensQuestion(rng: Rng): ChoiceQ {
+function makeTensQuestion(rng: Rng, prefer: readonly string[] = []): ChoiceQ {
   const max = ADD_MAX.tens;
-  const fact = tensOperands(rng);
+  const wish = shapeWish(prefer);
+  let fact = tensOperands(rng);
+  for (let i = 0; wish.op && fact.op !== wish.op && i < 12; i++) fact = tensOperands(rng);
   const { op, pink, teal, total } = fact;
   const roll = rng.next();
-  let left: number | null = 0;
-  let right: number | null = 0;
-  let result: number | null = 0;
-  let hidden = 0;
-  let solved = "";
-  if (op === "+") {
-    solved = `${pink} + ${teal} = ${total}`;
-    if (roll < 0.5) {
-      left = pink;
-      right = null;
-      result = total;
-      hidden = teal;
-    } else if (roll < 0.82) {
-      left = pink;
-      right = teal;
-      result = null;
-      hidden = total;
-    } else {
-      left = null;
-      right = teal;
-      result = total;
-      hidden = pink;
-    }
-  } else {
-    solved = `${total} ${MINUS} ${teal} = ${pink}`;
-    if (roll < 0.55) {
-      left = total;
-      right = teal;
-      result = null;
-      hidden = pink;
-    } else if (roll < 0.85) {
-      left = total;
-      right = null;
-      result = pink;
-      hidden = teal;
-    } else {
-      left = null;
-      right = teal;
-      result = pink;
-      hidden = total;
-    }
-  }
+  const solved = op === "+" ? `${pink} + ${teal} = ${total}` : `${total} ${MINUS} ${teal} = ${pink}`;
+  const { left, right, result, hidden } = placeHidden(op, pink, teal, rollHide(op, roll, wish.op && fact.op !== wish.op ? undefined : wish.hide));
   return {
     id: qid(rng),
     game: "add",

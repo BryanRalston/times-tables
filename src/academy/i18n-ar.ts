@@ -749,6 +749,8 @@ export const AR: Record<string, string> = {
   "Count the squares.": "عدّ المربعات.",
   "Count the squishees and try again.": "عدّ squishees وحاول مرة أخرى.",
   "Count the tens and the ones": "عدّ العشرات والآحاد",
+  "Count all of them.": "عُدَّها كلها.",
+  "Count the ones left.": "عُدَّ الباقي.",
   "Count to 10": "عدّ حتى 10",
   "Count to 120": "عدّ حتى 120",
   "Count to 20": "عدّ حتى 20",
