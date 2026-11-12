@@ -25,6 +25,8 @@ export interface StaticSheet {
   description: string;
   h1: string;
   game: SheetGame;
+  /** Game levels the items practice. The title's grade range comes from these. */
+  levels: readonly string[];
   items: StaticItem[];
 }
 
@@ -70,16 +72,21 @@ export function describeCoins(pile: CoinCounts): string {
 }
 
 function timesSheet(factor: number): StaticSheet {
+  // 2s, 5s, and 10s are the grade 2 level. The other tables start in grade 3.
+  const early = factor === 2 || factor === 5 || factor === 10;
+  const level = early ? "twos" : factor <= 5 ? "mix" : "toTen";
+  const grade = early ? "2" : "3";
   const items: StaticItem[] = [];
   for (let n = 1; n <= 10; n++) {
     items.push({ prompt: `${factor} × ${n} =`, answer: String(factor * n) });
   }
   return {
     slug: `multiplication-${factor}s`,
-    title: `Free Multiplication by ${factor}s Worksheet (Grades 2–4) | Squishee Academy`,
-    description: `Print a free ${factor}s times table for grades 2–4. Ten problems, an answer key, and no signup.`,
+    title: `Free Multiplication by ${factor}s Worksheet (Grade ${grade}) | Squishee Academy`,
+    description: `Print a free ${factor}s times table for grade ${grade}. Ten problems, an answer key, and no signup.`,
     h1: `Multiplication by ${factor}s`,
     game: "times",
+    levels: [level],
     items,
   };
 }
@@ -157,19 +164,21 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   timesSheet(10),
   {
     slug: "multiplication-mixed",
-    title: "Free Mixed Multiplication Worksheet (Grades 2–4) | Squishee Academy",
-    description: "Print a free mixed times table worksheet for grades 2–4. Facts through the 9s, with an answer key. No signup.",
+    title: "Free Mixed Multiplication Worksheet (Grade 3) | Squishee Academy",
+    description: "Print a free mixed times table worksheet for grade 3. Facts through the 9s, with an answer key. No signup.",
     h1: "Mixed multiplication facts",
     game: "times",
+    levels: ["toTen"],
     items: MIXED_PRODUCTS.map(([a, b]) => ({ prompt: `${a} × ${b} =`, answer: String(a * b) })),
   },
   arithmeticSheet(
     {
       slug: "addition-within-10",
-      title: "Free Addition Within 10 Worksheet (K–1) | Squishee Academy",
-      description: "Print a free addition worksheet for sums within 10. Made for kindergarten and grade 1, with an answer key. No signup.",
+      title: "Free Addition Within 10 Worksheet (Kindergarten) | Squishee Academy",
+      description: "Print a free addition worksheet for sums within 10. Made for kindergarten, with an answer key. No signup.",
       h1: "Addition within 10",
       game: "add",
+      levels: ["within10"],
     },
     [
       [2, 3, "+"],
@@ -187,10 +196,11 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   arithmeticSheet(
     {
       slug: "addition-within-20",
-      title: "Free Addition Within 20 Worksheet (Grades 1–2) | Squishee Academy",
-      description: "Print a free addition worksheet for sums within 20. Grades 1–2, with an answer key. No signup.",
+      title: "Free Addition Within 20 Worksheet (Grade 1) | Squishee Academy",
+      description: "Print a free addition worksheet for sums within 20. Grade 1, with an answer key. No signup.",
       h1: "Addition within 20",
       game: "add",
+      levels: ["within20"],
     },
     [
       [9, 8, "+"],
@@ -208,10 +218,11 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   arithmeticSheet(
     {
       slug: "subtraction-within-10",
-      title: "Free Subtraction Within 10 Worksheet (K–1) | Squishee Academy",
-      description: "Print a free subtraction worksheet for facts within 10. Kindergarten and grade 1, with an answer key. No signup.",
+      title: "Free Subtraction Within 10 Worksheet (Kindergarten) | Squishee Academy",
+      description: "Print a free subtraction worksheet for facts within 10. Kindergarten, with an answer key. No signup.",
       h1: "Subtraction within 10",
       game: "add",
+      levels: ["within10"],
     },
     [
       [9, 4, "-"],
@@ -229,10 +240,11 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   arithmeticSheet(
     {
       slug: "subtraction-within-20",
-      title: "Free Subtraction Within 20 Worksheet (Grades 1–2) | Squishee Academy",
-      description: "Print a free subtraction worksheet for facts within 20. Grades 1–2, with an answer key. No signup.",
+      title: "Free Subtraction Within 20 Worksheet (Grade 1) | Squishee Academy",
+      description: "Print a free subtraction worksheet for facts within 20. Grade 1, with an answer key. No signup.",
       h1: "Subtraction within 20",
       game: "add",
+      levels: ["within20"],
     },
     [
       [15, 7, "-"],
@@ -250,10 +262,11 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   arithmeticSheet(
     {
       slug: "addition-and-subtraction",
-      title: "Free Addition and Subtraction Worksheet (Grades 1–2) | Squishee Academy",
-      description: "Print a free mixed addition and subtraction worksheet for grades 1–2. Facts stay within 20, with an answer key. No signup.",
+      title: "Free Addition and Subtraction Worksheet (Grade 1) | Squishee Academy",
+      description: "Print a free mixed addition and subtraction worksheet for grade 1. Facts stay within 20, with an answer key. No signup.",
       h1: "Addition and subtraction",
       game: "add",
+      levels: ["within20"],
     },
     [
       [8, 5, "+"],
@@ -271,9 +284,10 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   timeSheet(
     {
       slug: "telling-time-to-the-hour",
-      title: "Free Telling Time to the Hour Worksheet (Grade 1) | Squishee Academy",
-      description: "Print a free o'clock worksheet for grade 1. Analog clocks and an answer key. No signup.",
+      title: "Free Telling Time to the Hour Worksheet (Kindergarten) | Squishee Academy",
+      description: "Print a free o'clock worksheet for kindergarten. Analog clocks and an answer key. No signup.",
       h1: "Telling time to the hour",
+      levels: ["hour"],
     },
     [
       [1, 0],
@@ -294,6 +308,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       title: "Free Half Hour Worksheet (Grade 1) | Squishee Academy",
       description: "Print a free half-hour clock worksheet for grade 1. Analog clocks and an answer key. No signup.",
       h1: "Telling time to the half hour",
+      levels: ["half"],
     },
     [
       [1, 30],
@@ -311,9 +326,10 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   timeSheet(
     {
       slug: "telling-time-quarter-hour",
-      title: "Free Quarter Hour Worksheet (Grades 2–3) | Squishee Academy",
-      description: "Print a free quarter-hour clock worksheet for grades 2–3. :00, :15, :30, and :45, with an answer key. No signup.",
+      title: "Free Quarter Hour Worksheet (Grade 2) | Squishee Academy",
+      description: "Print a free quarter-hour clock worksheet for grade 2. :00, :15, :30, and :45, with an answer key. No signup.",
       h1: "Telling time to the quarter hour",
+      levels: ["quarter"],
     },
     [
       [12, 0],
@@ -331,9 +347,10 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   timeSheet(
     {
       slug: "telling-time-five-minutes",
-      title: "Free Telling Time to Five Minutes Worksheet (Grades 2–3) | Squishee Academy",
-      description: "Print a free five-minute clock worksheet for grades 2–3. Analog clocks and an answer key. No signup.",
+      title: "Free Telling Time to Five Minutes Worksheet (Grade 2) | Squishee Academy",
+      description: "Print a free five-minute clock worksheet for grade 2. Analog clocks and an answer key. No signup.",
       h1: "Telling time to five minutes",
+      levels: ["fives"],
     },
     [
       [1, 5],
@@ -353,9 +370,10 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   moneySheet(
     {
       slug: "counting-coins",
-      title: "Free Counting Coins Worksheet (Grades 1–4) | Squishee Academy",
-      description: "Print a free coin-counting worksheet for grades 1–4. Pennies, nickels, dimes, and quarters, with an answer key. No signup.",
+      title: "Free Counting Coins Worksheet (Grade 1) | Squishee Academy",
+      description: "Print a free coin-counting worksheet for grade 1. Pennies, nickels, dimes, and quarters, with an answer key. No signup.",
       h1: "Counting coins",
+      levels: ["count"],
     },
     [
       countItem({ quarter: 1, dime: 1, penny: 3 }),
@@ -373,9 +391,10 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   moneySheet(
     {
       slug: "counting-pennies-and-nickels",
-      title: "Free Pennies and Nickels Worksheet (Grades 1–4) | Squishee Academy",
-      description: "Print a free pennies and nickels worksheet for grades 1–4. Count the coins and check the answer key. No signup.",
+      title: "Free Pennies and Nickels Worksheet (Grade 1) | Squishee Academy",
+      description: "Print a free pennies and nickels worksheet for grade 1. Count the coins and check the answer key. No signup.",
       h1: "Counting pennies and nickels",
+      levels: ["count"],
     },
     [
       countItem({ penny: 4 }),
@@ -393,9 +412,10 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   moneySheet(
     {
       slug: "counting-dimes-and-quarters",
-      title: "Free Dimes and Quarters Worksheet (Grades 1–4) | Squishee Academy",
-      description: "Print a free dimes and quarters worksheet for grades 1–4. An answer key is on the page. No signup.",
+      title: "Free Dimes and Quarters Worksheet (Grade 1) | Squishee Academy",
+      description: "Print a free dimes and quarters worksheet for grade 1. An answer key is on the page. No signup.",
       h1: "Counting dimes and quarters",
+      levels: ["count"],
     },
     [
       countItem({ dime: 1 }),
@@ -413,18 +433,20 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   moneySheet(
     {
       slug: "making-change",
-      title: "Free Making Change Worksheet (Grades 2–3) | Squishee Academy",
-      description: "Print a free making-change worksheet for grades 2–3. Pay with one dollar and find the change. Answer key included. No signup.",
+      title: "Free Making Change Worksheet (Grade 2) | Squishee Academy",
+      description: "Print a free making-change worksheet for grade 2. Pay with one dollar and find the change. Answer key included. No signup.",
       h1: "Making change from a dollar",
+      levels: ["change"],
     },
     [65, 40, 25, 99, 30, 10, 80, 45, 15, 50].map(changeItem),
   ),
   moneySheet(
     {
       slug: "dollars-and-cents",
-      title: "Free Dollars and Cents Worksheet (Grades 2–4) | Squishee Academy",
-      description: "Print a free dollars and cents worksheet for grades 2–4. Bills, coins, and money problems, with an answer key. No signup.",
+      title: "Free Dollars and Cents Worksheet (Grade 2) | Squishee Academy",
+      description: "Print a free dollars and cents worksheet for grade 2. Dollar bills and coins, with an answer key. No signup.",
       h1: "Dollars and cents",
+      levels: ["dollars"],
     },
     [
       countItem({ dollar: 1 }),
@@ -441,10 +463,11 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   ),
   {
     slug: "counting-to-20",
-    title: "Free Counting to 20 Worksheet (Pre-K–4) | Squishee Academy",
-    description: "Print a free counting worksheet for Pre-K through grade 4. Count to 20, compare more and less, and find the number before and after. Answer key included. No signup.",
+    title: "Free Counting to 20 Worksheet (K–1) | Squishee Academy",
+    description: "Print a free counting worksheet for kindergarten and grade 1. Count to 20, compare more and less, and find the number before and after. Answer key included. No signup.",
     h1: "Counting to 20",
     game: "count",
+    levels: ["to20", "compare", "neighbor"],
     items: [
       { prompt: "Count the stars: ★★", answer: "2" },
       { prompt: "Count the stars: ★★★★", answer: "4" },
@@ -460,10 +483,11 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "place-value-blocks",
-    title: "Free Place Value Worksheet (Grades 1–4) | Squishee Academy",
-    description: "Print a free place value worksheet for grades 1–4. Tens and ones, expanded form, comparing numbers, rounding, and thousands. Answer key included. No signup.",
+    title: "Free Place Value Worksheet (Grades 1–3) | Squishee Academy",
+    description: "Print a free place value worksheet for grades 1–3. Tens and ones, expanded form, comparing numbers, and rounding to 10 and 100. Answer key included. No signup.",
     h1: "Place value blocks",
     game: "place",
+    levels: ["blocks", "expanded", "compare", "round10", "round100"],
     items: [
       { prompt: "3 tens and 4 ones =", answer: "34" },
       { prompt: "6 tens and 0 ones =", answer: "60" },
@@ -480,9 +504,10 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   {
     slug: "naming-shapes",
     title: "Free Shapes Worksheet (Pre-K–4) | Squishee Academy",
-    description: "Print a free shapes worksheet for Pre-K to grade 5. Name flat and solid shapes, count sides, tile a rectangle, and find lines of symmetry. Answer key included. No signup.",
+    description: "Print a free shapes worksheet for Pre-K through grade 4. Name flat and solid shapes, count sides, tile a rectangle, and find lines of symmetry. Answer key included. No signup.",
     h1: "Naming shapes",
     game: "shapes",
+    levels: ["flat", "solid", "sides", "rows", "fold"],
     items: [
       { prompt: "Name the flat shape with 3 sides.", answer: "triangle" },
       { prompt: "Name the flat shape with 4 equal sides.", answer: "square" },
@@ -504,10 +529,11 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "fractions-of-a-whole",
-    title: "Free Fractions Worksheet (Grades 1–4) | Squishee Academy",
-    description: "Print a free fractions worksheet for grades 1–4. Parts of a whole, comparing fractions, equivalent fractions, and decimals. Answer key included. No signup.",
+    title: "Free Fractions Worksheet (Grades 1–3) | Squishee Academy",
+    description: "Print a free fractions worksheet for grades 1–3. Parts of a whole, unit fractions, comparing fractions, and equivalent fractions. Answer key included. No signup.",
     h1: "Fractions of a whole",
     game: "fractions",
+    levels: ["parts", "unit", "compare", "equivalent"],
     items: [
       { prompt: "1 of 2 equal parts are shaded. What fraction?", answer: "1/2" },
       { prompt: "1 of 4 equal parts are shaded. What fraction?", answer: "1/4" },
@@ -523,10 +549,11 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "measuring-length",
-    title: "Free Measurement Worksheet (Pre-K–4) | Squishee Academy",
-    description: "Print a free measurement worksheet for Pre-K through grade 4. Compare length, read a ruler, read a graph, and find area. Answer key included. No signup.",
+    title: "Free Measurement Worksheet (K–3) | Squishee Academy",
+    description: "Print a free measurement worksheet for kindergarten through grade 3. Compare length, read a ruler, read a graph, and find how many more. Answer key included. No signup.",
     h1: "Measuring length",
     game: "measure",
+    levels: ["compare", "picture", "ruler", "more"],
     items: [
       { prompt: "Which is longer, 3 units or 7 units?", answer: "7" },
       { prompt: "Which is shorter, 9 units or 4 units?", answer: "4" },
@@ -542,10 +569,11 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "phonics-beginning-sounds",
-    title: "Free Phonics Worksheet (Pre-K–4) | Squishee Academy",
-    description: "Print a free phonics worksheet for Pre-K through grade 4. Beginning sounds, rhymes, and CVC blending. Answer key included. No signup.",
+    title: "Free Phonics Worksheet (K–2) | Squishee Academy",
+    description: "Print a free phonics worksheet for kindergarten through grade 2. Beginning sounds, rhymes, and CVC blending. Answer key included. No signup.",
     h1: "Beginning sounds",
     game: "phonics",
+    levels: ["begin", "rhyme", "cvc"],
     items: [
       { prompt: "Which word starts with the mmm sound: moon, sun, pig, dog?", answer: "moon" },
       { prompt: "Which word starts with the sss sound: moon, sun, pig, dog?", answer: "sun" },
@@ -561,10 +589,11 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "addition-word-problems",
-    title: "Free Word Problems Worksheet (K–4) | Squishee Academy",
-    description: "Print a free word problem worksheet for kindergarten through grade 4. Add, subtract, multiply, share, and two-step stories with an answer key. No signup.",
+    title: "Free Word Problems Worksheet (K–3) | Squishee Academy",
+    description: "Print a free word problem worksheet for kindergarten through grade 3. Add, subtract, multiply, and share stories with an answer key. No signup.",
     h1: "Addition word problems",
     game: "problems",
+    levels: ["add", "sub", "mult", "div"],
     items: [
       { prompt: "Peach has 3 apples. Frog brings 2 more. How many apples?", answer: "5" },
       { prompt: "Peach has 4 apples. Frog brings 4 more. How many apples?", answer: "8" },
@@ -584,6 +613,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
     description: "Print a free missing-number worksheet for kindergarten through grade 4. Find the box in addition, subtraction, multiplication, and two-step equations. Answer key included. No signup.",
     h1: "Missing number equations",
     game: "variables",
+    levels: ["addend", "either", "factor", "times", "steps"],
     items: [
       { prompt: "3 + __ = 7", answer: "4" },
       { prompt: "__ + 4 = 9", answer: "5" },
@@ -603,6 +633,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
     description: "Print a free counting worksheet for ages 3–5. Count stars up to 10. Answer key included. No signup.",
     h1: "Counting to 10",
     game: "count",
+    levels: ["objects"],
     items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => ({ prompt: `Count the stars: ${"★".repeat(n)}`, answer: String(n) })),
   },
   {
@@ -611,6 +642,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
     description: "Print a free colors, matching, and patterns worksheet for Pre-K. Answer key included. No signup.",
     h1: "Colors and patterns",
     game: "shapes",
+    levels: ["color", "pattern"],
     items: [
       { prompt: "Which color is named red?", answer: "red" },
       { prompt: "Which color is named blue?", answer: "blue" },
@@ -626,10 +658,11 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "bigger-and-smaller",
-    title: "Free Bigger and Smaller Worksheet (Pre-K) | Squishee Academy",
-    description: "Print a free bigger-and-smaller worksheet for Pre-K. Answer key included. No signup.",
+    title: "Free Bigger and Smaller Worksheet (Pre-K and K) | Squishee Academy",
+    description: "Print a free bigger-and-smaller worksheet for Pre-K and kindergarten. Bigger and smaller, then longer and shorter. Answer key included. No signup.",
     h1: "Bigger and smaller",
     game: "measure",
+    levels: ["size", "compare"],
     items: [
       { prompt: "Which is bigger, a seed or a pumpkin?", answer: "pumpkin" },
       { prompt: "Which is longer, 2 units or 8 units?", answer: "8" },
@@ -649,6 +682,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
     description: "Print a free letter-name worksheet for Pre-K. Answer key included. No signup.",
     h1: "Letter names",
     game: "phonics",
+    levels: ["letters"],
     items: ["M", "S", "T", "B", "P", "A", "C", "D", "L", "R"].map((letter) => ({
       prompt: `Name the letter that looks like ${letter}.`,
       answer: letter,
@@ -660,6 +694,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
     description: "Print a free multi-digit multiplication worksheet for grade 4. Answer key included. No signup.",
     h1: "Multi-digit multiplication",
     game: "times",
+    levels: ["multi"],
     items: [
       [12, 4],
       [23, 3],
@@ -679,6 +714,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
     description: "Print a free division-with-remainders worksheet for grade 4. Answer key included. No signup.",
     h1: "Division with remainders",
     game: "times",
+    levels: ["divide"],
     items: [
       [23, 4],
       [17, 5],
@@ -702,6 +738,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
     description: "Print a free place-value worksheet for grade 4. Values through hundred thousands, with an answer key. No signup.",
     h1: "Place value to 1,000,000",
     game: "place",
+    levels: ["big"],
     items: [
       { prompt: "What is the value of the 4 in 345678?", answer: "40000" },
       { prompt: "What is the value of the 3 in 345678?", answer: "300000" },
@@ -721,6 +758,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
     description: "Print a free like-fractions and decimals worksheet for grade 4. Answer key included. No signup.",
     h1: "Like fractions and decimals",
     game: "fractions",
+    levels: ["addLike", "decimals"],
     items: [
       { prompt: "2/8 + 3/8 =", answer: "5/8" },
       { prompt: "1/5 + 2/5 =", answer: "3/5" },
@@ -740,6 +778,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
     description: "Print a free grade 4 worksheet for area, perimeter, elapsed time, and money. Answer key included. No signup.",
     h1: "Area, time, and money",
     game: "measure",
+    levels: ["area", "perimeter"],
     items: [
       { prompt: "Area of a 6 by 4 rectangle =", answer: "24" },
       { prompt: "Area of a 8 by 3 rectangle =", answer: "24" },
@@ -760,6 +799,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       "Print a free data and graphs worksheet for Pre-K through grade 4. Sort and count, read a tally, compare picture and bar graphs, use a scale, and add fractions from a line plot. No signup.",
     h1: "Data and graphs",
     game: "graphs",
+    levels: ["sort", "tally", "picture", "bar", "scale", "line"],
     items: [
       { prompt: "There are 2 apples and 1 banana. How many apples?", answer: "2" },
       { prompt: "There are 3 apples and 2 bananas. How many bananas?", answer: "2" },
@@ -782,6 +822,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       "Print a free sharing and division worksheet for Pre-K through grade 4. Deal cookies onto plates, make equal groups, and find what is left over. No signup.",
     h1: "Fair shares",
     game: "share",
+    levels: ["pairs", "fair", "groups", "left"],
     items: [
       { prompt: "Share 6 cookies onto 2 plates. How many on each plate?", answer: "3" },
       { prompt: "Share 8 cookies onto 4 plates. How many on each plate?", answer: "2" },
@@ -802,6 +843,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       "Print a free area and perimeter worksheet for grades 2–4. Count unit squares, find the distance around a figure, and solve for a missing side. No signup.",
     h1: "Grid garden",
     game: "grid",
+    levels: ["tiles", "fence", "side"],
     items: [
       { prompt: "An L is 3 squares tall plus 1 more. How many squares?", answer: "4" },
       { prompt: "An L is 3 squares tall plus 2 more. How many squares?", answer: "5" },
@@ -822,6 +864,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       "Print a free skip-counting worksheet for kindergarten through grade 4. Count by tens, fives, twos, and hundreds, then name the rule. No signup.",
     h1: "Number patterns",
     game: "patterns",
+    levels: ["tens", "fives", "twos", "hundreds", "rule", "grow"],
     items: [
       { prompt: "10, 20, 30, __. What comes next?", answer: "40" },
       { prompt: "5, 10, 15, __. What comes next?", answer: "20" },
@@ -842,6 +885,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       "Print a free comparison worksheet for kindergarten through grade 4. Mark less than, equal to, or greater than. No signup.",
     h1: "Compare numbers",
     game: "signs",
+    levels: ["to10", "tens", "hundreds", "big"],
     items: [
       { prompt: "Which is true: 3 is less than 8, 3 is greater than 8, or 3 is equal to 8?", answer: "3 is less than 8" },
       { prompt: "Which is true: 6 is equal to 6, 6 is less than 6, or 6 is greater than 6?", answer: "6 is equal to 6" },
@@ -862,6 +906,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       "Print a free worksheet for grades 1–4. Find 10 more, 10 less, 100 more, 100 less, and 1000 more. No signup.",
     h1: "Ten more",
     game: "jumps",
+    levels: ["ten", "hundred", "thousand"],
     items: [
       { prompt: "What is 10 more than 24?", answer: "34" },
       { prompt: "What is 10 less than 51?", answer: "41" },
@@ -882,6 +927,7 @@ export const WORKSHEETS: readonly StaticSheet[] = [
       "Print a free number-line fractions worksheet for grades 2–4. The middle ticks stay blank. Count the parts. No signup.",
     h1: "Number line fractions",
     game: "ticks",
+    levels: ["fourths", "sixths", "eighths", "past"],
     items: [
       { prompt: "A number line from 0 to 1 is split into 2 equal parts. The dot is on mark 1. What fraction?", answer: "1/2" },
       { prompt: "A number line from 0 to 1 is split into 4 equal parts. The dot is on mark 1. What fraction?", answer: "1/4" },
@@ -897,11 +943,12 @@ export const WORKSHEETS: readonly StaticSheet[] = [
   },
   {
     slug: "time-to-the-minute",
-    title: "Free Time to the Minute Worksheet (Grades 3–4) | Squishee Academy",
+    title: "Free Time to the Minute Worksheet (Grade 3) | Squishee Academy",
     description:
-      "Print a free time-to-the-minute worksheet for grades 3–4. Count the minutes past the hour. No signup.",
+      "Print a free time-to-the-minute worksheet for grade 3. Count the minutes past the hour. No signup.",
     h1: "Time to the minute",
     game: "minute",
+    levels: ["early", "half", "all"],
     items: [
       { prompt: "What time is it?", answer: "2:07", clock: { hours: 2, minutes: 7 } },
       { prompt: "What time is it?", answer: "4:13", clock: { hours: 4, minutes: 13 } },

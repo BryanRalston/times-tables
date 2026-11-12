@@ -220,6 +220,12 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "4": "grade 4",
     "5": "grade 5",
     "PK,K,1,2,3,4": "Pre-K to grade 4",
+    "PK,K,1,2": "Pre-K to grade 2",
+    "PK,K,1,2,3": "Pre-K to grade 3",
+    "PK,K,1,2,3,4,5": "Pre-K to grade 5",
+    "K,1,2,3,4,5": "kindergarten through grade 5",
+    "1,2,3,4,5": "grades 1–5",
+    "2,3,4,5": "grades 2–5",
     "K,1,2,3,4": "kindergarten through grade 4",
     "1,2,3,4": "grades 1–4",
     "2,3,4": "grades 2–4",
@@ -241,6 +247,12 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "4": "grado 4",
     "5": "grado 5",
     "PK,K,1,2,3,4": "de prekínder a grado 4",
+    "PK,K,1,2": "de prekínder a grado 2",
+    "PK,K,1,2,3": "de prekínder a grado 3",
+    "PK,K,1,2,3,4,5": "de prekínder a grado 5",
+    "K,1,2,3,4,5": "de kínder a grado 5",
+    "1,2,3,4,5": "grados 1 a 5",
+    "2,3,4,5": "grados 2 a 5",
     "K,1,2,3,4": "de kínder a grado 4",
     "1,2,3,4": "grados 1 a 4",
     "2,3,4": "grados 2 a 4",
@@ -262,6 +274,12 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "4": "4.º ano",
     "5": "5.º ano",
     "PK,K,1,2,3,4": "da pré-escola ao 4.º ano",
+    "PK,K,1,2": "da pré-escola ao 2.º ano",
+    "PK,K,1,2,3": "da pré-escola ao 3.º ano",
+    "PK,K,1,2,3,4,5": "da pré-escola ao 5.º ano",
+    "K,1,2,3,4,5": "do jardim ao 5.º ano",
+    "1,2,3,4,5": "do 1.º ao 5.º ano",
+    "2,3,4,5": "do 2.º ao 5.º ano",
     "K,1,2,3,4": "do jardim ao 4.º ano",
     "1,2,3,4": "do 1.º ao 4.º ano",
     "2,3,4": "do 2.º ao 4.º ano",
@@ -283,6 +301,12 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "4": "le CM1",
     "5": "le CM2",
     "PK,K,1,2,3,4": "de la maternelle au CM1",
+    "PK,K,1,2": "de la maternelle au CE1",
+    "PK,K,1,2,3": "de la maternelle au CE2",
+    "PK,K,1,2,3,4,5": "de la maternelle au CM2",
+    "K,1,2,3,4,5": "de la grande section au CM2",
+    "1,2,3,4,5": "du CP au CM2",
+    "2,3,4,5": "du CE1 au CM2",
     "K,1,2,3,4": "de la grande section au CM1",
     "1,2,3,4": "du CP au CM1",
     "2,3,4": "du CE1 au CM1",
@@ -304,6 +328,12 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "4": "四年级",
     "5": "五年级",
     "PK,K,1,2,3,4": "学前班到四年级",
+    "PK,K,1,2": "学前班到二年级",
+    "PK,K,1,2,3": "学前班到三年级",
+    "PK,K,1,2,3,4,5": "学前班到五年级",
+    "K,1,2,3,4,5": "幼儿园到五年级",
+    "1,2,3,4,5": "一至五年级",
+    "2,3,4,5": "二至五年级",
     "K,1,2,3,4": "幼儿园到四年级",
     "1,2,3,4": "一至四年级",
     "2,3,4": "二至四年级",
@@ -325,6 +355,12 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "4": "कक्षा 4",
     "5": "कक्षा 5",
     "PK,K,1,2,3,4": "नर्सरी से कक्षा 4",
+    "PK,K,1,2": "नर्सरी से कक्षा 2",
+    "PK,K,1,2,3": "नर्सरी से कक्षा 3",
+    "PK,K,1,2,3,4,5": "नर्सरी से कक्षा 5",
+    "K,1,2,3,4,5": "केजी से कक्षा 5",
+    "1,2,3,4,5": "कक्षा 1 से 5",
+    "2,3,4,5": "कक्षा 2 से 5",
     "K,1,2,3,4": "केजी से कक्षा 4",
     "1,2,3,4": "कक्षा 1 से 4",
     "2,3,4": "कक्षा 2 से 4",
@@ -346,6 +382,12 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "4": "الصف الرابع",
     "5": "الصف الخامس",
     "PK,K,1,2,3,4": "ما قبل الروضة حتى الصف الرابع",
+    "PK,K,1,2": "ما قبل الروضة حتى الصف الثاني",
+    "PK,K,1,2,3": "ما قبل الروضة حتى الصف الثالث",
+    "PK,K,1,2,3,4,5": "ما قبل الروضة حتى الصف الخامس",
+    "K,1,2,3,4,5": "الروضة حتى الصف الخامس",
+    "1,2,3,4,5": "الصف الأول حتى الخامس",
+    "2,3,4,5": "الصف الثاني حتى الخامس",
     "K,1,2,3,4": "الروضة حتى الصف الرابع",
     "1,2,3,4": "الصف الأول حتى الرابع",
     "2,3,4": "الصف الثاني حتى الرابع",
@@ -430,7 +472,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "times",
     slug: "times-tables-game",
-    grades: ["2", "3", "4"],
+    grades: ["1", "2", "3", "4", "5"],
     name: phrase("times tables", "tablas de multiplicar", "tabuada", "tables de multiplication", "乘法口诀", "पहाड़े", "جداول الضرب"),
     blurb: phrase(
       "Kids practice multiplication facts, factors, multi-digit multiplication, and division with remainders.",
@@ -445,7 +487,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "add",
     slug: "addition-subtraction-game",
-    grades: ["K", "1", "2", "3", "4"],
+    grades: ["K", "1", "2", "3", "4", "5"],
     name: phrase("addition and subtraction", "sumas y restas", "adição e subtração", "additions et soustractions", "加减法", "जोड़ और घटाव", "الجمع والطرح"),
     blurb: phrase(
       "Kids add and subtract, from facts within 5 up through the thousands.",
@@ -460,7 +502,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "time",
     slug: "telling-time-game",
-    grades: ["1", "2", "3", "4"],
+    grades: ["K", "1", "2", "3", "4"],
     name: phrase("telling time", "la hora", "horas", "lecture de l'heure", "认识钟表", "समय देखना", "قراءة الساعة"),
     blurb: phrase(
       "Kids read an analog clock to the hour, half hour, quarter hour, and five minutes, then find elapsed time.",
@@ -520,7 +562,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "count",
     slug: "counting-game",
-    grades: ["PK", "K", "1", "2", "3", "4"],
+    grades: ["PK", "K", "1", "2"],
     name: phrase("counting", "contar", "contagem", "dénombrement", "数数", "गिनती", "العدّ"),
     blurb: phrase(
       "Kids count objects, compare groups, find the number before and after, and fill a ten-frame.",
@@ -535,7 +577,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "place",
     slug: "place-value-game",
-    grades: ["1", "2", "3", "4"],
+    grades: ["1", "2", "3", "4", "5"],
     name: phrase("place value", "valor posicional", "valor posicional", "valeur de position", "数位", "स्थानीय मान", "القيمة المنزلية"),
     blurb: phrase(
       "Kids work with tens and ones, expanded form, comparing, rounding, and place value up to 1,000,000.",
@@ -565,7 +607,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "fractions",
     slug: "fractions-game",
-    grades: ["1", "2", "3", "4"],
+    grades: ["1", "2", "3", "4", "5"],
     name: phrase("fractions", "fracciones", "frações", "fractions", "分数", "भिन्न", "الكسور"),
     blurb: phrase(
       "Kids shade parts of a whole, compare fractions, find equivalents, add like fractions, and read decimals.",
@@ -595,7 +637,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "phonics",
     slug: "phonics-game",
-    grades: ["PK", "K", "1", "2", "3", "4"],
+    grades: ["PK", "K", "1", "2", "3"],
     name: phrase("phonics", "fonética", "consciência fonológica", "phonologie", "自然拼读", "ध्वनि ज्ञान", "الصوتيات"),
     blurb: phrase(
       "Kids name letters, hear sounds, rhyme, and blend CVC words. A speaker reads the sound.",
@@ -625,7 +667,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "variables",
     slug: "missing-numbers-game",
-    grades: ["K", "1", "2", "3", "4"],
+    grades: ["K", "1", "2", "3", "4", "5"],
     name: phrase("missing numbers", "números que faltan", "números que faltam", "nombres manquants", "缺数", "गायब संख्या", "الأعداد الناقصة"),
     blurb: phrase(
       "Kids find the missing number in addition, subtraction, multiplication, and two-step equations. A first look at variables.",
@@ -655,7 +697,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "share",
     slug: "sharing-game",
-    grades: ["PK", "K", "1", "2", "3", "4"],
+    grades: ["PK", "K", "1", "2", "3", "4", "5"],
     name: phrase("fair shares", "repartos iguales", "partes iguais", "parts égales", "平均分", "बराबर बाँटना", "حصص متساوية"),
     blurb: phrase(
       "Kids deal cookies onto plates, make equal groups, practice division facts, and see what is left over.",
@@ -670,7 +712,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "grid",
     slug: "grid-garden-game",
-    grades: ["2", "3", "4"],
+    grades: ["2", "3", "4", "5"],
     name: phrase("grid garden", "jardín de cuadrícula", "jardim quadriculado", "jardin quadrillé", "方格园", "ग्रिड बगीचा", "حديقة المربعات"),
     blurb: phrase(
       "Kids count unit squares in a shape, walk the fence around it, and find a missing side.",
@@ -738,7 +780,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "minute",
     slug: "time-to-the-nearest-minute-game",
-    grades: ["3", "4"],
+    grades: ["3"],
     name: phrase(
       "time to the minute",
       "la hora al minuto",
@@ -784,7 +826,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "patterns",
     slug: "number-patterns-game",
-    grades: ["K", "1", "2", "3", "4"],
+    grades: ["K", "1", "2", "3", "4", "5"],
     name: phrase("number patterns", "patrones numéricos", "padrões numéricos", "suites de nombres", "数字规律", "संख्या के पैटर्न", "أنماط الأعداد"),
     blurb: phrase(
       "Kids count by tens, fives, twos, and hundreds, then find the rule that grows the pattern.",
@@ -990,6 +1032,13 @@ const SHEET_GRADES: Record<string, Phrase> = {
   "Pre-K": phrase("Pre-K", "prekínder", "pré-escola", "maternelle", "学前班", "नर्सरी", "ما قبل الروضة"),
   "Grade 4": phrase("Grade 4", "grado 4", "4.º ano", "CM1", "四年级", "कक्षा 4", "الصف الرابع"),
   "Grades 3–4": phrase("Grades 3–4", "grados 3 a 4", "3.º e 4.º ano", "CE2 et CM1", "三至四年级", "कक्षा 3–4", "الصفان الثالث والرابع"),
+  "Kindergarten": phrase("Kindergarten", "kínder", "jardim", "grande section", "幼儿园", "केजी", "الروضة"),
+  "Grade 2": phrase("Grade 2", "grado 2", "2.º ano", "CE1", "二年级", "कक्षा 2", "الصف الثاني"),
+  "Grade 3": phrase("Grade 3", "grado 3", "3.º ano", "CE2", "三年级", "कक्षा 3", "الصف الثالث"),
+  "K–2": phrase("K–2", "de kínder a grado 2", "do jardim ao 2.º ano", "de la grande section au CE1", "幼儿园到二年级", "केजी से कक्षा 2", "الروضة حتى الصف الثاني"),
+  "K–3": phrase("K–3", "de kínder a grado 3", "do jardim ao 3.º ano", "de la grande section au CE2", "幼儿园到三年级", "केजी से कक्षा 3", "الروضة حتى الصف الثالث"),
+  "Grades 1–3": phrase("Grades 1–3", "grados 1 a 3", "1.º ao 3.º ano", "CP au CE2", "一至三年级", "कक्षा 1–3", "الصف الأول حتى الثالث"),
+  "Pre-K and K": phrase("Pre-K and K", "prekínder y kínder", "pré-escola e jardim", "maternelle et grande section", "学前班和幼儿园", "नर्सरी और केजी", "ما قبل الروضة والروضة"),
 };
 
 export function sheetGradeLabel(englishTitle: string, lang: SeoLang): string {
@@ -1126,19 +1175,19 @@ export function sheetDescription(lang: SeoLang, h1: string, grades: string): str
 export function sheetIndexTitle(lang: SeoLang): string {
   switch (lang) {
     case "en":
-      return "Free Pre-K to Grade 4 Math Worksheets | Squishee Academy";
+      return "Free Pre-K to Grade 5 Math Worksheets | Squishee Academy";
     case "es":
-      return "Fichas gratis de mates de prekínder a grado 4 | Squishee Academy";
+      return "Fichas gratis de mates de prekínder a grado 5 | Squishee Academy";
     case "pt-BR":
-      return "Folhas grátis de matemática da pré-escola ao 4.º ano | Squishee Academy";
+      return "Folhas grátis de matemática da pré-escola ao 5.º ano | Squishee Academy";
     case "fr":
-      return "Fiches de maths gratuites, de la maternelle au CM1 | Squishee Academy";
+      return "Fiches de maths gratuites, de la maternelle au CM2 | Squishee Academy";
     case "zh-Hans":
-      return "学前班到四年级的免费数学练习纸 | Squishee Academy";
+      return "学前班到五年级的免费数学练习纸 | Squishee Academy";
     case "hi":
-      return "नर्सरी से कक्षा 4 तक मुफ़्त गणित वर्कशीट | Squishee Academy";
+      return "नर्सरी से कक्षा 5 तक मुफ़्त गणित वर्कशीट | Squishee Academy";
     case "ar":
-      return "أوراق رياضيات مجانية من ما قبل الروضة حتى الصف الرابع | Squishee Academy";
+      return "أوراق رياضيات مجانية من ما قبل الروضة حتى الصف الخامس | Squishee Academy";
     default: {
       const neverLang: never = lang;
       return neverLang;
@@ -1151,17 +1200,17 @@ export function sheetIndexDescription(lang: SeoLang): string {
     case "en":
       return "Free printable math worksheets for Pre-K to grade 5. Times tables, addition, subtraction, elapsed time, counting coins, money problems, thousands, and area. Answer keys included. No signup.";
     case "es":
-      return "Fichas de mates imprimibles y gratis, de prekínder a grado 4. Tablas, sumas, restas, tiempo transcurrido, monedas, problemas de dinero, millares y área. Con respuestas. Sin registro.";
+      return "Fichas de mates imprimibles y gratis, de prekínder a grado 5. Tablas, sumas, restas, tiempo transcurrido, monedas, problemas de dinero, millares y área. Con respuestas. Sin registro.";
     case "pt-BR":
-      return "Folhas de matemática imprimíveis e grátis, da pré-escola ao 4.º ano. Tabuada, adição, subtração, tempo decorrido, moedas, problemas de dinheiro, milhares e área. Com gabarito. Sem cadastro.";
+      return "Folhas de matemática imprimíveis e grátis, da pré-escola ao 5.º ano. Tabuada, adição, subtração, tempo decorrido, moedas, problemas de dinheiro, milhares e área. Com gabarito. Sem cadastro.";
     case "fr":
-      return "Fiches de maths à imprimer, gratuites, de la maternelle au CM1. Tables, additions, soustractions, temps écoulé, pièces, problèmes d'argent, milliers et aire. Corrigé inclus. Sans inscription.";
+      return "Fiches de maths à imprimer, gratuites, de la maternelle au CM2. Tables, additions, soustractions, temps écoulé, pièces, problèmes d'argent, milliers et aire. Corrigé inclus. Sans inscription.";
     case "zh-Hans":
-      return "学前班到四年级的免费可打印数学练习纸。乘法口诀、加减、经过的时间、数硬币、钱的应用题、千位数和面积。附答案。不用注册。";
+      return "学前班到五年级的免费可打印数学练习纸。乘法口诀、加减、经过的时间、数硬币、钱的应用题、千位数和面积。附答案。不用注册。";
     case "hi":
-      return "नर्सरी से कक्षा 4 तक मुफ़्त छापने योग्य गणित वर्कशीट। पहाड़े, जोड़, घटाव, बीता समय, सिक्के, पैसे के सवाल, हज़ार और क्षेत्रफल। उत्तर साथ में। बिना साइन अप।";
+      return "नर्सरी से कक्षा 5 तक मुफ़्त छापने योग्य गणित वर्कशीट। पहाड़े, जोड़, घटाव, बीता समय, सिक्के, पैसे के सवाल, हज़ार और क्षेत्रफल। उत्तर साथ में। बिना साइन अप।";
     case "ar":
-      return "أوراق رياضيات مجانية للطباعة من ما قبل الروضة حتى الصف الرابع. جداول الضرب والجمع والطرح والوقت المنقضي وعدّ العملات ومسائل النقود والألوف والمساحة. مع الإجابات. بلا تسجيل.";
+      return "أوراق رياضيات مجانية للطباعة من ما قبل الروضة حتى الصف الخامس. جداول الضرب والجمع والطرح والوقت المنقضي وعدّ العملات ومسائل النقود والألوف والمساحة. مع الإجابات. بلا تسجيل.";
     default: {
       const neverLang: never = lang;
       return neverLang;

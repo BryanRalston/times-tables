@@ -1139,7 +1139,7 @@ export function PlayScreen({
                 {slot.kind !== "choice" ? (
                   <div className="ac-hands-layout">
                     {playBuddy}
-                    <p className="ac-story">{slotStory(slot, child.avatarId, hostId)}</p>
+                    <p className="ac-story">{slotStory(slot, child.avatarId, hostId, child.grade)}</p>
                     {phase === "feedback" ? (
                       <p className="ac-banner is-yes">{served ? praiseLine(served.slot) : show("Yes!")}</p>
                     ) : null}
@@ -1151,7 +1151,7 @@ export function PlayScreen({
                   <>
                     {spec?.Aside ? <spec.Aside question={choice} /> : null}
                     <div className={cx("ac-stage-copy", game === "add" && "is-add", (game === "cubes" || view?.id === "cubes") && "is-cubes")}>
-                      <p className="ac-story">{slotStory(slot, child.avatarId, hostId)}</p>
+                      <p className="ac-story">{slotStory(slot, child.avatarId, hostId, child.grade)}</p>
                       {choice.visual.kind === "money" ? <CoinShare buddyId={child.avatarId} hostId={hostId} /> : null}
                       {view ? (
                         <view.Prompt question={choice} reveal={phase === "feedback"} mascot={mascot} happy={ok} />

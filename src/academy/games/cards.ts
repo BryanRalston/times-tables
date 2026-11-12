@@ -46,13 +46,13 @@ const TIMES_CHIPS = ["2", "3", "4", "5", "6", "7", "8", "9", "10"].map((n) => ({
 export const timesCard: GameCard = {
   id: "times",
   title: "Times Tables",
-  audience: "Grade 2–5",
+  audience: "Grades 1–5",
   tint: "pink",
   mascot: "peach",
   sheetSlug: "times-tables",
   sheetScreen: "sheet-times",
   blurb:
-    "Free printable multiplication practice for grades 2–4. Facts, multi-digit problems, and an answer key. No signup.",
+    "Free printable multiplication practice for grades 1–5. Facts, multi-digit problems, and an answer key. No signup.",
   sheetCount: 16,
   layout: "card",
   levels: [
@@ -140,7 +140,7 @@ export const addCard: GameCard = {
   sheetSlug: "add-subtract",
   sheetScreen: "sheet-add",
   blurb:
-    "Free printable addition and subtraction for kindergarten through grade 4. Facts within 5, 10, 20, 100, or the thousands, plus an answer key.",
+    "Free printable addition and subtraction for kindergarten through grade 5. Facts within 5, 10, 20, 100, or the thousands, plus an answer key.",
   sheetCount: 16,
   layout: "card",
   levels: [
@@ -208,13 +208,13 @@ const TIME_CHIPS: SkillRow[] = [
 export const timeCard: GameCard = {
   id: "time",
   title: "Telling Time",
-  audience: "Grade 1–4",
+  audience: "K–4",
   tint: "sun",
   mascot: "melon",
   sheetSlug: "telling-time",
   sheetScreen: "sheet-time",
   blurb:
-    "Free printable telling-time practice for grades 1–4. Analog clocks to the hour, half hour, quarter hour, and 5 minutes, plus elapsed time, with an answer key.",
+    "Free printable telling-time practice for kindergarten through grade 4. Analog clocks to the hour, half hour, quarter hour, and 5 minutes, plus elapsed time, with an answer key.",
   sheetCount: 6,
   layout: "wide",
   levels: [
@@ -283,7 +283,7 @@ export const moneyCard: GameCard = {
   sheetSlug: "money",
   sheetScreen: "sheet-money",
   blurb:
-    "Free printable coin practice for Pre-K to grade 5. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.",
+    "Free printable coin practice for Pre-K to grade 4. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.",
   sheetCount: 12,
   layout: "card",
   levels: [
@@ -463,13 +463,13 @@ const COUNT_ROWS: SkillRow[] = [
 export const countCard = sceneCard("Counting", COUNT_ROWS, {
   id: "count",
   title: "Counting",
-  audience: "Pre-K–4",
+  audience: "Pre-K–2",
   tint: "coral",
   mascot: "chick",
   sheetSlug: "counting",
   sheetScreen: "sheet-count",
   blurb:
-    "Free counting practice for Pre-K through grade 4. Count objects to 20, compare groups, find the number before and after, read dot patterns, and fill a ten-frame.",
+    "Free counting practice for Pre-K through grade 2. Count objects to 20, compare groups, find the number before and after, read dot patterns, and fill a ten-frame.",
   levels: [
     { id: "objects", label: "Count to 10", num: 1 },
     { id: "to20", label: "Count to 20", num: 2 },
@@ -517,13 +517,13 @@ const PLACE_ROWS: SkillRow[] = [
 export const placeCard = sceneCard("Place Value", PLACE_ROWS, {
   id: "place",
   title: "Place Value",
-  audience: "1–5",
+  audience: "Grades 1–5",
   tint: "leaf",
   mascot: "bear",
   sheetSlug: "place-value",
   sheetScreen: "sheet-place",
   blurb:
-    "Free place value practice for grades 1–4. Tens and ones with base-ten blocks, expanded form, comparing numbers, rounding, and thousands up to a million.",
+    "Free place value practice for grades 1–5. Tens and ones with base-ten blocks, expanded form, comparing numbers, rounding, and thousands up to a million.",
   levels: [
     { id: "blocks", label: "Tens and ones", num: 1 },
     { id: "expanded", label: "Expanded form", num: 2 },
@@ -590,7 +590,7 @@ export const shapesCard = sceneCard("Shapes", SHAPE_ROWS, {
   sheetSlug: "shapes",
   sheetScreen: "sheet-shapes",
   blurb:
-    "Free geometry for Pre-K to grade 5. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.",
+    "Free geometry for Pre-K to grade 4. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.",
   levels: [
     { id: "color", label: "Colors", num: 1 },
     { id: "match", label: "Matching", num: 2 },
@@ -677,7 +677,7 @@ const FRACTION_ROWS: SkillRow[] = [
 export const fractionsCard = sceneCard("Fractions", FRACTION_ROWS, {
   id: "fractions",
   title: "Fractions",
-  audience: "1–5",
+  audience: "Grades 1–5",
   tint: "sand",
   mascot: "panda",
   sheetSlug: "fractions",
@@ -788,13 +788,13 @@ const PHONICS_ROWS: SkillRow[] = [
 export const phonicsCard = sceneCard("Phonics", PHONICS_ROWS, {
   id: "phonics",
   title: "Phonics",
-  audience: "Pre-K–4",
+  audience: "Pre-K–3",
   tint: "lilac",
   mascot: "bunny",
   sheetSlug: "phonics",
   sheetScreen: "sheet-phonics",
   blurb:
-    "Free phonics practice for Pre-K through grade 4. Letter sounds, beginning sounds with pictures, rhyming words, and CVC blending. A speaker reads the sound, with the sound written out when a voice is not available.",
+    "Free phonics practice for Pre-K through grade 3. Letter sounds, beginning sounds with pictures, rhyming words, and CVC blending. A speaker reads the sound, with the sound written out when a voice is not available.",
   levels: [
     { id: "letters", label: "Letter names", num: 1 },
     { id: "sounds", label: "Letter sounds", num: 2 },
@@ -897,7 +897,7 @@ export const variablesCard = sceneCard("What is missing", VARIABLE_ROWS, {
   sheetSlug: "missing-numbers",
   sheetScreen: "sheet-variables",
   blurb:
-    "Free missing-number equations for kindergarten through grade 4. Find the box in an addition, subtraction, multiplication, or two-step equation. A first look at variables. No signup.",
+    "Free missing-number equations for kindergarten through grade 5. Find the box in an addition, subtraction, multiplication, or two-step equation. A first look at variables. No signup.",
   levels: [
     { id: "addend", label: "Addend within 10", num: 1 },
     { id: "either", label: "Blank within 20", num: 2 },
@@ -1008,7 +1008,7 @@ export const shareCard = sceneCard("Shares", SHARE_ROWS, {
   sheetSlug: "sharing",
   sheetScreen: "sheet-share",
   blurb:
-    "Free sharing and division practice for Pre-K through grade 4. Deal cookies onto plates, make equal groups, and see what is left over. No signup.",
+    "Free sharing and division practice for Pre-K through grade 5. Deal cookies onto plates, make equal groups, and see what is left over. No signup.",
   levels: [
     { id: "pairs", label: "Two plates", num: 1 },
     { id: "fair", label: "Equal shares", num: 2 },
@@ -1061,7 +1061,7 @@ export const gridCard = sceneCard("Garden", GRID_ROWS, {
   sheetSlug: "grid-garden",
   sheetScreen: "sheet-grid",
   blurb:
-    "Free area and perimeter practice for grades 2–4. Count unit squares in a shape, walk the fence around it, and find a missing side. No signup.",
+    "Free area and perimeter practice for grades 2–5. Count unit squares in a shape, walk the fence around it, and find a missing side. No signup.",
   levels: [
     { id: "tiles", label: "Count squares", num: 1 },
     { id: "fence", label: "Around the shape", num: 2 },
@@ -1114,7 +1114,7 @@ export const patternsCard = sceneCard("Patterns", PATTERN_ROWS, {
   sheetSlug: "number-patterns",
   sheetScreen: "sheet-patterns",
   blurb:
-    "Free skip-counting and number patterns for kindergarten through grade 4. Count by tens, fives, twos, and hundreds, then find the rule. No signup.",
+    "Free skip-counting and number patterns for kindergarten through grade 5. Count by tens, fives, twos, and hundreds, then find the rule. No signup.",
   levels: [
     { id: "tens", label: "Count by tens", num: 1 },
     { id: "fives", label: "Count by fives", num: 2 },
@@ -1307,12 +1307,12 @@ const MINUTE_ROWS: SkillRow[] = [
 export const minuteCard = sceneCard("Minutes", MINUTE_ROWS, {
   id: "minute",
   title: "Minutes",
-  audience: "Grades 3–4",
+  audience: "Grade 3",
   tint: "sand",
   mascot: "kiwi",
   sheetSlug: "time-to-the-minute",
   sheetScreen: "sheet-minute",
-  blurb: "Free time to the minute for grades 3–4. Count the minutes past the hour. No signup.",
+  blurb: "Free time to the minute for grade 3. Count the minutes past the hour. No signup.",
   levels: [
     { id: "early", label: "After the hour", num: 1 },
     { id: "half", label: "To the half hour", num: 2 },
