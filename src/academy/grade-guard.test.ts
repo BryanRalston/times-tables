@@ -17,7 +17,10 @@ import { shareAnswer } from "./games/share-data";
 import { signTruth, trueSignCount } from "./games/signs-data";
 import { TIME_MINUTES, type TimeLevel } from "./games/time";
 import { TIMES_SPEC, type TimesLevel } from "./games/times";
-import { FRACTION_DENOMINATORS, GRADE_BANDS, levelAllowed, playWindow } from "./grade-map";
+import { FRACTION_DENOMINATORS, GRADE_BANDS, bandFor, levelAllowed, playWindow } from "./grade-map";
+import { advanceJourney, bossReady, normalizeJourney } from "./journey";
+import { makeBossRound, makeQuestion } from "./games/round";
+import { SUMMIT_SKILLS } from "./games/summit-data";
 import { hasHandsCard, makeHandsTask, type HandsTask } from "./hands-build";
 import { makeClockTask, makePayTask } from "./hands";
 import type { Grade } from "./model";
@@ -1034,10 +1037,12 @@ describe("grade bands", () => {
         for (let i = 0; i < SAMPLES; i++) {
           const level = allowed.ids[i % allowed.ids.length]!;
           const question = game.makeQuestion(rngFromSeed(`${game.id}-${grade}-${level}-${i}`), level);
-          expect(question.game).toBe(game.id);
+          // The Summit mixes cards from other games: each card keeps its own game and level.
+          if (game.mixed) expect(SUMMIT_SKILLS).toContain(question.skill);
+          else expect(question.game).toBe(game.id);
           expect(question.choices).toHaveLength(4);
           expect(question.choices).toContain(question.answer);
-          assertQuestion(grade, level, question);
+          assertQuestion(grade, game.mixed ? question.skill.split(":")[1]! : level, question);
           if (game.id === "time") {
             const clock = makeClockTask(level, rngFromSeed(`clock-${grade}-${level}-${i}`));
             expect(TIME_MINUTES[level as TimeLevel]).toContain(clock.minutes);
@@ -1378,5 +1383,75 @@ describe("grade 5 slice 4: two rules and the coordinate plane (5.OA.B.3, 5.G.A)"
 
   it("has no hands-on build card for the new levels", () => {
     for (const [gameId, levelId] of NEW_LEVELS) expect(hasHandsCard(gameId, levelId)).toBe(false);
+  });
+});
+
+describe("grade 5 summit boss (mixed grade 5 review)", () => {
+  const BELOW_FIVE: Grade[] = ["PK", "K", "1", "2", "3", "4"];
+  const summit = GAMES.find((game) => game.id === "summit")!;
+  const ids = summit.levels.map((row) => row.id);
+
+  it("is appended last, grade 5 only, and mixes cards from other games", () => {
+    expect(GAMES.at(-1)?.id).toBe("summit");
+    expect(summit.audience).toBe("Grade 5 boss");
+    expect(summit.mixed).toBe(true);
+    expect(ids).toEqual(["mix"]);
+    expect(hasHandsCard("summit", "mix")).toBe(false);
+  });
+
+  it("stays locked below grade 5, even with challenge ahead on", () => {
+    for (const grade of BELOW_FIVE) {
+      for (const challenge of [false, true]) {
+        expect(playWindow(ids, "summit", grade, challenge).ids, `${grade} ${challenge}`).toEqual([]);
+        expect(levelAllowed(ids, "summit", grade, "mix", challenge)).toBe(false);
+      }
+      expect(GRADE_BANDS.summit![grade]!.offer).toBe("later");
+      expect(bossReady(blankChild({ grade }).journey, "summit", grade)).toBe(false);
+      for (let i = 0; i < 50; i += 1) {
+        expect(makeBossRound("summit", "mix", rngFromSeed(`summit-low-${grade}-${i}`), [], undefined, { grade, crown: false, challengeAhead: true })).toEqual([]);
+      }
+    }
+    expect(playWindow(ids, "summit", "5", false).ids).toEqual(["mix"]);
+  });
+
+  it("asks five different grade 5 skills in every boss round, each inside the grade 5 map", () => {
+    for (let i = 0; i < 300; i += 1) {
+      const round = makeBossRound("summit", "mix", rngFromSeed(`summit-boss-${i}`), [], undefined, { grade: "5", crown: i % 3 === 0, challengeAhead: false });
+      expect(round).toHaveLength(5);
+      expect(new Set(round.map((q) => q.game)).size).toBe(5);
+      for (const question of round) {
+        expect(SUMMIT_SKILLS).toContain(question.skill);
+        const [gameId, level] = question.skill.split(":") as [string, string];
+        expect(question.game).toBe(gameId);
+        expect(bandFor(gameId, "5")?.levels ?? []).toContain(level);
+        for (const grade of BELOW_FIVE) expect(playWindow(GAMES.find((g) => g.id === gameId)!.levels.map((r) => r.id), gameId, grade, false).ids).not.toContain(level);
+        expect(new Set(question.choices).size).toBe(question.choices.length);
+        expect(question.choices).toContain(question.answer);
+        assertQuestion("5", level, question);
+      }
+    }
+  });
+
+  it("keeps practice and try-one-like-it cards on grade 5 skills", () => {
+    for (let i = 0; i < 300; i += 1) {
+      const question = makeQuestion("summit", "mix", rngFromSeed(`summit-mix-${i}`));
+      expect(SUMMIT_SKILLS).toContain(question.skill);
+      const level = question.skill.split(":")[1]!;
+      expect(makeQuestion("summit", level, rngFromSeed(`summit-like-${i}`)).skill).toBe(question.skill);
+    }
+  });
+
+  it("waits for a grade 5 child until beaten, and a win does not move the path", () => {
+    const child = blankChild({ name: "Noor", grade: "5" });
+    expect(bossReady(child.journey, "summit", "5")).toBe(true);
+    const before = normalizeJourney(child.journey, "5");
+    const lost = advanceJourney(child.journey, { game: "summit", correct: 2, total: 5, boss: true }, "5");
+    expect(lost.bosses).not.toContain("summit");
+    const won = advanceJourney(child.journey, { game: "summit", correct: 4, total: 5, boss: true }, "5");
+    expect(won.bosses).toContain("summit");
+    expect(won.trails).toEqual(before.trails);
+    expect(bossReady(won, "summit", "5")).toBe(false);
+    const grade4 = advanceJourney(blankChild({ name: "Sam", grade: "4" }).journey, { game: "summit", correct: 5, total: 5, boss: true }, "4");
+    expect(grade4.bosses).not.toContain("summit");
   });
 });

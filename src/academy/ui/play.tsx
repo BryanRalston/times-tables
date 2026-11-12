@@ -777,7 +777,9 @@ export function PlayScreen({
   // Addition and Cube Builder fit a card on one phone screen. Each new card starts at the top,
   // so a scroll left over from the last card never hides the question or the tiles.
   useEffect(() => {
-    if ((game !== "add" && game !== "cubes") || boss) return;
+    // Summit cards change size a lot (a grid, then a box of cubes), so even its boss cards start at the top.
+    if (game !== "add" && game !== "cubes" && game !== "summit") return;
+    if (boss && game !== "summit") return;
     if (phase !== "ask" && phase !== "practice" && phase !== "teach") return;
     if (typeof window !== "undefined" && window.scrollY > 0) window.scrollTo(0, 0);
   }, [game, boss, phase, index, practice, roundId]);
@@ -785,7 +787,10 @@ export function PlayScreen({
   const correct = dots.filter((dot) => dot === "ok" || dot === "helped").length;
   const liveStars = starsForRound(correct, total);
   const mascot = spec?.mascot ?? "peach";
-  const ChoiceView = spec?.Choices;
+  const choice = slot?.kind === "choice" ? slot.question : null;
+  // A mixed game (Grade 5 Summit) draws each card with the game it came from.
+  const view = spec?.mixed && choice ? (gameById(choice.game) ?? spec) : spec;
+  const ChoiceView = view?.Choices;
   const friend = unlockId ? squisheeById(unlockId) : undefined;
   const asking = phase === "ask" || phase === "practice";
   const ok = phase === "feedback";
@@ -813,7 +818,6 @@ export function PlayScreen({
     counting: phase === "ask" && counting,
   });
   const palBond = bondTier(bondScore(child.bonds, child.avatarId));
-  const choice = slot?.kind === "choice" ? slot.question : null;
   const graphPals =
     choice?.visual.kind === "scene" &&
     (choice.visual.board.game === "graphs" ||
@@ -870,7 +874,7 @@ export function PlayScreen({
   const maxEnergy = bossMaxEnergy(BOSS_LENGTH, crownFight);
 
   return (
-    <div className={cx("ac-shell", child.grade === "PK" && "is-prek", spec?.layout === "wide" && "ac-wide", boss && "is-boss", crownFight && "is-crown")} data-phase={phase} data-round={child.rounds <= 0 && !boss ? "first" : "play"}>
+    <div className={cx("ac-shell", child.grade === "PK" && "is-prek", spec?.layout === "wide" && "ac-wide", boss && "is-boss", crownFight && "is-crown", game === "summit" && "is-summit")} data-phase={phase} data-round={child.rounds <= 0 && !boss ? "first" : "play"}>
       <header className="ac-play-top">
         <button type="button" className="ac-x" onClick={close} aria-label={show("Close")}>
           ×
@@ -1142,11 +1146,11 @@ export function PlayScreen({
                 ) : choice ? (
                   <>
                     {spec?.Aside ? <spec.Aside question={choice} /> : null}
-                    <div className={cx("ac-stage-copy", game === "add" && "is-add", game === "cubes" && "is-cubes")}>
+                    <div className={cx("ac-stage-copy", game === "add" && "is-add", (game === "cubes" || view?.id === "cubes") && "is-cubes")}>
                       <p className="ac-story">{slotStory(slot, child.avatarId, hostId)}</p>
                       {choice.visual.kind === "money" ? <CoinShare buddyId={child.avatarId} hostId={hostId} /> : null}
-                      {spec ? (
-                        <spec.Prompt question={choice} reveal={phase === "feedback"} mascot={mascot} happy={ok} />
+                      {view ? (
+                        <view.Prompt question={choice} reveal={phase === "feedback"} mascot={mascot} happy={ok} />
                       ) : null}
                       {playBuddy}
                       {ChoiceView ? (

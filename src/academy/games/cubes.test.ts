@@ -152,8 +152,9 @@ describe("Cube Builder grade guard", () => {
   const ids = game.levels.map((row) => row.id);
 
   it("is appended last, is a math game, and has a real worksheet", () => {
-    expect(GAMES[GAMES.length - 1]?.id).toBe("cubes");
-    expect(GAME_CARDS[GAME_CARDS.length - 1]?.id).toBe("cubes");
+    // Appended after Minutes; only the Grade 5 Summit comes after it.
+    expect(GAMES.map((row) => row.id).slice(-2)).toEqual(["cubes", "summit"]);
+    expect(GAME_CARDS.map((row) => row.id).slice(-2)).toEqual(["cubes", "summit"]);
     expect(subjectKeyOf("cubes")).toBe("math");
     expect(game.sheetSlug).toBe("volume-with-cubes");
     expect(game.sheetScreen).toBe("sheet-cubes");

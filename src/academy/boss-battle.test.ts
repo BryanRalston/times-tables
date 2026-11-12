@@ -72,6 +72,11 @@ describe("boss battle", () => {
         const round = makeBossRound(game.id, game.levels[game.levels.length - 1]!.id, rngFromSeed(`${game.id}-${grade}`), [], undefined, {
           grade,
         });
+        if (game.makeBossRound) {
+          // The Grade 5 Summit never fights below grade 5.
+          expect(round).toEqual([]);
+          continue;
+        }
         expect(round).toHaveLength(BOSS_LENGTH);
         for (const question of round) {
           const skillLevel = question.skill.split(":")[1] ?? "";

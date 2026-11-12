@@ -151,7 +151,15 @@ export function parseJourney(raw: unknown, grade?: Grade): Journey {
   return normalizeJourney({ areaId, stop, bosses, trails }, grade);
 }
 
+/**
+ * Boss-only islands (the Grade 5 Summit) are not a stop on the path: the boss
+ * waits there for a grade 5 child from the first visit until it is beaten.
+ */
+export const BOSS_ONLY_GAMES: Readonly<Record<string, Grade>> = { summit: "5" };
+
 export function bossReady(journey: Journey, gameId: string, grade?: Grade): boolean {
+  const onlyFor = BOSS_ONLY_GAMES[gameId];
+  if (onlyFor) return (grade === undefined || grade === onlyFor) && !journey.bosses.includes(gameId);
   const here = normalizeJourney(journey, grade);
   const spot = here.trails![subjectKeyOf(gameId)]!;
   if (spot.areaId !== gameId) return false;
@@ -180,6 +188,11 @@ export function advanceJourney(journey: Journey, step: RoundStep, grade?: Grade)
   const here = normalizeJourney(journey, grade);
   const key = subjectKeyOf(step.game);
   const spot = here.trails![key]!;
+  if (BOSS_ONLY_GAMES[step.game]) {
+    // A Summit win is kept, and the path does not move.
+    if (!step.boss || !bossReady(here, step.game, grade) || !bossWon(step.correct, step.total)) return here;
+    return { ...here, bosses: [...here.bosses, step.game] };
+  }
   if (step.game !== spot.areaId) return here;
   const put = (next: JourneySpot, bosses = here.bosses): Journey => ({
     areaId: next.areaId,

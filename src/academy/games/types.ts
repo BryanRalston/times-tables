@@ -199,9 +199,13 @@ export interface GameModule {
   bars: SkillRow[];
   /** Mastered chips. `label` is the short chip text. */
   chips: SkillRow[];
+  /** Cards come from other games (Grade 5 Summit). Play draws each card with its own game. */
+  mixed?: boolean;
+  /** A game-specific boss round. Return [] for a grade that may not have this fight. */
+  makeBossRound?: (rng: Rng, grade: Grade | undefined, prefer: string[]) => ChoiceQ[];
   skillLabel: (key: string) => string | null;
   chipLabel: (key: string) => string | null;
 }
 
 /** Home, map, and saves need this. Question code and boards stay out of the first download. */
-export type GameCard = Omit<GameModule, "makeQuestion" | "makeSheetItem" | "Prompt" | "Choices" | "Aside" | "SheetBody" | "reviewKeys">;
+export type GameCard = Omit<GameModule, "makeQuestion" | "makeSheetItem" | "Prompt" | "Choices" | "Aside" | "SheetBody" | "reviewKeys" | "makeBossRound">;

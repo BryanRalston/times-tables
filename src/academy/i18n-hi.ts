@@ -505,6 +505,13 @@ export const BOSS_HI: Record<string, BossEs> = {
     cosmeticName: "कागज़ की घड़ी",
     trophyName: "मिनट ट्रॉफी",
   },
+  summit: {
+    taunt: "कक्षा 5 के पाँच सवाल, सब अलग-अलग। आराम से हर सवाल को सोचकर हल करो।",
+    friendly: "तुमने पूरी चढ़ाई ध्यान से सोचा। तुम चोटी पर पहुँच गए।",
+    personality: "एक शांत साही प्रोफ़ेसर, जिसने कक्षा 5 का हर रास्ता देखा है और जिसे अच्छी समझ पसंद है।",
+    cosmeticName: "चोटी का लबादा",
+    trophyName: "चोटी की ट्रॉफी",
+  },
 };
 
 export const TRAIT_HI: Record<string, string> = {
@@ -1392,6 +1399,16 @@ export const HI: Record<string, string> = {
   "Two rules": "दो नियम",
   "Coordinate plane": "निर्देशांक तल",
   "Cube Builder": "घन बिल्डर",
+  "Grade 5 boss": "कक्षा 5 का बॉस",
+  "Grade 5 Summit": "कक्षा 5 की चोटी",
+  "Mixed review": "मिला-जुला दोहराव",
+  "Summit": "चोटी",
+  "Free grade 5 math review. Unlike fractions, decimals, dividing by 2 digits, the coordinate plane, two-rule patterns, and volume. No signup.": "कक्षा 5 गणित का मुफ्त दोहराव। अलग हर वाले भिन्न, दशमलव, 2 अंकों से भाग, निर्देशांक तल, दो नियमों वाले पैटर्न और आयतन। साइन-अप नहीं।",
+  "K–5": "केजी से कक्षा 5",
+  "1–5": "कक्षा 1 से 5",
+  "Pre-K–5": "नर्सरी से कक्षा 5",
+  "Grade 2–5": "कक्षा 2 से 5",
+  "Grades 2–5": "कक्षा 2–5",
   "Cubes": "घन",
   "Grade 5": "कक्षा 5",
   "Free volume practice for grade 5. Count unit cubes, build boxes, and use length × width × height. No signup.": "कक्षा 5 के लिए मुफ़्त आयतन अभ्यास। इकाई घन गिनो, डिब्बे बनाओ, और लंबाई × चौड़ाई × ऊँचाई लगाओ। साइन अप नहीं।",

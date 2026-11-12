@@ -205,6 +205,10 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     formula: "5.MD.C.5",
     two: "5.MD.C.5",
   },
+  // Summit cards report their own game's skill; this row only names the island.
+  summit: {
+    mix: "5.NF.A.1",
+  },
 };
 
 const CHIP_SKILL: Record<string, string> = {

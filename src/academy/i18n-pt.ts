@@ -506,6 +506,13 @@ export const BOSS_PT: Record<string, BossEs> = {
     cosmeticName: "Relógio de papel",
     trophyName: "Troféu do minuto",
   },
+  summit: {
+    taunt: "Cinco perguntas do 5.º ano, todas diferentes. Vá com calma e pense em cada uma.",
+    friendly: "Você pensou com cuidado a subida inteira. Chegou ao topo.",
+    personality: "Um ouriço professor tranquilo que já percorreu cada trilha do 5.º ano e gosta de uma boa explicação.",
+    cosmeticName: "Capa do topo",
+    trophyName: "Troféu do topo",
+  },
 };
 
 export const TRAIT_PT: Record<string, string> = {
@@ -1418,6 +1425,16 @@ export const PT: Record<string, string> = {
   "Two rules": "Duas regras",
   "Coordinate plane": "Plano cartesiano",
   "Cube Builder": "Construtor de cubos",
+  "Grade 5 boss": "Chefe do 5.º ano",
+  "Grade 5 Summit": "Topo do 5.º ano",
+  "Mixed review": "Revisão mista",
+  "Summit": "Topo",
+  "Free grade 5 math review. Unlike fractions, decimals, dividing by 2 digits, the coordinate plane, two-rule patterns, and volume. No signup.": "Revisão grátis de matemática do 5.º ano. Frações com denominadores diferentes, decimais, divisão por 2 algarismos, o plano cartesiano, padrões com duas regras e volume. Sem cadastro.",
+  "K–5": "Jardim ao 5.º",
+  "1–5": "1.º ao 5.º",
+  "Pre-K–5": "Pré-escola ao 5.º",
+  "Grade 2–5": "2.º ao 5.º ano",
+  "Grades 2–5": "2.º ao 5.º ano",
   "Cubes": "Cubos",
   "Grade 5": "5.º ano",
   "Free volume practice for grade 5. Count unit cubes, build boxes, and use length × width × height. No signup.": "Volume grátis para o 5.º ano. Conte cubos unitários, monte caixas e use comprimento × largura × altura. Sem cadastro.",

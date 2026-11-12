@@ -521,6 +521,13 @@ export const BOSS_ES: Record<string, BossEs> = {
     cosmeticName: "Reloj de papel",
     trophyName: "Trofeo del minuto",
   },
+  summit: {
+    taunt: "Cinco preguntas de quinto, todas distintas. Tómate tu tiempo y piensa cada una.",
+    friendly: "Pensaste con cuidado todo el camino. Llegaste a la cumbre.",
+    personality: "Un erizo profesor tranquilo que ha recorrido cada sendero de quinto y disfruta una buena explicación.",
+    cosmeticName: "Capa de la cumbre",
+    trophyName: "Trofeo de la cumbre",
+  },
 };
 
 export const TRAIT_ES: Record<string, string> = {
@@ -1090,6 +1097,16 @@ export const ES: Record<string, string> = {
   "Two rules": "Dos reglas",
   "Coordinate plane": "Plano de coordenadas",
   "Cube Builder": "Constructor de cubos",
+  "Grade 5 boss": "Jefe de quinto",
+  "Grade 5 Summit": "Cumbre de quinto",
+  "Mixed review": "Repaso mixto",
+  "Summit": "Cumbre",
+  "Free grade 5 math review. Unlike fractions, decimals, dividing by 2 digits, the coordinate plane, two-rule patterns, and volume. No signup.": "Repaso gratis de matemáticas de quinto. Fracciones con distinto denominador, decimales, dividir entre 2 cifras, el plano de coordenadas, patrones con dos reglas y volumen. Sin registro.",
+  "K–5": "K a 5",
+  "1–5": "1 a 5",
+  "Pre-K–5": "Prekínder a 5",
+  "Grade 2–5": "Grado 2 a 5",
+  "Grades 2–5": "Grados 2 a 5",
   "Cubes": "Cubos",
   "Grade 5": "Grado 5",
   "Free volume practice for grade 5. Count unit cubes, build boxes, and use length × width × height. No signup.": "Práctica gratis de volumen para grado 5. Cuenta cubos unidad, construye cajas y usa largo × ancho × alto. Sin cuenta.",

@@ -14,6 +14,8 @@ export interface GradeBand {
   cap?: string;
   /** Lowest level the one-level drift down may reach. */
   floor?: string;
+  /** A "later" band that Challenge ahead does not open (the Grade 5 Summit boss). */
+  locked?: boolean;
   standards: readonly string[];
 }
 
@@ -1121,6 +1123,57 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["5.MD.C.3", "5.MD.C.4", "5.MD.C.5"],
     }),
   },
+  /** The grade 5 boss. Below grade 5 it stays locked, even with Challenge ahead on. */
+  summit: {
+    PK: band({
+      levels: [],
+      start: "mix",
+      offer: "later",
+      locked: true,
+      standards: ["K.CC.A.1"],
+    }),
+    K: band({
+      levels: [],
+      start: "mix",
+      offer: "later",
+      locked: true,
+      standards: ["K.CC.A.1"],
+    }),
+    "1": band({
+      levels: [],
+      start: "mix",
+      offer: "later",
+      locked: true,
+      standards: ["1.OA.C.6"],
+    }),
+    "2": band({
+      levels: [],
+      start: "mix",
+      offer: "later",
+      locked: true,
+      standards: ["2.NBT.B.5"],
+    }),
+    "3": band({
+      levels: [],
+      start: "mix",
+      offer: "later",
+      locked: true,
+      standards: ["3.OA.C.7"],
+    }),
+    "4": band({
+      levels: [],
+      start: "mix",
+      offer: "later",
+      locked: true,
+      standards: ["4.NBT.B.5"],
+    }),
+    "5": band({
+      levels: ["mix"],
+      start: "mix",
+      offer: "play",
+      standards: ["5.NF.A.1", "5.NBT.B.6", "5.NBT.B.7", "5.G.A.1", "5.OA.B.3", "5.MD.C.5"],
+    }),
+  },
 };
 
 export function bandFor(gameId: string, grade: Grade): GradeBand | undefined {
@@ -1144,7 +1197,7 @@ export function playWindow(
   if (!bandRow || levelIds.length === 0) {
     return { offer: "play", min: 0, max: Math.max(0, levelIds.length - 1), start, ids: levelIds };
   }
-  if (bandRow.offer === "later" && !challengeAhead) {
+  if (bandRow.offer === "later" && (!challengeAhead || bandRow.locked)) {
     return { offer: "later", min: 0, max: -1, start, ids: [] };
   }
   const core = bandRow.levels.map((id) => levelIds.indexOf(id)).filter((index) => index >= 0);

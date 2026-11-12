@@ -21,7 +21,9 @@ describe("academy game registry", () => {
       }
       for (const level of game.levels) {
         const q = game.makeQuestion(rngFromSeed(`${game.id}-${level.id}`), level.id);
-        expect(q.game).toBe(game.id);
+        // The Grade 5 Summit mixes cards from other games.
+        if (game.mixed) expect(GAMES.some((other) => other.id === q.game && !other.mixed)).toBe(true);
+        else expect(q.game).toBe(game.id);
         expect(q.choices).toHaveLength(4);
         expect(new Set(q.choices).size).toBe(4);
         expect(q.choices).toContain(q.answer);

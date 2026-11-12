@@ -44,7 +44,7 @@ const NUMBER_MAX = 1000;
 export const DEVICE_VOICE_SKILLS: ReadonlySet<string> = new Set(["problems:estimate", "place:thousandths", "fractions:addUnlike", "fractions:fracTimes", "variables:orderOps", "times:bigMulti", "share:longDiv", "add:decimalOps", "patterns:twoRules", "grid:coords", "cubes:count", "cubes:build", "cubes:formula", "cubes:two"]);
 
 /** Games whose title and generic boss lines use the device voice until clips are rendered. */
-export const DEVICE_VOICE_GAMES: ReadonlySet<string> = new Set(["cubes"]);
+export const DEVICE_VOICE_GAMES: ReadonlySet<string> = new Set(["cubes", "summit"]);
 
 export const CORE_VOICE_GAMES = new Set(["add", "time", "ui", "buddy", "boss"]);
 
