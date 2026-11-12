@@ -749,6 +749,8 @@ export const HI: Record<string, string> = {
   "Count the squares.": "वर्ग गिनो।",
   "Count the squishees and try again.": "squishees गिनो और फिर कोशिश करो।",
   "Count the tens and the ones": "दहाई और इकाई गिनो",
+  "Count all of them.": "सबको गिनो।",
+  "Count the ones left.": "बचे हुए गिनो।",
   "Count to 10": "10 तक गिनो",
   "Count to 120": "120 तक गिनो",
   "Count to 20": "20 तक गिनो",

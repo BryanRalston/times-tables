@@ -11,14 +11,17 @@ export function RoundBuddy({
   cosmetic,
   reaction,
   pulse = 0,
+  countLine,
 }: {
   id: string;
   cosmetic?: string;
   reaction: BuddyReaction;
   pulse?: number;
+  /** A card-specific "count" line. It replaces the buddy's own catchphrase when set ("" stays quiet). */
+  countLine?: string;
 }) {
   const reduced = useReducedMotion();
-  const text = bubbleText(reaction.line, id);
+  const text = reaction.line === "count" && countLine !== undefined ? countLine : bubbleText(reaction.line, id);
   return (
     <div
       className={cx("ac-buddy", `is-${reaction.mood}`)}

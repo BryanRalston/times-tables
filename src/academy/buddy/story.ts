@@ -38,95 +38,109 @@ function say(en: string, es: string, pt: string, fr?: string, zh?: string, hi?: 
   }
 }
 
-/** Name only the numbers the equation shows. A hidden addend stays hidden. */
+/**
+ * Name only the numbers the equation shows. A hidden addend stays hidden.
+ * English reads like a picture book ("Sweet Peach has 5 squishees."). Arabic leads with
+ * Arabic words and isolates each English name and the word "squishees" so the line does not jumble.
+ */
 function addStory(visual: Extract<Visual, { kind: "add" }>, buddy: string, host: string, trait: string): string {
   const total = visual.pink + visual.teal;
+  const star = `${trait.charAt(0).toUpperCase()}${trait.slice(1)} ${buddy}`;
+  const b = isolate(buddy);
+  const h = isolate(host);
+  // Digits stay in the Arabic flow; only the English word is isolated, so "6 squishees." never reads as ".6".
+  const n = (count: number) => `${count} ${isolate(thingName("squishees", count, count === 1 ? "squishee" : "squishees"))}`;
   if (visual.op === "+" && (visual.pink === 0 || visual.teal === 0)) {
     return say(
-      `${buddy} the ${trait} has ${pals(total)}. How many is that?`,
+      `${star} has ${pals(total)}. How many is that?`,
       `${buddy}, ${trait}, tiene ${pals(total)}. ¿Cuántos son?`,
       `${buddy}, ${trait}, tem ${pals(total)}. Quantos são?`,
       `${buddy}, ${trait}, a ${pals(total)}. Combien ça fait ?`,
       `${buddy}，${trait}，有${pals(total)}。一共几个？`,
       `${buddy} ${trait} के पास ${pals(total)} हैं। कुल कितने हैं?`,
-      `${buddy} ${trait} معه ${pals(total)}. كم هذا؟`,
+      `مع ${b} ${n(total)}. كم هذا؟`,
     );
   }
   if (visual.op === "-" && visual.teal === 0) {
     return say(
-      `${buddy} the ${trait} has ${pals(visual.pink)}. How many are left?`,
+      `${star} has ${pals(visual.pink)}. How many are left?`,
       `${buddy}, ${trait}, tiene ${pals(visual.pink)}. ¿Cuántos quedan?`,
       `${buddy}, ${trait}, tem ${pals(visual.pink)}. Quantos sobram?`,
       `${buddy}, ${trait}, a ${pals(visual.pink)}. Combien en reste-t-il ?`,
       `${buddy}，${trait}，有${pals(visual.pink)}。还剩几个？`,
       `${buddy} ${trait} के पास ${pals(visual.pink)} हैं। कितने बचे?`,
-      `${buddy} ${trait} معه ${pals(visual.pink)}. كم يبقى؟`,
+      `مع ${b} ${n(visual.pink)}. كم يبقى؟`,
     );
   }
   if (visual.op === "+") {
     if (visual.result == null) {
       return say(
-        `${buddy} the ${trait} has ${pals(visual.pink)}. ${host} brings ${pals(visual.teal)}. How many in all?`,
-        `${buddy}, ${trait}, tiene ${pals(visual.pink)}. ${host} trae ${pals(visual.teal)}. ¿Cuántos hay en total?`,
-        `${buddy}, ${trait}, tem ${pals(visual.pink)}. ${host} traz ${pals(visual.teal)}. Quantos tem ao todo?`,
-        `${buddy}, ${trait}, a ${pals(visual.pink)}. ${host} apporte ${pals(visual.teal)}. Combien en tout ?`,
+      `${star} has ${pals(visual.pink)}. ${host} brings ${visual.teal} more. How many in all?`,
+      `${buddy}, ${trait}, tiene ${pals(visual.pink)}. ${host} trae ${pals(visual.teal)}. ¿Cuántos hay en total?`,
+      `${buddy}, ${trait}, tem ${pals(visual.pink)}. ${host} traz ${pals(visual.teal)}. Quantos tem ao todo?`,
+      `${buddy}, ${trait}, a ${pals(visual.pink)}. ${host} apporte ${pals(visual.teal)}. Combien en tout ?`,
       `${buddy}，${trait}，有${pals(visual.pink)}。${host}拿来${pals(visual.teal)}。一共有几个？`,
-        `${buddy} ${trait} के पास ${pals(visual.pink)} हैं। ${host} ${pals(visual.teal)} लाता है। कुल कितने हैं?`,
-        `${buddy} ${trait} معه ${pals(visual.pink)}. ${host} يحضر ${pals(visual.teal)}. كم المجموع؟`,
-      );
+      `${buddy} ${trait} के पास ${pals(visual.pink)} हैं। ${host} ${pals(visual.teal)} लाता है। कुल कितने हैं?`,
+      `مع ${b} ${n(visual.pink)}، ويحضر ${h} ${n(visual.teal)}. كم المجموع؟`,
+    );
     }
     if (visual.right == null) {
       return say(
-        `${buddy} the ${trait} has ${pals(visual.pink)}. Together they have ${pals(total)}. How many did ${host} bring?`,
-        `${buddy}, ${trait}, tiene ${pals(visual.pink)}. Juntos tienen ${pals(total)}. ¿Cuántos trajo ${host}?`,
-        `${buddy}, ${trait}, tem ${pals(visual.pink)}. Juntos eles têm ${pals(total)}. Quantos ${host} trouxe?`,
-        `${buddy}, ${trait}, a ${pals(visual.pink)}. Ensemble, ils en ont ${pals(total)}. Combien ${host} a apporté ?`,
+      `${star} has ${pals(visual.pink)}. ${host} brings some more. Now there are ${pals(total)}. How many did ${host} bring?`,
+      `${buddy}, ${trait}, tiene ${pals(visual.pink)}. Juntos tienen ${pals(total)}. ¿Cuántos trajo ${host}?`,
+      `${buddy}, ${trait}, tem ${pals(visual.pink)}. Juntos eles têm ${pals(total)}. Quantos ${host} trouxe?`,
+      `${buddy}, ${trait}, a ${pals(visual.pink)}. Ensemble, ils en ont ${pals(total)}. Combien ${host} a apporté ?`,
       `${buddy}，${trait}，有${pals(visual.pink)}。他们一共有${pals(total)}。${host}拿来了几个？`,
-        `${buddy} ${trait} के पास ${pals(visual.pink)} हैं। दोनों के पास मिलकर ${pals(total)} हैं। ${host} कितने लाया?`,
-        `${buddy} ${trait} معه ${pals(visual.pink)}. معًا لديهما ${pals(total)}. كم أحضر ${host}؟`,
-      );
+      `${buddy} ${trait} के पास ${pals(visual.pink)} हैं। दोनों के पास मिलकर ${pals(total)} हैं। ${host} कितने लाया?`,
+      `مع ${b} ${n(visual.pink)}، ويحضر ${h} المزيد. صار معهما ${n(total)}. كم أحضر ${h}؟`,
+    );
     }
     return say(
-      `${host} brings ${pals(visual.teal)}. Together they have ${pals(total)}. How many did ${buddy} start with?`,
+      `${host} brings ${pals(visual.teal)}. Now there are ${pals(total)}. How many did ${buddy} have at first?`,
       `${host} trae ${pals(visual.teal)}. Juntos tienen ${pals(total)}. ¿Con cuántos empezó ${buddy}?`,
       `${host} traz ${pals(visual.teal)}. Juntos eles têm ${pals(total)}. Com quantos ${buddy} começou?`,
       `${host} apporte ${pals(visual.teal)}. Ensemble, ils en ont ${pals(total)}. Avec combien ${buddy} a commencé ?`,
-    `${host}拿来${pals(visual.teal)}。他们一共有${pals(total)}。${buddy}一开始有几个？`,
+      `${host}拿来${pals(visual.teal)}。他们一共有${pals(total)}。${buddy}一开始有几个？`,
       `${host} ${pals(visual.teal)} लाता है। दोनों के पास मिलकर ${pals(total)} हैं। ${buddy} के पास शुरू में कितने थे?`,
-      `${host} يحضر ${pals(visual.teal)}. معًا لديهما ${pals(total)}. كم كان مع ${buddy} في البداية؟`,
+      `يحضر ${h} ${n(visual.teal)}، فيصير معهما ${n(total)}. كم كان مع ${b} في البداية؟`,
     );
   }
   if (visual.result == null) {
     return say(
-      `${buddy} the ${trait} has ${pals(total)} and shares ${pals(visual.teal)} with ${host}. How many are left?`,
+      `${star} has ${pals(total)} and gives ${visual.teal} to ${host}. How many are left?`,
       `${buddy}, ${trait}, tiene ${pals(total)} y comparte ${pals(visual.teal)} con ${host}. ¿Cuántos quedan?`,
       `${buddy}, ${trait}, tem ${pals(total)} e reparte ${pals(visual.teal)} com ${host}. Quantos sobram?`,
       `${buddy}, ${trait}, a ${pals(total)} et en partage ${pals(visual.teal)} avec ${host}. Combien en reste-t-il ?`,
-    `${buddy}，${trait}，有${pals(total)}，分给${host} ${pals(visual.teal)}。还剩几个？`,
+      `${buddy}，${trait}，有${pals(total)}，分给${host} ${pals(visual.teal)}。还剩几个？`,
       `${buddy} ${trait} के पास ${pals(total)} हैं और ${pals(visual.teal)} को ${host} के साथ बाँटता है। कितने बचे?`,
-      `${buddy} ${trait} معه ${pals(total)} ويشارك ${host} بـ ${pals(visual.teal)}. كم يبقى؟`,
+      `مع ${b} ${n(total)}، ويعطي ${n(visual.teal)} إلى ${h}. كم يبقى؟`,
     );
   }
   if (visual.right == null) {
     return say(
-      `${buddy} the ${trait} has ${pals(total)} and has ${pals(visual.pink)} left. How many did ${buddy} share with ${host}?`,
+      `${star} had ${pals(total)} and gave some to ${host}. Now ${buddy} has ${visual.pink}. How many did ${buddy} give?`,
       `${buddy}, ${trait}, tiene ${pals(total)} y le quedan ${pals(visual.pink)}. ¿Cuántos compartió con ${host}?`,
       `${buddy}, ${trait}, tem ${pals(total)} e sobram ${pals(visual.pink)}. Quantos ${buddy} repartiu com ${host}?`,
       `${buddy}, ${trait}, a ${pals(total)} et il en reste ${pals(visual.pink)}. Combien ${buddy} a partagé avec ${host} ?`,
-    `${buddy}，${trait}，有${pals(total)}，还剩${pals(visual.pink)}。${buddy}分给${host}几个？`,
+      `${buddy}，${trait}，有${pals(total)}，还剩${pals(visual.pink)}。${buddy}分给${host}几个？`,
       `${buddy} ${trait} के पास ${pals(total)} हैं और ${pals(visual.pink)} बचे हैं। ${buddy} ने ${host} के साथ कितने बाँटे?`,
-      `${buddy} ${trait} معه ${pals(total)} وبقي ${pals(visual.pink)}. كم شارك ${buddy} مع ${host}؟`,
+      `كان مع ${b} ${n(total)}، وأعطى بعضها إلى ${h}. بقي معه ${n(visual.pink)}. كم أعطى؟`,
     );
   }
   return say(
-    `${buddy} the ${trait} shares ${pals(visual.teal)} with ${host} and has ${pals(visual.pink)} left. How many did ${buddy} start with?`,
-    `${buddy}, ${trait}, comparte ${pals(visual.teal)} con ${host} y le quedan ${pals(visual.pink)}. ¿Con cuántos empezó?`,
-    `${buddy}, ${trait}, reparte ${pals(visual.teal)} com ${host} e sobram ${pals(visual.pink)}. Com quantos começou?`,
-    `${buddy}, ${trait}, partage ${pals(visual.teal)} avec ${host} et il en reste ${pals(visual.pink)}. Avec combien a-t-il commencé ?`,
-  `${buddy}，${trait}，分给${host} ${pals(visual.teal)}，还剩${pals(visual.pink)}。${buddy}一开始有几个？`,
-    `${buddy} ${trait} ${pals(visual.teal)} को ${host} के साथ बाँटता है और ${pals(visual.pink)} बचे हैं। ${buddy} के पास शुरू में कितने थे?`,
-    `${buddy} ${trait} يشارك ${host} بـ ${pals(visual.teal)} ويبقى ${pals(visual.pink)}. كم كان معه في البداية؟`,
-  );
+      `${star} gave ${pals(visual.teal)} to ${host}. Now ${buddy} has ${visual.pink} left. How many did ${buddy} have at first?`,
+      `${buddy}, ${trait}, comparte ${pals(visual.teal)} con ${host} y le quedan ${pals(visual.pink)}. ¿Con cuántos empezó?`,
+      `${buddy}, ${trait}, reparte ${pals(visual.teal)} com ${host} e sobram ${pals(visual.pink)}. Com quantos começou?`,
+      `${buddy}, ${trait}, partage ${pals(visual.teal)} avec ${host} et il en reste ${pals(visual.pink)}. Avec combien a-t-il commencé ?`,
+      `${buddy}，${trait}，分给${host} ${pals(visual.teal)}，还剩${pals(visual.pink)}。${buddy}一开始有几个？`,
+      `${buddy} ${trait} ${pals(visual.teal)} को ${host} के साथ बाँटता है और ${pals(visual.pink)} बचे हैं। ${buddy} के पास शुरू में कितने थे?`,
+      `أعطى ${b} ${n(visual.teal)} إلى ${h}، وبقي معه ${n(visual.pink)}. كم كان معه في البداية؟`,
+    );
+}
+
+/** First-strong isolate, so an English run inside Arabic keeps its own direction. */
+function isolate(text: string): string {
+  return `\u2068${text}\u2069`;
 }
 
 export function storyLine(visual: Visual, buddyId: string, hostId: string): string {
