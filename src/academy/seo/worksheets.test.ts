@@ -590,7 +590,7 @@ describe("printable worksheets", () => {
     const index = worksheetIndexHtml();
     expectShareCard(
       index,
-      "Free Pre-K to Grade 4 Math Worksheets | Squishee Academy",
+      "Free Pre-K to Grade 5 Math Worksheets | Squishee Academy",
       "Free printable math worksheets for Pre-K to grade 5. Times tables, addition, subtraction, elapsed time, counting coins, money problems, thousands, and area. Answer keys included. No signup.",
       "https://squisheeacademy.com/worksheets/",
     );
@@ -616,8 +616,8 @@ describe("printable worksheets", () => {
     const practice = withOpenGraph(rewriteDomainSource(readFileSync("academy/worksheets/times-tables/index.html", "utf8")));
     expectShareCard(
       practice,
-      "Free Times Tables Worksheet (Grades 2–4) | Squishee Academy",
-      "Print a free times tables worksheet for grades 2–4. Random multiplication problems and an answer key. No signup.",
+      "Free Times Tables Worksheet (Grades 1–5) | Squishee Academy",
+      "Print a free times tables worksheet for grades 1–5. Random multiplication problems and an answer key. No signup.",
       "https://squisheeacademy.com/worksheets/times-tables/",
     );
   });

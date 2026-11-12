@@ -2,6 +2,7 @@ import { squisheeById } from "@/lib/squishees";
 import type { Board, CountBoard, GraphsBoard, MeasureBoard, PhonicsBoard, PlaceBoard, ShapeBoard } from "../games/boards";
 import type { Visual } from "../games/types";
 import { getLocale, thingName, type Locale } from "../i18n";
+import type { Grade } from "../model";
 import type { RoundSlot } from "../round-flow";
 import { personaOf } from "./persona";
 
@@ -143,7 +144,8 @@ function isolate(text: string): string {
   return `\u2068${text}\u2069`;
 }
 
-export function storyLine(visual: Visual, buddyId: string, hostId: string): string {
+/** `grade` lets a game give its older children a line that fits their level. */
+export function storyLine(visual: Visual, buddyId: string, hostId: string, grade?: Grade): string {
   const buddy = nameOf(buddyId, "Peach");
   const host = nameOf(hostId, "Panda");
   const trait = personaOf(buddyId).trait;
@@ -225,7 +227,7 @@ export function storyLine(visual: Visual, buddyId: string, hostId: string): stri
     case "spell":
       return say(`${buddy} helps ${host} spell the word.`, `${buddy} ayuda a ${host} a deletrear la palabra.`, `${buddy} ajuda ${host} a soletrar a palavra.`, `${buddy} aide ${host} à épeler le mot.`, `${buddy}帮${host}拼这个词。`, `${buddy} ${host} को शब्द लिखने में मदद करता है।`, `${buddy} يساعد ${host} على تهجئة الكلمة.`);
     case "scene":
-      return sceneStory(visual.board, buddy, host, trait);
+      return sceneStory(visual.board, buddy, host, trait, grade);
     default: {
       const neverVisual: never = visual;
       return neverVisual;
@@ -606,7 +608,20 @@ function graphStory(board: GraphsBoard, buddy: string, host: string): string {
   }
 }
 
-function sceneStory(board: Board, buddy: string, host: string, trait: string): string {
+/** Grade 5 fractions are unlike fractions and decimals, not sharing one shape. */
+function fractionsGrade5Story(buddy: string, host: string): string {
+  return say(
+    `${buddy} and ${host} take on unlike fractions and decimals. You've got this!`,
+    `${buddy} y ${host} se animan con fracciones de distinto denominador y decimales. ¡Tú puedes!`,
+    `${buddy} e ${host} encaram frações com denominadores diferentes e decimais. Você consegue!`,
+    `${buddy} et ${host} s'attaquent aux fractions de dénominateurs différents et aux décimaux. Tu peux le faire !`,
+    `${buddy}和${host}来挑战异分母分数和小数。你能行！`,
+    `${buddy} और ${host} असमान हर वाले भिन्न और दशमलव हल करते हैं। तुम कर सकते हो!`,
+    `${buddy} و${host} يتحدّيان الكسور ذات المقامات المختلفة والأعداد العشرية. أنت تستطيع!`,
+  );
+}
+
+function sceneStory(board: Board, buddy: string, host: string, trait: string, grade?: Grade): string {
   switch (board.game) {
     case "count":
       return countStory(board, buddy, host, trait);
@@ -615,6 +630,7 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string): s
     case "shapes":
       return shapeStory(board, host);
     case "fractions":
+      if (grade === "5") return fractionsGrade5Story(buddy, host);
       return say(
         `${buddy} and ${host} share a shape. What fraction is that?`,
         `${buddy} y ${host} comparten una figura. ¿Qué fracción es?`,
@@ -857,12 +873,12 @@ function handsStory(kind: Exclude<RoundSlot, { kind: "choice" }>["kind"], buddy:
   }
 }
 
-export function slotStory(slot: RoundSlot, buddyId: string, hostId: string): string {
+export function slotStory(slot: RoundSlot, buddyId: string, hostId: string, grade?: Grade): string {
   const buddy = nameOf(buddyId, "Peach");
   const host = nameOf(hostId, "Panda");
   switch (slot.kind) {
     case "choice":
-      return storyLine(slot.question.visual, buddyId, hostId);
+      return storyLine(slot.question.visual, buddyId, hostId, grade);
     default:
       return handsStory(slot.kind, buddy, host);
   }

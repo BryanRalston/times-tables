@@ -571,6 +571,9 @@ export const ES: Record<string, string> = {
   "1–4": "1 a 4",
   "Grade 1–4": "Grado 1 a 4",
   "Pre-K–4": "Prekínder a 4",
+  "Pre-K–2": "Prekínder a 2",
+  "Pre-K–3": "Prekínder a 3",
+  "Grades 1–5": "Grados 1 a 5",
   "1–3": "1 a 3",
   "2s, 5s, 10s · small": "De 2, de 5 y de 10 · chiquitas",
   "2s, 5s, 10s": "De 2, de 5 y de 10",
@@ -677,10 +680,10 @@ export const ES: Record<string, string> = {
   "Multiply stories": "Historias de multiplicar",
   "Share stories": "Historias de repartir",
   "Picture stories": "Historias con dibujos",
-  "Free printable multiplication practice for grades 2–4. Facts, multi-digit problems, and an answer key. No signup.":
-    "Práctica de multiplicar para imprimir, de grado 2 a grado 4. Las tablas, problemas de varios dígitos y la hoja de respuestas. Sin cuenta.",
-  "Free printable addition and subtraction for kindergarten through grade 4. Facts within 5, 10, 20, 100, or the thousands, plus an answer key.":
-    "Sumas y restas para imprimir, de kínder a grado 4. Hasta el 5, el 10, el 20, el 100 o los millares, con la hoja de respuestas.",
+  "Free printable multiplication practice for grades 1–5. Facts, multi-digit problems, and an answer key. No signup.":
+    "Práctica de multiplicar para imprimir, de grado 1 a grado 5. Las tablas, problemas de varios dígitos y la hoja de respuestas. Sin cuenta.",
+  "Free printable addition and subtraction for kindergarten through grade 5. Facts within 5, 10, 20, 100, or the thousands, plus an answer key.":
+    "Sumas y restas para imprimir, de kínder a grado 5. Hasta el 5, el 10, el 20, el 100 o los millares, con la hoja de respuestas.",
   "Free fraction practice for grades 1–5. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.":
     "Fracciones para los grados 1 a 5. Partes de un entero, fracciones unitarias, la recta numérica, comparar, fracciones equivalentes con dibujos y decimales.",
   "Free spelling for kindergarten through grade 4. Hear a word in a sentence, then build it from letter tiles. Lists move from CVC words to digraphs, blends, long vowels, and grade 4 words.":
@@ -691,20 +694,20 @@ export const ES: Record<string, string> = {
     "Datos y gráficas, de prekínder a grado 4. Clasifica y cuenta, haz un conteo de hasta tres grupos, arma gráficas de dibujos y de barras, lee una escala y usa un diagrama de puntos con fracciones.",
   "Free Dolch and Fry sight word practice for kindergarten through grade 4. Hear a word, match a picture, and fill a sentence. Trace the list, then check the answer key.":
     "Palabras frecuentes en inglés, de kínder a grado 4. Escucha la palabra, une el dibujo y completa la oración. Las palabras se quedan en inglés.",
-  "Free printable coin practice for Pre-K to grade 5. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.":
-    "Monedas para imprimir, de prekínder a grado 5. Nombra, cuenta, forma una cantidad, da el cambio, lee dólares y centavos y resuelve problemas de dinero.",
-  "Free printable telling-time practice for grades 1–4. Analog clocks to the hour, half hour, quarter hour, and 5 minutes, plus elapsed time, with an answer key.":
-    "La hora para imprimir, de grado 1 a grado 4. Relojes en punto, y media, y cuarto, de 5 en 5 y el tiempo transcurrido, con la hoja de respuestas.",
-  "Free counting practice for Pre-K through grade 4. Count objects to 20, compare groups, find the number before and after, read dot patterns, and fill a ten-frame.":
-    "Contar, de prekínder a grado 4. Hasta 20, compara grupos, el número de antes y después, puntos de un vistazo y el tablero de diez.",
-  "Free word problems for kindergarten through grade 4. Short add, subtract, multiply, share, and two-step stories with a picture, read aloud for children who are still learning to read.":
-    "Problemas cortos, de kínder a grado 4. Sumar, restar, multiplicar, repartir y dos pasos, con un dibujo y la voz en alto.",
-  "Free phonics practice for Pre-K through grade 4. Letter sounds, beginning sounds with pictures, rhyming words, and CVC blending. A speaker reads the sound, with the sound written out when a voice is not available.":
-    "Sonidos del inglés, de prekínder a grado 4. La letra, el sonido del principio, palabras que riman y unir sonidos. La voz dice el sonido.",
-  "Free geometry for Pre-K to grade 5. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.":
-    "Figuras de prekínder a grado 5. Nombra las formas, palabras de lugar, une figuras, cuenta caras y cuadrados, y ordena cuadriláteros.",
-  "Free place value practice for grades 1–4. Tens and ones with base-ten blocks, expanded form, comparing numbers, rounding, and thousands up to a million.":
-    "Valor posicional para los grados 1 a 4. Decenas y unidades, forma desarrollada, comparar, redondear y millares hasta el millón.",
+  "Free printable coin practice for Pre-K to grade 4. Name pennies, nickels, dimes, and quarters, count them, make an amount, make change, read dollars and cents, and solve money problems.":
+    "Monedas para imprimir, de prekínder a grado 4. Nombra, cuenta, forma una cantidad, da el cambio, lee dólares y centavos y resuelve problemas de dinero.",
+  "Free printable telling-time practice for kindergarten through grade 4. Analog clocks to the hour, half hour, quarter hour, and 5 minutes, plus elapsed time, with an answer key.":
+    "La hora para imprimir, de kínder a grado 4. Relojes en punto, y media, y cuarto, de 5 en 5 y el tiempo transcurrido, con la hoja de respuestas.",
+  "Free counting practice for Pre-K through grade 2. Count objects to 20, compare groups, find the number before and after, read dot patterns, and fill a ten-frame.":
+    "Contar, de prekínder a grado 2. Hasta 20, compara grupos, el número de antes y después, puntos de un vistazo y el tablero de diez.",
+  "Free word problems for kindergarten through grade 4. Short add, subtract, multiply, share, estimate, and two-step stories with a picture, read aloud for children who are still learning to read.":
+    "Problemas cortos, de kínder a grado 4. Sumar, restar, multiplicar, repartir, estimar y dos pasos, con un dibujo y la voz en alto.",
+  "Free phonics practice for Pre-K through grade 3. Letter sounds, beginning sounds with pictures, rhyming words, and CVC blending. A speaker reads the sound, with the sound written out when a voice is not available.":
+    "Sonidos del inglés, de prekínder a grado 3. La letra, el sonido del principio, palabras que riman y unir sonidos. La voz dice el sonido.",
+  "Free geometry for Pre-K to grade 4. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.":
+    "Figuras de prekínder a grado 4. Nombra las formas, palabras de lugar, une figuras, cuenta caras y cuadrados, y ordena cuadriláteros.",
+  "Free place value practice for grades 1–5. Tens and ones with base-ten blocks, expanded form, comparing numbers, rounding, and thousands up to a million.":
+    "Valor posicional para los grados 1 a 5. Decenas y unidades, forma desarrollada, comparar, redondear y millares hasta el millón.",
   Settings: "Ajustes",
   "Grown-ups": "Adultos",
   Stories: "Cuentos",
@@ -1119,8 +1122,8 @@ export const ES: Record<string, string> = {
   "Multiply fractions": "Multiplicar fracciones",
   "Order of operations": "Orden de las operaciones",
   Numbers: "Números",
-  "Free missing-number equations for kindergarten through grade 4. Find the box in an addition, subtraction, multiplication, or two-step equation. A first look at variables. No signup.":
-    "Ecuaciones con un número que falta, de kínder a grado 4. Busca la caja en una suma, resta, multiplicación o dos pasos. Un primer vistazo a las variables. Sin cuenta.",
+  "Free missing-number equations for kindergarten through grade 5. Find the box in an addition, subtraction, multiplication, or two-step equation. A first look at variables. No signup.":
+    "Ecuaciones con un número que falta, de kínder a grado 5. Busca la caja en una suma, resta, multiplicación o dos pasos. Un primer vistazo a las variables. Sin cuenta.",
   "Loading…": "Cargando…",
   "This page is not saved on this device yet. Connect once, then open Academy again.":
     "Esta página todavía no está guardada en este aparato. Conéctate una vez y abre Academy de nuevo.",
@@ -1181,8 +1184,8 @@ export const ES: Record<string, string> = {
   "Grades 3–4": "Grados 3 a 4",
   "Free fractions on a number line for grades 2–4. The ticks between 0 and 1 stay blank, so you count the parts. No signup.":
     "Fracciones gratis en la recta numérica, de grado 2 a 4. Las marcas entre 0 y 1 van en blanco, así que cuentas las partes. Sin cuenta.",
-  "Free time to the minute for grades 3–4. Count the minutes past the hour. No signup.":
-    "La hora al minuto, gratis, de grado 3 a 4. Cuenta los minutos después de la hora. Sin cuenta.",
+  "Free time to the minute for grade 3. Count the minutes past the hour. No signup.":
+    "La hora al minuto, gratis, para grado 3. Cuenta los minutos después de la hora. Sin cuenta.",
   "Shares": "Repartos",
   "Garden": "Jardín",
   "Give one to each plate.": "Da una a cada plato.",
@@ -1206,7 +1209,7 @@ export const ES: Record<string, string> = {
   "Find the perimeter": "Hallar el perímetro",
   "Number patterns": "Patrones numéricos",
   "Follow a number rule": "Seguir una regla numérica",
-  "Free sharing and division practice for Pre-K through grade 4. Deal cookies onto plates, make equal groups, and see what is left over. No signup.": "Práctica gratis de repartir y dividir, de prekínder a grado 4. Reparte galletas en platos, haz grupos iguales y mira lo que sobra. Sin cuenta.",
-  "Free area and perimeter practice for grades 2–4. Count unit squares in a shape, walk the fence around it, and find a missing side. No signup.": "Práctica gratis de área y perímetro para los grados 2 a 4. Cuenta cuadrados unidad, recorre el borde y halla un lado que falta. Sin cuenta.",
-  "Free skip-counting and number patterns for kindergarten through grade 4. Count by tens, fives, twos, and hundreds, then find the rule. No signup.": "Conteo salteado y patrones numéricos gratis, de kínder a grado 4. Cuenta de 10 en 10, de 5 en 5, de 2 en 2 y de 100 en 100, y halla la regla. Sin cuenta.",
+  "Free sharing and division practice for Pre-K through grade 5. Deal cookies onto plates, make equal groups, and see what is left over. No signup.": "Práctica gratis de repartir y dividir, de prekínder a grado 5. Reparte galletas en platos, haz grupos iguales y mira lo que sobra. Sin cuenta.",
+  "Free area and perimeter practice for grades 2–5. Count unit squares in a shape, walk the fence around it, and find a missing side. No signup.": "Práctica gratis de área y perímetro para los grados 2 a 5. Cuenta cuadrados unidad, recorre el borde y halla un lado que falta. Sin cuenta.",
+  "Free skip-counting and number patterns for kindergarten through grade 5. Count by tens, fives, twos, and hundreds, then find the rule. No signup.": "Conteo salteado y patrones numéricos gratis, de kínder a grado 5. Cuenta de 10 en 10, de 5 en 5, de 2 en 2 y de 100 en 100, y halla la regla. Sin cuenta.",
 };

@@ -1,12 +1,12 @@
 import { GAME_CARDS } from "../games/cards";
 import { GRADE_BANDS } from "../grade-map";
+import { contentGrades, gradeSpan, levelHomeGrade } from "../grade-range";
 import type { Grade } from "../model";
 import { WORKSHEETS, type StaticSheet } from "./catalog";
 import {
   ageRange,
   GAME_COPY,
   gradePhrase,
-  GRADE_ORDER,
   joinCodes,
   pageH1,
   pageTitle,
@@ -74,20 +74,6 @@ interface Topic {
   related: { slug: string; label: Phrase }[];
 }
 
-const SHEET_GRADE_IDS: Record<string, Grade[]> = {
-  "Grades 2–4": ["2", "3", "4"],
-  "K–1": ["K", "1"],
-  "Grades 1–2": ["1", "2"],
-  "Grade 1": ["1"],
-  "Grades 2–3": ["2", "3"],
-  "Grades 1–4": ["1", "2", "3", "4"],
-  "K–4": ["K", "1", "2", "3", "4"],
-  "Pre-K–4": ["PK", "K", "1", "2", "3", "4"],
-  "Pre-K": ["PK"],
-  "Grade 4": ["4"],
-  "Grades 3–4": ["3", "4"],
-};
-
 export function withLocale(prefix: string, slug: string): string {
   return [prefix, slug].filter(Boolean).join("/");
 }
@@ -127,15 +113,10 @@ function codesFor(gameId: string, grades: readonly Grade[]): string[] {
   return codes;
 }
 
+/** A skill page names the grade that first teaches the level. Later grades only review it. */
 function gradesForLevel(gameId: string, levelId: string): Grade[] {
-  const grades: Grade[] = [];
-  for (const grade of GRADE_ORDER) {
-    const band = GRADE_BANDS[gameId]?.[grade];
-    if (!band || band.offer === "later") continue;
-    if (!band.levels.includes(levelId)) continue;
-    grades.push(grade);
-  }
-  return grades;
+  const home = levelHomeGrade(gameId, levelId);
+  return home ? [home] : [];
 }
 
 function skillSlug(english: string, levelId: string): string {
@@ -146,10 +127,10 @@ function skillSlug(english: string, levelId: string): string {
   return slug || levelId;
 }
 
-function sheetGrades(title: string): Grade[] {
-  const key = /\(([^)]+)\)/.exec(title)?.[1] ?? "";
-  const grades = SHEET_GRADE_IDS[key];
-  if (!grades) throw new Error(`worksheet grades ${title}`);
+/** A ready-made sheet's grades come from the levels its items practice. */
+function sheetGrades(sheet: StaticSheet): Grade[] {
+  const grades = gradeSpan(contentGrades(sheet.game, sheet.levels));
+  if (grades.length === 0) throw new Error(`worksheet grades ${sheet.slug}`);
   return grades;
 }
 
@@ -401,7 +382,7 @@ export function sheetIndexPages(): SeoPage[] {
 
 function sheetPage(sheet: StaticSheet, locale: SeoLocale): SeoPage {
   const lang = locale.id;
-  const grades = sheetGrades(sheet.title);
+  const grades = sheetGrades(sheet);
   const gradeLabel = sheetGradeLabel(sheet.title, lang);
   const h1 = lang === "en" ? sheet.h1 : sheetH1(sheet.h1, lang);
   const title = lang === "en" ? sheet.title : sheetTitle(lang, h1, gradeLabel);
@@ -447,7 +428,7 @@ function sheetPage(sheet: StaticSheet, locale: SeoLocale): SeoPage {
 function sheetIndexPage(locale: SeoLocale): SeoPage {
   const lang = locale.id;
   const path = withLocale(locale.prefix, "worksheets");
-  const ui = uiCopy(lang, gradePhrase(lang, ["PK", "K", "1", "2", "3", "4"]), "Squishee Academy");
+  const ui = uiCopy(lang, gradePhrase(lang, ["PK", "K", "1", "2", "3", "4", "5"]), "Squishee Academy");
   const games = GAME_COPY.map((game) => ({
     href: relativeHref(path, withLocale(locale.prefix, game.slug)),
     label: say(game.name, lang),
@@ -461,9 +442,9 @@ function sheetIndexPage(locale: SeoLocale): SeoPage {
     description: sheetIndexDescription(lang),
     h1: sheetIndexH1(lang),
     lede: sheetIndexLede(lang),
-    gradesLabel: gradePhrase(lang, ["PK", "K", "1", "2", "3", "4"]),
+    gradesLabel: gradePhrase(lang, ["PK", "K", "1", "2", "3", "4", "5"]),
     codes: [],
-    ageRange: "4-10",
+    ageRange: "4-11",
     shot: "/shots/times.png",
     shotAlt: uiCopy(lang, "", say(GAME_COPY[0]!.name, lang)).shot,
     gameId: "times",

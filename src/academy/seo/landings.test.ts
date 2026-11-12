@@ -56,8 +56,8 @@ describe("search landing pages", () => {
       expect(scripts.every((tag) => tag.includes('type="application/ld+json"'))).toBe(true);
     }
     const times = bySlug.get("times-tables-game");
-    expect(times?.ageRange).toBe("7-10");
-    expect(times?.gradesLabel).toBe("grades 2–4");
+    expect(times?.ageRange).toBe("6-11");
+    expect(times?.gradesLabel).toBe("grades 1–5");
   });
 
   it("keeps game and skill landing titles within 60 and descriptions within 160 characters, search phrase first", () => {
