@@ -186,7 +186,8 @@ export interface GraphsBoard {
   marks: number[];
 }
 
-export type ShareLevel = "pairs" | "fair" | "groups" | "facts" | "left";
+/** `longDiv` is grade 5 (5.NBT.B.6): `total` ÷ `plates` (a two-digit divisor) = `each`, remainder `leftover`. It has no cookie bench. */
+export type ShareLevel = "pairs" | "fair" | "groups" | "facts" | "left" | "longDiv";
 
 export interface ShareBoard {
   game: "share";
@@ -263,7 +264,32 @@ export interface MinuteBoard {
   minutes: number;
 }
 
+/** Grade 5 multi-digit multiplication (5.NBT.B.5), drawn as an area model of partial products. */
+export interface TimesBoard {
+  game: "times";
+  mode: "bigMulti";
+  a: number;
+  b: number;
+}
+
+/**
+ * Grade 5 decimal operations to hundredths (5.NBT.B.7). `left`, `right`, and
+ * `result` are counts of hundredths (2.7 is 270). `unit` is 10 or 100: the
+ * place the think-it-through step counts in for × and ÷.
+ */
+export interface AddBoard {
+  game: "add";
+  mode: "decimalOps";
+  op: "+" | "-" | "×" | "÷";
+  left: number;
+  right: number;
+  result: number;
+  unit: 10 | 100;
+}
+
 export type Board =
+  | TimesBoard
+  | AddBoard
   | CountBoard
   | PlaceBoard
   | ShapeBoard

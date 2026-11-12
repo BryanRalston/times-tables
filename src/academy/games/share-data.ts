@@ -1,10 +1,11 @@
 import type { Rng } from "@/lib/rng";
 import { t } from "../i18n";
 import type { ShareBoard, ShareLevel } from "./boards";
+import { longDivSheet, makeLongDivQuestion, remainderText, rollLongDiv } from "./grade5-ops";
 import { nearChoices, sceneQuestion } from "./pick";
 import type { ChoiceQ, SheetItem } from "./types";
 
-export const SHARE_LEVELS = ["pairs", "fair", "groups", "facts", "left"] as const;
+export const SHARE_LEVELS = ["pairs", "fair", "groups", "facts", "left", "longDiv"] as const;
 
 export interface ShareTask {
   kind: "share";
@@ -28,6 +29,7 @@ export function shareAnswer(board: Pick<ShareBoard, "mode" | "plates" | "each" |
     case "pairs":
     case "fair":
     case "facts":
+    case "longDiv":
       return board.each;
     case "groups":
       return board.plates;
@@ -106,6 +108,8 @@ export function shareSpeech(board: Pick<ShareBoard, "mode" | "total" | "plates" 
       return intoGroups(board.total, board.each);
     case "left":
       return leftTitle(board.total, board.plates);
+    case "longDiv":
+      return `${board.total} ÷ ${board.plates}`;
     default: {
       const neverMode: never = board.mode;
       return neverMode;
@@ -123,6 +127,8 @@ export function shareSolved(board: Pick<ShareBoard, "mode" | "plates" | "each" |
       return groupWord(board.plates);
     case "left":
       return leftWord(board.leftover);
+    case "longDiv":
+      return remainderText(board.each, board.leftover);
     default: {
       const neverMode: never = board.mode;
       return neverMode;
@@ -144,6 +150,16 @@ export function shareHint(mode: ShareLevel): string {
         "每个盘子放一块。",
         "हर प्लेट पर एक रखो।",
         "ضع واحدة في كل طبق.",
+      );
+    case "longDiv":
+      return t(
+        "Try the divisor times 10 first. Then take away and keep going.",
+        "Prueba primero el divisor por 10. Luego resta y sigue.",
+        "Tente primeiro o divisor vezes 10. Depois subtraia e continue.",
+        "Essaie d'abord le diviseur fois 10. Puis retire et continue.",
+        "先试试除数乘10，再减去，然后继续。",
+        "पहले भाजक गुणा 10 आज़माओ। फिर घटाओ और आगे बढ़ो।",
+        "جرّب أولًا المقسوم عليه مضروبًا في 10، ثم اطرح وتابع.",
       );
     case "groups":
       return t(
@@ -198,6 +214,10 @@ function roll(level: ShareLevel, rng: Rng): ShareBoard {
       const leftover = rng.int(1, plates - 1);
       return { game: "share", mode: "left", plates, each, leftover, total: plates * each + leftover };
     }
+    case "longDiv": {
+      const fact = rollLongDiv(rng);
+      return { game: "share", mode: "longDiv", plates: fact.divisor, each: fact.quotient, leftover: fact.remainder, total: fact.total };
+    }
     default: {
       const neverLevel: never = level;
       return neverLevel;
@@ -241,6 +261,7 @@ export function shareSettled(task: ShareTask, counts: readonly number[], bank: n
 }
 
 export function makeShareQuestion(rng: Rng, level: string): ChoiceQ {
+  if (level === "longDiv") return makeLongDivQuestion(rng);
   const task = makeShareTask(level, rng);
   const answer = shareAnswer(task);
   const hi = task.mode === "facts" ? 12 : task.mode === "groups" ? 8 : 6;
@@ -270,6 +291,7 @@ export function makeShareQuestion(rng: Rng, level: string): ChoiceQ {
 }
 
 export function makeShareSheet(rng: Rng, level: string): SheetItem {
+  if (level === "longDiv") return longDivSheet(rng);
   const task = makeShareTask(level, rng);
   return { prompt: task.speech, answer: String(shareAnswer(task)) };
 }

@@ -15,6 +15,7 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     factors: "4.OA.B.4",
     multi: "4.NBT.B.5",
     divide: "4.NBT.B.6",
+    bigMulti: "5.NBT.B.5",
   },
   add: {
     within5: "K.OA.A.2",
@@ -24,6 +25,7 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     within100: "2.NBT.B.5",
     within1000: "3.NBT.A.2",
     thousands: "4.NBT.B.4",
+    decimalOps: "5.NBT.B.7",
   },
   time: {
     hour: "1.MD.B.3",
@@ -158,6 +160,7 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     groups: "3.OA.A.2",
     facts: "3.OA.C.7",
     left: "4.OA.A.3",
+    longDiv: "5.NBT.B.6",
   },
   grid: {
     tiles: "3.MD.C.6",
@@ -294,6 +297,9 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "4.G.A.3": { en: "A line of symmetry", es: "Un eje de simetría" },
   "5.NBT.A.3": { en: "Read, compare, and round decimals", es: "Leer, comparar y redondear decimales" },
   "5.NBT.A.4": { en: "Round decimals to any place", es: "Redondear decimales a cualquier lugar" },
+  "5.NBT.B.5": { en: "Multiply multi-digit numbers", es: "Multiplicar números de varias cifras" },
+  "5.NBT.B.6": { en: "Divide by two-digit numbers", es: "Dividir entre números de dos cifras" },
+  "5.NBT.B.7": { en: "Add, subtract, multiply, and divide decimals", es: "Sumar, restar, multiplicar y dividir decimales" },
   "5.NF.A.1": { en: "Add and subtract unlike fractions", es: "Sumar y restar fracciones con distinto denominador" },
   "5.NF.B.4": { en: "Multiply fractions", es: "Multiplicar fracciones" },
   "5.OA.A.1": { en: "Parentheses in expressions", es: "Paréntesis en expresiones" },

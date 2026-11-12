@@ -81,7 +81,10 @@ describe("island map", () => {
       expect(q.choices).toHaveLength(4);
       expect(q.choices).toContain(q.answer);
     }
-    const top = makeBossRound("add", "thousands", rngFromSeed("top"));
-    expect(top.every((q) => q.skill === "add:thousands")).toBe(true);
+    const top = makeBossRound("add", "decimalOps", rngFromSeed("top"));
+    expect(top.every((q) => q.skill === "add:decimalOps")).toBe(true);
+    // With a grade, a grade 4 boss at the top of its band never reaches grade 5 decimals.
+    const four = makeBossRound("add", "thousands", rngFromSeed("four"), [], undefined, { grade: "4" });
+    expect(four.some((q) => q.skill === "add:decimalOps")).toBe(false);
   });
 });

@@ -39,7 +39,7 @@ function sceneCard(
   };
 }
 
-const TIMES_IDS = ["count", "twos", "mix", "toTen", "factors", "multi", "divide"] as const;
+const TIMES_IDS = ["count", "twos", "mix", "toTen", "factors", "multi", "divide", "bigMulti"] as const;
 const TIMES_BARS = ["2", "5", "10", "3", "4", "6", "7", "8", "9"].map((n) => ({ key: `table:${n}`, label: `×${n}` }));
 const TIMES_CHIPS = ["2", "3", "4", "5", "6", "7", "8", "9", "10"].map((n) => ({ key: `table:${n}`, label: `×${n}` }));
 
@@ -63,6 +63,7 @@ export const timesCard: GameCard = {
     { id: "factors", label: "Factors and multiples", num: 5 },
     { id: "multi", label: "Multi-digit multiply", num: 6 },
     { id: "divide", label: "Division with remainders", num: 7 },
+    { id: "bigMulti", label: "Multiply by 2 digits", num: 8 },
   ],
   defaultLevel(grade) {
     const fallback = ((): string => {
@@ -76,8 +77,9 @@ export const timesCard: GameCard = {
         case "3":
           return "toTen";
         case "4":
-        case "5":
           return "factors";
+        case "5":
+          return "bigMulti";
         default: {
           const neverGrade: never = grade;
           return neverGrade;
@@ -108,7 +110,7 @@ export const timesCard: GameCard = {
   chipLabel: () => null,
 };
 
-const ADD_IDS = ["within5", "within10", "within20", "tens", "within100", "within1000", "thousands"] as const;
+const ADD_IDS = ["within5", "within10", "within20", "tens", "within100", "within1000", "thousands", "decimalOps"] as const;
 const ADD_BARS: SkillRow[] = [
   { key: "add:within5", label: "Add within 5" },
   { key: "add:within10", label: "Add within 10" },
@@ -117,6 +119,7 @@ const ADD_BARS: SkillRow[] = [
   { key: "add:within100", label: "Add within 100" },
   { key: "add:within1000", label: "Add within 1000" },
   { key: "add:thousands", label: "Add thousands" },
+  { key: "add:decimalOps", label: "Decimal operations" },
 ];
 const ADD_CHIPS: SkillRow[] = [
   { key: "doubles", label: "Doubles" },
@@ -148,6 +151,7 @@ export const addCard: GameCard = {
     { id: "within100", label: "Within 100", num: 5 },
     { id: "within1000", label: "Within 1000", num: 6 },
     { id: "thousands", label: "Thousands", num: 7 },
+    { id: "decimalOps", label: "Decimal operations", num: 8 },
   ],
   defaultLevel(grade) {
     const fallback = ((): string => {
@@ -162,8 +166,9 @@ export const addCard: GameCard = {
         case "3":
           return "within100";
         case "4":
-        case "5":
           return "within1000";
+        case "5":
+          return "decimalOps";
         default: {
           const neverGrade: never = grade;
           return neverGrade;
@@ -984,13 +989,14 @@ export const graphsCard = sceneCard("Data", GRAPH_ROWS, {
   isLevel: (value) => isId(["sort", "tally", "picture", "bar", "scale", "line"], value),
 });
 
-const SHARE_IDS = ["pairs", "fair", "groups", "facts", "left"] as const;
+const SHARE_IDS = ["pairs", "fair", "groups", "facts", "left", "longDiv"] as const;
 const SHARE_ROWS: SkillRow[] = [
   { key: "share:pairs", label: "Two plates" },
   { key: "share:fair", label: "Equal shares" },
   { key: "share:groups", label: "Groups of" },
   { key: "share:facts", label: "Division facts" },
   { key: "share:left", label: "Leftovers" },
+  { key: "share:longDiv", label: "Divide by 2 digits" },
 ];
 
 export const shareCard = sceneCard("Shares", SHARE_ROWS, {
@@ -1009,6 +1015,7 @@ export const shareCard = sceneCard("Shares", SHARE_ROWS, {
     { id: "groups", label: "Groups of", num: 3 },
     { id: "facts", label: "Division facts", num: 4 },
     { id: "left", label: "Leftovers", num: 5 },
+    { id: "longDiv", label: "Divide by 2 digits", num: 6 },
   ],
   defaultLevel(grade) {
     const fallback = ((): string => {
@@ -1022,8 +1029,9 @@ export const shareCard = sceneCard("Shares", SHARE_ROWS, {
         case "3":
           return "facts";
         case "4":
-        case "5":
           return "left";
+        case "5":
+          return "longDiv";
         default: {
           const neverGrade: never = grade;
           return neverGrade;

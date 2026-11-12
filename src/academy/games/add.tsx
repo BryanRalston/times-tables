@@ -5,10 +5,13 @@ import { pickTalk } from "./flavor";
 import { addCard } from "./cards";
 import { DotModel, Equation, SquisheeImg, cx } from "../ui/bits";
 import { fourChoices, qid } from "./choices";
+import { decimalOpsSheet, makeDecimalOpsQuestion } from "./grade5-ops";
+import { DecimalOpsArt } from "./grade5-ops-art";
+import { SceneCard } from "./scene-ui";
 import { makeBigAddQuestion, spanSheet } from "./span";
 import { MINUS, type ChoiceQ, type GameModule, type SheetItem } from "./types";
 
-export const ADD_LEVELS = ["within5", "within10", "within20", "tens", "within100", "within1000", "thousands"] as const;
+export const ADD_LEVELS = ["within5", "within10", "within20", "tens", "within100", "within1000", "thousands", "decimalOps"] as const;
 export type AddLevel = (typeof ADD_LEVELS)[number];
 
 export const ADD_MAX: Record<AddLevel, number> = {
@@ -19,6 +22,8 @@ export const ADD_MAX: Record<AddLevel, number> = {
   within100: 100,
   within1000: 1000,
   thousands: 9999,
+  /** Grade 5 decimals (5.NBT.B.7): values below 100, to hundredths. See DECIMAL_OPS_MAX in grade5-ops. */
+  decimalOps: 100,
 };
 
 export function isAddLevel(v: unknown): v is AddLevel {
@@ -51,6 +56,7 @@ function bothParts(level: AddLevel, total: number, part: number): number {
 
 export function makeAddQuestion(rng: Rng, level: AddLevel, prefer: readonly string[] = []): ChoiceQ {
   if (level === "within1000" || level === "thousands") return makeBigAddQuestion(rng, level, prefer);
+  if (level === "decimalOps") return makeDecimalOpsQuestion(rng);
   if (level === "tens") return makeTensQuestion(rng);
   const max = ADD_MAX[level];
   const span = easeSpan(1, max, easeOf(prefer));
@@ -214,6 +220,7 @@ function makeTensQuestion(rng: Rng): ChoiceQ {
 function sheetItem(rng: Rng, level: string): SheetItem {
   const extra = spanSheet(rng, "add", level);
   if (extra) return extra;
+  if (level === "decimalOps") return decimalOpsSheet(rng);
   if (level === "tens") {
     const fact = tensOperands(rng);
     if (fact.op === "+") return { prompt: `${fact.pink} + ${fact.teal} =`, answer: String(fact.total) };
@@ -232,6 +239,13 @@ function sheetItem(rng: Rng, level: string): SheetItem {
 }
 
 export function AddPrompt({ question, reveal, mascot, happy }: { question: ChoiceQ; reveal: boolean; mascot: string; happy: boolean }) {
+  if (question.visual.kind === "scene" && question.visual.board.game === "add") {
+    return (
+      <SceneCard title={question.title} mascot={mascot} happy={happy} hint={question.hint} hands={false} answer={question.answer}>
+        <DecimalOpsArt board={question.visual.board} reveal={reveal} />
+      </SceneCard>
+    );
+  }
   return (
     <section className="ac-qcard">
       <h1>{question.title}</h1>
