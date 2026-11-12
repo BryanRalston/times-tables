@@ -2278,9 +2278,33 @@ body:has(.ac-boss-intro) { background: #3c2448; }
   -webkit-mask-image: radial-gradient(circle closest-side, #000 58%, transparent 100%);
   mask-image: radial-gradient(circle closest-side, #000 58%, transparent 100%);
 }
-.ac-boss.is-fight .ac-boss-scene { width: 136%; }
+.ac-boss.is-fight .ac-boss-scene { width: 128%; }
 .ac-boss-face { filter: drop-shadow(0 8px 10px rgba(30, 12, 44, 0.4)); }
 .ac-done > .ac-boss.is-hero { margin: 40px auto 36px; }
+.ac-boss-head {
+  position: absolute;
+  top: 50%;
+  left: 14%;
+  z-index: 3;
+  width: 72%;
+  aspect-ratio: 1;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.ac-boss-head.is-behind { z-index: 0; }
+.ac-boss-hat,
+.ac-look-hat {
+  position: absolute;
+  max-width: none;
+  height: auto;
+  transform: translateY(-100%);
+  pointer-events: none;
+  /* A soft shadow under the brim so the hat reads as worn, not pasted on. */
+  filter: drop-shadow(0 4px 4px rgba(30, 12, 44, 0.42));
+}
+.ac-boss.is-gold .ac-boss-hat {
+  filter: drop-shadow(0 4px 4px rgba(30, 12, 44, 0.42)) drop-shadow(0 0 8px rgba(255, 224, 138, 0.9));
+}
 .ac-boss.is-arrive { animation: ac-boss-in 0.7s ease; }
 .ac-boss.is-idle { animation: ac-float 2.4s ease-in-out infinite; }
 .ac-boss.is-hit { animation: ac-wobble 0.45s ease; }
@@ -2349,8 +2373,30 @@ body:has(.ac-boss-intro) { background: #3c2448; }
 .ac-trophy { color: #a56b00; font-weight: 800; }
 .ac-trophy.is-gold { color: #a56b00; }
 .ac-boss-win { display: grid; justify-items: center; gap: 6px; }
-.ac-pal-look { position: relative; display: inline-grid; }
-.ac-look-badge { position: absolute; top: -6px; right: -8px; width: 42px; height: 24px; }
+.ac-pal-look { position: relative; display: inline-grid; isolation: isolate; }
+span.ac-pal-look > .ac-pal-head {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+span.ac-pal-look > .ac-pal-head.for-ac-shelf-you { top: 8px; }
+span.ac-pal-look > .ac-pal-head.is-behind { z-index: -1; }
+span.ac-pal-look > .ac-pal-head > img.ac-look-hat { height: auto; object-fit: fill; }
+span.ac-pal-look > img.ac-look-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  z-index: 2;
+  width: min(44%, 48px);
+  height: auto;
+  transform: rotate(12deg);
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px rgba(30, 12, 44, 0.3));
+}
 @keyframes ac-boss-in {
   from { transform: translateY(-40px) scale(0.8); opacity: 0; }
   to { transform: none; opacity: 1; }
