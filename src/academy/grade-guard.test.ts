@@ -29,6 +29,7 @@ import type { ChoiceQ } from "./games/types";
 import { graphAnswer } from "./games/graph-data";
 import { variableAnswer } from "./games/variables";
 import { BIG_MULTI_MAX, DECIMAL_OPS_MAX, LONG_DIV_RANGE, hundredthsText } from "./games/grade5-ops";
+import { PLANE_MAX, TWO_RULES_RANGE, pairText, parsePair, planeAnswer, twoRuleTerms, twoRulesAnswer } from "./games/grade5-pairs";
 
 const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
 const SAMPLES = 200;
@@ -368,6 +369,11 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       break;
     }
     case "grid": {
+      if (board.mode === "coords") {
+        expect(grade).toBe("5");
+        assertPlane(board, question);
+        break;
+      }
       if (board.mode === "tiles" || board.mode === "fence") {
         expect(board.cells.length).toBeGreaterThanOrEqual(3);
         expect(board.cells.length).toBeLessThanOrEqual(6);
@@ -384,10 +390,16 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       }
       if (grade === "2") expect(board.mode).toBe("tiles");
       if (grade === "3") expect(["tiles", "fence"]).toContain(board.mode);
-      if ((grade === "4" || grade === "5")) expect(["tiles", "fence", "side"]).toContain(board.mode);
+      if (grade === "4") expect(["tiles", "fence", "side"]).toContain(board.mode);
+      if (grade === "5") expect(["fence", "side"]).toContain(board.mode);
       break;
     }
     case "patterns": {
+      if (board.mode === "twoRules") {
+        expect(grade).toBe("5");
+        assertTwoRules(board, question);
+        break;
+      }
       expect(board.step).toBeGreaterThan(0);
       if (board.mode === "grow") {
         expect(board.terms).toHaveLength(4);
@@ -405,7 +417,8 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if (grade === "K" || grade === "1") expect(board.mode).toBe("tens");
       if (grade === "2") expect(["tens", "fives", "twos", "hundreds"]).toContain(board.mode);
       if (grade === "3") expect(["hundreds", "rule"]).toContain(board.mode);
-      if ((grade === "4" || grade === "5")) expect(["rule", "grow"]).toContain(board.mode);
+      if (grade === "4") expect(["rule", "grow"]).toContain(board.mode);
+      if (grade === "5") expect(["grow"]).toContain(board.mode);
       expect(board.answer).toBeLessThanOrEqual(1000);
       break;
     }
@@ -546,6 +559,61 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
     default: {
       const neverBoard: never = board;
       throw new Error(String(neverBoard));
+    }
+  }
+}
+
+function assertTwoRules(board: Extract<Board, { game: "patterns" }>, question: ChoiceQ): void {
+  // Grade 5 two rules (5.OA.B.3): both patterns from 0, B a whole multiple of A, terms inside 0–60.
+  const two = board.two!;
+  expect(two).toBeDefined();
+  expect(two.count).toBe(TWO_RULES_RANGE.count);
+  expect(two.ruleA).toBeGreaterThanOrEqual(1);
+  expect(two.ruleB).toBeLessThanOrEqual(TWO_RULES_RANGE.ruleMax);
+  const k = two.ruleB / two.ruleA;
+  expect(Number.isInteger(k)).toBe(true);
+  expect(k).toBeGreaterThanOrEqual(TWO_RULES_RANGE.timesMin);
+  expect(k).toBeLessThanOrEqual(TWO_RULES_RANGE.timesMax);
+  const { a, b } = twoRuleTerms(two);
+  expect(a[0]).toBe(0);
+  expect(b[0]).toBe(0);
+  for (const n of [...a, ...b]) {
+    expect(n).toBeGreaterThanOrEqual(0);
+    expect(n).toBeLessThanOrEqual(TWO_RULES_RANGE.termMax);
+  }
+  expect(question.answer).toBe(twoRulesAnswer(two));
+  for (const choice of question.choices) {
+    if (two.ask === "missing") expect(choice).toMatch(/^\d+$/);
+    if (two.ask === "relation") expect(choice).toMatch(/^[×+] \d+$/);
+    if (two.ask === "pair") expect(parsePair(choice)).not.toBeNull();
+  }
+  // No negatives and no letters-as-variables before grade 6.
+  expect(question.choices.join(" ")).not.toMatch(/-\d|−/);
+}
+
+function assertPlane(board: Extract<Board, { game: "grid" }>, question: ChoiceQ): void {
+  // Grade 5 coordinate plane (5.G.A): quadrant I only, whole numbers 0–10.
+  const plane = board.plane!;
+  expect(plane).toBeDefined();
+  const inside = (p: { x: number; y: number }) => {
+    expect(Number.isInteger(p.x) && Number.isInteger(p.y)).toBe(true);
+    expect(p.x).toBeGreaterThanOrEqual(0);
+    expect(p.y).toBeGreaterThanOrEqual(0);
+    expect(p.x).toBeLessThanOrEqual(PLANE_MAX);
+    expect(p.y).toBeLessThanOrEqual(PLANE_MAX);
+  };
+  inside(plane.target);
+  for (const p of plane.points) inside(p);
+  expect(question.answer).toBe(planeAnswer(plane));
+  if (plane.ask === "find") {
+    expect(question.choices).toEqual(["A", "B", "C", "D"]);
+    expect(new Set(plane.points.map((p) => `${p.x},${p.y}`)).size).toBe(4);
+  } else {
+    expect(question.answer).toBe(pairText(plane.target.x, plane.target.y));
+    for (const choice of question.choices) {
+      const p = parsePair(choice);
+      expect(p, choice).not.toBeNull();
+      inside(p!);
     }
   }
 }
@@ -1215,6 +1283,92 @@ describe("grade 5 slice 3: multi-digit multiply, 2-digit division, decimal opera
   });
 
   it("has no hands-on build card for the new levels and no grade 5 boss", () => {
+    for (const [gameId, levelId] of NEW_LEVELS) expect(hasHandsCard(gameId, levelId)).toBe(false);
+  });
+});
+
+describe("grade 5 slice 4: two rules and the coordinate plane (5.OA.B.3, 5.G.A)", () => {
+  const NEW_LEVELS: [string, string, string, string[]][] = [
+    // game, new level, grade 4 top level, standards
+    ["patterns", "twoRules", "grow", ["5.OA.B.3"]],
+    ["grid", "coords", "side", ["5.G.A.1", "5.G.A.2"]],
+  ];
+  const BELOW_FIVE: Grade[] = ["PK", "K", "1", "2", "3", "4"];
+
+  it("slots each new level last in its game and opens it first for grade 5", () => {
+    for (const [gameId, levelId, top] of NEW_LEVELS) {
+      const game = GAMES.find((item) => item.id === gameId)!;
+      const ids = game.levels.map((row) => row.id);
+      expect(ids.at(-1), gameId).toBe(levelId);
+      expect(ids.indexOf(top), gameId).toBe(ids.length - 2);
+      expect(game.isLevel(levelId)).toBe(true);
+      expect(game.defaultLevel("5")).toBe(levelId);
+      const window = playWindow(ids, gameId, "5", false);
+      expect(window.start).toBe(levelId);
+      expect(window.ids).toEqual([top, levelId]);
+    }
+  });
+
+  it("never opens a new level below grade 5 unless challenge ahead is on", () => {
+    for (const [gameId, levelId, top] of NEW_LEVELS) {
+      const game = GAMES.find((item) => item.id === gameId)!;
+      const ids = game.levels.map((row) => row.id);
+      for (const grade of BELOW_FIVE) {
+        expect(playWindow(ids, gameId, grade, false).ids, `${gameId} grade ${grade}`).not.toContain(levelId);
+        expect(levelAllowed(ids, gameId, grade, levelId, false, "easy"), `${gameId} grade ${grade} easy`).toBe(false);
+        expect(levelAllowed(ids, gameId, grade, levelId, false, "medium"), `${gameId} grade ${grade} medium`).toBe(false);
+      }
+      expect(playWindow(ids, gameId, "4", false).ids.at(-1)).toBe(top);
+      expect(playWindow(ids, gameId, "4", true).ids).toContain(levelId);
+    }
+  });
+
+  it("ties each new level to its grade 5 standards, and grade 5 only", () => {
+    for (const [gameId, , , codes] of NEW_LEVELS) {
+      expect(GRADE_BANDS[gameId]?.["5"].standards).toEqual(codes);
+      for (const grade of BELOW_FIVE) expect(GRADE_BANDS[gameId]?.[grade].standards.some((item) => item.startsWith("5."))).toBe(false);
+    }
+  });
+
+  it("serves in-range cards per new level with four distinct tiles and one right answer, in every locale", () => {
+    const locales: Locale[] = ["en", "es", "pt", "fr", "zh", "hi", "ar"];
+    try {
+      for (const locale of locales) {
+        setLocale(locale);
+        for (const [gameId, levelId] of NEW_LEVELS) {
+          const game = GAMES.find((item) => item.id === gameId)!;
+          for (let i = 0; i < (locale === "en" ? 600 : 80); i += 1) {
+            const question = game.makeQuestion(rngFromSeed(`g5s4-${locale}-${gameId}-${i}`), levelId);
+            expect(question.skill).toBe(`${gameId}:${levelId}`);
+            expect(question.choices).toHaveLength(4);
+            expect(new Set(question.choices).size).toBe(4);
+            expect(question.choices.filter((choice) => choice === question.answer)).toHaveLength(1);
+            expect(question.choices.some((choice) => /^no \d/.test(choice))).toBe(false);
+            expect(question.title.length).toBeGreaterThan(0);
+            assertQuestion("5", levelId, question);
+          }
+        }
+      }
+    } finally {
+      setLocale("en");
+    }
+  });
+
+  it("never serves new content to grades below 5 in 400 draws", () => {
+    for (const [gameId, levelId] of NEW_LEVELS) {
+      const game = GAMES.find((item) => item.id === gameId)!;
+      const ids = game.levels.map((row) => row.id);
+      for (const grade of BELOW_FIVE) {
+        const window = playWindow(ids, gameId, grade, false);
+        for (let i = 0; i < 400 && window.ids.length > 0; i += 1) {
+          const level = window.ids[i % window.ids.length]!;
+          expect(game.makeQuestion(rngFromSeed(`g5s4-leak-${gameId}-${grade}-${i}`), level).skill).not.toBe(`${gameId}:${levelId}`);
+        }
+      }
+    }
+  });
+
+  it("has no hands-on build card for the new levels", () => {
     for (const [gameId, levelId] of NEW_LEVELS) expect(hasHandsCard(gameId, levelId)).toBe(false);
   });
 });

@@ -895,12 +895,14 @@ share:longDiv|dividing by two-digit numbers|dividir entre números de dos cifras
 grid:tiles|counting unit squares|contar cuadrados unidad|contar quadrados unitários|compter les carrés unités|数单位方格|इकाई वर्ग गिनना|عدّ مربعات الوحدة
 grid:fence|distance around a shape|distancia alrededor|distância ao redor|tour d'une figure|图形的周长|आकृति के चारों ओर|المسافة حول الشكل
 grid:side|a missing side|un lado que falta|um lado que falta|un côté manquant|缺的边|छूटी भुजा|ضلع ناقص
+grid:coords|the coordinate plane|el plano de coordenadas|o plano cartesiano|le repère du plan|坐标平面|निर्देशांक तल|المستوى الإحداثي
 patterns:tens|counting by tens|contar de 10 en 10|contar de 10 em 10|compter de 10 en 10|十个十个数|दस-दस गिनना|العدّ بالعشرات
 patterns:fives|counting by fives|contar de 5 en 5|contar de 5 em 5|compter de 5 en 5|五个五个数|पाँच-पाँच गिनना|العدّ بالخمسات
 patterns:twos|counting by twos|contar de 2 en 2|contar de 2 em 2|compter de 2 en 2|两个两个数|दो-दो गिनना|العدّ بالاثنين
 patterns:hundreds|counting by hundreds|contar de 100 en 100|contar de 100 em 100|compter de 100 en 100|一百一百地数|सौ-सौ गिनना|العدّ بالمئات
 patterns:rule|the next number|el número que sigue|o próximo número|le nombre suivant|下一个数|अगली संख्या|العدد التالي
 patterns:grow|the rule of a pattern|la regla del patrón|a regra do padrão|la règle de la suite|规律是什么|पैटर्न का नियम|قاعدة النمط
+patterns:twoRules|two rules and ordered pairs|dos reglas y pares ordenados|duas regras e pares ordenados|deux règles et des couples|两个规律和有序数对|दो नियम और क्रमित युग्म|قاعدتان وأزواج مرتبة
 signs:to10|comparing numbers to 10|comparar números hasta el 10|comparar números até 10|comparer les nombres jusqu'à 10|比较10以内的数|10 तक तुलना|مقارنة الأعداد حتى 10
 signs:tens|comparing two-digit numbers|comparar números de dos cifras|comparar números de dois algarismos|comparer les nombres à deux chiffres|比较两位数|दो अंकों की तुलना|مقارنة عددين من رقمين
 signs:hundreds|comparing three-digit numbers|comparar números de tres cifras|comparar números de três algarismos|comparer les nombres à trois chiffres|比较三位数|तीन अंकों की तुलना|مقارنة عددين من ثلاثة أرقام

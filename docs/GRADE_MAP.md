@@ -10,6 +10,8 @@ Saved games from version 9 keep their grade. Version 10 only adds Pre-K and grad
 
 **Grade 5 (pre-algebra path, slice 1).** Grade 5 follows Common Core 5.OA, 5.NBT, and 5.NF. This first slice adds three new levels, one in Place Value, one in Fractions, and one in What is missing. Every other game keeps its grade 4 band for grade 5 as review, until a grade 5 level exists for it. The three new levels are capped so grade 4 and lower never drift into them. Challenge ahead opens them. They are text-first, tap-and-think cards: grade 5 does not auto-speak, the device voice reads the instructions, and there is no drag-and-build card for these levels. There is no grade 5 boss yet. See `PREALGEBRA_ROADMAP.md` for what comes next.
 
+**Grade 5 slice 4 (5.OA.B.3, 5.G.A).** Two more grade 5 levels, each the last level of its game: two rules in Number Patterns (5.OA.B.3) and the coordinate plane in Grid Garden (5.G.A.1, 5.G.A.2, quadrant I only). Grade 5 opens on the new level, with the old grade 4 top level as the one-level drift down. Grade 4 is capped at its own top level in both games, so the new levels stay grade 5 unless challenge ahead is on. Same rules as slices 1 and 3: text-first tap-and-think cards, four tiles with one right answer, device voice, no drag-and-build card, no grade 5 boss.
+
 **Grade 5 slice 3 (5.NBT.B).** Three more grade 5 levels, each the last level of its game: multiply by 2 digits in Times Tables (5.NBT.B.5), divide by 2 digits in Fair Shares (5.NBT.B.6), and decimal operations in Add & Subtract (5.NBT.B.7). Grade 5 opens on the new level, with the old grade 4 top level as the one-level drift down. Grade 4 is capped at its own top level in all three games, so the new levels stay grade 5 unless challenge ahead is on. Same rules as slice 1: text-first tap-and-think cards, four tiles with one right answer, device voice, no drag-and-build card, no grade 5 boss.
 
 Standards below are Common Core. Sight words use the Dolch lists. Grade 2 adds Fry words that are not already on a Dolch list. Grade 3 does the same with the next Fry band.
@@ -343,9 +345,11 @@ Pre-K and kindergarten only deal two plates. Grade 1 stays there too. Grade 2 ca
 
 ## Grid Garden
 
-Levels, easy to hard: count squares, around the shape, missing side.
+Levels, easy to hard: count squares, around the shape, missing side, coordinate plane.
 
 The shape is an irregular group of unit squares, never a filled rectangle. Count squares asks how many squares are in the shape. Around the shape asks for the distance around, counted as the outside edges. Missing side gives the area or the distance around plus one side, and asks for the other side.
+
+Grade 5 coordinate plane (5.G.A.1, 5.G.A.2) is quadrant I only: both axes run 0 to 10, every point has whole-number coordinates from 0 to 10, and there are no negatives. There are three kinds of card. Read a point names the coordinates of one dot (x and y from 1 to 9, never equal), and the swapped pair (y, x) is always one of the wrong tiles, with pairs one step off. Find a point shows four lettered dots and asks which one is at a given pair; the other dots are the swapped pair and two neighbors one step off. Next point plots three points made by two rules from (0, 0) (x adds 1, 2, or 3 and y adds 1, 2, or 3, never the same) and asks for the fourth, which stays inside 9 by 9; wrong tiles are the swapped pair, a point where one coordinate used the other rule, and pairs one off. Every tile is an ordered pair on the 0 to 10 grid, drawn left to right in every language.
 
 | Grade | Offer | Start | Core levels | Cap without challenge | Standards |
 |---|---|---|---|---|---|
@@ -354,15 +358,18 @@ The shape is an irregular group of unit squares, never a filled rectangle. Count
 | 1 | Coming later | — | — | — | Grid garden waits |
 | 2 | Gentle intro | Count squares | Count squares | Count squares | 2.G.A.2 |
 | 3 | Play | Around the shape | Count squares, around the shape | Around the shape | 3.MD.C.6, 3.MD.D.8 |
-| 4 | Play | Missing side | Around the shape, missing side | One level down (count squares) | 4.MD.A.3, 3.MD.D.8 |
+| 4 | Play | Missing side | Around the shape, missing side | Missing side | 4.MD.A.3, 3.MD.D.8 |
+| 5 | Play | Coordinate plane | Coordinate plane (missing side is the one-level drift down) | — | 5.G.A.1, 5.G.A.2 |
 
-Pre-K through grade 1 stay locked. Grade 2 only counts squares. Grade 3 can drift down to count squares and cannot climb into a missing side. Grade 4 can drift down to count squares.
+Pre-K through grade 1 stay locked. Grade 2 only counts squares. Grade 3 can drift down to count squares and cannot climb into a missing side. Grade 4 can drift down to count squares. Grade 4 is capped at missing side, so the coordinate plane stays grade 5 unless challenge ahead is on.
 
 ## Number Patterns
 
-Levels, easy to hard: count by tens, count by fives, count by twos, count by hundreds, next number, the rule.
+Levels, easy to hard: count by tens, count by fives, count by twos, count by hundreds, next number, the rule, two rules.
 
 Count by tens, fives, twos, and hundreds shows three numbers and asks for the next one. Next number uses a step of 2, 3, 4, 5, or 10. The rule shows the whole row and asks which step built it.
+
+Grade 5 two rules (5.OA.B.3) shows two patterns, A and B, as two rows of five terms. Both start at 0. A adds a step from 1 to 6, and B adds 2 to 5 times that step, never more than 15, so no term passes 60 and each B term is a whole-number multiple of its A term. There are three kinds of card. Missing number blanks one term in column 3 to 5; wrong tiles are the term from the other row, the term you get by using the other pattern's rule, and one term off. How B comes from A asks for the relationship, with tiles like × 2, × 3, + 2, and + 4; the adding tile that only fits the first pair is always there. Ordered pair shades one column and asks for (A, B); wrong tiles are the swapped pair (B, A) and pairs with one term off. No negatives and no letters for unknowns.
 
 | Grade | Offer | Start | Core levels | Cap without challenge | Standards |
 |---|---|---|---|---|---|
@@ -371,9 +378,10 @@ Count by tens, fives, twos, and hundreds shows three numbers and asks for the ne
 | 1 | Play | Count by tens | Count by tens | Count by tens | 1.NBT.A.1 |
 | 2 | Play | Count by fives | Count by fives, count by twos, count by hundreds | Count by hundreds | 2.NBT.A.2 |
 | 3 | Play | Next number | Next number | Next number | 3.OA.D.9 |
-| 4 | Play | The rule | The rule | One level down (next number) | 4.OA.C.5 |
+| 4 | Play | The rule | The rule | The rule | 4.OA.C.5 |
+| 5 | Play | Two rules | Two rules (the rule is the one-level drift down) | — | 5.OA.B.3 |
 
-Pre-K stays locked. Kindergarten and grade 1 only count by tens. Grade 2 can drift down to tens and cannot climb into next number. Grade 3 can drift down to hundreds and cannot climb into the rule. Grade 4 can drift down to next number.
+Pre-K stays locked. Kindergarten and grade 1 only count by tens. Grade 2 can drift down to tens and cannot climb into next number. Grade 3 can drift down to hundreds and cannot climb into the rule. Grade 4 can drift down to next number. Grade 4 is capped at the rule, so two rules stays grade 5 unless challenge ahead is on.
 
 ## Compare
 

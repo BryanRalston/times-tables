@@ -1087,6 +1087,8 @@ export const ES: Record<string, string> = {
   "Multiply by 2 digits": "Multiplicar por 2 cifras",
   "Decimal operations": "Operaciones con decimales",
   "Divide by 2 digits": "Dividir entre 2 cifras",
+  "Two rules": "Dos reglas",
+  "Coordinate plane": "Plano de coordenadas",
   "Add unlike fractions": "Sumar fracciones distintas",
   "Multiply fractions": "Multiplicar fracciones",
   "Order of operations": "Orden de las operaciones",

@@ -1,10 +1,11 @@
 import type { Rng } from "@/lib/rng";
 import { t } from "../i18n";
 import type { GridBoard, GridLevel } from "./boards";
+import { makePlaneQuestion, planeHint, planeSheet } from "./grade5-pairs";
 import { nearChoices, sceneQuestion } from "./pick";
 import type { ChoiceQ, SheetItem } from "./types";
 
-export const GRID_LEVELS = ["tiles", "fence", "side"] as const;
+export const GRID_LEVELS = ["tiles", "fence", "side", "coords"] as const;
 
 /** Irregular polyominoes. A full rectangle would repeat the shapes game. */
 const FIGURES: readonly (readonly (readonly [number, number])[])[] = [
@@ -79,6 +80,7 @@ export function gridAnswer(task: Pick<GridTask, "mode" | "cells" | "edges" | "mi
     case "fence":
       return task.edges;
     case "side":
+    case "coords":
       return task.missing;
     default: {
       const neverMode: never = task.mode;
@@ -170,6 +172,8 @@ export function gridHint(mode: GridLevel): string {
         "क्षेत्रफल या चारों ओर की दूरी इस्तेमाल करो।",
         "استخدم المساحة أو المحيط.",
       );
+    case "coords":
+      return planeHint("read");
     default: {
       const neverMode: never = mode;
       return neverMode;
@@ -232,6 +236,9 @@ function roll(level: GridLevel, rng: Rng): GridTask {
       return figureTask("fence", rng);
     case "side":
       return sideTask(rng);
+    case "coords":
+      // Grade 5 coordinates are written cards (grade5-pairs). This side task is only a safe fallback.
+      return sideTask(rng);
     default: {
       const neverLevel: never = level;
       return neverLevel;
@@ -265,6 +272,7 @@ export function gridMatches(task: GridTask, picked: readonly string[]): boolean 
       return want.length > 0 && want.length === picked.length && want.every((key) => picked.includes(key));
     }
     case "side":
+    case "coords":
       return picked.length === 1 && picked[0] === String(task.missing);
     default: {
       const neverMode: never = task.mode;
@@ -306,6 +314,7 @@ export function gridTaskFromBoard(board: GridBoard): GridTask {
 }
 
 export function makeGridQuestion(rng: Rng, level: string): ChoiceQ {
+  if (level === "coords") return makePlaneQuestion(rng);
   const task = makeGridTask(level, rng);
   const answer = gridAnswer(task);
   const hi = task.mode === "side" ? 12 : 24;
@@ -328,6 +337,7 @@ export function makeGridQuestion(rng: Rng, level: string): ChoiceQ {
 }
 
 export function makeGridSheet(rng: Rng, level: string): SheetItem {
+  if (level === "coords") return planeSheet(rng);
   const task = makeGridTask(level, rng);
   return { prompt: task.speech, answer: String(gridAnswer(task)) };
 }

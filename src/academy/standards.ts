@@ -166,6 +166,7 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     tiles: "3.MD.C.6",
     fence: "3.MD.D.8",
     side: "4.MD.A.3",
+    coords: "5.G.A.1",
   },
   patterns: {
     tens: "K.CC.A.1",
@@ -174,6 +175,7 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     hundreds: "2.NBT.A.2",
     rule: "3.OA.D.9",
     grow: "4.OA.C.5",
+    twoRules: "5.OA.B.3",
   },
   signs: {
     to10: "K.CC.C.7",
@@ -295,6 +297,9 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "4.MD.C.5": { en: "Understand angles", es: "Entender los ángulos" },
   "4.G.A.1": { en: "Lines and angles", es: "Líneas y ángulos" },
   "4.G.A.3": { en: "A line of symmetry", es: "Un eje de simetría" },
+  "5.OA.B.3": { en: "Two rules and ordered pairs", es: "Dos reglas y pares ordenados" },
+  "5.G.A.1": { en: "Points on the coordinate plane", es: "Puntos en el plano de coordenadas" },
+  "5.G.A.2": { en: "Graph points in the first quadrant", es: "Graficar puntos en el primer cuadrante" },
   "5.NBT.A.3": { en: "Read, compare, and round decimals", es: "Leer, comparar y redondear decimales" },
   "5.NBT.A.4": { en: "Round decimals to any place", es: "Redondear decimales a cualquier lugar" },
   "5.NBT.B.5": { en: "Multiply multi-digit numbers", es: "Multiplicar números de varias cifras" },
