@@ -125,9 +125,22 @@ export interface AnswerMark {
   unscored?: boolean;
 }
 
-/** Pre-K, kindergarten, and grade 1 hear each prompt. Older grades tap the speaker. */
-export function autoSpeakGrade(grade: Grade): boolean {
+/**
+ * Game questions never read themselves aloud, at any grade. A child taps the
+ * speaker ("Hear it again") to hear a question. Sound effects stay on.
+ */
+export function autoSpeakGrade(_grade: Grade): boolean {
+  return false;
+}
+
+/** Pre-K, kindergarten, and grade 1 get the calm round: no clock, simpler labels. */
+export function calmGrade(grade: Grade): boolean {
   return grade === "PK" || grade === "K" || grade === "1";
+}
+
+/** Storybooks read themselves aloud through grade 2. From grade 3 the child taps to hear. */
+export function storyAutoReadGrade(grade: Grade): boolean {
+  return grade === "PK" || grade === "K" || grade === "1" || grade === "2";
 }
 
 /**
