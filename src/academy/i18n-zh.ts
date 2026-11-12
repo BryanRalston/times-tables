@@ -1351,6 +1351,7 @@ export const ZH: Record<string, string> = {
   "They match": "它们一样",
   "This backup is long. Use the code.": "这份备份太长了。请用代码。",
   "This game": "这个游戏",
+  "This grade plays other games first.": "这个年级先玩别的游戏。",
   "This grade plays other games first. A grown-up can turn on challenge ahead in settings.": "这个年级先玩别的游戏。家长可以在设置里打开后面的挑战。",
   "This month has practice time.": "这个月有练习。",
   "This page hit a bug. Close it and open the link again.": "这一页出了点小问题。关掉它，再把链接打开。",

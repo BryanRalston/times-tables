@@ -857,7 +857,11 @@ export function PlayScreen({
               `${show(spec?.title ?? "This game")} llega más adelante`, `${show(spec?.title ?? "This game")} chega mais tarde`,
             `${show(spec?.title ?? "This game")} arrive plus tard`, `稍后才会有${show(spec?.title ?? "This game")}`, `${show(spec?.title ?? "This game")} बाद में आएगा`, `${show(spec?.title ?? "This game")} يأتي لاحقًا`)}
           </h1>
-          <p className="ac-hint">{show("This grade plays other games first. A grown-up can turn on challenge ahead in settings.")}</p>
+          <p className="ac-hint">
+            {game === "summit"
+              ? show("This grade plays other games first.")
+              : show("This grade plays other games first. A grown-up can turn on challenge ahead in settings.")}
+          </p>
           <button type="button" className="ac-go" onClick={onExit}>
             {show("Home")}
           </button>
@@ -933,7 +937,7 @@ export function PlayScreen({
         <section className="ac-done" data-confetti={liveStars === 3 || bossWonRound ? "on" : "off"} data-boss={boss ? "yes" : "no"}>
           {liveStars === 3 || bossWonRound ? <Confetti /> : null}
           {bossWonRound ? (
-            <BossFigure face={bossDef.face} look={bossDef.look} mood="friendly" crown={crownFight} name={bossDef.name} size="hero" />
+            <BossFigure face={bossDef.face} look={bossDef.look} mood="friendly" crown={crownFight} name={bossDef.name} size="hero" gameId={bossDef.gameId} />
           ) : (
             <SquisheeImg id={friend && !met ? friend.id : mascot} className="ac-done-pal" label={friend?.name ?? ""} />
           )}

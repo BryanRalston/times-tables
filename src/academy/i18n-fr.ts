@@ -1350,6 +1350,7 @@ export const FR: Record<string, string> = {
   "They match": "Ils sont pareils",
   "This backup is long. Use the code.": "Cette copie est longue. Utilise le code.",
   "This game": "Ce jeu",
+  "This grade plays other games first.": "Cette classe joue d'abord à d'autres jeux.",
   "This grade plays other games first. A grown-up can turn on challenge ahead in settings.": "Cette classe joue d'abord à d'autres jeux. Un adulte peut activer le défi plus loin dans Réglages.",
   "This month has practice time.": "Ce mois a du temps de pratique.",
   "This page hit a bug. Close it and open the link again.": "Cette page a rencontré un problème. Ferme-la et ouvre encore le lien.",
