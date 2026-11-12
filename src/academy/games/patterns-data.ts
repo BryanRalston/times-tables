@@ -1,10 +1,11 @@
 import type { Rng } from "@/lib/rng";
 import { t } from "../i18n";
 import type { PatternBoard, PatternLevel } from "./boards";
+import { makeTwoRulesQuestion, twoRulesSheet } from "./grade5-pairs";
 import { nearChoices, sceneQuestion, uniqueChoices } from "./pick";
 import type { ChoiceQ, SheetItem } from "./types";
 
-export const PATTERN_LEVELS = ["tens", "fives", "twos", "hundreds", "rule", "grow"] as const;
+export const PATTERN_LEVELS = ["tens", "fives", "twos", "hundreds", "rule", "grow", "twoRules"] as const;
 
 const RULES = [2, 3, 4, 5, 10] as const;
 
@@ -113,6 +114,9 @@ function roll(level: PatternLevel, rng: Rng): PatternTask {
       const terms = series(step, start, 4);
       return pack(level, terms.slice(0, 3), step, terms[3] ?? start + step * 3);
     }
+    case "twoRules":
+      // Grade 5 two rules is a written card (grade5-pairs). This step task is only a safe fallback.
+      return roll("rule", rng);
     case "grow": {
       const step = rng.pick(RULES);
       const start = rng.int(1, Math.max(1, 40 - step * 3));
@@ -165,6 +169,7 @@ export function taskBoard(task: PatternTask): PatternBoard {
 }
 
 export function makePatternQuestion(rng: Rng, level: string): ChoiceQ {
+  if (level === "twoRules") return makeTwoRulesQuestion(rng);
   const task = makePatternTask(level, rng);
   const answer = task.mode === "grow" ? ruleLabel(task.step) : String(task.answer);
   return sceneQuestion(rng, {
@@ -186,6 +191,7 @@ export function makePatternQuestion(rng: Rng, level: string): ChoiceQ {
 }
 
 export function makePatternSheet(rng: Rng, level: string): SheetItem {
+  if (level === "twoRules") return twoRulesSheet(rng);
   const task = makePatternTask(level, rng);
   const answer = task.mode === "grow" ? ruleLabel(task.step) : String(task.answer);
   return { prompt: task.speech, answer };

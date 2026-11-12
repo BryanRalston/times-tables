@@ -3883,3 +3883,61 @@ button.ac-go.ac-next {
 .ac-choice.is-remainder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px; }
 .ac-choice.is-remainder b { font-weight: inherit; line-height: 1; }
 .ac-choice.is-remainder small { font: 700 15px/1.1 Nunito, sans-serif; color: var(--ac-muted); }
+
+/* Grade 5 slice 4 (5.OA.B.3, 5.G.A): two patterns side by side, quadrant I plane. Calm, flat boards. */
+.ac-g5-rules {
+  display: grid;
+  gap: 5px;
+  width: min(350px, 96%);
+  margin: 8px auto;
+  direction: ltr;
+  font-family: Fredoka, Nunito, sans-serif;
+}
+.ac-g5-rules-name {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 58px;
+  padding: 0 4px 0 2px;
+  color: var(--ac-ink);
+}
+.ac-g5-rules-name b { font: 600 22px/1 Fredoka, Nunito, sans-serif; }
+.ac-g5-rules-name small { font: 700 12px/1.15 Nunito, sans-serif; color: var(--ac-muted); white-space: nowrap; }
+.ac-g5-rules-name.is-a b { color: #c2457a; }
+.ac-g5-rules-name.is-b b { color: var(--ac-teal-deep); }
+.ac-g5-rules-name.is-k small { font-size: 11px; }
+.ac-g5-rules-term {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  border-radius: 12px;
+  font: 600 clamp(18px, 5.4vw, 24px)/1 Fredoka, Nunito, sans-serif;
+  color: var(--ac-ink);
+}
+.ac-g5-rules-term.is-a { background: #ffe0ec; box-shadow: inset 0 0 0 2px #ffc2d9; }
+.ac-g5-rules-term.is-b { background: #d9f5ef; box-shadow: inset 0 0 0 2px #b4e8de; }
+.ac-g5-rules-term.is-col { box-shadow: inset 0 0 0 3px #3d2a55; }
+.ac-g5-rules-term.is-blank { background: #fff; box-shadow: inset 0 0 0 2px #ffc2d9; border: 2px dashed #c9a9c0; color: var(--ac-pink); }
+.ac-g5-rules-term.is-blank.is-shown { color: var(--ac-teal-deep); border-style: solid; border-color: #b4e8de; }
+.ac-g5-rules-k { display: flex; align-items: center; justify-content: center; font: 600 15px/1 Fredoka, Nunito, sans-serif; color: var(--ac-teal-deep); }
+.ac-g5-rules-pair { margin: 4px 0 0; text-align: center; font: 600 22px/1.1 Fredoka, Nunito, sans-serif; color: var(--ac-teal-deep); }
+
+.ac-g5-plane { width: min(234px, 64vw); margin: 2px auto 0; direction: ltr; }
+.ac-g5-plane svg { display: block; width: 100%; height: auto; overflow: visible; }
+.ac-g5-plane-line { stroke: #eadcf0; stroke-width: 1; }
+.ac-g5-plane-axis { stroke: #3d2a55; stroke-width: 2.5; stroke-linecap: round; }
+.ac-g5-plane-num { font: 700 13px Nunito, sans-serif; fill: #6d5872; }
+.ac-g5-plane-axis-name { font: 600 17px Fredoka, Nunito, sans-serif; font-style: italic; fill: #3d2a55; }
+.ac-g5-plane-guide line { stroke: var(--ac-teal-deep); stroke-width: 2; stroke-dasharray: 5 4; }
+.ac-g5-plane-step { stroke: #b4e8de; stroke-width: 3; stroke-linecap: round; }
+.ac-g5-plane-pt circle { fill: var(--ac-pink); stroke: #fff; stroke-width: 2.5; }
+.ac-g5-plane-pt.is-step circle { fill: var(--ac-teal-deep); }
+.ac-g5-plane-pt.is-hit circle { fill: var(--ac-teal-deep); }
+.ac-g5-plane-pt.is-next circle { fill: #fff; stroke: var(--ac-teal-deep); stroke-width: 3; }
+.ac-g5-plane-label { font: 700 17px Fredoka, Nunito, sans-serif; fill: #3d2a55; paint-order: stroke; stroke: #fff; stroke-width: 3px; }
+.ac-g5-plane-tag { font: 700 17px Fredoka, Nunito, sans-serif; fill: var(--ac-teal-deep); paint-order: stroke; stroke: #fff; stroke-width: 3px; }
+.ac-choice.is-math { direction: ltr; }
+.ac-choices.is-compact .ac-choice { min-height: 58px; font-size: 30px; }
+.ac-g5-pair { unicode-bidi: isolate; white-space: nowrap; }

@@ -3,15 +3,17 @@ import { show } from "../i18n";
 import { cx } from "../ui/bits";
 import { GridBench } from "../ui/grid-board";
 import { gridCard } from "./cards";
+import { PairTile, PlaneArt } from "./grade5-pairs-art";
 import { gridTaskFromBoard, isGridLevel, makeGridQuestion, makeGridSheet } from "./grid-data";
 import { SceneCard, sceneModule } from "./scene-ui";
 import type { ChoiceProps, GameModule, PromptProps } from "./types";
 
-export function GridPrompt({ question, mascot, happy }: PromptProps) {
+export function GridPrompt({ question, reveal, mascot, happy }: PromptProps) {
   if (question.visual.kind !== "scene" || question.visual.board.game !== "grid") return null;
+  const board = question.visual.board;
   return (
     <SceneCard title={question.title} mascot={mascot} happy={happy} hint={question.hint} hands={question.visual.hands} answer={question.answer}>
-      {null}
+      {board.mode === "coords" && board.plane ? <PlaneArt plane={board.plane} reveal={reveal} /> : null}
     </SceneCard>
   );
 }
@@ -23,6 +25,18 @@ export function GridChoices({ question, reveal, onChoose }: ChoiceProps) {
     choiceRef.current?.scrollIntoView({ block: "nearest", inline: "nearest" });
   }, [question.id]);
   if (!board) return null;
+  if (board.mode === "coords") {
+    // Grade 5: the coordinate plane sits in the prompt card. Tiles only here.
+    return (
+      <div ref={choiceRef} className={cx("ac-choices", "is-compact", reveal && "is-locked")}>
+        {question.choices.map((option) => (
+          <button key={option} type="button" className={cx("ac-choice", "is-math", reveal && option === question.answer && "is-yes")} disabled={reveal} onClick={() => onChoose(option)}>
+            <PairTile text={option} />
+          </button>
+        ))}
+      </div>
+    );
+  }
   const live = gridTaskFromBoard(board);
   const note =
     board.mode === "fence" ? show("Walk the fence, then pick an answer.") : board.mode === "side" ? show("Put a number on the blank.") : show("Count the squares, then pick an answer.");

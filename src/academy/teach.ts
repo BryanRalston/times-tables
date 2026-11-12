@@ -2,8 +2,9 @@ import { coinAsA, remainderShown, t } from "./i18n";
 import { speakable } from "./voice/speakable";
 
 export { speakable } from "./voice/speakable";
-import type { AddBoard, Board, CountBoard, FractionBoard, MeasureBoard, PhonicsBoard, PlaceBoard, ProblemBoard, ShapeBoard, ShareBoard, TimesBoard } from "./games/boards";
+import type { AddBoard, Board, GridBoard, PatternBoard, CountBoard, FractionBoard, MeasureBoard, PhonicsBoard, PlaceBoard, ProblemBoard, ShapeBoard, ShareBoard, TimesBoard } from "./games/boards";
 import { decimalExpr, decimalThink, hundredthsText, hundredthsWord, placeParts, remainderText, tenthsWord } from "./games/grade5-ops";
+import { pairText, timesOf, twoRuleTerms } from "./games/grade5-pairs";
 import { mathText } from "./games/grade5";
 import { TIMES } from "./games/types";
 import { geometryArt } from "./games/geometry";
@@ -406,6 +407,55 @@ function moneyFrames(visual: MoneyVisual, answer: string): MoneyFrame[] {
   }
 }
 
+/** Grade 5 worked example: walk each pattern by its rule, then compare the same column. */
+function twoRulesCaptions(board: PatternBoard, solved: string): string[] {
+  const two = board.two;
+  if (!two) return [solved];
+  const { a, b } = twoRuleTerms(two);
+  const col = Math.max(1, two.col);
+  switch (two.ask) {
+    case "missing": {
+      const rule = two.row === "a" ? two.ruleA : two.ruleB;
+      const prev = (two.row === "a" ? a : b)[col - 1] ?? 0;
+      return [mathText(`${two.row === "a" ? "A" : "B"}: ${prev} + ${rule} = ${prev + rule}`), solved];
+    }
+    case "relation": {
+      const k = timesOf(two);
+      return [mathText(`${a[1]} ${TIMES} ${k} = ${b[1]}`), mathText(`${a[2]} ${TIMES} ${k} = ${b[2]}`), solved];
+    }
+    case "pair":
+      return [mathText(`A = ${a[col]}, B = ${b[col]}`), solved];
+    default: {
+      const neverAsk: never = two.ask;
+      return neverAsk;
+    }
+  }
+}
+
+/** Grade 5 worked example: across the x-axis, up the y-axis; or add each rule to its coordinate. */
+function planeCaptions(board: GridBoard, solved: string): string[] {
+  const plane = board.plane;
+  if (!plane) return [solved];
+  const { x, y } = plane.target;
+  if (plane.ask === "pattern") {
+    const last = plane.points[plane.points.length - 1] ?? { x: 0, y: 0 };
+    return [mathText(`x: ${last.x} + ${plane.stepX} = ${x}`), mathText(`y: ${last.y} + ${plane.stepY} = ${y}`), solved];
+  }
+  return [
+    t(
+      `Across ${x}, up ${y}`,
+      `${x} a la derecha, ${y} hacia arriba`,
+      `${x} para a direita, ${y} para cima`,
+      `${x} vers la droite, ${y} vers le haut`,
+      `向右${x}，向上${y}`,
+      `${x} आगे, ${y} ऊपर`,
+      `${mathText(`x = ${x}`)}، ${mathText(`y = ${y}`)}`,
+    ),
+    mathText(pairText(x, y)),
+    solved,
+  ];
+}
+
 /** Grade 5 worked example: split the factors by place, one partial product per row, then add. */
 function bigMultiCaptions(board: TimesBoard): string[] {
   const { a, b } = board;
@@ -754,6 +804,7 @@ function sceneFrames(question: ChoiceQ, board: Board): TeachFrame[] {
       if (board.mode === "longDiv") return captions(longDivCaptions(board));
       return captions([shareHint(board.mode === "groups" ? "groups" : "pairs"), solved]);
     case "grid":
+      if (board.mode === "coords") return captions(planeCaptions(board, solved));
       if (board.mode === "side") {
         return captions([
           board.useArea ? t("Length times width", "Largo por ancho") : t("Add all four sides", "Suma los cuatro lados"),
@@ -762,6 +813,7 @@ function sceneFrames(question: ChoiceQ, board: Board): TeachFrame[] {
       }
       return captions([gridHint(board.mode === "fence" ? "fence" : "tiles"), solved]);
     case "patterns":
+      if (board.mode === "twoRules") return captions(twoRulesCaptions(board, solved));
       return captions([patternHint(), solved]);
     case "signs":
       return [

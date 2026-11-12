@@ -638,6 +638,17 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string): s
         `${buddy} و${host} يتقاسمان البسكويت.`,
       );
     case "grid":
+      if (board.mode === "coords") {
+        return say(
+          `${buddy} and ${host} read the coordinate plane.`,
+          `${buddy} y ${host} leen el plano de coordenadas.`,
+          `${buddy} e ${host} leem o plano cartesiano.`,
+          `${buddy} et ${host} lisent le repère.`,
+          `${buddy}和${host}一起看坐标平面。`,
+          `${buddy} और ${host} निर्देशांक तल पढ़ते हैं।`,
+          `${buddy} و${host} يقرآن المستوى الإحداثي.`,
+        );
+      }
       return say(
         `${buddy} and ${host} count the squares.`,
         `${buddy} y ${host} cuentan los cuadrados.`,
@@ -648,6 +659,17 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string): s
         `${buddy} و${host} يعدّان المربعات.`,
       );
     case "patterns":
+      if (board.mode === "twoRules") {
+        return say(
+          `${buddy} and ${host} compare two patterns.`,
+          `${buddy} y ${host} comparan dos patrones.`,
+          `${buddy} e ${host} comparam dois padrões.`,
+          `${buddy} et ${host} comparent deux suites.`,
+          `${buddy}和${host}比较两个规律。`,
+          `${buddy} और ${host} दो पैटर्न की तुलना करते हैं।`,
+          `${buddy} و${host} يقارنان نمطين.`,
+        );
+      }
       return say(
         `${buddy} and ${host} find what comes next.`,
         `${buddy} y ${host} buscan qué sigue.`,

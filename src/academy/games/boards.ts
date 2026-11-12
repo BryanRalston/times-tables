@@ -198,7 +198,21 @@ export interface ShareBoard {
   leftover: number;
 }
 
-export type GridLevel = "tiles" | "fence" | "side";
+/** `coords` is grade 5 (5.G.A): quadrant I of the coordinate plane. It has no tile bench; `plane` holds the points. */
+export type GridLevel = "tiles" | "fence" | "side" | "coords";
+
+/**
+ * Grade 5 coordinate plane, quadrant I only (5.G.A). Axes run 0 to 10.
+ * `read`: name the one point. `find`: four lettered points, pick the one at `target`.
+ * `pattern`: points made by two rules (x adds `stepX`, y adds `stepY`), pick the next one (`target`).
+ */
+export interface PlaneBoard {
+  ask: "read" | "find" | "pattern";
+  points: { x: number; y: number; label: string }[];
+  target: { x: number; y: number };
+  stepX: number;
+  stepY: number;
+}
 
 export interface GridBoard {
   game: "grid";
@@ -210,9 +224,27 @@ export interface GridBoard {
   known: number;
   missing: number;
   useArea: boolean;
+  plane?: PlaneBoard;
 }
 
-export type PatternLevel = "tens" | "fives" | "twos" | "hundreds" | "rule" | "grow";
+/** `twoRules` is grade 5 (5.OA.B.3): two patterns from two rules, side by side. `two` holds them. */
+export type PatternLevel = "tens" | "fives" | "twos" | "hundreds" | "rule" | "grow" | "twoRules";
+
+/**
+ * Grade 5 two rules (5.OA.B.3). Both patterns start at 0: term i of A is
+ * `ruleA` × i and term i of B is `ruleB` × i, for i = 0 to `count` − 1.
+ * `ruleB` is always a whole multiple of `ruleA`, so B = A × (ruleB ÷ ruleA).
+ * `missing`: the term in row `row`, column `col` is blank. `relation`: how B
+ * comes from A. `pair`: the ordered pair (A, B) from column `col`.
+ */
+export interface TwoRules {
+  ruleA: number;
+  ruleB: number;
+  count: number;
+  ask: "missing" | "relation" | "pair";
+  col: number;
+  row: "a" | "b";
+}
 
 export interface PatternBoard {
   game: "patterns";
@@ -220,6 +252,7 @@ export interface PatternBoard {
   terms: number[];
   step: number;
   answer: number;
+  two?: TwoRules;
 }
 
 export type SignLevel = "to10" | "tens" | "hundreds" | "big";

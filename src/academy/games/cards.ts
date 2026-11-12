@@ -1044,11 +1044,12 @@ export const shareCard = sceneCard("Shares", SHARE_ROWS, {
   isLevel: (value) => isId(SHARE_IDS, value),
 });
 
-const GRID_IDS = ["tiles", "fence", "side"] as const;
+const GRID_IDS = ["tiles", "fence", "side", "coords"] as const;
 const GRID_ROWS: SkillRow[] = [
   { key: "grid:tiles", label: "Count squares" },
   { key: "grid:fence", label: "Around the shape" },
   { key: "grid:side", label: "Missing side" },
+  { key: "grid:coords", label: "Coordinate plane" },
 ];
 
 export const gridCard = sceneCard("Garden", GRID_ROWS, {
@@ -1065,6 +1066,7 @@ export const gridCard = sceneCard("Garden", GRID_ROWS, {
     { id: "tiles", label: "Count squares", num: 1 },
     { id: "fence", label: "Around the shape", num: 2 },
     { id: "side", label: "Missing side", num: 3 },
+    { id: "coords", label: "Coordinate plane", num: 4 },
   ],
   defaultLevel(grade) {
     const fallback = ((): string => {
@@ -1077,8 +1079,9 @@ export const gridCard = sceneCard("Garden", GRID_ROWS, {
         case "3":
           return "fence";
         case "4":
-        case "5":
           return "side";
+        case "5":
+          return "coords";
         default: {
           const neverGrade: never = grade;
           return neverGrade;
@@ -1091,7 +1094,7 @@ export const gridCard = sceneCard("Garden", GRID_ROWS, {
   isLevel: (value) => isId(GRID_IDS, value),
 });
 
-const PATTERN_IDS = ["tens", "fives", "twos", "hundreds", "rule", "grow"] as const;
+const PATTERN_IDS = ["tens", "fives", "twos", "hundreds", "rule", "grow", "twoRules"] as const;
 const PATTERN_ROWS: SkillRow[] = [
   { key: "patterns:tens", label: "Count by tens" },
   { key: "patterns:fives", label: "Count by fives" },
@@ -1099,6 +1102,7 @@ const PATTERN_ROWS: SkillRow[] = [
   { key: "patterns:hundreds", label: "Count by hundreds" },
   { key: "patterns:rule", label: "Next number" },
   { key: "patterns:grow", label: "The rule" },
+  { key: "patterns:twoRules", label: "Two rules" },
 ];
 
 export const patternsCard = sceneCard("Patterns", PATTERN_ROWS, {
@@ -1118,6 +1122,7 @@ export const patternsCard = sceneCard("Patterns", PATTERN_ROWS, {
     { id: "hundreds", label: "Count by hundreds", num: 4 },
     { id: "rule", label: "Next number", num: 5 },
     { id: "grow", label: "The rule", num: 6 },
+    { id: "twoRules", label: "Two rules", num: 7 },
   ],
   defaultLevel(grade) {
     const fallback = ((): string => {
@@ -1131,8 +1136,9 @@ export const patternsCard = sceneCard("Patterns", PATTERN_ROWS, {
         case "3":
           return "rule";
         case "4":
-        case "5":
           return "grow";
+        case "5":
+          return "twoRules";
         default: {
           const neverGrade: never = grade;
           return neverGrade;
