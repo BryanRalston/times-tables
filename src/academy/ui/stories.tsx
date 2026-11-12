@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { type Grade, type SkillStat } from "../model";
+import { storyAutoReadGrade, type Grade, type SkillStat } from "../model";
 import { starsForRound } from "../rewards";
 import { storyGradeLabel } from "../stories/band";
 import type { Story } from "../stories/catalog";
@@ -11,7 +11,7 @@ import { getLocale, show, t } from "../i18n";
 import { countStoryFinish } from "../seo/events";
 import { ensureVoice } from "../voice/clips";
 import { startClipSpeech, startReadAlong, stopClipSpeech } from "../voice/player";
-import { BackLink, SquisheeImg, Stars, cx } from "./bits";
+import { BackLink, SpeakerIcon, SquisheeImg, Stars, cx } from "./bits";
 import { StoryPicture, StoryScene } from "./story-scene";
 
 function storyDir(): "rtl" | "ltr" {
@@ -20,6 +20,27 @@ function storyDir(): "rtl" | "ltr" {
 
 function storyBack(): string {
   return t("Back", "Atrás", "Voltar", "Retour", "返回", "वापस", "رجوع");
+}
+
+function storyReadLabel(): string {
+  return t("Read to me", "Léemelo", "Leia para mim", "Lis pour moi", "读给我听", "मुझे पढ़कर सुनाओ", "اقرأ لي");
+}
+
+/** The tap-to-hear control on a story page or check. Same white speaker look as the game's "Hear it again". */
+export function StoryReadButton({ reading, onRead }: { reading: boolean; onRead: () => void }) {
+  return (
+    <button
+      type="button"
+      className={cx("ac-story-read", reading && "is-reading")}
+      data-story-read
+      data-reading={reading ? "yes" : "no"}
+      aria-pressed={reading}
+      onClick={onRead}
+    >
+      <SpeakerIcon />
+      <span>{storyReadLabel()}</span>
+    </button>
+  );
 }
 
 function storyNext(): string {
@@ -110,6 +131,7 @@ export function StoryReader({
   onFinish: (result: { id: string; correct: number; total: number; seconds: number }) => void;
 }) {
   const lang = getLocale();
+  const autoRead = storyAutoReadGrade(grade);
   const shown = useMemo(() => presentStory(story), [story, lang]);
   const [state, setState] = useState<ReaderState>(() => openStory(story.checks.length));
   const [active, setActive] = useState(-1);
@@ -155,8 +177,10 @@ export function StoryReader({
     if (state.phase === "done") return;
     const text = state.phase === "page" ? (shown.pages[state.page]?.text ?? "") : (shown.checks[state.check]?.prompt ?? "");
     if (!text) return;
+    // Through grade 2 the page reads itself. From grade 3 the child taps "Read to me".
+    if (!autoRead) return;
     playText(text);
-  }, [state.phase, state.page, state.check, state.returnTo, shown, sound]);
+  }, [state.phase, state.page, state.check, state.returnTo, shown, sound, autoRead]);
 
   useEffect(() => {
     if (state.phase !== "done" || sent.current) return;
@@ -178,7 +202,7 @@ export function StoryReader({
       if (!startClipSpeech(line, 1, () => {})) startReadAlong(lineTokens(line).map((token) => ({ key: token.key, gapAfterMs: 40 })), () => {}, () => {}, () => {});
     });
     else stopClipSpeech();
-    if (!follow) return;
+    if (!follow || !autoRead) return;
     wait.current = window.setTimeout(() => {
       wait.current = null;
       playText(follow);
@@ -192,7 +216,7 @@ export function StoryReader({
     const score = storyScore(state);
     const stars = starsForRound(score.correct, Math.max(1, score.total));
     return (
-      <div className="ac-shell ac-mid" data-story-phase="done" data-story-id={story.id} data-grade={grade} dir={storyDir()} lang={lang}>
+      <div className="ac-shell ac-mid" data-story-phase="done" data-story-id={story.id} data-grade={grade} data-story-auto={autoRead ? "yes" : "no"} dir={storyDir()} lang={lang}>
         <StoryScene background={page.background} mood={page.mood} pals={page.pals} prop={page.prop} placement={page.placement} />
         <h1>{show("Yes!")}</h1>
         <Stars value={stars} />
@@ -207,7 +231,7 @@ export function StoryReader({
     const check = shown.checks[state.check];
     if (!check) return null;
     return (
-      <div className="ac-shell ac-mid" data-story-phase="check" data-story-id={story.id} data-story-check={state.check} data-grade={grade} dir={storyDir()} lang={lang}>
+      <div className="ac-shell ac-mid" data-story-phase="check" data-story-id={story.id} data-story-check={state.check} data-grade={grade} data-story-auto={autoRead ? "yes" : "no"} dir={storyDir()} lang={lang}>
         <header className="ac-top">
           <a className="ac-back" href="#/stories">
             {show("Stories")}
@@ -227,6 +251,7 @@ export function StoryReader({
             });
           }}
         />
+        <StoryReadButton reading={active >= 0} onRead={() => playText(check.prompt)} />
         <div className="ac-story-choices">
           {check.choices.map((choice) => (
             <button
@@ -265,7 +290,7 @@ export function StoryReader({
 
   const tokens = lineTokens(page.text);
   return (
-    <div className="ac-shell ac-mid" data-story-phase="page" data-story-id={story.id} data-story-page={state.page} data-grade={grade} dir={storyDir()} lang={lang}>
+    <div className="ac-shell ac-mid" data-story-phase="page" data-story-id={story.id} data-story-page={state.page} data-grade={grade} data-story-auto={autoRead ? "yes" : "no"} dir={storyDir()} lang={lang}>
       <header className="ac-top">
         <a className="ac-back" href="#/stories">
           {show("Stories")}
@@ -295,9 +320,7 @@ export function StoryReader({
           });
         }}
       />
-      <button type="button" className="ac-story-read" data-story-read onClick={() => playText(page.text)}>
-        {t("Read to me", "Léemelo", "Leia para mim", "Lis pour moi", "读给我听", "मुझे पढ़कर सुनाओ", "اقرأ لي")}
-      </button>
+      <StoryReadButton reading={active >= 0} onRead={() => playText(page.text)} />
       <div className="ac-story-nav">
         <button
           type="button"

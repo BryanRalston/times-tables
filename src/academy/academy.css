@@ -2834,7 +2834,22 @@ body:has(.ac-boss-intro) { background: #3c2448; }
   box-shadow: 0 4px 0 var(--ac-line);
   font-family: Fredoka, Nunito, sans-serif;
   font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
+.ac-story-read svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: var(--ac-teal);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ac-story-read.is-reading { background: var(--ac-teal); color: #fff; }
+.ac-story-read.is-reading svg { stroke: #fff; }
 .ac-story-nav { display: flex; gap: 10px; margin-top: 10px; }
 .ac-story-nav .ac-quiet { width: auto; min-width: 96px; flex: none; margin-top: 0; }
 .ac-story-nav .ac-go { flex: 1; width: auto; margin-top: 0; }

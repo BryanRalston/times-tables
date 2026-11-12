@@ -37,6 +37,7 @@ import { nextFor, subjectOf } from "../subjects";
 import { nextAction } from "./next-copy";
 import {
   autoSpeakGrade,
+  calmGrade,
   BOSS_LENGTH,
   cardsThisRound,
   PLACEMENT_LENGTH,
@@ -209,7 +210,7 @@ export function PlayScreen({
     ? 0
     : Math.max(gradeWindow.min, Math.min(gradeWindow.max, spec?.levels.findIndex((row) => row.id === level) ?? gradeWindow.min));
   const bounds = { min: Math.max(0, gradeWindow.min), max: Math.max(0, gradeWindow.max) };
-  const calm = autoSpeakGrade(child.grade);
+  const calm = calmGrade(child.grade);
   const crownFight = crown && child.journey.bosses.includes(game);
   const openingBoss = crownFight || bossReady(child.journey, game, child.grade);
   const practiced = gameHasMarks(child.skills, game);
