@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { show } from "../i18n";
+import { remainderShown, show, t } from "../i18n";
 import { cx } from "../ui/bits";
 import { ShareBench } from "../ui/share-board";
+import { LongDivArt } from "./grade5-ops-art";
 import { shareCard } from "./cards";
 import { isShareLevel, makeShareQuestion, makeShareSheet, shareSettled } from "./share-data";
 import type { ShareTask } from "./share-data";
@@ -23,11 +24,33 @@ function taskOf(board: { mode: ShareTask["mode"]; total: number; plates: number;
   };
 }
 
-export function SharePrompt({ question, mascot, happy }: PromptProps) {
+function remainderWord(r: number): string {
+  return t(`remainder ${r}`, `residuo ${r}`, `resto ${r}`, `reste ${r}`, `余${r}`, `शेष ${r}`, `الباقي ${r}`);
+}
+
+function remainderLabel(text: string): string {
+  const match = /^(\d+) remainder (\d+)$/.exec(text);
+  return match ? `${match[1]} ${remainderWord(Number(match[2]))}` : remainderShown(text);
+}
+
+/** "27 remainder 16" as a big quotient over a small remainder line, so four tiles fit on a phone. */
+function RemainderTile({ text }: { text: string }) {
+  const match = /^(\d+) remainder (\d+)$/.exec(text);
+  if (!match) return <b>{text}</b>;
+  return (
+    <>
+      <b>{match[1]}</b>
+      <small>{remainderWord(Number(match[2]))}</small>
+    </>
+  );
+}
+
+export function SharePrompt({ question, reveal, mascot, happy }: PromptProps) {
   if (question.visual.kind !== "scene" || question.visual.board.game !== "share") return null;
+  const board = question.visual.board;
   return (
     <SceneCard title={question.title} mascot={mascot} happy={happy} hint={question.hint} hands={question.visual.hands} answer={question.answer}>
-      {null}
+      {board.mode === "longDiv" ? <LongDivArt board={board} reveal={reveal} /> : null}
     </SceneCard>
   );
 }
@@ -41,6 +64,18 @@ export function ShareChoices({ question, reveal, onChoose }: ChoiceProps) {
     if (showChoices) choiceRef.current?.scrollIntoView({ block: "nearest", inline: "nearest" });
   }, [showChoices, question.id]);
   if (!board) return null;
+  if (board.mode === "longDiv") {
+    // Grade 5: a written division card. There is no cookie bench to deal first.
+    return (
+      <div className={cx("ac-choices", reveal && "is-locked")}>
+        {question.choices.map((option) => (
+          <button key={option} type="button" className={cx("ac-choice", "is-remainder", reveal && option === question.answer && "is-yes")} aria-label={remainderLabel(option)} disabled={reveal} onClick={() => onChoose(option)}>
+            <RemainderTile text={option} />
+          </button>
+        ))}
+      </div>
+    );
+  }
   const task = taskOf(board);
   return (
     <div className="ac-share-play">

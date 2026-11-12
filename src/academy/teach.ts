@@ -1,8 +1,11 @@
-import { coinAsA, t } from "./i18n";
+import { coinAsA, remainderShown, t } from "./i18n";
 import { speakable } from "./voice/speakable";
 
 export { speakable } from "./voice/speakable";
-import type { Board, CountBoard, FractionBoard, MeasureBoard, PhonicsBoard, PlaceBoard, ProblemBoard, ShapeBoard } from "./games/boards";
+import type { AddBoard, Board, CountBoard, FractionBoard, MeasureBoard, PhonicsBoard, PlaceBoard, ProblemBoard, ShapeBoard, ShareBoard, TimesBoard } from "./games/boards";
+import { decimalExpr, decimalThink, hundredthsText, hundredthsWord, placeParts, remainderText, tenthsWord } from "./games/grade5-ops";
+import { mathText } from "./games/grade5";
+import { TIMES } from "./games/types";
 import { geometryArt } from "./games/geometry";
 import { graphsTeachCaption } from "./games/graph-data";
 import { gridHint } from "./games/grid-data";
@@ -403,6 +406,52 @@ function moneyFrames(visual: MoneyVisual, answer: string): MoneyFrame[] {
   }
 }
 
+/** Grade 5 worked example: split the factors by place, one partial product per row, then add. */
+function bigMultiCaptions(board: TimesBoard): string[] {
+  const { a, b } = board;
+  const rows = placeParts(b).map((part) => `${a} ${TIMES} ${part} = ${a * part}`);
+  const sum = placeParts(b).map((part) => a * part).join(" + ");
+  return [
+    t(`Split ${b} into ${placeParts(b).join(" + ")}`, `Separa ${b} en ${placeParts(b).join(" + ")}`, `Separe ${b} em ${placeParts(b).join(" + ")}`, `Décompose ${b} en ${placeParts(b).join(" + ")}`, `把${b}拆成${placeParts(b).join(" + ")}`, `${b} को ${placeParts(b).join(" + ")} में तोड़ो`, `جزّئ ${b} إلى ${mathText(placeParts(b).join(" + "))}`),
+    ...rows.map(mathText),
+    mathText(`${sum} = ${a * b}`),
+  ];
+}
+
+/** Grade 5 worked example: take away a big chunk (divisor × tens), then the rest. */
+function longDivCaptions(board: ShareBoard): string[] {
+  const d = board.plates;
+  const tens = Math.floor(board.each / 10) * 10;
+  const ones = board.each - tens;
+  const rest = board.total - d * tens;
+  const lines = [
+    mathText(`${d} ${TIMES} ${tens} = ${d * tens}`),
+    t(`${board.total} − ${d * tens} = ${rest} left`, `${board.total} − ${d * tens} = quedan ${rest}`, `${board.total} − ${d * tens} = sobram ${rest}`, `${board.total} − ${d * tens} = il reste ${rest}`, `${board.total} − ${d * tens} = ${rest}，还剩${rest}`, `${board.total} − ${d * tens} = ${rest} बचे`, `${mathText(`${board.total} − ${d * tens} = ${rest}`)}، ويبقى ${rest}`),
+  ];
+  if (ones > 0) lines.push(mathText(`${d} ${TIMES} ${ones} = ${d * ones}`));
+  const answer = remainderShown(remainderText(board.each, board.leftover));
+  lines.push(mathText(`${tens} + ${ones} = ${board.each}`) + (board.leftover > 0 ? ` · ${answer}` : ""));
+  return lines;
+}
+
+/** Grade 5 worked example: line up the points, or count in tenths or hundredths and put the point back. */
+function decimalOpsCaptions(board: AddBoard): string[] {
+  const expr = decimalExpr(board);
+  const answer = hundredthsText(board.result);
+  if (board.op === "+" || board.op === "-") {
+    return [
+      t("Line up the decimal points", "Alinea los puntos decimales", "Alinhe as vírgulas", "Aligne les virgules", "对齐小数点", "दशमलव बिंदु एक सीध में रखो", "رتّب الفواصل العشرية فوق بعضها"),
+      mathText(`${expr} = ${answer}`),
+    ];
+  }
+  const think = decimalThink(board);
+  const word = board.unit === 10 ? tenthsWord() : hundredthsWord();
+  return [
+    t(`Think in ${word}: ${think.line}`, `Piensa en ${word}: ${think.line}`, `Pense em ${word}: ${think.line}`, `Pense en ${word} : ${think.line}`, `想成${word}：${think.line}`, `${word} में सोचो: ${think.line}`, `فكّر بـ${word}: ${mathText(think.line)}`),
+    mathText(`${expr} = ${answer}`),
+  ];
+}
+
 function captions(lines: string[]): SceneFrame[] {
   return lines.map((caption) => ({ kind: "scene", show: caption, caption }));
 }
@@ -702,6 +751,7 @@ function sceneFrames(question: ChoiceQ, board: Board): TeachFrame[] {
     case "graphs":
       return captions([graphsTeachCaption(board), solved]);
     case "share":
+      if (board.mode === "longDiv") return captions(longDivCaptions(board));
       return captions([shareHint(board.mode === "groups" ? "groups" : "pairs"), solved]);
     case "grid":
       if (board.mode === "side") {
@@ -733,6 +783,10 @@ function sceneFrames(question: ChoiceQ, board: Board): TeachFrame[] {
       return captions([t("Read the tick under the dot", "Lee la marca debajo del punto"), `${board.num}/${board.den}`]);
     case "minute":
       return timeFrames({ kind: "time", hours: board.hours, minutes: board.minutes, level: board.mode });
+    case "times":
+      return captions(bigMultiCaptions(board));
+    case "add":
+      return captions(decimalOpsCaptions(board));
     default: {
       const neverBoard: never = board;
       return neverBoard;

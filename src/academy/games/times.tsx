@@ -8,9 +8,12 @@ import { timesCard } from "./cards";
 import { makeDivideQuestion, makeFactorQuestion, makeMultiQuestion, spanSheet } from "./span";
 import { Equation, Groups, SquisheeImg, cx } from "../ui/bits";
 import { fourChoices, qid } from "./choices";
+import { bigMultiSheet, makeBigMultiQuestion } from "./grade5-ops";
+import { BigMultiArt } from "./grade5-ops-art";
+import { SceneCard } from "./scene-ui";
 import { TIMES, type ChoiceQ, type GameModule, type SheetItem } from "./types";
 
-export const TIMES_LEVELS = ["count", "twos", "mix", "toTen", "factors", "multi", "divide"] as const;
+export const TIMES_LEVELS = ["count", "twos", "mix", "toTen", "factors", "multi", "divide", "bigMulti"] as const;
 export type TimesLevel = (typeof TIMES_LEVELS)[number];
 
 export const TIMES_SPEC: Record<TimesLevel, { factors: number[]; max: number }> = {
@@ -21,6 +24,8 @@ export const TIMES_SPEC: Record<TimesLevel, { factors: number[]; max: number }> 
   factors: { factors: [2, 3, 4, 5, 10], max: 10 },
   multi: { factors: [2, 3, 4, 5, 10], max: 9 },
   divide: { factors: [2, 3, 4, 5, 10], max: 9 },
+  /** Grade 5 multi-digit multiply (5.NBT.B.5) does not use the fact engine. See BIG_MULTI_MAX in grade5-ops. */
+  bigMulti: { factors: [], max: 99 },
 };
 
 /** 6, 7, 8, and 9 are grade 3 facts (3.OA). Earlier levels may still use 10. */
@@ -121,6 +126,7 @@ export function makeTimesQuestion(rng: Rng, level: TimesLevel, prefer: string[] 
   if (level === "factors") return makeFactorQuestion(rng);
   if (level === "multi") return makeMultiQuestion(rng);
   if (level === "divide") return makeDivideQuestion(rng);
+  if (level === "bigMulti") return makeBigMultiQuestion(rng);
   const { a, b } = nextTimesFact(rng, level, prefer);
   const product = a * b;
   const solved = `${a} ${TIMES} ${b} = ${product}`;
@@ -150,6 +156,7 @@ export function makeTimesQuestion(rng: Rng, level: TimesLevel, prefer: string[] 
 function sheetItem(rng: Rng, level: string, focus?: number): SheetItem {
   const extra = spanSheet(rng, "times", level);
   if (extra) return extra;
+  if (level === "bigMulti") return bigMultiSheet(rng);
   const safe = isTimesLevel(level) ? level : "toTen";
   const fact =
     focus && focus >= 2 && focus <= 12 ? { a: focus, b: rng.int(1, 10) } : nextTimesFact(rng, safe, []);
@@ -157,6 +164,13 @@ function sheetItem(rng: Rng, level: string, focus?: number): SheetItem {
 }
 
 export function TimesPrompt({ question, reveal, mascot, happy }: { question: ChoiceQ; reveal: boolean; mascot: string; happy: boolean }) {
+  if (question.visual.kind === "scene" && question.visual.board.game === "times") {
+    return (
+      <SceneCard title={question.title} mascot={mascot} happy={happy} hint={question.hint} hands={false} answer={question.answer}>
+        <BigMultiArt board={question.visual.board} reveal={reveal} />
+      </SceneCard>
+    );
+  }
   return (
     <section className="ac-qcard">
       <h1>{question.title}</h1>

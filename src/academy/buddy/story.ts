@@ -697,6 +697,26 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string): s
         `${buddy} और ${host} घड़ी पढ़ते हैं।`,
         `${buddy} و${host} يقرآن الساعة.`,
       );
+    case "times":
+      return say(
+        `${host} splits the numbers by place and multiplies.`,
+        `${host} separa los números por lugares y multiplica.`,
+        `${host} separa os números por posições e multiplica.`,
+        `${host} décompose les nombres par rang et multiplie.`,
+        `${host}把数按数位拆开再相乘。`,
+        `${host} संख्याओं को स्थान के अनुसार तोड़कर गुणा करता है।`,
+        `${host} يجزّئ العددين حسب المنازل ثم يضرب.`,
+      );
+    case "add":
+      return say(
+        `${buddy} and ${host} work with decimals.`,
+        `${buddy} y ${host} trabajan con decimales.`,
+        `${buddy} e ${host} trabalham com decimais.`,
+        `${buddy} et ${host} calculent avec des décimaux.`,
+        `${buddy}和${host}一起算小数。`,
+        `${buddy} और ${host} दशमलव के साथ काम करते हैं।`,
+        `${buddy} و${host} يحسبان بالأعداد العشرية.`,
+      );
     default: {
       const neverBoard: never = board;
       return neverBoard;

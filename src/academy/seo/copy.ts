@@ -776,6 +776,7 @@ times:toTen|times tables up to 10|tablas hasta el 10|tabuada até o 10|tables ju
 times:factors|factors and multiples|factores y múltiplos|fatores e múltiplos|facteurs et multiples|因数和倍数|गुणनखंड और गुणज|العوامل والمضاعفات
 times:multi|multi-digit multiplication|multiplicación de varias cifras|multiplicação com vários dígitos|multiplication à plusieurs chiffres|多位数乘法|कई अंकों की गुणा|الضرب بعدة أرقام
 times:divide|division with remainders|división con residuo|divisão com resto|division avec reste|有余数的除法|शेष वाली भाग|القسمة مع باقٍ
+times:bigMulti|multiplying by two-digit numbers|multiplicar por números de dos cifras|multiplicar por números de dois algarismos|multiplier par un nombre à deux chiffres|乘两位数|दो अंकों की संख्या से गुणा|الضرب في عدد من رقمين
 add:within5|addition and subtraction within 5|sumas y restas hasta el 5|adição e subtração até 5|additions et soustractions jusqu'à 5|5以内的加减|5 के अंदर जोड़ और घटाव|الجمع والطرح ضمن 5
 add:within10|addition and subtraction within 10|sumas y restas hasta el 10|adição e subtração até 10|additions et soustractions jusqu'à 10|10以内的加减|10 के अंदर जोड़ और घटाव|الجمع والطرح ضمن 10
 add:within20|addition and subtraction within 20|sumas y restas hasta el 20|adição e subtração até 20|additions et soustractions jusqu'à 20|20以内的加减|20 के अंदर जोड़ और घटाव|الجمع والطرح ضمن 20
@@ -783,6 +784,7 @@ add:tens|tens and ones|decenas y unidades|dezenas e unidades|dizaines et unités
 add:within100|addition and subtraction within 100|sumas y restas hasta el 100|adição e subtração até 100|additions et soustractions jusqu'à 100|100以内的加减|100 के अंदर जोड़ और घटाव|الجمع والطرح ضمن 100
 add:within1000|addition and subtraction within 1000|sumas y restas hasta el 1000|adição e subtração até 1000|additions et soustractions jusqu'à 1000|1000以内的加减|1000 के अंदर जोड़ और घटाव|الجمع والطرح ضمن 1000
 add:thousands|addition in the thousands|sumas de millares|adição de milhares|additions de milliers|千位数加法|हज़ारों का जोड़|جمع الألوف
+add:decimalOps|decimal operations|operaciones con decimales|operações com decimais|opérations sur les décimaux|小数加减乘除|दशमलव की संक्रियाएँ|العمليات على الأعداد العشرية
 time:hour|telling time to the hour|la hora en punto|horas em ponto|l'heure pile|整点|पूरा घंटा|الساعة التامة
 time:half|telling time to the half hour|la hora y media|meia hora|la demie|半点|साढ़े घंटा|الساعة والنصف
 time:quarter|telling time to the quarter hour|la hora y cuarto|quartos de hora|le quart d'heure|一刻钟|सवा घंटा|ربع الساعة
@@ -889,6 +891,7 @@ share:fair|equal shares|repartos iguales|partes iguais|parts égales|平均分|�
 share:groups|groups of the same size|grupos del mismo tamaño|grupos do mesmo tamanho|groupes de même taille|同样多的一组|एक जैसे समूह|مجموعات متساوية
 share:facts|division facts|division exacta|divisão exata|division exacte|除法口诀|भाग के तथ्य|حقائق القسمة
 share:left|leftovers|lo que sobra|o que sobra|ce qui reste|剩下的|बचे हुए|الباقي
+share:longDiv|dividing by two-digit numbers|dividir entre números de dos cifras|dividir por números de dois algarismos|diviser par un nombre à deux chiffres|除以两位数|दो अंकों की संख्या से भाग|القسمة على عدد من رقمين
 grid:tiles|counting unit squares|contar cuadrados unidad|contar quadrados unitários|compter les carrés unités|数单位方格|इकाई वर्ग गिनना|عدّ مربعات الوحدة
 grid:fence|distance around a shape|distancia alrededor|distância ao redor|tour d'une figure|图形的周长|आकृति के चारों ओर|المسافة حول الشكل
 grid:side|a missing side|un lado que falta|um lado que falta|un côté manquant|缺的边|छूटी भुजा|ضلع ناقص

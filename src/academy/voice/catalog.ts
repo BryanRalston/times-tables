@@ -9,7 +9,7 @@ import { ALL_SPELL } from "../games/spell-data";
 import { GAMES } from "../games/registry";
 import { blankOut } from "../games/words";
 import { graphClipLines } from "../games/graph-data";
-import { makeHandsTask } from "../hands-build";
+import { hasHandsCard, makeHandsTask } from "../hands-build";
 import { makeClockTask, makePayTask } from "../hands";
 import { exampleFor } from "../round-flow";
 import { hintCue, promptSpeech, speakable, workedExample } from "../teach";
@@ -41,7 +41,7 @@ const NUMBER_MAX = 1000;
  * New stories start here so no new paid audio is needed; speak() falls back to
  * the device whenever planSpeech cannot cover a line.
  */
-export const DEVICE_VOICE_SKILLS: ReadonlySet<string> = new Set(["problems:estimate", "place:thousandths", "fractions:addUnlike", "fractions:fracTimes", "variables:orderOps"]);
+export const DEVICE_VOICE_SKILLS: ReadonlySet<string> = new Set(["problems:estimate", "place:thousandths", "fractions:addUnlike", "fractions:fracTimes", "variables:orderOps", "times:bigMulti", "share:longDiv", "add:decimalOps"]);
 
 export const CORE_VOICE_GAMES = new Set(["add", "time", "ui", "buddy", "boss"]);
 
@@ -161,6 +161,8 @@ export function collectSpokenLines(): SpokenLine[] {
     const game = GAMES.find((row) => row.id === id);
     if (!game) continue;
     for (const level of game.levels) {
+      // Grade 5 written cards (like share:longDiv) have no hands-on task to speak.
+      if (!hasHandsCard(id, level.id)) continue;
       for (let i = 0; i < HAND_SAMPLES; i += 1) {
         const task = makeHandsTask(id, level.id, rngFromSeed(`hands:${id}:${level.id}:${i}`));
         push(lines, task.speech, id);

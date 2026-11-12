@@ -10,6 +10,8 @@ Saved games from version 9 keep their grade. Version 10 only adds Pre-K and grad
 
 **Grade 5 (pre-algebra path, slice 1).** Grade 5 follows Common Core 5.OA, 5.NBT, and 5.NF. This first slice adds three new levels, one in Place Value, one in Fractions, and one in What is missing. Every other game keeps its grade 4 band for grade 5 as review, until a grade 5 level exists for it. The three new levels are capped so grade 4 and lower never drift into them. Challenge ahead opens them. They are text-first, tap-and-think cards: grade 5 does not auto-speak, the device voice reads the instructions, and there is no drag-and-build card for these levels. There is no grade 5 boss yet. See `PREALGEBRA_ROADMAP.md` for what comes next.
 
+**Grade 5 slice 3 (5.NBT.B).** Three more grade 5 levels, each the last level of its game: multiply by 2 digits in Times Tables (5.NBT.B.5), divide by 2 digits in Fair Shares (5.NBT.B.6), and decimal operations in Add & Subtract (5.NBT.B.7). Grade 5 opens on the new level, with the old grade 4 top level as the one-level drift down. Grade 4 is capped at its own top level in all three games, so the new levels stay grade 5 unless challenge ahead is on. Same rules as slice 1: text-first tap-and-think cards, four tiles with one right answer, device voice, no drag-and-build card, no grade 5 boss.
+
 Standards below are Common Core. Sight words use the Dolch lists. Grade 2 adds Fry words that are not already on a Dolch list. Grade 3 does the same with the next Fry band.
 
 `src/academy/grade-guard.test.ts` builds 200 questions for every registered game and grade and checks these bounds.
@@ -24,9 +26,11 @@ Standards below are Common Core. Sight words use the Dolch lists. Grade 2 adds F
 
 ## Add & Subtract
 
-Levels, easy to hard: within 5, within 10, within 20, tens and ones, within 100, within 1000, thousands.
+Levels, easy to hard: within 5, within 10, within 20, tens and ones, within 100, within 1000, thousands, decimal operations.
 
 Tens and ones is a two-digit number plus a one-digit number, or plus a multiple of 10, with sums and differences inside 100 (1.NBT.C.4, 1.NBT.C.6). Two-digit plus two-digit regrouping starts at within 100 (2.NBT.B.5). Within 1000 is the grade 3 fluency band (3.NBT.A.2). Thousands is four-digit addition and subtraction (4.NBT.B.4).
+
+Grade 5 decimal operations (5.NBT.B.7) add, subtract, multiply, and divide decimals to hundredths. Every number on the card is below 100 with at most two digits after the point. Addition and subtraction often mix tenths and hundredths (like 3.45 + 2.7) and show place-value columns with the points lined up; misreading 2.7 as 0.27 is one of the wrong tiles. Multiplication is a tenths or hundredths decimal times a whole number from 2 to 9, or tenths times tenths (0.3 × 0.4 = 0.12, on a 10 by 10 grid). Division is a decimal divided by a whole number from 2 to 9 with an exact answer, or a decimal divided by tenths with a whole-number answer (2.8 ÷ 0.4 = 7). Multiply and divide cards show the whole-number fact in tenths or hundredths, then the point goes back; a point slip (10 times too big or too small) is usually one of the wrong tiles. Subtraction never goes below zero.
 
 | Grade | Offer | Start | Core levels | Standards |
 |---|---|---|---|---|
@@ -36,14 +40,15 @@ Tens and ones is a two-digit number plus a one-digit number, or plus a multiple 
 | 2 | Play | Within 20 | Within 20, tens and ones, within 100 | 2.OA.B.2, 2.NBT.B.5 |
 | 3 | Play | Within 100 | Tens and ones, within 100 | 3.NBT.A.2 |
 | 4 | Play | Within 1000 | Within 1000, thousands | 4.NBT.B.4 |
+| 5 | Play | Decimal operations | Decimal operations (thousands is the one-level drift down) | 5.NBT.B.7 |
 
-A kindergartner can drift up to within 20. They cannot reach tens-and-ones or within 100 unless challenge ahead is on. Grade 1 can drift up to tens and ones, not to two-digit regrouping. Grade 3 can drift one level into within 1000. Thousands stays grade 4 unless challenge ahead is on.
+A kindergartner can drift up to within 20. They cannot reach tens-and-ones or within 100 unless challenge ahead is on. Grade 1 can drift up to tens and ones, not to two-digit regrouping. Grade 3 can drift one level into within 1000. Thousands stays grade 4 unless challenge ahead is on. Grade 4 is capped at thousands, so decimal operations stay grade 5 unless challenge ahead is on.
 
 ## Times Tables
 
-Levels: 2s, 5s, and 10s kept small (products to 20), then 2s, 5s, and 10s, then a mix through 5s, then facts through 10×10, then factors and multiples, multi-digit multiplication, and division with remainders.
+Levels: 2s, 5s, and 10s kept small (products to 20), then 2s, 5s, and 10s, then a mix through 5s, then facts through 10×10, then factors and multiples, multi-digit multiplication, division with remainders, and multiply by 2 digits.
 
-Multiplication facts are a grade 3 standard (3.OA.C.7). Grade 2 works with equal groups and arrays (2.OA.C.4) and skip-counts (2.NBT.A.2). Pre-K and kindergarten do not play this game. Grade 4 covers factors and multiples (4.OA.B.4), multi-digit multiplication (4.NBT.B.5), and division with remainders (4.NBT.B.6).
+Multiplication facts are a grade 3 standard (3.OA.C.7). Grade 2 works with equal groups and arrays (2.OA.C.4) and skip-counts (2.NBT.A.2). Pre-K and kindergarten do not play this game. Grade 4 covers factors and multiples (4.OA.B.4), multi-digit multiplication (4.NBT.B.5), and division with remainders (4.NBT.B.6). Grade 5 multiply by 2 digits (5.NBT.B.5) is a 2-digit number (23–98) or a 3-digit number (102–489) times a 2-digit number, with products at most 99,999 and no factor that is a multiple of 10. The card is an area model: one column per place of the first number and one row per place of the second, each cell a partial product to find and add. Wrong tiles are real slips: a carry off by 100, one group too many or too few, a tens row written without its zero.
 
 | Grade | Offer | Start | Core levels | Standards |
 |---|---|---|---|---|
@@ -53,8 +58,9 @@ Multiplication facts are a grade 3 standard (3.OA.C.7). Grade 2 works with equal
 | 2 | Play | 2s, 5s, 10s | Small groups, then 2s, 5s, 10s | 2.OA.C.4, 2.NBT.A.2 |
 | 3 | Play | Up to 10s | Mix through 5s, then up to 10s | 3.OA.A.1, 3.OA.C.7 |
 | 4 | Play | Factors and multiples | Factors, multi-digit multiply, division with remainders | 4.OA.B.4, 4.NBT.B.5, 4.NBT.B.6 |
+| 5 | Play | Multiply by 2 digits | Multiply by 2 digits (division with remainders is the one-level drift down) | 5.NBT.B.5 |
 
-Grade 2 can drift into the mix (2s, 3s, 4s, 5s, 10s). On every level before “Up to 10s,” the other factor is 1–5 or 10. Facts with 6, 7, 8, or 9 stay on the grade 3 level. Grade 3 is capped at 10×10, so it does not drift into factors. Grade 4 can drift one level down into 10×10.
+Grade 2 can drift into the mix (2s, 3s, 4s, 5s, 10s). On every level before “Up to 10s,” the other factor is 1–5 or 10. Facts with 6, 7, 8, or 9 stay on the grade 3 level. Grade 3 is capped at 10×10, so it does not drift into factors. Grade 4 can drift one level down into 10×10, and is capped at division with remainders, so multiply by 2 digits stays grade 5 unless challenge ahead is on.
 
 ## Telling Time
 
@@ -317,9 +323,11 @@ Kindergarten and grade 1 do not see subtraction blanks, missing factors, or two-
 
 ## Fair Shares
 
-Levels, easy to hard: two plates, equal shares, groups of, division facts, leftovers.
+Levels, easy to hard: two plates, equal shares, groups of, division facts, leftovers, divide by 2 digits.
 
 The child deals cookies onto plates. Two plates uses 2, 4, or 6 cookies and asks how many land on each plate. Equal shares uses two to four plates with nothing left over. Groups of asks how many groups of 2, 5, or 10 the cookies make. Division facts asks the same equal-share question with a larger total. Leftovers leaves fewer extras than there are plates.
+
+Grade 5 divide by 2 digits (5.NBT.B.6) is a written card with no cookie bench: a dividend up to 9,999 divided by a divisor from 11 to 49 (never 20, 30, or 40), with a whole-number quotient from 10 to 99. About half the cards have a remainder, always smaller than the divisor. Some cards are bakery stories (cookies packed into boxes), the rest are bare division. The picture is a division area model: the divisor on the side and one block per place of the quotient (divisor × tens, divisor × ones), plus the leftover. A card with a remainder offers only remainder answers, and one without offers only whole numbers. One wrong tile keeps a leftover bigger than the divisor, so the child checks that one more box fits.
 
 | Grade | Offer | Start | Core levels | Cap without challenge | Standards |
 |---|---|---|---|---|---|
@@ -328,9 +336,10 @@ The child deals cookies onto plates. Two plates uses 2, 4, or 6 cookies and asks
 | 1 | Play | Two plates | Two plates | Two plates | 1.OA.C.5 |
 | 2 | Play | Equal shares | Two plates, equal shares | Equal shares | 2.OA.C.3, 2.OA.C.4 |
 | 3 | Play | Division facts | Groups of, division facts | Division facts | 3.OA.A.2, 3.OA.C.7 |
-| 4 | Play | Leftovers | Division facts, leftovers | One level down (groups of) | 4.OA.A.3, 3.OA.C.7 |
+| 4 | Play | Leftovers | Division facts, leftovers | Leftovers | 4.OA.A.3, 3.OA.C.7 |
+| 5 | Play | Divide by 2 digits | Divide by 2 digits | Divide by 2 digits (leftovers is the one-level drift down) | 5.NBT.B.6 |
 
-Pre-K and kindergarten only deal two plates. Grade 1 stays there too. Grade 2 can drift down to two plates and cannot climb into groups of. Grade 3 can drift down to equal shares and cannot climb into leftovers. Grade 4 can drift down to groups of.
+Pre-K and kindergarten only deal two plates. Grade 1 stays there too. Grade 2 can drift down to two plates and cannot climb into groups of. Grade 3 can drift down to equal shares and cannot climb into leftovers. Grade 4 can drift down to groups of, and is capped at leftovers, so divide by 2 digits stays grade 5 unless challenge ahead is on.
 
 ## Grid Garden
 

@@ -17,7 +17,7 @@ import { shareAnswer } from "./games/share-data";
 import { signTruth, trueSignCount } from "./games/signs-data";
 import { TIME_MINUTES, type TimeLevel } from "./games/time";
 import { TIMES_SPEC, type TimesLevel } from "./games/times";
-import { FRACTION_DENOMINATORS, GRADE_BANDS, playWindow } from "./grade-map";
+import { FRACTION_DENOMINATORS, GRADE_BANDS, levelAllowed, playWindow } from "./grade-map";
 import { hasHandsCard, makeHandsTask, type HandsTask } from "./hands-build";
 import { makeClockTask, makePayTask } from "./hands";
 import type { Grade } from "./model";
@@ -28,6 +28,7 @@ import type { Board } from "./games/boards";
 import type { ChoiceQ } from "./games/types";
 import { graphAnswer } from "./games/graph-data";
 import { variableAnswer } from "./games/variables";
+import { BIG_MULTI_MAX, DECIMAL_OPS_MAX, LONG_DIV_RANGE, hundredthsText } from "./games/grade5-ops";
 
 const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
 const SAMPLES = 200;
@@ -339,6 +340,11 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       break;
     }
     case "share": {
+      if (board.mode === "longDiv") {
+        expect(grade).toBe("5");
+        assertLongDiv(board, question);
+        break;
+      }
       expect(Number(question.answer)).toBe(shareAnswer(board));
       expect(board.total).toBe(board.plates * board.each + board.leftover);
       expect(board.each).toBeGreaterThanOrEqual(1);
@@ -504,11 +510,59 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if ((grade === "4" || grade === "5")) expect(["half", "all"]).toContain(board.mode);
       break;
     }
+    case "times": {
+      // Grade 5 multi-digit multiply (5.NBT.B.5): 2- or 3-digit times 2-digit.
+      expect(grade).toBe("5");
+      expect(board.mode).toBe("bigMulti");
+      expect(board.a).toBeGreaterThanOrEqual(11);
+      expect(board.a).toBeLessThanOrEqual(BIG_MULTI_MAX.a);
+      expect(board.b).toBeGreaterThanOrEqual(11);
+      expect(board.b).toBeLessThanOrEqual(BIG_MULTI_MAX.b);
+      expect(board.a * board.b).toBeLessThanOrEqual(BIG_MULTI_MAX.product);
+      expect(question.answer).toBe(String(board.a * board.b));
+      for (const choice of question.choices) expect(Number(choice)).toBeGreaterThan(0);
+      break;
+    }
+    case "add": {
+      // Grade 5 decimal operations (5.NBT.B.7): to hundredths, values under 100.
+      expect(grade).toBe("5");
+      expect(board.mode).toBe("decimalOps");
+      for (const n of [board.left, board.right, board.result]) {
+        expect(Number.isInteger(n)).toBe(true);
+        expect(n).toBeGreaterThan(0);
+        expect(n).toBeLessThanOrEqual(DECIMAL_OPS_MAX);
+      }
+      if (board.op === "+") expect(board.left + board.right).toBe(board.result);
+      if (board.op === "-") expect(board.left - board.right).toBe(board.result);
+      if (board.op === "×") expect(board.left * board.right).toBe(board.result * 100);
+      if (board.op === "÷") expect(board.result * board.right).toBe(board.left * 100);
+      expect(question.answer).toBe(hundredthsText(board.result));
+      for (const choice of question.choices) {
+        expect(choice).toMatch(/^\d+(\.\d{1,2})?$/);
+        expect(Math.round(Number(choice) * 100)).toBeLessThan(100_000);
+      }
+      break;
+    }
     default: {
       const neverBoard: never = board;
       throw new Error(String(neverBoard));
     }
   }
+}
+
+function assertLongDiv(board: Extract<Board, { game: "share" }>, question: ChoiceQ): void {
+  // Grade 5 division (5.NBT.B.6): up to four-digit dividends, two-digit divisors.
+  expect(board.plates).toBeGreaterThanOrEqual(LONG_DIV_RANGE.divisorMin);
+  expect(board.plates).toBeLessThanOrEqual(LONG_DIV_RANGE.divisorMax);
+  expect(board.total).toBeLessThanOrEqual(LONG_DIV_RANGE.dividendMax);
+  expect(board.total).toBe(board.plates * board.each + board.leftover);
+  expect(board.leftover).toBeGreaterThanOrEqual(0);
+  expect(board.leftover).toBeLessThan(board.plates);
+  expect(board.each).toBeGreaterThanOrEqual(LONG_DIV_RANGE.quotientMin);
+  expect(board.each).toBeLessThanOrEqual(LONG_DIV_RANGE.quotientMax);
+  expect(question.answer).toBe(board.leftover === 0 ? String(board.each) : `${board.each} remainder ${board.leftover}`);
+  // A card with a remainder offers remainder answers only, and a card without one offers whole numbers only.
+  for (const choice of question.choices) expect(/remainder/.test(choice)).toBe(board.leftover > 0);
 }
 
 function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
@@ -872,7 +926,7 @@ describe("grade bands", () => {
     const ids = add!.levels.map((level) => level.id);
     const band = playWindow(ids, "add", "K", false);
     expect(band.ids).toEqual(["within5", "within10", "within20"]);
-    expect(playWindow(ids, "add", "K", true).ids.at(-1)).toBe("thousands");
+    expect(playWindow(ids, "add", "K", true).ids.at(-1)).toBe("decimalOps");
     let ladder = startLadder(openingIndex(ids.indexOf(band.start), 0, false, { min: band.min, max: band.max }));
     for (let i = 0; i < 12; i++) {
       ladder = stepLadder(ladder, ids.length, true, { min: band.min, max: band.max });
@@ -1074,5 +1128,93 @@ describe("grade 5 slice 2: add and subtract unlike fractions", () => {
         expect(fractions.makeQuestion(rngFromSeed(`g5s2-leak-${grade}-${i}`), level).skill).not.toBe("fractions:addUnlike");
       }
     }
+  });
+});
+
+describe("grade 5 slice 3: multi-digit multiply, 2-digit division, decimal operations (5.NBT.B)", () => {
+  const NEW_LEVELS: [string, string, string, string][] = [
+    // game, new level, grade 4 top level, standard
+    ["times", "bigMulti", "divide", "5.NBT.B.5"],
+    ["share", "longDiv", "left", "5.NBT.B.6"],
+    ["add", "decimalOps", "thousands", "5.NBT.B.7"],
+  ];
+  const BELOW_FIVE: Grade[] = ["PK", "K", "1", "2", "3", "4"];
+
+  it("slots each new level last in its game and opens it first for grade 5", () => {
+    for (const [gameId, levelId, top] of NEW_LEVELS) {
+      const game = GAMES.find((item) => item.id === gameId)!;
+      const ids = game.levels.map((row) => row.id);
+      expect(ids.at(-1), gameId).toBe(levelId);
+      expect(ids.indexOf(top), gameId).toBe(ids.length - 2);
+      expect(game.isLevel(levelId)).toBe(true);
+      expect(game.defaultLevel("5")).toBe(levelId);
+      const window = playWindow(ids, gameId, "5", false);
+      expect(window.start).toBe(levelId);
+      expect(window.ids).toEqual([top, levelId]);
+    }
+  });
+
+  it("never opens a new level below grade 5 unless challenge ahead is on", () => {
+    for (const [gameId, levelId, top] of NEW_LEVELS) {
+      const game = GAMES.find((item) => item.id === gameId)!;
+      const ids = game.levels.map((row) => row.id);
+      for (const grade of BELOW_FIVE) {
+        expect(playWindow(ids, gameId, grade, false).ids, `${gameId} grade ${grade}`).not.toContain(levelId);
+        expect(levelAllowed(ids, gameId, grade, levelId, false, "easy"), `${gameId} grade ${grade} easy`).toBe(false);
+        expect(levelAllowed(ids, gameId, grade, levelId, false, "medium"), `${gameId} grade ${grade} medium`).toBe(false);
+      }
+      // Grade 4 is capped at its own top level, so adaptive drift stops there.
+      expect(playWindow(ids, gameId, "4", false).ids.at(-1)).toBe(top);
+      expect(playWindow(ids, gameId, "4", true).ids).toContain(levelId);
+    }
+  });
+
+  it("ties each new level to its 5.NBT.B standard, and grade 5 only", () => {
+    for (const [gameId, , , code] of NEW_LEVELS) {
+      expect(GRADE_BANDS[gameId]?.["5"].standards).toEqual([code]);
+      for (const grade of BELOW_FIVE) expect(GRADE_BANDS[gameId]?.[grade].standards.some((item) => item.startsWith("5."))).toBe(false);
+    }
+  });
+
+  it("serves 600 in-range cards per new level with four distinct tiles and one right answer, in every locale", () => {
+    const locales: Locale[] = ["en", "es", "pt", "fr", "zh", "hi", "ar"];
+    try {
+      for (const locale of locales) {
+        setLocale(locale);
+        for (const [gameId, levelId] of NEW_LEVELS) {
+          const game = GAMES.find((item) => item.id === gameId)!;
+          for (let i = 0; i < (locale === "en" ? 600 : 80); i += 1) {
+            const question = game.makeQuestion(rngFromSeed(`g5s3-${locale}-${gameId}-${i}`), levelId);
+            expect(question.skill).toBe(`${gameId}:${levelId}`);
+            expect(question.choices).toHaveLength(4);
+            expect(new Set(question.choices).size).toBe(4);
+            expect(question.choices.filter((choice) => choice === question.answer)).toHaveLength(1);
+            expect(question.choices.some((choice) => /^no \d/.test(choice))).toBe(false);
+            expect(question.title.length).toBeGreaterThan(0);
+            assertQuestion("5", levelId, question);
+          }
+        }
+      }
+    } finally {
+      setLocale("en");
+    }
+  });
+
+  it("never serves new content to grades below 5 in 400 draws", () => {
+    for (const [gameId, levelId] of NEW_LEVELS) {
+      const game = GAMES.find((item) => item.id === gameId)!;
+      const ids = game.levels.map((row) => row.id);
+      for (const grade of BELOW_FIVE) {
+        const window = playWindow(ids, gameId, grade, false);
+        for (let i = 0; i < 400 && window.ids.length > 0; i += 1) {
+          const level = window.ids[i % window.ids.length]!;
+          expect(game.makeQuestion(rngFromSeed(`g5s3-leak-${gameId}-${grade}-${i}`), level).skill).not.toBe(`${gameId}:${levelId}`);
+        }
+      }
+    }
+  });
+
+  it("has no hands-on build card for the new levels and no grade 5 boss", () => {
+    for (const [gameId, levelId] of NEW_LEVELS) expect(hasHandsCard(gameId, levelId)).toBe(false);
   });
 });
