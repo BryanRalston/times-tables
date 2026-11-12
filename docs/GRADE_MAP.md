@@ -12,6 +12,8 @@ Saved games from version 9 keep their grade. Version 10 only adds Pre-K and grad
 
 **Grade 5 slice 4 (5.OA.B.3, 5.G.A).** Two more grade 5 levels, each the last level of its game: two rules in Number Patterns (5.OA.B.3) and the coordinate plane in Grid Garden (5.G.A.1, 5.G.A.2, quadrant I only). Grade 5 opens on the new level, with the old grade 4 top level as the one-level drift down. Grade 4 is capped at its own top level in both games, so the new levels stay grade 5 unless challenge ahead is on. Same rules as slices 1 and 3: text-first tap-and-think cards, four tiles with one right answer, device voice, no drag-and-build card, no grade 5 boss.
 
+**Grade 5 Cube Builder (5.MD.C).** A new grade 5 game, appended last in the registry, so it is the last island of the Math path. It is coming later for Pre-K through grade 4 (no stones, no questions; Challenge ahead can open it, as for every later game) and plays for grade 5 only. Four levels, all whole unit cubes: count the cubes, build a box, use the formula, and two boxes. Questions are not auto-read; the device voice reads them on tap until clips are rendered. There is no hands card and no grade 5 boss (a generic boss ends the path).
+
 **Grade 5 slice 3 (5.NBT.B).** Three more grade 5 levels, each the last level of its game: multiply by 2 digits in Times Tables (5.NBT.B.5), divide by 2 digits in Fair Shares (5.NBT.B.6), and decimal operations in Add & Subtract (5.NBT.B.7). Grade 5 opens on the new level, with the old grade 4 top level as the one-level drift down. Grade 4 is capped at its own top level in all three games, so the new levels stay grade 5 unless challenge ahead is on. Same rules as slice 1: text-first tap-and-think cards, four tiles with one right answer, device voice, no drag-and-build card, no grade 5 boss.
 
 Standards below are Common Core. Sight words use the Dolch lists. Grade 2 adds Fry words that are not already on a Dolch list. Grade 3 does the same with the next Fry band.
@@ -451,9 +453,29 @@ The card shows an analog clock. The spoken question is “What time is it?” Th
 
 Pre-K through grade 2 stay locked. Grade 3 can use every level of this game. Grade 4 can drift down to the half hour. Estimation of a sum or difference (3.OA.D.8) is still open: a spoken “about how many” would either repeat Place Value’s rounding line or Add’s “what is A plus B.”
 
+## Cube Builder
+
+Levels, easy to hard: count the cubes, build a box, use the formula, two boxes.
+
+Every box is drawn as unit cubes on a floor in one fixed 3D view, so each cube rests on the floor or on another cube. Edges are whole numbers; there are no fractional edges (grade 6), no unit conversion (5.MD.A), and no line plots (5.MD.B).
+
+Count the cubes (5.MD.C.3, 5.MD.C.4) shows a full box 2–4 long, 2–3 wide, and 2–3 tall (at most 36 cubes). Some cubes are always hidden in the back or the middle, and the layers are colored so a child can count one layer and then the layers. The number of cubes you can see is always one of the wrong tiles, with one layer only and one layer off. Build a box (5.MD.C.4, 5.MD.C.5) is hands-on in the card: tap long, wide, and tall to stack cubes until the box holds the target volume. Some cards fix the floor (only layers change); others accept any box with that volume (long up to 6, wide up to 4, tall up to 5). The first wrong check gives a nudge; the second counts as a miss. Use the formula (5.MD.C.5a, 5.MD.C.5b) labels length, width, and height (length 3–7, width 2–4, height 2–5) and asks for V = l × w × h, or gives the base area B and the height for V = B × h. Wrong tiles are real slips: adding the edges, l × w + h, and forgetting the height. Two boxes (5.MD.C.5c) joins a tall box and a shorter box of the same width side by side; the answer adds the two volumes, and one wrong tile treats the figure as one big box. Each box's edge numbers are drawn in that box's color (pink or teal) next to its own edges, and a color key under the picture repeats each box as length × width × height.
+
+| Grade | Offer | Start | Core levels | Cap without challenge | Standards |
+|---|---|---|---|---|---|
+| Pre-K | Coming later | — | — | — | 3.MD.C.5 (area first; volume waits) |
+| K | Coming later | — | — | — | 3.MD.C.5 (area first; volume waits) |
+| 1 | Coming later | — | — | — | 3.MD.C.5 (area first; volume waits) |
+| 2 | Coming later | — | — | — | 3.MD.C.5 (area first; volume waits) |
+| 3 | Coming later | — | — | — | 3.MD.C.5 (area first; volume waits) |
+| 4 | Coming later | — | — | — | 3.MD.C.5 (area first; volume waits) |
+| 5 | Play | Count the cubes | Count the cubes, build a box, use the formula, two boxes | — | 5.MD.C.3, 5.MD.C.4, 5.MD.C.5 |
+
+Pre-K through grade 4 stay locked unless Challenge ahead is on. Grade 5 Easy stays on counting cubes, Medium opens all four levels from the start, and Hard starts on two boxes. Unit conversion (5.MD.A), line plots (5.MD.B), and a grade 5 boss are later.
+
 ## Still open
 
-Grade 5 also has more to add. Next up are unlike denominators (5.NF.A), decimal operations and two-digit division (5.NBT.B), the coordinate plane and two-rule patterns (5.OA.B, 5.G), unit conversion and volume (5.MD), and a grade 5 boss. Grade 5 search-engine landing copy waits for those.
+Grade 5 also has more to add. Next up are unlike denominators (5.NF.A), decimal operations and two-digit division (5.NBT.B), the coordinate plane and two-rule patterns (5.OA.B, 5.G), unit conversion (5.MD.A), line plots (5.MD.B), and a grade 5 boss. Volume (5.MD.C) is Cube Builder, which has its own grade 5 landing page. Other grade 5 search-engine landing copy waits for those.
 
 These Common Core skills still have no game: teen numbers as ten and ones (K.NBT.A.1), decomposing numbers within 10 (K.OA.A.3), the meaning of the equal sign (1.OA.D.7), three-addend word problems (1.OA.A.2), adding up to four two-digit numbers (2.NBT.B.6), the full subtraction algorithm within 1000 (2.NBT.B.7), measuring the same length in two units (2.MD.A.2), estimating length (2.MD.A.3), comparing lengths (2.MD.A.4), length word problems (2.MD.B.5), a number line of lengths (2.MD.B.6), line plots of measurements (2.MD.D.9), multiplying a one-digit number by a multiple of 10 (3.NBT.A.3), mass and liquid volume (3.MD.A.2), properties of multiplication (3.OA.B.5), and the early reading work of syllables (RF.K.2.B), onset and rime (RF.K.2.C), and phoneme substitution (RF.K.2.E). Rounding to 10 and 100 is already Place Value, and estimate stories put it in a story. Estimating sums and differences is the estimate stories level of Word Problems. Time to the minute is the Minutes game. Blank fraction lines are the Line game. Elapsed time stays a grade 4 level of Telling Time. Rhyming words are already Phonics, and only in the languages that teach English reading. Even and odd is still open as a question, though Fair Shares already deals equal pairs.
 

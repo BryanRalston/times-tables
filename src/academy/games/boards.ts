@@ -320,6 +320,19 @@ export interface AddBoard {
   unit: 10 | 100;
 }
 
+/** Grade 5 volume (5.MD.C). Edges are whole unit cubes. `two` joins a second box on the right. */
+export interface CubeBox {
+  l: number;
+  w: number;
+  h: number;
+}
+
+export type CubeBoard =
+  | { game: "cubes"; mode: "count"; box: CubeBox }
+  | { game: "cubes"; mode: "build"; box: CubeBox; target: number; floorFixed: boolean }
+  | { game: "cubes"; mode: "formula"; box: CubeBox; ask: "lwh" | "base" }
+  | { game: "cubes"; mode: "two"; box: CubeBox; second: CubeBox };
+
 export type Board =
   | TimesBoard
   | AddBoard
@@ -338,7 +351,8 @@ export type Board =
   | SignsBoard
   | JumpsBoard
   | TickBoard
-  | MinuteBoard;
+  | MinuteBoard
+  | CubeBoard;
 
 export function countName(name: string, n: number): string {
   if (n === 1 && name.endsWith("s")) return name.slice(0, -1);

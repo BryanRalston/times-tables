@@ -29,6 +29,7 @@ import type { ChoiceQ } from "./games/types";
 import { graphAnswer } from "./games/graph-data";
 import { variableAnswer } from "./games/variables";
 import { BIG_MULTI_MAX, DECIMAL_OPS_MAX, LONG_DIV_RANGE, hundredthsText } from "./games/grade5-ops";
+import { boardVolume } from "./games/cubes-data";
 import { PLANE_MAX, TWO_RULES_RANGE, pairText, parsePair, planeAnswer, twoRuleTerms, twoRulesAnswer } from "./games/grade5-pairs";
 
 const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
@@ -554,6 +555,13 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
         expect(choice).toMatch(/^\d+(\.\d{1,2})?$/);
         expect(Math.round(Number(choice) * 100)).toBeLessThan(100_000);
       }
+      break;
+    }
+    case "cubes": {
+      // Volume (5.MD.C) is grade 5 only. Whole unit cubes, never a decimal or fraction edge.
+      expect(grade).toBe("5");
+      expect(Number(question.answer)).toBe(boardVolume(board));
+      for (const n of [board.box.l, board.box.w, board.box.h]) expect(Number.isInteger(n) && n >= 1).toBe(true);
       break;
     }
     default: {

@@ -572,6 +572,7 @@ describe("hands-on card generators", () => {
     for (const game of GAMES) {
       if (game.id === "time" || game.id === "money" || game.id === "minute") continue;
       const level = game.levels[0]!.id;
+      if (!hasHandsCard(game.id, level)) continue;
       const task = makeBuildTask(game.id, level, rngFromSeed(`${game.id}-retry`));
       const next = similarSlot(game.id, task, rngFromSeed(`${game.id}-retry-next`));
       expect(next.kind).toBe(task.kind);

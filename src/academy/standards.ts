@@ -199,6 +199,12 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     half: "3.MD.A.1",
     all: "3.MD.A.1",
   },
+  cubes: {
+    count: "5.MD.C.4",
+    build: "5.MD.C.5",
+    formula: "5.MD.C.5",
+    two: "5.MD.C.5",
+  },
 };
 
 const CHIP_SKILL: Record<string, string> = {
@@ -297,6 +303,9 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "4.MD.C.5": { en: "Understand angles", es: "Entender los ángulos" },
   "4.G.A.1": { en: "Lines and angles", es: "Líneas y ángulos" },
   "4.G.A.3": { en: "A line of symmetry", es: "Un eje de simetría" },
+  "5.MD.C.3": { en: "Volume is measured in unit cubes", es: "El volumen se mide en cubos unidad" },
+  "5.MD.C.4": { en: "Count unit cubes to find volume", es: "Contar cubos unidad para hallar el volumen" },
+  "5.MD.C.5": { en: "Volume with length × width × height", es: "Volumen con largo × ancho × alto" },
   "5.OA.B.3": { en: "Two rules and ordered pairs", es: "Dos reglas y pares ordenados" },
   "5.G.A.1": { en: "Points on the coordinate plane", es: "Puntos en el plano de coordenadas" },
   "5.G.A.2": { en: "Graph points in the first quadrant", es: "Graficar puntos en el primer cuadrante" },

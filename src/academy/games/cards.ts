@@ -1342,6 +1342,37 @@ export const minuteCard = sceneCard("Minutes", MINUTE_ROWS, {
   isLevel: (value) => isId(MINUTE_IDS, value),
 });
 
+const CUBE_IDS = ["count", "build", "formula", "two"] as const;
+const CUBE_ROWS: SkillRow[] = [
+  { key: "cubes:count", label: "Count the cubes" },
+  { key: "cubes:build", label: "Build a box" },
+  { key: "cubes:formula", label: "Use the formula" },
+  { key: "cubes:two", label: "Two boxes" },
+];
+
+/** Grade 5 volume (5.MD.C). Earlier grades see it as later; see docs/GRADE_MAP.md. */
+export const cubesCard = sceneCard("Cubes", CUBE_ROWS, {
+  id: "cubes",
+  title: "Cube Builder",
+  audience: "Grade 5",
+  tint: "sky",
+  mascot: "waffle",
+  sheetSlug: "volume-with-cubes",
+  sheetScreen: "sheet-cubes",
+  blurb: "Free volume practice for grade 5. Count unit cubes, build boxes, and use length × width × height. No signup.",
+  levels: [
+    { id: "count", label: "Count the cubes", num: 1 },
+    { id: "build", label: "Build a box", num: 2 },
+    { id: "formula", label: "Use the formula", num: 3 },
+    { id: "two", label: "Two boxes", num: 4 },
+  ],
+  defaultLevel(grade) {
+    return bandStart("cubes", grade, CUBE_IDS, "count");
+  },
+  sheetDefaultLevel: "count",
+  isLevel: (value) => isId(CUBE_IDS, value),
+});
+
 /** Home-card order is also the island order. Append a game; do not insert one in front. */
 export const GAME_CARDS = [
   timesCard,
@@ -1366,6 +1397,7 @@ export const GAME_CARDS = [
   jumpsCard,
   ticksCard,
   minuteCard,
+  cubesCard,
 ] as const;
 
 export type GameId = (typeof GAME_CARDS)[number]["id"];

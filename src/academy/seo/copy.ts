@@ -218,6 +218,7 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "2": "grade 2",
     "3": "grade 3",
     "4": "grade 4",
+    "5": "grade 5",
     "PK,K,1,2,3,4": "Pre-K to grade 4",
     "K,1,2,3,4": "kindergarten through grade 4",
     "1,2,3,4": "grades 1–4",
@@ -238,6 +239,7 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "2": "grado 2",
     "3": "grado 3",
     "4": "grado 4",
+    "5": "grado 5",
     "PK,K,1,2,3,4": "de prekínder a grado 4",
     "K,1,2,3,4": "de kínder a grado 4",
     "1,2,3,4": "grados 1 a 4",
@@ -258,6 +260,7 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "2": "2.º ano",
     "3": "3.º ano",
     "4": "4.º ano",
+    "5": "5.º ano",
     "PK,K,1,2,3,4": "da pré-escola ao 4.º ano",
     "K,1,2,3,4": "do jardim ao 4.º ano",
     "1,2,3,4": "do 1.º ao 4.º ano",
@@ -278,6 +281,7 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "2": "le CE1",
     "3": "le CE2",
     "4": "le CM1",
+    "5": "le CM2",
     "PK,K,1,2,3,4": "de la maternelle au CM1",
     "K,1,2,3,4": "de la grande section au CM1",
     "1,2,3,4": "du CP au CM1",
@@ -298,6 +302,7 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "2": "二年级",
     "3": "三年级",
     "4": "四年级",
+    "5": "五年级",
     "PK,K,1,2,3,4": "学前班到四年级",
     "K,1,2,3,4": "幼儿园到四年级",
     "1,2,3,4": "一至四年级",
@@ -318,6 +323,7 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "2": "कक्षा 2",
     "3": "कक्षा 3",
     "4": "कक्षा 4",
+    "5": "कक्षा 5",
     "PK,K,1,2,3,4": "नर्सरी से कक्षा 4",
     "K,1,2,3,4": "केजी से कक्षा 4",
     "1,2,3,4": "कक्षा 1 से 4",
@@ -338,6 +344,7 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "2": "الصف الثاني",
     "3": "الصف الثالث",
     "4": "الصف الرابع",
+    "5": "الصف الخامس",
     "PK,K,1,2,3,4": "ما قبل الروضة حتى الصف الرابع",
     "K,1,2,3,4": "الروضة حتى الصف الرابع",
     "1,2,3,4": "الصف الأول حتى الرابع",
@@ -752,6 +759,29 @@ export const GAME_COPY: readonly GameCopy[] = [
     ),
   },
   {
+    id: "cubes",
+    slug: "volume-cube-builder-game",
+    grades: ["5"],
+    name: phrase(
+      "volume with unit cubes",
+      "volumen con cubos",
+      "volume com cubos",
+      "volume en cubes unités",
+      "用单位小正方体求体积",
+      "इकाई घनों से आयतन",
+      "الحجم بالمكعبات",
+    ),
+    blurb: phrase(
+      "Grade 5 kids count unit cubes, build boxes, and find volume with length × width × height.",
+      "Los niños de grado 5 cuentan cubos unidad, construyen cajas y hallan el volumen con largo × ancho × alto.",
+      "As crianças do 5.º ano contam cubos unitários, montam caixas e acham o volume com comprimento × largura × altura.",
+      "Les élèves de CM2 comptent des cubes unités, construisent des boîtes et trouvent le volume avec longueur × largeur × hauteur.",
+      "五年级的孩子数单位小正方体、搭长方体，用长 × 宽 × 高求体积。",
+      "कक्षा 5 के बच्चे इकाई घन गिनते हैं, डिब्बे बनाते हैं, और लंबाई × चौड़ाई × ऊँचाई से आयतन निकालते हैं।",
+      "يعدّ تلاميذ الصف الخامس مكعبات الوحدة، ويبنون صناديق، ويجدون الحجم بالطول × العرض × الارتفاع.",
+    ),
+  },
+  {
     id: "patterns",
     slug: "number-patterns-game",
     grades: ["K", "1", "2", "3", "4"],
@@ -917,6 +947,10 @@ ticks:past|fractions past one|fracciones después del uno|frações depois do um
 minute:early|minutes just after the hour|minutos justo después de la hora|minutos logo depois da hora|minutes juste après l'heure|过了整点的分钟|घंटे के बाद के मिनट|دقائق بعد الساعة
 minute:half|minutes before half past|minutos antes de y media|minutos antes de e meia|minutes avant et demie|到半点的分钟|साढ़े से पहले के मिनट|دقائق قبل النصف
 minute:all|any minute on the clock|cualquier minuto del reloj|qualquer minuto do relógio|n'importe quelle minute de l'horloge|钟上的每一分钟|घड़ी का कोई भी मिनट|أي دقيقة على الساعة
+cubes:count|counting cubes for volume|contar cubos|contar cubos|compter des cubes|数小正方体求体积|घन गिनकर आयतन|عدّ المكعبات
+cubes:build|building a box|construir cajas|montar caixas|construire des boîtes|搭长方体|डिब्बा बनाना|بناء صندوق
+cubes:formula|the volume formula|la fórmula del volumen|a fórmula do volume|la formule du volume|体积公式|आयतन का सूत्र|قانون الحجم
+cubes:two|volume of two boxes|volumen de dos cajas|volume de duas caixas|volume de deux boîtes|两个长方体的体积|दो डिब्बों का आयतन|حجم صندوقين
 `;
 
 function loadSkills(): Record<string, Phrase> {

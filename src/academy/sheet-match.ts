@@ -34,6 +34,7 @@ const GAME_TITLE_ES: Record<string, string> = {
   jumps: "10 más",
   ticks: "Punto",
   minute: "Minutos",
+  cubes: "Cubos",
 };
 
 interface NamedSheet {

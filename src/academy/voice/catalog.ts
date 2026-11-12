@@ -41,7 +41,10 @@ const NUMBER_MAX = 1000;
  * New stories start here so no new paid audio is needed; speak() falls back to
  * the device whenever planSpeech cannot cover a line.
  */
-export const DEVICE_VOICE_SKILLS: ReadonlySet<string> = new Set(["problems:estimate", "place:thousandths", "fractions:addUnlike", "fractions:fracTimes", "variables:orderOps", "times:bigMulti", "share:longDiv", "add:decimalOps", "patterns:twoRules", "grid:coords"]);
+export const DEVICE_VOICE_SKILLS: ReadonlySet<string> = new Set(["problems:estimate", "place:thousandths", "fractions:addUnlike", "fractions:fracTimes", "variables:orderOps", "times:bigMulti", "share:longDiv", "add:decimalOps", "patterns:twoRules", "grid:coords", "cubes:count", "cubes:build", "cubes:formula", "cubes:two"]);
+
+/** Games whose title and generic boss lines use the device voice until clips are rendered. */
+export const DEVICE_VOICE_GAMES: ReadonlySet<string> = new Set(["cubes"]);
 
 export const CORE_VOICE_GAMES = new Set(["add", "time", "ui", "buddy", "boss"]);
 
@@ -66,6 +69,7 @@ function addChoice(lines: SpokenLine[], question: ChoiceQ, game: string) {
 function explicitLines(): SpokenLine[] {
   const lines: SpokenLine[] = [];
   for (const game of GAMES) {
+    if (DEVICE_VOICE_GAMES.has(game.id)) continue;
     push(lines, show(game.title), "ui");
     const boss = bossForGame(game.id);
     push(lines, boss.taunt, "boss");
