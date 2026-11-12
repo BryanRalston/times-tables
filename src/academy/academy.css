@@ -3972,3 +3972,66 @@ button.ac-go.ac-next {
   .ac-stage-copy.is-add .ac-qcard h1 { font-size: 22px; }
   .ac-stage-copy.is-add .ac-choice { min-height: 76px; }
 }
+
+/* Cube Builder (grade 5 volume). Cubes sit on a floor; numbers stay left to right.
+   On a phone the question, the box, and all four tiles (or the build controls) fit one screen. */
+.ac-cubes-art { width: 100%; margin: 4px auto 0; direction: ltr; }
+.ac-cubes-svg { display: block; margin: 0 auto; height: min(200px, 25vh); width: auto; max-width: 100%; overflow: visible; }
+.ac-cubes-floor { fill: #f1e8f8; stroke: #dccbec; stroke-width: 1.5; stroke-linejoin: round; }
+.ac-cubes-shadow { fill: rgba(60, 36, 72, 0.08); }
+.ac-cubes-grid { stroke: #d9c6ea; stroke-width: 1; }
+.ac-cube polygon { stroke: #4a2f5c; stroke-opacity: 0.5; stroke-width: 1.1; stroke-linejoin: round; }
+.ac-cube.is-drop { animation: ac-cube-drop 0.28s ease-out; }
+@keyframes ac-cube-drop {
+  from { transform: translateY(-14px); opacity: 0.4; }
+  to { transform: none; opacity: 1; }
+}
+.ac-cubes-num { font: 800 23px var(--ac-display); fill: var(--ac-ink); paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
+.ac-cubes-num.is-base { fill: #9a6a00; }
+.ac-cubes-target, .ac-cubes-formula, .ac-cubes-readout { direction: ltr; unicode-bidi: isolate; margin: 4px 0 0; text-align: center; }
+.ac-cubes-target { font: 800 28px var(--ac-display); color: var(--ac-teal-deep); }
+.ac-cubes-formula { font: 700 18px var(--ac-display); color: var(--ac-muted); }
+.ac-cubes-readout { font: 800 22px var(--ac-display); color: var(--ac-ink); margin: 0; }
+.ac-cubes-build { display: grid; justify-items: center; gap: 4px; width: 100%; }
+.ac-cubes-build.is-locked { pointer-events: none; }
+.ac-cubes-build .ac-cubes-svg { height: min(160px, 18vh); }
+.ac-cubes-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; width: 100%; }
+.ac-cubes-step { display: grid; justify-items: center; gap: 0; padding: 4px; border-radius: 16px; background: #fff; box-shadow: 0 4px 0 var(--ac-line); }
+.ac-cubes-step.is-fixed { background: #f7f0fb; box-shadow: inset 0 0 0 2px #eadcf5; }
+.ac-cubes-step-name { font-size: 15px; font-weight: 800; color: var(--ac-muted); }
+.ac-cubes-step-row { display: flex; align-items: center; gap: 4px; min-height: 44px; }
+.ac-cubes-step-row b { min-width: 20px; font: 800 26px var(--ac-display); text-align: center; }
+.ac-cubes-step-row button { width: 36px; height: 40px; border: 0; border-radius: 12px; background: #fff0f6; color: var(--ac-ink); font-size: 24px; font-weight: 800; box-shadow: 0 3px 0 #f3c3d8; }
+.ac-cubes-step-row button:disabled { opacity: 0.35; }
+.ac-cubes-step-row button:active { transform: translateY(2px); box-shadow: 0 1px 0 #f3c3d8; }
+.ac-cubes-build .ac-tile-note { margin: 0; min-height: 0; }
+.ac-cubes-build .ac-check { margin-top: 2px; min-height: 52px; }
+.ac-cubes-sheet { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.ac-cubes-sheet figure { margin: 0; text-align: center; break-inside: avoid; }
+.ac-cubes-sheet .ac-cubes-svg { height: 120px; }
+.ac-cubes-sheet figcaption { margin-top: 6px; font-size: 18px; }
+
+@media (max-height: 900px) {
+  .ac-stage-copy.is-cubes { gap: 6px; }
+  .ac-stage-copy.is-cubes .ac-story { margin-bottom: 0; }
+  .ac-stage-copy.is-cubes .ac-play-buddy { flex: 0 0 auto; min-height: 0; }
+  .ac-stage-copy.is-cubes .ac-play-buddy .ac-buddy { flex-direction: row; align-items: center; gap: 8px; }
+  .ac-stage-copy.is-cubes .ac-play-buddy .ac-buddy-img,
+  .ac-stage-copy.is-cubes .ac-play-buddy .ac-wear,
+  .ac-stage-copy.is-cubes .ac-play-buddy .ac-squish { width: 52px; height: 52px; }
+  .ac-stage-copy.is-cubes .ac-play-buddy .ac-bubble { font-size: 15px; }
+  .ac-stage-copy.is-cubes .ac-qcard { padding: 10px 12px; }
+  .ac-stage-copy.is-cubes .ac-qcard h1 { font-size: 22px; }
+  .ac-stage-copy.is-cubes .ac-choice { min-height: 72px; }
+}
+.ac-cubes-num.is-pink { fill: #c2306f; }
+.ac-cubes-num.is-mint { fill: #17806a; }
+.ac-cubes-key { direction: ltr; unicode-bidi: isolate; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; margin: 2px 0 0; font: 800 19px var(--ac-display); }
+.ac-cubes-key span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.ac-cubes-key i { width: 16px; height: 16px; border-radius: 4px; display: inline-block; }
+.ac-cubes-key .is-pink { color: #c2306f; }
+.ac-cubes-key .is-pink i { background: #f47fb0; }
+.ac-cubes-key .is-mint { color: #17806a; }
+.ac-cubes-key .is-mint i { background: #5cbfa8; }
+.ac-cubes-sheet .ac-cubes-key { font-size: 14px; gap: 2px 10px; }
+.ac-cubes-sheet .ac-cubes-key i { width: 11px; height: 11px; }

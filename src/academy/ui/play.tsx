@@ -774,10 +774,10 @@ export function PlayScreen({
     if (phase === "ask" || phase === "practice") retryFocusRef.current?.focus(game === "add" ? { preventScroll: true } : undefined);
   }, [phase, index, practice, game]);
 
-  // Addition fits a card on one phone screen. Each new card starts at the top, so a
-  // scroll left over from the last card never hides the question or the tiles.
+  // Addition and Cube Builder fit a card on one phone screen. Each new card starts at the top,
+  // so a scroll left over from the last card never hides the question or the tiles.
   useEffect(() => {
-    if (game !== "add" || boss) return;
+    if ((game !== "add" && game !== "cubes") || boss) return;
     if (phase !== "ask" && phase !== "practice" && phase !== "teach") return;
     if (typeof window !== "undefined" && window.scrollY > 0) window.scrollTo(0, 0);
   }, [game, boss, phase, index, practice, roundId]);
@@ -1142,7 +1142,7 @@ export function PlayScreen({
                 ) : choice ? (
                   <>
                     {spec?.Aside ? <spec.Aside question={choice} /> : null}
-                    <div className={cx("ac-stage-copy", game === "add" && "is-add")}>
+                    <div className={cx("ac-stage-copy", game === "add" && "is-add", game === "cubes" && "is-cubes")}>
                       <p className="ac-story">{slotStory(slot, child.avatarId, hostId)}</p>
                       {choice.visual.kind === "money" ? <CoinShare buddyId={child.avatarId} hostId={hostId} /> : null}
                       {spec ? (

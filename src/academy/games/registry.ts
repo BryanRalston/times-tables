@@ -3,6 +3,7 @@ import { sheetHref as sheetPath } from "../paths";
 import type { Grade } from "../model";
 import { addGame } from "./add";
 import { countGame } from "./count";
+import { cubesGame } from "./cubes";
 import { fractionsGame } from "./fractions";
 import { graphsGame } from "./graphs";
 import { gridGame } from "./grid";
@@ -52,6 +53,7 @@ export const GAMES = [
   jumpsGame,
   ticksGame,
   minuteGame,
+  cubesGame,
 ] as const;
 
 export type GameId = (typeof GAMES)[number]["id"];

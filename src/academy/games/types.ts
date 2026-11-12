@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Rng } from "@/lib/rng";
 import type { Grade, WordCard } from "../model";
-import type { Board } from "./boards";
+import type { Board, CubeBoard } from "./boards";
 
 export const MINUS = "−";
 export const TIMES = "×";
@@ -130,6 +130,8 @@ export interface SheetItem {
   prompt: string;
   answer: string;
   clock?: { hours: number; minutes: number };
+  /** Cube Builder rows draw the box above the blank. */
+  cubes?: CubeBoard;
   /** Dotted handwriting model. Sentence rows leave this off so the answer stays in the key. */
   trace?: string;
 }

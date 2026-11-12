@@ -723,6 +723,16 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string): s
         `${buddy} और ${host} बिंदु ढूँढते हैं।`,
         `${buddy} و${host} يجدان النقطة.`,
       );
+    case "cubes":
+      return say(
+        `${buddy} and ${host} stack squishee cubes.`,
+        `${buddy} y ${host} apilan cubos squishee.`,
+        `${buddy} e ${host} empilham cubos squishee.`,
+        `${buddy} et ${host} empilent des cubes squishee.`,
+        `${buddy}和${host}一起搭squishee小方块。`,
+        `${buddy} और ${host} squishee घन जमाते हैं।`,
+        `${buddy} و${host} يرصّان مكعبات squishee.`,
+      );
     case "minute":
       return say(
         `${buddy} and ${host} read the clock.`,
