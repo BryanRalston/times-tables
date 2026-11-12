@@ -1350,6 +1350,7 @@ export const AR: Record<string, string> = {
   "They match": "إنهما متطابقان",
   "This backup is long. Use the code.": "هذه النسخة طويلة. استخدم الرمز.",
   "This game": "هذه اللعبة",
+  "This grade plays other games first.": "هذا الصف يلعب ألعاباً أخرى أولاً.",
   "This grade plays other games first. A grown-up can turn on challenge ahead in settings.": "هذا الصف يلعب ألعاباً أخرى أولاً. يستطيع أحد الكبار تشغيل التحدّي القادم في الإعدادات.",
   "This month has practice time.": "هذا الشهر فيه وقت تدريب.",
   "This page hit a bug. Close it and open the link again.": "حدث خلل في هذه الصفحة. أغلقها وافتح الرابط مرة أخرى.",

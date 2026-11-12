@@ -1350,6 +1350,7 @@ export const HI: Record<string, string> = {
   "They match": "वे मेल खाते हैं",
   "This backup is long. Use the code.": "यह बैकअप लंबा है। कोड का उपयोग करो।",
   "This game": "यह खेल",
+  "This grade plays other games first.": "यह कक्षा पहले दूसरे खेल खेलती है।",
   "This grade plays other games first. A grown-up can turn on challenge ahead in settings.": "यह कक्षा पहले दूसरे खेल खेलती है। बड़े सेटिंग में आगे की चुनौती चालू कर सकते हैं।",
   "This month has practice time.": "इस महीने अभ्यास का समय है।",
   "This page hit a bug. Close it and open the link again.": "इस पृष्ठ में गड़बड़ हुई। इसे बंद करो और लिंक फिर खोलो।",

@@ -832,6 +832,7 @@ export const ES: Record<string, string> = {
   "Yes! That pays the price.": "¡Sí! Así se paga.",
   "This game": "Este juego",
   "is coming later": "llega más adelante",
+  "This grade plays other games first.": "Este grado juega otros juegos primero.",
   "This grade plays other games first. A grown-up can turn on challenge ahead in settings.":
     "Este grado juega otros juegos primero. Un adulto puede prender un reto más adelante en Ajustes.",
   Home: "Inicio",

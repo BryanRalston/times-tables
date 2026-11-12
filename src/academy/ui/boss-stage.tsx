@@ -8,7 +8,7 @@ export function BossIntro({ boss, crown, onStart }: { boss: IslandBoss; crown: b
   return (
     <div className="ac-boss-intro" role="dialog" aria-label={t(`${boss.name} appears`, `${boss.name} aparece`, `${boss.name} aparece`, `${boss.name} apparaît`, `${boss.name}出现了`, `${boss.name} दिखता है`, `${boss.name} يظهر`)} data-boss-intro={boss.gameId}>
       <p className="ac-boss-kicker">{crown ? show("Gold Crown rematch") : show("Boss battle")}</p>
-      <BossFigure face={boss.face} look={boss.look} mood="arrive" crown={crown} name={boss.name} size="hero" />
+      <BossFigure face={boss.face} look={boss.look} mood="arrive" crown={crown} name={boss.name} size="hero" gameId={boss.gameId} />
       <p className="ac-boss-banner">{boss.name}</p>
       <p className="ac-boss-taunt">{boss.taunt}</p>
       <button type="button" className="ac-go" onClick={onStart}>
@@ -50,7 +50,7 @@ export function BossHud({
       </div>
       <div className="ac-boss-row">
         <SquisheeImg id={buddyId} squish="buddy" className={cx("ac-buddy", (mood === "hit" || mood === "dizzy") && "is-attack")} label="" />
-        <BossFigure face={boss.face} look={boss.look} mood={mood} crown={crown} name="" size="fight" />
+        <BossFigure face={boss.face} look={boss.look} mood={mood} crown={crown} name="" size="fight" gameId={boss.gameId} />
       </div>
       {phase === "rally" ? null : <p className={cx("ac-phase-banner", phase === "super" && "is-super")}>{bossPhaseLabel(phase)}</p>}
     </div>

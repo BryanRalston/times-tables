@@ -2262,7 +2262,25 @@ body:has(.ac-boss-intro) { background: #3c2448; }
 .ac-boss.is-hero { width: 180px; height: 210px; }
 .ac-boss-face { width: 72%; height: auto; position: relative; z-index: 1; }
 .ac-boss-face img { width: 100%; height: auto; display: block; }
-.ac-boss-cape, .ac-boss-gear { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ac-boss-gear { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; }
+.ac-boss-scene {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  width: 160%;
+  max-width: none;
+  height: auto;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle closest-side, #000 58%, transparent 100%);
+  mask-image: radial-gradient(circle closest-side, #000 58%, transparent 100%);
+}
+.ac-boss.is-fight .ac-boss-scene { width: 136%; }
+.ac-boss-face { filter: drop-shadow(0 8px 10px rgba(30, 12, 44, 0.4)); }
+.ac-done > .ac-boss.is-hero { margin: 40px auto 36px; }
 .ac-boss.is-arrive { animation: ac-boss-in 0.7s ease; }
 .ac-boss.is-idle { animation: ac-float 2.4s ease-in-out infinite; }
 .ac-boss.is-hit { animation: ac-wobble 0.45s ease; }

@@ -304,7 +304,7 @@ export function ShelfScreen({ save, onSave }: { save: Save; onSave: (save: Save)
           return (
             <article key={game.id} className={cx("ac-book-card", !friend && "is-locked")} data-boss-card={game.id} data-friend={friend ? "yes" : "no"}>
               {friend ? (
-                <BossFigure face={boss.face} look={boss.look} mood="friendly" crown={gold} name={boss.name} size="fight" />
+                <BossFigure face={boss.face} look={boss.look} mood="friendly" crown={gold} name={boss.name} size="fight" gameId={boss.gameId} />
               ) : (
                 <p className="ac-hint">???</p>
               )}

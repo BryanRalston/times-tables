@@ -3,40 +3,14 @@ import { lookForCosmetic, type BossLook } from "../bosses";
 import { squisheeUrl } from "../paths";
 import { AcademyPal, cx } from "./bits";
 import { Squishy } from "./squishy";
+import arenaScene from "../art/boss/arena.webp";
+import summitScene from "../art/boss/summit.webp";
 
 export type BossMood = "arrive" | "idle" | "hit" | "dizzy" | "raspberry" | "friendly";
 
-function capeFill(look: BossLook): string {
-  switch (look) {
-    case "crown":
-      return "#ff7eb3";
-    case "cape":
-      return "#b48cff";
-    case "armor":
-      return "#7ad7c8";
-    case "clock":
-      return "#f0b429";
-    case "coins":
-      return "#ffd56a";
-    case "spell":
-      return "#c9b6ff";
-    default: {
-      const neverLook: never = look;
-      return neverLook;
-    }
-  }
-}
-
-function Cape({ look }: { look: BossLook }) {
-  const fill = capeFill(look);
-  return (
-    <>
-      <path d="M78 78c-28 8-52 48-58 92 22-10 40-8 58 4 10-28 14-62 0-96Z" fill={fill} />
-      <path d="M122 78c28 8 52 48 58 92-22-10-40-8-58 4-10-28-14-62 0-96Z" fill={fill} />
-      <path d="M70 92h60l8 78H62Z" fill={fill} opacity="0.9" />
-      <path d="M100 96c8 18 8 36 0 70 8-34 16-52 28-70H72c12 18 20 36 28 70Z" fill="#fff" opacity="0.35" />
-    </>
-  );
+/** Painted backdrop behind every boss. Grade 5 Summit gets the mountain peak. */
+export function bossSceneUrl(gameId?: string): string {
+  return gameId === "summit" ? summitScene : arenaScene;
 }
 
 function Gear({ look, gold }: { look: BossLook; gold: boolean }) {
@@ -134,6 +108,7 @@ export function BossFigure({
   crown = false,
   name,
   size = "fight",
+  gameId,
 }: {
   face: string;
   look: BossLook;
@@ -141,14 +116,14 @@ export function BossFigure({
   crown?: boolean;
   name?: string;
   size?: "fight" | "hero";
+  /** Picks the painted scene; Summit gets the mountain. */
+  gameId?: string;
 }) {
   const s = squisheeById(face);
   const src = squisheeUrl(s?.file ?? "peach.png");
   return (
     <div className={cx("ac-boss", `is-${look}`, `is-${mood}`, `is-${size}`, crown && "is-gold")} data-mood={mood} data-look={look}>
-      <svg className="ac-boss-cape" viewBox="0 0 200 240" aria-hidden="true">
-        <Cape look={look} />
-      </svg>
+      <img className="ac-boss-scene" src={bossSceneUrl(gameId)} alt="" aria-hidden="true" draggable={false} width={560} height={560} />
       <Squishy id={face} className="ac-boss-face">
         <img src={src} alt={name ?? ""} draggable={false} />
       </Squishy>
