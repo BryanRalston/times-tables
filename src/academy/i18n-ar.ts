@@ -1697,6 +1697,8 @@ export const AR: Record<string, string> = {
   "Walk the fence, then pick an answer.": "در حول الشكل، ثم اختر إجابة.",
   "Put a number on the blank.": "ضع عددًا في الفراغ.",
   "Cookies to share": "بسكويت للتوزيع",
+  "More games": "ألعاب أخرى",
+  "Today": "اليوم",
   "Tap a picture, then tap its group.": "المس صورة، ثم المس مجموعتها.",
   "Tap the cookies to put one on a plate.": "المس البسكويت لتضع قطعة على طبق.",
   "Plate": "طبق",

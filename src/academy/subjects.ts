@@ -1,3 +1,4 @@
+import { skillHeat, skillKeyForLevel } from "./adapt";
 import { GAME_CARDS as GAMES, gameCard } from "./games/catalog";
 import { gameOffered } from "./games/offer";
 import { tierKey, tierWindow, type Tier } from "./grade-map";
@@ -5,6 +6,7 @@ import { t } from "./i18n";
 import { bossReady, normalizeJourney, subjectSpot } from "./journey";
 import type { Child } from "./model";
 import { nextPlacement, type PlacementReason } from "./placement";
+import { levelStones } from "./stones";
 import { READING_GAMES, SPELLING_GAMES } from "./subject-games";
 
 /**
@@ -102,34 +104,60 @@ export interface NextStep {
   /** Empty when the subject has only the story shelf here. */
   game: string;
   level: string;
+  /** The level's number on its stepping stone (0 for the story shelf). */
+  num: number;
   reason: NextReason;
   /** The hash Continue / Next opens. */
   href: string;
 }
 
+/** Tried 2+ times and still under 80% right. */
+function stillMissed(child: Learner, gameId: string, level: string): boolean {
+  const stat = child.skills[skillKeyForLevel(gameId, level)];
+  if (!stat) return false;
+  const n = stat.ok + stat.miss;
+  return n >= 2 && stat.miss >= 1 && stat.ok / n < 0.8;
+}
+
+function stoneNum(gameId: string, level: string): number {
+  return gameCard(gameId)?.levels.find((row) => row.id === level)?.num ?? 0;
+}
+
 /**
- * THE one "what's next" rule. Home Continue and the round-end Next both call this.
+ * THE one "what's next" rule. Home Continue, each subject's Continue and the
+ * round-end Next all call this. It walks the subject's own path, so a kid never
+ * has to figure out where to go:
  *
- * 1. A weak skill in this subject comes first (2+ tries, under 80% right).
- * 2. Otherwise, if the island path stands at a ready boss in this subject, face the boss.
- * 3. Otherwise the usual placement inside this subject: step up a mastered level,
- *    start a first game, or review the least-sure skill.
- * A subject with no game here (Reading in zh/hi/ar) continues to the story shelf.
+ * 1. Stand on the island the subject's path is at (the chosen grade decides
+ *    where a new visitor starts: grade 3 Math starts on Times Tables).
+ * 2. A level on this island the kid is still missing comes back first.
+ * 3. Otherwise, if the boss stone is ready, face the boss.
+ * 4. Otherwise the next unfinished level stone, in level order, from the one
+ *    the kid is on. When every stone is mastered, keep the last one.
+ * Other islands' weak skills never pull Continue off the path; they show under
+ * More games. A subject with no game here (Reading in zh/hi/ar) continues to
+ * the story shelf.
  */
 export function nextFor(child: Learner, id: SubjectId): NextStep {
   const trail = subjectTrail(child, id);
-  if (trail.length === 0) return { subject: id, game: "", level: "", reason: "stories", href: "#/stories" };
-  const place = nextPlacement(child, trail);
-  const spot = subjectSpot(normalizeJourney(child.journey, child.grade), id);
-  if (place.reason !== "weak" && trail.includes(spot.areaId) && bossReady(child.journey, spot.areaId, child.grade)) {
-    const ids = allowedIds(child, spot.areaId);
-    const saved = child.levels[spot.areaId] ?? "";
-    const level = ids.includes(saved) ? saved : (ids[0] ?? place.level);
-    return { subject: id, game: spot.areaId, level, reason: "boss", href: `#/play/${spot.areaId}` };
+  if (trail.length === 0) return { subject: id, game: "", level: "", num: 0, reason: "stories", href: "#/stories" };
+  const spot = subjectSpot(normalizeJourney(child.journey, child.grade), id, child.grade);
+  const game = trail.includes(spot.areaId) ? spot.areaId : trail[0]!;
+  const href = `#/play/${game}`;
+  const stones = levelStones(child, game);
+  const ids = stones.map((row) => row.level);
+  const nowAt = Math.max(0, stones.findIndex((row) => row.state === "now"));
+  const missed = ids.slice(0, nowAt + 1).find((level) => stillMissed(child, game, level));
+  if (missed) return { subject: id, game, level: missed, num: stoneNum(game, missed), reason: "weak", href };
+  if (bossReady(child.journey, game, child.grade)) {
+    const level = ids[nowAt] ?? ids[0] ?? "";
+    return { subject: id, game, level, num: stoneNum(game, level), reason: "boss", href };
   }
-  const game = trail.includes(place.game) ? place.game : trail[0]!;
-  const level = game === place.game ? place.level : (allowedIds(child, game)[0] ?? "");
-  return { subject: id, game, level, reason: game === place.game ? place.reason : "start", href: `#/play/${game}` };
+  const ahead = ids.slice(nowAt);
+  const level = ahead.find((row) => skillHeat(child.skills[skillKeyForLevel(game, row)]) !== "mastered") ?? ids[ids.length - 1] ?? "";
+  const seen = skillHeat(child.skills[skillKeyForLevel(game, level)]) !== "new";
+  const reason: NextReason = ids.indexOf(level) > nowAt ? "stretch" : seen ? "review" : "start";
+  return { subject: id, game, level, num: stoneNum(game, level), reason, href };
 }
 
 export interface TodayPick {

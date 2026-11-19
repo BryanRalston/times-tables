@@ -1724,6 +1724,8 @@ export const PT: Record<string, string> = {
   "Walk the fence, then pick an answer.": "Percorra a cerca e depois escolha.",
   "Put a number on the blank.": "Ponha um número no espaço.",
   "Cookies to share": "Biscoitos para repartir",
+  "More games": "Mais jogos",
+  "Today": "Hoje",
   "Tap a picture, then tap its group.": "Toque em um desenho e depois no grupo dele.",
   "Tap the cookies to put one on a plate.": "Toque nos biscoitos para pôr um no prato.",
   "Plate": "Prato",

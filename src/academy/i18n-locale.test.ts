@@ -190,7 +190,7 @@ describe("playtest leaks", () => {
 
   it("translates the Chinese island lock instead of leaving the English game name", () => {
     setLocale("zh");
-    const html = renderToStaticMarkup(createElement(MapScreen, { child: blankChild({ name: "Lin", grade: "2" }), onOpenEgg: () => {} }));
+    const html = renderToStaticMarkup(createElement(MapScreen, { child: blankChild({ name: "Lin", grade: "3" }), onOpenEgg: () => {} }));
     expect(html).toContain("打败乘法表的大魔王。");
     expect(html).not.toMatch(/打败[A-Za-z]/);
   });

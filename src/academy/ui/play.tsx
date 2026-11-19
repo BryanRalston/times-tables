@@ -35,7 +35,7 @@ import { cardStepLabel, cardsRoundLabel, getLocale, remainderShown, show, t, you
 import { bossReady, bossWon } from "../journey";
 import { LevelStones } from "./level-stones";
 import { nextFor, subjectOf } from "../subjects";
-import { nextAction } from "./next-copy";
+import { nextAction, stepLine } from "./next-copy";
 import {
   autoSpeakGrade,
   calmGrade,
@@ -884,9 +884,9 @@ export function PlayScreen({
     );
   }
 
+  // The big Next keeps walking this subject's path: the next stone, or the boss.
   const nextStep = nextFor(child, subjectOf(game));
-  const sameNext = nextStep.game === game && nextStep.reason !== "boss";
-  const nextCopy = { ...nextAction(nextStep, "done"), ...(sameNext ? { action: show("Play again") } : {}) };
+  const nextCopy = { ...nextAction(nextStep, "done"), title: stepLine(nextStep) };
   const fightPhase = boss ? phaseForIndex(index, total) : "rally";
   const bossWonRound = boss && bossWon(correct, total);
   const maxEnergy = bossMaxEnergy(BOSS_LENGTH, crownFight);

@@ -61,14 +61,15 @@ describe("island map", () => {
   });
 
   it("moves the saved journey when a round in the current area ends", () => {
+    // Grade 1 Math starts on Add & Subtract.
     const child = blankChild({ id: "kid", name: "Maya", grade: "1" });
     const next = applyRound(
       child,
-      { game: GAMES[0]!.id, correct: 8, total: 10, seconds: 40, answers: [], bestCombo: 2, boss: false },
+      { game: "add", correct: 8, total: 10, seconds: 40, answers: [], bestCombo: 2, boss: false },
       "2026-10-09",
     );
     expect(next.journey.stop).toBe(1);
-    expect(next.journey.areaId).toBe(GAMES[0]!.id);
+    expect(next.journey.areaId).toBe("add");
   });
 
   it("mixes a short boss round that is one level harder", () => {

@@ -1697,6 +1697,8 @@ export const HI: Record<string, string> = {
   "Walk the fence, then pick an answer.": "बाड़ पर चलो, फिर उत्तर चुनो।",
   "Put a number on the blank.": "खाली जगह पर एक संख्या रखो।",
   "Cookies to share": "बाँटने के बिस्कुट",
+  "More games": "और खेल",
+  "Today": "आज",
   "Tap a picture, then tap its group.": "एक चित्र छुओ, फिर उसका समूह छुओ।",
   "Tap the cookies to put one on a plate.": "बिस्कुट छुओ, एक प्लेट पर रखो।",
   "Plate": "प्लेट",
