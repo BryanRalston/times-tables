@@ -135,7 +135,8 @@ export function makeAddQuestion(rng: Rng, level: AddLevel, prefer: readonly stri
     pink = total - teal;
     solved = `${total} ${MINUS} ${teal} = ${pink}`;
   }
-  const { left, right, result, hidden } = placeHidden(op, pink, teal, rollHide(op, roll, wish.hide));
+  const hide = rollHide(op, roll, wish.hide);
+  const { left, right, result, hidden } = placeHidden(op, pink, teal, hide);
 
   const tags: string[] = [];
   if (op === "+" && pink === teal) tags.push("doubles");
@@ -145,7 +146,7 @@ export function makeAddQuestion(rng: Rng, level: AddLevel, prefer: readonly stri
   return {
     id: qid(rng),
     game: "add",
-    title: addTitle(rng, op),
+    title: addTitle(rng, op, hide, pink + teal, hide === "right" ? pink : teal),
     hint: max <= 20 ? t("Count the dots", "Cuenta los puntos") : t("Count the tens and the ones", "Cuenta las decenas y las unidades"),
     praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`, `Sim! ${solved}`, `Oui ! ${solved}`, `对！${solved}`, `हाँ! ${solved}`, `نعم! ${solved}`),
     almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`, `Quase! ${solved}`, `Presque ! ${solved}`, `差一点！${solved}`, `लगभग! ${solved}`, `تقريبًا! ${solved}`),
@@ -157,24 +158,39 @@ export function makeAddQuestion(rng: Rng, level: AddLevel, prefer: readonly stri
   };
 }
 
+/** Biggest count-up gap a kid is asked to count by ones. Past this, or past 20, count tens then ones. */
+export const COUNT_UP_MAX_GAP = 10;
+
+/** True when a missing part is small enough to count up to by ones: a gap of 10 or less, within 20. */
+export function countsUpByOnes(from: number, to: number): boolean {
+  return to <= COUNT_ON_MAX && to - from <= COUNT_UP_MAX_GAP;
+}
+
 /**
  * What the buddy says on an Addition card. It points at the group that is the answer:
  * all of them for a sum, the ones left for a difference, and counting on for a missing part.
- * Big numbers count tens and ones. Empty when no picture backs the line up.
+ * A big missing part counts tens, then ones. Big numbers count tens and ones.
+ * Empty when no picture backs the line up.
  */
 export function addCountLine(visual: { op: "+" | "-"; left: number | null; right: number | null; result: number | null; pink: number; teal: number; max: number }): string {
   if (visual.max > 100) return "";
-  if (visual.max > 20) return t("Count the tens and the ones", "Cuenta las decenas y las unidades");
   const hide = addHideOf(visual);
   const total = visual.pink + visual.teal;
+  const from = visual.op === "+" ? (hide === "right" ? visual.pink : visual.teal) : visual.pink;
+  const missingPart = visual.op === "+" ? hide !== "result" : hide === "right";
+  if (missingPart) return countsUpByOnes(from, total) ? countUpLine(from, total) : tensThenOnesLine();
+  if (visual.max > 20) return t("Count the tens and the ones", "Cuenta las decenas y las unidades");
   if (visual.op === "+") {
     if (hide === "result") return t("Count all of them.", "Cuéntalos todos.", "Conte todos.", "Compte-les tous.", "全部数一数。", "सबको गिनो।", "عُدَّها كلها.");
-    const known = hide === "right" ? visual.pink : visual.teal;
-    return countUpLine(known, total);
+    return countUpLine(from, total);
   }
   if (hide === "result") return t("Count the ones left.", "Cuenta los que quedan.", "Conte os que sobraram.", "Compte ceux qui restent.", "数一数剩下的。", "बचे हुए गिनो।", "عُدَّ الباقي.");
   if (hide === "right") return countUpLine(visual.pink, total);
   return t("Count all of them.", "Cuéntalos todos.", "Conte todos.", "Compte-les tous.", "全部数一数。", "सबको गिनो।", "عُدَّها كلها.");
+}
+
+function tensThenOnesLine(): string {
+  return t("Count the tens, then the ones.", "Cuenta las decenas y luego las unidades.", "Conte as dezenas e depois as unidades.", "Compte les dizaines, puis les unités.", "先数几个十，再数几个一。", "पहले दहाई गिनो, फिर इकाई।", "عُدَّ العشرات، ثم الآحاد.");
 }
 
 function countUpLine(from: number, to: number): string {
@@ -189,19 +205,33 @@ function countUpLine(from: number, to: number): string {
   );
 }
 
-function addTitle(rng: Rng, op: "+" | "-"): string {
-  if (op === "+") {
-    return pickTalk(rng, [
-      ["Tap the missing number!", "¡Toca el número que falta!"],
-      ["Count on. Tap the missing number!", "Sigue contando. ¡Toca el número que falta!"],
-      ["What number is hiding?", "¿Qué número se esconde?"],
-    ]);
+const TAP_MISSING = ["Tap the missing number!", "¡Toca el número que falta!"] as const;
+const WHAT_HIDING = ["What number is hiding?", "¿Qué número se esconde?"] as const;
+const COUNT_ON = ["Count on. Tap the missing number!", "Sigue contando. ¡Toca el número que falta!"] as const;
+const WHAT_LEFT = ["What is left?", "¿Cuánto queda?", "Quanto sobrou?", "Combien en reste-t-il ?", "还剩多少？", "कितने बचे?", "كم بقي؟"] as const;
+const TAKEN_AWAY = ["How many were taken away?", "¿Cuántos se quitaron?", "Quantos foram tirados?", "Combien en a-t-on enlevé ?", "拿走了多少？", "कितने हटाए गए?", "كم أُخِذ؟"] as const;
+
+/** Largest number on a card where counting on by ones still makes sense. */
+export const COUNT_ON_MAX = 20;
+
+/**
+ * Title lines that fit the hidden number. "Count on" only names a hidden addend the kid can count up to
+ * by ones (see countsUpByOnes). `known` is the addend that shows.
+ * Minus says what it asks: the part taken away, or what is left. A hidden start stays neutral.
+ */
+export function addTitleLines(op: "+" | "-", hide: AddHide, total: number, known = total): readonly (readonly [string, string, ...string[]])[] {
+  if (op === "-") {
+    if (hide === "result") return [WHAT_LEFT];
+    if (hide === "right") return [TAKEN_AWAY];
+    return [TAP_MISSING, WHAT_HIDING];
   }
-  return pickTalk(rng, [
-    ["Tap the missing number!", "¡Toca el número que falta!"],
-    ["What number is hiding?", "¿Qué número se esconde?"],
-    ["Count on. Tap the missing number!", "Sigue contando. ¡Toca el número que falta!"],
-  ]);
+  if (hide !== "result" && countsUpByOnes(known, total)) return [TAP_MISSING, COUNT_ON, WHAT_HIDING];
+  return [TAP_MISSING, WHAT_HIDING];
+}
+
+/** One RNG draw on every path, so the rest of the card rolls the same as before. */
+function addTitle(rng: Rng, op: "+" | "-", hide: AddHide, total: number, known: number): string {
+  return pickTalk(rng, addTitleLines(op, hide, total, known));
 }
 
 function makeTensQuestion(rng: Rng, prefer: readonly string[] = []): ChoiceQ {
@@ -212,11 +242,12 @@ function makeTensQuestion(rng: Rng, prefer: readonly string[] = []): ChoiceQ {
   const { op, pink, teal, total } = fact;
   const roll = rng.next();
   const solved = op === "+" ? `${pink} + ${teal} = ${total}` : `${total} ${MINUS} ${teal} = ${pink}`;
-  const { left, right, result, hidden } = placeHidden(op, pink, teal, rollHide(op, roll, wish.op && fact.op !== wish.op ? undefined : wish.hide));
+  const hide = rollHide(op, roll, wish.op && fact.op !== wish.op ? undefined : wish.hide);
+  const { left, right, result, hidden } = placeHidden(op, pink, teal, hide);
   return {
     id: qid(rng),
     game: "add",
-    title: addTitle(rng, op),
+    title: addTitle(rng, op, hide, total, hide === "right" ? pink : teal),
     hint: t("Count the tens and the ones", "Cuenta las decenas y las unidades"),
     praise: t(`Yes! ${solved}`, `¡Sí! ${solved}`, `Sim! ${solved}`, `Oui ! ${solved}`, `对！${solved}`, `हाँ! ${solved}`, `نعم! ${solved}`),
     almost: t(`Almost! ${solved}`, `¡Casi! ${solved}`, `Quase! ${solved}`, `Presque ! ${solved}`, `差一点！${solved}`, `लगभग! ${solved}`, `تقريبًا! ${solved}`),

@@ -110,9 +110,10 @@ describe("Addition buddy line", () => {
       } else if (v.op === "+" || hide === "right") {
         const known = v.op === "+" ? (hide === "right" ? v.pink : v.teal) : v.pink;
         const total = v.pink + v.teal;
-        expect(line).toBe(`Start at ${known}. Count up to ${total}.`);
         // Counting on from the known part lands on the answer.
         expect(total - known).toBe(v.hidden);
+        // A gap past 10 counts tens, then ones, instead of counting by ones.
+        expect(line).toBe(total - known <= 10 ? `Start at ${known}. Count up to ${total}.` : "Count the tens, then the ones.");
       } else {
         expect(line).toBe("Count all of them.");
         expect(v.pink + v.teal).toBe(v.hidden);

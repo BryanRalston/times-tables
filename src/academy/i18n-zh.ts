@@ -757,6 +757,7 @@ export const ZH: Record<string, string> = {
   "Count the squares.": "数正方形。",
   "Count the squishees and try again.": "数一数squishees，再试一次。",
   "Count the tens and the ones": "数十位和个位",
+  "Count the tens, then the ones.": "先数几个十，再数几个一。",
   "Count all of them.": "全部数一数。",
   "Count the ones left.": "数一数剩下的。",
   "Count to 10": "数到10",

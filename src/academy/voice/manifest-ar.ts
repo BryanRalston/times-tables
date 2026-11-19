@@ -3806,5 +3806,7 @@ export const VOICE_FILES_AR: Record<string, string> = {
   "يوزع": "ar/clip-9de74ed9.mp3",
   "يُظهر": "ar/clip-7c484529.mp3",
   "يُقرَّب": "ar/clip-8204c63e.mp3",
-  "يُقرَّب إلى": "ar/clip-65274a6a.mp3"
+  "يُقرَّب إلى": "ar/clip-65274a6a.mp3",
+  "أُخِذ": "ar/clip-30f0850c.mp3",
+  "كم أُخِذ": "ar/clip-806099c7.mp3"
 };

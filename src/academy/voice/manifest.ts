@@ -5064,5 +5064,8 @@ export const VOICE_FILES: Record<string, string> = {
   "zesty": "core/zesty-8c3b2d9b.mp3",
   "zesty streak": "core/zesty-streak-02ca1c20.mp3",
   "zoo": "lazy/zoo-8971acfc.mp3",
-  "zzz": "lazy/zzz-74be33fb.mp3"
+  "zzz": "lazy/zzz-74be33fb.mp3",
+  "how many were taken away": "core/how-many-were-taken-away-47a73e59.mp3",
+  "taken": "core/taken-a03bc2fa.mp3",
+  "what is left": "core/what-is-left-d34febde.mp3"
 };
