@@ -4285,3 +4285,123 @@ button.ac-go.ac-next {
   .ac-shell:not(.is-boss) .ac-stage-copy .ac-choices.is-stack { gap: 6px; }
   .ac-shell:not(.is-boss) .ac-stage-copy .ac-choice.is-sentence { min-height: 48px; padding: 6px 12px; font-size: 17px; line-height: 1.2; }
 }
+
+/* Home: the buddy plus ONE giant Continue, small subject chips, the path just below,
+   and every other game under More games. A kid never has to figure out where to go. */
+.ac-home-hero h1 { font-size: clamp(26px, 7vw, 36px); margin: 0 0 10px; }
+.ac-play-stage button.ac-go.ac-continue,
+button.ac-go.ac-continue {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  width: 100%;
+  min-height: 112px;
+  padding: 12px 18px 12px 12px;
+  border-radius: 30px;
+  text-align: start;
+}
+.ac-continue .ac-continue-pic {
+  flex: none;
+  width: 76px;
+  height: 76px;
+  padding: 6px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  object-fit: contain;
+}
+.ac-continue .ac-play-copy { flex: 1; align-items: flex-start; text-align: start; }
+.ac-continue .ac-play-copy strong { font-size: clamp(32px, 9vw, 42px); }
+.ac-continue .ac-play-copy small { font-size: 17px; }
+.ac-continue > svg { flex: none; width: 30px; height: 30px; }
+.ac-continue.is-map { margin: 0 0 14px; }
+.ac-subjects.is-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+.ac-subjects.is-chips .ac-subject {
+  flex-direction: row;
+  gap: 6px;
+  min-height: 44px;
+  padding: 4px 14px 4px 6px;
+  border-width: 2px;
+  border-radius: 999px;
+  font-size: 15px;
+  box-shadow: 0 3px 0 var(--ac-line);
+}
+.ac-subjects.is-chips .ac-subject img,
+.ac-subjects.is-chips .ac-subject .ac-squish { width: 32px; height: 32px; }
+.ac-subjects.is-chips .ac-subject.is-on { box-shadow: 0 3px 0 var(--ac-teal-deep); }
+.ac-trail {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: var(--ac-radius-lg);
+  background: #fff;
+  box-shadow: var(--ac-elev-card);
+}
+.ac-trail-head { display: flex; align-items: center; gap: 10px; }
+.ac-trail-head img, .ac-trail-head .ac-squish { width: 48px; height: 48px; object-fit: contain; }
+.ac-trail-head h2 { margin: 0; font-size: 22px; }
+.ac-trail .ac-map-link { margin-top: 10px; }
+.ac-more {
+  margin-top: 16px;
+  border-radius: var(--ac-radius-lg);
+  background: #fff;
+  box-shadow: var(--ac-elev-card);
+}
+.ac-more > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 56px;
+  padding: 8px 18px;
+  font-family: var(--ac-display);
+  font-size: 20px;
+  cursor: pointer;
+  list-style: none;
+}
+.ac-more > summary::-webkit-details-marker { display: none; }
+.ac-more > summary::after { content: "⌄"; font-size: 22px; color: var(--ac-muted); }
+.ac-more[open] > summary::after { content: "⌃"; }
+.ac-more > summary small { margin-inline-start: auto; color: var(--ac-muted); font-family: inherit; font-size: 14px; font-weight: 800; }
+.ac-more > summary:focus-visible { outline: 3px solid var(--ac-pink); outline-offset: 2px; border-radius: var(--ac-radius-lg); }
+.ac-more .ac-foryou { margin-top: 0; box-shadow: none; padding-top: 4px; }
+.ac-more-grid { padding: 0 14px 14px; }
+.ac-home-about { margin-top: 16px; text-align: center; }
+.ac-home-about .ac-lede { margin: 0 0 6px; font-size: 15px; }
+.ac-home-hero .ac-play-stage { grid-template-columns: minmax(0, 1fr); }
+.ac-home-hero .ac-play-pal { grid-template-columns: 84px minmax(0, 1fr); }
+.ac-home-hero .ac-play-pal .ac-pals img,
+.ac-home-hero .ac-play-pal .ac-wear.is-mid { width: 80px; height: 80px; }
+button.ac-go.ac-continue { box-sizing: border-box; min-width: 0; max-width: 100%; margin: 0; }
+.ac-subjects.is-chips { flex-wrap: nowrap; gap: 6px; }
+.ac-subjects.is-chips .ac-subject { flex: 0 1 auto; min-width: 0; padding: 4px 12px 4px 4px; font-size: 15px; }
+.ac-subjects.is-chips .ac-subject img,
+.ac-subjects.is-chips .ac-subject .ac-squish { width: 30px; height: 30px; }
+.ac-today-box {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: var(--ac-radius-lg);
+  background: #fff;
+  box-shadow: var(--ac-elev-card);
+  text-align: center;
+}
+.ac-today-box .ac-daily { margin-top: 0; }
+@media (max-width: 600px) {
+  .ac-home-hero { padding: 12px 12px 14px; }
+  .ac-home-hero h1 { font-size: 24px; margin-bottom: 8px; }
+  .ac-home-hero .ac-play-stage { padding: 10px; gap: 8px; margin-bottom: 10px; }
+  .ac-home-hero .ac-play-pal { grid-template-columns: 68px minmax(0, 1fr); }
+  .ac-home-hero .ac-play-pal .ac-pals img,
+  .ac-home-hero .ac-play-pal .ac-wear.is-mid { width: 64px; height: 64px; }
+  button.ac-go.ac-continue { min-height: 100px; gap: 10px; padding: 10px 14px 10px 10px; }
+  .ac-continue .ac-continue-pic { width: 64px; height: 64px; }
+  .ac-continue .ac-play-copy strong { font-size: 34px; }
+  .ac-continue .ac-play-copy small { font-size: 16px; }
+  .ac-subjects.is-chips .ac-subject { padding: 3px 10px 3px 3px; font-size: 14px; }
+  .ac-home-hero ~ .ac-trail { margin-top: 12px; }
+}

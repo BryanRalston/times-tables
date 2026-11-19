@@ -13,11 +13,12 @@ import { subjectKeyOf } from "../subject-games";
 import { LevelStones } from "./level-stones";
 import { show, t } from "../i18n";
 import { DAILY_GOAL, todayIso, type Child } from "../model";
-import { AcademyPal, BackLink, Foot, LockIcon, Logo, cx } from "./bits";
+import { AcademyPal, BackLink, Foot, LockIcon, Logo, PlayMark, SquisheeImg, cx } from "./bits";
 import { PalWithLook } from "./boss-figure";
 import { EggIcon } from "./buddy-view";
 import { islandLabel } from "./home";
-import { playHref, subjectById, type SubjectId } from "../subjects";
+import { nextFor, playHref, subjectById, type SubjectId } from "../subjects";
+import { nextAction, stepLine } from "./next-copy";
 
 export function MapScreen({
   child,
@@ -47,6 +48,7 @@ export function MapScreen({
       </header>
       <h1>{subject ? islandLabel(subject) : show("Island map")}</h1>
       <p className="ac-lede">{t("Finish a round to hop. Beat the boss to befriend the host.", "Termina una ronda para saltar. Vence al jefe para hacerte amigo del anfitrión.")}</p>
+      {subject ? <SubjectContinue child={child} subject={subject} onPlayLevel={onPlayLevel} /> : null}
       <div className="ac-egg-card" data-egg={eggReady ? "ready" : eggOpen ? "open" : "wait"}>
         <EggIcon ready={eggReady} />
         {eggReady ? (
@@ -173,5 +175,42 @@ export function MapScreen({
         </div>
       ) : null}
     </div>
+  );
+}
+
+/** Each subject keeps its own Continue: the same next stone as Home, on this subject's path. */
+function SubjectContinue({
+  child,
+  subject,
+  onPlayLevel,
+}: {
+  child: Child;
+  subject: SubjectId;
+  onPlayLevel?: (gameId: string, level: string) => void;
+}) {
+  const step = nextFor(child, subject);
+  const copy = nextAction(step, "home");
+  const line = stepLine(step);
+  return (
+    <button
+      type="button"
+      className="ac-go ac-play-main ac-continue is-map"
+      data-continue={subject}
+      data-play-game={step.game}
+      data-play-level={step.level}
+      data-placement={step.reason}
+      aria-label={`${copy.action}. ${line}`}
+      onClick={() => {
+        if (step.game && onPlayLevel) onPlayLevel(step.game, step.level);
+        else window.location.hash = step.game ? playHref(step.game, "map") : step.href;
+      }}
+    >
+      <SquisheeImg id={subjectById(subject).icon} squish="off" className="ac-continue-pic" />
+      <span className="ac-play-copy">
+        <strong>{copy.action}</strong>
+        <small>{line}</small>
+      </span>
+      <PlayMark />
+    </button>
   );
 }

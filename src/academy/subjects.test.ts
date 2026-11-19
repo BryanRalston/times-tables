@@ -98,9 +98,11 @@ describe("one next rule", () => {
     expect(step).toMatchObject({ game: "times", reason: "boss" });
   });
 
-  it("a weak skill in the subject comes before the boss", () => {
-    const child = bossKid({ skills: { "add:within1000": { ok: 1, miss: 4 } } as Child["skills"] });
-    expect(nextFor(child, "math")).toMatchObject({ game: "add", reason: "weak" });
+  it("a weak skill on this island comes before the boss; another island's does not pull Continue off the path", () => {
+    const here = bossKid({ skills: { "times:toTen": { ok: 1, miss: 4 } } as Child["skills"] });
+    expect(nextFor(here, "math")).toMatchObject({ game: "times", level: "toTen", reason: "weak" });
+    const elsewhere = bossKid({ skills: { "add:within1000": { ok: 1, miss: 4 } } as Child["skills"] });
+    expect(nextFor(elsewhere, "math")).toMatchObject({ game: "times", reason: "boss" });
   });
 
   it("a weak skill in another subject does not hide this subject's boss", () => {
@@ -118,7 +120,7 @@ describe("one next rule", () => {
     expect(html).toContain('data-play-game="times"');
     expect(html).toContain('data-placement="boss"');
     expect(html).toContain('href="#/map/math"');
-    expect(html).toContain('href="#/games/math"');
+    expect(html).toContain('data-more="math"');
     expect(html.match(/href="#\/map/g)).toHaveLength(1);
   });
 });

@@ -20,6 +20,14 @@ export function nextAction(step: NextStep, where: "home" | "done"): { action: st
   return { action: where === "home" ? continueWord() : nextWord(), title, picture: mascotFor(step.game) };
 }
 
+/** The small line under Continue / Next: "Times Tables · Level 4", "Times Tables · Boss", or "Stories". */
+export function stepLine(step: NextStep): string {
+  if (step.reason === "stories" || !step.game) return show("Stories");
+  const title = show(gameTitle(step.game));
+  if (step.reason === "boss") return `${title} · ${pickTag("boss")}`;
+  return step.num > 0 ? `${title} · ${show("Level")} ${step.num}` : title;
+}
+
 export function continueWord(): string {
   return t("Continue", "Continuar", "Continuar", "Continuer", "继续", "आगे खेलो", "تابع");
 }

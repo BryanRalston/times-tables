@@ -3,14 +3,15 @@ import { squisheeById } from "@/lib/squishees";
 import { bondName, bondScore, bondTier } from "../buddy/bond";
 import { bookEntries, catchphrase } from "../buddy/cast";
 import { ownedIds } from "../buddy/unlock";
-import { GAME_CARDS as GAMES } from "../games/catalog";
+import { GAME_CARDS as GAMES, gameCard } from "../games/catalog";
 import { bandFor } from "../grade-map";
 import { dailySnapshot, normalizeJourney, subjectSpot } from "../journey";
 import { show, t } from "../i18n";
 import { todayIso, type AppLang, type Child } from "../model";
 import { todayPlayLine } from "../placement";
-import { activeSubject, forYouToday, nextFor, playHref, subjectById, subjectGames, subjectName, subjectTrail, visibleSubjects, type SubjectId } from "../subjects";
-import { nextAction, pickTag } from "./next-copy";
+import { activeSubject, forYouToday, nextFor, playHref, subjectById, subjectGames, subjectName, visibleSubjects, type SubjectId } from "../subjects";
+import { nextAction, pickTag, stepLine } from "./next-copy";
+import { LevelStones } from "./level-stones";
 import { rollGift, type GiftRoll } from "../rewards";
 import { outfitLabel } from "../wardrobe";
 import { chime } from "../sound";
@@ -38,6 +39,7 @@ export function HomeScreen({
   onPlay: (game: string, level: string) => void;
 }) {
   const [prize, setPrize] = useState<GiftRoll | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
   const todayId = todayIso();
   const daily = dailySnapshot(child, todayId);
   const subject = activeSubject(child);
@@ -45,14 +47,17 @@ export function HomeScreen({
   const step = nextFor(child, subject);
   const copy = nextAction(step, "home");
   const todayLine = todayPlayLine(copy.title, child.grade);
+  const line = stepLine(step);
   const picks = forYouToday(child, subject);
   const info = subjectById(subject);
   const more = subjectGames(subject);
   const book = bookEntries();
   const palTier = bondTier(bondScore(child.bonds, child.avatarId));
+  const journey = normalizeJourney(child.journey, child.grade);
+  const islandGame = step.game ? gameCard(step.game) : undefined;
 
   return (
-    <div className={cx("ac-shell", child.grade === "PK" && "is-prek")}>
+    <div className={cx("ac-shell", child.grade === "PK" && "is-prek")} data-home="continue">
       <header className="ac-top">
         <Logo />
         <div className="ac-top-tools">
@@ -60,14 +65,45 @@ export function HomeScreen({
         </div>
       </header>
 
-      <section className="ac-hero">
+      <section className="ac-hero ac-home-hero">
         <h1>
           {t(`Hi ${child.name}! Ready to play?`, `¡Hola ${child.name}! ¿Listo para jugar?`, `Oi ${child.name}! Vamos jogar?`, `Salut ${child.name} ! Tu veux jouer ?`, `${child.name}，你好！准备好玩了吗？`, `नमस्ते ${child.name}! खेलने के लिए तैयार?`, `مرحبًا ${child.name}! هل أنت مستعد للعب؟`)}
         </h1>
-        <p className="ac-lede">{show("Short games · hop the island · collect squishees")}</p>
-        <PlayLanguages />
+        <div className="ac-play-stage">
+          <div className="ac-play-pal">
+            <div className="ac-pals">
+              <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="is-mid" label={child.name} />
+            </div>
+            <p className="ac-bubble">{catchphrase(child.avatarId)}</p>
+            <p className="ac-bond" data-bond={palTier}>
+              {squisheeById(child.avatarId)?.name ?? show("Buddy")} · {bondName(palTier)}
+            </p>
+          </div>
+          {/* THE one big button: the next stone on this subject's path. */}
+          <button
+            type="button"
+            className="ac-go ac-play-main ac-continue"
+            data-continue={subject}
+            data-subject={subject}
+            data-placement={step.reason}
+            data-play-game={step.game}
+            data-play-level={step.level}
+            aria-label={`${copy.action}. ${line}. ${todayLine}`}
+            onClick={() => {
+              if (step.game) onPlay(step.game, step.level);
+              else window.location.hash = step.href;
+            }}
+          >
+            <SquisheeImg id={info.icon} squish="off" className="ac-continue-pic" />
+            <span className="ac-play-copy">
+              <strong>{copy.action}</strong>
+              <small>{line}</small>
+            </span>
+            <PlayMark />
+          </button>
+        </div>
         {subjects.length > 1 ? (
-          <div className="ac-subjects" role="tablist" aria-label={t("Subjects", "Materias", "Matérias", "Matières", "科目", "विषय", "المواد")}>
+          <div className="ac-subjects is-chips" role="tablist" aria-label={t("Subjects", "Materias", "Matérias", "Matières", "科目", "विषय", "المواد")}>
             {subjects.map((row) => (
               <button
                 key={row.id}
@@ -84,36 +120,30 @@ export function HomeScreen({
             ))}
           </div>
         ) : null}
-        <div className="ac-play-stage">
-          <div className="ac-play-pal">
-            <div className="ac-pals">
-              <PalWithLook id={child.avatarId} cosmetic={child.equipped} lookId={child.equippedLook} className="is-mid" label={child.name} />
-            </div>
-            <p className="ac-bubble">{catchphrase(child.avatarId)}</p>
-            <p className="ac-bond" data-bond={palTier}>
-              {squisheeById(child.avatarId)?.name ?? show("Buddy")} · {bondName(palTier)}
-            </p>
+      </section>
+
+      {islandGame ? (
+        <section className="ac-trail" data-trail={subject} data-island={islandGame.id} aria-labelledby="ac-trail-h">
+          <div className="ac-trail-head">
+            <SquisheeImg id={islandGame.mascot} squish="off" />
+            <h2 id="ac-trail-h">{show(islandGame.title)}</h2>
           </div>
-          <button
-            type="button"
-            className="ac-go ac-play-main"
-            data-subject={subject}
-            data-placement={step.reason}
-            data-play-game={step.game}
-            data-play-level={step.level}
-            aria-label={`${copy.action}. ${todayLine}`}
-            onClick={() => {
-              if (step.game) onPlay(step.game, step.level);
-              else window.location.hash = step.href;
+          <LevelStones
+            child={{ ...child, journey }}
+            gameId={islandGame.id}
+            here
+            onPick={(level) => onPlay(islandGame.id, level)}
+            onBoss={() => {
+              window.location.hash = playHref(islandGame.id, "home");
             }}
-          >
-            <PlayMark />
-            <span className="ac-play-copy">
-              <strong>{copy.action}</strong>
-              <small>{todayLine}</small>
-            </span>
-          </button>
-        </div>
+          />
+          <a className="ac-quiet ac-quiet-link ac-map-link" href={`#/map/${subject}`} data-map={subject}>
+            {islandLabel(subject)}
+          </a>
+        </section>
+      ) : null}
+
+      <section className="ac-today-box" aria-label={t("Today", "Hoy", "Hoje", "Aujourd'hui", "今天", "आज", "اليوم")}>
         <div className="ac-daily" data-daily-rounds={daily.rounds} data-daily-goal={daily.goal} data-gift={daily.ready ? "closed" : daily.claimed ? "open" : "none"}>
           <ProgressRing
             value={daily.rounds}
@@ -140,58 +170,57 @@ export function HomeScreen({
         <WeekStickers secondsByDay={child.secondsByDay} today={todayId} />
       </section>
 
-      <section className="ac-foryou" data-subject={subject} aria-labelledby="ac-foryou-h">
-        <h2 id="ac-foryou-h">{t("For you today", "Para ti hoy", "Para você hoje", "Pour toi aujourd'hui", "今天给你", "आज तुम्हारे लिए", "لك اليوم")}</h2>
-        <div className="ac-foryou-list">
-          {picks.map((pick) => {
-            const game = GAMES.find((row) => row.id === pick.game);
-            if (!game) return null;
-            return (
-              <a
-                key={pick.game}
-                className={`ac-pick is-${game.tint}`}
-                data-pick={pick.game}
-                data-reason={pick.reason}
-                href={playHref(pick.game, "home")}
-                onClick={(event) => {
-                  event.preventDefault();
-                  onPlay(pick.game, pick.level);
-                }}
-              >
-                <SquisheeImg id={game.mascot} squish="off" />
-                <span className="ac-pick-copy">
-                  <strong>{show(game.title)}</strong>
-                  <small>{pickTag(pick.reason)}</small>
-                </span>
-                <Pips value={child.bestStars[game.id] ?? 0} />
-              </a>
-            );
-          })}
-          {info.stories && storiesOffered() ? (
-            <a className="ac-pick is-sky" href="#/stories" data-stories="open">
-              <SquisheeImg id="owl" squish="off" />
-              <span className="ac-pick-copy">
-                <strong>{show("Stories")}</strong>
-                <small>{show("Read along")}</small>
-              </span>
-            </a>
-          ) : null}
+      <details className="ac-more" data-more={subject}>
+        <summary>
+          <span>{t("More games", "Más juegos", "Mais jogos", "Plus de jeux", "更多游戏", "और खेल", "ألعاب أخرى")}</span>
+          <small>{moreGamesLabel(subject, more.length)}</small>
+        </summary>
+        <section className="ac-foryou" data-subject={subject} aria-labelledby="ac-foryou-h">
+          <h2 id="ac-foryou-h">{t("For you today", "Para ti hoy", "Para você hoje", "Pour toi aujourd'hui", "今天给你", "आज तुम्हारे लिए", "لك اليوم")}</h2>
+          <div className="ac-foryou-list">
+            {picks.map((pick) => {
+              const game = GAMES.find((row) => row.id === pick.game);
+              if (!game) return null;
+              return (
+                <a
+                  key={pick.game}
+                  className={`ac-pick is-${game.tint}`}
+                  data-pick={pick.game}
+                  data-reason={pick.reason}
+                  href={playHref(pick.game, "home")}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    onPlay(pick.game, pick.level);
+                  }}
+                >
+                  <SquisheeImg id={game.mascot} squish="off" />
+                  <span className="ac-pick-copy">
+                    <strong>{show(game.title)}</strong>
+                    <small>{pickTag(pick.reason)}</small>
+                  </span>
+                  <Pips value={child.bestStars[game.id] ?? 0} />
+                </a>
+              );
+            })}
+          </div>
+        </section>
+        <div className="ac-grid ac-more-grid">
+          {more.map((id) => (
+            <GameTile
+              key={id}
+              gameId={id}
+              child={child}
+              here={subjectSpot(journey, subject).areaId === id}
+              onLater={(text) => {
+                setToast(text);
+                window.setTimeout(() => setToast(null), 1800);
+              }}
+            />
+          ))}
         </div>
-        <div className="ac-subject-links">
-          {more.length > picks.length ? (
-            <a className="ac-quiet ac-quiet-link" href={`#/games/${subject}`} data-more={subject}>
-              {moreGamesLabel(subject, more.length)}
-            </a>
-          ) : null}
-          {subjectTrail(child, subject).length > 0 ? (
-            <a className="ac-quiet ac-quiet-link ac-map-link" href={`#/map/${subject}`} data-map={subject}>
-              {islandLabel(subject)}
-            </a>
-          ) : null}
-        </div>
-      </section>
+      </details>
 
-      {!info.stories && storiesOffered() ? (
+      {storiesOffered() ? (
         <a className="ac-stories-card" href="#/stories" data-stories="open">
           <SquisheeImg id="owl" squish="off" />
           <span>
@@ -231,7 +260,17 @@ export function HomeScreen({
         </a>
       </div>
 
+      <div className="ac-home-about">
+        <p className="ac-lede">{show("Short games · hop the island · collect squishees")}</p>
+        <PlayLanguages />
+      </div>
+
       <Foot />
+      {toast ? (
+        <div className="ac-toast" role="status">
+          {toast}
+        </div>
+      ) : null}
       {prize ? (
         <div className="ac-modal" role="dialog" aria-label={show("Daily gift")}>
           <div className="ac-modal-card ac-prize">
