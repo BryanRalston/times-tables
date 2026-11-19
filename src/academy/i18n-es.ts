@@ -825,8 +825,8 @@ export const ES: Record<string, string> = {
   Continue: "Seguir",
   Answer: "Respuesta",
   "That answer is not right.": "Esa respuesta no está bien.",
-  "Press and hold, then multiply. This keeps the charts for families.":
-    "Mantén presionado y luego multiplica. Así las gráficas se quedan para la familia.",
+  "Press and hold for 2 seconds, then add. This keeps grown-up settings for families.": "Mantén presionado 2 segundos y luego suma. Así los ajustes quedan para los adultos.",
+  "Easy, Medium or Hard for each game. Saved for this grade.": "Fácil, Medio o Difícil para cada juego. Se guarda para este grado.",
   "What is": "¿Cuánto es",
   Buddy: "Amigo",
   Friend: "Amigo",

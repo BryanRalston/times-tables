@@ -7,15 +7,13 @@ import { bookEntries, catchphrase } from "../buddy/cast";
 import { palOwned, withBuddy } from "../buddy/unlock";
 import { GAME_CARDS as GAMES, sheetHref } from "../games/catalog";
 import { gameOffered } from "../games/offer";
-import { tierWindow } from "../grade-map";
-import { TierPicker } from "./tier-picker";
 import { show, t } from "../i18n";
-import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, isGrade, type Grade, type Save } from "../model";
+import { DEFAULT_START_GRADE, SQUAD_IDS, cleanName, type Grade, type Save } from "../model";
 import { buyOutfit, wearOutfit } from "../rewards";
 import { lookShowsOn, outfitHint, outfitLabel, outfitPrice, shopSections } from "../wardrobe";
-import { activeChild, mapActive, tierFor, withGrade, withLevel, withTier } from "../storage";
+import { activeChild, mapActive, withGrade } from "../storage";
 import { silence, speak } from "../voice";
-import { AcademyPal, BackLink, Foot, FreeNote, Logo, PlayMark, SquisheeImg, cx } from "./bits";
+import { AcademyPal, BackLink, FreeNote, Logo, PlayMark, SquisheeImg, cx } from "./bits";
 import { SquishTally } from "./squishy";
 import { BossFigure, PalWithLook } from "./boss-figure";
 import { GradeChips } from "./grade-chips";
@@ -86,124 +84,6 @@ export function HelloScreen({ save, onSave, sound }: { save: Save; onSave: (save
         </label>
         <FreeNote />
       </form>
-    </div>
-  );
-}
-
-export function SettingsScreen({ save, onSave }: { save: Save; onSave: (save: Save) => void }) {
-  const child = activeChild(save);
-  const [name, setName] = useState(child.name);
-
-  return (
-    <div className="ac-shell">
-      <header className="ac-top">
-        <Logo />
-        <LanguageButton lang={save.lang} onLang={(lang) => onSave(withLang(save, lang))} />
-      </header>
-      <h1>{show("Settings")}</h1>
-      <form
-        className="ac-panel"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const cleaned = cleanName(name);
-          if (!cleaned) return;
-          onSave(mapActive(save, (row) => ({ ...row, name: cleaned })));
-        }}
-      >
-        <label className="ac-field">
-          {show("Name")}
-          <input value={name} maxLength={12} onChange={(e) => setName(e.target.value)} />
-        </label>
-        <button type="submit" className="ac-quiet">
-          {show("Save name")}
-        </button>
-      </form>
-      <section className="ac-panel">
-        <h2>{show("Grade")}</h2>
-        <p className="ac-hint">{show("This sets the starting level and the levels each game can use.")}</p>
-        <GradeChips
-          grade={child.grade}
-          onGrade={(grade) => {
-            if (!isGrade(grade)) return;
-            onSave(mapActive(save, (row) => withGrade(row, grade)));
-          }}
-        />
-      </section>
-      <section className="ac-panel">
-        <h2>{show("Challenge ahead")}</h2>
-        <p className="ac-hint">{show("A grown-up can open levels past this grade. Games still start in the grade band.")}</p>
-        <button
-          type="button"
-          className={cx("ac-grade", child.challengeAhead && "is-on")}
-          aria-pressed={child.challengeAhead}
-          onClick={() =>
-            onSave(
-              mapActive(save, (row) => {
-                const challengeAhead = !row.challengeAhead;
-                const next = { ...row, challengeAhead };
-                const levels = { ...next.levels };
-                for (const game of GAMES) {
-                  const allowed = tierWindow(
-                    game.levels.map((level) => level.id),
-                    game.id,
-                    next.grade,
-                    challengeAhead,
-                    tierFor(next, game.id),
-                  );
-                  if (!allowed.ids.includes(levels[game.id] ?? "")) levels[game.id] = allowed.start || game.defaultLevel(next.grade);
-                }
-                return { ...next, levels };
-              }),
-            )
-          }
-        >
-          {child.challengeAhead ? show("On") : show("Off")}
-        </button>
-      </section>
-      <section className="ac-panel">
-        <h2>{show("Sound")}</h2>
-        <button type="button" className={cx("ac-grade", save.sound && "is-on")} onClick={() => onSave({ ...save, sound: !save.sound })}>
-          {save.sound ? show("On") : show("Off")}
-        </button>
-      </section>
-      {GAMES.filter((game) => gameOffered(game.id)).map((game) => {
-        const tier = tierFor(child, game.id);
-        const allowed = tierWindow(
-          game.levels.map((row) => row.id),
-          game.id,
-          child.grade,
-          child.challengeAhead,
-          tier,
-        );
-        return (
-          <section key={game.id} className="ac-panel">
-            <h2>{show(game.title)}</h2>
-            {allowed.ids.length === 0 ? (
-              <p className="ac-hint">{show("Coming later for this grade.")}</p>
-            ) : (
-              <>
-              <TierPicker tier={tier} onTier={(next) => onSave(mapActive(save, (kid) => withTier(kid, game.id, next)))} />
-              <div className="ac-levels">
-                {game.levels
-                  .filter((row) => allowed.ids.includes(row.id))
-                  .map((row) => (
-                    <button
-                      key={row.id}
-                      type="button"
-                      className={cx("ac-grade", child.levels[game.id] === row.id && "is-on")}
-                      onClick={() => onSave(mapActive(save, (kid) => withLevel(kid, game.id, row.id)))}
-                    >
-                      {show(row.label)}
-                    </button>
-                  ))}
-              </div>
-              </>
-            )}
-          </section>
-        );
-      })}
-      <BackLink>{show("Back to games")}</BackLink>
-      <Foot />
     </div>
   );
 }

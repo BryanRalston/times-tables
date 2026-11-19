@@ -14,6 +14,7 @@ import { BackLink, Foot, Logo, SquisheeImg, cx } from "./bits";
 import { GradeChips } from "./grade-chips";
 import { HistoryPanel, useWeekPrint } from "./history-panel";
 import { InstallTip } from "./install-tip";
+import { GrownupSettings } from "./grownup-settings";
 
 const GATE_KEY = "squishee-academy-gate";
 
@@ -89,11 +90,11 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
           }}
         >
           <h1>{show("Grown-ups")}</h1>
-          <p>{show("Press and hold, then multiply. This keeps the charts for families.")}</p>
+          <p>{show("Press and hold for 2 seconds, then add. This keeps grown-up settings for families.")}</p>
           {armed ? (
             <>
               <p className="ac-gate-q">
-                {show("What is")} {gate.a} × {gate.b}?
+                {show("What is")} {gate.a} + {gate.b}?
               </p>
               <input
                 inputMode="numeric"
@@ -205,6 +206,10 @@ export function GrownupsScreen({ save, onSave }: { save: Save; onSave: (save: Sa
           </button>
         </form>
       ) : null}
+
+      <div className="ac-no-print">
+        <GrownupSettings save={save} onSave={onSave} />
+      </div>
 
       <div className="ac-stats3 ac-no-print">
         <article className="ac-statcard" data-days={card.days}>

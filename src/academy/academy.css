@@ -4115,33 +4115,67 @@ button.ac-go.ac-next {
   .ac-shell.is-boss.is-summit .ac-phase-banner { padding: 3px 12px; }
 }
 
-/* Easy, Medium, Hard on a phone: one small chip in the top bar instead of a full row.
-   Tapping it opens the same three choices just below. */
-.ac-tier-chip-wrap { display: none; position: relative; flex: none; }
-.ac-tier-chip {
+/* Easy or Hard in a game: a small read-only label in the top bar. Medium shows nothing.
+   Changing it lives in the Grown-ups corner. */
+.ac-tier-note {
   display: inline-flex;
+  flex: none;
   align-items: center;
-  gap: 6px;
-  min-height: 44px;
-  padding: 0 12px;
-  border: 0;
+  gap: 5px;
+  padding: 3px 9px;
   border-radius: 999px;
-  background: #fff;
-  color: var(--ac-ink);
-  box-shadow: 0 4px 0 var(--ac-line);
-  font: inherit;
-  font-size: 15px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--ac-muted);
+  font-size: 13px;
   font-weight: 800;
-  cursor: pointer;
 }
-.ac-tier-chip:focus-visible { outline: 3px solid var(--ac-teal); outline-offset: 2px; }
-.ac-tier-caret { color: var(--ac-muted); }
-.ac-tier-scrim { position: fixed; inset: 0; z-index: 30; border: 0; background: rgba(40, 20, 50, 0.12); }
-.ac-tier-pop { position: absolute; z-index: 31; inset-inline-end: 0; top: calc(100% + 8px); width: min(300px, calc(100vw - 32px)); }
-.ac-tier-pop .ac-tiers { margin: 0; grid-template-columns: 1fr; box-shadow: 0 8px 24px rgba(60, 20, 60, 0.18), 0 3px 0 var(--ac-line); }
-@media (max-width: 600px) {
-  .ac-tier-chip-wrap { display: block; }
-  .ac-play-tiers { display: none; }
+.ac-tier-note .ac-tier-icon { width: 14px; height: 11px; }
+
+/* Kids' screens: one small, quiet Grown-ups door instead of a row of big buttons. */
+.ac-foot.is-quiet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 16px;
+  margin-top: 18px;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+.ac-foot.is-quiet a {
+  flex: none;
+  flex-direction: row;
+  gap: 6px;
+  min-height: 36px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ac-muted);
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 800;
+}
+.ac-foot.is-quiet a.ac-gu-door { border: 1.5px solid var(--ac-line); }
+.ac-foot.is-quiet svg { width: 16px; height: 16px; color: var(--ac-muted); }
+
+/* Grown-ups corner: grade, Challenge ahead, difficulty per game. */
+.ac-gu-settings h2 { margin-bottom: 6px; }
+.ac-gu-who { color: var(--ac-muted); font-size: 0.8em; }
+.ac-gu-row { padding: 12px 0; border-top: 1px solid var(--ac-line); }
+.ac-gu-row:first-of-type { border-top: 0; }
+.ac-gu-row h3 { margin: 0 0 4px; font-size: 17px; }
+.ac-gu-row .ac-hint { margin: 0 0 8px; }
+.ac-gu-tiers { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.ac-gu-tiers li { display: grid; gap: 4px; }
+.ac-gu-game { font-weight: 800; }
+.ac-gu-tiers .ac-tiers { margin: 0; }
+.ac-gu-pair { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 24px; }
+.ac-gu-name { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+.ac-gu-links { display: flex; flex-wrap: wrap; gap: 8px 18px; padding-top: 12px; border-top: 1px solid var(--ac-line); }
+.ac-gu-links a { color: var(--ac-action); font-weight: 800; }
+@media (min-width: 700px) {
+  .ac-gu-tiers li { grid-template-columns: 180px 1fr; align-items: center; }
 }
 /* Data and Fair Shares: a big first line says the first step, and the first time a gentle
    hand pulses under the first thing to tap. */

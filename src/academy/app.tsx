@@ -6,9 +6,9 @@ import { openEgg } from "./buddy/unlock";
 import { acknowledgeUnlocks, applyRound, applyStory, claimDailyGift } from "./rewards";
 import { getLocale, loadLocalePack, localePackReady, setLocale, show, type Locale } from "./i18n";
 import { noteLocale } from "./seo/events";
-import { activeChild, loadSave, mapActive, tierFor, withLevel, withTier, writeSave } from "./storage";
+import { activeChild, loadSave, mapActive, tierFor, withLevel, writeSave } from "./storage";
 import { warmVoices } from "./voice";
-import { HelloScreen, SettingsScreen, SheetsScreen, ShelfScreen } from "./ui/extra";
+import { HelloScreen, SheetsScreen, ShelfScreen } from "./ui/extra";
 import { chooseLanguage, LanguageWelcome, langFromLanding, withLang } from "./ui/lang";
 import { HomeScreen, SubjectGamesScreen } from "./ui/home";
 import { backHref, isSubjectId, parseFrom, playHref, type From, type SubjectId } from "./subjects";
@@ -249,20 +249,18 @@ function AcademyApp() {
           }}
           onRound={onRound}
           onLevel={(level) => setSave((current) => mapActive(current, (row) => withLevel(row, route.game, level)))}
-          onTier={(tier) => setSave((current) => mapActive(current, (row) => withTier(row, route.game, tier)))}
           onAck={() => setSave((current) => mapActive(current, acknowledgeUnlocks))}
           onToggleSound={() => setSave((current) => ({ ...current, sound: !current.sound }))}
         />
       </Screen>
     );
-  } else if (route.name === "grownups") {
+  } else if (route.name === "grownups" || route.name === "settings") {
+    // #/settings is an old link: grade, Challenge ahead and difficulty now live in the gated Grown-ups corner.
     body = (
       <Screen>
         <GrownupsScreen save={save} onSave={setSave} />
       </Screen>
     );
-  } else if (route.name === "settings") {
-    body = <SettingsScreen save={save} onSave={setSave} />;
   } else if (route.name === "shelf") {
     body = <ShelfScreen save={save} onSave={setSave} />;
   } else if (route.name === "sheets") {
