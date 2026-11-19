@@ -4133,5 +4133,11 @@ export const VOICE_FILES_HI: Record<string, string> = {
   "होते": "hi/clip-6e30d132.mp3",
   "होशियार": "hi/clip-e6312aec.mp3",
   "होशियार बिस्कुट की लकीर": "hi/clip-3420073a.mp3",
-  "हो।": "hi/clip-119d9ffa.mp3"
+  "हो।": "hi/clip-119d9ffa.mp3",
+  "अब तुम्हारी बारी। कितने बचे": "hi/clip-f04d60ba.mp3",
+  "अब तुम्हारी बारी। कितने हटाए गए": "hi/clip-1380bb2a.mp3",
+  "कितने बचे": "hi/clip-a3bf6c27.mp3",
+  "कितने हटाए गए": "hi/clip-8695144c.mp3",
+  "गए": "hi/clip-1fc1b0a6.mp3",
+  "हटाए": "hi/clip-f92b6d40.mp3"
 };

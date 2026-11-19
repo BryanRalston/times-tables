@@ -5372,5 +5372,7 @@ export const VOICE_FILES_ES: Record<string, string> = {
   "qué buen paseo": "es/que-buen-paseo-df235f8e.mp3",
   "qué buen paseo para fox": "es/que-buen-paseo-para-fox-946b053a.mp3",
   "qué linda es la luna": "es/que-linda-es-la-luna-4610391d.mp3",
-  "qué linda es la noche": "es/que-linda-es-la-noche-d7501f11.mp3"
+  "qué linda es la noche": "es/que-linda-es-la-noche-d7501f11.mp3",
+  "cuántos se quitaron": "es/cuantos-se-quitaron-292b4e37.mp3",
+  "quitaron": "es/quitaron-2285559b.mp3"
 };

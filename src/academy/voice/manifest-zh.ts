@@ -3256,5 +3256,6 @@ export const VOICE_FILES_ZH: Record<string, string> = {
   "鱼 是 红色的": "zh/clip-7051f1e4.mp3",
   "鳃一飘": "zh/clip-d6c29300.mp3",
   "黄色": "zh/clip-2c42764a.mp3",
-  "黄色的": "zh/clip-6a4b861b.mp3"
+  "黄色的": "zh/clip-6a4b861b.mp3",
+  "拿走了多少": "zh/clip-d7fc9ad1.mp3"
 };

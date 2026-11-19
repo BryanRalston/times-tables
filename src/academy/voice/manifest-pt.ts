@@ -5369,5 +5369,7 @@ export const VOICE_FILES_PT: Record<string, string> = {
   "é um triângulo": "pt/e-um-triangulo-11f8b043.mp3",
   "é uma esfera": "pt/e-uma-esfera-39e7752d.mp3",
   "é uma moeda de": "pt/e-uma-moeda-de-a4b76e90.mp3",
-  "último": "pt/ultimo-9f2a8fae.mp3"
+  "último": "pt/ultimo-9f2a8fae.mp3",
+  "quantos foram tirados": "pt/quantos-foram-tirados-101e247f.mp3",
+  "tirados": "pt/tirados-3c80165b.mp3"
 };

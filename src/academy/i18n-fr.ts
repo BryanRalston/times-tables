@@ -757,6 +757,7 @@ export const FR: Record<string, string> = {
   "Count the squares.": "Compte les carrés.",
   "Count the squishees and try again.": "Compte les squishees et réessaie.",
   "Count the tens and the ones": "Compte les dizaines et les unités",
+  "Count the tens, then the ones.": "Compte les dizaines, puis les unités.",
   "Count all of them.": "Compte-les tous.",
   "Count the ones left.": "Compte ceux qui restent.",
   "Count to 10": "Compter jusqu'à 10",

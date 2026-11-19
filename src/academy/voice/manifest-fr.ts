@@ -5402,5 +5402,8 @@ export const VOICE_FILES_FR: Record<string, string> = {
   "étoiles et peach trouve": "fr/etoiles-et-peach-trouve-745953a1.mp3",
   "étoiles pour bear": "fr/etoiles-pour-bear-0fd447e3.mp3",
   "étoiles pour bunny": "fr/etoiles-pour-bunny-ce85f30d.mp3",
-  "étoiles pour cookie": "fr/etoiles-pour-cookie-668bea84.mp3"
+  "étoiles pour cookie": "fr/etoiles-pour-cookie-668bea84.mp3",
+  "a-t-on": "fr/a-t-on-8da91a7f.mp3",
+  "combien en a-t-on enlevé": "fr/combien-en-a-t-on-enleve-7fb16d6f.mp3",
+  "enlevé": "fr/enleve-94257ccb.mp3"
 };
