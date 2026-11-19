@@ -3,6 +3,8 @@ import { GRADE_BANDS } from "../grade-map";
 import { contentGrades, gradeSpan, levelHomeGrade } from "../grade-range";
 import type { Grade } from "../model";
 import { WORKSHEETS, type StaticSheet } from "./catalog";
+import { STORIES } from "../stories/catalog";
+import { STORY_COPY, type StoryLang } from "../stories/copy";
 import {
   ageRange,
   GAME_COPY,
@@ -24,6 +26,7 @@ import {
   sheetIndexTitle,
   sheetTitle,
   skillPhrase,
+  STORY_SHELF_COPY,
   type UiCopy,
   uiCopy,
 } from "./copy";
@@ -39,7 +42,7 @@ export interface SeoAlternate {
 }
 
 export interface SeoPage {
-  kind: "game" | "skill" | "sheet" | "sheet-index";
+  kind: "game" | "skill" | "sheet" | "sheet-index" | "stories";
   path: string;
   file: string;
   locale: SeoLocale;
@@ -60,6 +63,8 @@ export interface SeoPage {
   related: SeoLink[];
   ui: UiCopy;
   sheet?: StaticSheet;
+  /** The read-along shelf: every book in this language, easiest first. */
+  books?: { title: string; grade: string; pages: number }[];
 }
 
 interface Topic {
@@ -454,6 +459,59 @@ function sheetIndexPage(locale: SeoLocale): SeoPage {
     alternates: alternatesFor("worksheets"),
     related: games,
     ui,
+  };
+}
+
+/** Read-along storybooks, in the page's language. Same slug in every locale, like the game pages. */
+export const STORY_SHELF_SLUG = "read-along-stories";
+
+const STORY_LANG: Record<SeoLang, StoryLang | null> = { en: null, es: "es", "pt-BR": "pt", fr: "fr", "zh-Hans": "zh", hi: "hi", ar: "ar" };
+const STORY_GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4"];
+
+export function storyShelfPages(): SeoPage[] {
+  return SEO_LOCALES.map((locale) => storyShelfPage(locale));
+}
+
+function storyShelfPage(locale: SeoLocale): SeoPage {
+  const lang = locale.id;
+  const copy = STORY_SHELF_COPY[lang];
+  const storyLang = STORY_LANG[lang];
+  const path = withLocale(locale.prefix, STORY_SHELF_SLUG);
+  const depth = path.split("/").filter(Boolean).length;
+  const grades = gradePhrase(lang, STORY_GRADES);
+  const books = [...STORIES]
+    .sort((a, b) => STORY_GRADES.indexOf(a.grade) - STORY_GRADES.indexOf(b.grade))
+    .map((story) => ({
+      title: (storyLang ? STORY_COPY[storyLang][story.id]?.title : undefined) ?? story.title,
+      grade: gradePhrase(lang, [story.grade]),
+      pages: story.pages.length,
+    }));
+  const base = uiCopy(lang, grades, copy.h1);
+  return {
+    kind: "stories",
+    path,
+    file: `${path}/index.html`,
+    locale,
+    title: copy.title,
+    description: copy.lede,
+    h1: copy.h1,
+    lede: copy.lede,
+    gradesLabel: grades,
+    codes: [],
+    ageRange: ageRange(STORY_GRADES),
+    shot: "/shots/stories.png",
+    shotAlt: copy.shot,
+    gameId: "stories",
+    playHref: `${"../".repeat(depth)}#/stories`,
+    privacyHref: relativeHref(path, withLocale(locale.prefix, "privacy")),
+    worksheetsHref: relativeHref(path, withLocale(locale.prefix, "worksheets")),
+    alternates: alternatesFor(STORY_SHELF_SLUG),
+    related: GAME_COPY.filter((game) => game.id === "sight" || game.id === "phonics" || game.id === "problems").map((game) => ({
+      href: relativeHref(path, withLocale(locale.prefix, game.slug)),
+      label: say(game.name, lang),
+    })),
+    ui: { ...base, play: copy.read, shot: copy.shot },
+    books,
   };
 }
 

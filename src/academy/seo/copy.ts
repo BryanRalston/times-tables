@@ -1265,3 +1265,72 @@ export function sheetIndexLede(lang: SeoLang): string {
 }
 
 export { GRADE_ORDER };
+
+/** The read-along storybook shelf page, one per language. */
+export interface StoryShelfCopy {
+  title: string;
+  h1: string;
+  lede: string;
+  read: string;
+  pages: string;
+  shot: string;
+}
+
+export const STORY_SHELF_COPY: Record<SeoLang, StoryShelfCopy> = {
+  en: {
+    title: "Free read-along stories for kids | Squishee Academy",
+    h1: "Free read-along stories for kids",
+    lede: "Short picture books for Pre-K to grade 4. Each word lights up as the story is read aloud, and a picture question follows. Free, with no ads.",
+    read: "Read free",
+    pages: "pages",
+    shot: "Screenshot of a read-along story",
+  },
+  es: {
+    title: "Cuentos gratis para leer en voz alta | Squishee Academy",
+    h1: "Cuentos gratis para leer en voz alta",
+    lede: "Cuentos cortos con dibujos, de prekínder a grado 4. Se leen en voz alta en español, palabra por palabra, y al final hay una pregunta.",
+    read: "Leer gratis",
+    pages: "páginas",
+    shot: "Captura de un cuento para leer en voz alta",
+  },
+  "pt-BR": {
+    title: "Histórias grátis para ler junto | Squishee Academy",
+    h1: "Histórias grátis para ler junto",
+    lede: "Livrinhos curtos com figuras, da pré-escola ao 4.º ano. Cada palavra acende enquanto a história é lida em voz alta, com uma pergunta no fim.",
+    read: "Ler grátis",
+    pages: "páginas",
+    shot: "Captura de uma história para ler junto",
+  },
+  fr: {
+    title: "Histoires lues à voix haute | Squishee Academy",
+    h1: "Histoires gratuites lues à voix haute",
+    lede: "De petits livres illustrés, de la maternelle au CM1. Chaque mot s'allume pendant la lecture à voix haute, puis une question suit.",
+    read: "Lire gratuitement",
+    pages: "pages",
+    shot: "Capture d'une histoire lue à voix haute",
+  },
+  "zh-Hans": {
+    title: "免费有声故事 | Squishee Academy",
+    h1: "免费有声故事",
+    lede: "学前班到四年级的小故事。读给你听，每个词都会亮起来，最后还有一道看图题。",
+    read: "免费读",
+    pages: "页",
+    shot: "有声故事的截图",
+  },
+  hi: {
+    title: "बच्चों के लिए मुफ़्त कहानियाँ | Squishee Academy",
+    h1: "बच्चों के लिए मुफ़्त कहानियाँ",
+    lede: "नर्सरी से कक्षा 4 तक की छोटी चित्र कहानियाँ। कहानी पढ़कर सुनाई जाती है, हर शब्द चमकता है, और अंत में एक सवाल आता है।",
+    read: "मुफ़्त पढ़ो",
+    pages: "पृष्ठ",
+    shot: "एक कहानी का स्क्रीनशॉट",
+  },
+  ar: {
+    title: "قصص مجانية للأطفال بصوت عال | Squishee Academy",
+    h1: "قصص مجانية للأطفال بصوت عال",
+    lede: "قصص قصيرة مصورة من الروضة إلى الصف 4. تُقرأ القصة بصوت عال وتضيء كل كلمة، ثم يأتي سؤال عن الصورة.",
+    read: "اقرأ مجانا",
+    pages: "صفحات",
+    shot: "لقطة من قصة تُقرأ بصوت عال",
+  },
+};
