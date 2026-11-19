@@ -26,7 +26,8 @@ import { bossEnergyAfterHit, bossIsTimed, bossMaxEnergy, phaseForIndex } from ".
 import { bossForGame } from "../bosses";
 import { tierWindow, type Tier } from "../grade-map";
 import { tierFor } from "../storage";
-import { TierPicker } from "./tier-picker";
+import { TierChip, TierPicker } from "./tier-picker";
+import { revealAnswers } from "./answers-in-view";
 import { countGameStart, countRoundComplete } from "../seo/events";
 import { gameById, pillLabel } from "../games/registry";
 import { hasHandsCard, makeHandsTask } from "../hands-build";
@@ -771,17 +772,29 @@ export function PlayScreen({
   }, [phase, sound, bossDef.taunt]);
 
   useEffect(() => {
-    if (phase === "ask" || phase === "practice") retryFocusRef.current?.focus(game === "add" ? { preventScroll: true } : undefined);
+    // Focus never scrolls the page; the card's own scroll (below) decides what is in view.
+    if (phase === "ask" || phase === "practice") retryFocusRef.current?.focus({ preventScroll: true });
   }, [phase, index, practice, game]);
 
-  // Addition and Cube Builder fit a card on one phone screen. Each new card starts at the top,
-  // so a scroll left over from the last card never hides the question or the tiles.
+  // Every game fits a card on one phone screen. Each new card starts at the top, so a scroll
+  // left over from the last card never hides the question. Then, if the answers still end
+  // below the screen (a very small phone, big system text), the page scrolls just enough to
+  // show them. Summit boss cards change size a lot, so they start at the top too.
   useEffect(() => {
-    // Summit cards change size a lot (a grid, then a box of cubes), so even its boss cards start at the top.
-    if (game !== "add" && game !== "cubes" && game !== "summit") return;
-    if (boss && game !== "summit") return;
     if (phase !== "ask" && phase !== "practice" && phase !== "teach") return;
-    if (typeof window !== "undefined" && window.scrollY > 0) window.scrollTo(0, 0);
+    if (typeof window === "undefined") return;
+    if ((!boss || game === "summit") && window.scrollY > 0) window.scrollTo(0, 0);
+    if (phase === "teach") return;
+    const frame = window.requestAnimationFrame(() => revealAnswers());
+    // Story pictures can load a moment later and push the tiles down; check once more.
+    const later = window.setTimeout(() => revealAnswers(), 450);
+    // A device with no voice shows the word in a box after about 700ms; check after that too.
+    const settled = window.setTimeout(() => revealAnswers(), 950);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(later);
+      window.clearTimeout(settled);
+    };
   }, [game, boss, phase, index, practice, roundId]);
 
   const correct = dots.filter((dot) => dot === "ok" || dot === "helped").length;
@@ -837,6 +850,7 @@ export function PlayScreen({
         reaction={buddyCue}
         pulse={phase === "feedback" ? cheer : 0}
         countLine={choice?.visual.kind === "add" ? addCountLine(choice.visual) : undefined}
+        game={choice?.game ?? view?.id ?? game}
       />
       {graphPals ? <AcademyPal id={hostId} className="ac-buddy-img" squish="buddy" label="" /> : null}
     </div>
@@ -916,6 +930,7 @@ export function PlayScreen({
         ) : (
           <span className="ac-speed-gap" />
         )}
+        {filled === 0 && !boss && onTier && phase !== "done" ? <TierChip tier={tier} onTier={(next) => { if (next !== tier) onTier(next); }} /> : null}
         {showSpeed ? (
           <>
             <div
@@ -1068,7 +1083,11 @@ export function PlayScreen({
               crown={crownFight}
             />
           ) : null}
-          {filled === 0 && !boss && onTier ? <TierPicker tier={tier} compact onTier={(next) => { if (next !== tier) onTier(next); }} /> : null}
+          {filled === 0 && !boss && onTier ? (
+            <div className="ac-play-tiers">
+              <TierPicker tier={tier} compact onTier={(next) => { if (next !== tier) onTier(next); }} />
+            </div>
+          ) : null}
           <div className="ac-play-meta">
             {filled === 0 && !boss ? (
               <button type="button" className="ac-pill" onClick={() => setMenu(true)}>

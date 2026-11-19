@@ -2,21 +2,28 @@ import { useState } from "react";
 import { show } from "../i18n";
 import type { ShareTask } from "../games/share-data";
 import { shareMatches } from "../games/share-data";
+import { TapHand } from "./first-tap";
 import { HandsShell } from "./hands-kit";
 
 export function ShareBench({
   task,
   locked,
   onChange,
+  hand = false,
+  onFirstTap,
 }: {
   task: ShareTask;
   locked: boolean;
   onChange: (counts: number[], bank: number) => void;
+  /** Show the pulsing hand on the cookies the first time. */
+  hand?: boolean;
+  onFirstTap?: () => void;
 }) {
   const [counts, setCounts] = useState<number[]>(() => (task.mode === "groups" ? [0] : Array.from({ length: task.plates }, () => 0)));
   const [bank, setBank] = useState(task.total);
 
   function publish(nextCounts: number[], nextBank: number) {
+    onFirstTap?.();
     setCounts(nextCounts);
     setBank(nextBank);
     onChange(nextCounts, nextBank);
@@ -86,11 +93,12 @@ export function ShareBench({
 
   return (
     <div className="ac-share-play">
-      <button type="button" className="ac-cookie-bank" onClick={deal} disabled={locked || bank <= 0}>
+      <button type="button" className={hand && placed === 0 ? "ac-cookie-bank ac-has-hand" : "ac-cookie-bank"} onClick={deal} disabled={locked || bank <= 0}>
         <span className="ac-cookie" aria-hidden="true" />
         <span>
           {show("Cookies to share")} {bank}
         </span>
+        {hand && placed === 0 ? <TapHand /> : null}
       </button>
       <div className="ac-plates">
         {counts.map((count, index) => (

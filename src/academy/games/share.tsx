@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { remainderShown, show, t } from "../i18n";
+import { remainderShown, t } from "../i18n";
 import { cx } from "../ui/bits";
+import { firstStepLine, useFirstTap } from "../ui/first-tap";
 import { ShareBench } from "../ui/share-board";
 import { LongDivArt } from "./grade5-ops-art";
 import { shareCard } from "./cards";
@@ -59,6 +60,7 @@ export function ShareChoices({ question, reveal, onChoose }: ChoiceProps) {
   const board = question.visual.kind === "scene" && question.visual.board.game === "share" ? question.visual.board : null;
   const [ready, setReady] = useState(false);
   const choiceRef = useRef<HTMLDivElement>(null);
+  const [hand, handDone] = useFirstTap("share");
   const showChoices = ready || reveal;
   useEffect(() => {
     if (showChoices) choiceRef.current?.scrollIntoView({ block: "nearest", inline: "nearest" });
@@ -79,10 +81,13 @@ export function ShareChoices({ question, reveal, onChoose }: ChoiceProps) {
   const task = taskOf(board);
   return (
     <div className="ac-share-play">
+      {showChoices ? null : <p className="ac-first-step">{firstStepLine("share")}</p>}
       <ShareBench
         key={question.id}
         task={task}
         locked={reveal}
+        hand={hand}
+        onFirstTap={handDone}
         onChange={(counts, bank) => setReady(shareSettled(task, counts, bank))}
       />
       {showChoices ? (
@@ -93,9 +98,7 @@ export function ShareChoices({ question, reveal, onChoose }: ChoiceProps) {
             </button>
           ))}
         </div>
-      ) : (
-        <p className="ac-tile-note">{show("Deal the cookies, then pick an answer.")}</p>
-      )}
+      ) : null}
     </div>
   );
 }

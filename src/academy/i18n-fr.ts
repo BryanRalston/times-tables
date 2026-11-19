@@ -1697,6 +1697,8 @@ export const FR: Record<string, string> = {
   "Walk the fence, then pick an answer.": "Fais le tour, puis choisis une réponse.",
   "Put a number on the blank.": "Mets un nombre dans la case.",
   "Cookies to share": "Biscuits à partager",
+  "Tap a picture, then tap its group.": "Touche une image, puis touche son groupe.",
+  "Tap the cookies to put one on a plate.": "Touche les biscuits pour en poser un sur une assiette.",
   "Plate": "Assiette",
   "Group": "Groupe",
   "Square": "Carré",

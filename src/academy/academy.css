@@ -4114,3 +4114,174 @@ button.ac-go.ac-next {
   .ac-shell.is-boss.is-summit .ac-boss.is-fight { width: 76px; height: 90px; }
   .ac-shell.is-boss.is-summit .ac-phase-banner { padding: 3px 12px; }
 }
+
+/* Easy, Medium, Hard on a phone: one small chip in the top bar instead of a full row.
+   Tapping it opens the same three choices just below. */
+.ac-tier-chip-wrap { display: none; position: relative; flex: none; }
+.ac-tier-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ac-ink);
+  box-shadow: 0 4px 0 var(--ac-line);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.ac-tier-chip:focus-visible { outline: 3px solid var(--ac-teal); outline-offset: 2px; }
+.ac-tier-caret { color: var(--ac-muted); }
+.ac-tier-scrim { position: fixed; inset: 0; z-index: 30; border: 0; background: rgba(40, 20, 50, 0.12); }
+.ac-tier-pop { position: absolute; z-index: 31; inset-inline-end: 0; top: calc(100% + 8px); width: min(300px, calc(100vw - 32px)); }
+.ac-tier-pop .ac-tiers { margin: 0; grid-template-columns: 1fr; box-shadow: 0 8px 24px rgba(60, 20, 60, 0.18), 0 3px 0 var(--ac-line); }
+@media (max-width: 600px) {
+  .ac-tier-chip-wrap { display: block; }
+  .ac-play-tiers { display: none; }
+}
+/* Data and Fair Shares: a big first line says the first step, and the first time a gentle
+   hand pulses under the first thing to tap. */
+.ac-first-step {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 16px;
+  background: #fff4c9;
+  color: var(--ac-ink);
+  font-family: Fredoka, Nunito, sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  align-self: stretch;
+}
+.ac-has-hand { position: relative; overflow: visible; }
+.ac-tap-hand {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  z-index: 3;
+  margin-top: -10px;
+  font-size: 34px;
+  line-height: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px rgba(60, 20, 60, 0.25));
+  transform: translateX(-50%);
+  animation: ac-tap-pulse 1.3s ease-in-out infinite;
+}
+@keyframes ac-tap-pulse {
+  0%, 100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+  50% { transform: translate(-50%, -6px) scale(1.12); opacity: 0.85; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ac-tap-hand { animation: none; }
+}
+.ac-graph-play .ac-first-step { margin-bottom: 8px; }
+
+/* Every game on a phone or a short screen: the question, its picture, the buddy line, and
+   all the answers (tiles, letters, the Check button) fit one screen. This is the Addition fit
+   from #166 for every game: the buddy tucks in beside its line, spacing tightens, and tiles
+   get shorter. Tap targets stay at least 44px tall. */
+@media (max-height: 900px) {
+  .ac-shell:not(.is-boss) .ac-play-top { margin-bottom: 4px; }
+  .ac-shell:not(.is-boss) .ac-play-meta { flex-wrap: nowrap; gap: 6px; margin: 2px 0 6px; }
+  .ac-shell:not(.is-boss) .ac-play-meta .ac-pill {
+    display: block;
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-height: 44px;
+    padding: 0 12px;
+    line-height: 44px;
+    font-size: 15px;
+  }
+  .ac-shell:not(.is-boss) .ac-play-meta .ac-nudge-slot { flex: 1 1 0; min-width: 0; }
+  .ac-shell:not(.is-boss) .ac-play-meta .ac-hear,
+  .ac-shell:not(.is-boss) .ac-play-meta .ac-hint-btn { width: 44px; height: 44px; flex: none; }
+  .ac-shell:not(.is-boss) .ac-play-meta .ac-stars { flex: none; }
+  .ac-shell:not(.is-boss) .ac-stage-copy,
+  .ac-shell:not(.is-boss) .ac-hands-layout { gap: 6px; }
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-story,
+  .ac-shell:not(.is-boss) .ac-hands-layout .ac-story { margin: 0; font-size: 15px; line-height: 1.25; }
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-play-buddy { flex: 0 0 auto; min-height: 0; }
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-play-buddy .ac-buddy { flex-direction: row; align-items: center; gap: 8px; }
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-play-buddy .ac-buddy-img,
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-play-buddy .ac-wear,
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-play-buddy .ac-squish { width: 48px; height: 48px; }
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-play-buddy .ac-squish { flex: none; padding: 0; margin: 0; }
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-play-buddy .ac-bubble { margin: 0; font-size: 15px; }
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-qcard { padding: 8px 10px; }
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-qcard h1 { font-size: 21px; line-height: 1.2; }
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-choices { gap: 8px; }
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-choice { min-height: 60px; }
+  /* Listening cards (Spelling, Sight Words, Phonics): a smaller speaker, and the no-speaker word on one line. */
+  .ac-shell:not(.is-boss) .ac-speaker-wrap { margin: 4px 0 0; }
+  .ac-shell:not(.is-boss) .ac-speaker { width: 60px; height: 60px; }
+  .ac-shell:not(.is-boss) .ac-speaker svg { width: 30px; height: 30px; }
+  .ac-shell:not(.is-boss) .ac-slow { width: 48px; height: 48px; font-size: 22px; }
+  .ac-shell:not(.is-boss) .ac-fallback { margin-top: 6px; padding: 4px 10px; max-width: none; }
+  .ac-shell:not(.is-boss) .ac-fallback small { display: inline; font-size: 13px; }
+  .ac-shell:not(.is-boss) .ac-fallback strong { display: inline; margin: 0 0 0 6px; }
+  .ac-shell:not(.is-boss) .ac-fallback strong.is-word { font-size: 28px; line-height: 1.1; }
+  .ac-shell:not(.is-boss) .ac-pattern { margin-top: 4px; padding: 2px 10px; }
+  /* Letter tiles: shorter, still 48px to tap. */
+  .ac-shell:not(.is-boss) .ac-spell { margin-top: 0; }
+  .ac-shell:not(.is-boss) .ac-slots, .ac-shell:not(.is-boss) .ac-tiles { gap: 6px; }
+  .ac-shell:not(.is-boss) .ac-slots { min-height: 48px; gap: 4px; }
+  /* Seven-letter words keep their boxes on one row on a 390px phone. */
+  .ac-shell:not(.is-boss) .ac-slots .ac-slot { min-width: 46px; padding: 0 6px; }
+  .ac-shell:not(.is-boss) .ac-tiles { margin-top: 8px; }
+  .ac-shell:not(.is-boss) .ac-slot, .ac-shell:not(.is-boss) .ac-tile { min-width: 48px; min-height: 48px; padding: 0 8px; border-radius: 14px; font-size: 26px; }
+  .ac-shell:not(.is-boss) .ac-tile-note { margin: 4px 0 0; min-height: 0; }
+  .ac-shell:not(.is-boss) .ac-tile-note:empty { display: none; }
+  .ac-shell:not(.is-boss) .ac-spell .ac-check { margin-top: 8px; min-height: 48px; }
+  /* Compare: both numbers and their blocks side by side, smaller blocks, two sentence tiles per row. */
+  .ac-shell:not(.is-boss) .ac-sign-eq { flex-wrap: nowrap; gap: 6px; align-items: flex-start; }
+  .ac-shell:not(.is-boss) .ac-sign-eq > div { flex: 1 1 0; min-width: 0; }
+  .ac-shell:not(.is-boss) .ac-sign-eq b { font-size: 30px; }
+  .ac-shell:not(.is-boss) .ac-sign-eq .ac-sign-gap { flex: none; align-self: center; }
+  .ac-shell:not(.is-boss) .ac-sign-eq .ac-base { gap: 3px; margin: 4px 0; }
+  .ac-shell:not(.is-boss) .ac-sign-eq .ac-flat { width: 18px; height: 18px; border-radius: 4px; }
+  .ac-shell:not(.is-boss) .ac-sign-eq .ac-rod { width: 7px; height: 22px; border-radius: 3px; }
+  .ac-shell:not(.is-boss) .ac-sign-eq .ac-ones { max-width: 48px; gap: 2px; }
+  .ac-shell:not(.is-boss) .ac-sign-eq .ac-ones .ac-dot { width: 8px; height: 8px; }
+  .ac-shell:not(.is-boss) .ac-sign-play .ac-choices.is-stack { grid-template-columns: 1fr 1fr; margin-top: 6px; }
+  .ac-shell:not(.is-boss) .ac-sign-play .ac-choice { min-height: 52px; font-size: 21px; padding: 4px; }
+  /* Telling time: a smaller clock and question so the four times sit below them. */
+  .ac-shell:not(.is-boss) .ac-stage.is-time .ac-clock { width: min(220px, 25vh); }
+  .ac-shell:not(.is-boss) .ac-time-copy h1 { margin: 0; font-size: 22px; line-height: 1.2; }
+  /* Shapes and picture tiles: a smaller picture, shorter tiles. */
+  .ac-shell:not(.is-boss) .ac-qcard .ac-shape { width: auto; height: min(120px, 17vh); max-width: 60vw; margin: 4px auto; }
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-choice.is-card { min-height: 72px; gap: 2px; padding: 4px; }
+  .ac-shell:not(.is-boss) .ac-choice.is-card .ac-shape,
+  .ac-shell:not(.is-boss) .ac-choice.is-card .ac-part { width: auto; max-width: 84px; height: 48px; margin: 0 auto; }
+  .ac-shell.is-prek:not(.is-boss) .ac-stage-copy .ac-choice { min-height: 76px; }
+  .ac-shell.is-prek:not(.is-boss) .ac-stage-copy .ac-choice.is-card { min-height: 84px; }
+  /* Fair Shares: plates side by side, still big enough to tap. */
+  .ac-shell:not(.is-boss) .ac-share-play { gap: 8px; }
+  .ac-shell:not(.is-boss) .ac-cookie-bank { min-height: 52px; padding: 4px 14px; }
+  .ac-shell:not(.is-boss) .ac-cookie-bank .ac-cookie { width: 30px; height: 30px; }
+  .ac-shell:not(.is-boss) .ac-plates { gap: 8px; }
+  .ac-shell:not(.is-boss) .ac-plate { flex: 1 1 0; max-width: 92px; width: auto; min-width: 64px; min-height: 0; aspect-ratio: 1; padding: 6px; }
+  .ac-shell:not(.is-boss) .ac-plate .ac-cookie { width: 20px; height: 20px; border-width: 2px; }
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-qcard.ac-scene { min-height: 0; }
+  .ac-shell:not(.is-boss) .ac-qcard .ac-geo { width: auto; height: min(120px, 17vh); max-width: 60vw; }
+  .ac-shell:not(.is-boss) .ac-choice.is-card .ac-geo { width: auto; max-width: 84px; height: 48px; }
+  /* Word Problems: groups of story objects sit side by side with smaller objects. */
+  .ac-shell:not(.is-boss) .ac-qcard .ac-problem-object { width: 22px; height: 22px; flex-basis: 22px; }
+  .ac-shell:not(.is-boss) .ac-choice.is-card .ac-problem-object { width: 24px; height: 24px; flex-basis: 24px; }
+  .ac-shell:not(.is-boss) .ac-qcard .ac-groups,
+  .ac-shell:not(.is-boss) .ac-qcard .ac-problem-picture { gap: 4px; }
+  .ac-shell:not(.is-boss) .ac-qcard .ac-group:has(.ac-problem-object) { max-width: calc(50% - 4px); padding: 2px; }
+  .ac-shell:not(.is-boss) .ac-qcard .ac-sight-word,
+  .ac-shell:not(.is-boss) .ac-qcard .ac-fill-sentence { margin-top: 4px; font-size: 24px; }
+  .ac-shell:not(.is-boss) .ac-first-step { padding: 6px 10px; font-size: 19px; }
+  /* Sight Words, grades 4 and 5: four sentence tiles stack; keep each one short. */
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-choices.is-stack { gap: 6px; }
+  .ac-shell:not(.is-boss) .ac-stage-copy .ac-choice.is-sentence { min-height: 48px; padding: 6px 12px; font-size: 17px; line-height: 1.2; }
+}
