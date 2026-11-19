@@ -9,7 +9,7 @@ import { GAME_CARDS as GAMES, gameCard as gameById } from "../games/catalog";
 import { gameOffered } from "../games/offer";
 import { bandFor } from "../grade-map";
 import { areaOpen, bossReady, gateBefore, normalizeJourney, subjectSpot } from "../journey";
-import { subjectKeyOf } from "../subject-games";
+import { subjectIndexes, subjectKeyOf } from "../subject-games";
 import { LevelStones } from "./level-stones";
 import { show, t } from "../i18n";
 import { DAILY_GOAL, todayIso, type Child } from "../model";
@@ -75,7 +75,8 @@ export function MapScreen({
         )}
       </div>
       <ol className="ac-islands" data-area={subject ? subjectSpot(journey, subject).areaId : journey.areaId} data-stop={subject ? subjectSpot(journey, subject).stop : journey.stop}>
-        {GAMES.map((game, index) => {
+        {(subject ? subjectIndexes(subject, child.grade) : GAMES.map((_, i) => i)).map((index) => {
+          const game = GAMES[index]!;
           if (!gameOffered(game.id)) return null;
           if (only && !only.includes(game.id)) return null;
           const open = areaOpen(journey, index, child.grade);

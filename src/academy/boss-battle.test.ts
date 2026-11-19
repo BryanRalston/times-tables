@@ -122,7 +122,8 @@ describe("boss battle", () => {
   });
 
   it("unlocks a trophy, a look, and a Gold Crown", () => {
-    const child = blankChild({ id: "kid", name: "Maya", grade: "1" });
+    // Grade 3 Math starts on Times Tables (grades 1 and 2 start on Add & Subtract).
+    const child = blankChild({ id: "kid", name: "Maya", grade: "3" });
     const missed = grantBossPrize(child, "times", false, false);
     expect(missed).toBe(child);
 

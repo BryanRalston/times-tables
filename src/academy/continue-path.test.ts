@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { GAME_CARDS } from "./games/catalog";
 import { tierWindow } from "./grade-map";
 import { setLocale } from "./i18n";
-import { normalizeJourney, subjectSpot } from "./journey";
+import { areaOpen, normalizeJourney, subjectSpot } from "./journey";
 import { STOPS_PER_AREA, type Child, type Grade } from "./model";
 import { levelStones } from "./stones";
 import { blankChild, withGrade } from "./storage";
@@ -52,10 +52,38 @@ describe("grade guardrail: Continue respects the chosen grade", () => {
     }
   });
 
-  it("does not drop every new visitor into Add & Subtract", () => {
+  it("starts grades 1 and 2 on Add & Subtract, grades 3 to 5 on Times Tables, Pre-K on Counting", () => {
+    expect(nextFor(newVisitor("1"), "math")).toMatchObject({ game: "add", level: "within10", reason: "start" });
+    expect(nextFor(newVisitor("2"), "math")).toMatchObject({ game: "add", level: "within20", reason: "start" });
     expect(nextFor(newVisitor("3"), "math")).toMatchObject({ game: "times", level: "toTen", reason: "start" });
     expect(nextFor(newVisitor("4"), "math").game).toBe("times");
+    expect(nextFor(newVisitor("5"), "math").game).toBe("times");
     expect(nextFor(newVisitor("PK"), "math").game).toBe("count");
+    expect(nextFor(newVisitor("K"), "math").game).toBe("add");
+    // Reading and Spelling are unchanged by the Add-first Math path.
+    for (const grade of ["1", "2"] as Grade[]) {
+      expect(nextFor(newVisitor(grade), "reading").game).toBe("sight");
+      expect(nextFor(newVisitor(grade), "spelling").game).toBe("spelling");
+    }
+  });
+
+  it("grades 1 and 2: the Add & Subtract boss opens Times Tables next, and the map shows Add first", () => {
+    for (const grade of ["1", "2"] as Grade[]) {
+      const add = GAME_CARDS.findIndex((row) => row.id === "add");
+      const times = GAME_CARDS.findIndex((row) => row.id === "times");
+      const fresh = normalizeJourney({ areaId: "", stop: 0, bosses: [] }, grade);
+      expect(areaOpen(fresh, add, grade)).toBe(true);
+      expect(areaOpen(fresh, times, grade)).toBe(false);
+      expect(areaOpen({ ...fresh, bosses: ["add"] }, times, grade)).toBe(true);
+      expect(subjectSpot(normalizeJourney({ areaId: "", stop: 0, bosses: ["add"] }, grade), "math", grade).areaId).toBe("times");
+      const map = renderToStaticMarkup(createElement(MapScreen, { child: newVisitor(grade), subject: "math", onOpenEgg() {} }));
+      expect(map.indexOf("Add &amp; Subtract")).toBeLessThan(map.indexOf("Times Tables"));
+    }
+    const g3 = normalizeJourney({ areaId: "", stop: 0, bosses: [] }, "3");
+    expect(subjectSpot(g3, "math", "3").areaId).toBe("times");
+  });
+
+  it("does not drop every new visitor into one game", () => {
     const levels = new Set(GRADES.map((grade) => `${nextFor(newVisitor(grade), "math").game}:${nextFor(newVisitor(grade), "math").level}`));
     expect(levels.size).toBeGreaterThan(3);
   });

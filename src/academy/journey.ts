@@ -43,7 +43,7 @@ function skipsGate(gameId: string, grade: Grade | undefined): boolean {
 export function areaOpen(journey: Journey, index: number, grade?: Grade): boolean {
   const game = GAMES[index];
   if (!game) return index <= 0;
-  const chain = subjectIndexes(subjectKeyOf(game.id));
+  const chain = subjectIndexes(subjectKeyOf(game.id), grade);
   const pos = chain.indexOf(index);
   if (pos <= 0) return true;
   if (!grade) {
@@ -62,7 +62,7 @@ export function areaOpen(journey: Journey, index: number, grade?: Grade): boolea
 export function gateBefore(journey: Journey, index: number, grade?: Grade): string {
   const game = GAMES[index];
   if (!game) return "";
-  const chain = subjectIndexes(subjectKeyOf(game.id));
+  const chain = subjectIndexes(subjectKeyOf(game.id), grade);
   const pos = chain.indexOf(index);
   for (let i = 0; i < pos; i++) {
     const id = GAMES[chain[i]!]!.id;
@@ -75,7 +75,7 @@ export function gateBefore(journey: Journey, index: number, grade?: Grade): stri
 /** Fit a saved spot onto one subject's chain. */
 function fitSpot(bossesOnly: Journey, key: SubjectKey, saved: JourneySpot | undefined, grade?: Grade): JourneySpot {
   let raw: JourneySpot = saved ?? { areaId: "", stop: 0 };
-  const chain = subjectIndexes(key);
+  const chain = subjectIndexes(key, grade);
   if (chain.length === 0) return { areaId: GAMES[0]?.id ?? "times", stop: 0 };
   let index = GAMES.findIndex((game) => game.id === raw.areaId);
   if (index < 0 || !chain.includes(index)) {
@@ -203,7 +203,7 @@ export function advanceJourney(journey: Journey, step: RoundStep, grade?: Grade)
   if (bossReady(here, step.game, grade)) {
     if (!step.boss || !bossWon(step.correct, step.total)) return here;
     const bosses = here.bosses.includes(step.game) ? here.bosses : [...here.bosses, step.game];
-    const chain = subjectIndexes(key);
+    const chain = subjectIndexes(key, grade);
     let pos = chain.indexOf(GAMES.findIndex((game) => game.id === step.game)) + 1;
     if (grade) {
       while (pos < chain.length && skipsGate(GAMES[chain[pos]!]!.id, grade)) pos += 1;

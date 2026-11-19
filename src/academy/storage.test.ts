@@ -129,7 +129,8 @@ describe("academy save", () => {
     expect(fromV2.children[0]?.levels.money).toBe(defaultLevels("2").money);
     expect(fromV2.children[0]?.bestStars.money).toBe(0);
     expect(fromV2.children[0]?.coins).toBe(0);
-    expect(fromV2.children[0]?.journey.areaId).toBe("times");
+    // Grade 2 Math starts on Add & Subtract.
+    expect(fromV2.children[0]?.journey.areaId).toBe("add");
     expect(fromV2.children[0]?.words).toEqual({});
 
     const fromV3 = parseSave({
