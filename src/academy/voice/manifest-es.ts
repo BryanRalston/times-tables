@@ -5357,5 +5357,20 @@ export const VOICE_FILES_ES: Record<string, string> = {
   "zzz": "es/zzz-3bcf2a0d.mp3",
   "ángulo": "es/angulo-503b2e46.mp3",
   "área": "es/area-4d524bb1.mp3",
-  "último": "es/ultimo-54a64dfb.mp3"
+  "último": "es/ultimo-54a64dfb.mp3",
+  "de noche": "es/de-noche-3489c3a5.mp3",
+  "duck estaba contenta": "es/duck-estaba-contenta-f76bbfc1.mp3",
+  "duck puede comparar el barco con el pez": "es/duck-puede-comparar-el-barco-con-el-pez-7f438769.mp3",
+  "el barco se va": "es/el-barco-se-va-204ec15b.mp3",
+  "el barco va rápido": "es/el-barco-va-rapido-c9a1fdbc.mp3",
+  "koala está contenta": "es/koala-esta-contenta-a1a56092.mp3",
+  "la luna da luz": "es/la-luna-da-luz-261a973e.mp3",
+  "otra vez a volar": "es/otra-vez-a-volar-7dd4e090.mp3",
+  "predigo que el barco va rápido": "es/predigo-que-el-barco-va-rapido-2d992bf9.mp3",
+  "predigo que el pez va a nadar": "es/predigo-que-el-pez-va-a-nadar-06e41098.mp3",
+  "predigo que luego sale el sol": "es/predigo-que-luego-sale-el-sol-6d18a5d6.mp3",
+  "qué buen paseo": "es/que-buen-paseo-df235f8e.mp3",
+  "qué buen paseo para fox": "es/que-buen-paseo-para-fox-946b053a.mp3",
+  "qué linda es la luna": "es/que-linda-es-la-luna-4610391d.mp3",
+  "qué linda es la noche": "es/que-linda-es-la-noche-d7501f11.mp3"
 };

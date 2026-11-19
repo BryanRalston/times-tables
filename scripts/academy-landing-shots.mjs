@@ -93,6 +93,21 @@ try {
     await page.screenshot({ path: resolve(OUT, `${id}.png`), type: "png" });
     console.log(`shot ${id}`);
   }
+  // The read-along shelf page uses a story page, not a game. The dev server does not serve the root
+  // public/art folder (the build copies it), so the story art is served from disk here.
+  await page.route(/\/art\/story-/, (route) => {
+    const match = route.request().url().match(/\/(art\/story-[^?]+)/);
+    return match ? route.fulfill({ path: resolve("public", match[1]) }) : route.continue();
+  });
+  await page.goto(`${BASE}#/stories/g2-bear-boat`, { waitUntil: "domcontentloaded" });
+  await page.locator(".ac-story-line").waitFor({ timeout: 20000 });
+  await page.evaluate(async () => {
+    window.scrollTo(0, 0);
+    await document.fonts.ready;
+  });
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: resolve(OUT, "stories.png"), type: "png" });
+  console.log("shot stories");
 } finally {
   await browser.close();
   if (server) server.kill();

@@ -1,7 +1,7 @@
 import { WORKSHEETS, type StaticItem, type StaticSheet } from "./catalog";
-import { SEO_LOCALES, type SeoLocale } from "./copy";
+import { SEO_LOCALES, STORY_SHELF_COPY, type SeoLocale } from "./copy";
 import { withVisitorCounter } from "./counter";
-import { landingPages, relativeHref, sheetIndexPages, sheetPages, withLocale, type SeoPage } from "./landings";
+import { landingPages, relativeHref, sheetIndexPages, sheetPages, storyShelfPages, withLocale, type SeoPage } from "./landings";
 import { privacyCopy } from "./privacy-copy";
 
 export const CANONICAL_ORIGIN = "https://squisheeacademy.com";
@@ -238,7 +238,7 @@ function learningJsonLd(page: SeoPage): string {
     url,
     inLanguage: page.locale.hreflang,
     isAccessibleForFree: true,
-    learningResourceType: page.kind === "sheet" || page.kind === "sheet-index" ? "Worksheet" : "Game",
+    learningResourceType: page.kind === "sheet" || page.kind === "sheet-index" ? "Worksheet" : page.kind === "stories" ? "Story" : "Game",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     provider: { "@type": "Organization", name: "Squishee Academy", url: `${CANONICAL_ORIGIN}/` },
   };
@@ -406,6 +406,19 @@ function landingBody(page: SeoPage): string {
     </article>`;
 }
 
+/** The storybook shelf: every book title in the page's language, so search can read them. */
+function storyShelfBody(page: SeoPage): string {
+  const books = (page.books ?? [])
+    .map((book) => `<li><strong>${escapeHtml(book.title)}</strong> <small>${escapeHtml(book.grade)} · ${book.pages} ${escapeHtml(STORY_SHELF_COPY[page.locale.id].pages)}</small></li>`)
+    .join("");
+  return `<article>
+      <h1>${escapeHtml(page.h1)}</h1>
+      <p class="lede">${escapeHtml(page.lede)}</p>
+      <ul class="books">${books}</ul>
+      ${crawlableExtras(page)}
+    </article>`;
+}
+
 function privacyPath(locale: SeoLocale): string {
   return withLocale(locale.prefix, "privacy");
 }
@@ -467,7 +480,7 @@ function sitemapNode(path: string, alternates?: { hreflang: string; path: string
 }
 
 export function sitemapNodes(): SitemapNode[] {
-  const pages = [...landingPages(), ...sheetPages(), ...sheetIndexPages()];
+  const pages = [...landingPages(), ...sheetPages(), ...sheetIndexPages(), ...storyShelfPages()];
   const seen = new Set<string>();
   const nodes: SitemapNode[] = [
     sitemapNode(
@@ -515,6 +528,7 @@ export function academySeoFiles(options: AcademySeoOptions = {}): SeoFile[] {
     ...indexes.map((page) => ({ path: page.file, body: worksheetIndexHtmlFor(page, options) })),
     ...sheets.map((page) => ({ path: page.file, body: renderSeoPage(page, sheetBody(page), options) })),
     ...landings.map((page) => ({ path: page.file, body: renderSeoPage(page, landingBody(page), options) })),
+    ...storyShelfPages().map((page) => ({ path: page.file, body: renderSeoPage(page, storyShelfBody(page), options) })),
   ];
 }
 
