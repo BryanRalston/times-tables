@@ -171,3 +171,95 @@ export function studyGame(id: string): string | null {
 export function buddyMove(id: string): BuddyMove {
   return personaOf(id).move;
 }
+
+const LISTEN = ["phonics", "spelling", "sight"] as const;
+const CLOCK = ["time", "minute"] as const;
+
+/**
+ * Games where a pal's own "count" line fits the picture. A pal missing here has a line that
+ * fits any game ("Hop as we count."). An empty list means the line is about the pal, not the
+ * card ("Count the sweet ones."), so every game gets the friendly neutral line instead.
+ */
+export const COUNT_LINE_GAMES: Readonly<Record<string, readonly string[]>> = {
+  peach: [],
+  melon: ["fractions"],
+  grape: ["times"],
+  panda: ["times"],
+  owl: ["phonics", "spelling"],
+  penguin: [...CLOCK],
+  whale: [],
+  avocado: ["measure"],
+  donut: ["phonics", "spelling"],
+  corn: ["problems"],
+  lemon: ["money"],
+  strawberry: [],
+  cookie: ["spelling"],
+  boba: [],
+  fox: ["money"],
+  capybara: ["place"],
+  "crystal-axolotl": [],
+  "rainbow-cupcake": [],
+  "star-mochi": [],
+  "galaxy-narwhal": [],
+  koala: ["times"],
+  hedgehog: [],
+  pretzel: ["money"],
+  kiwi: [],
+  mushroom: ["spelling"],
+  dumpling: [],
+  cactus: ["place"],
+  waffle: ["shapes", "grid"],
+  matcha: ["fractions"],
+  sushi: ["fractions", "measure"],
+  axolotl: ["phonics", "spelling"],
+  taco: ["problems"],
+  toast: ["variables"],
+};
+
+/** Games where a pal's own "work" line (shown with a worked example) fits. Same rules as count lines. */
+export const WORK_LINE_GAMES: Readonly<Record<string, readonly string[]>> = {
+  melon: ["fractions"],
+  grape: ["times"],
+  cat: [...LISTEN],
+  panda: ["times"],
+  owl: [...LISTEN],
+  penguin: [...CLOCK],
+  whale: ["fractions", "share"],
+  avocado: ["measure"],
+  donut: ["phonics", "spelling"],
+  lemon: ["money"],
+  strawberry: [...LISTEN],
+  cookie: ["spelling"],
+  boba: [...CLOCK],
+  fox: ["money"],
+  capybara: ["place"],
+  "crystal-axolotl": [...LISTEN],
+  "rainbow-cupcake": ["fractions", "share"],
+  "star-mochi": ["times"],
+  "galaxy-narwhal": ["measure"],
+  koala: ["times"],
+  hedgehog: ["add"],
+  sloth: [...CLOCK],
+  pretzel: ["money"],
+  kiwi: [...LISTEN],
+  mushroom: ["spelling"],
+  cactus: ["place"],
+  waffle: ["shapes"],
+  matcha: ["fractions"],
+  sushi: ["measure"],
+  axolotl: ["phonics", "spelling"],
+  toast: ["variables"],
+};
+
+/** True when this pal's own line fits the game. Without a game, the pal's own line is used. */
+export function palLineFits(kind: "count" | "work", id: string, gameId?: string): boolean {
+  if (!gameId) return true;
+  const games = (kind === "count" ? COUNT_LINE_GAMES : WORK_LINE_GAMES)[id];
+  return !games || games.includes(gameId);
+}
+
+/** The pal's "count" or "work" line for this game, or a friendly neutral line when theirs is off topic. */
+export function palLine(kind: "count" | "work", id: string, gameId?: string): string {
+  const persona = palLineFits(kind, id, gameId) ? personaOf(id) : personaOf("");
+  return kind === "count" ? persona.count : persona.work;
+}

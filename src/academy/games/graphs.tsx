@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { t } from "../i18n";
 import { cx } from "../ui/bits";
+import { firstStepLine, useFirstTap } from "../ui/first-tap";
 import { GraphBench } from "../ui/graph-board";
 import { graphsCard } from "./cards";
 import { isGraphLevel, makeGraphsQuestion, makeGraphsSheet, specFromBoard, targetCounts } from "./graph-data";
@@ -29,6 +30,7 @@ export function GraphChoices({ question, reveal, onChoose }: ChoiceProps) {
   const target = spec ? targetCounts(spec) : [];
   const [counts, setCounts] = useState<number[]>(() => target.map(() => 0));
   const choiceRef = useRef<HTMLDivElement>(null);
+  const [hand, handDone] = useFirstTap("graphs");
   const ready = counts.length === target.length && target.every((count, index) => count === counts[index]);
   const showChoices = ready || reveal;
   useEffect(() => {
@@ -37,7 +39,8 @@ export function GraphChoices({ question, reveal, onChoose }: ChoiceProps) {
   if (!board || !spec) return null;
   return (
     <div className="ac-graph-play">
-      <GraphBench key={question.id} spec={spec} locked={reveal} onChange={setCounts} />
+      {showChoices ? null : <p className="ac-first-step">{firstStepLine("graphs")}</p>}
+      <GraphBench key={question.id} spec={spec} locked={reveal} onChange={setCounts} hand={hand} onFirstTap={handDone} />
       {showChoices ? (
         <div ref={choiceRef} className={cx("ac-choices", reveal && "is-locked")}>
           {question.choices.map((option) => (

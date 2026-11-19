@@ -1698,6 +1698,8 @@ export const ZH: Record<string, string> = {
   "Walk the fence, then pick an answer.": "先沿着边走一圈，再选答案。",
   "Put a number on the blank.": "把一个数放到空格里。",
   "Cookies to share": "要分的饼干",
+  "Tap a picture, then tap its group.": "先点一张图片，再点它的组。",
+  "Tap the cookies to put one on a plate.": "点饼干，把一块放到盘子上。",
   "Plate": "盘子",
   "Group": "一组",
   "Square": "方格",

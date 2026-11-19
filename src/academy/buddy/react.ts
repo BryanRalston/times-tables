@@ -1,5 +1,5 @@
 import { show } from "../i18n";
-import { personaOf } from "./persona";
+import { palLine, personaOf } from "./persona";
 
 export type BuddyPhase = "ask" | "teach" | "practice" | "feedback" | "done";
 export type BuddyMood = "idle" | "cheer" | "hint" | "oops" | "dance";
@@ -52,7 +52,7 @@ export function buddyReaction(cue: BuddyCue): BuddyReaction {
   }
 }
 
-export function bubbleText(line: BuddyLine, id: string): string {
+export function bubbleText(line: BuddyLine, id: string, gameId?: string): string {
   const persona = personaOf(id);
   switch (line) {
     case "cheer":
@@ -70,9 +70,9 @@ export function bubbleText(line: BuddyLine, id: string): string {
     case "streak":
       return persona.line;
     case "count":
-      return persona.count;
+      return palLine("count", id, gameId);
     case "work":
-      return persona.work;
+      return palLine("work", id, gameId);
     default: {
       const neverLine: never = line;
       return neverLine;

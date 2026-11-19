@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent, type P
 import { show, t, nounIsFeminine, thingName } from "../i18n";
 import type { GraphShape } from "../games/boards";
 import { graphsMatches, type GraphBenchSpec, type GraphsTask } from "../games/graph-data";
+import { cx } from "./bits";
+import { TapHand } from "./first-tap";
 import { DragGhost, HandsShell, inside, useTrayDrag } from "./hands-kit";
 
 interface GraphToken {
@@ -118,10 +120,15 @@ export function GraphBench({
   spec,
   locked,
   onChange,
+  hand = false,
+  onFirstTap,
 }: {
   spec: GraphBenchSpec;
   locked: boolean;
   onChange?: (counts: number[]) => void;
+  /** Show the pulsing hand on the first picture to sort. */
+  hand?: boolean;
+  onFirstTap?: () => void;
 }) {
   const bins = columnCount(spec);
   const [tokens, setTokens] = useState<GraphToken[]>(() => tokensFor(spec));
@@ -152,6 +159,7 @@ export function GraphBench({
 
   const { ghost, pointerProps } = useTrayDrag((id, point, tapped) => {
     if (locked) return;
+    onFirstTap?.();
     const token = tokens.find((row) => row.id === id);
     if (!token) return;
     if (tapped) {
@@ -251,17 +259,18 @@ export function GraphBench({
         <div ref={bankRef} className="ac-graph-bank" aria-label={t("Pictures to sort", "Dibujos para ordenar")}>
           {view
             .filter((token) => token.bin < 0)
-            .map((token) => (
+            .map((token, at) => (
               <button
                 key={token.id}
                 type="button"
-                className={token.id === selected ? "ac-graph-token is-pick" : "ac-graph-token"}
+                className={cx("ac-graph-token", token.id === selected && "is-pick", hand && at === 0 && placed === 0 && !selected && "ac-has-hand")}
                 aria-pressed={token.id === selected}
                 aria-label={token.label}
                 disabled={locked}
                 {...tokenProps(token.id)}
               >
                 {token.emoji || token.label}
+                {hand && at === 0 && placed === 0 && !selected ? <TapHand /> : null}
               </button>
             ))}
         </div>
