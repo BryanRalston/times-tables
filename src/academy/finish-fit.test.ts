@@ -11,7 +11,7 @@ import { scrollToShow } from "./ui/answers-in-view";
 import { firstStepLine, firstTapSeen, markFirstTap } from "./ui/first-tap";
 import { GraphBench } from "./ui/graph-board";
 import { ShareBench } from "./ui/share-board";
-import { TierChip } from "./ui/tier-picker";
+import { TierNote } from "./ui/tier-picker";
 
 /** Words in a pal line that tie it to a game. A line using one only shows in those games. */
 const TOPIC_WORDS: readonly [RegExp, readonly string[]][] = [
@@ -167,23 +167,22 @@ describe("first step for Data and Fair Shares", () => {
   });
 });
 
-describe("Easy, Medium, Hard on a phone", () => {
-  it("is one small chip that opens the choice", () => {
+describe("Easy, Medium, Hard in a game", () => {
+  it("is a small read-only label, and only for Easy or Hard", () => {
     setLocale("en");
-    const html = renderToStaticMarkup(createElement(TierChip, { tier: "medium", onTier: () => {} }));
-    expect(html).toContain('class="ac-tier-chip"');
-    expect(html).toContain('aria-expanded="false"');
-    expect(html).toContain("Medium");
-    expect(html).not.toContain("Easy");
-    expect(html).not.toContain("Hard");
+    expect(renderToStaticMarkup(createElement(TierNote, { tier: "medium" }))).toBe("");
+    const html = renderToStaticMarkup(createElement(TierNote, { tier: "hard" }));
+    expect(html).toContain('class="ac-tier-note"');
+    expect(html).toContain("Hard");
+    expect(html).not.toContain("<button");
   });
 
-  it("shows the chip on phones and the full bar on wider screens", () => {
-    const css = readFileSync("src/academy/academy.css", "utf8");
-    expect(css).toMatch(/@media \(max-width: 600px\) \{\s*\.ac-tier-chip-wrap \{ display: block; \}\s*\.ac-play-tiers \{ display: none; \}/);
+  it("has no difficulty picker in the game; that lives in Grown-ups", () => {
     const play = readFileSync("src/academy/ui/play.tsx", "utf8");
-    expect(play).toContain("<TierChip");
-    expect(play).toContain('className="ac-play-tiers"');
+    expect(play).toContain("<TierNote");
+    expect(play).not.toContain("<TierPicker");
+    expect(play).not.toContain("<TierChip");
+    expect(play).not.toContain("ac-play-tiers");
   });
 });
 

@@ -1187,8 +1187,8 @@ export const PT: Record<string, string> = {
   "Pre-primer": "Primeiras palavras",
   "Pre-primer words": "Primeiras palavras",
   "Press and hold": "Pressione e segure",
-  "Press and hold, then multiply. This keeps the charts for families.":
-    "Pressione e segure e depois multiplique. Assim os gráficos ficam para a família.",
+  "Press and hold for 2 seconds, then add. This keeps grown-up settings for families.": "Pressione e segure por 2 segundos e depois some. Assim os ajustes ficam para os adultos.",
+  "Easy, Medium or Hard for each game. Saved for this grade.": "Fácil, Médio ou Difícil para cada jogo. Fica salvo para esta série.",
   Primer: "Palavras iniciais",
   "Primer words": "Palavras iniciais",
   Print: "Imprimir",

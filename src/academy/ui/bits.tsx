@@ -172,14 +172,6 @@ export function LockIcon() {
   );
 }
 
-function IconShield() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3 5 6v6c0 4.2 2.8 7.2 7 8.5 4.2-1.3 7-4.3 7-8.5V6Z" />
-    </svg>
-  );
-}
-
 function IconPeople() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -191,25 +183,6 @@ function IconPeople() {
   );
 }
 
-function IconPrint() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M7 8V4h10v4" />
-      <rect x="5" y="8" width="14" height="8" rx="2" />
-      <path d="M8 14h8v6H8z" />
-    </svg>
-  );
-}
-
-function IconGear() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M18 6l-1.6 1.6M7.6 16.4 6 18" />
-    </svg>
-  );
-}
-
 export function FreeNote() {
   return <p className="ac-free">{show("Free for every family. No ads, no accounts.")}</p>;
 }
@@ -217,18 +190,13 @@ export function FreeNote() {
 export function Foot() {
   return (
     <>
-      <nav className="ac-foot" aria-label={show("More")}>
-        <a href="#/grownups">
+      {/* Kids see one small, quiet door. Grade, Challenge ahead, difficulty and worksheets sit behind it. */}
+      <nav className="ac-foot is-quiet" aria-label={show("More")}>
+        <a className="ac-gu-door" href="#/grownups">
           <IconPeople /> {show("Grown-ups")}
         </a>
-        <a href="#/sheets">
-          <IconPrint /> {show("Free worksheets")}
-        </a>
-        <a href="#/settings">
-          <IconGear /> {show("Settings")}
-        </a>
-        <a href={`${import.meta.env.BASE_URL}${privacyPathForLocale(getLocale())}`}>
-          <IconShield /> {show("Privacy")}
+        <a className="ac-foot-privacy" href={`${import.meta.env.BASE_URL}${privacyPathForLocale(getLocale())}`}>
+          {show("Privacy")}
         </a>
       </nav>
       <FreeNote />

@@ -24,9 +24,9 @@ import { buddyReaction } from "../buddy/react";
 import { slotStory } from "../buddy/story";
 import { bossEnergyAfterHit, bossIsTimed, bossMaxEnergy, phaseForIndex } from "../boss-battle";
 import { bossForGame } from "../bosses";
-import { tierWindow, type Tier } from "../grade-map";
+import { tierWindow } from "../grade-map";
 import { tierFor } from "../storage";
-import { TierChip, TierPicker } from "./tier-picker";
+import { TierNote } from "./tier-picker";
 import { revealAnswers } from "./answers-in-view";
 import { countGameStart, countRoundComplete } from "../seo/events";
 import { gameById, pillLabel } from "../games/registry";
@@ -179,7 +179,6 @@ export function PlayScreen({
   onNext,
   onRound,
   onLevel,
-  onTier,
   onAck,
   onToggleSound,
 }: {
@@ -192,7 +191,6 @@ export function PlayScreen({
   onNext?: (game: string, level: string) => void;
   onRound: (result: RoundResult) => void;
   onLevel: (level: string) => void;
-  onTier?: (tier: Tier) => void;
   onAck: () => void;
   onToggleSound: () => void;
 }) {
@@ -930,7 +928,8 @@ export function PlayScreen({
         ) : (
           <span className="ac-speed-gap" />
         )}
-        {filled === 0 && !boss && onTier && phase !== "done" ? <TierChip tier={tier} onTier={(next) => { if (next !== tier) onTier(next); }} /> : null}
+        {/* Easy / Medium / Hard is set in Grown-ups. The game only names a non-default pick. */}
+        {filled === 0 && !boss && phase !== "done" ? <TierNote tier={tier} /> : null}
         {showSpeed ? (
           <>
             <div
@@ -1082,11 +1081,6 @@ export function PlayScreen({
               phase={fightPhase}
               crown={crownFight}
             />
-          ) : null}
-          {filled === 0 && !boss && onTier ? (
-            <div className="ac-play-tiers">
-              <TierPicker tier={tier} compact onTier={(next) => { if (next !== tier) onTier(next); }} />
-            </div>
           ) : null}
           <div className="ac-play-meta">
             {filled === 0 && !boss ? (
@@ -1268,7 +1262,6 @@ export function PlayScreen({
           <div className="ac-modal-card">
             <h2>{show("Pick a level")}</h2>
             <p className="ac-hint">{show("Starts a new round.")}</p>
-            {onTier ? <TierPicker tier={tier} onTier={(next) => { setMenu(false); if (next !== tier) onTier(next); }} /> : null}
             <LevelStones
               child={child}
               gameId={game}

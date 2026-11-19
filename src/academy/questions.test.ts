@@ -198,18 +198,21 @@ describe("academy question generators", () => {
     }
   });
 
-  it("asks a grown-up to multiply two 2-digit numbers", () => {
-    expect(GROWNUP_HOLD_MS).toBeGreaterThanOrEqual(1000);
-    for (let seed = 1; seed <= 40; seed++) {
+  it("asks a grown-up to hold for 2 seconds, then add two 2-digit numbers with carries", () => {
+    expect(GROWNUP_HOLD_MS).toBeGreaterThanOrEqual(2000);
+    for (let seed = 1; seed <= 60; seed++) {
       const gate = grownupGate(rngFromSeed(seed));
-      expect(gate.a).toBeGreaterThanOrEqual(12);
-      expect(gate.a).toBeLessThanOrEqual(48);
-      expect(gate.b).toBeGreaterThanOrEqual(12);
-      expect(gate.b).toBeLessThanOrEqual(48);
-      expect(gate.answer).toBe(gate.a * gate.b);
-      expect(gate.answer).not.toBe(gate.a + gate.b);
+      expect(gate.a).toBeGreaterThanOrEqual(10);
+      expect(gate.a).toBeLessThanOrEqual(99);
+      expect(gate.b).toBeGreaterThanOrEqual(10);
+      expect(gate.b).toBeLessThanOrEqual(99);
+      expect((gate.a % 10) + (gate.b % 10)).toBeGreaterThanOrEqual(10);
+      expect(gate.answer).toBe(gate.a + gate.b);
+      expect(gate.answer).toBeGreaterThan(100);
       expect(gateAnswerMatches(gate, String(gate.answer))).toBe(true);
-      expect(gateAnswerMatches(gate, String(gate.a + gate.b))).toBe(false);
+      expect(gateAnswerMatches(gate, ` ${gate.answer} `)).toBe(true);
+      expect(gateAnswerMatches(gate, String(gate.answer + 1))).toBe(false);
+      expect(gateAnswerMatches(gate, String(gate.a * gate.b))).toBe(false);
       expect(gateAnswerMatches(gate, "")).toBe(false);
     }
   });
