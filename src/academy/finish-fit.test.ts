@@ -212,3 +212,13 @@ describe("phone fit for every game", () => {
     }
   });
 });
+
+describe("one instruction at a time in Data and Fair Shares", () => {
+  it("shows the yellow first line without a second green line", () => {
+    for (const file of ["src/academy/games/graphs.tsx", "src/academy/games/share.tsx"]) {
+      const text = readFileSync(file, "utf8");
+      expect(text).toContain("ac-first-step");
+      expect(text).not.toContain("then pick an answer");
+    }
+  });
+});

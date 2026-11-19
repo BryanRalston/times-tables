@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { remainderShown, show, t } from "../i18n";
+import { remainderShown, t } from "../i18n";
 import { cx } from "../ui/bits";
 import { firstStepLine, useFirstTap } from "../ui/first-tap";
 import { ShareBench } from "../ui/share-board";
@@ -98,9 +98,7 @@ export function ShareChoices({ question, reveal, onChoose }: ChoiceProps) {
             </button>
           ))}
         </div>
-      ) : (
-        <p className="ac-tile-note">{show("Deal the cookies, then pick an answer.")}</p>
-      )}
+      ) : null}
     </div>
   );
 }

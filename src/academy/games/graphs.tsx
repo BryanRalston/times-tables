@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { t } from "../i18n";
 import { cx } from "../ui/bits";
 import { firstStepLine, useFirstTap } from "../ui/first-tap";
 import { GraphBench } from "../ui/graph-board";
@@ -55,9 +54,7 @@ export function GraphChoices({ question, reveal, onChoose }: ChoiceProps) {
             </button>
           ))}
         </div>
-      ) : (
-        <p className="ac-tile-note">{t("Sort the pictures, then pick an answer.", "Ordena los dibujos y luego elige.")}</p>
-      )}
+      ) : null}
     </div>
   );
 }

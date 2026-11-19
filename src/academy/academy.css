@@ -4180,7 +4180,6 @@ button.ac-go.ac-next {
   .ac-tap-hand { animation: none; }
 }
 .ac-graph-play .ac-first-step { margin-bottom: 8px; }
-.ac-graph-play .ac-data + .ac-tile-note { margin-top: 18px; }
 
 /* Every game on a phone or a short screen: the question, its picture, the buddy line, and
    all the answers (tiles, letters, the Check button) fit one screen. This is the Addition fit
