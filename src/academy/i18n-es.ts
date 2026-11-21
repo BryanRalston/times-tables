@@ -574,6 +574,7 @@ export const ES: Record<string, string> = {
   "Pre-K–2": "Prekínder a 2",
   "Pre-K–3": "Prekínder a 3",
   "Grades 1–5": "Grados 1 a 5",
+  "Grades 1–6": "Grados 1 a 6",
   "1–3": "1 a 3",
   "2s, 5s, 10s · small": "De 2, de 5 y de 10 · chiquitas",
   "2s, 5s, 10s": "De 2, de 5 y de 10",
@@ -684,8 +685,8 @@ export const ES: Record<string, string> = {
     "Práctica de multiplicar para imprimir, de grado 1 a grado 5. Las tablas, problemas de varios dígitos y la hoja de respuestas. Sin cuenta.",
   "Free printable addition and subtraction for kindergarten through grade 5. Facts within 5, 10, 20, 100, or the thousands, plus an answer key.":
     "Sumas y restas para imprimir, de kínder a grado 5. Hasta el 5, el 10, el 20, el 100 o los millares, con la hoja de respuestas.",
-  "Free fraction practice for grades 1–5. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.":
-    "Fracciones para los grados 1 a 5. Partes de un entero, fracciones unitarias, la recta numérica, comparar, fracciones equivalentes con dibujos y decimales.",
+  "Free fraction practice for grades 1–6. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, decimals, and dividing fractions.":
+    "Fracciones para los grados 1 a 6. Partes de un entero, fracciones unitarias, la recta numérica, comparar, fracciones equivalentes con dibujos, decimales y dividir fracciones.",
   "Free spelling for kindergarten through grade 4. Hear a word in a sentence, then build it from letter tiles. Lists move from CVC words to digraphs, blends, long vowels, and grade 4 words.":
     "Deletreo de kínder a grado 4. Escuchas una palabra en inglés y la armas con letras. Empieza con palabras cortas y llega a palabras de grado 4.",
   "Free measurement and data practice for Pre-K through grade 4. Compare longer and shorter, measure inches on a ruler, read picture graphs and bar graphs, and find area.":
@@ -1107,6 +1108,7 @@ export const ES: Record<string, string> = {
   "Summit": "Cumbre",
   "Free grade 5 math review. Unlike fractions, decimals, dividing by 2 digits, the coordinate plane, two-rule patterns, and volume. No signup.": "Repaso gratis de matemáticas de quinto. Fracciones con distinto denominador, decimales, dividir entre 2 cifras, el plano de coordenadas, patrones con dos reglas y volumen. Sin registro.",
   "K–5": "K a 5",
+  "K–6": "K a 6",
   "1–5": "1 a 5",
   "Pre-K–5": "Prekínder a 5",
   "Grade 2–5": "Grado 2 a 5",
@@ -1121,9 +1123,23 @@ export const ES: Record<string, string> = {
   "Add unlike fractions": "Sumar fracciones distintas",
   "Multiply fractions": "Multiplicar fracciones",
   "Order of operations": "Orden de las operaciones",
+  "GCF and LCM": "MCD y MCM",
+  "Divide fractions": "Dividir fracciones",
+  "Exponents": "Exponentes",
+  "Expressions": "Expresiones",
+  "Multiply it by itself.": "Multiplícalo por sí mismo.",
+  "Count the letters.": "Cuenta las letras.",
+  "Swap in the number for the letter.": "Cambia la letra por el número.",
+  "Greatest common factor": "Máximo común divisor",
+  "Least common multiple": "Mínimo común múltiplo",
+  "Replace the letter with the number, then multiply and add.": "Cambia la letra por el número, luego multiplica y suma.",
+  "The same expression can look different. Try distributing or combining.": "La misma expresión puede verse distinta. Prueba a distribuir o juntar.",
+  "An exponent tells how many times to multiply the base by itself. 2^3 means 2 × 2 × 2.": "El exponente dice cuántas veces se multiplica la base por sí misma. 2^3 significa 2 × 2 × 2.",
+  "The greatest common factor is the biggest number that divides both.": "El máximo común divisor es el número más grande que divide a ambos.",
+  "The least common multiple is the smallest number that both go into.": "El mínimo común múltiplo es el número más pequeño en el que caben ambos.",
   Numbers: "Números",
-  "Free missing-number equations for kindergarten through grade 5. Find the box in an addition, subtraction, multiplication, or two-step equation. A first look at variables. No signup.":
-    "Ecuaciones con un número que falta, de kínder a grado 5. Busca la caja en una suma, resta, multiplicación o dos pasos. Un primer vistazo a las variables. Sin cuenta.",
+  "Free missing-number equations for kindergarten through grade 6. Find the box in an addition, subtraction, multiplication, or two-step equation, evaluate expressions with a letter, and try small exponents. A first look at variables. No signup.":
+    "Ecuaciones con un número que falta, de kínder a grado 6. Busca la caja en una suma, resta, multiplicación o dos pasos, evalúa expresiones con una letra y prueba exponentes pequeños. Un primer vistazo a las variables. Sin cuenta.",
   "Loading…": "Cargando…",
   "This page is not saved on this device yet. Connect once, then open Academy again.":
     "Esta página todavía no está guardada en este aparato. Conéctate una vez y abre Academy de nuevo.",
@@ -1215,5 +1231,5 @@ export const ES: Record<string, string> = {
   "Follow a number rule": "Seguir una regla numérica",
   "Free sharing and division practice for Pre-K through grade 5. Deal cookies onto plates, make equal groups, and see what is left over. No signup.": "Práctica gratis de repartir y dividir, de prekínder a grado 5. Reparte galletas en platos, haz grupos iguales y mira lo que sobra. Sin cuenta.",
   "Free area and perimeter practice for grades 2–5. Count unit squares in a shape, walk the fence around it, and find a missing side. No signup.": "Práctica gratis de área y perímetro para los grados 2 a 5. Cuenta cuadrados unidad, recorre el borde y halla un lado que falta. Sin cuenta.",
-  "Free skip-counting and number patterns for kindergarten through grade 5. Count by tens, fives, twos, and hundreds, then find the rule. No signup.": "Conteo salteado y patrones numéricos gratis, de kínder a grado 5. Cuenta de 10 en 10, de 5 en 5, de 2 en 2 y de 100 en 100, y halla la regla. Sin cuenta.",
+  "Free skip-counting and number patterns for kindergarten through grade 6. Count by tens, fives, twos, and hundreds, find the rule, and find the greatest common factor or least common multiple. No signup.": "Conteo salteado y patrones numéricos gratis, de kínder a grado 6. Cuenta de 10 en 10, de 5 en 5, de 2 en 2 y de 100 en 100, halla la regla, y halla el máximo común divisor o el mínimo común múltiplo. Sin cuenta.",
 };

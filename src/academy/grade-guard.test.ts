@@ -23,7 +23,7 @@ import { makeBossRound, makeQuestion } from "./games/round";
 import { SUMMIT_SKILLS } from "./games/summit-data";
 import { hasHandsCard, makeHandsTask, type HandsTask } from "./hands-build";
 import { makeClockTask, makePayTask } from "./hands";
-import type { Grade } from "./model";
+import { autoSpeakGrade, type Grade } from "./model";
 import { nextPlacement } from "./placement";
 import { blankChild } from "./storage";
 import { formatClockTime } from "@/lib/clock";
@@ -35,7 +35,7 @@ import { BIG_MULTI_MAX, DECIMAL_OPS_MAX, LONG_DIV_RANGE, hundredthsText } from "
 import { boardVolume } from "./games/cubes-data";
 import { PLANE_MAX, TWO_RULES_RANGE, pairText, parsePair, planeAnswer, twoRuleTerms, twoRulesAnswer } from "./games/grade5-pairs";
 
-const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
+const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5", "6"];
 const SAMPLES = 200;
 const FIVES_ONLY = [5, 10, 20, 25, 35, 40, 50, 55];
 
@@ -82,7 +82,7 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
         expect(question.answer).toBe(String(board.digit * board.place));
       }
       if (board.mode === "thousandths") {
-        expect(grade).toBe("5");
+        expect(["5", "6"]).toContain(grade);
         const numbers = question.choices.filter((choice) => /^\d+\.\d+$/.test(choice));
         if (board.ask === "greatest") {
           const values = question.choices.map(Number);
@@ -131,7 +131,7 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if (grade === "1") expect(["sort", "traits", "compose", "sides"]).toContain(board.mode);
       if (grade === "2") expect(["sides", "faces", "rows", "symmetry"]).toContain(board.mode);
       if (grade === "3") expect(["symmetry", "quads", "share", "parts", "cover"]).toContain(board.mode);
-      if ((grade === "4" || grade === "5")) expect(["cover", "fold", "angles"]).toContain(board.mode);
+      if ((grade === "4" || grade === "5" || grade === "6")) expect(["cover", "fold", "angles"]).toContain(board.mode);
       break;
     case "fractions": {
       if (board.mode === "decimals") {
@@ -142,7 +142,7 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
         break;
       }
       if (board.mode === "addUnlike") {
-        expect(grade).toBe("5");
+        expect(["5", "6"]).toContain(grade);
         expect(board.den).not.toBe(board.den2);
         expect(board.common).toBeLessThanOrEqual(12);
         expect(board.common % board.den).toBe(0);
@@ -160,7 +160,7 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
         break;
       }
       if (board.mode === "fracTimes") {
-        expect(grade).toBe("5");
+        expect(["5", "6"]).toContain(grade);
         expect(board.den).toBeLessThanOrEqual(6);
         if (board.whole > 0) {
           expect(board.whole % board.den).toBe(0);
@@ -179,6 +179,15 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
             if (board.whole === 0) expect((n ?? 0) * board.den * board.den2).not.toBe((d ?? 1) * board.num * board.num2);
           }
         }
+        break;
+      }
+      if (board.mode === "fracDiv") {
+        expect(["5", "6"]).toContain(grade);
+        expect(grade).toBe("6");
+        expect((board.num / board.den) / (board.num2 / board.den2)).toBeCloseTo(Number(question.answer), 9);
+        expect(Number(question.answer)).toBeGreaterThan(0);
+        expect(Number.isInteger(Number(question.answer))).toBe(true);
+        expect(question.choices.every((choice) => Number(choice) > 0)).toBe(true);
         break;
       }
       if (board.mode === "addLike") {
@@ -242,8 +251,17 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if (grade === "3") expect(["div", "picture", "mult", "estimate"]).toContain(board.mode);
       break;
     case "variables": {
+      if (board.mode === "exprEval" || board.mode === "exponents") {
+        expect(grade).toBe("6");
+        expect(board.expr).toBeTruthy();
+        expect(question.choices).toHaveLength(4);
+        expect(question.choices).toContain(question.answer);
+        const blob = `${question.title} ${question.hint} ${question.answer} ${question.choices.join(" ")}`;
+        expect(blob).not.toMatch(/(?<![0-9./xnyXNY ])-\d/);
+        break;
+      }
       if (board.mode === "orderOps") {
-        expect(grade).toBe("5");
+        expect(["5", "6"]).toContain(grade);
         expect(board.expr).toBeTruthy();
         const clean = (board.expr ?? "").replace(/[\u2066\u2069]/g, "");
         expect(clean.match(/[+−×]/g)?.length ?? 0).toBeLessThanOrEqual(3);
@@ -341,12 +359,12 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if (grade === "1") expect(["sort", "tally"]).toContain(board.mode);
       if (grade === "2") expect(["tally", "picture", "bar"]).toContain(board.mode);
       if (grade === "3") expect(["bar", "scale"]).toContain(board.mode);
-      if ((grade === "4" || grade === "5")) expect(["scale", "line"]).toContain(board.mode);
+      if ((grade === "4" || grade === "5" || grade === "6")) expect(["scale", "line"]).toContain(board.mode);
       break;
     }
     case "share": {
       if (board.mode === "longDiv") {
-        expect(grade).toBe("5");
+        expect(["5", "6"]).toContain(grade);
         assertLongDiv(board, question);
         break;
       }
@@ -368,13 +386,13 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if (grade === "PK" || grade === "K" || grade === "1") expect(board.mode).toBe("pairs");
       if (grade === "2") expect(["pairs", "fair"]).toContain(board.mode);
       if (grade === "3") expect(["fair", "groups", "facts"]).toContain(board.mode);
-      if ((grade === "4" || grade === "5")) expect(["groups", "facts", "left"]).toContain(board.mode);
+      if ((grade === "4" || grade === "5" || grade === "6")) expect(["groups", "facts", "left"]).toContain(board.mode);
       expect(board.total).toBeLessThanOrEqual(board.mode === "groups" ? 20 : 18);
       break;
     }
     case "grid": {
       if (board.mode === "coords") {
-        expect(grade).toBe("5");
+        expect(["5", "6"]).toContain(grade);
         assertPlane(board, question);
         break;
       }
@@ -395,12 +413,21 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if (grade === "2") expect(board.mode).toBe("tiles");
       if (grade === "3") expect(["tiles", "fence"]).toContain(board.mode);
       if (grade === "4") expect(["tiles", "fence", "side"]).toContain(board.mode);
-      if (grade === "5") expect(["fence", "side"]).toContain(board.mode);
+      if (grade === "5" || grade === "6") expect(["fence", "side"]).toContain(board.mode);
       break;
     }
     case "patterns": {
+      if (board.mode === "gcfLcm") {
+        expect(grade).toBe("6");
+        expect(board.factor).toBeDefined();
+        const fact = board.factor!;
+        expect(fact.a).toBeGreaterThan(0);
+        expect(fact.b).toBeGreaterThan(0);
+        expect(Number(question.answer)).toBeGreaterThan(0);
+        break;
+      }
       if (board.mode === "twoRules") {
-        expect(grade).toBe("5");
+        expect(["5", "6"]).toContain(grade);
         assertTwoRules(board, question);
         break;
       }
@@ -454,7 +481,7 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if (grade === "K") expect(board.mode).toBe("to10");
       if (grade === "1") expect(["to10", "tens"]).toContain(board.mode);
       if (grade === "2" || grade === "3") expect(["tens", "hundreds"]).toContain(board.mode);
-      if ((grade === "4" || grade === "5")) expect(["hundreds", "big"]).toContain(board.mode);
+      if ((grade === "4" || grade === "5" || grade === "6")) expect(["hundreds", "big"]).toContain(board.mode);
       break;
     }
     case "jumps": {
@@ -479,7 +506,7 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       if (grade === "1") expect(board.mode).toBe("ten");
       if (grade === "2") expect(["ten", "hundred"]).toContain(board.mode);
       if (grade === "3") expect(["ten", "hundred"]).toContain(board.mode);
-      if ((grade === "4" || grade === "5")) expect(["hundred", "thousand"]).toContain(board.mode);
+      if ((grade === "4" || grade === "5" || grade === "6")) expect(["hundred", "thousand"]).toContain(board.mode);
       break;
     }
     case "ticks": {
@@ -508,7 +535,7 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       }
       if (grade === "2") expect(board.mode).toBe("fourths");
       if (grade === "3") expect(["fourths", "sixths", "eighths"]).toContain(board.mode);
-      if ((grade === "4" || grade === "5")) expect(["eighths", "past"]).toContain(board.mode);
+      if ((grade === "4" || grade === "5" || grade === "6")) expect(["eighths", "past"]).toContain(board.mode);
       break;
     }
     case "minute": {
@@ -524,12 +551,12 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
         expect(board.minutes).toBeLessThanOrEqual(29);
       }
       if (grade === "3") expect(["early", "half", "all"]).toContain(board.mode);
-      if ((grade === "4" || grade === "5")) expect(["half", "all"]).toContain(board.mode);
+      if ((grade === "4" || grade === "5" || grade === "6")) expect(["half", "all"]).toContain(board.mode);
       break;
     }
     case "times": {
       // Grade 5 multi-digit multiply (5.NBT.B.5): 2- or 3-digit times 2-digit.
-      expect(grade).toBe("5");
+      expect(["5", "6"]).toContain(grade);
       expect(board.mode).toBe("bigMulti");
       expect(board.a).toBeGreaterThanOrEqual(11);
       expect(board.a).toBeLessThanOrEqual(BIG_MULTI_MAX.a);
@@ -542,7 +569,7 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
     }
     case "add": {
       // Grade 5 decimal operations (5.NBT.B.7): to hundredths, values under 100.
-      expect(grade).toBe("5");
+      expect(["5", "6"]).toContain(grade);
       expect(board.mode).toBe("decimalOps");
       for (const n of [board.left, board.right, board.result]) {
         expect(Number.isInteger(n)).toBe(true);
@@ -562,7 +589,7 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
     }
     case "cubes": {
       // Volume (5.MD.C) is grade 5 only. Whole unit cubes, never a decimal or fraction edge.
-      expect(grade).toBe("5");
+      expect(["5", "6"]).toContain(grade);
       expect(Number(question.answer)).toBe(boardVolume(board));
       for (const n of [board.box.l, board.box.w, board.box.h]) expect(Number.isInteger(n) && n >= 1).toBe(true);
       break;
@@ -663,14 +690,14 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
           expect(task.minutes).toBeLessThanOrEqual(29);
         }
         if (grade === "3") expect(["early", "half", "all"]).toContain(mode);
-        if ((grade === "4" || grade === "5")) expect(["half", "all"]).toContain(mode);
+        if ((grade === "4" || grade === "5" || grade === "6")) expect(["half", "all"]).toContain(mode);
       }
       break;
     case "pay":
       break;
     case "array":
       expect(task.rows * task.cols).toBeLessThanOrEqual(level === "count" ? 20 : 100);
-      if (grade !== "3" && grade !== "4" && grade !== "5") {
+      if (grade !== "3" && grade !== "4" && grade !== "5" && grade !== "6") {
         expect([6, 7, 8, 9]).not.toContain(task.rows);
         expect([6, 7, 8, 9]).not.toContain(task.cols);
       }
@@ -803,7 +830,7 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
       expect(task.total).toBeLessThanOrEqual(task.mode === "groups" ? 20 : 18);
       if (grade === "PK" || grade === "K" || grade === "1") expect(task.mode).toBe("pairs");
       if (grade === "2") expect(["pairs", "fair"]).toContain(task.mode);
-      if ((grade === "4" || grade === "5")) expect(["groups", "facts", "left"]).toContain(task.mode);
+      if ((grade === "4" || grade === "5" || grade === "6")) expect(["groups", "facts", "left"]).toContain(task.mode);
       break;
     case "grid":
       if (task.mode !== "side") {
@@ -811,26 +838,26 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
         expect(task.cells.length).toBeLessThanOrEqual(6);
       }
       if (grade === "2") expect(task.mode).toBe("tiles");
-      if ((grade === "4" || grade === "5")) expect(["tiles", "fence", "side"]).toContain(task.mode);
+      if ((grade === "4" || grade === "5" || grade === "6")) expect(["tiles", "fence", "side"]).toContain(task.mode);
       break;
     case "pattern":
       expect(task.answer).toBeLessThanOrEqual(1000);
       if (grade === "K" || grade === "1") expect(task.mode).toBe("tens");
       if (grade === "2") expect(["tens", "fives", "twos", "hundreds"]).toContain(task.mode);
-      if ((grade === "4" || grade === "5")) expect(["rule", "grow"]).toContain(task.mode);
+      if ((grade === "4" || grade === "5" || grade === "6")) expect(["rule", "grow"]).toContain(task.mode);
       break;
     case "signs":
       expect(signTruth(task.left, task.right)).toBe(task.mark);
       if (grade === "K") expect(task.mode).toBe("to10");
       if (grade === "1") expect(["to10", "tens"]).toContain(task.mode);
-      if ((grade === "4" || grade === "5")) expect(["hundreds", "big"]).toContain(task.mode);
+      if ((grade === "4" || grade === "5" || grade === "6")) expect(["hundreds", "big"]).toContain(task.mode);
       break;
     case "jumps":
       expect(task.answer).toBe(task.dir === "more" ? task.start + task.step : task.start - task.step);
       expect(task.answer % 10).toBe(task.start % 10);
       if (grade === "1") expect(task.mode).toBe("ten");
       if (grade === "2" || grade === "3") expect(["ten", "hundred"]).toContain(task.mode);
-      if ((grade === "4" || grade === "5")) expect(["hundred", "thousand"]).toContain(task.mode);
+      if ((grade === "4" || grade === "5" || grade === "6")) expect(["hundred", "thousand"]).toContain(task.mode);
       break;
     case "ticks":
       expect(task.speech).toBe(`${task.num}/${task.den}`);
@@ -838,7 +865,7 @@ function assertHandsGrade(grade: Grade, level: string, task: HandsTask): void {
       expect(task.num).toBeLessThan(task.den * task.whole);
       if (grade === "2") expect(task.mode).toBe("fourths");
       if (grade === "3") expect(["fourths", "sixths", "eighths"]).toContain(task.mode);
-      if ((grade === "4" || grade === "5")) expect(["eighths", "past"]).toContain(task.mode);
+      if ((grade === "4" || grade === "5" || grade === "6")) expect(["eighths", "past"]).toContain(task.mode);
       break;
     default: {
       const neverTask: never = task;
@@ -894,7 +921,7 @@ function assertQuestion(grade: Grade, level: string, question: ChoiceQ): void {
         expect(visual.b).toBeLessThanOrEqual(spec.max);
       }
       if (level === "count") expect(visual.a * visual.b).toBeLessThanOrEqual(20);
-      if (grade !== "3" && grade !== "4" && grade !== "5") {
+      if (grade !== "3" && grade !== "4" && grade !== "5" && grade !== "6") {
         expect([6, 7, 8, 9]).not.toContain(visual.a);
         expect([6, 7, 8, 9]).not.toContain(visual.b);
       }
@@ -1052,7 +1079,7 @@ describe("grade bands", () => {
           if (game.id === "money") {
             const pay = makePayTask(level, rngFromSeed(`pay-${grade}-${level}-${i}`));
             expect(pay.cents).toBeGreaterThan(0);
-            expect(pay.cents).toBeLessThanOrEqual((grade === "4" || grade === "5") ? 400 : grade === "3" || grade === "2" ? 200 : 75);
+            expect(pay.cents).toBeLessThanOrEqual((grade === "4" || grade === "5" || grade === "6") ? 400 : grade === "3" || grade === "2" ? 200 : 75);
             if (level === "name") expect(pay.bank).toHaveLength(1);
             if (grade === "K" || grade === "1") expect(pay.cents).toBeLessThanOrEqual(75);
           }
@@ -1312,8 +1339,7 @@ describe("grade 5 slice 4: two rules and the coordinate plane (5.OA.B.3, 5.G.A)"
     for (const [gameId, levelId, top] of NEW_LEVELS) {
       const game = GAMES.find((item) => item.id === gameId)!;
       const ids = game.levels.map((row) => row.id);
-      expect(ids.at(-1), gameId).toBe(levelId);
-      expect(ids.indexOf(top), gameId).toBe(ids.length - 2);
+      expect(ids.indexOf(levelId), gameId).toBe(ids.indexOf(top) + 1);
       expect(game.isLevel(levelId)).toBe(true);
       expect(game.defaultLevel("5")).toBe(levelId);
       const window = playWindow(ids, gameId, "5", false);
@@ -1453,5 +1479,117 @@ describe("grade 5 summit boss (mixed grade 5 review)", () => {
     expect(bossReady(won, "summit", "5")).toBe(false);
     const grade4 = advanceJourney(blankChild({ name: "Sam", grade: "4" }).journey, { game: "summit", correct: 5, total: 5, boss: true }, "4");
     expect(grade4.bosses).not.toContain("summit");
+  });
+});
+
+describe("grade 6 slice 1: expressions, fraction division, GCF and LCM", () => {
+  const NEW_LEVELS: [string, string, string, string[]][] = [
+    // game, new level, grade 5 top level, standards
+    ["variables", "exprEval", "orderOps", ["6.EE.A.1", "6.EE.A.2", "6.EE.A.3", "6.EE.A.4"]],
+    ["variables", "exponents", "orderOps", ["6.EE.A.1", "6.EE.A.2", "6.EE.A.3", "6.EE.A.4"]],
+    ["fractions", "fracDiv", "fracTimes", ["6.NS.A.1"]],
+    ["patterns", "gcfLcm", "twoRules", ["6.NS.B.4"]],
+  ];
+  const BELOW_SIX: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
+
+  it("slots each new level last in its game and opens the new work first for grade 6", () => {
+    const variables = GAMES.find((item) => item.id === "variables")!;
+    expect(variables.levels.map((row) => row.id).slice(-2)).toEqual(["exprEval", "exponents"]);
+    expect(variables.defaultLevel("6")).toBe("exprEval");
+    const vIds = variables.levels.map((row) => row.id);
+    expect(playWindow(vIds, "variables", "6", false).start).toBe("exprEval");
+    expect(playWindow(vIds, "variables", "6", false).ids).toEqual(["orderOps", "exprEval", "exponents"]);
+
+    const fractions = GAMES.find((item) => item.id === "fractions")!;
+    const fIds = fractions.levels.map((row) => row.id);
+    expect(fIds.at(-1)).toBe("fracDiv");
+    expect(fractions.defaultLevel("6")).toBe("fracDiv");
+    expect(playWindow(fIds, "fractions", "6", false).start).toBe("fracDiv");
+    expect(playWindow(fIds, "fractions", "6", false).ids).toEqual(["fracTimes", "fracDiv"]);
+
+    const patterns = GAMES.find((item) => item.id === "patterns")!;
+    const pIds = patterns.levels.map((row) => row.id);
+    expect(pIds.at(-1)).toBe("gcfLcm");
+    expect(patterns.defaultLevel("6")).toBe("gcfLcm");
+    expect(playWindow(pIds, "patterns", "6", false).start).toBe("gcfLcm");
+    expect(playWindow(pIds, "patterns", "6", false).ids).toEqual(["twoRules", "gcfLcm"]);
+  });
+
+  it("never opens a new level below grade 6 unless challenge ahead is on", () => {
+    for (const [gameId, levelId, top] of NEW_LEVELS) {
+      const game = GAMES.find((item) => item.id === gameId)!;
+      const ids = game.levels.map((row) => row.id);
+      for (const grade of BELOW_SIX) {
+        expect(playWindow(ids, gameId, grade, false).ids, `${gameId} grade ${grade}`).not.toContain(levelId);
+        expect(levelAllowed(ids, gameId, grade, levelId, false, "easy"), `${gameId} grade ${grade} easy`).toBe(false);
+        expect(levelAllowed(ids, gameId, grade, levelId, false, "medium"), `${gameId} grade ${grade} medium`).toBe(false);
+      }
+      expect(playWindow(ids, gameId, "5", false).ids.at(-1)).toBe(top);
+      expect(playWindow(ids, gameId, "5", true).ids).toContain(levelId);
+    }
+  });
+
+  it("ties each new level to its grade 6 standards, and grade 6 only", () => {
+    expect(GRADE_BANDS.variables?.["6"].standards).toEqual(["6.EE.A.1", "6.EE.A.2", "6.EE.A.3", "6.EE.A.4"]);
+    expect(GRADE_BANDS.fractions?.["6"].standards).toEqual(["6.NS.A.1"]);
+    expect(GRADE_BANDS.patterns?.["6"].standards).toEqual(["6.NS.B.4"]);
+    for (const grade of BELOW_SIX) {
+      for (const row of Object.values(GRADE_BANDS)) {
+        expect(row[grade].standards.some((code) => code.startsWith("6."))).toBe(false);
+      }
+    }
+  });
+
+  it("serves in-range cards with four distinct tiles, no negatives, and letters only in grade 6", () => {
+    const locales: Locale[] = ["en", "es", "pt", "fr", "zh", "hi", "ar"];
+    try {
+      for (const locale of locales) {
+        setLocale(locale);
+        for (const [gameId, levelId] of NEW_LEVELS) {
+          const game = GAMES.find((item) => item.id === gameId)!;
+          for (let i = 0; i < (locale === "en" ? 200 : 40); i += 1) {
+            const question = game.makeQuestion(rngFromSeed(`g6s1-${locale}-${gameId}-${levelId}-${i}`), levelId);
+            expect(question.skill).toBe(`${gameId}:${levelId}`);
+            expect(question.choices).toHaveLength(4);
+            expect(new Set(question.choices).size).toBe(4);
+            expect(question.choices.filter((choice) => choice === question.answer)).toHaveLength(1);
+            const blob = `${question.title} ${question.hint} ${question.answer} ${question.choices.join(" ")}`;
+            expect(blob).not.toMatch(/(?<![0-9./xnyXNY ])-\d/);
+            expect(blob).not.toMatch(/−\d/);
+            assertQuestion("6", levelId, question);
+          }
+        }
+      }
+    } finally {
+      setLocale("en");
+    }
+  });
+
+  it("never serves new content to grades below 6 in 400 draws", () => {
+    for (const [gameId, levelId] of NEW_LEVELS) {
+      const game = GAMES.find((item) => item.id === gameId)!;
+      const ids = game.levels.map((row) => row.id);
+      for (const grade of BELOW_SIX) {
+        const window = playWindow(ids, gameId, grade, false);
+        for (let i = 0; i < 400 && window.ids.length > 0; i += 1) {
+          expect(game.makeQuestion(rngFromSeed(`g6s1-leak-${gameId}-${grade}-${i}`), window.ids[i % window.ids.length]!).skill).not.toBe(`${gameId}:${levelId}`);
+        }
+      }
+    }
+  });
+
+  it("Easy, Medium and Hard work for the new levels, and questions are not auto-read", () => {
+    expect(autoSpeakGrade("6")).toBe(false);
+    for (const [gameId, levelId] of NEW_LEVELS) {
+      const game = GAMES.find((item) => item.id === gameId)!;
+      const ids = game.levels.map((row) => row.id);
+      expect(levelAllowed(ids, gameId, "6", levelId, false, "medium")).toBe(true);
+      expect(levelAllowed(ids, gameId, "6", levelId, false, "hard")).toBe(true);
+      // Easy stays in the window; expressions Easy may stay on the first new level.
+      const easy = levelAllowed(ids, gameId, "6", levelId, false, "easy");
+      if (levelId === "exponents") expect(easy).toBe(false);
+      else expect(easy).toBe(true);
+      expect(hasHandsCard(gameId, levelId)).toBe(false);
+    }
   });
 });

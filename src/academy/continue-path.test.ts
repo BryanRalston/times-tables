@@ -15,7 +15,7 @@ import { HomeScreen } from "./ui/home";
 import { MapScreen } from "./ui/map";
 import { stepLine } from "./ui/next-copy";
 
-const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
+const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5", "6"];
 
 /** A first-time visitor: Hello sets name, buddy and grade on the blank (Kindergarten) child. */
 function newVisitor(grade: Grade): Child {
@@ -52,12 +52,13 @@ describe("grade guardrail: Continue respects the chosen grade", () => {
     }
   });
 
-  it("starts grades 1 and 2 on Add & Subtract, grades 3 to 5 on Times Tables, Pre-K on Counting", () => {
+  it("starts grades 1 and 2 on Add & Subtract, grades 3 to 5 on Times Tables, grade 6 on Expressions, Pre-K on Counting", () => {
     expect(nextFor(newVisitor("1"), "math")).toMatchObject({ game: "add", level: "within10", reason: "start" });
     expect(nextFor(newVisitor("2"), "math")).toMatchObject({ game: "add", level: "within20", reason: "start" });
     expect(nextFor(newVisitor("3"), "math")).toMatchObject({ game: "times", level: "toTen", reason: "start" });
     expect(nextFor(newVisitor("4"), "math").game).toBe("times");
     expect(nextFor(newVisitor("5"), "math").game).toBe("times");
+    expect(nextFor(newVisitor("6"), "math")).toMatchObject({ game: "variables", level: "exprEval", reason: "start" });
     expect(nextFor(newVisitor("PK"), "math").game).toBe("count");
     expect(nextFor(newVisitor("K"), "math").game).toBe("add");
     // Reading and Spelling are unchanged by the Add-first Math path.

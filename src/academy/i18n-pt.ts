@@ -865,14 +865,14 @@ export const PT: Record<string, string> = {
   "Free counting practice for Pre-K through grade 2. Count objects to 20, compare groups, find the number before and after, read dot patterns, and fill a ten-frame.":
     "Contar de graça, da pré-escola ao 2.º ano. Conte objetos até 20, compare grupos, ache o número de antes e o de depois, leia padrões de pontos e preencha um quadro de dez.",
   "Free for every family. No ads, no accounts.": "Grátis para todas as famílias. Sem anúncios e sem conta.",
-  "Free fraction practice for grades 1–5. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.":
-    "Frações de graça, do 1.º ao 5.º ano. Partes de um inteiro, frações unitárias, frações na reta numérica, comparar frações, frações equivalentes com desenhos e decimais.",
+  "Free fraction practice for grades 1–6. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, decimals, and dividing fractions.":
+    "Frações de graça, do 1.º ao 6.º ano. Partes de um inteiro, frações unitárias, frações na reta numérica, comparar frações, frações equivalentes com desenhos, decimais e dividir frações.",
   "Free geometry for Pre-K to grade 4. Name shapes, learn position words, join shapes, count faces and squares, and sort quadrilaterals.":
     "Geometria de graça, da pré-escola ao 4.º ano. Diga o nome das figuras, aprenda palavras de lugar, junte figuras, conte faces e quadrados e separe os quadriláteros.",
   "Free measurement and data practice for Pre-K through grade 4. Compare longer and shorter, measure inches on a ruler, read picture graphs and bar graphs, and find area.":
     "Medidas e dados de graça, da pré-escola ao 4.º ano. Compare o que é mais comprido e o que é mais curto, meça polegadas na régua, leia gráficos de figuras e gráficos de barras e ache a área.",
-  "Free missing-number equations for kindergarten through grade 5. Find the box in an addition, subtraction, multiplication, or two-step equation. A first look at variables. No signup.":
-    "Contas com um número que falta, do jardim ao 5.º ano, de graça. Ache a caixa numa soma, numa subtração, numa multiplicação ou numa conta de dois passos. Um primeiro olhar para as variáveis. Sem cadastro.",
+  "Free missing-number equations for kindergarten through grade 6. Find the box in an addition, subtraction, multiplication, or two-step equation, evaluate expressions with a letter, and try small exponents. A first look at variables. No signup.":
+    "Contas com um número que falta, do jardim ao 6.º ano, de graça. Ache a caixa numa soma, numa subtração, numa multiplicação ou numa conta de dois passos, avalie expressões com uma letra e experimente expoentes pequenos. Um primeiro olhar às variáveis. Sem cadastro.",
   "Free phonics practice for Pre-K through grade 3. Letter sounds, beginning sounds with pictures, rhyming words, and CVC blending. A speaker reads the sound, with the sound written out when a voice is not available.":
     "Prática grátis de sons, da pré-escola ao 3.º ano. Sons das letras, sons do começo com desenhos, palavras que rimam e juntar sons CVC. Uma voz lê o som, e o som aparece escrito quando não há voz. Os sons da fonética continuam em inglês.",
   "Free place value practice for grades 1–5. Tens and ones with base-ten blocks, expanded form, comparing numbers, rounding, and thousands up to a million.":
@@ -1185,6 +1185,7 @@ export const PT: Record<string, string> = {
   "Pre-K–2": "Pré-escola ao 2.º",
   "Pre-K–3": "Pré-escola ao 3.º",
   "Grades 1–5": "1.º ao 5.º ano",
+  "Grades 1–6": "1.º ao 6.º ano",
   "Pre-primer": "Primeiras palavras",
   "Pre-primer words": "Primeiras palavras",
   "Press and hold": "Pressione e segure",
@@ -1436,6 +1437,7 @@ export const PT: Record<string, string> = {
   "Summit": "Topo",
   "Free grade 5 math review. Unlike fractions, decimals, dividing by 2 digits, the coordinate plane, two-rule patterns, and volume. No signup.": "Revisão grátis de matemática do 5.º ano. Frações com denominadores diferentes, decimais, divisão por 2 algarismos, o plano cartesiano, padrões com duas regras e volume. Sem cadastro.",
   "K–5": "Jardim ao 5.º",
+  "K–6": "Jardim ao 6.º",
   "1–5": "1.º ao 5.º",
   "Pre-K–5": "Pré-escola ao 5.º",
   "Grade 2–5": "2.º ao 5.º ano",
@@ -1473,6 +1475,20 @@ export const PT: Record<string, string> = {
   "Add unlike fractions": "Somar frações diferentes",
   "Multiply fractions": "Multiplicar frações",
   "Order of operations": "Ordem das operações",
+  "GCF and LCM": "MDC e MMC",
+  "Divide fractions": "Dividir frações",
+  "Exponents": "Expoentes",
+  "Expressions": "Expressões",
+  "Multiply it by itself.": "Multiplique por ele mesmo.",
+  "Count the letters.": "Conte as letras.",
+  "Swap in the number for the letter.": "Troque a letra pelo número.",
+  "Greatest common factor": "Máximo divisor comum",
+  "Least common multiple": "Mínimo múltiplo comum",
+  "Replace the letter with the number, then multiply and add.": "Troque a letra pelo número, depois multiplique e some.",
+  "The same expression can look different. Try distributing or combining.": "A mesma expressão pode parecer diferente. Tente distribuir ou juntar.",
+  "An exponent tells how many times to multiply the base by itself. 2^3 means 2 × 2 × 2.": "O expoente diz quantas vezes multiplicar a base por ela mesma. 2^3 significa 2 × 2 × 2.",
+  "The greatest common factor is the biggest number that divides both.": "O máximo divisor comum é o maior número que divide os dois.",
+  "The least common multiple is the smallest number that both go into.": "O mínimo múltiplo comum é o menor número em que os dois cabem.",
   "Two-step stories": "Histórias de dois passos",
   "Understand a fraction": "Entender uma fração",
   "Understand angles": "Entender os ângulos",
@@ -1741,5 +1757,5 @@ export const PT: Record<string, string> = {
   "Follow a number rule": "Seguir uma regra numérica",
   "Free sharing and division practice for Pre-K through grade 5. Deal cookies onto plates, make equal groups, and see what is left over. No signup.": "Prática grátis de repartir e dividir, da pré-escola ao 5.º ano. Reparta biscoitos nos pratos, faça grupos iguais e veja o que sobra. Sem cadastro.",
   "Free area and perimeter practice for grades 2–5. Count unit squares in a shape, walk the fence around it, and find a missing side. No signup.": "Prática grátis de área e perímetro para o 2.º ao 5.º ano. Conte quadrados unitários, percorra a cerca e ache um lado que falta. Sem cadastro.",
-  "Free skip-counting and number patterns for kindergarten through grade 5. Count by tens, fives, twos, and hundreds, then find the rule. No signup.": "Contagem saltada e padrões numéricos grátis, do jardim ao 5.º ano. Conte de 10 em 10, de 5 em 5, de 2 em 2 e de 100 em 100, e ache a regra. Sem cadastro.",
+  "Free skip-counting and number patterns for kindergarten through grade 6. Count by tens, fives, twos, and hundreds, find the rule, and find the greatest common factor or least common multiple. No signup.": "Contagem saltada e padrões numéricos grátis, do jardim ao 6.º ano. Conte de 10 em 10, de 5 em 5, de 2 em 2 e de 100 em 100, ache a regra, e ache o máximo divisor comum ou o mínimo múltiplo comum. Sem cadastro.",
 };

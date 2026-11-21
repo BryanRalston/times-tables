@@ -24,7 +24,7 @@ import {
 /** Stable key. The schema version lives on the save, not in the key name. */
 export const STORAGE_KEY = "squishee-academy-v1";
 const SUBJECT_IDS: readonly string[] = ["math", "reading", "spelling"];
-export const SAVE_VERSION = 13;
+export const SAVE_VERSION = 14;
 
 /**
  * Migrations run from the save's version up to SAVE_VERSION.
@@ -43,6 +43,7 @@ const MIGRATIONS: Record<number, (raw: Record<string, unknown>) => Record<string
   10: migrateV10toV11,
   11: migrateV11toV12,
   12: migrateV12toV13,
+  13: migrateV13toV14,
 };
 
 /** A newer app wrote this disk. Don't replace it with an older schema. */
@@ -236,6 +237,11 @@ function migrateV9toV10(raw: Record<string, unknown>): Record<string, unknown> {
 /** Grade 5 joins the picker. Nothing in an older save changes. */
 function migrateV11toV12(raw: Record<string, unknown>): Record<string, unknown> {
   return { ...raw, version: 12 };
+}
+
+/** Grade 6 joins the picker. Nothing in an older save changes. */
+function migrateV13toV14(raw: Record<string, unknown>): Record<string, unknown> {
+  return { ...raw, version: 14 };
 }
 
 /** Difficulty per game and grade arrives. Older saves play Medium and keep their levels. */

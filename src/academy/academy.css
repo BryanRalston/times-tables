@@ -4439,3 +4439,42 @@ button.ac-go.ac-continue { box-sizing: border-box; min-width: 0; max-width: 100%
   .ac-subjects.is-chips .ac-subject { padding: 3px 10px 3px 3px; font-size: 14px; }
   .ac-home-hero ~ .ac-trail { margin-top: 12px; }
 }
+
+
+/* Grade 6 slice 1: expressions, exponents, fraction division, GCF/LCM */
+.ac-g6-expr { margin: 0; letter-spacing: 0.02em; }
+.ac-g6-eval, .ac-g6-exp, .ac-g6-div, .ac-g6-factor { display: grid; gap: 8px; justify-items: center; }
+.ac-g6-when, .ac-g6-factor-word { margin: 0; font-size: 1.05rem; font-weight: 700; }
+.ac-g6-div-row { display: grid; gap: 4px; justify-items: center; width: 100%; }
+.ac-g6-and { font-weight: 700; opacity: 0.7; }
+html[lang="ar"] .ac-g6-expr, html[lang="ar"] .ac-g6-when { direction: ltr; }
+/* Keep the question count on screen, even when a hint banner adds height. */
+.ac-round-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  padding: 8px 0 calc(6px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to bottom, rgba(255, 241, 247, 0), #fff1f7 18%, #fff1f7);
+}
+.ac-shell:not(.is-boss) .ac-play-meta .ac-nudge-slot:empty {
+  flex: 0 0 0;
+  min-width: 0;
+  width: 0;
+  overflow: hidden;
+  margin: 0;
+}
+@media (max-height: 720px) {
+  .ac-g6-div { gap: 4px; }
+  .ac-g6-div-row { gap: 0; }
+  .ac-g6-div .ac-frac { margin: 2px auto; }
+  .ac-g6-div .ac-frac i { height: 28px; }
+  .ac-g6-div .ac-frac-name { font-size: 15px; }
+  .ac-shell:not(.is-boss) .ac-round-foot .ac-combo-row { margin-top: 6px; }
+  .ac-shell:not(.is-boss) .ac-round-foot .ac-qdots { margin-top: 6px; }
+  .ac-shell:not(.is-boss) .ac-round-foot .ac-qmeta { margin-top: 2px; }
+}
+
+@media (max-width: 430px) {
+  .ac-g6-expr { font-size: 1.6rem; }
+  .ac-g6-when { font-size: 1rem; }
+}

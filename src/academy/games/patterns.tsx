@@ -3,6 +3,7 @@ import { cx } from "../ui/bits";
 import { PatternBench } from "../ui/pattern-board";
 import { patternsCard } from "./cards";
 import { PairTile, TwoRulesArt } from "./grade5-pairs-art";
+import { GcfLcmArt } from "./grade6-art";
 import { isPatternLevel, makePatternQuestion, makePatternSheet } from "./patterns-data";
 import type { PatternTask } from "./patterns-data";
 import { SceneCard, sceneModule } from "./scene-ui";
@@ -28,6 +29,7 @@ export function PatternPrompt({ question, reveal, mascot, happy }: PromptProps) 
   return (
     <SceneCard title={question.title} mascot={mascot} happy={happy} hint={question.hint} hands={question.visual.hands} answer={question.answer}>
       {board.mode === "twoRules" ? <TwoRulesArt board={board} reveal={reveal} /> : null}
+      {board.mode === "gcfLcm" ? <GcfLcmArt board={board} /> : null}
     </SceneCard>
   );
 }
@@ -40,8 +42,8 @@ export function PatternChoices({ question, reveal, onChoose }: ChoiceProps) {
     choiceRef.current?.scrollIntoView({ block: "nearest", inline: "nearest" });
   }, [question.id]);
   if (!board || !task) return null;
-  if (board.mode === "twoRules") {
-    // Grade 5: the two patterns sit in the prompt card. Tiles only here.
+  if (board.mode === "twoRules" || board.mode === "gcfLcm") {
+    // Grade 5 two rules and grade 6 GCF/LCM sit in the prompt card. Tiles only here.
     return (
       <div ref={choiceRef} className={cx("ac-choices", reveal && "is-locked")}>
         {question.choices.map((option) => (

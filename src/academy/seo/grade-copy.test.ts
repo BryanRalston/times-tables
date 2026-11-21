@@ -4,10 +4,10 @@ import { GAMES } from "../games/registry";
 import { WORKSHEETS } from "./catalog";
 import { worksheetIndexHtml } from "./html";
 
-describe("Pre-K to grade 5 public copy", () => {
+describe("Pre-K to grade 6 public copy", () => {
   it("names the full range and the grade 4 skills on the worksheet index", () => {
     const index = worksheetIndexHtml();
-    expect(index).toContain("Free Pre-K to Grade 5 Math Worksheets");
+    expect(index).toContain("Free Pre-K to Grade 6 Math Worksheets");
     expect(index).toContain("elapsed time");
     expect(index).toContain("money problems");
     expect(index).toContain("thousands");
@@ -32,7 +32,7 @@ describe("Pre-K to grade 5 public copy", () => {
     expect(times?.blurb).toContain("grades 1–5");
     expect(times?.blurb).not.toContain("Pre-K");
     expect(add?.blurb).toContain("kindergarten through grade 5");
-    expect(fractions?.blurb).toContain("grades 1–5");
+    expect(fractions?.blurb).toContain("grades 1–6");
     const bySlug = (slug: string) => WORKSHEETS.find((sheet) => sheet.slug === slug);
     expect(bySlug("multiplication-7s")?.title).toContain("(Grade 3)");
     expect(bySlug("addition-within-10")?.title).toContain("(Kindergarten)");

@@ -1186,6 +1186,7 @@ export function sceneModule(opts: {
   makeQuestion: GameModule["makeQuestion"];
   makeSheetItem: GameModule["makeSheetItem"];
   Prompt: GameModule["Prompt"];
+  pill?: GameModule["pill"];
 }): GameModule {
   return {
     id: opts.id,
@@ -1202,7 +1203,7 @@ export function sceneModule(opts: {
     defaultLevel: opts.defaultLevel,
     sheetDefaultLevel: opts.sheetDefaultLevel,
     isLevel: opts.isLevel,
-    pill: (level) => gamePill(opts.short, level.num),
+    pill: opts.pill ?? ((level) => gamePill(opts.short, level.num)),
     makeQuestion: opts.makeQuestion,
     makeSheetItem: opts.makeSheetItem,
     Prompt: opts.Prompt,

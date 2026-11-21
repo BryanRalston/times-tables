@@ -6,9 +6,9 @@ import { privacyCopy } from "./privacy-copy";
 
 export const CANONICAL_ORIGIN = "https://squisheeacademy.com";
 
-export const HOME_TITLE = "Free learning games for kids Pre-K to grade 5 | Squishee Academy";
+export const HOME_TITLE = "Free learning games for kids Pre-K to grade 6 | Squishee Academy";
 export const HOME_DESCRIPTION =
-  "Free learning games for kids Pre-K to grade 5. Play in 7 languages: English, Español, Português, Français, 中文, हिन्दी, العربية. No ads, no accounts.";
+  "Free learning games for kids Pre-K to grade 6. Play in 7 languages: English, Español, Português, Français, 中文, हिन्दी, العربية. No ads, no accounts.";
 
 /** One URL serves every language. These tell crawlers which languages that page is for. */
 export const HOME_HREFLANGS = ["x-default", "en", "es", "pt-BR", "fr", "zh-Hans", "hi", "ar"] as const;
@@ -17,7 +17,7 @@ export const HOME_HREFLANGS = ["x-default", "en", "es", "pt-BR", "fr", "zh-Hans"
 export const SHARE_IMAGE_PATH = "/og/squishee-academy.png";
 export const SHARE_IMAGE_WIDTH = 1200;
 export const SHARE_IMAGE_HEIGHT = 630;
-export const SHARE_IMAGE_ALT = "Squishee Academy. Free learning games for Pre-K to grade 5.";
+export const SHARE_IMAGE_ALT = "Squishee Academy. Free learning games for Pre-K to grade 6.";
 
 export function shareImageUrl(): string {
   return `${CANONICAL_ORIGIN}${SHARE_IMAGE_PATH}`;

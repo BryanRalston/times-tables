@@ -6,7 +6,7 @@ import type { Grade } from "./model";
  * A level belongs to the first grade whose band plays it (or gives it as a gentle
  * intro). A later grade that keeps the level is reviewing it, so it adds nothing.
  */
-export const GRADES_IN_ORDER: readonly Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
+export const GRADES_IN_ORDER: readonly Grade[] = ["PK", "K", "1", "2", "3", "4", "5", "6"];
 
 /** The grade that first teaches this level, or undefined when no grade band uses it. */
 export function levelHomeGrade(gameId: string, levelId: string): Grade | undefined {

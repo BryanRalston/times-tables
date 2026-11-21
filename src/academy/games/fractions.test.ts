@@ -119,6 +119,10 @@ describe("fraction questions", () => {
           case "addUnlike":
           case "fracTimes":
             break;
+          case "fracDiv":
+            expect((board.num / board.den) / (board.num2 / board.den2)).toBeCloseTo(Number(q.answer), 9);
+            expect(Number.isInteger(Number(q.answer))).toBe(true);
+            break;
           default: {
             const neverBoard: never = board;
             throw new Error(String(neverBoard));
@@ -145,6 +149,13 @@ describe("fraction questions", () => {
         const dens = [...`${row.prompt} ${row.answer}`.matchAll(/\/(\d+)/g)].map((found) => Number(found[1]));
         if (level.id === "addUnlike") {
           for (const found of dens) expect(found).toBeLessThanOrEqual(12);
+          continue;
+        }
+        if (level.id === "fracDiv") {
+          const div = row.prompt.match(/^(\d+)(?:\/(\d+))? ÷ (\d+)\/(\d+) =$/);
+          expect(div).toBeTruthy();
+          const leftDen = Number(div?.[2] ?? 1);
+          expect((Number(div?.[1]) / leftDen) / (Number(div?.[3]) / Number(div?.[4]))).toBeCloseTo(Number(row.answer), 9);
           continue;
         }
         for (const found of dens) expect([2, 3, 4, 6, 8]).toContain(found);

@@ -77,6 +77,8 @@ export type FractionBoard =
   | { game: "fractions"; mode: "addUnlike"; num: number; den: number; num2: number; den2: number; op: "+" | "-"; common: number }
   /** Grade 5: a fraction times a whole number (`whole` set) or times another fraction. */
   | { game: "fractions"; mode: "fracTimes"; num: number; den: number; num2: number; den2: number; whole: number }
+  /** Grade 6: how many of num2/den2 fit in num/den. `whole` is the quotient. */
+  | { game: "fractions"; mode: "fracDiv"; num: number; den: number; num2: number; den2: number; whole: number }
   | {
       game: "fractions";
       mode: "decimals";
@@ -125,7 +127,7 @@ export interface ProblemBoard {
 
 export type EstimateKind = "ten" | "hundred" | "sum" | "diff" | "check";
 
-export type VariableMode = "addend" | "either" | "factor" | "times" | "steps" | "orderOps";
+export type VariableMode = "addend" | "either" | "factor" | "times" | "steps" | "orderOps" | "exprEval" | "exponents";
 export type VariableBox = "left" | "right" | "result" | "extra";
 
 /** One unknown in an equation. `a`, `b`, and `c` are the true numbers. A null slot is the box. */
@@ -147,6 +149,8 @@ export interface VariableBoard {
   ask?: "value" | "match";
   /** Worked steps a miss can show. */
   steps?: string[];
+  /** Grade 6: the letter in an expression, when the card evaluates it. */
+  letter?: string;
 }
 
 export interface GraphCat {
@@ -228,7 +232,7 @@ export interface GridBoard {
 }
 
 /** `twoRules` is grade 5 (5.OA.B.3): two patterns from two rules, side by side. `two` holds them. */
-export type PatternLevel = "tens" | "fives" | "twos" | "hundreds" | "rule" | "grow" | "twoRules";
+export type PatternLevel = "tens" | "fives" | "twos" | "hundreds" | "rule" | "grow" | "twoRules" | "gcfLcm";
 
 /**
  * Grade 5 two rules (5.OA.B.3). Both patterns start at 0: term i of A is
@@ -246,6 +250,12 @@ export interface TwoRules {
   row: "a" | "b";
 }
 
+export interface FactorAsk {
+  kind: "gcf" | "lcm";
+  a: number;
+  b: number;
+}
+
 export interface PatternBoard {
   game: "patterns";
   mode: PatternLevel;
@@ -253,6 +263,8 @@ export interface PatternBoard {
   step: number;
   answer: number;
   two?: TwoRules;
+  /** Grade 6 GCF / LCM (6.NS.B). */
+  factor?: FactorAsk;
 }
 
 export type SignLevel = "to10" | "tens" | "hundreds" | "big";

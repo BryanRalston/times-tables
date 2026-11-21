@@ -433,7 +433,7 @@ function sheetPage(sheet: StaticSheet, locale: SeoLocale): SeoPage {
 function sheetIndexPage(locale: SeoLocale): SeoPage {
   const lang = locale.id;
   const path = withLocale(locale.prefix, "worksheets");
-  const ui = uiCopy(lang, gradePhrase(lang, ["PK", "K", "1", "2", "3", "4", "5"]), "Squishee Academy");
+  const ui = uiCopy(lang, gradePhrase(lang, ["PK", "K", "1", "2", "3", "4", "5", "6"]), "Squishee Academy");
   const games = GAME_COPY.map((game) => ({
     href: relativeHref(path, withLocale(locale.prefix, game.slug)),
     label: say(game.name, lang),
@@ -447,9 +447,9 @@ function sheetIndexPage(locale: SeoLocale): SeoPage {
     description: sheetIndexDescription(lang),
     h1: sheetIndexH1(lang),
     lede: sheetIndexLede(lang),
-    gradesLabel: gradePhrase(lang, ["PK", "K", "1", "2", "3", "4", "5"]),
+    gradesLabel: gradePhrase(lang, ["PK", "K", "1", "2", "3", "4", "5", "6"]),
     codes: [],
-    ageRange: "4-11",
+    ageRange: ageRange(["PK", "K", "1", "2", "3", "4", "5", "6"]),
     shot: "/shots/times.png",
     shotAlt: uiCopy(lang, "", say(GAME_COPY[0]!.name, lang)).shot,
     gameId: "times",

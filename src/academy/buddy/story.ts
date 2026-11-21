@@ -630,7 +630,18 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string, gr
     case "shapes":
       return shapeStory(board, host);
     case "fractions":
-      if (grade === "5") return fractionsGrade5Story(buddy, host);
+      if (board.mode === "fracDiv") {
+        return say(
+          `${buddy} and ${host} ask how many pieces fit.`,
+          `${buddy} y ${host} preguntan cuántas piezas caben.`,
+          `${buddy} e ${host} perguntam quantos pedaços cabem.`,
+          `${buddy} et ${host} se demandent combien de morceaux tiennent.`,
+          `${buddy}和${host}在问能放下几份。`,
+          `${buddy} और ${host} पूछते हैं कि कितने टुकड़े समाते हैं।`,
+          `${buddy} و${host} يسألان كم قطعة تدخل.`,
+        );
+      }
+      if (grade === "5" || grade === "6") return fractionsGrade5Story(buddy, host);
       return say(
         `${buddy} and ${host} share a shape. What fraction is that?`,
         `${buddy} y ${host} comparten una figura. ¿Qué fracción es?`,
@@ -649,6 +660,17 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string, gr
         `${buddy}, ${trait}, et ${host} résolvent une histoire.`,
       `${buddy}，${trait}，和${host}一起解这道故事题。`, `${buddy} ${trait} और ${host} एक कहानी हल करते हैं।`, `${buddy} ${trait} و${host} يحلّان قصة.`);
     case "variables":
+      if (board.mode === "exprEval" || board.mode === "exponents") {
+        return say(
+          `${buddy} the ${trait} and ${host} work out the expression.`,
+          `${buddy}, ${trait}, y ${host} calculan la expresión.`,
+          `${buddy}, ${trait}, e ${host} resolvem a expressão.`,
+          `${buddy}, ${trait}, et ${host} calculent l'expression.`,
+          `${buddy}，${trait}，和${host}一起算这个式子。`,
+          `${buddy} ${trait} और ${host} व्यंजक हल करते हैं।`,
+          `${buddy} ${trait} و${host} يحسبان العبارة.`,
+        );
+      }
       return say(
         `${buddy} the ${trait} and ${host} find the missing number.`,
         `${buddy}, ${trait}, y ${host} buscan el número que falta.`,
@@ -698,6 +720,17 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string, gr
           `${buddy}和${host}比较两个规律。`,
           `${buddy} और ${host} दो पैटर्न की तुलना करते हैं।`,
           `${buddy} و${host} يقارنان نمطين.`,
+        );
+      }
+      if (board.mode === "gcfLcm") {
+        return say(
+          `${buddy} and ${host} look for a shared factor or a shared multiple.`,
+          `${buddy} y ${host} buscan un factor o un múltiplo común.`,
+          `${buddy} e ${host} procuram um fator ou um múltiplo comum.`,
+          `${buddy} et ${host} cherchent un facteur ou un multiple commun.`,
+          `${buddy}和${host}找共同的因数或倍数。`,
+          `${buddy} और ${host} साझा गुणनखंड या गुणज ढूँढते हैं।`,
+          `${buddy} و${host} يبحثان عن عامل أو مضاعف مشترك.`,
         );
       }
       return say(

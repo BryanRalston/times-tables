@@ -1442,7 +1442,7 @@ export function makeBuildTask(game: string, level: string, rng: Rng, avoid?: str
  * Grade 5 levels are tap-and-think cards on a written expression, decimal, or
  * fraction. They have no drag-and-build card, so a round serves a normal card there.
  */
-const NO_HANDS_CARD: ReadonlySet<string> = new Set(["place:thousandths", "fractions:addUnlike", "fractions:fracTimes", "variables:orderOps", "times:bigMulti", "share:longDiv", "add:decimalOps", "patterns:twoRules", "grid:coords", "cubes:count", "cubes:build", "cubes:formula", "cubes:two"]);
+const NO_HANDS_CARD: ReadonlySet<string> = new Set(["place:thousandths", "fractions:addUnlike", "fractions:fracTimes", "fractions:fracDiv", "variables:orderOps", "variables:exprEval", "variables:exponents", "times:bigMulti", "share:longDiv", "add:decimalOps", "patterns:twoRules", "patterns:gcfLcm", "grid:coords", "cubes:count", "cubes:build", "cubes:formula", "cubes:two"]);
 
 /** Games with no hands-on card at any level. The Grade 5 Summit is all tap-a-tile cards. */
 const NO_HANDS_GAMES: ReadonlySet<string> = new Set(["summit"]);

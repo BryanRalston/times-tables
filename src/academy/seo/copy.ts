@@ -182,6 +182,7 @@ const AGE: Record<Grade, [number, number]> = {
   "3": [8, 9],
   "4": [9, 10],
   "5": [10, 11],
+  "6": [11, 12],
 };
 
 export function ageRange(grades: readonly Grade[]): string {
@@ -219,13 +220,18 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "3": "grade 3",
     "4": "grade 4",
     "5": "grade 5",
+    "6": "grade 6",
     "PK,K,1,2,3,4": "Pre-K to grade 4",
     "PK,K,1,2": "Pre-K to grade 2",
     "PK,K,1,2,3": "Pre-K to grade 3",
     "PK,K,1,2,3,4,5": "Pre-K to grade 5",
+    "PK,K,1,2,3,4,5,6": "Pre-K to grade 6",
     "K,1,2,3,4,5": "kindergarten through grade 5",
+    "K,1,2,3,4,5,6": "kindergarten through grade 6",
     "1,2,3,4,5": "grades 1–5",
+    "1,2,3,4,5,6": "grades 1–6",
     "2,3,4,5": "grades 2–5",
+    "2,3,4,5,6": "grades 2–6",
     "K,1,2,3,4": "kindergarten through grade 4",
     "1,2,3,4": "grades 1–4",
     "2,3,4": "grades 2–4",
@@ -246,13 +252,18 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "3": "grado 3",
     "4": "grado 4",
     "5": "grado 5",
+    "6": "grado 6",
     "PK,K,1,2,3,4": "de prekínder a grado 4",
     "PK,K,1,2": "de prekínder a grado 2",
     "PK,K,1,2,3": "de prekínder a grado 3",
     "PK,K,1,2,3,4,5": "de prekínder a grado 5",
+    "PK,K,1,2,3,4,5,6": "de prekínder a grado 6",
     "K,1,2,3,4,5": "de kínder a grado 5",
+    "K,1,2,3,4,5,6": "de kínder a grado 6",
     "1,2,3,4,5": "grados 1 a 5",
+    "1,2,3,4,5,6": "grados 1 a 6",
     "2,3,4,5": "grados 2 a 5",
+    "2,3,4,5,6": "grados 2 a 6",
     "K,1,2,3,4": "de kínder a grado 4",
     "1,2,3,4": "grados 1 a 4",
     "2,3,4": "grados 2 a 4",
@@ -273,13 +284,18 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "3": "3.º ano",
     "4": "4.º ano",
     "5": "5.º ano",
+    "6": "6.º ano",
     "PK,K,1,2,3,4": "da pré-escola ao 4.º ano",
     "PK,K,1,2": "da pré-escola ao 2.º ano",
     "PK,K,1,2,3": "da pré-escola ao 3.º ano",
     "PK,K,1,2,3,4,5": "da pré-escola ao 5.º ano",
+    "PK,K,1,2,3,4,5,6": "da pré-escola ao 6.º ano",
     "K,1,2,3,4,5": "do jardim ao 5.º ano",
+    "K,1,2,3,4,5,6": "do jardim ao 6.º ano",
     "1,2,3,4,5": "do 1.º ao 5.º ano",
+    "1,2,3,4,5,6": "do 1.º ao 6.º ano",
     "2,3,4,5": "do 2.º ao 5.º ano",
+    "2,3,4,5,6": "do 2.º ao 6.º ano",
     "K,1,2,3,4": "do jardim ao 4.º ano",
     "1,2,3,4": "do 1.º ao 4.º ano",
     "2,3,4": "do 2.º ao 4.º ano",
@@ -300,13 +316,18 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "3": "le CE2",
     "4": "le CM1",
     "5": "le CM2",
+    "6": "la 6e",
     "PK,K,1,2,3,4": "de la maternelle au CM1",
     "PK,K,1,2": "de la maternelle au CE1",
     "PK,K,1,2,3": "de la maternelle au CE2",
     "PK,K,1,2,3,4,5": "de la maternelle au CM2",
+    "PK,K,1,2,3,4,5,6": "de la maternelle à la 6e",
     "K,1,2,3,4,5": "de la grande section au CM2",
+    "K,1,2,3,4,5,6": "de la grande section à la 6e",
     "1,2,3,4,5": "du CP au CM2",
+    "1,2,3,4,5,6": "du CP à la 6e",
     "2,3,4,5": "du CE1 au CM2",
+    "2,3,4,5,6": "du CE1 à la 6e",
     "K,1,2,3,4": "de la grande section au CM1",
     "1,2,3,4": "du CP au CM1",
     "2,3,4": "du CE1 au CM1",
@@ -327,13 +348,18 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "3": "三年级",
     "4": "四年级",
     "5": "五年级",
+    "6": "六年级",
     "PK,K,1,2,3,4": "学前班到四年级",
     "PK,K,1,2": "学前班到二年级",
     "PK,K,1,2,3": "学前班到三年级",
     "PK,K,1,2,3,4,5": "学前班到五年级",
+    "PK,K,1,2,3,4,5,6": "学前班到六年级",
     "K,1,2,3,4,5": "幼儿园到五年级",
+    "K,1,2,3,4,5,6": "幼儿园到六年级",
     "1,2,3,4,5": "一至五年级",
+    "1,2,3,4,5,6": "一至六年级",
     "2,3,4,5": "二至五年级",
+    "2,3,4,5,6": "二至六年级",
     "K,1,2,3,4": "幼儿园到四年级",
     "1,2,3,4": "一至四年级",
     "2,3,4": "二至四年级",
@@ -354,13 +380,18 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "3": "कक्षा 3",
     "4": "कक्षा 4",
     "5": "कक्षा 5",
+    "6": "कक्षा 6",
     "PK,K,1,2,3,4": "नर्सरी से कक्षा 4",
     "PK,K,1,2": "नर्सरी से कक्षा 2",
     "PK,K,1,2,3": "नर्सरी से कक्षा 3",
     "PK,K,1,2,3,4,5": "नर्सरी से कक्षा 5",
+    "PK,K,1,2,3,4,5,6": "नर्सरी से कक्षा 6",
     "K,1,2,3,4,5": "केजी से कक्षा 5",
+    "K,1,2,3,4,5,6": "केजी से कक्षा 6",
     "1,2,3,4,5": "कक्षा 1 से 5",
+    "1,2,3,4,5,6": "कक्षा 1 से 6",
     "2,3,4,5": "कक्षा 2 से 5",
+    "2,3,4,5,6": "कक्षा 2 से 6",
     "K,1,2,3,4": "केजी से कक्षा 4",
     "1,2,3,4": "कक्षा 1 से 4",
     "2,3,4": "कक्षा 2 से 4",
@@ -381,13 +412,18 @@ const GRADE_PHRASES: Record<SeoLang, Record<string, string>> = {
     "3": "الصف الثالث",
     "4": "الصف الرابع",
     "5": "الصف الخامس",
+    "6": "الصف السادس",
     "PK,K,1,2,3,4": "ما قبل الروضة حتى الصف الرابع",
     "PK,K,1,2": "ما قبل الروضة حتى الصف الثاني",
     "PK,K,1,2,3": "ما قبل الروضة حتى الصف الثالث",
     "PK,K,1,2,3,4,5": "ما قبل الروضة حتى الصف الخامس",
+    "PK,K,1,2,3,4,5,6": "ما قبل الروضة حتى الصف السادس",
     "K,1,2,3,4,5": "الروضة حتى الصف الخامس",
+    "K,1,2,3,4,5,6": "الروضة حتى الصف السادس",
     "1,2,3,4,5": "الصف الأول حتى الخامس",
+    "1,2,3,4,5,6": "الصف الأول حتى السادس",
     "2,3,4,5": "الصف الثاني حتى الخامس",
+    "2,3,4,5,6": "الصف الثاني حتى السادس",
     "K,1,2,3,4": "الروضة حتى الصف الرابع",
     "1,2,3,4": "الصف الأول حتى الرابع",
     "2,3,4": "الصف الثاني حتى الرابع",
@@ -607,7 +643,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "fractions",
     slug: "fractions-game",
-    grades: ["1", "2", "3", "4", "5"],
+    grades: ["1", "2", "3", "4", "5", "6"],
     name: phrase("fractions", "fracciones", "frações", "fractions", "分数", "भिन्न", "الكسور"),
     blurb: phrase(
       "Kids shade parts of a whole, compare fractions, find equivalents, add like fractions, and read decimals.",
@@ -667,7 +703,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "variables",
     slug: "missing-numbers-game",
-    grades: ["K", "1", "2", "3", "4", "5"],
+    grades: ["K", "1", "2", "3", "4", "5", "6"],
     name: phrase("missing numbers", "números que faltan", "números que faltam", "nombres manquants", "缺数", "गायब संख्या", "الأعداد الناقصة"),
     blurb: phrase(
       "Kids find the missing number in addition, subtraction, multiplication, and two-step equations. A first look at variables.",
@@ -826,7 +862,7 @@ export const GAME_COPY: readonly GameCopy[] = [
   {
     id: "patterns",
     slug: "number-patterns-game",
-    grades: ["K", "1", "2", "3", "4", "5"],
+    grades: ["K", "1", "2", "3", "4", "5", "6"],
     name: phrase("number patterns", "patrones numéricos", "padrões numéricos", "suites de nombres", "数字规律", "संख्या के पैटर्न", "أنماط الأعداد"),
     blurb: phrase(
       "Kids count by tens, fives, twos, and hundreds, then find the rule that grows the pattern.",
@@ -925,6 +961,7 @@ fractions:addLike|adding like fractions|sumar fracciones iguales|somar frações
 fractions:decimals|decimals|decimales|decimais|décimales|小数|दशमलव|الأعداد العشرية
 fractions:addUnlike|adding unlike fractions|sumar fracciones con distinto denominador|somar frações com denominadores diferentes|additionner des fractions de dénominateurs différents|分母不同的分数加减|असमान हर वाले भिन्नों का जोड़|جمع الكسور مختلفة المقامات
 fractions:fracTimes|multiplying fractions|multiplicar fracciones|multiplicar frações|multiplier des fractions|分数乘法|भिन्नों का गुणा|ضرب الكسور
+fractions:fracDiv|dividing fractions|dividir fracciones|dividir frações|diviser des fractions|分数除法|भिन्नों का भाग|قسمة الكسور
 measure:size|bigger and smaller|más grande y más pequeño|maior e menor|plus grand et plus petit|大小|बड़ा और छोटा|أكبر وأصغر
 measure:compare|longer and shorter|más largo y más corto|mais longo e mais curto|plus long et plus court|长短|लंबा और छोटा|أطول وأقصر
 measure:picture|picture graphs|gráficas de dibujos|gráficos de figuras|graphiques illustrés|象形图|चित्र ग्राफ|رسوم الصور
@@ -952,6 +989,8 @@ variables:factor|missing factors|factores que faltan|fatores que faltam|facteurs
 variables:times|missing numbers in multiplication|números que faltan en la multiplicación|números que faltam na multiplicação|nombres manquants dans une multiplication|乘法里的缺数|गुणा में गायब संख्या|أعداد ناقصة في الضرب
 variables:steps|two-step missing numbers|números que faltan en dos pasos|números que faltam em dois passos|nombres manquants en deux étapes|两步算式的缺数|दो चरणों में गायब संख्या|أعداد ناقصة في خطوتين
 variables:orderOps|order of operations|orden de las operaciones|ordem das operações|ordre des opérations|运算顺序|संक्रियाओं का क्रम|ترتيب العمليات
+variables:exprEval|expressions with a letter|expresiones con una letra|expressões com uma letra|expressions avec une lettre|带字母的式子|अक्षर वाला व्यंजक|عبارات بحرف
+variables:exponents|exponents|exponentes|expoentes|exposants|指数|घातांक|الأسس
 graphs:sort|sorting and counting|clasificar y contar|classificar e contar|trier et compter|分类计数|छाँटना और गिनना|التصنيف والعدّ
 graphs:tally|tally charts|recuentos|listas de contagem|décomptes|正字统计|टैली चार्ट|جداول العدّ
 graphs:picture|picture graphs for data|gráficas de dibujos de datos|gráficos de figuras de dados|graphiques illustrés de données|数据象形图|आँकड़ों के चित्र ग्राफ|رسوم صور للبيانات
@@ -975,6 +1014,7 @@ patterns:hundreds|counting by hundreds|contar de 100 en 100|contar de 100 em 100
 patterns:rule|the next number|el número que sigue|o próximo número|le nombre suivant|下一个数|अगली संख्या|العدد التالي
 patterns:grow|the rule of a pattern|la regla del patrón|a regra do padrão|la règle de la suite|规律是什么|पैटर्न का नियम|قاعدة النمط
 patterns:twoRules|two rules and ordered pairs|dos reglas y pares ordenados|duas regras e pares ordenados|deux règles et des couples|两个规律和有序数对|दो नियम और क्रमित युग्म|قاعدتان وأزواج مرتبة
+patterns:gcfLcm|greatest common factor and least common multiple|máximo común divisor y mínimo común múltiplo|máximo divisor comum e mínimo múltiplo comum|plus grand commun diviseur et plus petit commun multiple|最大公因数和最小公倍数|महत्तम समापवर्तक और लघुत्तम समापवर्त्य|العامل المشترك الأكبر والمضاعف المشترك الأصغر
 signs:to10|comparing numbers to 10|comparar números hasta el 10|comparar números até 10|comparer les nombres jusqu'à 10|比较10以内的数|10 तक तुलना|مقارنة الأعداد حتى 10
 signs:tens|comparing two-digit numbers|comparar números de dos cifras|comparar números de dois algarismos|comparer les nombres à deux chiffres|比较两位数|दो अंकों की तुलना|مقارنة عددين من رقمين
 signs:hundreds|comparing three-digit numbers|comparar números de tres cifras|comparar números de três algarismos|comparer les nombres à trois chiffres|比较三位数|तीन अंकों की तुलना|مقارنة عددين من ثلاثة أرقام
@@ -1175,19 +1215,19 @@ export function sheetDescription(lang: SeoLang, h1: string, grades: string): str
 export function sheetIndexTitle(lang: SeoLang): string {
   switch (lang) {
     case "en":
-      return "Free Pre-K to Grade 5 Math Worksheets | Squishee Academy";
+      return "Free Pre-K to Grade 6 Math Worksheets | Squishee Academy";
     case "es":
-      return "Fichas gratis de mates de prekínder a grado 5 | Squishee Academy";
+      return "Fichas gratis de mates de prekínder a grado 6 | Squishee Academy";
     case "pt-BR":
-      return "Folhas grátis de matemática da pré-escola ao 5.º ano | Squishee Academy";
+      return "Folhas grátis de matemática da pré-escola ao 6.º ano | Squishee Academy";
     case "fr":
-      return "Fiches de maths gratuites, de la maternelle au CM2 | Squishee Academy";
+      return "Fiches de maths gratuites, de la maternelle à la 6e | Squishee Academy";
     case "zh-Hans":
-      return "学前班到五年级的免费数学练习纸 | Squishee Academy";
+      return "学前班到六年级的免费数学练习纸 | Squishee Academy";
     case "hi":
-      return "नर्सरी से कक्षा 5 तक मुफ़्त गणित वर्कशीट | Squishee Academy";
+      return "नर्सरी से कक्षा 6 तक मुफ़्त गणित वर्कशीट | Squishee Academy";
     case "ar":
-      return "أوراق رياضيات مجانية من ما قبل الروضة حتى الصف الخامس | Squishee Academy";
+      return "أوراق رياضيات مجانية من ما قبل الروضة حتى الصف السادس | Squishee Academy";
     default: {
       const neverLang: never = lang;
       return neverLang;
@@ -1198,19 +1238,19 @@ export function sheetIndexTitle(lang: SeoLang): string {
 export function sheetIndexDescription(lang: SeoLang): string {
   switch (lang) {
     case "en":
-      return "Free printable math worksheets for Pre-K to grade 5. Times tables, addition, subtraction, elapsed time, counting coins, money problems, thousands, and area. Answer keys included. No signup.";
+      return "Free printable math worksheets for Pre-K to grade 6. Times tables, addition, subtraction, elapsed time, counting coins, money problems, thousands, and area. Answer keys included. No signup.";
     case "es":
-      return "Fichas de mates imprimibles y gratis, de prekínder a grado 5. Tablas, sumas, restas, tiempo transcurrido, monedas, problemas de dinero, millares y área. Con respuestas. Sin registro.";
+      return "Fichas de mates imprimibles y gratis, de prekínder a grado 6. Tablas, sumas, restas, tiempo transcurrido, monedas, problemas de dinero, millares y área. Con respuestas. Sin registro.";
     case "pt-BR":
-      return "Folhas de matemática imprimíveis e grátis, da pré-escola ao 5.º ano. Tabuada, adição, subtração, tempo decorrido, moedas, problemas de dinheiro, milhares e área. Com gabarito. Sem cadastro.";
+      return "Folhas de matemática imprimíveis e grátis, da pré-escola ao 6.º ano. Tabuada, adição, subtração, tempo decorrido, moedas, problemas de dinheiro, milhares e área. Com gabarito. Sem cadastro.";
     case "fr":
-      return "Fiches de maths à imprimer, gratuites, de la maternelle au CM2. Tables, additions, soustractions, temps écoulé, pièces, problèmes d'argent, milliers et aire. Corrigé inclus. Sans inscription.";
+      return "Fiches de maths à imprimer, gratuites, de la maternelle à la 6e. Tables, additions, soustractions, temps écoulé, pièces, problèmes d'argent, milliers et aire. Corrigé inclus. Sans inscription.";
     case "zh-Hans":
-      return "学前班到五年级的免费可打印数学练习纸。乘法口诀、加减、经过的时间、数硬币、钱的应用题、千位数和面积。附答案。不用注册。";
+      return "学前班到六年级的免费可打印数学练习纸。乘法口诀、加减、经过的时间、数硬币、钱的应用题、千位数和面积。附答案。不用注册。";
     case "hi":
-      return "नर्सरी से कक्षा 5 तक मुफ़्त छापने योग्य गणित वर्कशीट। पहाड़े, जोड़, घटाव, बीता समय, सिक्के, पैसे के सवाल, हज़ार और क्षेत्रफल। उत्तर साथ में। बिना साइन अप।";
+      return "नर्सरी से कक्षा 6 तक मुफ़्त छापने योग्य गणित वर्कशीट। पहाड़े, जोड़, घटाव, बीता समय, सिक्के, पैसे के सवाल, हज़ार और क्षेत्रफल। उत्तर साथ में। बिना साइन अप।";
     case "ar":
-      return "أوراق رياضيات مجانية للطباعة من ما قبل الروضة حتى الصف الخامس. جداول الضرب والجمع والطرح والوقت المنقضي وعدّ العملات ومسائل النقود والألوف والمساحة. مع الإجابات. بلا تسجيل.";
+      return "أوراق رياضيات مجانية للطباعة من ما قبل الروضة حتى الصف السادس. جداول الضرب والجمع والطرح والوقت المنقضي وعدّ العملات ومسائل النقود والألوف والمساحة. مع الإجابات. بلا تسجيل.";
     default: {
       const neverLang: never = lang;
       return neverLang;

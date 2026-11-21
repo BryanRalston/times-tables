@@ -35,7 +35,7 @@ function band(row: GradeBand): GradeBand {
 }
 
 /**
- * Pre-K through grade 5. Grade 5 keeps the grade 4 levels for review where no 5.* level exists yet. Level ids match each game module.
+ * Pre-K through grade 6. A later grade keeps earlier levels for review where no new level exists yet. Level ids match each game module.
  * Standards are Common Core cluster codes. Sight words follow Dolch, with
  * Fry words folded into the grade 2 and grade 3 lists. Grade 4 vocabulary
  * is its own list.
@@ -86,6 +86,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       offer: "play",
       standards: ["5.NBT.B.5"],
     }),
+    "6": band({
+      levels: ["bigMulti"],
+      start: "bigMulti",
+      offer: "play",
+      standards: ["5.NBT.B.5"],
+    }),
   },
   add: {
     PK: band({
@@ -126,6 +132,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["4.NBT.B.4"],
     }),
     "5": band({
+      levels: ["decimalOps"],
+      start: "decimalOps",
+      offer: "play",
+      standards: ["5.NBT.B.7"],
+    }),
+    "6": band({
       levels: ["decimalOps"],
       start: "decimalOps",
       offer: "play",
@@ -176,6 +188,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       offer: "play",
       standards: ["4.MD.A.2"],
     }),
+    "6": band({
+      levels: ["elapsed"],
+      start: "elapsed",
+      offer: "play",
+      standards: ["4.MD.A.2"],
+    }),
   },
   money: {
     PK: band({
@@ -217,6 +235,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["4.MD.A.2"],
     }),
     "5": band({
+      levels: ["spend"],
+      start: "spend",
+      offer: "play",
+      standards: ["4.MD.A.2"],
+    }),
+    "6": band({
       levels: ["spend"],
       start: "spend",
       offer: "play",
@@ -269,6 +293,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       offer: "play",
       standards: ["RF.4.3.A", "L.4.4", "L.4.6"],
     }),
+    "6": band({
+      levels: ["fourth"],
+      start: "fourth",
+      offer: "play",
+      standards: ["RF.4.3.A", "L.4.4", "L.4.6"],
+    }),
   },
   spelling: {
     PK: band({
@@ -310,6 +340,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["RF.4.3.A", "L.4.2"],
     }),
     "5": band({
+      levels: ["grade4"],
+      start: "grade4",
+      offer: "play",
+      standards: ["RF.4.3.A", "L.4.2"],
+    }),
+    "6": band({
       levels: ["grade4"],
       start: "grade4",
       offer: "play",
@@ -360,6 +396,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       offer: "play",
       standards: ["4.NBT.A.2"],
     }),
+    "6": band({
+      levels: ["neighbor"],
+      start: "neighbor",
+      offer: "play",
+      standards: ["4.NBT.A.2"],
+    }),
   },
   place: {
     PK: band({
@@ -402,6 +444,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       cap: "roundBig",
     }),
     "5": band({
+      levels: ["thousandths"],
+      start: "thousandths",
+      offer: "play",
+      standards: ["5.NBT.A.3", "5.NBT.A.4"],
+    }),
+    "6": band({
       levels: ["thousandths"],
       start: "thousandths",
       offer: "play",
@@ -459,6 +507,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       offer: "play",
       standards: ["4.G.A.1", "4.G.A.3", "4.MD.C.5"],
     }),
+    "6": band({
+      levels: ["fold", "angles"],
+      start: "angles",
+      offer: "play",
+      standards: ["4.G.A.1", "4.G.A.3", "4.MD.C.5"],
+    }),
   },
   fractions: {
     PK: band({
@@ -505,6 +559,13 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       start: "addUnlike",
       offer: "play",
       standards: ["5.NF.A.1", "5.NF.B.4"],
+      cap: "fracTimes",
+    }),
+    "6": band({
+      levels: ["fracDiv"],
+      start: "fracDiv",
+      offer: "play",
+      standards: ["6.NS.A.1"],
     }),
   },
   measure: {
@@ -554,6 +615,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       offer: "play",
       standards: ["4.MD.A.3"],
     }),
+    "6": band({
+      levels: ["area", "perimeter"],
+      start: "area",
+      offer: "play",
+      standards: ["4.MD.A.3"],
+    }),
   },
   graphs: {
     PK: band({
@@ -598,6 +665,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["4.MD.B.4"],
     }),
     "5": band({
+      levels: ["line"],
+      start: "line",
+      offer: "play",
+      standards: ["4.MD.B.4"],
+    }),
+    "6": band({
       levels: ["line"],
       start: "line",
       offer: "play",
@@ -653,6 +726,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       offer: "play",
       standards: ["5.NBT.B.6"],
     }),
+    "6": band({
+      levels: ["longDiv"],
+      start: "longDiv",
+      offer: "play",
+      standards: ["5.NBT.B.6"],
+    }),
   },
   grid: {
     PK: band({
@@ -695,6 +774,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["4.MD.A.3", "3.MD.D.8"],
     }),
     "5": band({
+      levels: ["coords"],
+      start: "coords",
+      offer: "play",
+      standards: ["5.G.A.1", "5.G.A.2"],
+    }),
+    "6": band({
       levels: ["coords"],
       start: "coords",
       offer: "play",
@@ -748,6 +833,13 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       start: "twoRules",
       offer: "play",
       standards: ["5.OA.B.3"],
+      cap: "twoRules",
+    }),
+    "6": band({
+      levels: ["gcfLcm"],
+      start: "gcfLcm",
+      offer: "play",
+      standards: ["6.NS.B.4"],
     }),
   },
   signs: {
@@ -797,6 +889,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       offer: "play",
       standards: ["4.NBT.A.2"],
     }),
+    "6": band({
+      levels: ["big"],
+      start: "big",
+      offer: "play",
+      standards: ["4.NBT.A.2"],
+    }),
   },
   jumps: {
     PK: band({
@@ -839,6 +937,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["4.NBT.A.1"],
     }),
     "5": band({
+      levels: ["thousand"],
+      start: "thousand",
+      offer: "play",
+      standards: ["4.NBT.A.1"],
+    }),
+    "6": band({
       levels: ["thousand"],
       start: "thousand",
       offer: "play",
@@ -892,6 +996,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       offer: "play",
       standards: ["RF.4.3.A"],
     }),
+    "6": band({
+      levels: ["cvc", "end"],
+      start: "end",
+      offer: "play",
+      standards: ["RF.4.3.A"],
+    }),
   },
   problems: {
     PK: band({
@@ -935,6 +1045,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["4.OA.A.3"],
     }),
     "5": band({
+      levels: ["steps"],
+      start: "steps",
+      offer: "play",
+      standards: ["4.OA.A.3"],
+    }),
+    "6": band({
       levels: ["steps"],
       start: "steps",
       offer: "play",
@@ -988,6 +1104,13 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       start: "orderOps",
       offer: "play",
       standards: ["5.OA.A.1", "5.OA.A.2"],
+      cap: "orderOps",
+    }),
+    "6": band({
+      levels: ["exprEval", "exponents"],
+      start: "exprEval",
+      offer: "play",
+      standards: ["6.EE.A.1", "6.EE.A.2", "6.EE.A.3", "6.EE.A.4"],
     }),
   },
   ticks: {
@@ -1029,6 +1152,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["3.NF.A.2", "4.NF.B.3"],
     }),
     "5": band({
+      levels: ["past"],
+      start: "past",
+      offer: "play",
+      standards: ["3.NF.A.2", "4.NF.B.3"],
+    }),
+    "6": band({
       levels: ["past"],
       start: "past",
       offer: "play",
@@ -1078,6 +1207,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       offer: "play",
       standards: ["3.MD.A.1"],
     }),
+    "6": band({
+      levels: ["all"],
+      start: "all",
+      offer: "play",
+      standards: ["3.MD.A.1"],
+    }),
   },
   cubes: {
     PK: band({
@@ -1117,6 +1252,12 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["3.MD.C.5"],
     }),
     "5": band({
+      levels: ["count", "build", "formula", "two"],
+      start: "count",
+      offer: "play",
+      standards: ["5.MD.C.3", "5.MD.C.4", "5.MD.C.5"],
+    }),
+    "6": band({
       levels: ["count", "build", "formula", "two"],
       start: "count",
       offer: "play",
@@ -1172,6 +1313,13 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       start: "mix",
       offer: "play",
       standards: ["5.NF.A.1", "5.NBT.B.6", "5.NBT.B.7", "5.G.A.1", "5.OA.B.3", "5.MD.C.5"],
+    }),
+    "6": band({
+      levels: [],
+      start: "mix",
+      offer: "later",
+      locked: true,
+      standards: ["5.NF.A.1"],
     }),
   },
 };
