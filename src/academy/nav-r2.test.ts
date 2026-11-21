@@ -4,7 +4,7 @@ import { tierKey, tierWindow, type Tier } from "./grade-map";
 import { advanceJourney, areaOpen, bossReady, gateBefore, normalizeJourney, parseJourney, subjectSpot } from "./journey";
 import { BOSS_LENGTH, STOPS_PER_AREA, type Grade, type Journey } from "./model";
 
-const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
+const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5", "6"];
 import { bossStoneState, levelStones, roundsToBoss } from "./stones";
 import { blankChild, parseSave, SAVE_VERSION } from "./storage";
 import { subjectIndexes, subjectKeyOf, SUBJECT_KEYS } from "./subject-games";

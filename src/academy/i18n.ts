@@ -342,6 +342,8 @@ export function gradeText(grade: Grade): string {
         return "الصف 4";
       case "5":
         return "الصف 5";
+      case "6":
+        return "الصف 6";
       default: {
         const neverGrade: never = grade;
         return neverGrade;
@@ -364,6 +366,8 @@ export function gradeText(grade: Grade): string {
         return "कक्षा 4";
       case "5":
         return "कक्षा 5";
+      case "6":
+        return "कक्षा 6";
       default: {
         const neverGrade: never = grade;
         return neverGrade;
@@ -386,6 +390,8 @@ export function gradeText(grade: Grade): string {
         return "四年级";
       case "5":
         return "五年级";
+      case "6":
+        return "六年级";
       default: {
         const neverGrade: never = grade;
         return neverGrade;
@@ -408,6 +414,8 @@ export function gradeText(grade: Grade): string {
         return "CM1";
       case "5":
         return "CM2";
+      case "6":
+        return "6e";
       default: {
         const neverGrade: never = grade;
         return neverGrade;
@@ -1186,6 +1194,19 @@ export function gamePill(title: string, num: number): string {
     `${show(title)} · 第${num}关`,
     `${show(title)} · स्तर ${num}`,
     `${show(title)} · المستوى ${num}`,
+  );
+}
+
+/** A shorter pill for later levels, so the title still fits on a 360px phone. */
+export function compactPill(title: string, num: number): string {
+  return t(
+    `${title} · ${num}`,
+    `${show(title)} · ${num}`,
+    `${show(title)} · ${num}`,
+    `${show(title)} · ${num}`,
+    `${show(title)} · ${num}`,
+    `${show(title)} · ${num}`,
+    `${show(title)} · ${num}`,
   );
 }
 

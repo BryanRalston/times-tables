@@ -1,5 +1,5 @@
 import { bandFor } from "../grade-map";
-import { gamePill, show, t } from "../i18n";
+import { compactPill, gamePill, show, t } from "../i18n";
 import type { Grade } from "../model";
 import type { GameCard, LevelDef, SkillRow } from "./types";
 
@@ -25,15 +25,18 @@ function bandStart(game: string, grade: Grade, ids: readonly string[], fallback:
 function sceneCard(
   short: string,
   rows: SkillRow[],
-  fields: Omit<GameCard, "sheetCount" | "layout" | "pill" | "bars" | "chips" | "skillLabel" | "chipLabel">,
+  fields: Omit<GameCard, "sheetCount" | "layout" | "pill" | "bars" | "chips" | "skillLabel" | "chipLabel"> & {
+    pill?: GameCard["pill"];
+  },
 ): GameCard {
+  const { pill, ...rest } = fields;
   return {
-    ...fields,
+    ...rest,
     bars: rows,
     chips: rows,
     sheetCount: 10,
     layout: "card",
-    pill: (level: LevelDef) => gamePill(short, level.num),
+    pill: pill ?? ((level: LevelDef) => gamePill(short, level.num)),
     skillLabel: (key) => labelFor(rows, key),
     chipLabel: (key) => labelFor(rows, key),
   };
@@ -79,6 +82,7 @@ export const timesCard: GameCard = {
         case "4":
           return "factors";
         case "5":
+        case "6":
           return "bigMulti";
         default: {
           const neverGrade: never = grade;
@@ -168,6 +172,7 @@ export const addCard: GameCard = {
         case "4":
           return "within1000";
         case "5":
+        case "6":
           return "decimalOps";
         default: {
           const neverGrade: never = grade;
@@ -238,6 +243,7 @@ export const timeCard: GameCard = {
           return "fives";
         case "4":
         case "5":
+        case "6":
           return "elapsed";
         default: {
           const neverGrade: never = grade;
@@ -308,6 +314,7 @@ export const moneyCard: GameCard = {
           return "dollars";
         case "4":
         case "5":
+        case "6":
           return "spend";
         default: {
           const neverGrade: never = grade;
@@ -370,6 +377,7 @@ export const sightCard: GameCard = {
           return "third";
         case "4":
         case "5":
+        case "6":
           return "fourth";
         default: {
           const neverGrade: never = grade;
@@ -432,6 +440,7 @@ export const spellingCard: GameCard = {
           return "patterns";
         case "4":
         case "5":
+        case "6":
           return "grade4";
         default: {
           const neverGrade: never = grade;
@@ -491,6 +500,7 @@ export const countCard = sceneCard("Counting", COUNT_ROWS, {
       case "3":
       case "4":
       case "5":
+      case "6":
         return "neighbor";
       default: {
         const neverGrade: never = grade;
@@ -548,6 +558,7 @@ export const placeCard = sceneCard("Place Value", PLACE_ROWS, {
       case "4":
         return "big";
       case "5":
+      case "6":
         return "thousandths";
       default: {
         const neverGrade: never = grade;
@@ -626,6 +637,7 @@ export const shapesCard = sceneCard("Shapes", SHAPE_ROWS, {
         return "quads";
       case "4":
       case "5":
+      case "6":
         return "angles";
       default: {
         const neverGrade: never = grade;
@@ -672,18 +684,20 @@ const FRACTION_ROWS: SkillRow[] = [
   { key: "fractions:decimals", label: "Decimals" },
   { key: "fractions:addUnlike", label: "Add unlike fractions" },
   { key: "fractions:fracTimes", label: "Multiply fractions" },
+  { key: "fractions:fracDiv", label: "Divide fractions" },
 ];
 
 export const fractionsCard = sceneCard("Fractions", FRACTION_ROWS, {
   id: "fractions",
   title: "Fractions",
-  audience: "Grades 1–5",
+  pill: (level) => (level.num >= 10 ? compactPill("Fractions", level.num) : gamePill("Fractions", level.num)),
+  audience: "Grades 1–6",
   tint: "sand",
   mascot: "panda",
   sheetSlug: "fractions",
   sheetScreen: "sheet-fractions",
   blurb:
-    "Free fraction practice for grades 1–5. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, and decimals.",
+    "Free fraction practice for grades 1–6. Parts of a whole, unit fractions, fractions on a number line, comparing fractions, equivalent fractions with pictures, decimals, and dividing fractions.",
   levels: [
     { id: "parts", label: "Parts of a whole", num: 1 },
     { id: "unit", label: "Unit fractions", num: 2 },
@@ -695,6 +709,7 @@ export const fractionsCard = sceneCard("Fractions", FRACTION_ROWS, {
     { id: "decimals", label: "Decimals", num: 8 },
     { id: "addUnlike", label: "Add unlike fractions", num: 9 },
     { id: "fracTimes", label: "Multiply fractions", num: 10 },
+    { id: "fracDiv", label: "Divide fractions", num: 11 },
   ],
   defaultLevel(grade) {
     switch (grade) {
@@ -710,6 +725,8 @@ export const fractionsCard = sceneCard("Fractions", FRACTION_ROWS, {
         return "addLike";
       case "5":
         return "addUnlike";
+      case "6":
+        return "fracDiv";
       default: {
         const neverGrade: never = grade;
         return neverGrade;
@@ -717,7 +734,7 @@ export const fractionsCard = sceneCard("Fractions", FRACTION_ROWS, {
     }
   },
   sheetDefaultLevel: "parts",
-  isLevel: (value) => isId(["parts", "unit", "line", "compare", "equivalent", "shade", "addLike", "decimals", "addUnlike", "fracTimes"], value),
+  isLevel: (value) => isId(["parts", "unit", "line", "compare", "equivalent", "shade", "addLike", "decimals", "addUnlike", "fracTimes", "fracDiv"], value),
 });
 
 const MEASURE_ROWS: SkillRow[] = [
@@ -765,6 +782,7 @@ export const measureCard = sceneCard("Measurement", MEASURE_ROWS, {
         return "bar";
       case "4":
       case "5":
+      case "6":
         return "area";
       default: {
         const neverGrade: never = grade;
@@ -816,6 +834,7 @@ export const phonicsCard = sceneCard("Phonics", PHONICS_ROWS, {
         return "cvc";
       case "4":
       case "5":
+      case "6":
         return "end";
       default: {
         const neverGrade: never = grade;
@@ -868,6 +887,7 @@ export const problemsCard = sceneCard("Word Problems", PROBLEM_ROWS, {
         return "picture";
       case "4":
       case "5":
+      case "6":
         return "steps";
       default: {
         const neverGrade: never = grade;
@@ -886,18 +906,25 @@ const VARIABLE_ROWS: SkillRow[] = [
   { key: "variables:times", label: "Times blank" },
   { key: "variables:steps", label: "Two-step blank" },
   { key: "variables:orderOps", label: "Order of operations" },
+  { key: "variables:exprEval", label: "Expressions" },
+  { key: "variables:exponents", label: "Exponents" },
 ];
 
 export const variablesCard = sceneCard("What is missing", VARIABLE_ROWS, {
   id: "variables",
   title: "What is missing",
-  audience: "K–5",
+  pill: (level) => {
+    if (level.id === "exprEval") return compactPill("Expressions", level.num);
+    if (level.id === "exponents") return compactPill("Exponents", level.num);
+    return gamePill("What is missing", level.num);
+  },
+  audience: "K–6",
   tint: "iris",
   mascot: "otter",
   sheetSlug: "missing-numbers",
   sheetScreen: "sheet-variables",
   blurb:
-    "Free missing-number equations for kindergarten through grade 5. Find the box in an addition, subtraction, multiplication, or two-step equation. A first look at variables. No signup.",
+    "Free missing-number equations for kindergarten through grade 6. Find the box in an addition, subtraction, multiplication, or two-step equation, evaluate expressions with a letter, and try small exponents. A first look at variables. No signup.",
   levels: [
     { id: "addend", label: "Addend within 10", num: 1 },
     { id: "either", label: "Blank within 20", num: 2 },
@@ -905,9 +932,11 @@ export const variablesCard = sceneCard("What is missing", VARIABLE_ROWS, {
     { id: "times", label: "Times blank", num: 4 },
     { id: "steps", label: "Two-step blank", num: 5 },
     { id: "orderOps", label: "Order of operations", num: 6 },
+    { id: "exprEval", label: "Expressions", num: 7 },
+    { id: "exponents", label: "Exponents", num: 8 },
   ],
   defaultLevel(grade) {
-    const ids = ["addend", "either", "factor", "times", "steps", "orderOps"] as const;
+    const ids = ["addend", "either", "factor", "times", "steps", "orderOps", "exprEval", "exponents"] as const;
     const fallback = ((): string => {
       switch (grade) {
         case "PK":
@@ -922,6 +951,8 @@ export const variablesCard = sceneCard("What is missing", VARIABLE_ROWS, {
           return "steps";
         case "5":
           return "orderOps";
+        case "6":
+          return "exprEval";
         default: {
           const neverGrade: never = grade;
           return neverGrade;
@@ -931,7 +962,7 @@ export const variablesCard = sceneCard("What is missing", VARIABLE_ROWS, {
     return bandStart("variables", grade, ids, fallback);
   },
   sheetDefaultLevel: "addend",
-  isLevel: (value) => isId(["addend", "either", "factor", "times", "steps", "orderOps"], value),
+  isLevel: (value) => isId(["addend", "either", "factor", "times", "steps", "orderOps", "exprEval", "exponents"], value),
 });
 
 const GRAPH_ROWS: SkillRow[] = [
@@ -976,6 +1007,7 @@ export const graphsCard = sceneCard("Data", GRAPH_ROWS, {
           return "scale";
         case "4":
         case "5":
+        case "6":
           return "line";
         default: {
           const neverGrade: never = grade;
@@ -1031,6 +1063,7 @@ export const shareCard = sceneCard("Shares", SHARE_ROWS, {
         case "4":
           return "left";
         case "5":
+        case "6":
           return "longDiv";
         default: {
           const neverGrade: never = grade;
@@ -1081,6 +1114,7 @@ export const gridCard = sceneCard("Garden", GRID_ROWS, {
         case "4":
           return "side";
         case "5":
+        case "6":
           return "coords";
         default: {
           const neverGrade: never = grade;
@@ -1094,7 +1128,7 @@ export const gridCard = sceneCard("Garden", GRID_ROWS, {
   isLevel: (value) => isId(GRID_IDS, value),
 });
 
-const PATTERN_IDS = ["tens", "fives", "twos", "hundreds", "rule", "grow", "twoRules"] as const;
+const PATTERN_IDS = ["tens", "fives", "twos", "hundreds", "rule", "grow", "twoRules", "gcfLcm"] as const;
 const PATTERN_ROWS: SkillRow[] = [
   { key: "patterns:tens", label: "Count by tens" },
   { key: "patterns:fives", label: "Count by fives" },
@@ -1103,18 +1137,19 @@ const PATTERN_ROWS: SkillRow[] = [
   { key: "patterns:rule", label: "Next number" },
   { key: "patterns:grow", label: "The rule" },
   { key: "patterns:twoRules", label: "Two rules" },
+  { key: "patterns:gcfLcm", label: "GCF and LCM" },
 ];
 
 export const patternsCard = sceneCard("Patterns", PATTERN_ROWS, {
   id: "patterns",
   title: "Number Patterns",
-  audience: "K–5",
+  audience: "K–6",
   tint: "sand",
   mascot: "bun",
   sheetSlug: "number-patterns",
   sheetScreen: "sheet-patterns",
   blurb:
-    "Free skip-counting and number patterns for kindergarten through grade 5. Count by tens, fives, twos, and hundreds, then find the rule. No signup.",
+    "Free skip-counting and number patterns for kindergarten through grade 6. Count by tens, fives, twos, and hundreds, find the rule, and find the greatest common factor or least common multiple. No signup.",
   levels: [
     { id: "tens", label: "Count by tens", num: 1 },
     { id: "fives", label: "Count by fives", num: 2 },
@@ -1123,6 +1158,7 @@ export const patternsCard = sceneCard("Patterns", PATTERN_ROWS, {
     { id: "rule", label: "Next number", num: 5 },
     { id: "grow", label: "The rule", num: 6 },
     { id: "twoRules", label: "Two rules", num: 7 },
+    { id: "gcfLcm", label: "GCF and LCM", num: 8 },
   ],
   defaultLevel(grade) {
     const fallback = ((): string => {
@@ -1139,6 +1175,8 @@ export const patternsCard = sceneCard("Patterns", PATTERN_ROWS, {
           return "grow";
         case "5":
           return "twoRules";
+        case "6":
+          return "gcfLcm";
         default: {
           const neverGrade: never = grade;
           return neverGrade;
@@ -1188,6 +1226,7 @@ export const signsCard = sceneCard("Compare", SIGN_ROWS, {
           return "hundreds";
         case "4":
         case "5":
+        case "6":
           return "big";
         default: {
           const neverGrade: never = grade;
@@ -1235,6 +1274,7 @@ export const jumpsCard = sceneCard("10 more", JUMP_ROWS, {
           return "hundred";
         case "4":
         case "5":
+        case "6":
           return "thousand";
         default: {
           const neverGrade: never = grade;
@@ -1284,6 +1324,7 @@ export const ticksCard = sceneCard("Line", TICK_ROWS, {
           return "sixths";
         case "4":
         case "5":
+        case "6":
           return "past";
         default: {
           const neverGrade: never = grade;
@@ -1329,6 +1370,7 @@ export const minuteCard = sceneCard("Minutes", MINUTE_ROWS, {
           return "early";
         case "4":
         case "5":
+        case "6":
           return "all";
         default: {
           const neverGrade: never = grade;

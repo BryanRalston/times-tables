@@ -110,6 +110,7 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     decimals: "4.NF.C.6",
     addUnlike: "5.NF.A.1",
     fracTimes: "5.NF.B.4",
+    fracDiv: "6.NS.A.1",
   },
   measure: {
     size: "K.MD.A.2",
@@ -145,6 +146,8 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     times: "3.OA.A.4",
     steps: "4.OA.A.3",
     orderOps: "5.OA.A.1",
+    exprEval: "6.EE.A.2",
+    exponents: "6.EE.A.1",
   },
   graphs: {
     sort: "K.MD.B.3",
@@ -176,6 +179,7 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     rule: "3.OA.D.9",
     grow: "4.OA.C.5",
     twoRules: "5.OA.B.3",
+    gcfLcm: "6.NS.B.4",
   },
   signs: {
     to10: "K.CC.C.7",
@@ -322,6 +326,12 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "5.NF.B.4": { en: "Multiply fractions", es: "Multiplicar fracciones" },
   "5.OA.A.1": { en: "Parentheses in expressions", es: "Paréntesis en expresiones" },
   "5.OA.A.2": { en: "Write and read expressions", es: "Escribir y leer expresiones" },
+  "6.NS.A.1": { en: "Divide fractions by fractions", es: "Dividir fracciones entre fracciones" },
+  "6.NS.B.4": { en: "Greatest common factor and least common multiple", es: "Máximo común divisor y mínimo común múltiplo" },
+  "6.EE.A.1": { en: "Whole-number exponents", es: "Exponentes de números enteros" },
+  "6.EE.A.2": { en: "Write and evaluate expressions with variables", es: "Escribir y evaluar expresiones con variables" },
+  "6.EE.A.3": { en: "Equivalent expressions", es: "Expresiones equivalentes" },
+  "6.EE.A.4": { en: "Identify equivalent expressions", es: "Identificar expresiones equivalentes" },
   "RF.K.1.D": { en: "Name the letters", es: "Nombrar las letras" },
   "RF.K.2.A": { en: "Hear rhymes", es: "Escuchar rimas" },
   "RF.K.2.D": { en: "Hear sounds in a word", es: "Escuchar los sonidos de una palabra" },

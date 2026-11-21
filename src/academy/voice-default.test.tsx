@@ -30,7 +30,7 @@ import { speak } from "./voice";
 import { storyById } from "./stories/catalog";
 import { StoryReader } from "./ui/stories";
 
-const ALL: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
+const ALL: Grade[] = ["PK", "K", "1", "2", "3", "4", "5", "6"];
 const flush = () => new Promise((done) => setTimeout(done, 0));
 const src = (path: string) => readFileSync(resolve(__dirname, path), "utf8");
 

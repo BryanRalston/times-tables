@@ -2,6 +2,8 @@ import type { Rng } from "@/lib/rng";
 import { t, yesDetail } from "../i18n";
 import { variablesCard } from "./cards";
 import { makeOrderOpsQuestion, mathText, orderOpsSheet, rollOrderForm } from "./grade5";
+import { ExponentsArt, ExprEvalArt } from "./grade6-art";
+import { exponentsSheet, exprEvalSheet, makeExponentsQuestion, makeExprEvalQuestion } from "./grade6";
 import { Groups } from "../ui/bits";
 import { CountToken } from "../ui/count-token";
 import type { VariableBoard, VariableBox, VariableMode } from "./boards";
@@ -9,7 +11,7 @@ import { nearChoices, sceneQuestion } from "./pick";
 import { SceneCard, sceneModule } from "./scene-ui";
 import { MINUS, TIMES, type ChoiceQ, type GameModule, type PromptProps, type SheetItem } from "./types";
 
-export const VARIABLE_LEVELS = ["addend", "either", "factor", "times", "steps", "orderOps"] as const;
+export const VARIABLE_LEVELS = ["addend", "either", "factor", "times", "steps", "orderOps", "exprEval", "exponents"] as const;
 export type VariableLevel = (typeof VARIABLE_LEVELS)[number];
 
 type Truth = Omit<VariableBoard, "game" | "left" | "right" | "result" | "extra">;
@@ -49,7 +51,7 @@ export function variableAnswer(fact: Pick<Truth, "mode" | "op" | "extraOp" | "a"
     case "extra":
       return fact.c;
     case "result":
-      if (fact.mode === "orderOps") return fact.c;
+      if (fact.mode === "orderOps" || fact.mode === "exprEval" || fact.mode === "exponents") return fact.c;
       return fact.mode === "steps" ? stepTotal(fact) : plainResult(fact);
     default: {
       const neverBox: never = fact.box;
@@ -76,7 +78,10 @@ function symbol(op: Truth["op"]): string {
 }
 
 export function variableSolved(fact: Truth): string {
-  if (fact.mode === "orderOps") return `${mathText(fact.expr ?? "")} = ${fact.c}`;
+  if (fact.mode === "orderOps" || fact.mode === "exponents" || (fact.mode === "exprEval" && fact.ask !== "match")) {
+    return `${mathText(fact.expr ?? "")} = ${fact.c}`;
+  }
+  if (fact.mode === "exprEval") return mathText(fact.expr ?? "");
   if (fact.mode === "steps") {
     const extra = fact.extraOp === "+" ? "+" : MINUS;
     return `${fact.a} ${TIMES} ${fact.b} ${extra} ${fact.c} = ${stepTotal(fact)}`;
@@ -95,6 +100,9 @@ export function variableCaptions(fact: Truth): string[] {
   if (fact.mode === "orderOps") {
     const first = t("Parentheses first", "Primero los paréntesis", "Primeiro os parênteses", "D'abord les parenthèses", "先算括号", "पहले कोष्ठक", "الأقواس أولًا");
     return [first, ...(fact.steps ?? []).map(mathText)];
+  }
+  if (fact.mode === "exprEval" || fact.mode === "exponents") {
+    return [...(fact.steps ?? []).map(mathText), solved].filter(Boolean);
   }
   if (fact.mode === "steps") {
     const product = fact.a * fact.b;
@@ -189,6 +197,10 @@ export function rollVariable(rng: Rng, level: VariableLevel): VariableBoard {
       const form = rollOrderForm(rng);
       return { ...boardFrom(baseFact("orderOps", "×", 0, 0, "result", form.value)), expr: form.expr, ask: "value", steps: form.steps };
     }
+    case "exprEval":
+    case "exponents":
+      // Routed in makeVariableQuestion.
+      return { ...boardFrom(baseFact("orderOps", "×", 0, 0, "result", 0)), expr: "", ask: "value", steps: [] };
     default: {
       const neverLevel: never = level;
       return neverLevel;
@@ -233,6 +245,8 @@ function choiceHi(level: VariableLevel): number {
     case "steps":
       return 30;
     case "orderOps":
+    case "exprEval":
+    case "exponents":
       return 100;
     default: {
       const neverLevel: never = level;
@@ -243,7 +257,7 @@ function choiceHi(level: VariableLevel): number {
 
 export function printVariable(board: VariableBoard): string {
   const blank = "__";
-  if (board.mode === "orderOps") return `${board.expr ?? ""} = ${blank}`;
+  if (board.mode === "orderOps" || board.mode === "exprEval" || board.mode === "exponents") return `${board.expr ?? ""} = ${blank}`;
   const left = board.box === "left" ? blank : String(board.a);
   const right = board.box === "right" ? blank : String(board.b);
   if (board.mode === "steps") {
@@ -258,6 +272,8 @@ export function printVariable(board: VariableBoard): string {
 
 export function makeVariableQuestion(rng: Rng, level: VariableLevel): ChoiceQ {
   if (level === "orderOps") return makeOrderOpsQuestion(rng);
+  if (level === "exprEval") return makeExprEvalQuestion(rng);
+  if (level === "exponents") return makeExponentsQuestion(rng);
   const board = rollVariable(rng, level);
   const answer = variableAnswer(board);
   const kind = pictureKind(board);
@@ -283,6 +299,8 @@ export function makeVariableQuestion(rng: Rng, level: VariableLevel): ChoiceQ {
 function sheetItem(rng: Rng, level: string): SheetItem {
   const safe: VariableLevel = isVariableLevel(level) ? level : "addend";
   if (safe === "orderOps") return orderOpsSheet(rng);
+  if (safe === "exprEval") return exprEvalSheet(rng);
+  if (safe === "exponents") return exponentsSheet(rng);
   const board = rollVariable(rng, safe);
   return { prompt: printVariable(board), answer: String(variableAnswer(board)) };
 }
@@ -426,6 +444,20 @@ export function VariablesPrompt({ question, reveal, mascot, happy }: PromptProps
       </SceneCard>
     );
   }
+  if (board.mode === "exprEval") {
+    return (
+      <SceneCard title={question.title} mascot={mascot} happy={happy} hint={question.hint} hands={false} answer={question.answer}>
+        <ExprEvalArt board={board} />
+      </SceneCard>
+    );
+  }
+  if (board.mode === "exponents") {
+    return (
+      <SceneCard title={question.title} mascot={mascot} happy={happy} hint={question.hint} hands={false} answer={question.answer}>
+        <ExponentsArt board={board} />
+      </SceneCard>
+    );
+  }
   return (
     <SceneCard title={question.title} mascot={mascot} happy={happy} hint={question.hint} hands={false} answer={question.answer}>
       <VariablePicture board={board} />
@@ -437,6 +469,7 @@ export function VariablesPrompt({ question, reveal, mascot, happy }: PromptProps
 export const variablesGame: GameModule = sceneModule({
   ...variablesCard,
   short: "What is missing",
+  pill: variablesCard.pill,
   makeQuestion: (rng, level) => makeVariableQuestion(rng, isVariableLevel(level) ? level : "addend"),
   makeSheetItem: sheetItem,
   Prompt: VariablesPrompt,

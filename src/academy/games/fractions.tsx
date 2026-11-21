@@ -6,10 +6,12 @@ import { fractionText, type FractionBoard } from "./boards";
 import { sceneQuestion, uniqueChoices } from "./pick";
 import { makeAddLikeQuestion, makeDecimalQuestion, spanSheet } from "./span";
 import { addUnlikeSheet, makeAddUnlikeQuestion, makeFracTimesQuestion, simplestFraction } from "./grade5";
+import { FracDivArt } from "./grade6-art";
+import { fracDivSheet, makeFracDivQuestion } from "./grade6";
 import { AreaModel, DecimalGrid, FractionBar, FractionLine, SceneCard, sceneModule } from "./scene-ui";
 import type { ChoiceQ, PromptProps, SheetItem } from "./types";
 
-export const FRACTION_LEVELS = ["parts", "unit", "line", "compare", "equivalent", "shade", "addLike", "decimals", "addUnlike", "fracTimes"] as const;
+export const FRACTION_LEVELS = ["parts", "unit", "line", "compare", "equivalent", "shade", "addLike", "decimals", "addUnlike", "fracTimes", "fracDiv"] as const;
 export type FractionLevel = (typeof FRACTION_LEVELS)[number];
 
 const PAIRS: Array<[number, number, number, number]> = [
@@ -320,6 +322,8 @@ export function makeFractionQuestion(rng: Rng, level: FractionLevel): ChoiceQ {
       return makeAddUnlikeQuestion(rng);
     case "fracTimes":
       return makeFracTimesQuestion(rng);
+    case "fracDiv":
+      return makeFracDivQuestion(rng);
     default: {
       const neverLevel: never = level;
       return neverLevel;
@@ -388,6 +392,8 @@ function sheetItem(rng: Rng, level: string): SheetItem {
       const num2 = rng.int(1, den2 - 1);
       return { prompt: `${num}/${den} × ${num2}/${den2} =`, answer: simplestFraction(num * num2, den * den2) };
     }
+    case "fracDiv":
+      return fracDivSheet(rng);
     case "addLike":
     case "decimals": {
       const printed = spanSheet(rng, "fractions", safe);
@@ -470,6 +476,8 @@ function FractionArt({ board }: { board: FractionBoard }) {
     case "fracTimes":
       if (board.whole > 0) return <FractionBar num={board.num} den={board.den} />;
       return <AreaModel num={board.num} den={board.den} num2={board.num2} den2={board.den2} />;
+    case "fracDiv":
+      return <FracDivArt board={board} />;
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -480,6 +488,7 @@ function FractionArt({ board }: { board: FractionBoard }) {
 export const fractionsGame = sceneModule({
   ...fractionsCard,
   short: "Fractions",
+  pill: fractionsCard.pill,
   makeQuestion: (rng, level) => makeFractionQuestion(rng, isFractionLevel(level) ? level : "parts"),
   makeSheetItem: sheetItem,
   Prompt: FractionsPrompt,

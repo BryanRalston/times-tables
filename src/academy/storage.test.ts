@@ -180,7 +180,7 @@ describe("academy save", () => {
 
     const mem = new Map<string, string>();
     const disk = {
-      version: 14,
+      version: 15,
       activeId: "maya",
       sound: true,
       children: [{ id: "maya", name: "Maya", grade: "2", stars: 4 }],
@@ -202,7 +202,7 @@ describe("academy save", () => {
       children: loaded.children.map((child) => ({ ...child, stars: 99 })),
     });
     const kept = JSON.parse(mem.get(STORAGE_KEY) ?? "{}") as { version: number; children: { stars: number }[] };
-    expect(kept.version).toBe(14);
+    expect(kept.version).toBe(15);
     expect(kept.children[0]?.stars).toBe(4);
     mem.delete(STORAGE_KEY);
     loadSave();
@@ -210,7 +210,7 @@ describe("academy save", () => {
   });
 
   it("migrates a version 11 save to the current version and keeps the grade", () => {
-    expect(SAVE_VERSION).toBe(13);
+    expect(SAVE_VERSION).toBe(14);
     const old = {
       version: 11,
       activeId: "kai",
@@ -220,7 +220,7 @@ describe("academy save", () => {
       children: [{ id: "kai", name: "Kai", grade: "4", stars: 7 }],
     };
     const migrated = parseSave(old);
-    expect(migrated.version).toBe(13);
+    expect(migrated.version).toBe(14);
     expect(migrated.lang).toBe("es");
     expect(migrated.children[0]?.grade).toBe("4");
     expect(migrated.children[0]?.stars).toBe(7);
@@ -234,10 +234,24 @@ describe("academy save", () => {
     expect(child.levels.variables).toBe("orderOps");
     const save = { ...freshSave(), activeId: child.id, children: [child] };
     const again = parseSave(JSON.parse(JSON.stringify(save)));
-    expect(again.version).toBe(13);
+    expect(again.version).toBe(14);
     expect(again.children[0]?.grade).toBe("5");
     expect(again.children[0]?.levels.place).toBe("thousandths");
     expect(withGrade(child, "4").grade).toBe("4");
+  });
+
+  it("round-trips a grade 6 child and starts on the new grade 6 levels", () => {
+    const child = blankChild({ name: "Noor", grade: "6" });
+    expect(child.grade).toBe("6");
+    expect(child.levels.variables).toBe("exprEval");
+    expect(child.levels.fractions).toBe("fracDiv");
+    expect(child.levels.patterns).toBe("gcfLcm");
+    const save = { ...freshSave(), activeId: child.id, children: [child] };
+    const again = parseSave(JSON.parse(JSON.stringify(save)));
+    expect(again.version).toBe(14);
+    expect(again.children[0]?.grade).toBe("6");
+    expect(again.children[0]?.levels.variables).toBe("exprEval");
+    expect(withGrade(child, "5").grade).toBe("5");
   });
 
   it("keeps the offline worker on the academy path", () => {

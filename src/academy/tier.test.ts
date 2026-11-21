@@ -5,7 +5,7 @@ import type { Grade } from "./model";
 import { nextPlacement } from "./placement";
 import { freshSave, parseSave, SAVE_VERSION, tierFor, withGrade, withLevel, withTier } from "./storage";
 
-const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
+const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5", "6"];
 
 describe("difficulty tiers", () => {
   it("Easy/Medium stay inside the grade window; Hard adds exactly one level past it", () => {

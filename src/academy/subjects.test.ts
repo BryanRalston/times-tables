@@ -23,7 +23,7 @@ import {
 } from "./subjects";
 import { HomeScreen } from "./ui/home";
 
-const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
+const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5", "6"];
 
 function kid(grade: Grade, patch: Partial<Child> = {}): Child {
   return { ...blankChild({ name: "Mia", grade }), rounds: 8, ...patch };

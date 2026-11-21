@@ -69,6 +69,7 @@ import {
 } from "../round-flow";
 import { blip, bossFanfare, bossRaspberry, bossStrike, chime, startBossMusic, stopBossMusic, teachTone } from "../sound";
 import { hintCue } from "../teach";
+import { exprPalLine } from "../games/grade6";
 import { addCountLine } from "../games/add";
 import { precacheAfterFirstPrompt } from "../offline/later";
 import { silence, speak } from "../voice";
@@ -847,7 +848,15 @@ export function PlayScreen({
         cosmetic={child.equipped}
         reaction={buddyCue}
         pulse={phase === "feedback" ? cheer : 0}
-        countLine={choice?.visual.kind === "add" ? addCountLine(choice.visual) : undefined}
+        countLine={
+          choice?.visual.kind === "add"
+            ? addCountLine(choice.visual)
+            : choice?.visual.kind === "scene" &&
+                choice.visual.board.game === "variables" &&
+                (choice.visual.board.mode === "exprEval" || choice.visual.board.mode === "exponents")
+              ? exprPalLine(choice.visual.board)
+              : undefined
+        }
         game={choice?.game ?? view?.id ?? game}
       />
       {graphPals ? <AcademyPal id={hostId} className="ac-buddy-img" squish="buddy" label="" /> : null}
@@ -1220,6 +1229,7 @@ export function PlayScreen({
             )}
           </div>
           </RoundCastProvider>
+          <div className="ac-round-foot">
           <div
             className="ac-progress"
             role="progressbar"
@@ -1254,6 +1264,7 @@ export function PlayScreen({
             })}
           </div>
           <p className="ac-qmeta">{stepLabel}</p>
+          </div>
         </>
       ) : null}
 

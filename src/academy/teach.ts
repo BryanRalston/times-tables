@@ -670,6 +670,19 @@ function fractionTeach(board: FractionBoard, solved: string): SceneFrame[] {
           : t("Multiply the tops, multiply the bottoms, then simplify", "Multiplica los de arriba, multiplica los de abajo y simplifica", "Multiplique os de cima, multiplique os de baixo e simplifique", "Multiplie les numérateurs, multiplie les dénominateurs, puis simplifie", "分子乘分子，分母乘分母，再约分", "ऊपर वाली संख्याएँ गुणा करो, नीचे वाली गुणा करो, फिर सरल करो", "اضرب البسطين واضرب المقامين ثم بسّط"),
         solved,
       ]);
+    case "fracDiv":
+      return captions([
+        t(
+          `How many ${board.num2}/${board.den2}s fit in ${board.num}/${board.den}?`,
+          `¿Cuántos ${board.num2}/${board.den2} caben en ${board.num}/${board.den}?`,
+          `Quantos ${board.num2}/${board.den2} cabem em ${board.num}/${board.den}?`,
+          `Combien de ${board.num2}/${board.den2} tiennent dans ${board.num}/${board.den} ?`,
+          `${board.num}/${board.den}里面能放下几个${board.num2}/${board.den2}？`,
+          `${board.num}/${board.den} में कितने ${board.num2}/${board.den2} समाते हैं?`,
+          `كم ${board.num2}/${board.den2} يدخل في ${board.num}/${board.den}؟`,
+        ),
+        solved,
+      ]);
     default: {
       const neverBoard: never = board;
       return neverBoard;
@@ -815,6 +828,13 @@ function sceneFrames(question: ChoiceQ, board: Board): TeachFrame[] {
       return captions([gridHint(board.mode === "fence" ? "fence" : "tiles"), solved]);
     case "patterns":
       if (board.mode === "twoRules") return captions(twoRulesCaptions(board, solved));
+      if (board.mode === "gcfLcm" && board.factor) {
+        const fact = board.factor;
+        const line = fact.kind === "gcf"
+          ? t("The greatest common factor is the biggest number that divides both.", "El máximo común divisor es el número más grande que divide a ambos.", "O máximo divisor comum é o maior número que divide os dois.", "Le plus grand commun diviseur est le plus grand nombre qui divise les deux.", "最大公因数是能同时整除这两个数的最大的数。", "महत्तम समापवर्तक वह सबसे बड़ी संख्या है जो दोनों को भाग देती है।", "العامل المشترك الأكبر هو أكبر عدد يقسم العددين معًا.")
+          : t("The least common multiple is the smallest number that both go into.", "El mínimo común múltiplo es el número más pequeño en el que caben ambos.", "O mínimo múltiplo comum é o menor número em que os dois cabem.", "Le plus petit commun multiple est le plus petit nombre que les deux atteignent.", "最小公倍数是这两个数都能整除的最小的数。", "लघुत्तम समापवर्त्य वह सबसे छोटी संख्या है जिसमें दोनों समाते हैं।", "المضاعف المشترك الأصغر هو أصغر عدد يدخل فيه العددان معًا.");
+        return captions([line, solved]);
+      }
       return captions([patternHint(), solved]);
     case "signs":
       return [

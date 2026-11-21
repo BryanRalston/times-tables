@@ -6,7 +6,7 @@ import { tierWindow, type Tier } from "./grade-map";
 import type { Grade } from "./model";
 import { rngFromSeed } from "@/lib/rng";
 
-const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
+const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5", "6"];
 const TIERS: Tier[] = ["easy", "medium", "hard"];
 
 function openFor(gameId: string, grade: Grade, tier: Tier, saved: string) {

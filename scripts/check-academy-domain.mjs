@@ -12,7 +12,7 @@ function fail(msg) {
 }
 
 const SHARE_IMAGE = "https://squisheeacademy.com/og/squishee-academy.png";
-const SHARE_ALT = "Squishee Academy. Free learning games for Pre-K to grade 5.";
+const SHARE_ALT = "Squishee Academy. Free learning games for Pre-K to grade 6.";
 
 function assertShareCard(label, html) {
   const title = html.match(/<title>([^<]*)<\/title>/)?.[1];
@@ -344,12 +344,12 @@ if (!existsSync(resolve(root, "favicon.svg"))) fail("favicon.svg missing");
 if (!existsSync(resolve(root, "money/penny.png"))) fail("money/penny.png missing");
 
 assertShareCard("index.html", html);
-if (!html.includes('property="og:title" content="Free learning games for kids Pre-K to grade 5 | Squishee Academy"')) {
+if (!html.includes('property="og:title" content="Free learning games for kids Pre-K to grade 6 | Squishee Academy"')) {
   fail("home og:title");
 }
 if (
   !html.includes(
-    'content="Free learning games for kids Pre-K to grade 5. Play in 7 languages: English, Español, Português, Français, 中文, हिन्दी, العربية. No ads, no accounts."',
+    'content="Free learning games for kids Pre-K to grade 6. Play in 7 languages: English, Español, Português, Français, 中文, हिन्दी, العربية. No ads, no accounts."',
   )
 ) {
   fail("home description");

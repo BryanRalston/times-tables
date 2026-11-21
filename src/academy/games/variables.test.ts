@@ -68,7 +68,7 @@ export function evalOrder(text: string): number {
 describe("missing-number questions", () => {
   it("hides one number that makes the equation true", () => {
     for (let seed = 0; seed < 24; seed += 1) {
-      for (const level of VARIABLE_LEVELS.filter((id) => id !== "orderOps")) {
+      for (const level of VARIABLE_LEVELS.filter((id) => id !== "orderOps" && id !== "exprEval" && id !== "exponents")) {
         const q = makeVariableQuestion(rngFromSeed(`variables-${seed}-${level}`), level);
         expectChoices(q);
         if (q.visual.kind !== "scene" || q.visual.board.game !== "variables") throw new Error(level);
@@ -104,6 +104,16 @@ describe("missing-number questions", () => {
           const parsed = row.prompt.match(/^(.+) =$/);
           expect(parsed).toBeTruthy();
           expect(evalOrder(parsed?.[1] ?? "")).toBe(Number(row.answer));
+          continue;
+        }
+        if (level.id === "exprEval") {
+          expect(row.prompt).toMatch(/when [xny] = \d+$/);
+          expect(Number(row.answer)).toBeGreaterThan(0);
+          continue;
+        }
+        if (level.id === "exponents") {
+          expect(row.prompt).toMatch(/^\d+\^\d+ =$/);
+          expect(Number(row.answer)).toBeGreaterThan(0);
           continue;
         }
         filledHolds(row.prompt, row.answer);

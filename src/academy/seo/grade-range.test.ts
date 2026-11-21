@@ -104,9 +104,9 @@ describe("range labels come from the content grade map", () => {
     }
   });
 
-  it("keeps the worksheet index at grade 5 because grade 5 worksheets are on it", () => {
+  it("keeps the worksheet index at grade 6 because grade 6 worksheets are on it", () => {
     expect(GAME_CARDS.some((card) => card.id !== "summit" && contentGrades(card.id).includes("5"))).toBe(true);
-    expect(sheetIndexTitle("en")).toContain("Pre-K to Grade 5");
+    expect(sheetIndexTitle("en")).toContain("Pre-K to Grade 6");
   });
 
   it("translates every range label and blurb in all six languages", () => {

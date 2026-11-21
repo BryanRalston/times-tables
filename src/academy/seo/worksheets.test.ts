@@ -590,8 +590,8 @@ describe("printable worksheets", () => {
     const index = worksheetIndexHtml();
     expectShareCard(
       index,
-      "Free Pre-K to Grade 5 Math Worksheets | Squishee Academy",
-      "Free printable math worksheets for Pre-K to grade 5. Times tables, addition, subtraction, elapsed time, counting coins, money problems, thousands, and area. Answer keys included. No signup.",
+      "Free Pre-K to Grade 6 Math Worksheets | Squishee Academy",
+      "Free printable math worksheets for Pre-K to grade 6. Times tables, addition, subtraction, elapsed time, counting coins, money problems, thousands, and area. Answer keys included. No signup.",
       "https://squisheeacademy.com/worksheets/",
     );
     const privacy = privacyHtml();

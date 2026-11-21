@@ -112,7 +112,7 @@ describe("Spanish storybooks", () => {
   });
 
   it("still reads by itself only through grade 2; from grade 3 the child taps to hear", () => {
-    expect((["PK", "K", "1", "2", "3", "4", "5"] as Grade[]).filter(storyAutoReadGrade)).toEqual(["PK", "K", "1", "2"]);
+    expect((["PK", "K", "1", "2", "3", "4", "5", "6"] as Grade[]).filter(storyAutoReadGrade)).toEqual(["PK", "K", "1", "2"]);
     setLocale("es");
     const story = storyById("g1-fox-kite")!;
     expect(renderToStaticMarkup(<StoryReader story={story} grade="2" sound={false} onFinish={() => {}} />)).toContain('data-story-auto="yes"');
