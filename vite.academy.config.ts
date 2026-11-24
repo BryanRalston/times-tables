@@ -218,6 +218,7 @@ export default defineConfig({
         sheetCubes: resolve("academy/worksheets/volume-with-cubes/index.html"),
         sheetSummit: resolve("academy/worksheets/grade-5-math-review/index.html"),
         sheetBalance: resolve("academy/worksheets/balance-scale/index.html"),
+        sheetKeystone: resolve("academy/worksheets/grade-6-math-review/index.html"),
       },
     },
   },

@@ -182,6 +182,13 @@ describe("worked examples", () => {
     }
   });
 
+  it("speaks an exponent in natural words", () => {
+    expect(speakable("What is 7^2?")).toBe("What is 7 squared?");
+    expect(speakable("What is 7²?")).toBe("What is 7 squared?");
+    expect(speakable("What is 2^5?")).toBe("What is 2 to the power of 5?");
+    expect(speakable("What is 2⁵?")).toBe("What is 2 to the power of 5?");
+  });
+
   it("speaks a fraction as words", () => {
     expect(speakable("1/2")).toBe("one half");
     expect(speakable("3/4")).toBe("three fourths");

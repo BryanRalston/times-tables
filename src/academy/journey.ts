@@ -28,15 +28,16 @@ export function areaIndex(journey: Journey, key?: SubjectKey): number {
  * Pre-K coin-name intros stay on the home screen and do not gate counting.
  */
 /**
- * Boss-only islands (the Grade 5 Summit) are not a stop on the path: the boss
- * waits there for a grade 5 child from the first visit until it is beaten.
+ * Boss-only islands (the Grade 5 Summit and Grade 6 Keystone) are not a stop
+ * on the path: the boss waits there for its grade from the first visit until
+ * it is beaten.
  */
-export const BOSS_ONLY_GAMES: Readonly<Record<string, Grade>> = { summit: "5" };
+export const BOSS_ONLY_GAMES: Readonly<Record<string, Grade>> = { summit: "5", keystone: "6" };
 
 function skipsGate(gameId: string, grade: Grade | undefined): boolean {
   if (!gameOffered(gameId)) return true;
-  // Boss-only islands (the Grade 5 Summit) are not a stop on the path, so a
-  // later game can open after the island before them.
+  // Boss-only islands are not a stop on the path for other grades, so a later
+  // game can open after the island before them.
   if (BOSS_ONLY_GAMES[gameId] && grade !== BOSS_ONLY_GAMES[gameId]) return true;
   if (!grade) return false;
   const offer = bandFor(gameId, grade)?.offer;
@@ -188,7 +189,7 @@ export function advanceJourney(journey: Journey, step: RoundStep, grade?: Grade)
   const key = subjectKeyOf(step.game);
   const spot = here.trails![key]!;
   if (BOSS_ONLY_GAMES[step.game]) {
-    // A Summit win is kept, and the path does not move.
+    // A Summit or Keystone win is kept, and the path does not move.
     if (!step.boss || !bossReady(here, step.game, grade) || !bossWon(step.correct, step.total)) return here;
     return { ...here, bosses: [...here.bosses, step.game] };
   }

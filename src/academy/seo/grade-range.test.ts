@@ -56,6 +56,10 @@ describe("range labels come from the content grade map", () => {
         expect(card.audience).toBe("Grade 5 boss");
         continue;
       }
+      if (card.id === "keystone") {
+        expect(card.audience).toBe("Grade 6 boss");
+        continue;
+      }
       expect(card.audience, card.id).toBe(gameRangeLabel(grades));
       expect(card.blurb, card.id).toMatch(englishPhrase(gradeSpan(grades)));
       const top = gradeSpan(grades).at(-1)!;
@@ -67,7 +71,7 @@ describe("range labels come from the content grade map", () => {
 
   it("game worksheet pages carry the same range in title, meta, and noscript copy", () => {
     for (const card of GAME_CARDS) {
-      if (card.id === "summit") continue;
+      if (card.id === "summit" || card.id === "keystone") continue;
       const span = gradeSpan(contentGrades(card.id));
       const html = readFileSync(`academy/worksheets/${card.sheetSlug}/index.html`, "utf8");
       expect(html, card.sheetSlug).toContain(`(${sheetRangeLabel(span)}) | Squishee Academy</title>`);
@@ -105,7 +109,7 @@ describe("range labels come from the content grade map", () => {
   });
 
   it("keeps the worksheet index at grade 6 because grade 6 worksheets are on it", () => {
-    expect(GAME_CARDS.some((card) => card.id !== "summit" && contentGrades(card.id).includes("5"))).toBe(true);
+    expect(GAME_CARDS.some((card) => card.id !== "summit" && card.id !== "keystone" && contentGrades(card.id).includes("5"))).toBe(true);
     expect(sheetIndexTitle("en")).toContain("Pre-K to Grade 6");
   });
 

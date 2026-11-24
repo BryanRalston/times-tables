@@ -37,6 +37,7 @@ const GAME_TITLE_ES: Record<string, string> = {
   cubes: "Cubos",
   summit: "Cumbre de quinto",
   balance: "Balanza",
+  keystone: "Dovela de sexto",
 };
 
 interface NamedSheet {

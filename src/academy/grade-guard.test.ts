@@ -21,6 +21,7 @@ import { FRACTION_DENOMINATORS, GRADE_BANDS, bandFor, levelAllowed, playWindow, 
 import { advanceJourney, bossReady, normalizeJourney } from "./journey";
 import { makeBossRound, makeQuestion } from "./games/round";
 import { SUMMIT_SKILLS } from "./games/summit-data";
+import { KEYSTONE_SKILLS } from "./games/keystone-data";
 import { hasHandsCard, makeHandsTask, type HandsTask } from "./hands-build";
 import { makeClockTask, makePayTask } from "./hands";
 import { autoSpeakGrade, type Grade } from "./model";
@@ -1088,8 +1089,8 @@ describe("grade bands", () => {
         for (let i = 0; i < SAMPLES; i++) {
           const level = allowed.ids[i % allowed.ids.length]!;
           const question = game.makeQuestion(rngFromSeed(`${game.id}-${grade}-${level}-${i}`), level);
-          // The Summit mixes cards from other games: each card keeps its own game and level.
-          if (game.mixed) expect(SUMMIT_SKILLS).toContain(question.skill);
+          // Mixed bosses keep each card's own game and level.
+          if (game.mixed) expect(game.id === "summit" ? SUMMIT_SKILLS : KEYSTONE_SKILLS).toContain(question.skill);
           else expect(question.game).toBe(game.id);
           expect(question.choices).toHaveLength(4);
           expect(question.choices).toContain(question.answer);
@@ -1442,7 +1443,7 @@ describe("grade 5 summit boss (mixed grade 5 review)", () => {
   const ids = summit.levels.map((row) => row.id);
 
   it("is a boss-only grade 5 island, and mixes cards from other games", () => {
-    expect(GAMES.map((row) => row.id).slice(-2)).toEqual(["summit", "balance"]);
+    expect(GAMES.map((row) => row.id).slice(-3)).toEqual(["summit", "balance", "keystone"]);
     expect(summit.audience).toBe("Grade 5 boss");
     expect(summit.mixed).toBe(true);
     expect(ids).toEqual(["mix"]);
@@ -1624,7 +1625,8 @@ describe("grade 6 slice 2: Balance Scale one-step equations", () => {
 
   it("appends a grade 6 only game and opens add and subtract first", () => {
     const game = GAMES.find((item) => item.id === "balance")!;
-    expect(GAMES.at(-1)?.id).toBe("balance");
+    expect(GAMES.at(-2)?.id).toBe("balance");
+    expect(GAMES.at(-1)?.id).toBe("keystone");
     expect(game.levels.map((row) => row.id)).toEqual(["addsub", "times", "divide", "mix"]);
     expect(game.defaultLevel("6")).toBe("addsub");
     const ids = game.levels.map((row) => row.id);
@@ -1695,5 +1697,107 @@ describe("grade 6 slice 2: Balance Scale one-step equations", () => {
       expect(levelAllowed(ids, "balance", "6", levelId, false, "hard")).toBe(true);
     }
     expect(levelAllowed(ids, "balance", "6", "mix", false, "easy")).toBe(false);
+  });
+});
+
+
+describe("grade 6 keystone boss (mixed grade 6 review)", () => {
+  const BELOW_SIX: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
+  const keystone = GAMES.find((game) => game.id === "keystone")!;
+  const ids = keystone.levels.map((row) => row.id);
+
+  it("is a boss-only grade 6 island, and mixes cards from other games", () => {
+    expect(GAMES.map((row) => row.id).slice(-3)).toEqual(["summit", "balance", "keystone"]);
+    expect(keystone.audience).toBe("Grade 6 boss");
+    expect(keystone.mixed).toBe(true);
+    expect(ids).toEqual(["review"]);
+    expect(hasHandsCard("keystone", "review")).toBe(false);
+  });
+
+  it("stays locked below grade 6, even with challenge ahead on", () => {
+    for (const grade of BELOW_SIX) {
+      for (const challenge of [false, true]) {
+        expect(playWindow(ids, "keystone", grade, challenge).ids, `${grade} ${challenge}`).toEqual([]);
+        expect(levelAllowed(ids, "keystone", grade, "review", challenge)).toBe(false);
+      }
+      expect(GRADE_BANDS.keystone![grade]!.offer).toBe("later");
+      expect(bossReady(blankChild({ grade }).journey, "keystone", grade)).toBe(false);
+      for (let i = 0; i < 50; i += 1) {
+        expect(makeBossRound("keystone", "review", rngFromSeed(`keystone-low-${grade}-${i}`), [], undefined, { grade, crown: false, challengeAhead: true })).toEqual([]);
+      }
+    }
+    expect(playWindow(ids, "keystone", "6", false).ids).toEqual(["review"]);
+  });
+
+  it("asks five different grade 6 skills in every boss round, each inside the grade 6 map", () => {
+    for (let i = 0; i < 300; i += 1) {
+      const round = makeBossRound("keystone", "review", rngFromSeed(`keystone-boss-${i}`), [], undefined, { grade: "6", crown: i % 3 === 0, challengeAhead: false });
+      expect(round).toHaveLength(5);
+      expect(new Set(round.map((q) => q.skill)).size).toBe(5);
+      expect(round.some((q) => q.game === "variables")).toBe(true);
+      expect(round.some((q) => q.game === "fractions")).toBe(true);
+      expect(round.some((q) => q.game === "patterns")).toBe(true);
+      expect(round.some((q) => q.game === "balance")).toBe(true);
+      for (const question of round) {
+        expect(KEYSTONE_SKILLS).toContain(question.skill);
+        const [gameId, level] = question.skill.split(":") as [string, string];
+        expect(question.game).toBe(gameId);
+        expect(bandFor(gameId, "6")?.levels ?? []).toContain(level);
+        for (const grade of BELOW_SIX) expect(playWindow(GAMES.find((g) => g.id === gameId)!.levels.map((r) => r.id), gameId, grade, false).ids).not.toContain(level);
+        expect(new Set(question.choices).size).toBe(question.choices.length);
+        expect(question.choices).toContain(question.answer);
+        const blob = `${question.title} ${question.hint} ${question.answer} ${question.choices.join(" ")}`;
+        expect(blob).not.toMatch(/(?<![0-9./xnyXNY ])-\d/);
+        expect(blob).not.toMatch(/−\d/);
+        assertQuestion("6", level, question);
+      }
+    }
+  });
+
+  it("keeps practice and try-one-like-it cards on grade 6 skills, with hints in all 7 languages", () => {
+    const locales: Locale[] = ["en", "es", "pt", "fr", "zh", "hi", "ar"];
+    try {
+      for (const locale of locales) {
+        setLocale(locale);
+        for (let i = 0; i < (locale === "en" ? 80 : 20); i += 1) {
+          const question = makeQuestion("keystone", "review", rngFromSeed(`keystone-mix-${locale}-${i}`));
+          expect(KEYSTONE_SKILLS).toContain(question.skill);
+          expect(question.hint.length).toBeGreaterThan(0);
+          const level = question.skill.split(":")[1]!;
+          expect(makeQuestion("keystone", level, rngFromSeed(`keystone-like-${locale}-${i}`)).skill).toBe(question.skill);
+        }
+      }
+    } finally {
+      setLocale("en");
+    }
+  });
+
+  it("waits for a grade 6 child until beaten, and a win does not move the path", () => {
+    const child = blankChild({ name: "Noor", grade: "6" });
+    expect(bossReady(child.journey, "keystone", "6")).toBe(true);
+    const before = normalizeJourney(child.journey, "6");
+    const lost = advanceJourney(child.journey, { game: "keystone", correct: 2, total: 5, boss: true }, "6");
+    expect(lost.bosses).not.toContain("keystone");
+    const won = advanceJourney(child.journey, { game: "keystone", correct: 4, total: 5, boss: true }, "6");
+    expect(won.bosses).toContain("keystone");
+    expect(won.trails).toEqual(before.trails);
+    expect(bossReady(won, "keystone", "6")).toBe(false);
+    const grade5 = advanceJourney(blankChild({ name: "Sam", grade: "5" }).journey, { game: "keystone", correct: 5, total: 5, boss: true }, "5");
+    expect(grade5.bosses).not.toContain("keystone");
+  });
+
+  it("leaves the grade 5 Summit unchanged", () => {
+    const summit = GAMES.find((game) => game.id === "summit")!;
+    expect(summit.audience).toBe("Grade 5 boss");
+    expect(playWindow(summit.levels.map((row) => row.id), "summit", "5", false).ids).toEqual(["mix"]);
+    expect(playWindow(summit.levels.map((row) => row.id), "summit", "6", false).ids).toEqual([]);
+    expect(bossReady(blankChild({ grade: "5" }).journey, "summit", "5")).toBe(true);
+    expect(bossReady(blankChild({ grade: "6" }).journey, "summit", "6")).toBe(false);
+    expect(makeBossRound("summit", "mix", rngFromSeed("keystone-summit-stays"), [], undefined, { grade: "5", crown: false, challengeAhead: false })).toHaveLength(5);
+    expect(makeBossRound("summit", "mix", rngFromSeed("keystone-summit-g6"), [], undefined, { grade: "6", crown: false, challengeAhead: false })).toEqual([]);
+  });
+
+  it("does not auto-read Keystone questions", () => {
+    expect(autoSpeakGrade("6")).toBe(false);
   });
 });

@@ -1,6 +1,6 @@
 import { t } from "../i18n";
 import type { FractionBoard, PatternBoard, VariableBoard } from "./boards";
-import { fractionText, powerProduct, powerText } from "./grade6";
+import { fractionText, powerPretty, powerProduct } from "./grade6";
 import { FractionBar } from "./scene-ui";
 
 function ExprLine({ text }: { text: string }) {
@@ -98,5 +98,5 @@ export function GcfLcmArt({ board }: { board: PatternBoard }) {
 export function powerLabel(expr: string): string {
   const [base, exp] = expr.split("^").map(Number);
   if (!Number.isFinite(base) || !Number.isFinite(exp)) return expr;
-  return powerText(base, exp);
+  return powerPretty(base, exp);
 }

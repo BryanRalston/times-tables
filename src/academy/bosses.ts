@@ -320,6 +320,19 @@ const AUTHORED: readonly IslandBoss[] = [
     trophyId: "trophy-summit",
     trophyName: "Summit trophy",
   },
+  {
+    gameId: "keystone",
+    name: "Professor Pouch",
+    taunt: "Five grade 6 questions, each a different skill. Take your time and think them through.",
+    friendly: "Careful thinking all the way through. You held the keystone.",
+    personality: "A calm koala professor who has sat with every grade 6 puzzle and likes a careful explanation.",
+    face: "koala",
+    look: "spell",
+    cosmeticId: "keystone-cap",
+    cosmeticName: "Keystone cap",
+    trophyId: "trophy-keystone",
+    trophyName: "Keystone trophy",
+  },
 ];
 
 const LOOKS: readonly BossLook[] = ["crown", "cape", "armor", "clock", "coins", "spell"];

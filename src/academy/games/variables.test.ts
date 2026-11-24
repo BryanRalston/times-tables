@@ -112,7 +112,7 @@ describe("missing-number questions", () => {
           continue;
         }
         if (level.id === "exponents") {
-          expect(row.prompt).toMatch(/^\d+\^\d+ =$/);
+          expect(row.prompt).toMatch(/^\d+[⁰¹²³⁴⁵⁶⁷⁸⁹]+ =$/);
           expect(Number(row.answer)).toBeGreaterThan(0);
           continue;
         }
