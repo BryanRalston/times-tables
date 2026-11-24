@@ -213,6 +213,12 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
   summit: {
     mix: "5.NF.A.1",
   },
+  balance: {
+    addsub: "6.EE.B.7",
+    times: "6.EE.B.7",
+    divide: "6.EE.B.7",
+    mix: "6.EE.B.7",
+  },
 };
 
 const CHIP_SKILL: Record<string, string> = {
@@ -332,6 +338,8 @@ const NAMES: Record<string, { en: string; es: string }> = {
   "6.EE.A.2": { en: "Write and evaluate expressions with variables", es: "Escribir y evaluar expresiones con variables" },
   "6.EE.A.3": { en: "Equivalent expressions", es: "Expresiones equivalentes" },
   "6.EE.A.4": { en: "Identify equivalent expressions", es: "Identificar expresiones equivalentes" },
+  "6.EE.B.5": { en: "Understand solving an equation as keeping both sides equal", es: "Entender que resolver una ecuación es mantener los dos lados iguales" },
+  "6.EE.B.7": { en: "Solve one-step equations of the form x + p = q and px = q", es: "Resolver ecuaciones de un paso de la forma x + p = q y px = q" },
   "RF.K.1.D": { en: "Name the letters", es: "Nombrar las letras" },
   "RF.K.2.A": { en: "Hear rhymes", es: "Escuchar rimas" },
   "RF.K.2.D": { en: "Hear sounds in a word", es: "Escuchar los sonidos de una palabra" },

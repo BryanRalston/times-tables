@@ -19,6 +19,8 @@ Saved games from version 9 keep their grade. Version 10 only adds Pre-K and grad
 
 **Grade 6 slice 1 (6.EE.A, 6.NS.A, 6.NS.B).** Grade 6 joins the picker. This first slice adds four new levels and no new game types: Expressions and Exponents at the top of What is missing (evaluate 3x + 2 when x = 4, match equivalent expressions, and small whole-number powers like 2^3), Divide fractions at the top of Fractions (for example 3/4 ÷ 1/8, with a visual hint: how many 1/8s fit in 3/4?), and GCF and LCM at the top of Number Patterns. Grade 6 opens on the new levels; a new visitor's Math Continue starts on Expressions via the shared next-stone rule (What is missing is first on the grade 6 Math path). Grade 5 is capped at its own top level in those three games, so the new levels stay grade 6 unless Challenge ahead is on. Small friendly whole numbers only: no negative numbers in this slice. Same card style as grade 5: text-first tap-and-think, four tiles, device voice, no drag-and-build card, no grade 6 boss.
 
+**Grade 6 slice 2 (6.EE.B).** A new game type, Balance Scale, for one-step equations. A squishee scale shows x on one side and a number on the other. The child keeps it level by solving x + p = q, x − p = q, p × x = q, and x ÷ p = q, with whole numbers only and no negatives. Four levels, easy to hard: add and subtract, multiply, divide, and a mix. Easy, Medium, and Hard change both the starting level (equation type) and the number size inside a level. It is coming later for Pre-K through grade 5 (Challenge ahead can open it). On the grade 6 Math path it sits just after What is missing, so Continue still starts on Expressions, then moves to Balance Scale. Same card style: text-first tap-and-think, four tiles, device voice, no drag-and-build card, no grade 6 boss. The question card shows the full equation in large type. The scale is Imagine-painted, in pieces so it can tip and level.
+
 **Grade 5 slice 3 (5.NBT.B).** Three more grade 5 levels, each the last level of its game: multiply by 2 digits in Times Tables (5.NBT.B.5), divide by 2 digits in Fair Shares (5.NBT.B.6), and decimal operations in Add & Subtract (5.NBT.B.7). Grade 5 opens on the new level, with the old grade 4 top level as the one-level drift down. Grade 4 is capped at its own top level in all three games, so the new levels stay grade 5 unless challenge ahead is on. Same rules as slice 1: text-first tap-and-think cards, four tiles with one right answer, device voice, no drag-and-build card, no grade 5 boss.
 
 Standards below are Common Core. Sight words use the Dolch lists. Grade 2 adds Fry words that are not already on a Dolch list. Grade 3 does the same with the next Fry band.
@@ -486,6 +488,28 @@ One level, mixed review. The boss and the review rounds only draw these grade 5 
 |---|---|---|---|---|---|
 | Pre-K–4 | Coming later, locked (Challenge ahead does not open it) | — | — | — | The summit waits for grade 5 |
 | 5 | Play | Mixed review | Mixed review | — | 5.NF.A.1, 5.NBT.B.6, 5.NBT.B.7, 5.G.A.1, 5.OA.B.3, 5.MD.C.5 |
+
+
+## Balance Scale
+
+Levels, easy to hard: add and subtract, multiply, divide, mix.
+
+The card shows the full equation in large type under the title (for example, x + 8 = 11). A painted squishee-style scale shows the left side on one pan and the known number on the other. The child finds x so both sides are equal. The scale tips a little while x is unknown, sits level after a right answer, and tips the other way after a miss. Whole numbers only: no negatives, no fractions, and no two-step equations.
+
+Add and subtract (6.EE.B.7) asks x + p = q or x − p = q, with x, p, and q positive whole numbers (on Easy, x and p stay at or under 10 and the sum stays at or under 18; on Hard they can reach about 40 and 50). Subtract cards keep x bigger than p so the answer is never negative. Multiply asks p × x = q, and divide asks x ÷ p = q (p is at least 2, and q is a whole multiple so x is a whole number). Mix uses addition and subtraction on Easy, adds multiplication on Medium, and adds division on Hard. Wrong tiles are real slips: using p or q as the answer, doing the inverse operation the wrong way, or being one off. Pal hints say "Do the same to both sides," or a shorter "Add to both sides" / "Subtract from both sides" / "Multiply both sides" / "Divide both sides," in all seven languages.
+
+| Grade | Offer | Start | Core levels | Cap without challenge | Standards |
+|---|---|---|---|---|---|
+| Pre-K | Coming later | — | — | — | 4.OA.A.3 (two-step first; equations wait) |
+| K | Coming later | — | — | — | 4.OA.A.3 (two-step first; equations wait) |
+| 1 | Coming later | — | — | — | 4.OA.A.3 (two-step first; equations wait) |
+| 2 | Coming later | — | — | — | 4.OA.A.3 (two-step first; equations wait) |
+| 3 | Coming later | — | — | — | 4.OA.A.3 (two-step first; equations wait) |
+| 4 | Coming later | — | — | — | 4.OA.A.3 (two-step first; equations wait) |
+| 5 | Coming later | — | — | — | 5.OA.A.2 (expressions first; equations wait) |
+| 6 | Play | Add and subtract | Add and subtract, multiply, divide, mix | — | 6.EE.B.5, 6.EE.B.7 |
+
+Pre-K through grade 5 stay locked unless Challenge ahead is on. Grade 6 Easy stays on add and subtract, Medium opens all four levels from the start, and Hard starts on the mix. Questions are not auto-read; the speaker button uses the device voice until clips are rendered. There is no hands card and no grade 6 boss in this slice.
 
 ## Still open
 

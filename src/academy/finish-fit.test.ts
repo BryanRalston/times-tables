@@ -196,6 +196,10 @@ describe("phone fit for every game", () => {
     expect(all).toContain(".ac-shell:not(.is-boss) .ac-stage-copy .ac-choice { min-height: 60px; }");
   });
 
+  it("keeps Balance Scale tiles above the sticky footer on a short phone", () => {
+    expect(css).toContain(".ac-shell:not(.is-boss) .ac-stage-copy.is-balance .ac-choices { margin-bottom: 12px; }");
+  });
+
   it("keeps every tap target at least 44px tall on short screens", () => {
     // Only rules whose last selector part is the tap target itself (not an icon inside it).
     const targets = /\.ac-(choice|tile|slot|check|plate|tier-chip|hear|hint-btn|speaker|slow|cookie-bank|graph-token|pill)(\.[\w-]+|:[\w-]+(\([^)]*\))?)*\s*$/;

@@ -1322,6 +1322,57 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["5.NF.A.1"],
     }),
   },
+  /** Grade 6 one-step equations. Below grade 6 it stays later; Challenge ahead can open it. */
+  balance: {
+    PK: band({
+      levels: ["addsub"],
+      start: "addsub",
+      offer: "later",
+      standards: ["4.OA.A.3"],
+    }),
+    K: band({
+      levels: ["addsub"],
+      start: "addsub",
+      offer: "later",
+      standards: ["4.OA.A.3"],
+    }),
+    "1": band({
+      levels: ["addsub"],
+      start: "addsub",
+      offer: "later",
+      standards: ["4.OA.A.3"],
+    }),
+    "2": band({
+      levels: ["addsub"],
+      start: "addsub",
+      offer: "later",
+      standards: ["4.OA.A.3"],
+    }),
+    "3": band({
+      levels: ["addsub"],
+      start: "addsub",
+      offer: "later",
+      standards: ["4.OA.A.3"],
+    }),
+    "4": band({
+      levels: ["addsub"],
+      start: "addsub",
+      offer: "later",
+      standards: ["4.OA.A.3"],
+    }),
+    "5": band({
+      levels: ["addsub"],
+      start: "addsub",
+      offer: "later",
+      standards: ["5.OA.A.2"],
+    }),
+    "6": band({
+      levels: ["addsub", "times", "divide", "mix"],
+      start: "addsub",
+      offer: "play",
+      standards: ["6.EE.B.5", "6.EE.B.7"],
+    }),
+  },
 };
 
 export function bandFor(gameId: string, grade: Grade): GradeBand | undefined {

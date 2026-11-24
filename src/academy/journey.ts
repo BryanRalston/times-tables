@@ -27,8 +27,17 @@ export function areaIndex(journey: Journey, key?: SubjectKey): number {
  * Islands that do not block the path. Coming-later games are skipped.
  * Pre-K coin-name intros stay on the home screen and do not gate counting.
  */
+/**
+ * Boss-only islands (the Grade 5 Summit) are not a stop on the path: the boss
+ * waits there for a grade 5 child from the first visit until it is beaten.
+ */
+export const BOSS_ONLY_GAMES: Readonly<Record<string, Grade>> = { summit: "5" };
+
 function skipsGate(gameId: string, grade: Grade | undefined): boolean {
   if (!gameOffered(gameId)) return true;
+  // Boss-only islands (the Grade 5 Summit) are not a stop on the path, so a
+  // later game can open after the island before them.
+  if (BOSS_ONLY_GAMES[gameId] && grade !== BOSS_ONLY_GAMES[gameId]) return true;
   if (!grade) return false;
   const offer = bandFor(gameId, grade)?.offer;
   if (offer === "later") return true;
@@ -46,10 +55,6 @@ export function areaOpen(journey: Journey, index: number, grade?: Grade): boolea
   const chain = subjectIndexes(subjectKeyOf(game.id), grade);
   const pos = chain.indexOf(index);
   if (pos <= 0) return true;
-  if (!grade) {
-    const prev = GAMES[chain[pos - 1]!];
-    return !!prev && journey.bosses.includes(prev.id);
-  }
   for (let i = 0; i < pos; i++) {
     const id = GAMES[chain[i]!]!.id;
     if (skipsGate(id, grade)) continue;
@@ -66,7 +71,7 @@ export function gateBefore(journey: Journey, index: number, grade?: Grade): stri
   const pos = chain.indexOf(index);
   for (let i = 0; i < pos; i++) {
     const id = GAMES[chain[i]!]!.id;
-    if (grade && skipsGate(id, grade)) continue;
+    if (skipsGate(id, grade)) continue;
     if (!journey.bosses.includes(id)) return id;
   }
   return "";
@@ -96,7 +101,7 @@ function fitSpot(bossesOnly: Journey, key: SubjectKey, saved: JourneySpot | unde
     }
   }
   let hopped = false;
-  if (grade) {
+  {
     let pos = chain.indexOf(index);
     while (pos < chain.length - 1 && skipsGate(GAMES[chain[pos]!]!.id, grade)) {
       const next = chain[pos + 1]!;
@@ -151,12 +156,6 @@ export function parseJourney(raw: unknown, grade?: Grade): Journey {
   return normalizeJourney({ areaId, stop, bosses, trails }, grade);
 }
 
-/**
- * Boss-only islands (the Grade 5 Summit) are not a stop on the path: the boss
- * waits there for a grade 5 child from the first visit until it is beaten.
- */
-export const BOSS_ONLY_GAMES: Readonly<Record<string, Grade>> = { summit: "5" };
-
 export function bossReady(journey: Journey, gameId: string, grade?: Grade): boolean {
   const onlyFor = BOSS_ONLY_GAMES[gameId];
   if (onlyFor) return (grade === undefined || grade === onlyFor) && !journey.bosses.includes(gameId);
@@ -205,9 +204,7 @@ export function advanceJourney(journey: Journey, step: RoundStep, grade?: Grade)
     const bosses = here.bosses.includes(step.game) ? here.bosses : [...here.bosses, step.game];
     const chain = subjectIndexes(key, grade);
     let pos = chain.indexOf(GAMES.findIndex((game) => game.id === step.game)) + 1;
-    if (grade) {
-      while (pos < chain.length && skipsGate(GAMES[chain[pos]!]!.id, grade)) pos += 1;
-    }
+    while (pos < chain.length && skipsGate(GAMES[chain[pos]!]!.id, grade)) pos += 1;
     const next = pos < chain.length ? GAMES[chain[pos]!] : undefined;
     if (!next) return put({ areaId: spot.areaId, stop: STOPS_PER_AREA - 1 }, bosses);
     return put({ areaId: next.id, stop: 0 }, bosses);

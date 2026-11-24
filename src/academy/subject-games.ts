@@ -15,7 +15,7 @@ export function subjectKeyOf(gameId: string): SubjectKey {
 
 /**
  * Grades 1 and 2 start the Math path on Add & Subtract; Times Tables comes next.
- * Grade 6 starts on What is missing (expressions with a letter).
+ * Grade 6 starts on What is missing (expressions with a letter), then Balance Scale.
  * Every other grade keeps island order.
  */
 const ADD_FIRST: readonly string[] = ["1", "2"];
@@ -42,6 +42,13 @@ export function subjectIndexes(key: SubjectKey, grade?: string): number[] {
     if (at > 0) {
       out.splice(at, 1);
       out.unshift(variables);
+    }
+    const balance = GAMES.findIndex((game) => game.id === "balance");
+    const b = out.indexOf(balance);
+    if (b >= 0) {
+      out.splice(b, 1);
+      const after = out.indexOf(variables);
+      out.splice((after >= 0 ? after : 0) + 1, 0, balance);
     }
   }
   return out;

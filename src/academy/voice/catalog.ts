@@ -41,10 +41,10 @@ const NUMBER_MAX = 1000;
  * New stories start here so no new paid audio is needed; speak() falls back to
  * the device whenever planSpeech cannot cover a line.
  */
-export const DEVICE_VOICE_SKILLS: ReadonlySet<string> = new Set(["problems:estimate", "place:thousandths", "fractions:addUnlike", "fractions:fracTimes", "fractions:fracDiv", "variables:orderOps", "variables:exprEval", "variables:exponents", "times:bigMulti", "share:longDiv", "add:decimalOps", "patterns:twoRules", "patterns:gcfLcm", "grid:coords", "cubes:count", "cubes:build", "cubes:formula", "cubes:two"]);
+export const DEVICE_VOICE_SKILLS: ReadonlySet<string> = new Set(["problems:estimate", "place:thousandths", "fractions:addUnlike", "fractions:fracTimes", "fractions:fracDiv", "variables:orderOps", "variables:exprEval", "variables:exponents", "times:bigMulti", "share:longDiv", "add:decimalOps", "patterns:twoRules", "patterns:gcfLcm", "grid:coords", "cubes:count", "cubes:build", "cubes:formula", "cubes:two", "balance:addsub", "balance:times", "balance:divide", "balance:mix"]);
 
 /** Games whose title and generic boss lines use the device voice until clips are rendered. */
-export const DEVICE_VOICE_GAMES: ReadonlySet<string> = new Set(["cubes", "summit"]);
+export const DEVICE_VOICE_GAMES: ReadonlySet<string> = new Set(["cubes", "summit", "balance"]);
 
 export const CORE_VOICE_GAMES = new Set(["add", "time", "ui", "buddy", "boss"]);
 
