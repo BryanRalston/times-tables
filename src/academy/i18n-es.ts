@@ -528,6 +528,13 @@ export const BOSS_ES: Record<string, BossEs> = {
     cosmeticName: "Capa de la cumbre",
     trophyName: "Trofeo de la cumbre",
   },
+  keystone: {
+    taunt: "Cinco preguntas de sexto, cada una de una habilidad distinta. Tómate tu tiempo y piénsalas.",
+    friendly: "Pensaste con cuidado hasta el final. Sostuviste la dovela.",
+    personality: "Un koala profesor tranquilo que se ha sentado con cada acertijo de sexto y disfruta una explicación cuidadosa.",
+    cosmeticName: "Gorra de la dovela",
+    trophyName: "Trofeo de la dovela",
+  },
 };
 
 export const TRAIT_ES: Record<string, string> = {
@@ -1104,9 +1111,13 @@ export const ES: Record<string, string> = {
   "Cube Builder": "Constructor de cubos",
   "Grade 5 boss": "Jefe de quinto",
   "Grade 5 Summit": "Cumbre de quinto",
+  "Grade 6 boss": "Jefe de sexto",
+  "Grade 6 Keystone": "Dovela de sexto",
+  "Keystone": "Dovela",
   "Mixed review": "Repaso mixto",
   "Summit": "Cumbre",
   "Free grade 5 math review. Unlike fractions, decimals, dividing by 2 digits, the coordinate plane, two-rule patterns, and volume. No signup.": "Repaso gratis de matemáticas de quinto. Fracciones con distinto denominador, decimales, dividir entre 2 cifras, el plano de coordenadas, patrones con dos reglas y volumen. Sin registro.",
+  "Free grade 6 math review. Expressions, exponents, dividing fractions, GCF and LCM, and one-step equations. No signup.": "Repaso gratis de matemáticas de sexto. Expresiones, potencias, dividir fracciones, MCD y MCM, y ecuaciones de un paso. Sin registro.",
   "K–5": "K a 5",
   "K–6": "K a 6",
   "1–5": "1 a 5",

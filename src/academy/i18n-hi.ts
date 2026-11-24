@@ -512,6 +512,13 @@ export const BOSS_HI: Record<string, BossEs> = {
     cosmeticName: "चोटी का लबादा",
     trophyName: "चोटी की ट्रॉफी",
   },
+  keystone: {
+    taunt: "कक्षा 6 के पाँच सवाल, हर एक अलग कौशल का। आराम से सोचकर हल करो।",
+    friendly: "तुमने अंत तक ध्यान से सोचा। तुमने कीस्टोन संभाला।",
+    personality: "एक शांत कोआला प्रोफ़ेसर, जिसने कक्षा 6 की हर पहेली के साथ समय बिताया है और जिसे सावधानी भरी समझ पसंद है।",
+    cosmeticName: "कीस्टोन टोपी",
+    trophyName: "कीस्टोन ट्रॉफी",
+  },
 };
 
 export const TRAIT_HI: Record<string, string> = {
@@ -1408,9 +1415,13 @@ export const HI: Record<string, string> = {
   "Cube Builder": "घन बिल्डर",
   "Grade 5 boss": "कक्षा 5 का बॉस",
   "Grade 5 Summit": "कक्षा 5 की चोटी",
+  "Grade 6 boss": "कक्षा 6 का बॉस",
+  "Grade 6 Keystone": "कक्षा 6 की कीस्टोन",
+  "Keystone": "कीस्टोन",
   "Mixed review": "मिला-जुला दोहराव",
   "Summit": "चोटी",
   "Free grade 5 math review. Unlike fractions, decimals, dividing by 2 digits, the coordinate plane, two-rule patterns, and volume. No signup.": "कक्षा 5 गणित का मुफ्त दोहराव। अलग हर वाले भिन्न, दशमलव, 2 अंकों से भाग, निर्देशांक तल, दो नियमों वाले पैटर्न और आयतन। साइन-अप नहीं।",
+  "Free grade 6 math review. Expressions, exponents, dividing fractions, GCF and LCM, and one-step equations. No signup.": "कक्षा 6 गणित का मुफ्त दोहराव। व्यंजक, घातांक, भिन्नों का भाग, म.स. और ल.स., और एक-चरण समीकरण। साइन-अप नहीं।",
   "K–5": "केजी से कक्षा 5",
   "K–6": "केजी से कक्षा 6",
   "1–5": "कक्षा 1 से 5",

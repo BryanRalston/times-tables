@@ -512,6 +512,13 @@ export const BOSS_AR: Record<string, BossEs> = {
     cosmeticName: "عباءة القمة",
     trophyName: "كأس القمة",
   },
+  keystone: {
+    taunt: "خمسة أسئلة من الصف السادس، كل سؤال من مهارة مختلفة. خذ وقتك وفكّر فيها.",
+    friendly: "فكّرت بعناية حتى النهاية. أمسكت حجر العقد.",
+    personality: "أستاذ كوالا هادئ جلس مع كل لغز في الصف السادس ويحب الشرح المتأني.",
+    cosmeticName: "قبعة حجر العقد",
+    trophyName: "كأس حجر العقد",
+  },
 };
 
 export const TRAIT_AR: Record<string, string> = {
@@ -1408,9 +1415,13 @@ export const AR: Record<string, string> = {
   "Cube Builder": "باني المكعبات",
   "Grade 5 boss": "زعيم الصف الخامس",
   "Grade 5 Summit": "قمة الصف الخامس",
+  "Grade 6 boss": "زعيم الصف السادس",
+  "Grade 6 Keystone": "حجر العقد للصف السادس",
+  "Keystone": "حجر العقد",
   "Mixed review": "مراجعة متنوعة",
   "Summit": "القمة",
   "Free grade 5 math review. Unlike fractions, decimals, dividing by 2 digits, the coordinate plane, two-rule patterns, and volume. No signup.": "مراجعة مجانية لرياضيات الصف الخامس. كسور بمقامات مختلفة، وأعداد عشرية، وقسمة على عدد من رقمين، والمستوى الإحداثي، وأنماط بقاعدتين، والحجم. بلا تسجيل.",
+  "Free grade 6 math review. Expressions, exponents, dividing fractions, GCF and LCM, and one-step equations. No signup.": "مراجعة مجانية لرياضيات الصف السادس. تعابير، وأسس، وقسمة الكسور، و م.م.أ و م.م.م، ومعادلات بخطوة واحدة. بلا تسجيل.",
   "K–5": "تمهيدي–5",
   "K–6": "تمهيدي–6",
   "1–5": "الصف 1–5",

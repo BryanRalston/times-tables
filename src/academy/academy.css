@@ -2281,6 +2281,31 @@ body:has(.ac-boss-intro) { background: #3c2448; }
 .ac-boss.is-fight .ac-boss-scene { width: 128%; }
 .ac-boss-face { filter: drop-shadow(0 8px 10px rgba(30, 12, 44, 0.4)); }
 .ac-done > .ac-boss.is-hero { margin: 40px auto 36px; }
+
+/* Short phones: shrink the win-scene art so unlock and book-join lines stay in view. */
+@media (max-height: 720px) {
+  .ac-shell.is-boss[data-phase="done"] .ac-done { padding: 4px 0 16px; }
+  .ac-shell.is-boss[data-phase="done"] .ac-done h1 { font-size: clamp(24px, 6vw, 30px); margin: 4px 0; }
+  .ac-shell.is-boss[data-phase="done"] .ac-done p { margin: 4px 0 6px; }
+  .ac-shell.is-boss[data-phase="done"] .ac-done > .ac-boss.is-hero {
+    width: 112px;
+    height: 132px;
+    margin: 8px auto 8px;
+  }
+  .ac-shell.is-boss[data-phase="done"] .ac-stars-big .ac-star { width: 28px; height: 28px; }
+  .ac-shell.is-boss[data-phase="done"] .ac-boss-win { gap: 2px; }
+  .ac-shell.is-boss[data-phase="done"] .ac-done .ac-buddy { margin: 4px auto; }
+  .ac-shell.is-boss[data-phase="done"] .ac-done-actions { margin-top: 4px; }
+}
+@media (max-height: 640px) {
+  .ac-shell.is-boss[data-phase="done"] .ac-done > .ac-boss.is-hero {
+    width: 96px;
+    height: 114px;
+    margin: 4px auto 6px;
+  }
+  .ac-shell.is-boss[data-phase="done"] .ac-done h1 { font-size: 22px; }
+  .ac-shell.is-boss[data-phase="done"] .ac-stars-big .ac-star { width: 24px; height: 24px; }
+}
 .ac-boss-head {
   position: absolute;
   top: 50%;
@@ -4106,13 +4131,74 @@ button.ac-go.ac-next {
 .ac-summit-sheet .ac-cubes-art { max-width: 220px; margin: 0 0 4px; }
 .ac-summit-sheet .ac-cubes-svg { height: 110px; }
 
-/* Grade 5 Summit boss on a phone: a smaller fight row so a grid or a box of cubes and all four tiles fit. */
+/* Grade 5 Summit and Grade 6 Keystone bosses on a phone: a smaller fight row so
+   mixed cards and all four tiles fit above the sticky footer. */
 @media (max-height: 900px) {
-  .ac-shell.is-boss.is-summit .ac-boss-hud { gap: 4px; margin: 4px 0 2px; }
-  .ac-shell.is-boss.is-summit .ac-boss-row { min-height: 88px; }
-  .ac-shell.is-boss.is-summit .ac-boss-row .ac-buddy { width: 64px; height: 76px; max-width: 64px; }
-  .ac-shell.is-boss.is-summit .ac-boss.is-fight { width: 76px; height: 90px; }
-  .ac-shell.is-boss.is-summit .ac-phase-banner { padding: 3px 12px; }
+  .ac-shell.is-boss.is-summit .ac-boss-hud,
+  .ac-shell.is-boss.is-keystone .ac-boss-hud { gap: 4px; margin: 4px 0 2px; }
+  .ac-shell.is-boss.is-summit .ac-boss-row,
+  .ac-shell.is-boss.is-keystone .ac-boss-row { min-height: 88px; }
+  .ac-shell.is-boss.is-summit .ac-boss-row .ac-buddy,
+  .ac-shell.is-boss.is-keystone .ac-boss-row .ac-buddy { width: 64px; height: 76px; max-width: 64px; }
+  .ac-shell.is-boss.is-summit .ac-boss.is-fight,
+  .ac-shell.is-boss.is-keystone .ac-boss.is-fight { width: 76px; height: 90px; }
+  .ac-shell.is-boss.is-summit .ac-phase-banner,
+  .ac-shell.is-boss.is-keystone .ac-phase-banner { padding: 3px 12px; }
+}
+
+/* Keystone mixed cards (expressions, fractions, patterns, Balance Scale): shrink
+   the fight row and add space under the tiles so all four, including the 6px
+   edge, sit above the sticky footer on a short phone. */
+@media (max-height: 720px) {
+  .ac-shell.is-boss.is-keystone .ac-boss-hud { gap: 2px; margin: 0 0 2px; }
+  .ac-shell.is-boss.is-keystone .ac-boss-row { min-height: 62px; }
+  .ac-shell.is-boss.is-keystone .ac-boss-row .ac-buddy { width: 48px; height: 56px; max-width: 48px; }
+  .ac-shell.is-boss.is-keystone .ac-boss.is-fight { width: 56px; height: 68px; }
+  .ac-shell.is-boss.is-keystone .ac-play-meta {
+    flex-wrap: nowrap;
+    gap: 4px;
+    row-gap: 0;
+    margin: 0 0 2px;
+  }
+  .ac-shell.is-boss.is-keystone .ac-play-meta .ac-pill {
+    min-height: 36px;
+    padding: 4px 8px;
+    font-size: 14px;
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ac-shell.is-boss.is-keystone .ac-play-meta .ac-hear,
+  .ac-shell.is-boss.is-keystone .ac-play-meta .ac-hint-btn,
+  .ac-shell.is-boss.is-keystone .ac-play-meta .ac-hint-spacer {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    flex: none;
+  }
+  .ac-shell.is-boss.is-keystone .ac-story { margin: 0 0 2px; font-size: 14px; line-height: 1.2; }
+  .ac-shell.is-boss.is-keystone .ac-qcard { padding: 8px 10px; margin: 0; }
+  .ac-shell.is-boss.is-keystone .ac-qcard h1 { font-size: 20px; }
+  .ac-shell.is-boss.is-keystone .ac-g6-expr { font-size: 1.35rem; }
+  .ac-shell.is-boss.is-keystone .ac-g6-when { font-size: 0.95rem; }
+  .ac-shell.is-boss.is-keystone .ac-scale { height: min(88px, 13vh); }
+  .ac-shell.is-boss.is-keystone .ac-scale-eq { font-size: clamp(22px, 6.5vw, 30px); }
+  .ac-shell.is-boss.is-keystone .ac-scale-val { font-size: 11px; }
+  .ac-shell.is-boss.is-keystone .ac-stage-copy { gap: 4px; }
+  .ac-shell.is-boss.is-keystone .ac-choices { margin-bottom: 16px; gap: 8px; margin-top: 4px; }
+  .ac-shell.is-boss.is-keystone .ac-choice { min-height: 52px; }
+  .ac-shell.is-boss.is-keystone .ac-stage-copy.is-balance .ac-choices { margin-bottom: 16px; }
+}
+
+@media (max-height: 640px) {
+  .ac-shell.is-boss.is-keystone .ac-story { font-size: 13px; }
+  .ac-shell.is-boss.is-keystone .ac-qcard { padding: 6px 8px; }
+  .ac-shell.is-boss.is-keystone .ac-qcard h1 { font-size: 18px; }
+  .ac-shell.is-boss.is-keystone .ac-choices { margin-bottom: 16px; gap: 6px; margin-top: 2px; }
+  .ac-shell.is-boss.is-keystone .ac-choice { min-height: 48px; }
 }
 
 /* Easy or Hard in a game: a small read-only label in the top bar. Medium shows nothing.

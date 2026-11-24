@@ -1471,6 +1471,29 @@ export const balanceCard = sceneCard("Balance", BALANCE_ROWS, {
   pill: (level) => compactPill("Balance", level.num),
 });
 
+const KEYSTONE_ROWS: SkillRow[] = [{ key: "keystone:review", label: "Mixed review" }];
+
+/**
+ * Grade 6 Keystone: the grade 6 boss. Its cards come from the grade 6 levels of
+ * What is missing, Fractions, Number Patterns, and Balance Scale. Grade 6 only;
+ * see docs/GRADE_MAP.md.
+ */
+export const keystoneCard = sceneCard("Keystone", KEYSTONE_ROWS, {
+  id: "keystone",
+  title: "Grade 6 Keystone",
+  audience: "Grade 6 boss",
+  tint: "gold",
+  mascot: "koala",
+  sheetSlug: "grade-6-math-review",
+  sheetScreen: "sheet-keystone",
+  blurb: "Free grade 6 math review. Expressions, exponents, dividing fractions, GCF and LCM, and one-step equations. No signup.",
+  levels: [{ id: "review", label: "Mixed review", num: 1 }],
+  defaultLevel: () => "review",
+  sheetDefaultLevel: "review",
+  isLevel: (value) => value === "review",
+  mixed: true,
+});
+
 /** Home-card order is also the island order. Append a game; do not insert one in front. */
 export const GAME_CARDS = [
   timesCard,
@@ -1498,6 +1521,7 @@ export const GAME_CARDS = [
   cubesCard,
   summitCard,
   balanceCard,
+  keystoneCard,
 ] as const;
 
 export type GameId = (typeof GAME_CARDS)[number]["id"];

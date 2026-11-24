@@ -782,7 +782,7 @@ export function PlayScreen({
   useEffect(() => {
     if (phase !== "ask" && phase !== "practice" && phase !== "teach") return;
     if (typeof window === "undefined") return;
-    if ((!boss || game === "summit") && window.scrollY > 0) window.scrollTo(0, 0);
+    if ((!boss || game === "summit" || game === "keystone") && window.scrollY > 0) window.scrollTo(0, 0);
     if (phase === "teach") return;
     const frame = window.requestAnimationFrame(() => revealAnswers());
     // Story pictures can load a moment later and push the tiles down; check once more.
@@ -879,7 +879,7 @@ export function PlayScreen({
             `${show(spec?.title ?? "This game")} arrive plus tard`, `稍后才会有${show(spec?.title ?? "This game")}`, `${show(spec?.title ?? "This game")} बाद में आएगा`, `${show(spec?.title ?? "This game")} يأتي لاحقًا`)}
           </h1>
           <p className="ac-hint">
-            {game === "summit"
+            {game === "summit" || game === "keystone"
               ? show("This grade plays other games first.")
               : show("This grade plays other games first. A grown-up can turn on challenge ahead in settings.")}
           </p>
@@ -899,7 +899,7 @@ export function PlayScreen({
   const maxEnergy = bossMaxEnergy(BOSS_LENGTH, crownFight);
 
   return (
-    <div className={cx("ac-shell", child.grade === "PK" && "is-prek", spec?.layout === "wide" && "ac-wide", boss && "is-boss", crownFight && "is-crown", game === "summit" && "is-summit")} data-phase={phase} data-round={child.rounds <= 0 && !boss ? "first" : "play"}>
+    <div className={cx("ac-shell", child.grade === "PK" && "is-prek", spec?.layout === "wide" && "ac-wide", boss && "is-boss", crownFight && "is-crown", game === "summit" && "is-summit", game === "keystone" && "is-keystone")} data-phase={phase} data-round={child.rounds <= 0 && !boss ? "first" : "play"}>
       <header className="ac-play-top">
         <button type="button" className="ac-x" onClick={close} aria-label={show("Close")}>
           ×
@@ -1172,7 +1172,7 @@ export function PlayScreen({
                 ) : choice ? (
                   <>
                     {spec?.Aside ? <spec.Aside question={choice} /> : null}
-                    <div className={cx("ac-stage-copy", game === "add" && "is-add", (game === "cubes" || view?.id === "cubes") && "is-cubes", game === "balance" && "is-balance")}>
+                    <div className={cx("ac-stage-copy", game === "add" && "is-add", (game === "cubes" || view?.id === "cubes") && "is-cubes", (game === "balance" || view?.id === "balance") && "is-balance")}>
                       <p className="ac-story">{slotStory(slot, child.avatarId, hostId, child.grade)}</p>
                       {choice.visual.kind === "money" ? <CoinShare buddyId={child.avatarId} hostId={hostId} /> : null}
                       {view ? (

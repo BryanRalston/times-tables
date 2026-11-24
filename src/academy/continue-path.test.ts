@@ -97,6 +97,28 @@ describe("grade guardrail: Continue respects the chosen grade", () => {
     expect(subjectSpot(after, "math", "6").areaId).toBe("balance");
     const map = renderToStaticMarkup(createElement(MapScreen, { child: newVisitor("6"), subject: "math", onOpenEgg() {} }));
     expect(map.indexOf("What is missing")).toBeLessThan(map.indexOf("Balance Scale"));
+    expect(map.indexOf("Balance Scale")).toBeLessThan(map.indexOf("Grade 6 Keystone"));
+  });
+
+  it("grade 6 Continue faces the Keystone boss after the last regular math island, and grade 5 stays on Summit", () => {
+    const mathIds = GAME_CARDS.filter((row) => !["phonics", "sight", "spelling"].includes(row.id)).map((row) => row.id);
+    const prior = mathIds.filter((id) => id !== "keystone" && id !== "summit" && id !== "cubes");
+    const atEnd = normalizeJourney({ areaId: "cubes", stop: STOPS_PER_AREA - 1, bosses: prior }, "6");
+    const afterCubes = advanceJourney(atEnd, { game: "cubes", correct: 5, total: 5, boss: true }, "6");
+    expect(subjectSpot(afterCubes, "math", "6").areaId).toBe("keystone");
+    expect(areaOpen(afterCubes, GAME_CARDS.findIndex((row) => row.id === "keystone"), "6")).toBe(true);
+    const child = {
+      ...newVisitor("6"),
+      rounds: 12,
+      journey: afterCubes,
+      levels: { ...newVisitor("6").levels, keystone: "review" },
+    };
+    expect(nextFor(child, "math")).toMatchObject({ game: "keystone", reason: "boss" });
+    expect(stepLine(nextFor(child, "math"))).toBe("Grade 6 Keystone · Boss");
+    const g5 = normalizeJourney({ areaId: "cubes", stop: STOPS_PER_AREA - 1, bosses: prior.filter((id) => id !== "balance") }, "5");
+    const afterCubes5 = advanceJourney(g5, { game: "cubes", correct: 5, total: 5, boss: true }, "5");
+    expect(subjectSpot(afterCubes5, "math", "5").areaId).toBe("summit");
+    expect(afterCubes5.bosses).not.toContain("keystone");
   });
 
   it("does not drop every new visitor into one game", () => {

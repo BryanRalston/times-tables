@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
 import { setLocale, type Locale } from "../i18n";
+import { speakable } from "../voice/speakable";
 import type { ChoiceQ } from "./types";
 import { fractionsCard, variablesCard } from "./cards";
 import { fractionsGame } from "./fractions";
@@ -86,6 +87,23 @@ describe("grade 6 exponents (6.EE.A.1)", () => {
       expect(q.choices.every((choice) => Number(choice) >= 0)).toBe(true);
     }
     expect(seen.size).toBeGreaterThan(8);
+  });
+
+  it("prints exponent titles as superscripts and speaks them in every locale", () => {
+    const locales: Locale[] = ["en", "es", "pt", "fr", "zh", "hi", "ar"];
+    for (const locale of locales) {
+      setLocale(locale);
+      const q = makeExponentsQuestion(rngFromSeed(`pow-title-${locale}`));
+      expect(q.title, locale).toMatch(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/);
+      expect(q.title, locale).not.toMatch(/\d\^\d/);
+      expect(q.hint, locale).toContain("2³");
+      expect(q.hint, locale).not.toContain("2^3");
+      const heard = speakable(q.title);
+      expect(heard, locale).not.toMatch(/\d\^\d/);
+      expect(heard, locale).not.toMatch(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/);
+      expect(heard, locale).toMatch(/squared|to the power of|al cuadrado|a la potencia de|ao quadrado|elevado a|au carré|à la puissance|的平方|次方|का वर्ग|की घात|تربيع|أس/);
+    }
+    setLocale("en");
   });
 });
 

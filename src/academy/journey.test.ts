@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { rngFromSeed } from "@/lib/rng";
 import { GAMES } from "./games/registry";
 import { makeBossRound } from "./games/round";
-import { advanceJourney, areaOpen, blankJourney, bossReady, normalizeJourney } from "./journey";
+import { advanceJourney, areaOpen, blankJourney, bossReady, BOSS_ONLY_GAMES, normalizeJourney } from "./journey";
 import { subjectKeyOf } from "./subject-games";
 import { BOSS_LENGTH, STOPS_PER_AREA } from "./model";
 import { blankChild } from "./storage";
@@ -46,11 +46,12 @@ describe("island map", () => {
       }
       journey = advanceJourney(journey, { game: game.id, correct: 5, total: BOSS_LENGTH, boss: true });
     }
-    const last = GAMES[GAMES.length - 1]!.id;
-    expect(journey.areaId).toBe(last);
+    const lastStop = [...GAMES].reverse().find((game) => !BOSS_ONLY_GAMES[game.id])!.id;
+    expect(journey.areaId).toBe(lastStop);
     expect(journey.bosses).toEqual(GAMES.map((game) => game.id));
-    const again = advanceJourney(journey, { game: last, correct: 10, total: 10, boss: false });
-    expect(again.areaId).toBe(last);
+    const again = advanceJourney(journey, { game: lastStop, correct: 10, total: 10, boss: false });
+    expect(again.areaId).toBe(lastStop);
+    const last = GAMES[GAMES.length - 1]!.id;
 
     const clamped = normalizeJourney({ areaId: last, stop: 9, bosses: [] });
     // Locked spots fall back to the first island of the same subject.

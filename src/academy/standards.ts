@@ -219,6 +219,10 @@ const LEVEL_STANDARD: Record<string, Record<string, string>> = {
     divide: "6.EE.B.7",
     mix: "6.EE.B.7",
   },
+  // Keystone cards report their own game's skill; this row only names the island.
+  keystone: {
+    review: "6.EE.A.2",
+  },
 };
 
 const CHIP_SKILL: Record<string, string> = {

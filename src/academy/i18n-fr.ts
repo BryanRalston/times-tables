@@ -513,6 +513,13 @@ export const BOSS_FR: Record<string, BossEs> = {
     "cosmeticName": "Cape du sommet",
     "trophyName": "Trophée du sommet"
   },
+  "keystone": {
+    "taunt": "Cinq questions de 6e, chacune d'une compétence différente. Prends ton temps et réfléchis-y.",
+    "friendly": "Tu as réfléchi avec soin jusqu'au bout. Tu as tenu la clef de voûte.",
+    "personality": "Un koala professeur très calme qui s'est penché sur chaque énigme de 6e et aime les explications soigneuses.",
+    "cosmeticName": "Casquette de la clef de voûte",
+    "trophyName": "Trophée de la clef de voûte"
+  },
 };
 
 export const TRAIT_FR: Record<string, string> = {
@@ -1408,9 +1415,13 @@ export const FR: Record<string, string> = {
   "Cube Builder": "Bâtisseur de cubes",
   "Grade 5 boss": "Boss du CM2",
   "Grade 5 Summit": "Sommet du CM2",
+  "Grade 6 boss": "Boss de 6e",
+  "Grade 6 Keystone": "Clef de voûte de 6e",
+  "Keystone": "Clef de voûte",
   "Mixed review": "Révision mélangée",
   "Summit": "Sommet",
   "Free grade 5 math review. Unlike fractions, decimals, dividing by 2 digits, the coordinate plane, two-rule patterns, and volume. No signup.": "Révision gratuite de maths de CM2. Fractions de dénominateurs différents, décimaux, division par un nombre à 2 chiffres, le repère, suites à deux règles et volume. Sans inscription.",
+  "Free grade 6 math review. Expressions, exponents, dividing fractions, GCF and LCM, and one-step equations. No signup.": "Révision gratuite de maths de 6e. Expressions, puissances, division de fractions, PGCD et PPCM, et équations à une étape. Sans inscription.",
   "K–5": "GS à CM2",
   "K–6": "GS à la 6e",
   "1–5": "CP à CM2",

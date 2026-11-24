@@ -11,16 +11,18 @@ import clockHat from "../art/boss/hats/clock.webp";
 import crownHat from "../art/boss/hats/crown.webp";
 import helmHat from "../art/boss/hats/helm.webp";
 import scholarHat from "../art/boss/hats/scholar.webp";
+import keystoneHat from "../art/boss/hats/keystone.webp";
 import wizardHat from "../art/boss/hats/wizard.webp";
 
 export type BossMood = "arrive" | "idle" | "hit" | "dizzy" | "raspberry" | "friendly";
 
-/** Painted backdrop behind every boss. Grade 5 Summit gets the mountain peak. */
+/** Painted backdrop behind every boss. Grade 5 Summit gets the mountain peak.
+ *  Grade 6 Keystone reuses the gold-halo arena. */
 export function bossSceneUrl(gameId?: string): string {
   return gameId === "summit" ? summitScene : arenaScene;
 }
 
-export type BossHat = "wizard" | "scholar" | "crown" | "helm" | "clock";
+export type BossHat = "wizard" | "scholar" | "crown" | "helm" | "clock" | "keystone";
 
 const HAT_ART: Record<BossHat, string> = {
   wizard: wizardHat,
@@ -28,11 +30,13 @@ const HAT_ART: Record<BossHat, string> = {
   crown: crownHat,
   helm: helmHat,
   clock: clockHat,
+  keystone: keystoneHat,
 };
 
-/** Painted hat for a boss look. Professor Quill (Grade 5 Summit) wears the scholar cap. */
+/** Painted hat for a boss look. Professor Quill wears the scholar cap; Professor Pouch wears the keystone cap. */
 export function bossHat(look: BossLook, gameId?: string): BossHat {
   if (gameId === "summit") return "scholar";
+  if (gameId === "keystone") return "keystone";
   switch (look) {
     case "spell":
       return "wizard";
@@ -63,6 +67,9 @@ const HAT_FIT: Record<BossHat, { base: number; cx: number; fit: number; cover: n
   crown: { base: 0.87, cx: 0.5, fit: 1.05, cover: 0.2 },
   helm: { base: 0.98, cx: 0.5, fit: 1.05, cover: 0.25 },
   clock: { base: 0.92, cx: 0.5, fit: 1.3, cover: 0.18 },
+  // Gold band is the brim (base/cx measured from the keyed art). Cover is higher
+  // than the scholar cap so the thick band wraps down to just above the eyes.
+  keystone: { base: 0.827, cx: 0.538, fit: 1.1, cover: 0.4 },
 };
 
 /** Eyes this close to the head top (frog) get the hat tucked behind them. */
@@ -99,7 +106,9 @@ export function hatSeat(faceId: string, hat: BossHat): HatSeat {
 }
 
 function hatForCosmetic(cosmeticId: string, look: BossLook): BossHat {
-  return cosmeticId === "summit-cape" ? "scholar" : bossHat(look);
+  if (cosmeticId === "summit-cape") return "scholar";
+  if (cosmeticId === "keystone-cap") return "keystone";
+  return bossHat(look);
 }
 
 /** Small extras that are not the hat: Sir Coinsworth's coins and the cape clasp. */

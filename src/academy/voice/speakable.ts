@@ -31,9 +31,42 @@ function speakFractions(text: string): string {
   });
 }
 
+const SUPER_DIGIT: Record<string, string> = {
+  "\u2070": "0",
+  "\u00b9": "1",
+  "\u00b2": "2",
+  "\u00b3": "3",
+  "\u2074": "4",
+  "\u2075": "5",
+  "\u2076": "6",
+  "\u2077": "7",
+  "\u2078": "8",
+  "\u2079": "9",
+};
+
+/** "7^2" or "7²" is spoken as "7 squared"; other powers say "to the power of". */
+function speakPower(base: string, exp: string): string {
+  const locale = getLocale();
+  if (locale === "es") return exp === "2" ? `${base} al cuadrado` : `${base} a la potencia de ${exp}`;
+  if (locale === "pt") return exp === "2" ? `${base} ao quadrado` : `${base} elevado a ${exp}`;
+  if (locale === "fr") return exp === "2" ? `${base} au carré` : `${base} à la puissance ${exp}`;
+  if (locale === "zh") return exp === "2" ? `${base}的平方` : `${base}的${exp}次方`;
+  if (locale === "hi") return exp === "2" ? `${base} का वर्ग` : `${base} की घात ${exp}`;
+  if (locale === "ar") return exp === "2" ? `${base} تربيع` : `${base} أس ${exp}`;
+  return exp === "2" ? `${base} squared` : `${base} to the power of ${exp}`;
+}
+
+function speakExponents(text: string): string {
+  const fromCaret = text.replace(/(\d+)\^(\d+)/g, (_full, base: string, exp: string) => speakPower(base, exp));
+  return fromCaret.replace(/(\d+)([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, (_full, base: string, sup: string) => {
+    const exp = [...sup].map((ch) => SUPER_DIGIT[ch] ?? ch).join("");
+    return speakPower(base, exp);
+  });
+}
+
 /** Turn math marks into words a recorded clip can match. */
 export function speakable(text: string): string {
-  const fractions = speakFractions(text);
+  const fractions = speakFractions(speakExponents(text));
   if (getLocale() === "es") {
     return fractions
       .replace(/×/g, " por ")

@@ -513,6 +513,13 @@ export const BOSS_ZH: Record<string, BossEs> = {
     "cosmeticName": "山顶斗篷",
     "trophyName": "山顶奖杯"
   },
+  "keystone": {
+    "taunt": "五道六年级的题，每道都是不同的本领。慢慢来，好好想一想。",
+    "friendly": "你一路都想得很仔细。你稳住了拱心石。",
+    "personality": "一位安静的考拉教授，认真对待六年级的每一道题，喜欢仔细的讲解。",
+    "cosmeticName": "拱心石帽",
+    "trophyName": "拱心石奖杯"
+  },
 };
 
 export const TRAIT_ZH: Record<string, string> = {
@@ -1409,9 +1416,13 @@ export const ZH: Record<string, string> = {
   "Cube Builder": "搭方块",
   "Grade 5 boss": "五年级大关",
   "Grade 5 Summit": "五年级山顶",
+  "Grade 6 boss": "六年级大关",
+  "Grade 6 Keystone": "六年级拱心石",
+  "Keystone": "拱心石",
   "Mixed review": "综合复习",
   "Summit": "山顶",
   "Free grade 5 math review. Unlike fractions, decimals, dividing by 2 digits, the coordinate plane, two-rule patterns, and volume. No signup.": "免费的五年级数学复习。异分母分数、小数、除以两位数、坐标平面、两条规律的数列和体积。无需注册。",
+  "Free grade 6 math review. Expressions, exponents, dividing fractions, GCF and LCM, and one-step equations. No signup.": "免费的六年级数学复习。代数式、乘方、分数除法、最大公因数和最小公倍数，还有一步方程。无需注册。",
   "K–5": "幼儿园到五年级",
   "K–6": "幼儿园到六年级",
   "1–5": "一年级到五年级",

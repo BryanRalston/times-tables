@@ -1373,6 +1373,64 @@ export const GRADE_BANDS: Record<string, Record<Grade, GradeBand>> = {
       standards: ["6.EE.B.5", "6.EE.B.7"],
     }),
   },
+  /** The grade 6 boss. Below grade 6 it stays locked, even with Challenge ahead on. */
+  keystone: {
+    PK: band({
+      levels: [],
+      start: "review",
+      offer: "later",
+      locked: true,
+      standards: ["K.CC.A.1"],
+    }),
+    K: band({
+      levels: [],
+      start: "review",
+      offer: "later",
+      locked: true,
+      standards: ["K.CC.A.1"],
+    }),
+    "1": band({
+      levels: [],
+      start: "review",
+      offer: "later",
+      locked: true,
+      standards: ["1.OA.C.6"],
+    }),
+    "2": band({
+      levels: [],
+      start: "review",
+      offer: "later",
+      locked: true,
+      standards: ["2.NBT.B.5"],
+    }),
+    "3": band({
+      levels: [],
+      start: "review",
+      offer: "later",
+      locked: true,
+      standards: ["3.OA.C.7"],
+    }),
+    "4": band({
+      levels: [],
+      start: "review",
+      offer: "later",
+      locked: true,
+      standards: ["4.NBT.B.5"],
+    }),
+    "5": band({
+      levels: [],
+      start: "review",
+      offer: "later",
+      locked: true,
+      standards: ["5.OA.A.1"],
+    }),
+    "6": band({
+      levels: ["review"],
+      start: "review",
+      offer: "play",
+      standards: ["6.EE.A.1", "6.EE.A.2", "6.NS.A.1", "6.NS.B.4", "6.EE.B.5", "6.EE.B.7"],
+    }),
+  },
 };
 
 export function bandFor(gameId: string, grade: Grade): GradeBand | undefined {

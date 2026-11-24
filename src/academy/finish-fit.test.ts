@@ -198,6 +198,11 @@ describe("phone fit for every game", () => {
 
   it("keeps Balance Scale tiles above the sticky footer on a short phone", () => {
     expect(css).toContain(".ac-shell:not(.is-boss) .ac-stage-copy.is-balance .ac-choices { margin-bottom: 12px; }");
+    expect(css).toContain(".ac-shell.is-boss.is-keystone .ac-choices { margin-bottom: 16px; gap: 8px; margin-top: 4px; }");
+    expect(css).toContain(".ac-shell.is-boss.is-keystone .ac-play-meta {");
+    expect(css).toContain("flex-wrap: nowrap;");
+    expect(css).toContain('.ac-shell.is-boss[data-phase="done"] .ac-done > .ac-boss.is-hero');
+    expect(css).toContain("width: 112px;");
   });
 
   it("keeps every tap target at least 44px tall on short screens", () => {

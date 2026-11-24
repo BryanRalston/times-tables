@@ -13,8 +13,32 @@ import type { ChoiceQ, SheetItem } from "./types";
 const LRI = "\u2066";
 const PDI = "\u2069";
 
+const SUPER: Record<string, string> = {
+  "0": "\u2070",
+  "1": "\u00b9",
+  "2": "\u00b2",
+  "3": "\u00b3",
+  "4": "\u2074",
+  "5": "\u2075",
+  "6": "\u2076",
+  "7": "\u2077",
+  "8": "\u2078",
+  "9": "\u2079",
+};
+
+/** Print 7^2 as 7² in titles, hints, and praise. Board expr stays on a caret. */
+export function powerPretty(base: number, exp: number): string {
+  const expText = String(exp).replace(/[0-9]/g, (digit) => SUPER[digit] ?? digit);
+  return `${base}${expText}`;
+}
+
+export function prettyExponents(text: string): string {
+  return text.replace(/(\d+)\^(\d+)/g, (_full, base: string, exp: string) => powerPretty(Number(base), Number(exp)));
+}
+
 export function mathText(text: string): string {
-  return getLocale() === "ar" ? `${LRI}${text}${PDI}` : text;
+  const pretty = prettyExponents(text);
+  return getLocale() === "ar" ? `${LRI}${pretty}${PDI}` : pretty;
 }
 
 /** Short pal line on a grade 6 expressions or exponents card. */
@@ -129,14 +153,16 @@ function matchHint(): string {
 }
 
 function expHint(): string {
-  return t(
-    "An exponent tells how many times to multiply the base by itself. 2^3 means 2 × 2 × 2.",
-    "El exponente dice cuántas veces se multiplica la base por sí misma. 2^3 significa 2 × 2 × 2.",
-    "O expoente diz quantas vezes multiplicar a base por ela mesma. 2^3 significa 2 × 2 × 2.",
-    "L'exposant dit combien de fois multiplier la base par elle-même. 2^3 veut dire 2 × 2 × 2.",
-    "指数告诉你底数要乘自己几次。2^3 就是 2 × 2 × 2。",
-    "घातांक बताता है कि आधार को अपने से कितनी बार गुणा करना है। 2^3 का मतलब 2 × 2 × 2 है।",
-    "الأس يقول كم مرة نضرب الأساس في نفسه. 2^3 يعني 2 × 2 × 2.",
+  return prettyExponents(
+    t(
+      "An exponent tells how many times to multiply the base by itself. 2^3 means 2 × 2 × 2.",
+      "El exponente dice cuántas veces se multiplica la base por sí misma. 2^3 significa 2 × 2 × 2.",
+      "O expoente diz quantas vezes multiplicar a base por ela mesma. 2^3 significa 2 × 2 × 2.",
+      "L'exposant dit combien de fois multiplier la base par elle-même. 2^3 veut dire 2 × 2 × 2.",
+      "指数告诉你底数要乘自己几次。2^3 就是 2 × 2 × 2。",
+      "घातांक बताता है कि आधार को अपने से कितनी बार गुणा करना है। 2^3 का मतलब 2 × 2 × 2 है।",
+      "الأس يقول كم مرة نضرب الأساس في نفسه. 2^3 يعني 2 × 2 × 2.",
+    ),
   );
 }
 
@@ -469,7 +495,7 @@ export function makeExponentsQuestion(rng: Rng): ChoiceQ {
 
 export function exponentsSheet(rng: Rng): SheetItem {
   const form = rollExponentForm(rng);
-  return { prompt: `${form.expr} =`, answer: String(form.value) };
+  return { prompt: `${prettyExponents(form.expr)} =`, answer: String(form.value) };
 }
 
 /** Dividend num/den divided by divisor divNum/divDen, whole-number quotient. */
