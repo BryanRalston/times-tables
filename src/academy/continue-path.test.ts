@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { GAME_CARDS } from "./games/catalog";
 import { tierWindow } from "./grade-map";
 import { setLocale } from "./i18n";
-import { areaOpen, normalizeJourney, subjectSpot } from "./journey";
+import { advanceJourney, areaOpen, normalizeJourney, subjectSpot } from "./journey";
 import { STOPS_PER_AREA, type Child, type Grade } from "./model";
 import { levelStones } from "./stones";
 import { blankChild, withGrade } from "./storage";
@@ -82,6 +82,21 @@ describe("grade guardrail: Continue respects the chosen grade", () => {
     }
     const g3 = normalizeJourney({ areaId: "", stop: 0, bosses: [] }, "3");
     expect(subjectSpot(g3, "math", "3").areaId).toBe("times");
+  });
+
+  it("grade 6 walks from Expressions to Balance Scale on the shared path", () => {
+    const variables = GAME_CARDS.findIndex((row) => row.id === "variables");
+    const balance = GAME_CARDS.findIndex((row) => row.id === "balance");
+    const fresh = normalizeJourney({ areaId: "", stop: 0, bosses: [] }, "6");
+    expect(subjectSpot(fresh, "math", "6").areaId).toBe("variables");
+    expect(areaOpen(fresh, variables, "6")).toBe(true);
+    expect(areaOpen(fresh, balance, "6")).toBe(false);
+    const ready = normalizeJourney({ areaId: "variables", stop: STOPS_PER_AREA - 1, bosses: [] }, "6");
+    const after = advanceJourney(ready, { game: "variables", correct: 5, total: 5, boss: true }, "6");
+    expect(areaOpen(after, balance, "6")).toBe(true);
+    expect(subjectSpot(after, "math", "6").areaId).toBe("balance");
+    const map = renderToStaticMarkup(createElement(MapScreen, { child: newVisitor("6"), subject: "math", onOpenEgg() {} }));
+    expect(map.indexOf("What is missing")).toBeLessThan(map.indexOf("Balance Scale"));
   });
 
   it("does not drop every new visitor into one game", () => {

@@ -1438,6 +1438,39 @@ export const summitCard = sceneCard("Summit", SUMMIT_ROWS, {
   mixed: true,
 });
 
+
+const BALANCE_IDS = ["addsub", "times", "divide", "mix"] as const;
+const BALANCE_ROWS: SkillRow[] = [
+  { key: "balance:addsub", label: "Add and subtract" },
+  { key: "balance:times", label: "Multiply" },
+  { key: "balance:divide", label: "Divide" },
+  { key: "balance:mix", label: "Mix" },
+];
+
+/** Grade 6 one-step equations (6.EE.B). Earlier grades see it as later; see docs/GRADE_MAP.md. */
+export const balanceCard = sceneCard("Balance", BALANCE_ROWS, {
+  id: "balance",
+  title: "Balance Scale",
+  audience: "Grade 6",
+  tint: "iris",
+  mascot: "toast",
+  sheetSlug: "balance-scale",
+  sheetScreen: "sheet-balance",
+  blurb: "Free one-step equation practice for grade 6. Keep the scale level by finding x. No signup.",
+  levels: [
+    { id: "addsub", label: "Add and subtract", num: 1 },
+    { id: "times", label: "Multiply", num: 2 },
+    { id: "divide", label: "Divide", num: 3 },
+    { id: "mix", label: "Mix", num: 4 },
+  ],
+  defaultLevel(grade) {
+    return bandStart("balance", grade, BALANCE_IDS, "addsub");
+  },
+  sheetDefaultLevel: "addsub",
+  isLevel: (value) => isId(BALANCE_IDS, value),
+  pill: (level) => compactPill("Balance", level.num),
+});
+
 /** Home-card order is also the island order. Append a game; do not insert one in front. */
 export const GAME_CARDS = [
   timesCard,
@@ -1464,6 +1497,7 @@ export const GAME_CARDS = [
   minuteCard,
   cubesCard,
   summitCard,
+  balanceCard,
 ] as const;
 
 export type GameId = (typeof GAME_CARDS)[number]["id"];

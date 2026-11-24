@@ -7,6 +7,7 @@ import { decimalExpr, decimalThink, hundredthsText, hundredthsWord, placeParts, 
 import { pairText, timesOf, twoRuleTerms } from "./games/grade5-pairs";
 import { mathText } from "./games/grade5";
 import { cubeCaptions } from "./games/cubes-data";
+import { balanceCaptions } from "./games/balance-data";
 import { TIMES } from "./games/types";
 import { geometryArt } from "./games/geometry";
 import { graphsTeachCaption } from "./games/graph-data";
@@ -856,6 +857,8 @@ function sceneFrames(question: ChoiceQ, board: Board): TeachFrame[] {
       return captions([t("Read the tick under the dot", "Lee la marca debajo del punto"), `${board.num}/${board.den}`]);
     case "cubes":
       return captions(cubeCaptions(board));
+    case "balance":
+      return captions(balanceCaptions(board));
     case "minute":
       return timeFrames({ kind: "time", hours: board.hours, minutes: board.minutes, level: board.mode });
     case "times":

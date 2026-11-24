@@ -17,7 +17,7 @@ import { shareAnswer } from "./games/share-data";
 import { signTruth, trueSignCount } from "./games/signs-data";
 import { TIME_MINUTES, type TimeLevel } from "./games/time";
 import { TIMES_SPEC, type TimesLevel } from "./games/times";
-import { FRACTION_DENOMINATORS, GRADE_BANDS, bandFor, levelAllowed, playWindow } from "./grade-map";
+import { FRACTION_DENOMINATORS, GRADE_BANDS, bandFor, levelAllowed, playWindow, tierWindow } from "./grade-map";
 import { advanceJourney, bossReady, normalizeJourney } from "./journey";
 import { makeBossRound, makeQuestion } from "./games/round";
 import { SUMMIT_SKILLS } from "./games/summit-data";
@@ -33,6 +33,7 @@ import { graphAnswer } from "./games/graph-data";
 import { variableAnswer } from "./games/variables";
 import { BIG_MULTI_MAX, DECIMAL_OPS_MAX, LONG_DIV_RANGE, hundredthsText } from "./games/grade5-ops";
 import { boardVolume } from "./games/cubes-data";
+import { BALANCE_RANGE, equationHolds } from "./games/balance-data";
 import { PLANE_MAX, TWO_RULES_RANGE, pairText, parsePair, planeAnswer, twoRuleTerms, twoRulesAnswer } from "./games/grade5-pairs";
 
 const GRADES: Grade[] = ["PK", "K", "1", "2", "3", "4", "5", "6"];
@@ -592,6 +593,29 @@ function assertScene(grade: Grade, board: Board, question: ChoiceQ): void {
       expect(["5", "6"]).toContain(grade);
       expect(Number(question.answer)).toBe(boardVolume(board));
       for (const n of [board.box.l, board.box.w, board.box.h]) expect(Number.isInteger(n) && n >= 1).toBe(true);
+      break;
+    }
+    case "balance": {
+      // One-step equations (6.EE.B) are grade 6 only. Whole numbers, never a negative.
+      expect(grade).toBe("6");
+      expect(["addsub", "times", "divide", "mix"]).toContain(board.mode);
+      expect(["add", "sub", "times", "divide"]).toContain(board.op);
+      expect(equationHolds(board)).toBe(true);
+      expect(question.answer).toBe(String(board.x));
+      for (const n of [board.x, board.p, board.q]) {
+        expect(Number.isInteger(n) && n >= 1).toBe(true);
+      }
+      if (board.op === "add" || board.op === "sub") {
+        expect(board.q).toBeLessThanOrEqual(BALANCE_RANGE.addsub.firm.qMax + BALANCE_RANGE.addsub.firm.pMax);
+      }
+      if (board.op === "times") expect(board.p * board.x).toBe(board.q);
+      if (board.op === "divide") expect(board.x).toBe(board.p * board.q);
+      if (board.op === "sub") expect(board.x).toBeGreaterThan(board.p);
+      for (const choice of question.choices) {
+        expect(choice).toMatch(/^[1-9]\d*$/);
+        expect(Number(choice)).toBeGreaterThan(0);
+      }
+      expect(`${question.title} ${question.hint} ${question.choices.join(" ")}`).not.toMatch(/−\d|(?<![0-9./x ])-\d/);
       break;
     }
     default: {
@@ -1417,8 +1441,8 @@ describe("grade 5 summit boss (mixed grade 5 review)", () => {
   const summit = GAMES.find((game) => game.id === "summit")!;
   const ids = summit.levels.map((row) => row.id);
 
-  it("is appended last, grade 5 only, and mixes cards from other games", () => {
-    expect(GAMES.at(-1)?.id).toBe("summit");
+  it("is a boss-only grade 5 island, and mixes cards from other games", () => {
+    expect(GAMES.map((row) => row.id).slice(-2)).toEqual(["summit", "balance"]);
     expect(summit.audience).toBe("Grade 5 boss");
     expect(summit.mixed).toBe(true);
     expect(ids).toEqual(["mix"]);
@@ -1591,5 +1615,85 @@ describe("grade 6 slice 1: expressions, fraction division, GCF and LCM", () => {
       else expect(easy).toBe(true);
       expect(hasHandsCard(gameId, levelId)).toBe(false);
     }
+  });
+});
+
+describe("grade 6 slice 2: Balance Scale one-step equations", () => {
+  const LEVELS = ["addsub", "times", "divide", "mix"] as const;
+  const BELOW_SIX: Grade[] = ["PK", "K", "1", "2", "3", "4", "5"];
+
+  it("appends a grade 6 only game and opens add and subtract first", () => {
+    const game = GAMES.find((item) => item.id === "balance")!;
+    expect(GAMES.at(-1)?.id).toBe("balance");
+    expect(game.levels.map((row) => row.id)).toEqual(["addsub", "times", "divide", "mix"]);
+    expect(game.defaultLevel("6")).toBe("addsub");
+    const ids = game.levels.map((row) => row.id);
+    expect(playWindow(ids, "balance", "6", false).start).toBe("addsub");
+    expect(playWindow(ids, "balance", "6", false).ids).toEqual(["addsub", "times", "divide", "mix"]);
+    expect(GRADE_BANDS.balance?.["6"].standards).toEqual(["6.EE.B.5", "6.EE.B.7"]);
+  });
+
+  it("never opens below grade 6 unless challenge ahead is on", () => {
+    const game = GAMES.find((item) => item.id === "balance")!;
+    const ids = game.levels.map((row) => row.id);
+    for (const grade of BELOW_SIX) {
+      expect(playWindow(ids, "balance", grade, false).ids, `grade ${grade}`).toEqual([]);
+      expect(playWindow(ids, "balance", grade, false).offer).toBe("later");
+      expect(levelAllowed(ids, "balance", grade, "addsub", false, "medium"), `grade ${grade}`).toBe(false);
+      expect(playWindow(ids, "balance", grade, true).ids).toContain("addsub");
+    }
+  });
+
+  it("ties the new game to grade 6 standards, and grade 6 only", () => {
+    for (const grade of BELOW_SIX) {
+      for (const row of Object.values(GRADE_BANDS)) {
+        expect(row[grade].standards.some((code) => code.startsWith("6."))).toBe(false);
+      }
+    }
+    expect(GRADE_BANDS.balance?.["6"].standards.every((code) => code.startsWith("6.EE.B"))).toBe(true);
+  });
+
+  it("serves in-range cards with four distinct tiles, no negatives, and x always a whole number", () => {
+    const game = GAMES.find((item) => item.id === "balance")!;
+    const locales: Locale[] = ["en", "es", "pt", "fr", "zh", "hi", "ar"];
+    try {
+      for (const locale of locales) {
+        setLocale(locale);
+        for (const levelId of LEVELS) {
+          for (const prefer of [[], ["ease:gentle"], ["ease:firm"]]) {
+            for (let i = 0; i < (locale === "en" ? 80 : 20); i += 1) {
+              const question = game.makeQuestion(rngFromSeed(`g6s2-${locale}-${levelId}-${prefer.join(",")}-${i}`), levelId, prefer);
+              expect(question.skill).toBe(`balance:${levelId}`);
+              expect(question.game).toBe("balance");
+              expect(question.choices).toHaveLength(4);
+              expect(new Set(question.choices).size).toBe(4);
+              expect(question.choices.filter((choice) => choice === question.answer)).toHaveLength(1);
+              const blob = `${question.title} ${question.hint} ${question.answer} ${question.choices.join(" ")}`;
+              expect(blob).not.toMatch(/(?<![0-9./xnyXNY ])-\d/);
+              expect(blob).not.toMatch(/−\d/);
+              assertQuestion("6", levelId, question);
+            }
+          }
+        }
+      }
+    } finally {
+      setLocale("en");
+    }
+  });
+
+  it("Easy, Medium and Hard change the starting equation type, and questions are not auto-read", () => {
+    expect(autoSpeakGrade("6")).toBe(false);
+    const game = GAMES.find((item) => item.id === "balance")!;
+    const ids = game.levels.map((row) => row.id);
+    expect(tierWindow(ids, "balance", "6", false, "medium").start).toBe("addsub");
+    expect(tierWindow(ids, "balance", "6", false, "easy").ids).toEqual(["addsub"]);
+    expect(tierWindow(ids, "balance", "6", false, "hard").start).toBe("mix");
+    expect(hasHandsCard("balance", "addsub")).toBe(false);
+    expect(hasHandsCard("balance", "mix")).toBe(false);
+    for (const levelId of LEVELS) {
+      expect(levelAllowed(ids, "balance", "6", levelId, false, "medium")).toBe(true);
+      expect(levelAllowed(ids, "balance", "6", levelId, false, "hard")).toBe(true);
+    }
+    expect(levelAllowed(ids, "balance", "6", "mix", false, "easy")).toBe(false);
   });
 });

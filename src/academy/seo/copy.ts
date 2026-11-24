@@ -860,6 +860,29 @@ export const GAME_COPY: readonly GameCopy[] = [
     ),
   },
   {
+    id: "balance",
+    slug: "balance-scale-game",
+    grades: ["6"],
+    name: phrase(
+      "balance scale",
+      "balanza",
+      "balança",
+      "balance",
+      "天平",
+      "तराज़ू",
+      "الميزان",
+    ),
+    blurb: phrase(
+      "Grade 6 kids keep a scale level by solving one-step equations to find x.",
+      "Los niños de grado 6 mantienen la balanza nivelada al resolver ecuaciones de un paso para hallar x.",
+      "As crianças do 6.º ano mantêm a balança nivelada ao resolver equações de um passo para achar x.",
+      "Les élèves de 6e gardent la balance à niveau en résolvant des équations à une étape pour trouver x.",
+      "六年级的孩子用一步等式求 x，让天平保持水平。",
+      "कक्षा 6 के बच्चे एक-चरण समीकरण हल कर x ढूँढते हैं और तराज़ू को संतुलित रखते हैं।",
+      "يبقي تلاميذ الصف السادس الميزان متوازناً بحل معادلات من خطوة واحدة لإيجاد x.",
+    ),
+  },
+  {
     id: "patterns",
     slug: "number-patterns-game",
     grades: ["K", "1", "2", "3", "4", "5", "6"],
@@ -1033,6 +1056,10 @@ cubes:count|counting cubes for volume|contar cubos|contar cubos|compter des cube
 cubes:build|building a box|construir cajas|montar caixas|construire des boîtes|搭长方体|डिब्बा बनाना|بناء صندوق
 cubes:formula|the volume formula|la fórmula del volumen|a fórmula do volume|la formule du volume|体积公式|आयतन का सूत्र|قانون الحجم
 cubes:two|volume of two boxes|volumen de dos cajas|volume de duas caixas|volume de deux boîtes|两个长方体的体积|दो डिब्बों का आयतन|حجم صندوقين
+balance:addsub|plus and minus equations|sumas y restas con x|somas e subtrações com x|additions et soustractions avec x|加减等式|जोड़-घटाव समीकरण|جمع وطرح مع x
+balance:times|times equations|multiplicar para hallar x|multiplicar para achar x|multiplications pour trouver x|乘法等式|गुणा समीकरण|ضرب لإيجاد x
+balance:divide|division equations|dividir para hallar x|dividir para achar x|divisions pour trouver x|除法等式|भाग समीकरण|قسمة لإيجاد x
+balance:mix|mixed equations|ecuaciones mezcladas|equações misturadas|équations mélangées|混合等式|मिश्रित समीकरण|معادلات متنوعة
 `;
 
 function loadSkills(): Record<string, Phrase> {

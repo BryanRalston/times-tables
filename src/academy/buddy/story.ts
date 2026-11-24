@@ -782,6 +782,16 @@ function sceneStory(board: Board, buddy: string, host: string, trait: string, gr
         `${buddy} और ${host} squishee घन जमाते हैं।`,
         `${buddy} و${host} يرصّان مكعبات squishee.`,
       );
+    case "balance":
+      return say(
+        `${buddy} and ${host} keep the scale level.`,
+        `${buddy} y ${host} mantienen la balanza nivelada.`,
+        `${buddy} e ${host} mantêm a balança nivelada.`,
+        `${buddy} et ${host} gardent la balance à niveau.`,
+        `${buddy}和${host}让天平保持水平。`,
+        `${buddy} और ${host} तराज़ू को संतुलित रखते हैं।`,
+        `${buddy} و${host} يبقيان الميزان متوازناً.`,
+      );
     case "minute":
       return say(
         `${buddy} and ${host} read the clock.`,

@@ -345,6 +345,22 @@ export type CubeBoard =
   | { game: "cubes"; mode: "formula"; box: CubeBox; ask: "lwh" | "base" }
   | { game: "cubes"; mode: "two"; box: CubeBox; second: CubeBox };
 
+/** Grade 6 one-step equations (6.EE.B). Whole numbers only; no negatives. */
+export type BalanceOp = "add" | "sub" | "times" | "divide";
+export type BalanceLevel = "addsub" | "times" | "divide" | "mix";
+
+export interface BalanceBoard {
+  game: "balance";
+  mode: BalanceLevel;
+  op: BalanceOp;
+  /** The unknown. Always a positive whole number. */
+  x: number;
+  /** The known change, factor, or divisor. Always a positive whole number. */
+  p: number;
+  /** The known value on the other side. Always a positive whole number. */
+  q: number;
+}
+
 export type Board =
   | TimesBoard
   | AddBoard
@@ -364,7 +380,8 @@ export type Board =
   | JumpsBoard
   | TickBoard
   | MinuteBoard
-  | CubeBoard;
+  | CubeBoard
+  | BalanceBoard;
 
 export function countName(name: string, n: number): string {
   if (n === 1 && name.endsWith("s")) return name.slice(0, -1);

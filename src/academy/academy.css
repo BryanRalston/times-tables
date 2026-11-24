@@ -4478,3 +4478,109 @@ html[lang="ar"] .ac-g6-expr, html[lang="ar"] .ac-g6-when { direction: ltr; }
   .ac-g6-expr { font-size: 1.6rem; }
   .ac-g6-when { font-size: 1rem; }
 }
+
+
+/* Grade 6 slice 2: Balance Scale (6.EE.B). Big equation on the card, plus a
+   compact Imagine scale so the title, tiles, and question count fit a phone. */
+.ac-scale-eq {
+  margin: 2px 0 4px;
+  font-family: Fredoka, Nunito, sans-serif;
+  font-weight: 800;
+  font-size: clamp(32px, 8.6vw, 42px);
+  line-height: 1.1;
+  text-align: center;
+  color: var(--ac-ink);
+  letter-spacing: 0.01em;
+}
+.ac-scale-wrap {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  direction: ltr;
+}
+.ac-scale {
+  position: relative;
+  height: min(200px, 30vh);
+  aspect-ratio: 859 / 622;
+  width: auto;
+  max-width: 100%;
+  margin: 0 auto 2px;
+  overflow: visible;
+}
+.ac-scale-stand {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  height: 70%;
+  width: auto;
+  max-width: 40%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.ac-scale-cap {
+  position: absolute;
+  left: 50%;
+  top: 1.2%;
+  width: 8.6%;
+  height: auto;
+  transform: translateX(-50%);
+  z-index: 3;
+  pointer-events: none;
+}
+.ac-scale-beam {
+  position: absolute;
+  left: 50%;
+  top: 13.5%;
+  width: 76%;
+  transform: translateX(-50%) rotate(var(--tilt, 0deg));
+  transform-origin: 50% 50%;
+  transition: transform 280ms ease;
+  z-index: 2;
+}
+.ac-scale-beam-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+.ac-scale-pan {
+  position: absolute;
+  top: 38%;
+  width: 29%;
+  transform: rotate(calc(-1 * var(--tilt, 0deg)));
+  transform-origin: 50% 6%;
+  transition: transform 280ms ease;
+  z-index: 1;
+}
+.ac-scale-pan.is-left { left: 0; margin-left: -13.5%; }
+.ac-scale-pan.is-right { right: 0; margin-right: -13.5%; }
+.ac-scale-pan-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+.ac-scale-val {
+  position: absolute;
+  left: 50%;
+  top: 76%;
+  transform: translate(-50%, -50%);
+  font: 800 13px var(--ac-display);
+  color: var(--ac-ink);
+  text-shadow: 0 0 4px #fff, 0 0 4px #fff, 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+  white-space: nowrap;
+  pointer-events: none;
+  line-height: 1;
+}
+.ac-scale.is-level .ac-scale-pan-art { filter: drop-shadow(0 0 5px #3cbc8b); }
+@media (max-height: 720px) {
+  .ac-shell:not(.is-boss) .ac-scale { height: min(108px, 16vh); }
+  .ac-shell:not(.is-boss) .ac-scale-eq { font-size: clamp(28px, 8vw, 36px); }
+  .ac-shell:not(.is-boss) .ac-scale-val { font-size: 11px; }
+  /* Keep the bottom row of tiles, including the 6px edge, above the sticky footer. */
+  .ac-shell:not(.is-boss) .ac-stage-copy.is-balance { gap: 4px; }
+  .ac-shell:not(.is-boss) .ac-stage-copy.is-balance .ac-play-buddy .ac-buddy-img,
+  .ac-shell:not(.is-boss) .ac-stage-copy.is-balance .ac-play-buddy .ac-wear,
+  .ac-shell:not(.is-boss) .ac-stage-copy.is-balance .ac-play-buddy .ac-squish { width: 40px; height: 40px; }
+  .ac-shell:not(.is-boss) .ac-stage-copy.is-balance .ac-choices { margin-bottom: 12px; }
+}

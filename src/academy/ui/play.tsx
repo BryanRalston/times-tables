@@ -1172,7 +1172,7 @@ export function PlayScreen({
                 ) : choice ? (
                   <>
                     {spec?.Aside ? <spec.Aside question={choice} /> : null}
-                    <div className={cx("ac-stage-copy", game === "add" && "is-add", (game === "cubes" || view?.id === "cubes") && "is-cubes")}>
+                    <div className={cx("ac-stage-copy", game === "add" && "is-add", (game === "cubes" || view?.id === "cubes") && "is-cubes", game === "balance" && "is-balance")}>
                       <p className="ac-story">{slotStory(slot, child.avatarId, hostId, child.grade)}</p>
                       {choice.visual.kind === "money" ? <CoinShare buddyId={child.avatarId} hostId={hostId} /> : null}
                       {view ? (

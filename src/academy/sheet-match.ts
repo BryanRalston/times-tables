@@ -36,6 +36,7 @@ const GAME_TITLE_ES: Record<string, string> = {
   minute: "Minutos",
   cubes: "Cubos",
   summit: "Cumbre de quinto",
+  balance: "Balanza",
 };
 
 interface NamedSheet {

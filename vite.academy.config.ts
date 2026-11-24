@@ -217,6 +217,7 @@ export default defineConfig({
         sheetMinute: resolve("academy/worksheets/time-to-the-minute/index.html"),
         sheetCubes: resolve("academy/worksheets/volume-with-cubes/index.html"),
         sheetSummit: resolve("academy/worksheets/grade-5-math-review/index.html"),
+        sheetBalance: resolve("academy/worksheets/balance-scale/index.html"),
       },
     },
   },
